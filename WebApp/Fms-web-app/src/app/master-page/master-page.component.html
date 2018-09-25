@@ -1,0 +1,56 @@
+<!-- <p>
+  master-page works!
+</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2">
+      <button class="btn btn-primary" routerLink="./system">System</button> &nbsp; <br>
+      <button class="btn btn-primary" routerLink="./catalogue">Catalogue</button> &nbsp; <br>
+      <button class="btn btn-primary" routerLink="./sales-executive">Sale Executive</button>
+    </div>
+    <div class="col-md-10">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div> -->
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-primary">
+  <a class="navbar-brand">eFMS</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link"routerLink="./system">System</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="./catalogue">Catalogue</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="./sales-executive">Sale Executive</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+<hr>
+<input style="margin-left:30px" placeholder="email" [(ngModel)]="email" type="email" (keyup)="Search($event,['email'],'user','and')"/>
+<input style="margin-left:30px" placeholder="phone number" [(ngModel)]="phone" type="text" (keyup)="Search($event,['phone'],'user','and')"/>
+
+<div *ngFor="let item of users;let index=index;" style="margin-left:30px">
+  <p>{{item.email}}</p>
+  <p>{{item.phone}}</p>
+  <hr>
+</div>
+
+<button class="btn btn-success" (click)="submit()">Submit</button>
+
+
+<router-outlet></router-outlet>
