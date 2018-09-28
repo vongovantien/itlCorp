@@ -1,16 +1,27 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { CatalogueComponent } from './catalogue/catalogue.component';
+import { LocationComponent } from './location/location.component';
+import { PartnerComponent } from './partner/partner.component';
+import { WarehouseComponent } from './warehouse/warehouse.component';
 
 const routes: Routes = [
-  {
-    path:'catalogue',
-    component:CatalogueComponent
-  },
+
   {
     path:'',
-    redirectTo:'catalogue',
+    redirectTo:'partner',
     pathMatch:'full'
+  },
+  {
+    path:'location',
+    component:LocationComponent
+  },
+  {
+    path:'partner',
+    component:PartnerComponent
+  },
+  {
+    path:'ware-house',
+    component:WarehouseComponent
   }
 ];
 
