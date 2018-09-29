@@ -1,0 +1,4 @@
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagement.DL\obj\Release\netcoreapp2.1\SystemManagement.DL.csprojAssemblyReference.cache
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagement.DL\obj\Release\netcoreapp2.1\SystemManagement.DL.csproj.CoreCompileInputs.cache
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagement.DL\obj\Release\netcoreapp2.1\SystemManagement.DL.AssemblyInfoInputs.cache
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagement.DL\obj\Release\netcoreapp2.1\SystemManagement.DL.AssemblyInfo.cs

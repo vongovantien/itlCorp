@@ -1,0 +1,12 @@
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\bin\netcoreapp2.1\eFMS.API.System.Service.deps.json
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\bin\netcoreapp2.1\eFMS.API.System.Service.runtimeconfig.json
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\bin\netcoreapp2.1\eFMS.API.System.Service.runtimeconfig.dev.json
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\bin\netcoreapp2.1\eFMS.API.System.Service.dll
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\bin\netcoreapp2.1\eFMS.API.System.Service.pdb
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\eFMS.API.System.DAL\obj\Debug\netcoreapp2.1\eFMS.API.System.Service.csprojAssemblyReference.cache
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\eFMS.API.System.DAL\obj\Debug\netcoreapp2.1\eFMS.API.System.Service.csproj.CoreCompileInputs.cache
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\eFMS.API.System.DAL\obj\Debug\netcoreapp2.1\eFMS.API.System.Service.AssemblyInfoInputs.cache
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\eFMS.API.System.DAL\obj\Debug\netcoreapp2.1\eFMS.API.System.Service.AssemblyInfo.cs
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\eFMS.API.System.DAL\obj\Debug\netcoreapp2.1\eFMS.API.System.Service.csproj.CopyComplete
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\eFMS.API.System.DAL\obj\Debug\netcoreapp2.1\eFMS.API.System.Service.dll
+D:\TMSSolution\WebAppPro\eFMSProj\src\WebAPI\SystemManagement\eFMS.API.System.DAL\obj\Debug\netcoreapp2.1\eFMS.API.System.Service.pdb

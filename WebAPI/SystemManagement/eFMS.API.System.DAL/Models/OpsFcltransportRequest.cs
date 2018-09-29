@@ -1,0 +1,114 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace SystemManagementAPI.Service.Models
+{
+    public partial class OpsFcltransportRequest
+    {
+        public Guid Id { get; set; }
+        public Guid? ResponsibleWorkplaceId { get; set; }
+        public Guid? DestinationWorkPlaceId { get; set; }
+        public Guid MasterTransportRequestId { get; set; }
+        public Guid RouteId { get; set; }
+        public string Code { get; set; }
+        public int? VehicleId { get; set; }
+        public string SupplierId { get; set; }
+        public int? DriverId { get; set; }
+        public string DriverRole { get; set; }
+        public int? RemoocId { get; set; }
+        public int? PoStart { get; set; }
+        public int? PoReceipt { get; set; }
+        public DateTime? ReceiptDate { get; set; }
+        public int? PoTransfer { get; set; }
+        public DateTime? TransferDate { get; set; }
+        public int? PoDelivery { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+        public int? PoEnd { get; set; }
+        public decimal? WorkingDay { get; set; }
+        public string ContNumber { get; set; }
+        public string SealNumber { get; set; }
+        public DateTime? RequestedForDate { get; set; }
+        public string Remark { get; set; }
+        public short? Status { get; set; }
+        public string ContactName { get; set; }
+        public string ContactPhone { get; set; }
+        public bool? IsContAssociation { get; set; }
+        public string ContAssociationCode { get; set; }
+        public bool? IsAssociationQuotation { get; set; }
+        public string QuotationAssociationCode { get; set; }
+        public bool? SentSms { get; set; }
+        public bool? CustomerDenied { get; set; }
+        public byte[] BarCode { get; set; }
+        public string Opsapproved { get; set; }
+        public string OpsapprovedStatus { get; set; }
+        public DateTime? OpsapprovedDate { get; set; }
+        public string Csapproved { get; set; }
+        public string CsapprovedStatus { get; set; }
+        public DateTime? CsapprovedDate { get; set; }
+        public decimal? Mnrcost { get; set; }
+        public decimal? FuelCost { get; set; }
+        public decimal? TotalCharge { get; set; }
+        public decimal? FixedCost { get; set; }
+        public decimal? OverheadCost { get; set; }
+        public decimal? Gpslength { get; set; }
+        public decimal? TotalLenght { get; set; }
+        public decimal? TotalEmptyContLength { get; set; }
+        public decimal TotalWeight { get; set; }
+        public decimal? TotalWeightReal { get; set; }
+        public decimal? TotalFuelLiter { get; set; }
+        public string RefNo { get; set; }
+        public string TripSettlementCode { get; set; }
+        public bool? CheckPayment { get; set; }
+        public bool? IsAccident { get; set; }
+        public decimal? EstimatedLiterFuel { get; set; }
+        public decimal? FuelConsumption { get; set; }
+        public string BillingCompanyId { get; set; }
+        public bool? CheckedFuel { get; set; }
+        public string UserCheckedFuel { get; set; }
+        public DateTime? DatetimeCheckedFuel { get; set; }
+        public string ConfirmedOpsman { get; set; }
+        public DateTime? DateOpsmanConfirmed { get; set; }
+        public string ConfirmationStatus { get; set; }
+        public bool? PrintedVehicleRequest { get; set; }
+        public DateTime? PrintedDate { get; set; }
+        public string PrintedUser { get; set; }
+        public string CancelReason { get; set; }
+        public string ApprovedCancelBy { get; set; }
+        public string ApprovedCancelStatus { get; set; }
+        public DateTime? DateApprovedCancel { get; set; }
+        public string ApprovedCancelNote { get; set; }
+        public string ArisedRequestNote { get; set; }
+        public bool? LockedCharge { get; set; }
+        public bool? LockedFuel { get; set; }
+        public bool? ChangedLength { get; set; }
+        public string RouteType { get; set; }
+        public string ChangedRouteTypeNote { get; set; }
+        public decimal? TotalProfit { get; set; }
+        public bool? IsHire { get; set; }
+        public string AllowancePaidUser { get; set; }
+        public DateTime? AllowancePaidDatetime { get; set; }
+        public Guid? QuotationShortTripId { get; set; }
+        public string Gsanote { get; set; }
+        public decimal? Rating { get; set; }
+        public byte[] CustomerSignature { get; set; }
+        public DateTime? FinishedTime { get; set; }
+        public int? StartKm { get; set; }
+        public int? EndKm { get; set; }
+        public Guid? FclbuyingId { get; set; }
+        public Guid? TripBuyingRouteId { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
+        public bool? Inactive { get; set; }
+        public DateTime? InactiveOn { get; set; }
+        public string LonghualShipmentCode { get; set; }
+        public decimal? IndicatedCodvalue { get; set; }
+        public decimal? Codvalue { get; set; }
+        public bool? LockedInfo { get; set; }
+        public DateTime? PodhanoverRequestDate { get; set; }
+        public DateTime? PodreturnedDate { get; set; }
+
+        public OpsFclmasterTransportRequest MasterTransportRequest { get; set; }
+    }
+}

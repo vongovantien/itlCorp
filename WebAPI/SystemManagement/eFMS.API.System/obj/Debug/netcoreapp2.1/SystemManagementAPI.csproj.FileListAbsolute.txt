@@ -1,0 +1,15 @@
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\bin\netcoreapp2.1\SystemManagementAPI.deps.json
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\bin\netcoreapp2.1\SystemManagementAPI.runtimeconfig.json
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\bin\netcoreapp2.1\SystemManagementAPI.runtimeconfig.dev.json
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\bin\netcoreapp2.1\SystemManagementAPI.dll
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\bin\netcoreapp2.1\SystemManagementAPI.pdb
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.csproj.CoreCompileInputs.cache
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.RazorAssemblyInfo.cache
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.RazorAssemblyInfo.cs
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.AssemblyInfoInputs.cache
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.AssemblyInfo.cs
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.RazorTargetAssemblyInfo.cache
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.csproj.CopyComplete
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.dll
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.pdb
+D:\TMSSolution\WebAppPro\eTMSProj\WebAPI\SystemManagementAPI\SystemManagementAPI\obj\Debug\netcoreapp2.1\SystemManagementAPI.csprojAssemblyReference.cache
