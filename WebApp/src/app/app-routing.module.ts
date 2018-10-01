@@ -30,10 +30,30 @@ const routes: Routes = [
             {
                 path: 'catalogue',
                 loadChildren: './business-modules/catalogue/catalogue.module#CatalogueModule'
+            },        
+            {
+                path:'accounting',
+                loadChildren:'./business-modules/accounting/accounting.module#AccountingModule'
             },
             {
-                path: 'sales-executive',
-                loadChildren: './business-modules/sales-executive/sales-executive.module#SalesExecutiveModule'
+                path:'documentation',
+                loadChildren:'./business-modules/documentation/documentation.module#DocumentationModule'
+            },
+            {
+                path:'operation',
+                loadChildren:'./business-modules/operation/operation.module#OperationModule'
+            },
+            {
+                path:'report',
+                loadChildren:'./business-modules/report/report.module#ReportModule'
+            },
+            {
+                path:'support',
+                loadChildren:'./business-modules/support/support.module#SupportModule'
+            },
+            {
+                path:'tool',
+                loadChildren:'./business-modules/tool-setting/tool.module#ToolModule'
             }
         ]
 
