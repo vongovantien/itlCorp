@@ -40,13 +40,13 @@ namespace API.Mobile.Repository
 
         private List<Job> Search(JobCriteria criteria)
         {
-            jobs = jobs.Where(x => ((x.Id ?? "").Contains(criteria.Id ?? ""))
-                                       && ((x.CustomerName ?? "").Contains(criteria.CustomerName ?? ""))
-                                       && ((x.PO_NO ?? "").Contains(criteria.PO_NO ?? ""))
+            jobs = jobs.Where(x => ((x.Id ?? "").Contains(criteria.SearchText ?? ""))
+                                       && ((x.CustomerName ?? "").Contains(criteria.SearchText ?? ""))
+                                       && ((x.PO_NO ?? "").Contains(criteria.SearchText ?? ""))
                                        && (x.AssignTime >= criteria.FromDate || criteria.FromDate == null)
                                        && (x.AssignTime <= criteria.ToDate || criteria.ToDate == null)
-                                       && (x.UserId == criteria.UserId || string.IsNullOrEmpty(criteria.UserId))
-                                       && ((x.MBL ?? "").Contains(criteria.MBL ?? ""))
+                                       && ((x.UserId ?? "").Contains(criteria.SearchText ?? ""))
+                                       && ((x.MBL ?? "").Contains(criteria.SearchText ?? ""))
             ).ToList();
             var results = jobs;
             switch (criteria.SearchStatus)

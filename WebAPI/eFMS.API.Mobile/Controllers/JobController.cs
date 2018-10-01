@@ -2,23 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Mobile.Infrastructure.Middlewares;
 using API.Mobile.Models;
 using API.Mobile.Repository;
+using API.Mobile.Resources;
 using API.Mobile.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace API.Mobile.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [MiddlewareFilter(typeof(LocalizationMiddleware))]
+    [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class JobController : ControllerBase
     {
         private readonly IJobRepository jobRepository;
-        public JobController(IJobRepository job)
+        private readonly IStringLocalizer stringLocalizer;
+        public JobController(IJobRepository job, IStringLocalizer<LanguageSub> localizer)
         {
             jobRepository = job;
+            stringLocalizer = localizer;
         }
 
         [HttpPost]

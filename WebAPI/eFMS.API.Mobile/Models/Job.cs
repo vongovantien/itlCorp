@@ -35,13 +35,14 @@ namespace API.Mobile.Models
 
     public class JobCriteria
     {
-        public string Id { get; set; }
-        public string MBL { get; set; }
-        public string CustomerName { get; set; }
-        public string PO_NO { get; set; }
+        //public string Id { get; set; }
+        //public string MBL { get; set; }
+        //public string CustomerName { get; set; }
+        //public string PO_NO { get; set; }
+        //public string UserId { get; set; }
+        public string SearchText { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public JobStatusSearch SearchStatus { get; set; } = JobStatusSearch.All;
-        public string UserId { get; set; }
     }
 }
