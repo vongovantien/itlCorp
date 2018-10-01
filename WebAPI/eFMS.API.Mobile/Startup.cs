@@ -105,9 +105,9 @@ namespace API.Mobile
                             description.GroupName,
                             new Info()
                             {
-                                Title = $"Catalogue Management API {description.ApiVersion}",
+                                Title = $"eFMS Mobile API {description.ApiVersion}",
                                 Version = description.ApiVersion.ToString(),
-                                Description = "Catalogue Management API Document"
+                                Description = "eFMS Mobile API Document"
                             });
                     }
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
