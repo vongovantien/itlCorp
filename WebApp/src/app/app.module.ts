@@ -27,7 +27,7 @@ import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
     HeaderComponent,
     FooterComponent,
     PageSidebarComponent,
-    SubheaderComponent,
+    SubheaderComponent
   ],
   imports: [    
     BrowserModule,
