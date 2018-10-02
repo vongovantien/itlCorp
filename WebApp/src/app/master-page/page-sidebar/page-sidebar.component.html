@@ -24,8 +24,8 @@
             </li>
         </ul>
         <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
-            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" m-menu-submenu-toggle="hover" *ngFor="let item of Menu;let index = index;" #parrent>
-                <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(index,parrent)">
+            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" m-menu-submenu-toggle="hover" *ngFor="let item of Menu;let i = index;" #parrent [id]="i">
+                <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(i,parrent)">
                     <i [class]="'m-menu__link-icon '+item.icon"></i>
                     <span class="m-menu__link-text">
                         {{item.parent_name}}
@@ -35,8 +35,8 @@
                 <div class="m-menu__submenu" *ngIf="item.display_child">
                     <span class="m-menu__arrow"></span>
                     <ul class="m-menu__subnav">
-                        <li class="m-menu__item m-menu__item" aria-haspopup="true" *ngFor="let sub_item of item.childs;let index = index;">
-                            <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link " (click)="sub_menu_click(sub_item.name)">
+                        <li class="m-menu__item m-menu__item" aria-haspopup="true" *ngFor="let sub_item of item.childs;let k = index;" [id]="i+'-'+k">
+                            <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link " (click)="sub_menu_click(sub_item.name,i,k)">
                                 <i class="m-menu__link-bullet m-menu__link-bullet--dot">
                                     <span></span>
                                 </i>

@@ -1,6 +1,7 @@
 import { Component, OnInit,ViewChild,AfterViewInit } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import {PageSidebarComponent} from './page-sidebar/page-sidebar.component';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -16,33 +17,19 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
 
 
   ngAfterViewInit(): void {
-   this.Page_Info = this.Page_side_bar.Page_Info;
-   console.log(this.Page_Info);
+  // this.Page_Info = this.Page_side_bar.Page_Info;
   }
 
   constructor(private baseService: BaseService) { }
 
-  async ngOnInit() {
-    var url = "https://api.github.com/repositories/19438/issues"
-    var url_club = "https://gola-server.herokuapp.com/api/club/create";
-    var issues = await this.baseService.getAsync(url, null, true);
-
-    this.baseService.get(url).subscribe(data=>{
-      console.log(data);
-    })
-
-    
-    console.log(issues);
-    console.log("hi");
-
+   ngOnInit() {
+   
   }
 
 
   MenuChanged(event){
-    this.Page_Info = event;
-    console.log(this.Page_Info);
-    this.Component_name = event.children;
-    console.log(this.Component_name);
+    this.Page_Info = event;   
+    this.Component_name = event.children; 
   }
 
 

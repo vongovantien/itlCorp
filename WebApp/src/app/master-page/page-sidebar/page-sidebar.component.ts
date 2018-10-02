@@ -1,22 +1,50 @@
-import { Component, OnInit,Output,EventEmitter } from '@angular/core';
+import { Component, OnInit,Output,EventEmitter, AfterViewInit } from '@angular/core';
 import * as $ from 'jquery';
 import * as lodash from 'lodash';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-page-sidebar',
   templateUrl: './page-sidebar.component.html',
   // styleUrls: ['./page-sidebar.component.css']
 })
-export class PageSidebarComponent implements OnInit {
+export class PageSidebarComponent implements OnInit,AfterViewInit {
+
+
 
 
   index_parrent_menu=0;
   index_sub_menu=0;
+  previous_menu_id=null;
+  previous_menu_index=null;
+  previous_parent :HTMLElement = null;
+  previous_children :HTMLElement = null;
+  //action_component="";
   @Output() Page_Information = new EventEmitter<any>();
   Page_Info={
-    parent:"Master",
+    parent:"",
     children:""
   }
 
+
+  ngAfterViewInit(): void {
+
+  }
+  
+  
+  ngOnInit() {
+    var router = this.router.url.split('/');
+    var current_child_route = router[router.length-1];
+    console.log(current_child_route);
+    for(var i=0;i<this.Menu.length-1;i++){
+      for(var j=0;j<this.Menu[i].childs.length-1;j++){
+        if(this.Menu[i].childs[j].route_child==current_child_route){
+          this.Page_Info.parent = this.Menu[i].parent_name;
+          this.Page_Info.children = this.Menu[i].childs[j].name;
+          this.Page_Information.emit(this.Page_Info);
+        }
+      }
+    }
+  }
   /**
    * MENU COMPONENTS DEFINITION
    */
@@ -129,12 +157,22 @@ export class PageSidebarComponent implements OnInit {
    ]
   
 
-  constructor() { }
+  constructor(private router:Router) { }
 
-  ngOnInit() {
-  }
 
   open_sub_menu(index,parent){  
+    if(this.previous_menu_index!=null){
+      this.Menu[this.previous_menu_index].display_child = false;
+      var previous_menu = document.getElementById(this.previous_menu_index.toString());    
+      console.log(previous_menu);     
+      if(index!=this.previous_menu_index){
+        previous_menu.classList.remove('m-menu__item--open');  
+      }
+      
+    }
+    this.previous_menu_index = index;
+   
+
     this.index_parrent_menu=index;
     var parrent = $(parent);
     if(parrent.hasClass('m-menu__item--open')){
@@ -146,7 +184,24 @@ export class PageSidebarComponent implements OnInit {
     // this.Page_Info.parent= this.Menu[index].parent_name;    
   }
 
-  sub_menu_click(sub_menu_name){    
+  sub_menu_click(sub_menu_name,parrent_index,children_index){
+    
+    var current_parent = document.getElementById(parrent_index.toString());
+    var current_children = document.getElementById(parrent_index.toString()+'-'+children_index.toString());
+
+    if(this.previous_children!=null){
+        this.previous_children.classList.remove('m-menu__item--active');
+        this.previous_parent.classList.remove('m-menu__item--open');
+    }
+
+    this.previous_children = current_children;
+    this.previous_parent = current_parent;
+
+
+    current_parent.classList.add('m-menu__item--open');
+    current_children.classList.add('m-menu__item--active');
+
+
     for(var i=0;i<this.Menu.length;i++){
       for(var j=0;j<this.Menu[i].childs.length;j++){
         if(this.Menu[i].childs[j].name==sub_menu_name){
