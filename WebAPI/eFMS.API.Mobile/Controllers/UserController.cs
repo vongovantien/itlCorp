@@ -51,8 +51,8 @@ namespace API.Mobile.Controllers
                     signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SigningKey"])),
                             SecurityAlgorithms.HmacSha256)
                 );
-                user.Password = null;
-                return Ok(new { user, token = new JwtSecurityTokenHandler().WriteToken(token) });
+                var u = new { user.StaffId, user.Role, user.UserId, user.Email };
+                return Ok(new { u, token = new JwtSecurityTokenHandler().WriteToken(token) });
             }
             else
             {
