@@ -17,6 +17,7 @@ import { BaseService } from 'src/services-base/base.service';
 import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
+import { BreadcrumbComponent } from './master-page/breadcrumb/breadcrumb.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
     HeaderComponent,
     FooterComponent,
     PageSidebarComponent,
-    SubheaderComponent
+    SubheaderComponent,
+    BreadcrumbComponent
   ],
   imports: [    
     BrowserModule,
