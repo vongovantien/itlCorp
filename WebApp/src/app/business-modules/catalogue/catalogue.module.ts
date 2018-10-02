@@ -11,19 +11,23 @@ import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
 
+
+
 @NgModule({
   imports: [
     CommonModule,
     CatalogueRoutingModule
   ],
-  declarations: 
-  [ LocationComponent, 
-    WarehouseComponent, 
-    PortIndexComponent, 
-    CommodityComponent, 
-    ChargeComponent, 
-    UnitComponent, 
-    StageManagementComponent,
-    PartnerComponent],
+  declarations:
+    [LocationComponent,
+      WarehouseComponent,
+      PortIndexComponent,
+      CommodityComponent,
+      ChargeComponent,
+      UnitComponent,
+      StageManagementComponent,
+      PartnerComponent,
+      
+      ],
 })
 export class CatalogueModule { }

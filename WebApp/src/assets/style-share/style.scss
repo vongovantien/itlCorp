@@ -59,13 +59,6 @@
 
 @import "footer/default";
 
-app-root,
-app-master-page {
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: row;
-    transition: width .2s ease;
-}
 .m-body {
     width: 100%;
 }
