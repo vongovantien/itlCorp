@@ -19,7 +19,8 @@ namespace API.Mobile.Models
         public string PlaceFrom { get; set; }
         public string PlaceTo { get; set; }
         public string Warehouse { get; set; }
-        public string Cont { get; set; }
+        public string ContFCL { get; set; }
+        public string ContLCL { get; set; }
         public decimal GW { get; set; }
         public int CBM { get; set; }
         public int Weight { get; set; }

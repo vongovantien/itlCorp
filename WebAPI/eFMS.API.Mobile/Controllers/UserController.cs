@@ -29,16 +29,17 @@ namespace API.Mobile.Controllers
             configuration = config;
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return BadRequest();
             if (model.StaffId == user.StaffId && model.Password == user.Password)
             {
                 var claims = new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.StaffId),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("UserId", user.UserId),
+                    new Claim("Role", user.Role)
                 };
 
                 var token = new JwtSecurityToken
@@ -46,17 +47,16 @@ namespace API.Mobile.Controllers
                     issuer: configuration["Issuer"],
                     audience: configuration["Audience"],
                     claims: claims,
-                    expires: DateTime.UtcNow.AddDays(60),
-                    notBefore: DateTime.UtcNow,
+                    expires: DateTime.Now.AddDays(30),
                     signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SigningKey"])),
                             SecurityAlgorithms.HmacSha256)
                 );
-
-                return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+                user.Password = null;
+                return Ok(new { user, token = new JwtSecurityTokenHandler().WriteToken(token) });
             }
             else
             {
-                return Unauthorized();
+                return BadRequest("Not Found");
             }
         }
     }

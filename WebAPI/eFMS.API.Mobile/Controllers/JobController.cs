@@ -32,7 +32,8 @@ namespace API.Mobile.Controllers
         [HttpPost]
         public JobViewModel Get(JobCriteria criteria, int? offset, int limit = 15)
         {
-            return jobRepository.Get(criteria, offset, limit);
+            var userId = User.FindFirst("UserId")?.Value;
+            return jobRepository.Get(criteria, userId, offset, limit);
         }
     }
 }

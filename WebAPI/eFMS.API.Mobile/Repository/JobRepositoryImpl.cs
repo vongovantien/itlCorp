@@ -13,9 +13,9 @@ namespace API.Mobile.Repository
         private List<Job> jobs = FakeData.jobs;
         private List<Stage> stages = FakeData.stages;
 
-        public JobViewModel Get(JobCriteria criteria, int? offset, int limit = 15)
+        public JobViewModel Get(JobCriteria criteria, string userId, int? offset, int limit = 15)
         {
-            var data = Search(criteria);
+            var data = Search(criteria, userId);
             var totalItems = data.Count;
             var numberJobFinishs = data.Count(x => x.CurrentStageStatus == StatusEnum.JobStatus.Finish);
             if (offset != null)
@@ -35,10 +35,10 @@ namespace API.Mobile.Repository
 
         public List<Job> GetBy(JobCriteria criteria)
         {
-            return Search(criteria);
+            return Search(criteria, null);
         }
 
-        private List<Job> Search(JobCriteria criteria)
+        private List<Job> Search(JobCriteria criteria, string userId)
         {
             jobs = jobs.Where(x => ((x.Id ?? "").Contains(criteria.SearchText ?? ""))
                                        && ((x.CustomerName ?? "").Contains(criteria.SearchText ?? ""))
@@ -47,6 +47,7 @@ namespace API.Mobile.Repository
                                        && (x.AssignTime <= criteria.ToDate || criteria.ToDate == null)
                                        && ((x.UserId ?? "").Contains(criteria.SearchText ?? ""))
                                        && ((x.MBL ?? "").Contains(criteria.SearchText ?? ""))
+                                       && (x.UserId == userId || string.IsNullOrEmpty(userId))
             ).ToList();
             var results = jobs;
             switch (criteria.SearchStatus)

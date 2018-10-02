@@ -9,7 +9,7 @@ namespace API.Mobile.Repository
 {
     public interface IJobRepository
     {
-        JobViewModel Get(JobCriteria criteria, int? offset, int limit = 15);
+        JobViewModel Get(JobCriteria criteria, string userId, int? offset, int limit = 15);
         List<Job> GetBy(JobCriteria criteria);
     }
 }
