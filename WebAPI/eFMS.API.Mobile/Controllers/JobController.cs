@@ -7,6 +7,7 @@ using API.Mobile.Models;
 using API.Mobile.Repository;
 using API.Mobile.Resources;
 using API.Mobile.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -17,6 +18,7 @@ namespace API.Mobile.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
+    [Authorize]
     public class JobController : ControllerBase
     {
         private readonly IJobRepository jobRepository;

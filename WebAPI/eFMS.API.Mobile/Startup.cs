@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using API.Mobile.Infrastructure;
 using API.Mobile.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -18,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace API.Mobile
@@ -44,7 +48,7 @@ namespace API.Mobile
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
+            services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services);
             services.AddCors(options =>
@@ -59,6 +63,7 @@ namespace API.Mobile
                             .AllowAnyMethod();
                     });
             });
+            //services.AddCustomAuthentication(Configuration);
             services.AddApiVersioning(config =>
             {
                 config.ReportApiVersions = true;
@@ -66,6 +71,21 @@ namespace API.Mobile
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(jwtBearerOptions =>
+                {
+                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateActor = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Issuer"],
+                        ValidAudience = Configuration["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SigningKey"]))
+                    };
+                });
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
@@ -111,6 +131,14 @@ namespace API.Mobile
                             });
                     }
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
+                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    {
+                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
+                        AuthorizationUrl = "https://localhost:44368/connect/authorize",
+                        Scopes = new Dictionary<string, string> { { "api.mobile", "Demo API - full access" } }
+                    });
+
+                    options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
         }
 
@@ -136,10 +164,13 @@ namespace API.Mobile
                             $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json",
                             description.GroupName.ToUpperInvariant());
                     }
+                    options.OAuthClientId("ro.client");
+                    options.OAuthAppName("Demo API - Swagger"); // presentation purposes only
                 });
             app.UseCors("AllowAllOrigins");
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
         }
     }

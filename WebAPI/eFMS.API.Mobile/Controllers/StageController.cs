@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using API.Mobile.Infrastructure;
+﻿using API.Mobile.Infrastructure;
 using API.Mobile.Infrastructure.Middlewares;
-using API.Mobile.Models;
 using API.Mobile.Repository;
 using API.Mobile.Resources;
 using API.Mobile.ViewModel;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
-using static API.Mobile.Common.StatusEnum;
 
 namespace API.Mobile.Controllers
 {
@@ -20,6 +14,7 @@ namespace API.Mobile.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
+    [Authorize]
     public class StageController : ControllerBase
     {
         private readonly IStageRepository stateRepository;

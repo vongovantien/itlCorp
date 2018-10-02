@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using API.Mobile.Common;
 using API.Mobile.Infrastructure.Middlewares;
 using API.Mobile.Models;
+using API.Mobile.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API.Mobile.Controllers
 {
@@ -17,17 +23,40 @@ namespace API.Mobile.Controllers
     public class UserController : ControllerBase
     {
         private User user = FakeData.user;
+        private readonly IConfiguration configuration;
+        public UserController(IConfiguration config)
+        {
+            configuration = config;
+        }
 
         [HttpGet]
-        public IActionResult Login(string staffId, string password)
+        public IActionResult Login(LoginViewModel model)
         {
-            if(staffId == user.StaffId && password == user.Password)
+            if (!ModelState.IsValid) return BadRequest();
+            if (model.StaffId == user.StaffId && model.Password == user.Password)
             {
-                return Ok(user);
+                var claims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.StaffId),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                };
+
+                var token = new JwtSecurityToken
+                (
+                    issuer: configuration["Issuer"],
+                    audience: configuration["Audience"],
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddDays(60),
+                    notBefore: DateTime.UtcNow,
+                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SigningKey"])),
+                            SecurityAlgorithms.HmacSha256)
+                );
+
+                return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
             }
             else
             {
-                return BadRequest("Not Found");
+                return Unauthorized();
             }
         }
     }
