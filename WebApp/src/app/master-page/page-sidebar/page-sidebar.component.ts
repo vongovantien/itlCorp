@@ -20,6 +20,7 @@ export class PageSidebarComponent implements OnInit,AfterViewInit {
   previous_children :HTMLElement = null;
   //action_component="";
   @Output() Page_Information = new EventEmitter<any>();
+  Page_Component = "";
   Page_Info={
     parent:"",
     children:""
@@ -41,10 +42,13 @@ export class PageSidebarComponent implements OnInit,AfterViewInit {
           this.Page_Info.parent = this.Menu[i].parent_name;
           this.Page_Info.children = this.Menu[i].childs[j].name;
           this.Page_Information.emit(this.Page_Info);
+         // this.Page_Component = this.Menu[i].childs[j].name;
         }
       }
     }
   }
+
+
   /**
    * MENU COMPONENTS DEFINITION
    */

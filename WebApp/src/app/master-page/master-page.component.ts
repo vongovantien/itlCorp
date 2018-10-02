@@ -17,13 +17,16 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
 
 
   ngAfterViewInit(): void {
-  // this.Page_Info = this.Page_side_bar.Page_Info;
+   this.Page_Info = this.Page_side_bar.Page_Info;
+  // console.log(this.Page_Info);
   }
 
-  constructor(private baseService: BaseService) { }
+  constructor(private baseService: BaseService,private router: Router) { }
 
    ngOnInit() {
-   
+
+    console.log(this.router.url);
+
   }
 
 
