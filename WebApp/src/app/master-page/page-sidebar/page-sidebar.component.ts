@@ -1,11 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit,Output,EventEmitter } from '@angular/core';
+import * as $ from 'jquery';
+import * as lodash from 'lodash';
 @Component({
   selector: 'app-page-sidebar',
   templateUrl: './page-sidebar.component.html',
   // styleUrls: ['./page-sidebar.component.css']
 })
 export class PageSidebarComponent implements OnInit {
+
+
+  index_parrent_menu=0;
+  index_sub_menu=0;
+  @Output() Page_Information = new EventEmitter<any>();
+  Page_Info={
+    parent:"Master",
+    children:""
+  }
 
   /**
    * MENU COMPONENTS DEFINITION
@@ -18,7 +28,7 @@ export class PageSidebarComponent implements OnInit {
       parent_name:"Catalogue",
       icon:"icon-books",
       route_parent:"/home/catalogue/",
-      display_child:true,
+      display_child:false,
       childs:[
        
         {name:"Warehouse",route_child:"ware-house"},
@@ -122,6 +132,32 @@ export class PageSidebarComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+  }
+
+  open_sub_menu(index,parent){  
+    this.index_parrent_menu=index;
+    var parrent = $(parent);
+    if(parrent.hasClass('m-menu__item--open')){
+      parrent.removeClass('m-menu__item--open');
+    }else{
+      parrent.addClass('m-menu__item--open')
+    }
+     this.Menu[index].display_child = !this.Menu[index].display_child;
+    // this.Page_Info.parent= this.Menu[index].parent_name;    
+  }
+
+  sub_menu_click(sub_menu_name){    
+    for(var i=0;i<this.Menu.length;i++){
+      for(var j=0;j<this.Menu[i].childs.length;j++){
+        if(this.Menu[i].childs[j].name==sub_menu_name){
+          this.Page_Info.parent = this.Menu[i].parent_name;
+          this.Page_Info.children = this.Menu[i].childs[j].name;
+          this.Page_Information.emit(this.Page_Info);
+          console.log(this.Page_Info)
+          break;
+        }
+      }
+    }
   }
 
 }
