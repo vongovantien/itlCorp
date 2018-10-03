@@ -1,9 +1,11 @@
-﻿using System;
+﻿using eFMS.API.System.Service.Models;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.System.DL.Models
 {
-    public partial class SysUserGroup
+    public class SysUserGroupModel
     {
         public short Id { get; set; }
         public string Code { get; set; }

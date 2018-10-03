@@ -1,9 +1,15 @@
 ﻿using AutoMapper;
+using eFMS.API.System.Infrastructure;
+using eFMS.API.System.Infrastructure.Filters;
+using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.API.System.Service.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -17,11 +23,8 @@ using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
-using SystemManagementAPI.API.Infrastructure;
-using SystemManagementAPI.API.Infrastructure.Filters;
-using SystemManagementAPI.API.Infrastructure.Middlewares;
-using SystemManagementAPI.Service.Models;
 
 namespace SystemManagementAPI
 {
@@ -46,11 +49,82 @@ namespace SystemManagementAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCustomMvc()
-                 .AddCustomDbContext(Configuration)
-                 .AddCustomSwagger(Configuration)
-                 .AddCustomIntegrations(Configuration)
-                 .AddCustomAuthentication(Configuration);
+            //services.AddCustomMvc()
+            //     .AddCustomDbContext(Configuration)
+            //     .AddCustomSwagger(Configuration)
+            //     .AddCustomIntegrations(Configuration)
+            //     .AddCustomAuthentication(Configuration);
+            services.AddAutoMapper();
+            services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
+            services.AddMemoryCache();
+            ServiceRegister.Register(services);
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder
+                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
+            //services.AddCustomAuthentication(Configuration);
+            services.AddApiVersioning(config =>
+            {
+                config.ReportApiVersions = true;
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            });
+
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
+            //Multiple language setting
+            var supportedCultures = new[]
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("vi-VN")
+            };
+
+            var localizationOptions = new RequestLocalizationOptions()
+            {
+                DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
+
+            localizationOptions.RequestCultureProviders = new[]
+            {
+                 new RouteDataRequestCultureProvider()
+                 {
+                     RouteDataStringKey = "lang",
+                     Options = localizationOptions
+                 }
+            };
+
+            services.AddSingleton(localizationOptions);
+            
+            services.AddSwaggerGen(
+                options =>
+                {
+                    var provider = services.BuildServiceProvider()
+                    .GetRequiredService<IApiVersionDescriptionProvider>();
+
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.SwaggerDoc(
+                            description.GroupName,
+                            new Info()
+                            {
+                                Title = $"eFMS System API {description.ApiVersion}",
+                                Version = description.ApiVersion.ToString(),
+                                Description = "eFMS Mobile API Document"
+                            });
+                    }
+                });
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
@@ -175,7 +249,7 @@ namespace SystemManagementAPI
         {
             //services.AddDbContext<DNTDataContext>(options => options.UseSqlServer(configuration["ConnectStrings:Default"]));
             services.AddEntityFrameworkSqlServer()
-                .AddDbContext<DNTDataContext>(options =>
+                .AddDbContext<eFMSDataContext>(options =>
                 {
                     options.UseSqlServer(configuration["ConnectionString"],
                         sqlServerOptionsAction: sqlOptions =>

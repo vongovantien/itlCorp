@@ -6,15 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SystemManagementAPI.API.Infrastructure.Filters
+namespace eFMS.API.System.Infrastructure.Filters
 {
     public class AuthorizeCheckOperationFilter : IOperationFilter
     {
         public void Apply(Operation operation, OperationFilterContext context)
         {
             // Check for authorize attribute
-            var hasAuthorize = context.ApiDescription.ControllerAttributes().OfType<AuthorizeAttribute>().Any() ||
-                               context.ApiDescription.ActionAttributes().OfType<AuthorizeAttribute>().Any();
+            var hasAuthorize = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                    .Union(context.MethodInfo.GetCustomAttributes(true))
+                    .OfType<AuthorizeAttribute>().Any();
 
             if (hasAuthorize)
             {

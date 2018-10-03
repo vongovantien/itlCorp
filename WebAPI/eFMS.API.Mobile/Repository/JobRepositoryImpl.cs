@@ -53,13 +53,13 @@ namespace API.Mobile.Repository
             switch (criteria.SearchStatus)
             {
                 case StatusEnum.JobStatusSearch.Finish:
-                    results = results.Where(x => x.CurrentStageStatus == StatusEnum.JobStatus.Finish).OrderBy(x => x.ServiceDate).ToList();
+                    results = results.Where(x => x.CurrentStageStatus == StatusEnum.JobStatus.Finish).OrderByDescending(x => x.ServiceDate).ToList();
                     break;
                 case StatusEnum.JobStatusSearch.InProgess:
                     results = results.Where(x => x.CurrentStageStatus != StatusEnum.JobStatus.Finish).OrderBy(x => x.CurrentStageStatus).ToList();
                     break;
                 default:
-                    results = results.OrderBy(x => x.ServiceDate).ToList();
+                    results = results.OrderByDescending(x => x.ServiceDate).ToList();
                     break;
             }
 
