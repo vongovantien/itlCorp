@@ -3,12 +3,13 @@ using System.Collections.Generic;
 
 namespace eFMS.API.System.Service.Models
 {
-    public partial class SysUserGroup
+    public partial class CatStage
     {
-        public short Id { get; set; }
+        public int Id { get; set; }
         public string Code { get; set; }
-        public string Name { get; set; }
-        public string Decription { get; set; }
+        public string StageNameVn { get; set; }
+        public string StageNameEn { get; set; }
+        public string TypeId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
