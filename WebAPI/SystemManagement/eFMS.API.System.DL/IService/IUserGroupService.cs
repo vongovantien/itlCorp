@@ -12,6 +12,7 @@ namespace eFMS.API.System.DL.IService
 {
     public interface IUserGroupService : IRepositoryBase<SysUserGroup, SysUserGroupModel>
     {
-        IQueryable<SysUserGroup> Paging(UserGroupCriteria criteria, int page, int size, Expression<Func<SysUserGroup, object>> orderByProperty, bool isAscendingOrder, out int rowsCount);
+        IQueryable<SysUserGroup> Query(UserGroupCriteria criteria, string orderByProperty, bool isAscendingOrder);
+        IQueryable<SysUserGroup> Paging(UserGroupCriteria criteria, int page, int size, string orderByProperty, bool isAscendingOrder, out int rowsCount);
     }
 }

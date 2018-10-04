@@ -33,6 +33,14 @@ namespace eFMS.API.System.Controllers
             return Ok(results);
         }
 
+        [HttpGet]
+        [Route("Query")]
+        public IActionResult Get(UserGroupCriteria criteria, string orderByProperty, bool isAscendingOrder)
+        {
+            var results = userGroupService.Query(criteria, orderByProperty, isAscendingOrder);
+            return Ok(results);
+        }
+
         [HttpGet("{Id}")]
         public IActionResult Get(short Id)
         {
@@ -44,24 +52,19 @@ namespace eFMS.API.System.Controllers
         [Route("Paging")]
         public IActionResult Paging(UserGroupCriteria criteria, int page, int size, string orderByProperty, bool isAscendingOrder)
         {
-            var orderBy = CreateExpression<SysUserGroup, object>(orderByProperty);
-            var results = userGroupService.Paging(criteria, page, size, orderBy, isAscendingOrder, out int rowCount);
-            return Ok(results);
-        }
-
-        static Expression<Func<TModel, TProperty>> CreateExpression<TModel, TProperty>(
-        string propertyName)
-        {
-            var param = Expression.Parameter(typeof(TModel), "x");
-            return Expression.Lambda<Func<TModel, TProperty>>(
-                Expression.PropertyOrField(param, propertyName), param);
+            var data = userGroupService.Paging(criteria, page, size, orderByProperty, isAscendingOrder, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
         }
 
 
         [HttpPost]
+        [Route("Add")]
         public IActionResult Post(SysUserGroupModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var messageExisted = CheckExisted(model);
+            if (messageExisted.Length > 0) return BadRequest(stringLocalizer[messageExisted]);
             var result = userGroupService.Add(model);
             var message = HandleError.GetMessage(result, Crud.Insert);
             if (!result.Success)
@@ -72,9 +75,12 @@ namespace eFMS.API.System.Controllers
         }
 
         [HttpPut("{Id}")]
-        public IActionResult Put(short Id, SysUserGroupModel  model)
+        public IActionResult Put(SysUserGroupModel  model)
         {
-            var result = userGroupService.Update(model, x => x.Id == Id);
+            if(!ModelState.IsValid) return BadRequest();
+            var messageExisted = CheckExisted(model);
+            if (messageExisted.Length > 0) return BadRequest(stringLocalizer[messageExisted]);
+            var result = userGroupService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(result, Crud.Update);
             if (!result.Success)
             {
@@ -95,5 +101,31 @@ namespace eFMS.API.System.Controllers
             return Ok(stringLocalizer[message]);
         }
 
+        private string CheckExisted(SysUserGroupModel model)
+        {
+            if (model.Id == 0)
+            {
+                if (userGroupService.Any(x => x.Code == model.Code))
+                {
+                    return LanguageSub.MSG_CODE_EXISTED;
+                }
+                if (userGroupService.Any(x => x.Name == model.Name))
+                {
+                    return LanguageSub.MSG_NAME_EXISTED;
+                }
+            }
+            else
+            {
+                if (userGroupService.Any(x => x.Code == model.Code && x.Id != model.Id))
+                {
+                    return LanguageSub.MSG_CODE_EXISTED;
+                }
+                if (userGroupService.Any(x => x.Name == model.Name && x.Id != model.Id))
+                {
+                    return LanguageSub.MSG_NAME_EXISTED;
+                }
+            }
+            return string.Empty;
+        }
     }
 }
