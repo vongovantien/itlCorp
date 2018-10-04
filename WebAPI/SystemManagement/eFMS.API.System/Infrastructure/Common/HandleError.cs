@@ -27,6 +27,9 @@ namespace eFMS.API.System.Infrastructure.Common
                 case 201:
                     message = LanguageSub.MSG_OBJECT_NOT_EXISTS;
                     break;
+                case 202:
+                    message = LanguageSub.MSG_DELETE_FAIL_INCLUDED_CHILD;
+                    break;
                 case 203:
                     message = LanguageSub.MSG_OBJECT_DUPLICATED;
                     break;

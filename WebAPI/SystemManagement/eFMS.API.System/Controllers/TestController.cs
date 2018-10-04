@@ -25,7 +25,7 @@ namespace eFMS.API.System.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok();
+            return Ok(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
         }
     }
 }

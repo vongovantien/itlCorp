@@ -2,14 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Mobile.Infrastructure.Middlewares;
+using API.Mobile.Resources;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace API.Mobile.Controllers
 {
-    [Route("api/[controller]")]
+    [MiddlewareFilter(typeof(LocalizationMiddleware))]
+    [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly IStringLocalizer stringLocalizer;
+        public ValuesController(IStringLocalizer<LanguageSub> localizer)
+        {
+            stringLocalizer = localizer;
+        }
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
@@ -21,7 +30,7 @@ namespace API.Mobile.Controllers
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
         {
-            return "value";
+            return Ok(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
         }
 
         // POST api/values

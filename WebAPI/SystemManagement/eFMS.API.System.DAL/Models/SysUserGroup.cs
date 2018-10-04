@@ -5,6 +5,11 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysUserGroup
     {
+        public SysUserGroup()
+        {
+            SysUser = new HashSet<SysUser>();
+        }
+
         public short Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
@@ -15,5 +20,7 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public ICollection<SysUser> SysUser { get; set; }
     }
 }

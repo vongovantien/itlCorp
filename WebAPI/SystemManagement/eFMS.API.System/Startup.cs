@@ -28,6 +28,128 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace SystemManagementAPI
 {
+    //public class Startup
+    //{
+    //    public Startup(IConfiguration configuration)
+    //    {
+    //        Configuration = configuration;
+    //    }
+
+    //    public Startup(IHostingEnvironment env)
+    //    {
+    //        var builder = new ConfigurationBuilder().SetBasePath(env.ContentRootPath)
+    //            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    //            .AddEnvironmentVariables();
+
+    //        Configuration = builder.Build();
+    //    }
+
+    //    public IConfiguration Configuration { get; }
+
+    //    // This method gets called by the runtime. Use this method to add services to the container.
+    //    public void ConfigureServices(IServiceCollection services)
+    //    {
+    //        services.AddAutoMapper();
+    //        services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+    //        services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
+    //        services.AddMemoryCache();
+    //        ServiceRegister.Register(services);
+    //        services.AddCors(options =>
+    //        {
+    //            options.AddPolicy("AllowAllOrigins",
+    //                builder =>
+    //                {
+    //                    builder
+    //                        .WithHeaders("accept", "content-type", "origin", "x-custom-header")
+    //                        .AllowAnyOrigin()
+    //                        .AllowAnyHeader()
+    //                        .AllowAnyMethod();
+    //                });
+    //        });
+    //        services.AddApiVersioning(config =>
+    //        {
+    //            config.ReportApiVersions = true;
+    //            config.AssumeDefaultVersionWhenUnspecified = true;
+    //            config.DefaultApiVersion = new ApiVersion(1, 0);
+    //            config.ApiVersionReader = new HeaderApiVersionReader("api-version");
+    //        });
+
+    //        services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+    //        services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
+    //        //Multiple language setting
+    //        var supportedCultures = new[]
+    //        {
+    //            new CultureInfo("en-US"),
+    //            new CultureInfo("vi-VN")
+    //        };
+
+    //        var localizationOptions = new RequestLocalizationOptions()
+    //        {
+    //            DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
+    //            SupportedCultures = supportedCultures,
+    //            SupportedUICultures = supportedCultures
+    //        };
+
+    //        localizationOptions.RequestCultureProviders = new[]
+    //        {
+    //             new RouteDataRequestCultureProvider()
+    //             {
+    //                 RouteDataStringKey = "lang",
+    //                 Options = localizationOptions
+    //             }
+    //        };
+
+    //        services.AddSingleton(localizationOptions);
+    //        services.AddSwaggerGen(
+    //            options =>
+    //            {
+    //                var provider = services.BuildServiceProvider()
+    //                .GetRequiredService<IApiVersionDescriptionProvider>();
+
+    //                foreach (var description in provider.ApiVersionDescriptions)
+    //                {
+    //                    options.SwaggerDoc(
+    //                        description.GroupName,
+    //                        new Info()
+    //                        {
+    //                            Title = $"Catalogue Management API {description.ApiVersion}",
+    //                            Version = description.ApiVersion.ToString(),
+    //                            Description = "Catalogue Management API Document"
+    //                        });
+    //                }
+    //                //options.DocumentFilter<SwaggerAddEnumDescriptions>();
+    //            });
+    //    }
+
+    //    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    //    public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApiVersionDescriptionProvider provider)
+    //    {
+    //        if (env.IsDevelopment())
+    //        {
+    //            app.UseDeveloperExceptionPage();
+    //        }
+    //        else
+    //        {
+    //            app.UseHsts();
+    //        }
+    //        app.UseSwagger();
+    //        app.UseSwaggerUI(
+    //            options =>
+    //            {
+    //                string swaggerJsonBasePath = string.IsNullOrWhiteSpace(options.RoutePrefix) ? "." : "..";
+    //                foreach (var description in provider.ApiVersionDescriptions)
+    //                {
+    //                    options.SwaggerEndpoint(
+    //                        $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json",
+    //                        description.GroupName.ToUpperInvariant());
+    //                }
+    //            });
+    //        app.UseCors("AllowAllOrigins");
+    //        app.UseHttpsRedirection();
+    //        app.UseMvc();
+    //        app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+    //    }
+    //}
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -49,11 +171,82 @@ namespace SystemManagementAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddCustomMvc()
-            //     .AddCustomDbContext(Configuration)
-            //     .AddCustomSwagger(Configuration)
-            //     .AddCustomIntegrations(Configuration)
-            //     .AddCustomAuthentication(Configuration);
+            ////services.AddCustomMvc()
+            ////     .AddCustomDbContext(Configuration)
+            ////     .AddCustomSwagger(Configuration)
+            ////     .AddCustomIntegrations(Configuration)
+            ////     .AddCustomAuthentication(Configuration);
+            //services.AddAutoMapper();
+            //services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
+            //services.AddMemoryCache();
+            //ServiceRegister.Register(services);
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowAllOrigins",
+            //        builder =>
+            //        {
+            //            builder
+            //                .WithHeaders("accept", "content-type", "origin", "x-custom-header")
+            //                .AllowAnyOrigin()
+            //                .AllowAnyHeader()
+            //                .AllowAnyMethod();
+            //        });
+            //});
+            ////services.AddCustomAuthentication(Configuration);
+            //services.AddApiVersioning(config =>
+            //{
+            //    config.ReportApiVersions = true;
+            //    config.AssumeDefaultVersionWhenUnspecified = true;
+            //    config.DefaultApiVersion = new ApiVersion(1, 0);
+            //    config.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            //});
+
+            //services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            //services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
+            ////Multiple language setting
+            //var supportedCultures = new[]
+            //{
+            //    new CultureInfo("en-US"),
+            //    new CultureInfo("vi-VN")
+            //};
+
+            //var localizationOptions = new RequestLocalizationOptions()
+            //{
+            //    DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
+            //    SupportedCultures = supportedCultures,
+            //    SupportedUICultures = supportedCultures
+            //};
+
+            //localizationOptions.RequestCultureProviders = new[]
+            //{
+            //     new RouteDataRequestCultureProvider()
+            //     {
+            //         RouteDataStringKey = "lang",
+            //         Options = localizationOptions
+            //     }
+            //};
+
+            //services.AddSingleton(localizationOptions);
+
+            //services.AddSwaggerGen(
+            //    options =>
+            //    {
+            //        var provider = services.BuildServiceProvider()
+            //        .GetRequiredService<IApiVersionDescriptionProvider>();
+
+            //        foreach (var description in provider.ApiVersionDescriptions)
+            //        {
+            //            options.SwaggerDoc(
+            //                description.GroupName,
+            //                new Info()
+            //                {
+            //                    Title = $"eFMS System API {description.ApiVersion}",
+            //                    Version = description.ApiVersion.ToString(),
+            //                    Description = "eFMS Mobile API Document"
+            //                });
+            //        }
+            //    });
             services.AddAutoMapper();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
@@ -106,7 +299,6 @@ namespace SystemManagementAPI
             };
 
             services.AddSingleton(localizationOptions);
-            
             services.AddSwaggerGen(
                 options =>
                 {
@@ -119,11 +311,21 @@ namespace SystemManagementAPI
                             description.GroupName,
                             new Info()
                             {
-                                Title = $"eFMS System API {description.ApiVersion}",
+                                Title = $"eFMS Mobile API {description.ApiVersion}",
                                 Version = description.ApiVersion.ToString(),
                                 Description = "eFMS Mobile API Document"
                             });
                     }
+                    //options.DocumentFilter<SwaggerAddEnumDescriptions>();
+
+                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    {
+                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
+                        AuthorizationUrl = "",
+                        Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
+                    });
+
+                    options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
@@ -173,7 +375,7 @@ namespace SystemManagementAPI
 
             //app.UseCors("AllowAllOrigins");
             app.UseCors("CorsPolicy");
-            ConfigureAuth(app);
+            //ConfigureAuth(app);
 
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
@@ -189,7 +391,7 @@ namespace SystemManagementAPI
         }
     }
     static class CustomExtensionsMethods
-    { 
+    {
         public static IServiceCollection AddCustomMvc(this IServiceCollection services)
         {
             // Add framework services.
@@ -229,7 +431,8 @@ namespace SystemManagementAPI
                 return new UrlHelper(actionContext);
             });
             // Lỗi không hiển thị hết data vì có quan hệ các bảng khác
-            services.AddMvc().AddJsonOptions(options => {
+            services.AddMvc().AddJsonOptions(options =>
+            {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
 
@@ -283,7 +486,7 @@ namespace SystemManagementAPI
                                 Version = description.ApiVersion.ToString(),
                                 Description = "System Managemet API Document"
                             });
-                        
+
                     }
                     //Add authentication
                     options.AddSecurityDefinition("oauth2", new OAuth2Scheme

@@ -56,7 +56,7 @@ namespace API.Mobile.Controllers
             }
             else
             {
-                return BadRequest("Not Found");
+                return Unauthorized();
             }
         }
     }
