@@ -54,6 +54,10 @@ const routes: Routes = [
             {
                 path:'tool',
                 loadChildren:'./business-modules/tool-setting/tool.module#ToolModule'
+            },
+            {
+                path:'designs-zone',
+                loadChildren:'./design-modules/design-modules.module#DesignModulesModule'
             }
         ]
 
