@@ -52,7 +52,7 @@ namespace API.Mobile.Repository
             return stages.FirstOrDefault(x => x.Id == Id);
         }
 
-        public HandleState UpdateStatus(StageModel model)
+        public HandleState UpdateStatus(StageComment model)
         {
             HandleState result = null;
             var stage = stages.Find(x => x.Id == model.StageId);

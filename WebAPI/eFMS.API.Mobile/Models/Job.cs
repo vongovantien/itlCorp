@@ -29,18 +29,21 @@ namespace API.Mobile.Models
         public int EstimateDate { get; set; }
         public int NumberStage { get; set; }
         public int NumberStageFinish { get; set; }
+        public decimal PercentFinish { get; set; }
         public string UserId { get; set; }
         public DateTime CurrentDeadline { get; set; }
         public JobStatus CurrentStageStatus { get; set; }
+        public string Service { get; set; }
+    }
+
+    public class JobDetailModel
+    {
+        public Job Job { get; set; }
+        public List<Stage> Stages { get; set; }
     }
 
     public class JobCriteria
     {
-        //public string Id { get; set; }
-        //public string MBL { get; set; }
-        //public string CustomerName { get; set; }
-        //public string PO_NO { get; set; }
-        //public string UserId { get; set; }
         public string SearchText { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
