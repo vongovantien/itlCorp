@@ -32,6 +32,7 @@ namespace API.Mobile.Controllers
         }
 
         [HttpPost]
+        [Route("GetBy")]
         public JobViewModel Get(JobCriteria criteria, int? offset, int limit = 15)
         {
             var userId = User.FindFirst("UserId")?.Value;

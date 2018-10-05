@@ -50,10 +50,10 @@ namespace API.Mobile.Repository
 
         private List<Job> Search(JobCriteria criteria, string userId)
         {
-            jobs = jobs.Where(x => (((x.Id ?? "").Contains(criteria.SearchText) || string.IsNullOrEmpty(criteria.SearchText))
-                                       || (x.CustomerName ?? "").Contains(criteria.SearchText)
-                                       || (x.PO_NO ?? "").Contains(criteria.SearchText)
-                                       || (x.MBL ?? "").Contains(criteria.SearchText))
+            jobs = jobs.Where(x => ((x.Id ?? "").Contains(criteria.SearchText ?? "") 
+                                       || (x.CustomerName ?? "").Contains(criteria.SearchText ?? "")
+                                       || (x.PO_NO ?? "").Contains(criteria.SearchText ?? "")
+                                       || (x.MBL ?? "").Contains(criteria.SearchText ?? ""))
                                        && (x.UserId == userId || string.IsNullOrEmpty(userId))
                                        && (x.AssignTime >= criteria.FromDate || criteria.FromDate == null)
                                        && (x.AssignTime <= criteria.ToDate || criteria.ToDate == null)
