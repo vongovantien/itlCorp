@@ -175,7 +175,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     // Designs ZONE , included html template for components
     {
       parent_name: 'Designs Zone',
-      icon: 'icon-wrench',
+      icon: 'icon-format_paint',
       route_parent: "/home/designs-zone/",
       display_child: false,
       childs: [
@@ -226,6 +226,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     if (this.previous_children != null) {
       this.previous_children.classList.remove('m-menu__item--active');
       this.previous_parent.classList.remove('m-menu__item--open');
+      this.previous_parent.classList.remove('m-menu__item--active');
     }
 
     this.previous_children = current_children;
@@ -233,6 +234,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
 
 
     current_parent.classList.add('m-menu__item--open');
+    current_parent.classList.add('m-menu__item--active');
     current_children.classList.add('m-menu__item--active');
 
 
