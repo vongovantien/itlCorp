@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild,AfterViewInit } from '@angular/core';
+import { Component, OnInit,ViewChild,AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import {PageSidebarComponent} from './page-sidebar/page-sidebar.component';
 import { Router } from '@angular/router';
@@ -21,17 +21,15 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   // console.log(this.Page_Info);
   }
 
-  constructor(private baseService: BaseService,private router: Router) { }
+  constructor(private baseService: BaseService,private router: Router,private cdRef:ChangeDetectorRef) { }
 
    ngOnInit() {
-
-    console.log(this.router.url);
-
+    this.cdRef.detectChanges();
   }
 
 
   MenuChanged(event){
-    this.Page_Info = event;   
+    this.Page_Info = event;      
     this.Component_name = event.children; 
   }
 
