@@ -12,7 +12,7 @@ namespace API.Mobile.Repository
     public interface IStageRepository
     {
         List<Stage> Get(string jobId, int? offset = null , int? limit = null);
-        HandleState UpdateStatus(StageModel model);
+        HandleState UpdateStatus(StageComment model);
         Stage GetBy(string Id);
     }
 }

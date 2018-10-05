@@ -23,10 +23,12 @@ namespace API.Mobile.Controllers
     {
         private readonly IJobRepository jobRepository;
         private readonly IStringLocalizer stringLocalizer;
-        public JobController(IJobRepository job, IStringLocalizer<LanguageSub> localizer)
+        private readonly IStageRepository stateRepository;
+        public JobController(IJobRepository job, IStringLocalizer<LanguageSub> localizer, IStageRepository stateRepo)
         {
             jobRepository = job;
             stringLocalizer = localizer;
+            stateRepository = stateRepo;
         }
 
         [HttpPost]
@@ -34,6 +36,20 @@ namespace API.Mobile.Controllers
         {
             var userId = User.FindFirst("UserId")?.Value;
             return jobRepository.Get(criteria, userId, offset, limit);
+        }
+
+        /// <summary>
+        /// Get by job Id
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public JobDetailModel Get(string jobId)
+        {
+            var job = jobRepository.Get(jobId);
+            var stages = stateRepository.Get(jobId);
+            var results = new JobDetailModel { Job = job, Stages = stages };
+            return results;
         }
     }
 }

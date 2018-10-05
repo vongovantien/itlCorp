@@ -18,6 +18,7 @@ namespace API.Mobile.Infrastructure
             services.AddTransient<IStageRepository, StageRepositoryImpl>();
             services.AddTransient<ICommentRepository, CommentRepositoryImpl>();
             services.AddTransient<IJobRepository, JobRepositoryImpl>();
+            services.AddTransient<IUserRepository, UserRepositoryImpl>();
         }
     }
 }

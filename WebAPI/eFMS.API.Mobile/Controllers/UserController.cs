@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using API.Mobile.Common;
 using API.Mobile.Infrastructure.Middlewares;
 using API.Mobile.Models;
+using API.Mobile.Repository;
 using API.Mobile.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -24,9 +26,11 @@ namespace API.Mobile.Controllers
     {
         private User user = FakeData.user;
         private readonly IConfiguration configuration;
-        public UserController(IConfiguration config)
+        private readonly IUserRepository userRepository;
+        public UserController(IConfiguration config, IUserRepository user)
         {
             configuration = config;
+            userRepository = user;
         }
 
         [HttpPost]
@@ -58,6 +62,14 @@ namespace API.Mobile.Controllers
             {
                 return Unauthorized();
             }
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("Profile")]
+        public IActionResult Profile(string userId)
+        {
+            return Ok(userRepository.Get(userId));
         }
     }
 }
