@@ -1,0 +1,667 @@
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                <li class="m-nav__item">
+                    <a href="" class="m-nav__link">
+                        <span class="m-nav__link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="m-nav__separator">-</li>
+                <li class="m-nav__item">
+                    <a href="" class="m-nav__link">
+                        <span class="m-nav__link-text">Operation</span>
+                    </a>
+                </li>
+                <li class="m-nav__separator">-</li>
+                <li class="m-nav__item">
+                    <a href="" class="m-nav__link">
+                        <span class="m-nav__link-text">Job Management</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="row">
+        <div class="col-xl-12">
+            <!--begin:: m-portlet-->
+            <div class="m-portlet">
+                <!--begin::Form-->
+                <div class="m-form">
+                    <div class="m-portlet__body">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>
+                                        Search text
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>
+                                        Select filter
+                                    </label>
+                                    <select class="form-control m-input m-input--square">
+                                        <option value="">
+                                            Job ID
+                                        </option>
+                                        <option value="">
+                                            House Bill
+                                        </option>
+                                        <option value="">
+                                            Cont No
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>
+                                        From date - To date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right">
+                                        <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--begin::Advance-search-->
+                        <div class="div-inside bg-secondary" style="padding: 20px; margin-bottom: 20px">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Progress
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                80% - 100%
+                                            </option>
+                                            <option value="">
+                                                0% - 79%
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Status
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Status 1
+                                            </option>
+                                            <option value="">
+                                                Status 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Services
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Services 1
+                                            </option>
+                                            <option value="">
+                                                Services 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Team
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Team 1
+                                            </option>
+                                            <option value="">
+                                                Team 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Customer
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Customer 1
+                                            </option>
+                                            <option value="">
+                                                Customer 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Staff
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Staff 1
+                                            </option>
+                                            <option value="">
+                                                Staff 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::Advance-search-->
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <a href="" class="btn btn-link">
+                                        <span>
+                                            <i class="la la-angle-down"></i>
+                                            <span>Advance search</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-lg-6 m--align-right">
+                                    <button type="reset" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                        <span>
+                                            <i class="la la-refresh"></i>
+                                            <span>
+                                                Reset
+                                            </span>
+                                        </span>
+                                    </button>
+                                    <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                        style="margin-left: 10px;">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                            <span>
+                                                Search
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+            </div>
+            <!--end:: m-portlets-->
+            <!--begin:: m-portlet-->
+            <div class="m-portlet">
+                <div class="alert-block alert-block-red">
+                    <div class="alert-block__heading">
+                        <h3 class="alert-block__title">Job Summary</h3>
+                    </div>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr class="text-center">
+                                <td class="m--font-brand m--font-bolder">
+                                    <i class="icon-spinner"></i> In Progress: 50
+                                </td>
+                                <td class="m--font-success m--font-bolder">
+                                    <i class="icon-checkmark"></i> Complete: 50
+                                </td>
+                                <td class="m--font-danger m--font-bolder">
+                                    <i class="icon-back-in-time"></i> Over due: 20
+                                </td>
+                                <td class="m--font-bolder">
+                                    <i class="icon-cancel6"></i> Cancel: 02
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!--end:: m-portlets-->
+        </div>
+        <div class="col-12">
+            <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="" role="tab">
+                        Stage View
+                    </a>
+                </li>
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="" role="tab">
+                        Table View
+                    </a>
+                </li>
+            </ul>
+            <!--begin:: m-portlet portlet-stageview-->
+            <div class="m-portlet portlet-stageview">
+                <div class="m-portlet__body">
+                    <!--begin::Content-->
+                    <div class="job-stage-row">
+                        <div class="job-stage-info">
+                        </div>
+                        <div class="job-stage-list">
+                            <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item"
+                                    style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 1
+                                    <p style="font-size: 10px; margin-bottom: 0"><span>12:00 03/10/18</span></p>
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 2
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 3
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 4
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 5
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 6
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 7
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 8
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 9
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 10
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 11
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 12
+                                </div>
+                            </div>
+                        </div>
+                        <div class="job-stage-progress" style="padding: 30px 15px">
+                            <div class="progress" style="height: 10px">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Content-->
+                </div>
+            </div>
+            <!--end:: m-portlets-->
+            <!--begin:: m-portlet-->
+            <div class="m-portlet" style="display: none">
+                <div class="m-portlet__body">
+                    <!--begin::Content-->
+                    <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="local_data">
+                        <table class="m-datatable__table" style="display: block; min-height: 300px; overflow-x: auto;">
+                            <thead class="m-datatable__head">
+                                <tr class="m-datatable__row">
+                                    <th data-field="RecordID" class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"><span
+                                            style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--all m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox"><span></span></label></span></th>
+                                    <th data-field="OrderID" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 110px;">Order ID</span></th>
+                                    <th data-field="ShipName" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 110px;">Ship Name</span></th>
+                                    <th data-field="Currency" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 100px;">Currency</span></th>
+                                    <th data-field="ShipAddress" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 110px;">Ship Address</span></th>
+                                    <th data-field="ShipDate" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 110px;">Ship Date</span></th>
+                                    <th data-field="Latitude" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 110px;">Latitude</span></th>
+                                    <th data-field="Status" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 110px;">Status</span></th>
+                                    <th data-field="Type" class="m-datatable__cell m-datatable__cell--sort"><span style="width: 110px;">Type</span></th>
+                                    <th data-field="Actions" class="m-datatable__cell m-datatable__cell--sort"><span
+                                            style="width: 110px;">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody class="m-datatable__body" style="">
+                                <tr data-row="0" class="m-datatable__row" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="1"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">54473-251</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">GTQ</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">897
+                                            Magdeline Park</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">5/21/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">14.78667</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-primary">Retail</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="1" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="2"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">41250-308</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Denesik-Langosh</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">IDR</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">9
+                                            Brickson Park Junction</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">4/19/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">-6.4222</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-accent">Direct</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="2" class="m-datatable__row" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="3"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">0615-7571</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Kunze,
+                                            Schneider and Cronin</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">HRK</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">35712
+                                            Sundown Parkway</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">4/7/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">45.70333</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--danger m-badge--wide">Danger</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-accent">Direct</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="3" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="4"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">49349-551</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Jacobi-Ankunding</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">RUB</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">481
+                                            Sage Park</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">2/15/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">55.64528</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--success m-badge--wide">Success</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-primary">Retail</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="4" class="m-datatable__row" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="5"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">59779-750</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Johns-Kunze</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">IDR</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">59
+                                            Marcy Hill</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">1/30/2017</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">-8.6909</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--success m-badge--wide">Success</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-accent">Direct</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="5" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="6"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">63777-145</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Kris,
+                                            Keeling and Weimann</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">CNY</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">122
+                                            Evergreen Street</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">10/22/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">42.53306</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--primary m-badge--wide">Canceled</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-accent">Direct</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="6" class="m-datatable__row" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="7"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">57520-0136</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Effertz
+                                            Inc</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">EUR</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">328
+                                            8th Avenue</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">9/3/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">40.59814</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--success m-badge--wide">Success</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--danger m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-danger">Online</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown dropup"> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="7" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="8"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">0093-5200</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">West-Ullrich</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">SEK</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">48
+                                            Sommers Junction</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">2/10/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">59.514</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--metal m-badge--wide">Delivered</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-accent">Direct</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown dropup"> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="8" class="m-datatable__row" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="9"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">14783-319</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Stiedemann-Kemmer</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">IDR</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">10625
+                                            Dixon Road</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">11/11/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">-8.2137</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--metal m-badge--wide">Delivered</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-accent">Direct</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown dropup"> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                                <tr data-row="9" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                    <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                        data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                    type="checkbox" value="10"><span></span></label></span></td>
+                                    <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">59011-454</span></td>
+                                    <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Daniel-Feest</span></td>
+                                    <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">COP</span></td>
+                                    <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">48004
+                                            Mariners Cove Circle</span></td>
+                                    <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">12/15/2016</span></td>
+                                    <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">4.6375</span></td>
+                                    <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge  m-badge--danger m-badge--wide">Danger</span></span></td>
+                                    <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-primary">Retail</span></span></td>
+                                    <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                            <div class="dropdown dropup"> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                    data-toggle="dropdown"> <i class="la la-ellipsis-h"></i> </a>
+                                                <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                        href="#"><i class="la la-edit"></i> Edit Details</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-leaf"></i> Update Status</a> <a class="dropdown-item"
+                                                        href="#"><i class="la la-print"></i> Generate Report</a> </div>
+                                            </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                title="View "> <i class="la la-edit"></i> </a>
+                                        </span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="m-datatable__pager m-datatable--paging-loaded clearfix">
+                            <ul class="m-datatable__pager-nav">
+                                <li><a title="First" class="m-datatable__pager-link m-datatable__pager-link--first m-datatable__pager-link--disabled"
+                                        data-page="1" disabled="disabled"><i class="la la-angle-double-left"></i></a></li>
+                                <li><a title="Previous" class="m-datatable__pager-link m-datatable__pager-link--prev m-datatable__pager-link--disabled"
+                                        data-page="1" disabled="disabled"><i class="la la-angle-left"></i></a></li>
+                                <li style="display: none;"><a title="More pages" class="m-datatable__pager-link m-datatable__pager-link--more-prev"
+                                        data-page="1"><i class="la la-ellipsis-h"></i></a></li>
+                                <li style="display: none;"><input type="text" class="m-pager-input form-control" title="Page number"></li>
+                                <li><a class="m-datatable__pager-link m-datatable__pager-link-number m-datatable__pager-link--active"
+                                        data-page="1" title="1">1</a></li>
+                                <li><a class="m-datatable__pager-link m-datatable__pager-link-number" data-page="2"
+                                        title="2">2</a></li>
+                                <li><a class="m-datatable__pager-link m-datatable__pager-link-number" data-page="3"
+                                        title="3">3</a></li>
+                                <li><a class="m-datatable__pager-link m-datatable__pager-link-number" data-page="4"
+                                        title="4">4</a></li>
+                                <li><a class="m-datatable__pager-link m-datatable__pager-link-number" data-page="5"
+                                        title="5">5</a></li>
+                                <li><a class="m-datatable__pager-link m-datatable__pager-link-number" data-page="6"
+                                        title="6">6</a></li>
+                                <li><a title="More pages" class="m-datatable__pager-link m-datatable__pager-link--more-next"
+                                        data-page="7"><i class="la la-ellipsis-h"></i></a></li>
+                                <li><a title="Next" class="m-datatable__pager-link m-datatable__pager-link--next"
+                                        data-page="2"><i class="la la-angle-right"></i></a></li>
+                                <li><a title="Last" class="m-datatable__pager-link m-datatable__pager-link--last"
+                                        data-page="10"><i class="la la-angle-double-right"></i></a></li>
+                            </ul>
+                            <div class="m-datatable__pager-info">
+                                <div class="dropdown bootstrap-select m-datatable__pager-size" style="width: 70px;"><select
+                                        class="selectpicker m-datatable__pager-size" title="Select page size"
+                                        data-width="70px" data-selected="10" tabindex="-98">
+                                        <option class="bs-title-option" value="">Select page size</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select><button type="button" class="btn dropdown-toggle btn-light" data-toggle="dropdown"
+                                        role="button" title="Select page size">
+                                        <div class="filter-option">
+                                            <div class="filter-option-inner">10</div>
+                                        </div>&nbsp;<span class="bs-caret"><span class="caret"></span></span>
+                                    </button>
+                                    <div class="dropdown-menu " role="combobox">
+                                        <div class="inner show" role="listbox" aria-expanded="false" tabindex="-1">
+                                            <ul class="dropdown-menu inner show"></ul>
+                                        </div>
+                                    </div>
+                                </div><span class="m-datatable__pager-detail">Displaying 1 - 10 of 100 records</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Content-->
+                </div>
+            </div>
+            <!--end:: m-portlets-->
+        </div>
+    </div>
+</div>

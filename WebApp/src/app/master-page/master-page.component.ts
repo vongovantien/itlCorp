@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild,AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
+import {PageSidebarComponent} from './page-sidebar/page-sidebar.component';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -7,23 +9,28 @@ import { BaseService } from 'src/services-base/base.service';
   templateUrl: './master-page.component.html',
   styleUrls: ['./master-page.component.css']
 })
-export class MasterPageComponent implements OnInit {
+export class MasterPageComponent implements OnInit,AfterViewInit {
 
-  constructor(private baseService: BaseService) { }
+  @ViewChild(PageSidebarComponent) Page_side_bar;
+  Page_Info ={};
+  Component_name:"no-name";
 
-  async ngOnInit() {
-    var url = "https://api.github.com/repositories/19438/issues"
-    var url_club = "https://gola-server.herokuapp.com/api/club/create";
-    var issues = await this.baseService.getAsync(url, null, true);
 
-    this.baseService.get(url).subscribe(data=>{
-      console.log(data);
-    })
+  ngAfterViewInit(): void {
+   this.Page_Info = this.Page_side_bar.Page_Info;
+  // console.log(this.Page_Info);
+  }
 
-    
-    console.log(issues);
-    console.log("hi");
+  constructor(private baseService: BaseService,private router: Router,private cdRef:ChangeDetectorRef) { }
 
+   ngOnInit() {
+    this.cdRef.detectChanges();
+  }
+
+
+  MenuChanged(event){
+    this.Page_Info = event;      
+    this.Component_name = event.children; 
   }
 
 

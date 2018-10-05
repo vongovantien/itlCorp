@@ -29,15 +29,14 @@
                 <i class="la la-close"></i>
             </button>
             <div class="m-header-menu">
-                <h3 class="m-subheader__title">Master Page</h3>
+                <h3 class="m-subheader__title">{{Page_Info}}</h3>
             </div>
             <!-- END: Horizontal Menu -->
             <!-- BEGIN: Topbar -->
             <div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
                 <div class="m-stack__item m-topbar__nav-wrapper">
                     <ul class="m-topbar__nav m-nav m-nav--inline">
-                        <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light"
-                            m-dropdown-toggle="click">
+                        <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light">
                             <a href="#" class="m-nav__link m-dropdown__toggle">
                                 <span class="m-topbar__userpic">
                                     <img src="assets/app/media/img/users/user-default.png" class="m--img-rounded m--marginless m--img-centered" alt="">
@@ -135,10 +134,11 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="m-nav__item">
-                            <a href="#" class="m-nav__link">
-                                <span class="m-nav__link-icon" style="width: auto;">
-                                    <i class="icon-switch3"></i> logout
+                        <li class="m-nav__item m-topbar__item">
+                            <a href="javascript:;" class="m-menu__link m-menu__toggle">
+                                <i class="m-menu__link-icon icon-switch"></i>
+                                <span class="m-menu__link-text">
+                                    Logout
                                 </span>
                             </a>
                         </li>
