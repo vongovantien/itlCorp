@@ -23,65 +23,217 @@
         </div>
     </div>
 </div>
+
 <div class="m-content">
     <div class="row">
         <div class="col-xl-12">
             <!--begin:: m-portlet-->
             <div class="m-portlet">
-                <div class="m-portlet__body">
-                    <div class="form-group m-form__group row">
-                        <div class="col-lg-4">
-                            <input type="text" class="form-control m-input" placeholder="Search text">
+                <!--begin::Form-->
+                <div class="m-form">
+                    <div class="m-portlet__body">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>
+                                        Search text
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>
+                                        Select filter
+                                    </label>
+                                    <select class="form-control m-input m-input--square">
+                                        <option value="">
+                                            Job ID
+                                        </option>
+                                        <option value="">
+                                            House Bill
+                                        </option>
+                                        <option value="">
+                                            Cont No
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>
+                                        From date - To date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right">
+                                        <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-lg-4">
-                            <input type="text" class="form-control m-input" placeholder="Select Filter">
+                        <!--begin::Advance-search-->
+                        <div class="div-inside bg-secondary" style="padding: 20px; margin-bottom: 20px">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Progress
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                80% - 100%
+                                            </option>
+                                            <option value="">
+                                                0% - 79%
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Status
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Status 1
+                                            </option>
+                                            <option value="">
+                                                Status 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Services
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Services 1
+                                            </option>
+                                            <option value="">
+                                                Services 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Team
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Team 1
+                                            </option>
+                                            <option value="">
+                                                Team 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Customer
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Customer 1
+                                            </option>
+                                            <option value="">
+                                                Customer 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Staff
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Staff 1
+                                            </option>
+                                            <option value="">
+                                                Staff 2
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="m-input-icon m-input-icon--right">
-                                <input type="text" class="form-control m-input" placeholder="From date - To date">
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar-o"></i>
-                                    </span>
-                                </span>
+                        <!--end::Advance-search-->
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <a href="" class="btn btn-link">
+                                        <span>
+                                            <i class="la la-angle-down"></i>
+                                            <span>Advance search</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-lg-6 m--align-right">
+                                    <button type="reset" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                        <span>
+                                            <i class="la la-refresh"></i>
+                                            <span>
+                                                Reset
+                                            </span>
+                                        </span>
+                                    </button>
+                                    <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                        style="margin-left: 10px;">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                            <span>
+                                                Search
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-6"></div>
-                        <div class="col-lg-6 m--align-right">
-                            <a href="" class="btn btn-link">
-                                <i class="la la-search"></i> Advance search
-                            </a>
-                            <button type="reset" class="btn btn-default" style="margin-left: 10px;">
-                                Reset
-                            </button>
-                            <button type="reset" class="btn btn-brand" style="margin-left: 10px;">
-                                Search
-                            </button>
-                        </div>
-                    </div>
                 </div>
+                <!--end::Form-->
             </div>
             <!--end:: m-portlets-->
             <!--begin:: m-portlet-->
             <div class="m-portlet">
-                <!--begin::Content-->
-                <div class="m-stack m-stack--ver m-stack--general m-stack--demo">
-                    <div class="m-stack__item m-stack__item--center m-stack__item--middle  m-stack__item--fluid m--font-brand" style="width: 20%">
-                        In Progress: 50
+                <div class="alert-block alert-block-red">
+                    <div class="alert-block__heading">
+                        <h3 class="alert-block__title">Job Summary</h3>
                     </div>
-                    <div class="m-stack__item m-stack__item--center m-stack__item--middle m-stack__item--fluid m--font-success" style="width: 20%">
-                        Complete: 50
-                    </div>
-                    <div class="m-stack__item m-stack__item--center m-stack__item--middle m-stack__item--fluid m--font-danger" style="width: 20%">
-                        Over due: 20
-                    </div>
-                    <div class="m-stack__item m-stack__item--center m-stack__item--middle m-stack__item--fluid" style="width: 20%">
-                        Cancel: 02
-                    </div>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr class="text-center">
+                                <td class="m--font-brand m--font-bolder">
+                                    <i class="icon-spinner"></i> In Progress: 50
+                                </td>
+                                <td class="m--font-success m--font-bolder">
+                                    <i class="icon-checkmark"></i> Complete: 50
+                                </td>
+                                <td class="m--font-danger m--font-bolder">
+                                    <i class="icon-back-in-time"></i> Over due: 20
+                                </td>
+                                <td class="m--font-bolder">
+                                    <i class="icon-cancel6"></i> Cancel: 02
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <!--end::Content-->
             </div>
             <!--end:: m-portlets-->
         </div>
@@ -98,17 +250,67 @@
                     </a>
                 </li>
             </ul>
-            <!--begin:: m-portlet-->
-            <div class="m-portlet">
+            <!--begin:: m-portlet portlet-stageview-->
+            <div class="m-portlet portlet-stageview">
                 <div class="m-portlet__body">
                     <!--begin::Content-->
-                    <p>Stage View</p>
+                    <div class="job-stage-row">
+                        <div class="job-stage-info">
+                        </div>
+                        <div class="job-stage-list">
+                            <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item"
+                                    style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 1
+                                    <p style="font-size: 10px; margin-bottom: 0"><span>12:00 03/10/18</span></p>
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 2
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 3
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 4
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 5
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 6
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 7
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 8
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 9
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 10
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 11
+                                </div>
+                                <div class="m-stack__item m-stack__item--center m-stack__item--middle" style="min-width: 100px; background-color: #ecf3fa">
+                                    Stage 12
+                                </div>
+                            </div>
+                        </div>
+                        <div class="job-stage-progress" style="padding: 30px 15px">
+                            <div class="progress" style="height: 10px">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
                     <!--end::Content-->
                 </div>
             </div>
             <!--end:: m-portlets-->
             <!--begin:: m-portlet-->
-            <div class="m-portlet">
+            <div class="m-portlet" style="display: none">
                 <div class="m-portlet__body">
                     <!--begin::Content-->
                     <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="local_data">
