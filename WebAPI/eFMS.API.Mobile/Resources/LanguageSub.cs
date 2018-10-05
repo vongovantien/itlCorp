@@ -18,5 +18,8 @@ namespace API.Mobile.Resources
         public static readonly string MSG_UPDATE_SUCCESS = "MSG_UPDATE_SUCCESS";
 
         public static readonly string MSG_DELETE_SUCCESS = "MSG_DELETE_SUCCESS";
+        public static readonly string OLD_PASSWORD_NOT_CORRECT = "OLD_PASSWORD_NOT_CORRECT";
+        public static readonly string CHANGE_PASSWORD_SUCCESS = "CHANGE_PASSWORD_SUCCESS";
+
     }
 }

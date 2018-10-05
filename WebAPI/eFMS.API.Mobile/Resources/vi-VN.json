@@ -1,9 +1,11 @@
 ﻿{
-  "MSG_DATA_NOT_FOUND": "Data not found",
+  "MSG_DATA_NOT_FOUND": "Không tìm thấy dữ liệu",
   "MSG_OBJECT_NOT_EXISTS": "Object does nont exist",
   "MSG_OBJECT_DUPLICATED": "Object is douplicated",
   "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object", //204
-  "MSG_INSERT_SUCCESS": "New data added",
-  "MSG_UPDATE_SUCCESS": "Data update success",
-  "MSG_DELETE_SUCCESS": "Data delete success"
+  "MSG_INSERT_SUCCESS": "Thêm dữ liệu thành công",
+  "MSG_UPDATE_SUCCESS": "Cập nhật dữ liệu thành công",
+  "MSG_DELETE_SUCCESS": "Xóa dữ liệu thành công",
+  "OLD_PASSWORD_NOT_CORRECT": "Mật khẩu cũ không đúng",
+  "CHANGE_PASSWORD_SUCCESS": "Đổi mật khẩu thành công"
 }

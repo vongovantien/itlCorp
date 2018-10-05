@@ -9,11 +9,13 @@ using API.Mobile.Common;
 using API.Mobile.Infrastructure.Middlewares;
 using API.Mobile.Models;
 using API.Mobile.Repository;
+using API.Mobile.Resources;
 using API.Mobile.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Mobile.Controllers
@@ -27,10 +29,12 @@ namespace API.Mobile.Controllers
         private User user = FakeData.user;
         private readonly IConfiguration configuration;
         private readonly IUserRepository userRepository;
-        public UserController(IConfiguration config, IUserRepository user)
+        private readonly IStringLocalizer stringLocalizer;
+        public UserController(IConfiguration config, IUserRepository user, IStringLocalizer<LanguageSub> stringLocal)
         {
             configuration = config;
             userRepository = user;
+            stringLocalizer = stringLocal;
         }
 
         [HttpPost]
@@ -70,6 +74,30 @@ namespace API.Mobile.Controllers
         public IActionResult Profile(string userId)
         {
             return Ok(userRepository.Get(userId));
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("ChangePassword")]
+        public IActionResult ChangePassword(ChangePasswordModel model)
+        {
+            var u = userRepository.Get(model.UserId);
+            if (u != null)
+            {
+                if (u.Password == model.OldPassword)
+                {
+                    user.Password = model.NewPassword;
+                    return Ok(stringLocalizer[LanguageSub.CHANGE_PASSWORD_SUCCESS]);
+                }
+                else
+                {
+                    return Ok(stringLocalizer[LanguageSub.OLD_PASSWORD_NOT_CORRECT]);
+                }
+            }
+            else
+            {
+                return Ok(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+            }
         }
     }
 }

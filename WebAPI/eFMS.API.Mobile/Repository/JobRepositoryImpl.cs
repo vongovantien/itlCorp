@@ -50,7 +50,8 @@ namespace API.Mobile.Repository
 
         private List<Job> Search(JobCriteria criteria, string userId)
         {
-            jobs = jobs.Where(x => ((x.Id ?? "").Contains(criteria.SearchText ?? "") 
+            var listJob = jobs;
+            listJob = listJob.Where(x => ((x.Id ?? "").Contains(criteria.SearchText ?? "") 
                                        || (x.CustomerName ?? "").Contains(criteria.SearchText ?? "")
                                        || (x.PO_NO ?? "").Contains(criteria.SearchText ?? "")
                                        || (x.MBL ?? "").Contains(criteria.SearchText ?? ""))
@@ -58,7 +59,7 @@ namespace API.Mobile.Repository
                                        && (x.AssignTime >= criteria.FromDate || criteria.FromDate == null)
                                        && (x.AssignTime <= criteria.ToDate || criteria.ToDate == null)
             ).ToList();
-            var results = jobs;
+            var results = listJob;
             switch (criteria.SearchStatus)
             {
                 case StatusEnum.JobStatusSearch.Finish:
