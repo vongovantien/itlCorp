@@ -18,6 +18,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
 
             services.AddTransient<IUserGroupService, UserGroupService>();
+            services.AddTransient<ICatBranchService, CatBranchService>();
         }
     }
 }

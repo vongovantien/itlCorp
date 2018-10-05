@@ -11,5 +11,6 @@ namespace API.Mobile.Repository
     {
         JobViewModel Get(JobCriteria criteria, string userId, int? offset, int limit = 15);
         List<Job> GetBy(JobCriteria criteria);
+        Job Get(string id);
     }
 }

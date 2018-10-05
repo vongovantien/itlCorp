@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.System.DL.Models
 {
-    public class SysUserGroupModel: SysUserGroup
+    public class CatBranchModel: CatBranch
     {
     }
 }

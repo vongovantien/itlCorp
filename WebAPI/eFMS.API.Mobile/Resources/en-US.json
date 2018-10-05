@@ -5,5 +5,7 @@
   "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object", //204
   "MSG_INSERT_SUCCESS": "New data added",
   "MSG_UPDATE_SUCCESS": "Data update success",
-  "MSG_DELETE_SUCCESS": "Data delete success"
+  "MSG_DELETE_SUCCESS": "Data delete success",
+  "OLD_PASSWORD_NOT_CORRECT": "Old password not correct",
+  "CHANGE_PASSWORD_SUCCESS": "Change password success"
 }

@@ -7,7 +7,7 @@ using static API.Mobile.Common.StatusEnum;
 
 namespace API.Mobile.ViewModel
 {
-    public class StageModel
+    public class StageComment
     {
         [Required]
         public string StageId { get; set; }

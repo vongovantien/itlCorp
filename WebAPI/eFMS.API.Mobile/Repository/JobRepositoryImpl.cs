@@ -25,12 +25,22 @@ namespace API.Mobile.Repository
                 data = data.Skip(skip).Take(take).ToList();
             }
 
-            data.ForEach(x => {
-                x.NumberStageFinish = stages.Count(y => y.JobId == x.Id && y.Status == StatusEnum.StageStatus.Done);
-                x.NumberStage = stages.Count(y => y.JobId == x.Id);
+            //data.ForEach(x => {
+            //    x.NumberStageFinish = stages.Count(y => y.JobId == x.Id && y.Status == StatusEnum.StageStatus.Done);
+            //    x.NumberStage = stages.Count(y => y.JobId == x.Id);
+            //});
+            data.ForEach(x =>
+            {
+                x.PercentFinish = (decimal)stages.Count(y => y.JobId == x.Id && y.Status == StatusEnum.StageStatus.Done) / (decimal)stages.Count(y => y.JobId == x.Id);
             });
             var result = new JobViewModel { Jobs = data, TotalItems = totalItems, NumberJobFinishs = numberJobFinishs, Offset = offset, Limit = limit };
             return result;
+        }
+
+        public Job Get(string id)
+        {
+            var job = jobs.Find(x => x.Id == id);
+            return job;
         }
 
         public List<Job> GetBy(JobCriteria criteria)
@@ -40,16 +50,16 @@ namespace API.Mobile.Repository
 
         private List<Job> Search(JobCriteria criteria, string userId)
         {
-            jobs = jobs.Where(x => ((x.Id ?? "").Contains(criteria.SearchText ?? ""))
-                                       && ((x.CustomerName ?? "").Contains(criteria.SearchText ?? ""))
-                                       && ((x.PO_NO ?? "").Contains(criteria.SearchText ?? ""))
+            var listJob = jobs;
+            listJob = listJob.Where(x => ((x.Id ?? "").Contains(criteria.SearchText ?? "") 
+                                       || (x.CustomerName ?? "").Contains(criteria.SearchText ?? "")
+                                       || (x.PO_NO ?? "").Contains(criteria.SearchText ?? "")
+                                       || (x.MBL ?? "").Contains(criteria.SearchText ?? ""))
+                                       && (x.UserId == userId || string.IsNullOrEmpty(userId))
                                        && (x.AssignTime >= criteria.FromDate || criteria.FromDate == null)
                                        && (x.AssignTime <= criteria.ToDate || criteria.ToDate == null)
-                                       && ((x.UserId ?? "").Contains(criteria.SearchText ?? ""))
-                                       && ((x.MBL ?? "").Contains(criteria.SearchText ?? ""))
-                                       && (x.UserId == userId || string.IsNullOrEmpty(userId))
             ).ToList();
-            var results = jobs;
+            var results = listJob;
             switch (criteria.SearchStatus)
             {
                 case StatusEnum.JobStatusSearch.Finish:

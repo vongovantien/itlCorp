@@ -1,5 +1,6 @@
 ﻿using API.Mobile.Infrastructure;
 using API.Mobile.Infrastructure.Middlewares;
+using API.Mobile.Models;
 using API.Mobile.Repository;
 using API.Mobile.Resources;
 using API.Mobile.ViewModel;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
 
 namespace API.Mobile.Controllers
 {
@@ -22,7 +24,7 @@ namespace API.Mobile.Controllers
         private IMemoryCache cache;
         private readonly IStringLocalizer stringLocalizer;
 
-        public StageController(IStageRepository state, ICommentRepository comment, IMemoryCache memoryCache, IStringLocalizer<LanguageSub> localizer)
+        public StageController(IStageRepository state,  ICommentRepository comment, IMemoryCache memoryCache, IStringLocalizer<LanguageSub> localizer)
         {
             stateRepository = state;
             commentRepository = comment;
@@ -30,28 +32,16 @@ namespace API.Mobile.Controllers
             stringLocalizer = localizer;
         }
 
-        /// <summary>
-        /// Get by job Id
-        /// </summary>
-        /// <param name="jobId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public IActionResult Get(string jobId)
-        {
-            var results = stateRepository.Get(jobId);
-            return Ok(results);
-        }
-
         [HttpGet]
         [Route("GetComments")]
-        public IActionResult GetComments(string stageId)
+        public List<Comment> GetComments(string stageId)
         {
             var results = commentRepository.Get(stageId);
-            return Ok(results);
+            return results;
         }
 
         [HttpPut]
-        public IActionResult UpdateStatus(StageModel stage)
+        public IActionResult UpdateStatus(StageComment stage)
         {
             if (!ModelState.IsValid)
             {
