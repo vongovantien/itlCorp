@@ -1,0 +1,78 @@
+label {
+    font-weight: 500;
+}
+.form-control {
+    background-color: #fbfbfb;
+}
+.m-body {
+    width: 100%;
+}
+// job management
+.alert-block-red {
+    position: relative;
+    &:before {
+        content: "";
+        width: 5px;
+        display: block;
+        background-color: red;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+    }
+}  
+.alert-block__heading {
+    padding: 0.7rem 1.5rem;
+    background-color: #f2dedf;
+    .alert-block__title {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 0;
+    }
+}
+//job-stage-row
+.job-stage-row {
+    width: 100%;
+    padding-left: 100px;
+    padding-right: 130px;
+    border: 1px solid #ddd;
+    position: relative;
+}
+.job-stage-list {
+    width: 100%;
+    overflow: auto;
+    .m-stack {
+        height: 70px;
+    }
+    .m-stack__item {
+        min-width: 100px;
+        border: 1px solid #fff;
+    }
+}
+.job-stage-item {
+    background-color: #ecf3fa;
+}
+.job-stage-info {
+    width: 100px;
+    background-color: #ccedde;
+    border: 1px solid #ddd;
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    left: 1px;
+}
+.job-stage-progress {
+    width: 130px;
+    background-color: #d1e7f8;
+    border: 1px solid #ddd;
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    right: 1px;
+}
+
+//create job
+.c-modal-fullscreen {
+    width: calc(100% - 1.75rem);
+    max-width: none;
+}
