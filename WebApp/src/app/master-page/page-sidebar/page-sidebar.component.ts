@@ -31,18 +31,15 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     var current_child_route = router[router.length - 1];
     var parentInd = null;
     var childInd = null;
-    var child_name = null;
-    console.log(current_child_route);
+    var child_name = null; 
 
     for (var i = 0; i < this.Menu.length; i++) {
       for (var j = 0; j < this.Menu[i].childs.length; j++) {
 
         if (this.Menu[i].childs[j].route_child == current_child_route) {
           this.Page_Info.parent = this.Menu[i].parent_name;
-          this.Page_Info.children = this.Menu[i].childs[j].name;
-          console.log(this.Page_Info);
-          this.Page_Information.emit(this.Page_Info);
-          console.log(this.Menu[i]);
+          this.Page_Info.children = this.Menu[i].childs[j].name;         
+          this.Page_Information.emit(this.Page_Info);         
           this.open_sub_menu(i);
           this.Menu[i].display_child = true;
           parentInd = i; childInd = j; child_name = this.Menu[i].childs[j].name
@@ -192,12 +189,10 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
   open_sub_menu(index) {
     if (this.previous_menu_index != null) {
       this.Menu[this.previous_menu_index].display_child = false;
-      var previous_menu = document.getElementById(this.previous_menu_index.toString());
-      //  console.log(previous_menu);
+      var previous_menu = document.getElementById(this.previous_menu_index.toString());     
       if (index != this.previous_menu_index) {
         previous_menu.classList.remove('m-menu__item--open');
-        var check_class = previous_menu.classList.contains('m-menu__item--open');
-        //  console.log(check_class);
+        var check_class = previous_menu.classList.contains('m-menu__item--open');       
       }
 
     }
@@ -205,8 +200,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
 
 
     this.index_parrent_menu = index;
-    var parentMenu = document.getElementById(index.toString());
-    //console.log(parentMenu);
+    var parentMenu = document.getElementById(index.toString());   
     if (parentMenu.classList.contains('m-menu__item--open')) {
       parentMenu.classList.remove('m-menu__item--open');
     } else {
@@ -217,11 +211,9 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     // this.Page_Info.parent= this.Menu[index].parent_name;    
   }
 
-  sub_menu_click(sub_menu_name, parrent_index, children_index) {
-    console.log(sub_menu_name);
+  sub_menu_click(sub_menu_name, parrent_index, children_index) { 
     var current_parent = document.getElementById(parrent_index.toString());
     var current_children = document.getElementById(parrent_index.toString() + '-' + children_index.toString());
-    var test = document.getElementById('2-3');
 
     if (this.previous_children != null) {
       this.previous_children.classList.remove('m-menu__item--active');
@@ -241,8 +233,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         if (this.Menu[i].childs[j].name == sub_menu_name) {
           this.Page_Info.parent = this.Menu[i].parent_name;
           this.Page_Info.children = this.Menu[i].childs[j].name;
-          this.Page_Information.emit(this.Page_Info);
-          console.log(this.Page_Info)
+          this.Page_Information.emit(this.Page_Info);        
           break;
         }
       }
