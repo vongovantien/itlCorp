@@ -19,18 +19,17 @@ label {
         top: 0;
         bottom: 0;
         left: 0;
-    }   
-    .alert-block__heading {
-        padding: 0.7rem 1.5rem;
-        background-color: #f2dedf;
-        .alert-block__title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 0;
-        }
+    }
+}  
+.alert-block__heading {
+    padding: 0.7rem 1.5rem;
+    background-color: #f2dedf;
+    .alert-block__title {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 0;
     }
 }
-
 //job-stage-row
 .job-stage-row {
     width: 100%;
@@ -70,4 +69,10 @@ label {
     top: 1px;
     bottom: 1px;
     right: 1px;
+}
+
+//create job
+.c-modal-fullscreen {
+    width: calc(100% - 1.75rem);
+    max-width: none;
 }

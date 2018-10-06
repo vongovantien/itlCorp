@@ -193,7 +193,7 @@
                                         </span>
                                     </button>
                                     <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                        style="margin-left: 10px;">
+                                        id="myModal" style="margin-left: 10px;">
                                         <span>
                                             <i class="la la-search"></i>
                                             <span>
@@ -237,6 +237,7 @@
             </div>
             <!--end:: m-portlets-->
         </div>
+
         <div class="col-12">
             <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
                 <li class="nav-item m-tabs__item">
@@ -299,9 +300,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="job-stage-progress" style="padding: 30px 15px">
+                        <div class="job-stage-progress" style="padding: 40px 15px">
                             <div class="progress" style="height: 10px">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
                     </div>
@@ -662,6 +664,741 @@
                 </div>
             </div>
             <!--end:: m-portlets-->
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="create-job-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create New Job</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Job Information</h3>
+                        </div>
+                        <div class="m-portlet-body">
+                            <!--begin::Form-->
+                            <div class="m-form">
+                                <div class="m-portlet__body">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Search text
+                                                </label>
+                                                <input type="text" class="form-control m-input" placeholder="Search text">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Select filter
+                                                </label>
+                                                <select class="form-control m-input m-input--square">
+                                                    <option value="">
+                                                        Job ID
+                                                    </option>
+                                                    <option value="">
+                                                        House Bill
+                                                    </option>
+                                                    <option value="">
+                                                        Cont No
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    From date - To date
+                                                </label>
+                                                <div class="m-input-icon m-input-icon--right">
+                                                    <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                        <span>
+                                                            <i class="la la-calendar glyphicon-th"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Search text
+                                                </label>
+                                                <input type="text" class="form-control m-input" placeholder="Search text">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Select filter
+                                                </label>
+                                                <select class="form-control m-input m-input--square">
+                                                    <option value="">
+                                                        Job ID
+                                                    </option>
+                                                    <option value="">
+                                                        House Bill
+                                                    </option>
+                                                    <option value="">
+                                                        Cont No
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    From date - To date
+                                                </label>
+                                                <div class="m-input-icon m-input-icon--right">
+                                                    <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                        <span>
+                                                            <i class="la la-calendar glyphicon-th"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Search text
+                                                </label>
+                                                <input type="text" class="form-control m-input" placeholder="Search text">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Select filter
+                                                </label>
+                                                <select class="form-control m-input m-input--square">
+                                                    <option value="">
+                                                        Job ID
+                                                    </option>
+                                                    <option value="">
+                                                        House Bill
+                                                    </option>
+                                                    <option value="">
+                                                        Cont No
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    From date - To date
+                                                </label>
+                                                <div class="m-input-icon m-input-icon--right">
+                                                    <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                        <span>
+                                                            <i class="la la-calendar glyphicon-th"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Search text
+                                                </label>
+                                                <input type="text" class="form-control m-input" placeholder="Search text">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Select filter
+                                                </label>
+                                                <select class="form-control m-input m-input--square">
+                                                    <option value="">
+                                                        Job ID
+                                                    </option>
+                                                    <option value="">
+                                                        House Bill
+                                                    </option>
+                                                    <option value="">
+                                                        Cont No
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    From date - To date
+                                                </label>
+                                                <div class="m-input-icon m-input-icon--right">
+                                                    <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                        <span>
+                                                            <i class="la la-calendar glyphicon-th"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Form-->
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlets-->
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Route/Trip/Bill Information</h3>
+                        </div>
+                        <div class="m-portlet-body">
+                            <!--begin::Form-->
+                            <div class="m-form">
+                                <div class="m-portlet__body">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Search text
+                                                </label>
+                                                <input type="text" class="form-control m-input" placeholder="Search text">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Select filter
+                                                </label>
+                                                <select class="form-control m-input m-input--square">
+                                                    <option value="">
+                                                        Job ID
+                                                    </option>
+                                                    <option value="">
+                                                        House Bill
+                                                    </option>
+                                                    <option value="">
+                                                        Cont No
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    From date - To date
+                                                </label>
+                                                <div class="m-input-icon m-input-icon--right">
+                                                    <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                        <span>
+                                                            <i class="la la-calendar glyphicon-th"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Search text
+                                                </label>
+                                                <input type="text" class="form-control m-input" placeholder="Search text">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Select filter
+                                                </label>
+                                                <select class="form-control m-input m-input--square">
+                                                    <option value="">
+                                                        Job ID
+                                                    </option>
+                                                    <option value="">
+                                                        House Bill
+                                                    </option>
+                                                    <option value="">
+                                                        Cont No
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    From date - To date
+                                                </label>
+                                                <div class="m-input-icon m-input-icon--right">
+                                                    <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                        <span>
+                                                            <i class="la la-calendar glyphicon-th"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Search text
+                                                </label>
+                                                <input type="text" class="form-control m-input" placeholder="Search text">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    Select filter
+                                                </label>
+                                                <select class="form-control m-input m-input--square">
+                                                    <option value="">
+                                                        Job ID
+                                                    </option>
+                                                    <option value="">
+                                                        House Bill
+                                                    </option>
+                                                    <option value="">
+                                                        Cont No
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label>
+                                                    From date - To date
+                                                </label>
+                                                <div class="m-input-icon m-input-icon--right">
+                                                    <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                        <span>
+                                                            <i class="la la-calendar glyphicon-th"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Form-->
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlets-->
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">House Bill List</h3>
+                        </div>
+                        <div class="m-portlet-body">
+                            <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="local_data"
+                                style="">
+                                <table class="m-datatable__table" style="display: block; min-height: 300px; overflow-x: auto;">
+                                    <thead class="m-datatable__head">
+                                        <tr class="m-datatable__row" style="left: 0px;">
+                                            <th data-field="RecordID" class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"><span
+                                                    style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--all m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox"><span></span></label></span></th>
+                                            <th data-field="OrderID" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Order ID</span></th>
+                                            <th data-field="ShipName" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Ship Name</span></th>
+                                            <th data-field="Currency" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 100px;">Currency</span></th>
+                                            <th data-field="ShipAddress" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Ship Address</span></th>
+                                            <th data-field="ShipDate" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Ship Date</span></th>
+                                            <th data-field="Latitude" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Latitude</span></th>
+                                            <th data-field="Status" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Status</span></th>
+                                            <th data-field="Type" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Type</span></th>
+                                            <th data-field="Actions" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Actions</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="m-datatable__body" style="">
+                                        <tr data-row="0" class="m-datatable__row" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="1"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">54473-251</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">GTQ</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">897
+                                                    Magdeline Park</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">5/21/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">14.78667</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-primary">Retail</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="1" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="2"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">41250-308</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Denesik-Langosh</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">IDR</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">9
+                                                    Brickson Park Junction</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">4/19/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">-6.4222</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-accent">Direct</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="2" class="m-datatable__row" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="17"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">29500-9090</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Yundt
+                                                    Inc</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">CNY</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">538
+                                                    Saint Paul Plaza</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">11/25/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">31.2573</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-primary">Retail</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="3" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="23"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">57520-0581</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Heaney
+                                                    LLC</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">BRL</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">1
+                                                    Fordem Junction</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">6/4/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">-11.04833</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--danger m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-danger">Online</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="4" class="m-datatable__row" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="26"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">35356-933</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Adams-Kohler</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">RUB</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">16912
+                                                    Forest Run Circle</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">11/27/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">54.20914</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-accent">Direct</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlets-->
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Stage List</h3>
+                        </div>
+                        <div class="m-portlet-body">
+                            <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="local_data"
+                                style="">
+                                <table class="m-datatable__table" style="display: block; min-height: 300px; overflow-x: auto;">
+                                    <thead class="m-datatable__head">
+                                        <tr class="m-datatable__row" style="left: 0px;">
+                                            <th data-field="RecordID" class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"><span
+                                                    style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--all m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox"><span></span></label></span></th>
+                                            <th data-field="OrderID" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Order ID</span></th>
+                                            <th data-field="ShipName" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Ship Name</span></th>
+                                            <th data-field="Currency" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 100px;">Currency</span></th>
+                                            <th data-field="ShipAddress" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Ship Address</span></th>
+                                            <th data-field="ShipDate" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Ship Date</span></th>
+                                            <th data-field="Latitude" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Latitude</span></th>
+                                            <th data-field="Status" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Status</span></th>
+                                            <th data-field="Type" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Type</span></th>
+                                            <th data-field="Actions" class="m-datatable__cell m-datatable__cell--sort"><span
+                                                    style="width: 110px;">Actions</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="m-datatable__body" style="">
+                                        <tr data-row="0" class="m-datatable__row" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="1"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">54473-251</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">GTQ</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">897
+                                                    Magdeline Park</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">5/21/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">14.78667</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-primary">Retail</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="1" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="2"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">41250-308</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Denesik-Langosh</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">IDR</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">9
+                                                    Brickson Park Junction</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">4/19/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">-6.4222</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-accent">Direct</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="2" class="m-datatable__row" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="17"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">29500-9090</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Yundt
+                                                    Inc</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">CNY</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">538
+                                                    Saint Paul Plaza</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">11/25/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">31.2573</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-primary">Retail</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="3" class="m-datatable__row m-datatable__row--even" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="23"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">57520-0581</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Heaney
+                                                    LLC</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">BRL</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">1
+                                                    Fordem Junction</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">6/4/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">-11.04833</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--danger m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-danger">Online</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                        <tr data-row="4" class="m-datatable__row" style="left: 0px;">
+                                            <td class="m-datatable__cell--center m-datatable__cell m-datatable__cell--check"
+                                                data-field="RecordID"><span style="width: 50px;"><label class="m-checkbox m-checkbox--single m-checkbox--solid m-checkbox--brand"><input
+                                                            type="checkbox" value="26"><span></span></label></span></td>
+                                            <td data-field="OrderID" class="m-datatable__cell"><span style="width: 110px;">35356-933</span></td>
+                                            <td data-field="ShipName" class="m-datatable__cell"><span style="width: 110px;">Adams-Kohler</span></td>
+                                            <td data-field="Currency" class="m-datatable__cell"><span style="width: 100px;">RUB</span></td>
+                                            <td data-field="ShipAddress" class="m-datatable__cell"><span style="width: 110px;">16912
+                                                    Forest Run Circle</span></td>
+                                            <td data-field="ShipDate" class="m-datatable__cell"><span style="width: 110px;">11/27/2016</span></td>
+                                            <td data-field="Latitude" class="m-datatable__cell"><span style="width: 110px;">54.20914</span></td>
+                                            <td data-field="Status" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--brand m-badge--wide">Pending</span></span></td>
+                                            <td data-field="Type" class="m-datatable__cell"><span style="width: 110px;"><span
+                                                        class="m-badge m-badge--accent m-badge--dot"></span>&nbsp;<span
+                                                        class="m--font-bold m--font-accent">Direct</span></span></td>
+                                            <td data-field="Actions" class="m-datatable__cell"><span style="overflow: visible; position: relative; width: 110px;">
+                                                    <div class="dropdown "> <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                            data-toggle="dropdown"> <i class="la la-ellipsis-h"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right"> <a class="dropdown-item"
+                                                                href="#"><i class="la la-edit"></i> Edit Details</a> <a
+                                                                class="dropdown-item" href="#"><i class="la la-leaf"></i>
+                                                                Update Status</a> <a class="dropdown-item" href="#"><i
+                                                                    class="la la-print"></i> Generate Report</a> </div>
+                                                    </div> <a href="#" class="m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill"
+                                                        title="View "> <i class="la la-edit"></i> </a>
+                                                </span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlets-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
         </div>
     </div>
 </div>
