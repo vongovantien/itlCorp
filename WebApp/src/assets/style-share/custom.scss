@@ -62,6 +62,33 @@ label {
 }
 .job-stage-item {
     background-color: #ecf3fa;
+    position: relative;
+    color: #747474;
+    &.job-success {
+        color: #fff;
+        background-color: #00bd3b;
+    }
+    &.job-inprogress {
+        color: #fff;
+        background-color: #379be1;
+    }
+    &.job-overdue {
+        color: #fff;
+        background-color: #f23232;
+    }
+    &.job-warning {
+        color: #fff;
+        background-color: #ff8929;
+    }
+    .job-exp-timestamp {
+        width: 100%;
+        display: inline-block;
+        font-size: 9px;
+        font-weight: 500;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
 }
 .job-stage-info {
     width: 100px;
@@ -80,6 +107,14 @@ label {
     top: 1px;
     bottom: 1px;
     right: 1px;
+    .progress {
+        height: 10px;
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        right: 10px;
+        margin-top: -5px;
+    }
 }
 
 //create job
