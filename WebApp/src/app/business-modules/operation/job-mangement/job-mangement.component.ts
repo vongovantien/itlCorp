@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as lodash from 'lodash';
 
 @Component({
   selector: 'app-job-mangement',
