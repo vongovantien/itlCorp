@@ -1,7 +1,7 @@
 <div class="m-content">
   <div class="row">
       <div class="col-xl-12">
-          <!--begin:: m-portlet-->
+          <!--begin:: job-search-form-->
           <div class="m-portlet">
               <div class="m-portlet__head">
                   <div class="m-portlet__head-caption">
@@ -13,12 +13,194 @@
                   </div>
               </div>
               <div class="m-portlet__body">
-                  <!--begin::Content-->
-                  <p>Assigment page</p>
-                  <!--end::Content-->
+                  <!--begin::Form-->
+                <div class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Search text
+                                        </label>
+                                        <input type="text" class="form-control m-input" placeholder="Search text">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            Select filter
+                                        </label>
+                                        <select class="form-control m-input m-input--square">
+                                            <option value="">
+                                                Job ID
+                                            </option>
+                                            <option value="">
+                                                House Bill
+                                            </option>
+                                            <option value="">
+                                                Cont No
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>
+                                            From date - To date
+                                        </label>
+                                        <div class="m-input-icon m-input-icon--right">
+                                            <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar glyphicon-th"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--begin::Advance-search-->
+                            <div class="div-inside bg-secondary" style="padding: 20px; margin-bottom: 20px">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Progress
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    80% - 100%
+                                                </option>
+                                                <option value="">
+                                                    0% - 79%
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Status
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Status 1
+                                                </option>
+                                                <option value="">
+                                                    Status 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Services
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Services 1
+                                                </option>
+                                                <option value="">
+                                                    Services 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Team
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Team 1
+                                                </option>
+                                                <option value="">
+                                                    Team 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Customer
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Customer 1
+                                                </option>
+                                                <option value="">
+                                                    Customer 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Staff
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Staff 1
+                                                </option>
+                                                <option value="">
+                                                    Staff 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Advance-search-->
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <a href="javascript:void(0)" class="btn btn-link">
+                                            <span>
+                                                <i class="la la-angle-down"></i>
+                                                <span>Advance search</span>
+                                            </span>
+                                        </a>
+                                        <button type="reset" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                                            <span>
+                                                <i class="la la-hand-o-up"></i>
+                                                <span>
+                                                    Assigment
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="col-lg-6 m--align-right">
+                                        <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                                            <span>
+                                                <i class="la la-search"></i>
+                                                <span>
+                                                    Search
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                                            <span>
+                                                <i class="la la-refresh"></i>
+                                                <span>
+                                                    Reset
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Form-->
               </div>
           </div>
-          <!--end:: m-portlets-->
+          <!--end:: job-search-form-->
       </div>
   </div>
 </div>
