@@ -7,6 +7,17 @@ label {
 .m-body {
     width: 100%;
 }
+//table
+.table,
+.table-brand {
+    thead {
+        th {
+            color: #fff;
+            font-weight: 500;
+            background-color: #3966b6;
+        }
+    }
+}
 // job management
 .alert-block-red {
     position: relative;
