@@ -259,69 +259,779 @@
             <!--begin:: m-portlet portlet-stageview-->
             <div class="m-portlet portlet-stageview">
                 <div class="m-portlet__body">
-                    <!--begin::Content-->
-                    <div class="job-stage-row">
-                        <div class="job-stage-info">
-                        </div>
-                        <div class="job-stage-list">
-                            <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 1
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
+                    <div class="job-stageview-list">
+                        <!--begin::job-stage-row-->
+                        <div class="job-stage-row">
+                            <div class="job-stage-info">
+                                <div class="job-info-group">
+                                    <div class="block-text" title="Job ID: 12345678">Job ID</div>
+                                    <div class="block-text">OPS I.C</div>
+                                    <div class="block-text">CS/IC</div>
+                                    <div class="block-text">Cust</div>
                                 </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle  job-stage-item">
-                                    Stage 2
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                <div class="dropdown dropup job-stage-item-actions">
+                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
+                                        <i class="la la-list m--font-success"></i>
+                                    </a>
                                 </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
-                                    Stage 3
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
+                            </div>
+                            <div class="job-stage-list">
+                                <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
-                                    Stage 4
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 5
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 6
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 7
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 8
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 9
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 10
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 11
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 12
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
+                            </div>
+                            <div class="job-stage-progress">
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 50%"></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="job-stage-progress">
-                            <div class="progress">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%"></div>
+                        <!--end::job-stage-row-->
+                        <!--begin::job-stage-row-->
+                        <div class="job-stage-row">
+                            <div class="job-stage-info">
+                                <div class="job-info-group">
+                                    <div class="block-text" title="Job ID: 12345678">Job ID</div>
+                                    <div class="block-text">OPS I.C</div>
+                                    <div class="block-text">CS/IC</div>
+                                    <div class="block-text">Cust</div>
+                                </div>
+                                <div class="dropdown dropup job-stage-item-actions">
+                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
+                                        <i class="la la-list m--font-success"></i>
+                                    </a>
+                                </div>
                             </div>
+                            <div class="job-stage-list">
+                                <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-overdue">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-warning">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="job-stage-progress">
+                                <div class="progress">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::job-stage-row-->
+                        <!--begin::job-stage-row-->
+                        <div class="job-stage-row">
+                            <div class="job-stage-info">
+                                <div class="job-info-group">
+                                    <div class="block-text" title="Job ID: 12345678">Job ID</div>
+                                    <div class="block-text">OPS I.C</div>
+                                    <div class="block-text">CS/IC</div>
+                                    <div class="block-text">Cust</div>
+                                </div>
+                                <div class="dropdown dropup job-stage-item-actions">
+                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
+                                        <i class="la la-list m--font-success"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="job-stage-list">
+                                <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-warning">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="job-stage-progress">
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::job-stage-row-->
+                        <!--begin::job-stage-row-->
+                        <div class="job-stage-row">
+                            <div class="job-stage-info">
+                                <div class="job-info-group">
+                                    <div class="block-text" title="Job ID: 12345678">Job ID</div>
+                                    <div class="block-text">OPS I.C</div>
+                                    <div class="block-text">CS/IC</div>
+                                    <div class="block-text">Cust</div>
+                                </div>
+                                <div class="dropdown dropup job-stage-item-actions">
+                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
+                                        <i class="la la-list m--font-success"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="job-stage-list">
+                                <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
+                                        <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
+                                        <span class="job-exp-timestamp">12:01 03/10/18</span>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
+                                                <i class="icon-more-horizontal"></i>
+                                            </a>
+                                            <div class="dropdown-menu job-stage-action-menu">
+                                                <a class="dropdown-item" href="#">Edit stage detail</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Processing</a> 
+                                                <a class="dropdown-item" href="#">Pending</a>
+                                                <a class="dropdown-item" href="#">Overdued</a>
+                                                <a class="dropdown-item" href="#">Completed</a> 
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#">Delete stage</a>
+                                                <a class="dropdown-item" href="#">Exit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="job-stage-progress">
+                                <div class="progress">
+                                    <div class="progress-bar bg-gray" role="progressbar" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::job-stage-row-->
+                    </div>
+                    
+                    <!--begin::pagination-->
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="select-box" style="max-width: 190px">
+                                <select class="form-control" id="" aria-label="">
+                                    <option value="1">15 line/screen</option>
+                                    <option value="2">30 line/screen</option>
+                                    <option value="3">50 line/screen</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <nav aria-label="">
+                                <ul class="pagination  justify-content-end">
+                                    <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                                </ul>
+                            </nav>
                         </div>
                     </div>
-                    <!--end::Content-->
+                    <!--end::pagination-->
                 </div>
             </div>
             <!--end:: m-portlets-->
