@@ -246,16 +246,18 @@
         <div class="col-12">
             <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="" role="tab">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#job-stageview-tab" role="tab">
                         Stage View
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="" role="tab">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#job-tableview-tab" role="tab">
                         Table View
                     </a>
                 </li>
             </ul>
+            <div class="tab-content job-tab-content" id="jobTabContent">
+            <div class="tab-pane fade show active" id="job-stageview-tab" role="tabpanel" aria-labelledby="">
             <!--begin:: m-portlet portlet-stageview-->
             <div class="m-portlet portlet-stageview">
                 <div class="m-portlet__body">
@@ -1035,8 +1037,10 @@
                 </div>
             </div>
             <!--end:: m-portlets-->
+            </div>
+            <div class="tab-pane fade"  id="job-tableview-tab" role="tabpanel" aria-labelledby="">
             <!--begin:: m-portlet-->
-            <div class="m-portlet" style="display: none">
+            <div class="m-portlet">
                 <div class="m-portlet__body">
                     <!--begin: Datatable of stage-table-view -->
                     <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="">
@@ -1162,6 +1166,8 @@
                 </div>
             </div>
             <!--end:: m-portlets-->
+            </div>
+            </div>
         </div>
     </div>
 </div>

@@ -49,6 +49,11 @@ label {
     }
 }
 //
+.job-tab-content {
+    .tab-pane {
+        min-height: 300px;
+    }
+}
 .job-stageview-list {
     margin-bottom: 20px;
 }
