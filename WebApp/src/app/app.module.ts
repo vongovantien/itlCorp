@@ -18,6 +18,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 import { BreadcrumbComponent } from './master-page/breadcrumb/breadcrumb.component';
+import { Daterangepicker } from 'ng2-daterangepicker';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { BreadcrumbComponent } from './master-page/breadcrumb/breadcrumb.compone
     HttpClientModule,
     BrowserAnimationsModule, // required animations module
     ToastrModule.forRoot(), // ToastrModule added
-    Ng4LoadingSpinnerModule.forRoot()
+    Ng4LoadingSpinnerModule.forRoot(),
+    Daterangepicker
   ],
   providers: [BaseService],
   bootstrap: [AppComponent],

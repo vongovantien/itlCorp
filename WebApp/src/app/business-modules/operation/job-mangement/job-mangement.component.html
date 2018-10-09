@@ -50,7 +50,11 @@
                                     <label>
                                         Select filter
                                     </label>
-                                    <select class="form-control m-input m-input--square">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="No city selected">
+                                    </ng-select>
+                                    <!-- <select class="form-control m-input m-input--square">
                                         <option value="">
                                             Job ID
                                         </option>
@@ -60,7 +64,7 @@
                                         <option value="">
                                             Cont No
                                         </option>
-                                    </select>
+                                    </select> -->
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -69,7 +73,8 @@
                                         From date - To date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right">
-                                        <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                        <input type="text" class="form-control m-input" placeholder="From date - To date"
+                                            daterangepicker [options]="options" (selected)="selectedDate($event, daterange)">
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar glyphicon-th"></i>
