@@ -441,30 +441,30 @@
                             </div>
                             <!--begin::pagination-->
                             <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="select-box" style="max-width: 190px">
-                                            <select class="form-control" id="" aria-label="">
-                                                <option value="1">15 line/screen</option>
-                                                <option value="2">30 line/screen</option>
-                                                <option value="3">50 line/screen</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <nav aria-label="">
-                                            <ul class="pagination  justify-content-end">
-                                                <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                                            </ul>
-                                        </nav>
+                                <div class="col-sm-6">
+                                    <div class="select-box" style="max-width: 190px">
+                                        <select class="form-control" id="" aria-label="">
+                                            <option value="1">15 line/screen</option>
+                                            <option value="2">30 line/screen</option>
+                                            <option value="3">50 line/screen</option>
+                                        </select>
                                     </div>
                                 </div>
-                                    <!--end::pagination-->
+                                <div class="col-sm-6">
+                                    <nav aria-label="">
+                                        <ul class="pagination  justify-content-end">
+                                            <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                            <!--end::pagination-->
                         </div>
                         <!--end:: m-portlets-->
                     </div>
@@ -581,7 +581,7 @@
 </div>
 <!--end:: m-content-->
 <!--begin:: create-job-modal-->
-<div class="modal fade" id="create-job-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="create-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -752,42 +752,85 @@
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Qty">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                        Qty
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="G.W">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                            G.W
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Unit">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                            Unit
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="N.W">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                            N.W
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CBM">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                            CBM
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CNTS">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                            CNTS
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-12 m--align-right">
-                                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                                            data-toggle="modal" data-target="#container-list-of-job-modal">
                                                             <span>
                                                                 <i class="icon-plus7"></i>
                                                                 <span>
@@ -1317,7 +1360,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -1332,743 +1375,192 @@
 <!--end::create-job-modal-->
 
 <!--begin::container-list-of-job-modal-->
-<div class="modal fade" id="create-job-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
+<div class="modal fade" id="container-list-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create New Job</h5>
+                <h5 class="modal-title">Container List</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">Job Information</h3>
-                        </div>
-                        <div class="m-portlet-body">
-                            <!--begin::Form-->
-                            <div class="m-form">
-                                <div class="m-portlet__body">
-                                    <div class="row">
-                                        <div class="col-lg-8">
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Job ID
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Service Date
-                                                        </label>
-                                                        <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
-                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                                <span>
-                                                                    <i class="la la-calendar glyphicon-th"></i>
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Cargo O.P
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Finish Date
-                                                        </label>
-                                                        <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
-                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                                <span>
-                                                                    <i class="la la-calendar glyphicon-th"></i>
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            O.P IC
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Service
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Assign Route
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Commodity
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="row">
-                                                <div class="col-lg-12">
-                                                    <label>
-                                                        Container Summary
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="c-border-block">
-                                                <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Qty">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="G.W">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Unit">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="N.W">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CBM">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CNTS">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-12 m--align-right">
-                                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                                            <span>
-                                                                <i class="icon-plus7"></i>
-                                                                <span>
-                                                                    container
-                                                                </span>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end::Form-->
-                        </div>
-                    </div>
-                </div>
-                <!--end:: m-portlets-->
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">Route/Trip/Bill Information</h3>
-                        </div>
-                        <div class="m-portlet-body">
-                            <!--begin::Form-->
-                            <div class="m-form">
-                                <div class="m-portlet__body">
-                                    <div class="row">
-                                        <div class="col-lg-9">
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Supplier
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            W. House
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            P/O No.
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Agent
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            P.O.L
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Inv No.
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Vessel/Flight
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            P.O.D
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label for="">
-                                                            M - B/L
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label>
-                                                    Note
-                                                </label>
-                                                <textarea rows="10" type="text" class="form-control m-input"
-                                                    placeholder="Please enter detail"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end::Form-->
-                        </div>
-                    </div>
-                </div>
-                <!--end:: m-portlets-->
-
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">House Bill List</h3>
-                        </div>
-                        <div class="m-portlet__body">
-                            <!--begin: Search Form -->
-                            <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
-                                <div class="row align-items-center">
-                                    <div class="col-xl-8 order-2 order-xl-1">
-                                        <div class="form-group m-form__group row align-items-center">
-                                            <div class="col-md-4">
-                                                <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
-                                                        id="generalSearch">
-                                                    <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                        <span>
-                                                            <i class="la la-search"></i>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                            <span>
-                                                <i class="icon-plus7"></i>
+                <div class="container-list-table">
+                    <!--begin: Search Form -->
+                    <div class="m-form m-form--label-align-right m--margin-bottom-20">
+                        <div class="row align-items-center">
+                            <div class="col-xl-8 order-2 order-xl-1">
+                                <div class="form-group m-form__group row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="m-input-icon m-input-icon--left">
+                                            <input type="text" class="form-control m-input" placeholder="Search..." id="generalSearch">
+                                            <span class="m-input-icon__icon m-input-icon__icon--left">
                                                 <span>
-                                                    add new
+                                                    <i class="la la-search"></i>
                                                 </span>
                                             </span>
-                                        </button>
-                                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end: Search Form -->
-                            <!--begin: Datatable of house-bill-list -->
-                            <div class="table-wrapper" id="">
-                                <table class="table table-striped table-brand">
-                                    <thead class="">
-                                        <tr class="">
-                                            <th class="">
-                                                Actions
-                                            </th>
-                                            <th class="">
-                                                No
-                                            </th>
-                                            <th class="">
-                                                Customer
-                                            </th>
-                                            <th class="">
-                                                H-B/L (HAWB)
-                                            </th>
-                                            <th class="">
-                                                Salesman
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="">
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions">
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove bill">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>1</span>
-                                            </td>
-                                            <td>
-                                                <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="" selected>
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail"
-                                                    value="H-B/L (HAWB)">
-                                            </td>
-                                            <td>
-                                                <span>Scott Phuong</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions">
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove bill">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>2</span>
-                                            </td>
-                                            <td>
-                                                <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="" selected>
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail"
-                                                    value="H-B/L (HAWB)">
-                                            </td>
-                                            <td>
-                                                <span>Scott Phuong</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!--end: Datatable of house-bill-list -->
-                        </div>
-                    </div>
-                </div>
-                <!--end:: m-portlets-->
-
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">Stage List</h3>
-                        </div>
-                        <div class="m-portlet__body">
-                            <!--begin: Search Form -->
-                            <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
-                                <div class="row align-items-center">
-                                    <div class="col-xl-8 order-2 order-xl-1">
-                                        <div class="form-group m-form__group row align-items-center">
-                                            <div class="col-md-4">
-                                                <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
-                                                        id="generalSearch">
-                                                    <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                        <span>
-                                                            <i class="la la-search"></i>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                            <span>
-                                                <i class="icon-plus7"></i>
-                                                <span>
-                                                    add new
-                                                </span>
-                                            </span>
-                                        </button>
-                                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                                    </div>
                                 </div>
                             </div>
-                            <!--end: Search Form -->
-                            <!--begin: Datatable of stage-list -->
-                            <div class="table-wrapper" id="">
-                                <table class="table table-striped table-brand">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <span>Actions</span>
-                                            </th>
-                                            <th>
-                                                <span>Stage Order</span>
-                                            </th>
-                                            <th>
-                                                <span>Abbr</span>
-                                            </th>
-                                            <th>
-                                                <span>Name</span>
-                                            </th>
-                                            <th>
-                                                <span>Description</span>
-                                            </th>
-                                            <th>
-                                                <span>Assignee</span>
-                                            </th>
-                                            <th>
-                                                <span>Process Time</span>
-                                            </th>
-                                            <th>
-                                                <span>Deadline</span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>1</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 2</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>2</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 3</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>3</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 1</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="icon-plus7"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button>
+                                <div class="m-separator m-separator--dashed d-xl-none"></div>
                             </div>
-                            <!--end: Datatable of stage-list -->
                         </div>
                     </div>
+                    <!--end: Search Form -->
+                    <!--begin: Datatable of house-bill-list -->
+                    <div class="table-wrapper" id="">
+                        <table class="table table-striped table-brand table--editable">
+                            <thead class="">
+                                <tr class="">
+                                    <th class=""></th>
+                                    <th class="">
+                                        Q'ty
+                                    </th>
+                                    <th class="">
+                                        Cont Type
+                                    </th>
+                                    <th class="">
+                                        Cont No
+                                    </th>
+                                    <th class="">
+                                        Seal No
+                                    </th>
+                                    <th class="">
+                                        Type
+                                    </th>
+                                    <th class="">
+                                        Unit
+                                    </th>
+                                    <th class="">
+                                        Description
+                                    </th>
+                                    <th class="">
+                                        N.W
+                                    </th>
+                                    <th class="">
+                                        G.W
+                                    </th>
+                                    <th class="">
+                                        CBM
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="">
+                                <tr>
+                                    <td class="table-action-col">
+                                        <div class="table-actions">
+                                            <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Remove bill">
+                                                <i class="la la-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="40DC">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="00001">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="FCL">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="Cont">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="This is description">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="table-action-col">
+                                        <div class="table-actions">
+                                            <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Remove bill">
+                                                <i class="la la-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="40DC">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="00001">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="FCL">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="Cont">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="This is description">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable of house-bill-list -->
                 </div>
-                <!--end:: m-portlets-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="reset" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="reset" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
-                        <i class="la la-check"></i>
+                        <i class="la la-download"></i>
                         <span>
-                            choose default detail
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save as default
+                            import
                         </span>
                     </span>
                 </button>
                 <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
                     <span>
-                        <i class="la la-hand-o-up"></i>
+                        <i class="la la-save"></i>
                         <span>
-                            start job
+                            save
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
