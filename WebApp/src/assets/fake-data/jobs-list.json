@@ -15,7 +15,7 @@
             {"stage_name":"Stage 7","exp_time":"12:01 03/10/18","status":"default"},
             {"stage_name":"Stage 8","exp_time":"12:01 03/10/18","status":"warning"},
             {"stage_name":"Stage 9","exp_time":"12:01 03/10/18","status":"default"},
-            {"stage_name":"Stage 10","exp_time":"12:01 03/10/18","status":"default"}
+            {"stage_name":"Stage 10","exp_time":"12:01 03/10/18","status":"warning"}
         ]
     },
 
@@ -31,9 +31,9 @@
             {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"success"},
             {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"success"},
             {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"schedule"},
-            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"success"},
-            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"process"},
-            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"warning"}
+            {"stage_name":"Stage 7","exp_time":"12:01 03/10/18","status":"success"},
+            {"stage_name":"Stage 8","exp_time":"12:01 03/10/18","status":"process"},
+            {"stage_name":"Stage 9","exp_time":"12:01 03/10/18","status":"warning"}
         ]
     },
 
@@ -49,9 +49,9 @@
             {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"warning"},
             {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"default"},
             {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"success"},
-            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"warning"},
-            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"default"},
-            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"success"}
+            {"stage_name":"Stage 7","exp_time":"12:01 03/10/18","status":"warning"},
+            {"stage_name":"Stage 8","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 9","exp_time":"12:01 03/10/18","status":"success"}
         ]
     },
 
@@ -67,9 +67,9 @@
             {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"success"},
             {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"default"},
             {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"default"},
-            {"stage_name":"Stage 2","exp_time":"12:01 03/10/18","status":"process"},
-            {"stage_name":"Stage 3","exp_time":"12:01 03/10/18","status":"default"},
-            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"overdue"}
+            {"stage_name":"Stage 7","exp_time":"12:01 03/10/18","status":"process"},
+            {"stage_name":"Stage 8","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 9","exp_time":"12:01 03/10/18","status":"overdue"}
         ]
     }
 
