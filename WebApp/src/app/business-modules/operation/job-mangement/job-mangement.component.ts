@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import * as lodash from 'lodash';
+import { ActivatedRoute } from '@angular/router';
+declare var jquery: any;
+declare var $: any;
+
 
 @Component({
   selector: 'app-job-mangement',
@@ -8,9 +12,14 @@ import * as lodash from 'lodash';
 })
 export class JobMangementComponent implements OnInit {
 
-  constructor() { }
+  constructor(private route:ActivatedRoute) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.route.params.subscribe(prams => {
+      if (prams.action == "create_job") {
+        $("#create-job-modal").modal('show');
+      }
+    });
   }
 
 }
