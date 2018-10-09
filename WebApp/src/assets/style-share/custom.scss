@@ -27,7 +27,6 @@ label {
     width: 20px;
     height: 20px;
     margin-bottom: 0;
-    overflow: hidden;
 }
 //table
 .table,
@@ -41,6 +40,15 @@ label {
             background-color: #3966b6;
             &:first-child {
                 padding-left: 10px
+            }
+        }
+        .table-filter-row {
+            td {
+                background-color: #dde9f5;
+                padding: 0;
+            }
+            .form-control {
+                background-color: transparent;
             }
         }
     }
