@@ -1,12 +1,78 @@
 [
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"}
+
+    {
+        "job_id":"",
+        "ops_ic":"",
+        "cs_ic":"",
+        "customer":"",
+        "stage_list":[
+            {"stage_name":"Stage 1","exp_time":"12:01 03/10/18","status":"schedule"},
+            {"stage_name":"Stage 2","exp_time":"12:01 03/10/18","status":"process"},
+            {"stage_name":"Stage 3","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"success"},
+            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"warning"},
+            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"overdue"},
+            {"stage_name":"Stage 7","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 8","exp_time":"12:01 03/10/18","status":"warning"},
+            {"stage_name":"Stage 9","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 10","exp_time":"12:01 03/10/18","status":"default"}
+        ]
+    },
+
+    {
+        "job_id":"",
+        "ops_ic":"",
+        "cs_ic":"",
+        "customer":"",
+        "stage_list":[
+            {"stage_name":"Stage 1","exp_time":"12:01 03/10/18","status":"overdue"},
+            {"stage_name":"Stage 2","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 3","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"success"},
+            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"success"},
+            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"schedule"},
+            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"success"},
+            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"process"},
+            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"warning"}
+        ]
+    },
+
+    {
+        "job_id":"",
+        "ops_ic":"",
+        "cs_ic":"",
+        "customer":"",
+        "stage_list":[
+            {"stage_name":"Stage 1","exp_time":"12:01 03/10/18","status":"schedule"},
+            {"stage_name":"Stage 2","exp_time":"12:01 03/10/18","status":"overdue"},
+            {"stage_name":"Stage 3","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"warning"},
+            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"success"},
+            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"warning"},
+            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"success"}
+        ]
+    },
+
+    {
+        "job_id":"",
+        "ops_ic":"",
+        "cs_ic":"",
+        "customer":"",
+        "stage_list":[
+            {"stage_name":"Stage 1","exp_time":"12:01 03/10/18","status":"schedule"},
+            {"stage_name":"Stage 2","exp_time":"12:01 03/10/18","status":"process"},
+            {"stage_name":"Stage 3","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"success"},
+            {"stage_name":"Stage 5","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 6","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 2","exp_time":"12:01 03/10/18","status":"process"},
+            {"stage_name":"Stage 3","exp_time":"12:01 03/10/18","status":"default"},
+            {"stage_name":"Stage 4","exp_time":"12:01 03/10/18","status":"overdue"}
+        ]
+    }
+
+    
+
 ]

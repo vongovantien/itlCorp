@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as lodash from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
+import {BaseService} from 'src/services-base/base.service';
 declare var jquery: any;
 declare var $: any;
 
@@ -12,7 +13,9 @@ declare var $: any;
 })
 export class JobMangementComponent implements OnInit {
 
-  constructor(private route:ActivatedRoute,private router:Router) { }
+  Jobs_List:any;
+
+  constructor(private route:ActivatedRoute,private router:Router,private baseServices:BaseService) { }
 
   async ngOnInit() {
     this.route.params.subscribe(prams => {
@@ -21,6 +24,13 @@ export class JobMangementComponent implements OnInit {
         this.router.navigate(['/home/operation/job-management']);
       }
     });
+
+    this.getJobs();
+  }
+
+
+  async getJobs(){
+    this.Jobs_List = await this.baseServices.getAsync('./assets/fake-data/jobs-list.json',true,true);
   }
 
 }

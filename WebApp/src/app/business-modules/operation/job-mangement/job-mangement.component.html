@@ -80,7 +80,7 @@
                             </div>
                         </div>
                         <!--begin::Advance-search-->
-                        <div class="div-inside bg-secondary advance-search-form" style="display: none">
+                        <div class="div-inside bg-secondary" style="padding: 20px; margin-bottom: 20px">
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
@@ -261,15 +261,15 @@
                     <!--begin:: m-portlet portlet-stageview-->
                     <div class="m-portlet portlet-stageview">
                         <div class="m-portlet__body">
-                            <div class="job-stageview-list">
+                            <div class="job-stageview-list" *ngIf="Jobs_List">
                                 <!--begin::job-stage-row-->
-                                <div class="job-stage-row">
+                                <div class="job-stage-row" *ngFor="let job of Jobs_List;let i = index;">
                                     <div class="job-stage-info">
                                         <div class="job-info-group">
                                             <div class="block-text" title="Job ID: 12345678">Job ID</div>
-                                            <div class="block-text" title="OPS I.C">OPS I.C</div>
-                                            <div class="block-text" title="CS/IC">CS/IC</div>
-                                            <div class="block-text" title="Cust">Cust</div>
+                                            <div class="block-text">OPS I.C</div>
+                                            <div class="block-text">CS/IC</div>
+                                            <div class="block-text">Cust</div>
                                         </div>
                                         <div class="dropdown dropup job-stage-item-actions">
                                             <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
@@ -279,1771 +279,346 @@
                                     </div>
                                     <div class="job-stage-list">
                                         <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-file-text"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
+                                            <ng-container *ngFor="let stage of job.stage_list;let k = index;">
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item"
+                                                    *ngIf="stage.status=='default'">
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.stage_name}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
                                                         </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress"
+                                                    *ngIf="stage.status=='process'">
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.stage_name}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
                                                         </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success"
+                                                    *ngIf="stage.status=='success'">
+                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.stage_name}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
                                                         </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-overdue"
+                                                    *ngIf="stage.status=='overdue'">
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.stage_name}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
                                                         </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
+
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-warning"
+                                                    *ngIf="stage.status=='warning'">
+                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.stage_name}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
                                                         </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
+                                            </ng-container>
+
+                                        </div>
+                                        <div class="job-stage-progress">
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="job-stage-progress">
-                                        <div class="progress-text">50%</div>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%">
-                                            </div>
+                                    <!--end::job-stage-row-->
+                                    <!--begin::job-stage-row-->
+
+                                    <!--end::job-stage-row-->
+                                    <!--begin::job-stage-row-->
+
+                                    <!--end::job-stage-row-->
+                                    <!--begin::job-stage-row-->
+
+                                    <!--end::job-stage-row-->
+                                </div>
+
+                                <!--begin::pagination-->
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="select-box" style="max-width: 190px">
+                                            <select class="form-control" id="" aria-label="">
+                                                <option value="1">15 line/screen</option>
+                                                <option value="2">30 line/screen</option>
+                                                <option value="3">50 line/screen</option>
+                                            </select>
                                         </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <nav aria-label="">
+                                            <ul class="pagination  justify-content-end">
+                                                <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                                            </ul>
+                                        </nav>
                                     </div>
                                 </div>
-                                <!--end::job-stage-row-->
-                                <!--begin::job-stage-row-->
-                                <div class="job-stage-row">
-                                    <div class="job-stage-info">
-                                        <div class="job-info-group">
-                                            <div class="block-text" title="Job ID: 12345678">Job ID</div>
-                                            <div class="block-text" title="OPS I.C">OPS I.C</div>
-                                            <div class="block-text" title="CS/IC">CS/IC</div>
-                                            <div class="block-text" title="Cust">Cust</div>
-                                        </div>
-                                        <div class="dropdown dropup job-stage-item-actions">
-                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
-                                                <i class="la la-list m--font-success"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="job-stage-list">
-                                        <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-overdue">
-                                                <div class="stage-item-info"><i class="la la-file-text"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-file-text"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-warning">
-                                                <div class="stage-item-info"><i class="la la-file-text"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-file-text"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="job-stage-progress">
-                                        <div class="progress">
-                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 50%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end::job-stage-row-->
-                                <!--begin::job-stage-row-->
-                                <div class="job-stage-row">
-                                    <div class="job-stage-info">
-                                         <div class="job-info-group">
-                                            <div class="block-text" title="Job ID: 12345678">Job ID</div>
-                                            <div class="block-text" title="OPS I.C">OPS I.C</div>
-                                            <div class="block-text" title="CS/IC">CS/IC</div>
-                                            <div class="block-text" title="Cust">Cust</div>
-                                        </div>
-                                        <div class="dropdown dropup job-stage-item-actions">
-                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
-                                                <i class="la la-list m--font-success"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="job-stage-list">
-                                        <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-warning">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="job-stage-progress">
-                                        <div class="progress">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width: 50%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end::job-stage-row-->
-                                <!--begin::job-stage-row-->
-                                <div class="job-stage-row">
-                                    <div class="job-stage-info">
-                                         <div class="job-info-group">
-                                            <div class="block-text" title="Job ID: 12345678">Job ID</div>
-                                            <div class="block-text" title="OPS I.C">OPS I.C</div>
-                                            <div class="block-text" title="CS/IC">CS/IC</div>
-                                            <div class="block-text" title="Cust">Cust</div>
-                                        </div>
-                                        <div class="dropdown dropup job-stage-item-actions">
-                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
-                                                <i class="la la-list m--font-success"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="job-stage-list">
-                                        <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 1</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
-                                                <div class="stage-item-info"><i class="la la-truck"></i> Stage 2</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-file-text"></i> Stage 3</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                                <div class="stage-item-info"><i class="la la-file-text"></i> Stage 4</div>
-                                                <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                                <div class="dropdown dropup job-stage-item-actions">
-                                                    <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown" href="#" title="Setting">
-                                                        <i class="icon-more-horizontal"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu job-stage-action-menu">
-                                                        <div class="stage-detail-group">
-                                                            <div class="block-text">Stage description: This is Stage description</div>
-                                                            <div class="block-text">Stage deadline: <span>12:01 03/10/18</span></div>
-                                                            <div class="block-text">Stage comment: Kris completed before 29/09/2018</div>
-                                                        </div>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Edit stage detail</a> 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Pending</a>
-                                                        <a class="dropdown-item" href="#">Cancel</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item" href="#">Delete stage</a>
-                                                        <a class="dropdown-item" href="#">Exit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="job-stage-progress">
-                                        <div class="progress">
-                                            <div class="progress-bar bg-gray" role="progressbar" style="width: 50%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end::job-stage-row-->
+                                <!--end::pagination-->
                             </div>
-                            
-                            <!--begin::pagination-->
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="select-box" style="max-width: 190px">
-                                        <select class="form-control" id="" aria-label="">
-                                            <option value="1">15 line/screen</option>
-                                            <option value="2">30 line/screen</option>
-                                            <option value="3">50 line/screen</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <nav aria-label="">
-                                        <ul class="pagination  justify-content-end">
-                                            <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                            <!--end::pagination-->
                         </div>
+                        <!--end:: m-portlets-->
                     </div>
-                    <!--end:: m-portlets-->
-                </div>
-                <div class="tab-pane fade"  id="job-tableview-tab" role="tabpanel" aria-labelledby="">
-                    <!--begin:: m-portlet-->
-                    <div class="m-portlet">
-                        <div class="m-portlet__body">
-                            <!--begin: Datatable of stage-table-view -->
-                            <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="">
-                                <table class="m-datatable__table" style="display: block; min-height: 100px; overflow-x: auto;">
-                                    <thead class="m-datatable__head">
-                                        <tr class="m-datatable__row">
-                                            <th class="m-datatable__cell m-datatable__cell--sort">
-                                                <span style="width: 100px;">Actions</span>
-                                            </th>
-                                            <th class="m-datatable__cell m-datatable__cell--sort">
-                                                <span style="width: 110px;">No</span>
-                                            </th>
-                                            <th class="m-datatable__cell m-datatable__cell--sort">
-                                                <span style="width: 110px;">Customer</span>
-                                            </th>
-                                            <th class="m-datatable__cell m-datatable__cell--sort">
-                                                <span style="width: 110px;">H-B/L (HAWB)</span>
-                                            </th>
-                                            <th class="m-datatable__cell m-datatable__cell--sort">
-                                                <span style="width: 110px;">Salesman</span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="m-datatable__body">
-                                        <tr class="m-datatable__row" data-row="0">
-                                            <td class="m-datatable__cell">
-                                                <span style="width: 100px;"></span>
-                                                <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-edit"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                                    <i class="la la-trash"></i>
-                                                </a>
-                                            </td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                            <td class="m-datatable__cell">
-                                                <div style="width: 110px;">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="" selected>
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB) 100</span></td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
-                                        </tr>
-                                        <tr class="m-datatable__row" data-row="0">
-                                            <td class="m-datatable__cell">
-                                                <span style="width: 100px;"></span>
-                                                <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-edit"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                                    <i class="la la-trash"></i>
-                                                </a>
-                                            </td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB) 100</span></td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
-                                        </tr>
-                                        <tr class="m-datatable__row" data-row="0">
-                                            <td class="m-datatable__cell">
-                                                <span style="width: 100px;"></span>
-                                                <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-edit"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                                    <i class="la la-trash"></i>
-                                                </a>
-                                            </td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB) 100</span></td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
-                                        </tr>
-                                        <tr class="m-datatable__row" data-row="0">
-                                            <td class="m-datatable__cell">
-                                                <span style="width: 100px;"></span>
-                                                <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-edit"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                                    <i class="la la-trash"></i>
-                                                </a>
-                                            </td>
-                                            <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                            <td class="m-datatable__cell">
-                                                <div style="width: 110px;">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td class="m-datatable__cell">
-                                                <div style="width: 110px;">
-                                                    <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                </div>
-                                            </td>
-                                            <td class="m-datatable__cell">
-                                                <span style="width: 110px;"></span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                    <div class="tab-pane fade" id="job-tableview-tab" role="tabpanel" aria-labelledby="">
+                        <!--begin:: m-portlet-->
+                        <div class="m-portlet">
+                            <div class="m-portlet__body">
+                                <!--begin: Datatable of stage-table-view -->
+                                <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="">
+                                    <table class="m-datatable__table" style="display: block; min-height: 100px; overflow-x: auto;">
+                                        <thead class="m-datatable__head">
+                                            <tr class="m-datatable__row">
+                                                <th class="m-datatable__cell m-datatable__cell--sort">
+                                                    <span style="width: 100px;">Actions</span>
+                                                </th>
+                                                <th class="m-datatable__cell m-datatable__cell--sort">
+                                                    <span style="width: 110px;">No</span>
+                                                </th>
+                                                <th class="m-datatable__cell m-datatable__cell--sort">
+                                                    <span style="width: 110px;">Customer</span>
+                                                </th>
+                                                <th class="m-datatable__cell m-datatable__cell--sort">
+                                                    <span style="width: 110px;">H-B/L (HAWB)</span>
+                                                </th>
+                                                <th class="m-datatable__cell m-datatable__cell--sort">
+                                                    <span style="width: 110px;">Salesman</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="m-datatable__body">
+                                            <tr class="m-datatable__row" data-row="0">
+                                                <td class="m-datatable__cell">
+                                                    <span style="width: 100px;"></span>
+                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-edit"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        style="margin-left: 5px">
+                                                        <i class="la la-trash"></i>
+                                                    </a>
+                                                </td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
+                                                <td class="m-datatable__cell">
+                                                    <div style="width: 110px;">
+                                                        <select class="form-control m-input m-input--square">
+                                                            <option value="">
+                                                                Please select Customer
+                                                            </option>
+                                                            <option value="" selected>
+                                                                Scott Phuong 1
+                                                            </option>
+                                                            <option value="">
+                                                                Scott Phuong 2
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB)
+                                                        100</span></td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
+                                            </tr>
+                                            <tr class="m-datatable__row" data-row="0">
+                                                <td class="m-datatable__cell">
+                                                    <span style="width: 100px;"></span>
+                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-edit"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        style="margin-left: 5px">
+                                                        <i class="la la-trash"></i>
+                                                    </a>
+                                                </td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB)
+                                                        100</span></td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
+                                            </tr>
+                                            <tr class="m-datatable__row" data-row="0">
+                                                <td class="m-datatable__cell">
+                                                    <span style="width: 100px;"></span>
+                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-edit"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        style="margin-left: 5px">
+                                                        <i class="la la-trash"></i>
+                                                    </a>
+                                                </td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB)
+                                                        100</span></td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
+                                            </tr>
+                                            <tr class="m-datatable__row" data-row="0">
+                                                <td class="m-datatable__cell">
+                                                    <span style="width: 100px;"></span>
+                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-edit"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        style="margin-left: 5px">
+                                                        <i class="la la-trash"></i>
+                                                    </a>
+                                                </td>
+                                                <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
+                                                <td class="m-datatable__cell">
+                                                    <div style="width: 110px;">
+                                                        <select class="form-control m-input m-input--square">
+                                                            <option value="">
+                                                                Please select Customer
+                                                            </option>
+                                                            <option value="">
+                                                                Scott Phuong 1
+                                                            </option>
+                                                            <option value="">
+                                                                Scott Phuong 2
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td class="m-datatable__cell">
+                                                    <div style="width: 110px;">
+                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                    </div>
+                                                </td>
+                                                <td class="m-datatable__cell">
+                                                    <span style="width: 110px;"></span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!--end: Datatable of stage-table-view -->
                             </div>
-                            <!--end: Datatable of stage-table-view -->
                         </div>
+                        <!--end:: m-portlets-->
                     </div>
-                    <!--end:: m-portlets-->
                 </div>
             </div>
         </div>
     </div>
-</div>
-<!--begin:: create-job-modal-->
-<div class="modal fade" id="create-job-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create New Job</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">Job Information</h3>
-                        </div>
-                        <div class="m-portlet-body">
-                            <!--begin::Form-->
-                            <div class="m-form">
-                                <div class="m-portlet__body">
-                                    <div class="row">
-                                        <div class="col-lg-8">
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Job ID
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Service Date
-                                                        </label>
-                                                        <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
-                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                                <span>
-                                                                    <i class="la la-calendar glyphicon-th"></i>
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Cargo O.P
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Finish Date
-                                                        </label>
-                                                        <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
-                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                                <span>
-                                                                    <i class="la la-calendar glyphicon-th"></i>
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            O.P IC
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Service
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Assign Route
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Commodity
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="row">
-                                                <div class="col-lg-12">
-                                                    <label>
-                                                        Container Summary
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="c-border-block">
-                                                <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Qty">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="G.W">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Unit">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="N.W">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CBM">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CNTS">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-12 m--align-right">
-                                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                                            <span>
-                                                                <i class="icon-plus7"></i>
-                                                                <span>
-                                                                    container
-                                                                </span>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end::Form-->
-                        </div>
-                    </div>
-                </div>
-                <!--end:: m-portlets-->
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">Route/Trip/Bill Information</h3>
-                        </div>
-                        <div class="m-portlet-body">
-                            <!--begin::Form-->
-                            <div class="m-form">
-                                <div class="m-portlet__body">
-                                    <div class="row">
-                                        <div class="col-lg-9">
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Supplier
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            W. House
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            P/O No.
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Agent
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            P.O.L
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Inv No.
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            Vessel/Flight
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label>
-                                                            P.O.D
-                                                        </label>
-                                                        <select class="form-control m-input m-input--square">
-                                                            <option value="">
-                                                                Please select
-                                                            </option>
-                                                            <option value="">
-                                                                Option 1
-                                                            </option>
-                                                            <option value="">
-                                                                Option 2
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label for="">
-                                                            M - B/L
-                                                        </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label>
-                                                    Note
-                                                </label>
-                                                <textarea rows="10" type="text" class="form-control m-input"
-                                                    placeholder="Please enter detail"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end::Form-->
-                        </div>
-                    </div>
-                </div>
-                <!--end:: m-portlets-->
-
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">House Bill List</h3>
-                        </div>
-                        <div class="m-portlet__body">
-                            <!--begin: Search Form -->
-                            <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
-                                <div class="row align-items-center">
-                                    <div class="col-xl-8 order-2 order-xl-1">
-                                        <div class="form-group m-form__group row align-items-center">
-                                            <div class="col-md-4">
-                                                <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
-                                                        id="generalSearch">
-                                                    <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                        <span>
-                                                            <i class="la la-search"></i>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                            <span>
-                                                <i class="icon-plus7"></i>
-                                                <span>
-                                                    add new
-                                                </span>
-                                            </span>
-                                        </button>
-                                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end: Search Form -->
-                            <!--begin: Datatable of house-bill-list -->
-                            <div class="table-wrapper" id="">
-                                <table class="table table-striped table-brand">
-                                    <thead class="">
-                                        <tr class="">
-                                            <th class="">
-                                                Actions
-                                            </th>
-                                            <th class="">
-                                                No
-                                            </th>
-                                            <th class="">
-                                                Customer
-                                            </th>
-                                            <th class="">
-                                                H-B/L (HAWB)
-                                            </th>
-                                            <th class="">
-                                                Salesman
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="">
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions">
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove bill">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>1</span>
-                                            </td>
-                                            <td>
-                                                <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="" selected>
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="H-B/L (HAWB)">
-                                            </td>
-                                            <td>
-                                                <span>Scott Phuong</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions">
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove bill">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>2</span>
-                                            </td>
-                                            <td>
-                                                <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="" selected>
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="H-B/L (HAWB)">
-                                            </td>
-                                            <td>
-                                                <span>Scott Phuong</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!--end: Datatable of house-bill-list -->
-                        </div>
-                    </div>
-                </div>
-                <!--end:: m-portlets-->
-
-                <!--begin:: m-portlet-->
-                <div class="m-portlet">
-                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
-                        <div class="alert-block__heading">
-                            <h3 class="alert-block__title">Stage List</h3>
-                        </div>
-                        <div class="m-portlet__body">
-                            <!--begin: Search Form -->
-                            <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
-                                <div class="row align-items-center">
-                                    <div class="col-xl-8 order-2 order-xl-1">
-                                        <div class="form-group m-form__group row align-items-center">
-                                            <div class="col-md-4">
-                                                <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
-                                                        id="generalSearch">
-                                                    <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                        <span>
-                                                            <i class="la la-search"></i>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                            <span>
-                                                <i class="icon-plus7"></i>
-                                                <span>
-                                                    add new
-                                                </span>
-                                            </span>
-                                        </button>
-                                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end: Search Form -->
-                            <!--begin: Datatable of stage-list -->
-                            <div class="table-wrapper" id="">
-                                <table class="table table-striped table-brand">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <span>Actions</span>
-                                            </th>
-                                            <th>
-                                                <span>Stage Order</span>
-                                            </th>
-                                            <th>
-                                                <span>Abbr</span>
-                                            </th>
-                                            <th>
-                                                <span>Name</span>
-                                            </th>
-                                            <th>
-                                                <span>Description</span>
-                                            </th>
-                                            <th>
-                                                <span>Assignee</span>
-                                            </th>
-                                            <th>
-                                                <span>Process Time</span>
-                                            </th>
-                                            <th>
-                                                <span>Deadline</span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>1</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 2</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>2</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 3</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>3</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 1</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!--end: Datatable of stage-list -->
-                        </div>
-                    </div>
-                </div>
-                <!--end:: m-portlets-->
-            </div>
-            <div class="modal-footer m--align-center">
-                <button type="reset" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
-                    <span>
-                        <i class="la la-check"></i>
-                        <span>
-                            choose default detail
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save as default
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
-                    <span>
-                        <i class="la la-hand-o-up"></i>
-                        <span>
-                            start job
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::create-job-modal-->
-
-<!--begin:: container-list-of-job-modal-->
-<div class="modal fade" id="create-job-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <!--begin:: create-job-modal-->
+    <div class="modal fade" id="create-job-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2080,7 +655,8 @@
                                                                 Service Date
                                                             </label>
                                                             <div class="m-input-icon m-input-icon--right">
-                                                                <input type="text" class="form-control m-input" placeholder="//">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="//">
                                                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                     <span>
                                                                         <i class="la la-calendar glyphicon-th"></i>
@@ -2115,7 +691,8 @@
                                                                 Finish Date
                                                             </label>
                                                             <div class="m-input-icon m-input-icon--right">
-                                                                <input type="text" class="form-control m-input" placeholder="//">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="//">
                                                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                     <span>
                                                                         <i class="la la-calendar glyphicon-th"></i>
@@ -2214,36 +791,42 @@
                                                     <div class="row">
                                                         <div class="col-lg-6">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control m-input" placeholder="Qty">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="Qty">
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control m-input" placeholder="G.W">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-lg-6">
-                                                            <div class="form-group">
-                                                                <input type="text" class="form-control m-input" placeholder="Unit">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <div class="form-group">
-                                                                <input type="text" class="form-control m-input" placeholder="N.W">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="G.W">
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-lg-6">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control m-input" placeholder="CBM">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="Unit">
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control m-input" placeholder="CNTS">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="N.W">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="CBM">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="CNTS">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2427,7 +1010,7 @@
                         </div>
                     </div>
                     <!--end:: m-portlets-->
-    
+
                     <!--begin:: m-portlet-->
                     <div class="m-portlet">
                         <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
@@ -2493,7 +1076,8 @@
                                             <tr>
                                                 <td class="table-action-col">
                                                     <div class="table-actions">
-                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove bill">
+                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove bill">
                                                             <i class="la la-trash"></i>
                                                         </a>
                                                     </div>
@@ -2517,7 +1101,8 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control m-input" placeholder="Please enter detail" value="H-B/L (HAWB)">
+                                                    <input type="text" class="form-control m-input" placeholder="Please enter detail"
+                                                        value="H-B/L (HAWB)">
                                                 </td>
                                                 <td>
                                                     <span>Scott Phuong</span>
@@ -2526,7 +1111,8 @@
                                             <tr>
                                                 <td class="table-action-col">
                                                     <div class="table-actions">
-                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove bill">
+                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove bill">
                                                             <i class="la la-trash"></i>
                                                         </a>
                                                     </div>
@@ -2550,7 +1136,8 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control m-input" placeholder="Please enter detail" value="H-B/L (HAWB)">
+                                                    <input type="text" class="form-control m-input" placeholder="Please enter detail"
+                                                        value="H-B/L (HAWB)">
                                                 </td>
                                                 <td>
                                                     <span>Scott Phuong</span>
@@ -2564,7 +1151,7 @@
                         </div>
                     </div>
                     <!--end:: m-portlets-->
-    
+
                     <!--begin:: m-portlet-->
                     <div class="m-portlet">
                         <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
@@ -2639,10 +1226,12 @@
                                             <tr>
                                                 <td class="table-acitons-col">
                                                     <div class="table-acitons">
-                                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
+                                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit stage">
                                                             <i class="la la-edit"></i>
                                                         </a>
-                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
+                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            style="margin-left: 5px" title="Remove stage">
                                                             <i class="la la-trash"></i>
                                                         </a>
                                                     </div>
@@ -2657,7 +1246,8 @@
                                                     <span>Preprade document</span>
                                                 </td>
                                                 <td style="width: 200px;">
-                                                    <span>Preprade document template and detail Verify and signed Check a</span>
+                                                    <span>Preprade document template and detail Verify and signed Check
+                                                        a</span>
                                                 </td>
                                                 <td>
                                                     <span>Cargo O.P</span>
@@ -2672,10 +1262,12 @@
                                             <tr>
                                                 <td class="table-acitons-col">
                                                     <div class="table-acitons">
-                                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
+                                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit stage">
                                                             <i class="la la-edit"></i>
                                                         </a>
-                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
+                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            style="margin-left: 5px" title="Remove stage">
                                                             <i class="la la-trash"></i>
                                                         </a>
                                                     </div>
@@ -2690,7 +1282,8 @@
                                                     <span>Preprade document</span>
                                                 </td>
                                                 <td style="width: 200px;">
-                                                    <span>Preprade document template and detail Verify and signed Check a</span>
+                                                    <span>Preprade document template and detail Verify and signed Check
+                                                        a</span>
                                                 </td>
                                                 <td>
                                                     <span>Cargo O.P</span>
@@ -2705,10 +1298,12 @@
                                             <tr>
                                                 <td class="table-acitons-col">
                                                     <div class="table-acitons">
-                                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
+                                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit stage">
                                                             <i class="la la-edit"></i>
                                                         </a>
-                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
+                                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            style="margin-left: 5px" title="Remove stage">
                                                             <i class="la la-trash"></i>
                                                         </a>
                                                     </div>
@@ -2723,7 +1318,8 @@
                                                     <span>Preprade document</span>
                                                 </td>
                                                 <td style="width: 200px;">
-                                                    <span>Preprade document template and detail Verify and signed Check a</span>
+                                                    <span>Preprade document template and detail Verify and signed Check
+                                                        a</span>
                                                 </td>
                                                 <td>
                                                     <span>Cargo O.P</span>
