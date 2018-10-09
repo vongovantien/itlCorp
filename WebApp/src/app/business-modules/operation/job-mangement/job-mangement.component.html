@@ -755,53 +755,29 @@
                                             </div>
                                             <div class="c-border-block">
                                                 <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <div class="input-group m-input-group m-input-group--square">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
-                                                                        Qty
-                                                                    </span>
+                                                        <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <div class="input-group m-input-group m-input-group--square">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text" id="basic-addon1">
+                                                                                CBM
+                                                                            </span>
+                                                                        </div>
+                                                                        <input type="text" class="form-control m-input"
+                                                                            placeholder="">
+                                                                    </div>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input" placeholder="">
                                                             </div>
-                                                        </div>
-                                                    </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
                                                                     <span class="input-group-text" id="basic-addon1">
-                                                                            G.W
+                                                                        G.W
                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input" placeholder="">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <div class="input-group m-input-group m-input-group--square">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
-                                                                            Unit
-                                                                    </span>
-                                                                </div>
-                                                                <input type="text" class="form-control m-input" placeholder="">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <div class="input-group m-input-group m-input-group--square">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
-                                                                            N.W
-                                                                    </span>
-                                                                </div>
-                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -812,10 +788,11 @@
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
                                                                     <span class="input-group-text" id="basic-addon1">
-                                                                            CBM
+                                                                        CNTS
                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -824,15 +801,46 @@
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
                                                                     <span class="input-group-text" id="basic-addon1">
-                                                                            CNTS
+                                                                        N.W
                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input" placeholder="">
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="">
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                        FCL(Cont)
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                        LCL(Kg)
+                                                                    </span>
+                                                                </div>
+                                                                <input type="text" class="form-control m-input"
+                                                                    placeholder="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <div class="row">
+                                                      
                                                     <div class="col-lg-12 m--align-right">
                                                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                                             data-toggle="modal" data-target="#container-list-of-job-modal">
@@ -1410,7 +1418,8 @@
                                 </div>
                             </div>
                             <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="add_container()">
                                     <span>
                                         <i class="icon-plus7"></i>
                                         <span>
@@ -1461,87 +1470,48 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="">
+                            <tbody class="" *ngFor="let con of container_list;let i = index;">
                                 <tr>
                                     <td class="table-action-col">
                                         <div class="table-actions">
-                                            <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            <a (click)="remove_container(i)" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="Remove bill">
                                                 <i class="la la-trash"></i>
                                             </a>
                                         </div>
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                        <input type="number" [(ngModel)]="con.quantity" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="40DC">
+                                        <input type="text" [(ngModel)]="con.cont_type" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="00001">
+                                        <input type="number" [(ngModel)]="con.cont_no" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="FCL">
+                                        <input type="number" [(ngModel)]="con.seal_no" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                        <input type="text" [(ngModel)]="con.type" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="Cont">
+                                        <input type="text" [(ngModel)]="con.unit" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="This is description">
+                                        <input type="text" [(ngModel)]="con.descrption" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                        <input type="number" [(ngModel)]="con.n_w" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                        <input type="number" [(ngModel)]="con.g_w" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
+                                        <input type="number" [(ngModel)]="con.cbm" class="form-control form-control-sm m-input">
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td class="table-action-col">
-                                        <div class="table-actions">
-                                            <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove bill">
-                                                <i class="la la-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="40DC">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="00001">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="FCL">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="Cont">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="This is description">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm m-input" value="10">
-                                    </td>
-                                </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -1557,7 +1527,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
+                    (click)="save_container()">
                     <span>
                         <i class="la la-save"></i>
                         <span>

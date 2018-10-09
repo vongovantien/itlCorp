@@ -14,8 +14,15 @@ declare var $: any;
 export class JobMangementComponent implements OnInit {
 
   Jobs_List: any;
+  container = {
+    "quantity":"","cont_type":"","cont_no":"",
+    "seal_no":"","type":"","unit":"",
+    "descrption":"","n_w":"","g_w":"","cbm":""
+  }
+   
+  container_list : any =[];
+ 
 
-  names=['the','nguyen','dang','thu','tam','kien','toi','buu','le'];
 
   constructor(private route: ActivatedRoute, private router: Router, private baseServices: BaseService) { }
 
@@ -35,8 +42,27 @@ export class JobMangementComponent implements OnInit {
     this.Jobs_List = await this.baseServices.getAsync('./assets/fake-data/jobs-list.json', true, true);
   }
 
+  save_container(){
+    
+    console.table(this.container_list);
+  }
+
+  add_container(){
+    this.container_list.push(Object.assign({},this.container));
+  }
+
+  remove_container(i){
+    console.log(i);
+    this.container_list.splice(i,1);
+    
+    console.log("removed");
+  }
 
 
+
+  /**
+   * ng2-select
+   */
   public items: Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
     'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',
     'Budapest', 'Cologne', 'Copenhagen', 'Dortmund', 'Dresden', 'Dublin',
