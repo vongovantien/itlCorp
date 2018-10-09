@@ -20,7 +20,8 @@ namespace API.Mobile.Common
         public enum CommentType
         {
             Progressing = 1,
-            Pending = 2
+            Pending = 2,
+            Done = 3
         }
 
         public enum JobStatus

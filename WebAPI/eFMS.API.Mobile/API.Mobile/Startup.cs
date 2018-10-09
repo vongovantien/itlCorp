@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using API.Mobile.Common;
 using API.Mobile.Infrastructure;
 using API.Mobile.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,9 +48,9 @@ namespace API.Mobile
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
-            services.AddMemoryCache();
             ServiceRegister.Register(services);
             services.AddCors(options =>
             {
@@ -77,13 +78,13 @@ namespace API.Mobile
             //Multiple language setting
             var supportedCultures = new[]
             {
-                new CultureInfo("en-US"),
-                new CultureInfo("vi-VN")
+                new CultureInfo(StaticVariable.EnCulture),
+                new CultureInfo(StaticVariable.VnCulture)
             };
 
             var localizationOptions = new RequestLocalizationOptions()
             {
-                DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
+                DefaultRequestCulture = new RequestCulture(culture: StaticVariable.EnCulture, uiCulture: StaticVariable.EnCulture),
                 SupportedCultures = supportedCultures,
                 SupportedUICultures = supportedCultures
             };
@@ -98,22 +99,22 @@ namespace API.Mobile
             };
 
             services.AddSingleton(localizationOptions);
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(jwtBearerOptions =>
-                {
-                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidateActor = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["Issuer"],
-                        ValidAudience = Configuration["Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SigningKey"]))
-                    };
-                    jwtBearerOptions.SaveToken = true;
-                });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(jwtBearerOptions =>
+            //    {
+            //        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+            //        {
+            //            ValidateActor = false,
+            //            ValidateAudience = true,
+            //            ValidateLifetime = true,
+            //            ValidateIssuerSigningKey = true,
+            //            ValidIssuer = Configuration["Issuer"],
+            //            ValidAudience = Configuration["Audience"],
+            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SigningKey"])),
+            //            ClockSkew = TimeSpan.Zero
+            //        };
+            //        jwtBearerOptions.SaveToken = true;
+            //    });
             services.AddSwaggerGen(
                 options =>
                 {
@@ -133,14 +134,14 @@ namespace API.Mobile
                     }
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
 
-                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
-                    {
-                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
-                        AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
-                    });
+                    //options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    //{
+                    //    Flow = "implicit", // just get token via browser (suitable for swagger SPA)
+                    //    AuthorizationUrl = "",
+                    //    Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
+                    //});
 
-                    options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
+                    //options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
         }
 
@@ -171,7 +172,7 @@ namespace API.Mobile
                 });
             app.UseCors("AllowAllOrigins");
             app.UseHttpsRedirection();
-            app.UseAuthentication();
+            //app.UseAuthentication();
             app.UseMvc();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
         }

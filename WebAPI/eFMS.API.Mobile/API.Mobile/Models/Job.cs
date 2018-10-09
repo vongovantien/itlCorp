@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using API.Mobile.Common;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace API.Mobile.Models
         public string ContLCL { get; set; }
         public decimal GW { get; set; }
         public int CBM { get; set; }
-        public int Weight { get; set; }
+        public int NetWeight { get; set; }
         public string Route { get; set; }
         public DateTime AssignTime { get; set; }
         public int EstimateDate { get; set; }
@@ -33,7 +34,10 @@ namespace API.Mobile.Models
         public string UserId { get; set; }
         public DateTime CurrentDeadline { get; set; }
         public JobStatus CurrentStageStatus { get; set; }
-        public string Service { get; set; }
+        public string CurrentStageStatusName { get; set; }
+        public ServiceType ServiceType { get; set; }
+        public ServiceMethod ServiceMethod { get; set; }
+        public string ServiceName { get; set; }
     }
 
     public class JobDetailModel

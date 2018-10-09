@@ -13,8 +13,9 @@ namespace API.Mobile.Repository
 
         public User Get(string userId)
         {
+            var user = FakeData.users.FirstOrDefault(x => x.UserId == userId);
             User result = null;
-            if(user.UserId == userId)
+            if(user != null)
             {
                 result = user;
             }

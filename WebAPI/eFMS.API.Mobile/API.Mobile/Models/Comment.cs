@@ -14,5 +14,8 @@ namespace API.Mobile.Models
         public DateTime CreatedDate { get; set; }
         public string UserId { get; set; }
         public CommentType CommentType { get; set; }
+        public string CommentTypeName { get; set; }
+        public string UserName { get; set; }
+        public string Role { get; set; }
     }
 }

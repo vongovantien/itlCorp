@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using API.Mobile.Common;
 using API.Mobile.Infrastructure.Middlewares;
 using API.Mobile.Models;
 using API.Mobile.Repository;
@@ -18,7 +21,7 @@ namespace API.Mobile.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class JobController : ControllerBase
     {
         private readonly IJobRepository jobRepository;
@@ -35,7 +38,8 @@ namespace API.Mobile.Controllers
         [Route("GetBy")]
         public JobViewModel Get(JobCriteria criteria, int? offset, int limit = 15)
         {
-            var userId = User.FindFirst("UserId")?.Value;
+            //var userId = User.FindFirst("UserId")?.Value;
+            var userId = FakeData.user.UserId;
             return jobRepository.Get(criteria, userId, offset, limit);
         }
 
@@ -45,7 +49,7 @@ namespace API.Mobile.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet]
-        public JobDetailModel Get(string jobId)
+        public JobDetailModel Get([Required]string jobId)
         {
             var job = jobRepository.Get(jobId);
             var stages = stateRepository.Get(jobId);

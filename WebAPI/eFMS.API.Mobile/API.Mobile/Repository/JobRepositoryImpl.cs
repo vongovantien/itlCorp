@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using API.Mobile.Common;
 using API.Mobile.Models;
+using API.Mobile.Resources;
 using API.Mobile.ViewModel;
+using Microsoft.Extensions.Localization;
+using static API.Mobile.Common.StatusEnum;
 
 namespace API.Mobile.Repository
 {
@@ -12,6 +17,13 @@ namespace API.Mobile.Repository
     {
         private List<Job> jobs = FakeData.jobs;
         private List<Stage> stages = FakeData.stages;
+        private CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+        private IStringLocalizer stringLocalizer;
+
+        public JobRepositoryImpl(IStringLocalizer<LanguageSub> localizer)
+        {
+            stringLocalizer = localizer;
+        }
 
         public JobViewModel Get(JobCriteria criteria, string userId, int? offset, int limit = 15)
         {
@@ -24,17 +36,42 @@ namespace API.Mobile.Repository
                 int take = (int)limit;
                 data = data.Skip(skip).Take(take).ToList();
             }
-
-            //data.ForEach(x => {
-            //    x.NumberStageFinish = stages.Count(y => y.JobId == x.Id && y.Status == StatusEnum.StageStatus.Done);
-            //    x.NumberStage = stages.Count(y => y.JobId == x.Id);
-            //});
             data.ForEach(x =>
             {
-                x.PercentFinish = (decimal)stages.Count(y => y.JobId == x.Id && y.Status == StatusEnum.StageStatus.Done) / (decimal)stages.Count(y => y.JobId == x.Id);
+                x.CurrentStageStatusName = GetStatusName(x.CurrentStageStatus);
+                x.NumberStage = stages.Count(y => y.JobId == x.Id);
+                x.NumberStageFinish = stages.Count(y => y.JobId == x.Id && y.Status == StatusEnum.StageStatus.Done);
+                x.PercentFinish = Math.Round(decimal.Divide(x.NumberStageFinish, x.NumberStage) * 100);
             });
             var result = new JobViewModel { Jobs = data, TotalItems = totalItems, NumberJobFinishs = numberJobFinishs, Offset = offset, Limit = limit };
             return result;
+        }
+
+        private string GetStatusName(JobStatus status)
+        {
+            string statusName = string.Empty;
+            switch (status)
+            {
+                case JobStatus.NotStart:
+                    statusName = stringLocalizer[LanguageSub.JOB_STATUS_NOTSTART].Value;
+                    break;
+                case JobStatus.Overdued:
+                    statusName = stringLocalizer[LanguageSub.JOB_STATUS_OVERDUED].Value;
+                    break;
+                case JobStatus.Pending:
+                    statusName = stringLocalizer[LanguageSub.JOB_STATUS_PENDING].Value;
+                    break;
+                case JobStatus.Processing:
+                    statusName = stringLocalizer[LanguageSub.JOB_STATUS_PROCESSING].Value;
+                    break;
+                case JobStatus.WillOverDue:
+                    statusName = stringLocalizer[LanguageSub.JOB_STATUS_WILLOVERDUED].Value;
+                    break;
+                case JobStatus.Finish:
+                    statusName = stringLocalizer[LanguageSub.JOB_STATUS_FINISH].Value;
+                    break;
+            }
+            return statusName;
         }
 
         public Job Get(string id)

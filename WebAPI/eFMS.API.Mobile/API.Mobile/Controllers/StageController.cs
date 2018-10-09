@@ -16,7 +16,7 @@ namespace API.Mobile.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class StageController : ControllerBase
     {
         private readonly IStageRepository stateRepository;
@@ -41,21 +41,21 @@ namespace API.Mobile.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateStatus(StageComment stage)
+        public LocalizedString UpdateStatus(StageComment stage)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return stringLocalizer[LanguageSub.DATA_NOT_EMPTY];
             }
             var result = stateRepository.UpdateStatus(stage);
             string message = HandleError.GetMessage(result, Crud.Update);
             if (result.Success)
             {
-                return Ok(stringLocalizer[message]);
+                return stringLocalizer[message];
             }
             else
             {
-                return BadRequest(stringLocalizer[message]);
+                return stringLocalizer[message];
             }
         }
     }
