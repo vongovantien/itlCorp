@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { OperationRoutingModule } from './operation-routing.module';
 import { JobMangementComponent } from './job-mangement/job-mangement.component';
 import { AssigmentComponent } from './assigment/assigment.component';
@@ -13,7 +13,8 @@ import { SelectModule } from 'ng2-select';
     CommonModule,
     OperationRoutingModule,
     Daterangepicker,
-    SelectModule
+    SelectModule,
+    FormsModule
   ],
   declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent],
 })
