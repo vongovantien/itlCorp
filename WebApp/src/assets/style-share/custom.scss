@@ -107,6 +107,23 @@ label {
     text-align: center;
 }
 // job management
+.collapse-toggle {
+    .la-angle-up {
+        margin-right: 0.5em;
+    }
+    &.collapsed {
+        .la-angle-up {
+            &:before {
+                content: "\f110";
+            }
+        }
+    }
+}
+.div-inside {
+    width: 100%;
+    padding: 20px;
+    margin-bottom: 1rem;
+}
 .advance-search-form {
     padding: 20px; 
     margin-bottom: 20px;

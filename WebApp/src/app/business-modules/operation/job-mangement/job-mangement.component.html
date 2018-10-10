@@ -42,7 +42,7 @@
                                     <label>
                                         Search text
                                     </label>
-                                    <input type="text" class="form-control m-input" placeholder="Search text">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -54,17 +54,6 @@
                                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                         placeholder="No city selected">
                                     </ng-select>
-                                    <!-- <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Job ID
-                                        </option>
-                                        <option value="">
-                                            House Bill
-                                        </option>
-                                        <option value="">
-                                            Cont No
-                                        </option>
-                                    </select> -->
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -73,7 +62,7 @@
                                         From date - To date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right">
-                                        <input type="text" class="form-control m-input" placeholder="From date - To date"
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="From date - To date"
                                             daterangepicker [options]="options" (selected)="selectedDate($event, daterange)">
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
@@ -85,98 +74,100 @@
                             </div>
                         </div>
                         <!--begin::Advance-search-->
-                        <div class="div-inside bg-secondary" style="padding: 20px; margin-bottom: 20px">
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Progress
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                80% - 100%
-                                            </option>
-                                            <option value="">
-                                                0% - 79%
-                                            </option>
-                                        </select>
+                        <div class="collapse" id="advance-search-of-job">
+                            <div class="div-inside bg-secondary">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Progress
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    80% - 100%
+                                                </option>
+                                                <option value="">
+                                                    0% - 79%
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Status
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Status 1
+                                                </option>
+                                                <option value="">
+                                                    Status 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Services
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Services 1
+                                                </option>
+                                                <option value="">
+                                                    Services 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Status
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Status 1
-                                            </option>
-                                            <option value="">
-                                                Status 2
-                                            </option>
-                                        </select>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Team
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Team 1
+                                                </option>
+                                                <option value="">
+                                                    Team 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Services
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Services 1
-                                            </option>
-                                            <option value="">
-                                                Services 2
-                                            </option>
-                                        </select>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Customer
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Customer 1
+                                                </option>
+                                                <option value="">
+                                                    Customer 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Team
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Team 1
-                                            </option>
-                                            <option value="">
-                                                Team 2
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Customer
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Customer 1
-                                            </option>
-                                            <option value="">
-                                                Customer 2
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Staff
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Staff 1
-                                            </option>
-                                            <option value="">
-                                                Staff 2
-                                            </option>
-                                        </select>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Staff
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Staff 1
+                                                </option>
+                                                <option value="">
+                                                    Staff 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -185,15 +176,15 @@
                         <div class="form-actions">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <a href="" class="btn btn-link">
+                                    <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job" role="button" aria-expanded="false" aria-controls="advance-search-of-job">
                                         <span>
-                                            <i class="la la-angle-down"></i>
+                                            <i class="la la-angle-up"></i>
                                             <span>Advance search</span>
                                         </span>
                                     </a>
                                 </div>
                                 <div class="col-lg-6 m--align-right">
-                                    <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                                         style="margin-left: 10px;">
                                         <span>
                                             <i class="la la-search"></i>
@@ -202,7 +193,7 @@
                                             </span>
                                         </span>
                                     </button>
-                                    <button type="reset" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
                                         style="margin-left: 10px;">
                                         <span>
                                             <i class="la la-refresh"></i>
@@ -533,7 +524,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail"
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                                     value="H-B/L (HAWB)">
                                             </td>
                                             <td>
@@ -568,8 +559,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail"
-                                                    value="H-B/L (HAWB)">
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail" value="H-B/L (HAWB)">
                                             </td>
                                             <td>
                                                 <span>Scott Phuong</span>
@@ -617,7 +607,7 @@
                                                         <label>
                                                             Job ID
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6">
@@ -626,7 +616,7 @@
                                                             Service Date
                                                         </label>
                                                         <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
+                                                            <input type="text" class="form-control m-input m-input--square" placeholder="//">
                                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                 <span>
                                                                     <i class="la la-calendar glyphicon-th"></i>
@@ -661,7 +651,7 @@
                                                             Finish Date
                                                         </label>
                                                         <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
+                                                            <input type="text" class="form-control m-input m-input--square" placeholder="//">
                                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                 <span>
                                                                     <i class="la la-calendar glyphicon-th"></i>
@@ -758,34 +748,34 @@
                                             </div>
                                             <div class="c-border-block">
                                                 <div class="row">
-                                                        <div class="col-lg-6">
-                                                                <div class="form-group">
-                                                                    <div class="input-group m-input-group m-input-group--square">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text">
-                                                                                CBM
-                                                                            </span>
-                                                                            <span class="input-group-text">
-                                                                                   {{cbm_sum}}
-                                                                            </span>
-                                                                        </div>
-                                                                        <!-- <input type="text" class="form-control m-input" disabled
-                                                                            placeholder=""> -->
-                                                                    </div>
-                                                                </div>
-                                                            </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" >
+                                                                    <span class="input-group-text">
+                                                                        CBM
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{cbm_sum}}
+                                                                    </span>
+                                                                </div>
+                                                                <!-- <input type="text" class="form-control m-input m-input--square" disabled
+                                                                            placeholder=""> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
                                                                         G.W
                                                                     </span>
                                                                     <span class="input-group-text">
-                                                                            {{gw_sum}}
-                                                                     </span>
+                                                                        {{gw_sum}}
+                                                                    </span>
                                                                 </div>
-                                                                <!-- <input type="text" class="form-control m-input" disabled
+                                                                <!-- <input type="text" class="form-control m-input m-input--square" disabled
                                                                     placeholder=""> -->
                                                             </div>
                                                         </div>
@@ -796,14 +786,14 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" >
+                                                                    <span class="input-group-text">
                                                                         CNTS
                                                                     </span>
                                                                     <span class="input-group-text">
-                                                                            {{cnts_sum}}
-                                                                     </span>
+                                                                        {{cnts_sum}}
+                                                                    </span>
                                                                 </div>
-                                                                <!-- <input type="text" class="form-control m-input"
+                                                                <!-- <input type="text" class="form-control m-input m-input--square"
                                                                     placeholder=""> -->
                                                             </div>
                                                         </div>
@@ -812,14 +802,14 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" >
+                                                                    <span class="input-group-text">
                                                                         N.W
                                                                     </span>
                                                                     <span class="input-group-text">
-                                                                            {{nw_sum}}
-                                                                     </span>
+                                                                        {{nw_sum}}
+                                                                    </span>
                                                                 </div>
-                                                                <!-- <input type="text" class="form-control m-input"
+                                                                <!-- <input type="text" class="form-control m-input m-input--square"
                                                                     placeholder=""> -->
                                                             </div>
                                                         </div>
@@ -830,14 +820,14 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" >
+                                                                    <span class="input-group-text">
                                                                         FCL(Cont)
                                                                     </span>
                                                                     <span class="input-group-text">
-                                                                            {{fcl_sum}}
-                                                                     </span>
+                                                                        {{fcl_sum}}
+                                                                    </span>
                                                                 </div>
-                                                                <!-- <input type="text" class="form-control m-input"
+                                                                <!-- <input type="text" class="form-control m-input m-input--square"
                                                                     placeholder=""> -->
                                                             </div>
                                                         </div>
@@ -846,22 +836,22 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" >
+                                                                    <span class="input-group-text">
                                                                         LCL(Kg)
                                                                     </span>
                                                                     <span class="input-group-text">
-                                                                            {{lcl_sum}}
-                                                                     </span>
+                                                                        {{lcl_sum}}
+                                                                    </span>
                                                                 </div>
-                                                                <!-- <input type="text" class="form-control m-input"
+                                                                <!-- <input type="text" class="form-control m-input m-input--square"
                                                                     placeholder=""> -->
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+
                                                 </div>
                                                 <div class="row">
-                                                      
+
                                                     <div class="col-lg-12 m--align-right">
                                                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                                             data-toggle="modal" data-target="#container-list-of-job-modal">
@@ -870,7 +860,7 @@
                                                                 <span>
                                                                     container
                                                                 </span>
-                                                                
+
                                                             </span>
                                                         </button>
                                                     </div>
@@ -939,7 +929,7 @@
                                                         <label>
                                                             P/O No.
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -985,7 +975,7 @@
                                                         <label>
                                                             Inv No.
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -995,7 +985,7 @@
                                                         <label>
                                                             Vessel/Flight
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4">
@@ -1021,7 +1011,7 @@
                                                         <label for="">
                                                             M - B/L
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -1031,7 +1021,7 @@
                                                 <label>
                                                     Note
                                                 </label>
-                                                <textarea rows="10" type="text" class="form-control m-input"
+                                                <textarea rows="10" type="text" class="form-control m-input m-input--square"
                                                     placeholder="Please enter detail"></textarea>
                                             </div>
                                         </div>
@@ -1058,7 +1048,7 @@
                                         <div class="form-group m-form__group row align-items-center">
                                             <div class="col-md-4">
                                                 <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
+                                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
                                                         id="generalSearch">
                                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                                         <span>
@@ -1134,7 +1124,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail"
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                                     value="H-B/L (HAWB)">
                                             </td>
                                             <td>
@@ -1169,7 +1159,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail"
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                                     value="H-B/L (HAWB)">
                                             </td>
                                             <td>
@@ -1199,7 +1189,7 @@
                                         <div class="form-group m-form__group row align-items-center">
                                             <div class="col-md-4">
                                                 <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
+                                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
                                                         id="generalSearch">
                                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                                         <span>
@@ -1211,7 +1201,8 @@
                                         </div>
                                     </div>
                                     <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-stage-of-job-modal">
+                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                            data-toggle="modal" data-target="#add-stage-of-job-modal">
                                             <span>
                                                 <i class="icon-plus7"></i>
                                                 <span>
@@ -1371,7 +1362,7 @@
                 <!--end:: m-portlets-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="reset" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
                     <span>
                         <i class="la la-check"></i>
                         <span>
@@ -1379,7 +1370,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1387,7 +1378,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
                     <span>
                         <i class="la la-hand-o-up"></i>
                         <span>
@@ -1395,7 +1386,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -1429,7 +1420,7 @@
                                 <div class="form-group m-form__group row align-items-center">
                                     <div class="col-md-6">
                                         <div class="m-input-icon m-input-icon--left">
-                                            <input type="text" class="form-control m-input" placeholder="Search..." id="generalSearch">
+                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." id="generalSearch">
                                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                                 <span>
                                                     <i class="la la-search"></i>
@@ -1503,34 +1494,34 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <input type="number" [(ngModel)]="con.quantity" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.quantity" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="text" [(ngModel)]="con.cont_type" class="form-control form-control-sm m-input">
+                                        <input type="text" [(ngModel)]="con.cont_type" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="number" [(ngModel)]="con.cont_no" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.cont_no" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="number" [(ngModel)]="con.seal_no" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.seal_no" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="text" [(ngModel)]="con.type" class="form-control form-control-sm m-input">
+                                        <input type="text" [(ngModel)]="con.type" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="number" [(ngModel)]="con.unit" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.unit" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="text" [(ngModel)]="con.descrption" class="form-control form-control-sm m-input">
+                                        <input type="text" [(ngModel)]="con.descrption" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="number" [(ngModel)]="con.n_w" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.n_w" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="number" [(ngModel)]="con.g_w" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.g_w" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                     <td>
-                                        <input type="number" [(ngModel)]="con.cbm" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.cbm" class="form-control form-control-sm m-input m-input--square">
                                     </td>
                                 </tr>
 
@@ -1541,7 +1532,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button type="reset" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-download"></i>
                         <span>
@@ -1549,8 +1540,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" data-dismiss="modal"
-                    (click)="save_container()">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
+                    data-dismiss="modal" (click)="save_container()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1558,7 +1549,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -1573,8 +1564,7 @@
 <!--end::container-list-of-job-modal-->
 
 <!--begin::add-stage-of-job-modal-->
-<div class="modal fade" id="add-stage-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
+<div class="modal fade" id="add-stage-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -1601,7 +1591,8 @@
                                         <tr class="table-filter-row">
                                             <td class=""></td>
                                             <td class="">
-                                                <input _ngcontent-c3="" class="form-control form-control-sm m-input" type="text" placeholder="Filter">
+                                                <input _ngcontent-c3="" class="form-control form-control-sm m-input m-input--square"
+                                                    type="text" placeholder="Filter">
                                             </td>
                                         </tr>
                                     </thead>
@@ -1619,7 +1610,7 @@
                                                 <span>{{stage.abbreviation}}</span>
                                             </td>
                                         </tr>
-                                      
+
                                     </tbody>
                                 </table>
                             </div>
@@ -1627,7 +1618,8 @@
                         </div>
 
                         <div class="col-sm-2">
-                            <button type="reset" class="btn btn-success btn-block m-btn--square m-btn--icon m-btn--uppercase" (click)="add_selected_stages()">
+                            <button type="button" class="btn btn-success btn-block m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="add_selected_stages()">
                                 <span>
                                     <i class="la la-arrow-right"></i>
                                     <span>
@@ -1635,7 +1627,7 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="button" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase">
                                 <span>
                                     <i class="la la-arrow-left"></i>
                                     <span>
@@ -1662,10 +1654,12 @@
                                         <tr class="table-filter-row">
                                             <td class=""></td>
                                             <td class="">
-                                                <input type="text" class="form-control form-control-sm m-input" placeholder="Filter">
+                                                <input type="text" class="form-control form-control-sm m-input m-input--square"
+                                                    placeholder="Filter">
                                             </td>
                                             <td class="">
-                                                <input type="text" class="form-control form-control-sm m-input" placeholder="Filter">
+                                                <input type="text" class="form-control form-control-sm m-input m-input--square"
+                                                    placeholder="Filter">
                                             </td>
                                         </tr>
                                     </thead>
@@ -1674,7 +1668,7 @@
                                             <td class="table-action-col">
                                                 <div class="table-actions" style="width: 50px">
                                                     <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox" >
+                                                        <input type="checkbox">
                                                         <span></span>
                                                     </label>
                                                 </div>
@@ -1686,7 +1680,7 @@
                                                 <span> 6 </span>
                                             </td>
                                         </tr>
-                                   
+
                                     </tbody>
                                 </table>
                             </div>
@@ -1697,7 +1691,7 @@
                 <!--end:: add-stage-block-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1705,7 +1699,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
