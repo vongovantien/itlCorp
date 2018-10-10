@@ -10,6 +10,7 @@ label {
 }
 .m-body {
     width: 100%;
+    min-height: 600px;
 }
 .bg-gray {
     background-color: #585858;
@@ -27,6 +28,13 @@ label {
     width: 20px;
     height: 20px;
     margin-bottom: 0;
+}
+.c-button-actions {
+    .btn {
+        & + .btn {
+            margin-left: 10px;
+        }
+    }
 }
 //table
 .table,
@@ -64,9 +72,23 @@ label {
         }
     }
 }
+.table-acitons-col {
+    .btn {
+        & + .btn {
+            margin-left: 5px;
+        }
+    }
+}
 //modal
 .modal {
     background-color: rgba(0,0,0,0.5);
+    .c-button-actions {
+        .btn {
+            & + .btn {
+                margin-left: 10px;
+            }
+        }
+    }
 }
 .modal-header {
     border-top-left-radius: 0;
@@ -79,6 +101,10 @@ label {
     &.show {
         opacity: 0;
     }
+}
+.confirm-text-block {
+    padding: 10px 0;
+    text-align: center;
 }
 // job management
 .advance-search-form {
