@@ -14,6 +14,7 @@ declare var $: any;
 export class JobMangementComponent implements OnInit {
 
   Jobs_List: any;
+  Stages_List:any;
   container = {
     "quantity":"","cont_type":"","cont_no":"",
     "seal_no":"","type":"","unit":"",
@@ -21,7 +22,15 @@ export class JobMangementComponent implements OnInit {
   }
    
   container_list : any =[];
- 
+  temp_stages :any=[];
+  selected_stages:any=[];
+  cbm_sum= 0;
+  gw_sum=0;
+  cnts_sum = 0;
+  nw_sum = 0;
+  fcl_sum = 0;
+  lcl_sum = 0;
+  
 
 
   constructor(private route: ActivatedRoute, private router: Router, private baseServices: BaseService) { }
@@ -35,6 +44,7 @@ export class JobMangementComponent implements OnInit {
     });
 
     this.getJobs();
+    this.getStages();
   }
 
 
@@ -42,9 +52,25 @@ export class JobMangementComponent implements OnInit {
     this.Jobs_List = await this.baseServices.getAsync('./assets/fake-data/jobs-list.json', true, true);
   }
 
+  async getStages(){
+    this.Stages_List = await this.baseServices.getAsync('./assets/fake-data/stages-list.json', true, true);
+  }
+
   save_container(){
-    
-    console.table(this.container_list);
+    this.cbm_sum = lodash.sumBy(this.container_list,function(o){return o.cbm});
+    this.gw_sum = lodash.sumBy(this.container_list,function(o){return o.g_w});
+    this.cnts_sum = 0; // special formular 
+    this.nw_sum = lodash.sumBy(this.container_list,function(o){return o.n_w});
+    var fcl_list = lodash.filter(this.container_list,function(o){return (o.type=='FCL')});
+    var lcl_list = lodash.filter(this.container_list,function(o){return (o.type=='LCL')});
+
+    console.log({fcl_list,lcl_list});
+    this.fcl_sum = lodash.sumBy(fcl_list,function(o){return o.unit});
+    this.lcl_sum = lodash.sumBy(lcl_list,function(o){return o.unit});
+
+
+  //  / this.fcl_sum = lodash.sumBy(this.container_list,function(o){return o.cbm});
+   
   }
 
   add_container(){
@@ -58,21 +84,28 @@ export class JobMangementComponent implements OnInit {
     console.log("removed");
   }
 
+  select_stage(i,e){
+    if(e.target.checked==true){
+      var selected_stage = this.Stages_List[i];
+      this.temp_stages.push(selected_stage);
+    }else{
+      this.temp_stages.slice(i,1);
+    }
+  }
+
+  add_selected_stages(){
+    this.selected_stages = [];
+    console.log(this.temp_stages);
+    this.selected_stages = this.temp_stages.map(x=>Object.assign({},x));
+  }
+
 
 
   /**
    * ng2-select
    */
   public items: Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
-    'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',
-    'Budapest', 'Cologne', 'Copenhagen', 'Dortmund', 'Dresden', 'Dublin',
-    'Düsseldorf', 'Essen', 'Frankfurt', 'Genoa', 'Glasgow', 'Gothenburg',
-    'Hamburg', 'Hannover', 'Helsinki', 'Kraków', 'Leeds', 'Leipzig', 'Lisbon',
-    'London', 'Madrid', 'Manchester', 'Marseille', 'Milan', 'Munich', 'Málaga',
-    'Naples', 'Palermo', 'Paris', 'Poznań', 'Prague', 'Riga', 'Rome',
-    'Rotterdam', 'Seville', 'Sheffield', 'Sofia', 'Stockholm', 'Stuttgart',
-    'The Hague', 'Turin', 'Valencia', 'Vienna', 'Vilnius', 'Warsaw', 'Wrocław',
-    'Zagreb', 'Zaragoza', 'Łódź'];
+    'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',];
 
   private value: any = {};
   private _disabledV: string = '0';

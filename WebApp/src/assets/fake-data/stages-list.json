@@ -1,18 +1,15 @@
 [
-    {"ID":"001","Code":"STG1","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"A","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"002","Code":"STG2","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"B","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"003","Code":"STG3","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"C","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"004","Code":"STG4","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"D","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"005","Code":"STG5","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"A","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"006","Code":"STG6","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"A","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"007","Code":"STG7","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"B","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"008","Code":"STG8","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"B","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"009","Code":"STG9","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"A","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"010","Code":"STG10","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"D","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"011","Code":"STG11","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"D","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"012","Code":"STG12","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"D","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"013","Code":"STG13","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"A","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"014","Code":"STG14","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"C","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"015","Code":"STG15","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"C","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null},
-    {"ID":"016","Code":"STG16","StageName_VN":"Lấy thông tin","StageName_EN":"Get informations","TypeID":"B","UserCreated":"Thor The","DateTimeCreated":"October 06, 2018","UserModified":"Thor The","DateTimeModified":"October 06, 2018","Inactive":true,"InactiveOn":null}
+    {"abbreviation":"Stage 1","name":"Stage one","description":"description 1","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 2","name":"Stage two","description":"description 2","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 3","name":"Stage three","description":"description 3","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 4","name":"Stage four","description":"description 4","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 5","name":"Stage five","description":"description 5","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 6","name":"Stage six","description":"description 6","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 7","name":"Stage seven","description":"description 7","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 8","name":"Stage eight","description":"description 8","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 9","name":"Stage nine","description":"description 9","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+    {"abbreviation":"Stage 10","name":"Stage ten","description":"description 10","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"}
+
 ]
+
+

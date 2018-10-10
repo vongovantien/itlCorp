@@ -762,12 +762,15 @@
                                                                 <div class="form-group">
                                                                     <div class="input-group m-input-group m-input-group--square">
                                                                         <div class="input-group-prepend">
-                                                                            <span class="input-group-text" id="basic-addon1">
+                                                                            <span class="input-group-text">
                                                                                 CBM
                                                                             </span>
+                                                                            <span class="input-group-text">
+                                                                                   {{cbm_sum}}
+                                                                            </span>
                                                                         </div>
-                                                                        <input type="text" class="form-control m-input"
-                                                                            placeholder="">
+                                                                        <!-- <input type="text" class="form-control m-input" disabled
+                                                                            placeholder=""> -->
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -775,12 +778,15 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                    <span class="input-group-text" >
                                                                         G.W
                                                                     </span>
+                                                                    <span class="input-group-text">
+                                                                            {{gw_sum}}
+                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input"
-                                                                    placeholder="">
+                                                                <!-- <input type="text" class="form-control m-input" disabled
+                                                                    placeholder=""> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -790,12 +796,15 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                    <span class="input-group-text" >
                                                                         CNTS
                                                                     </span>
+                                                                    <span class="input-group-text">
+                                                                            {{cnts_sum}}
+                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input"
-                                                                    placeholder="">
+                                                                <!-- <input type="text" class="form-control m-input"
+                                                                    placeholder=""> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -803,12 +812,15 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                    <span class="input-group-text" >
                                                                         N.W
                                                                     </span>
+                                                                    <span class="input-group-text">
+                                                                            {{nw_sum}}
+                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input"
-                                                                    placeholder="">
+                                                                <!-- <input type="text" class="form-control m-input"
+                                                                    placeholder=""> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -818,12 +830,15 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                    <span class="input-group-text" >
                                                                         FCL(Cont)
                                                                     </span>
+                                                                    <span class="input-group-text">
+                                                                            {{fcl_sum}}
+                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input"
-                                                                    placeholder="">
+                                                                <!-- <input type="text" class="form-control m-input"
+                                                                    placeholder=""> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -831,12 +846,15 @@
                                                         <div class="form-group">
                                                             <div class="input-group m-input-group m-input-group--square">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="basic-addon1">
+                                                                    <span class="input-group-text" >
                                                                         LCL(Kg)
                                                                     </span>
+                                                                    <span class="input-group-text">
+                                                                            {{lcl_sum}}
+                                                                     </span>
                                                                 </div>
-                                                                <input type="text" class="form-control m-input"
-                                                                    placeholder="">
+                                                                <!-- <input type="text" class="form-control m-input"
+                                                                    placeholder=""> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -852,6 +870,7 @@
                                                                 <span>
                                                                     container
                                                                 </span>
+                                                                
                                                             </span>
                                                         </button>
                                                     </div>
@@ -1217,7 +1236,7 @@
                                                 <span>Stage Order</span>
                                             </th>
                                             <th>
-                                                <span>Abbr</span>
+                                                <span>Abbreviation</span>
                                             </th>
                                             <th>
                                                 <span>Name</span>
@@ -1226,7 +1245,7 @@
                                                 <span>Description</span>
                                             </th>
                                             <th>
-                                                <span>Assignee</span>
+                                                <span>Role</span>
                                             </th>
                                             <th>
                                                 <span>Process Time</span>
@@ -1499,7 +1518,7 @@
                                         <input type="text" [(ngModel)]="con.type" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
-                                        <input type="text" [(ngModel)]="con.unit" class="form-control form-control-sm m-input">
+                                        <input type="number" [(ngModel)]="con.unit" class="form-control form-control-sm m-input">
                                     </td>
                                     <td>
                                         <input type="text" [(ngModel)]="con.descrption" class="form-control form-control-sm m-input">
@@ -1530,7 +1549,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" data-dismiss="modal"
                     (click)="save_container()">
                     <span>
                         <i class="la la-save"></i>
@@ -1559,7 +1578,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Container List</h5>
+                <h5 class="modal-title">Stage List</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -1586,33 +1605,21 @@
                                             </td>
                                         </tr>
                                     </thead>
-                                    <tbody class="">
-                                        <tr>
+                                    <tbody class="" *ngIf="Stages_List">
+                                        <tr *ngFor="let stage of Stages_List;let i = index;">
                                             <td class="table-action-col">
                                                 <div class="table-actions" style="width: 50px">
                                                     <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox" >
+                                                        <input type="checkbox" (change)="select_stage(i,$event)">
                                                         <span></span>
                                                     </label>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span> Stage 3</span>
+                                                <span>{{stage.abbreviation}}</span>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions" style="width: 50px">
-                                                    <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox" >
-                                                        <span></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span> Stage 3</span>
-                                            </td>
-                                        </tr>
+                                      
                                     </tbody>
                                 </table>
                             </div>
@@ -1620,9 +1627,9 @@
                         </div>
 
                         <div class="col-sm-2">
-                            <button type="reset" class="btn btn-success btn-block m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="reset" class="btn btn-success btn-block m-btn--square m-btn--icon m-btn--uppercase" (click)="add_selected_stages()">
                                 <span>
-                                    <i class="la la-arrow-left"></i>
+                                    <i class="la la-arrow-right"></i>
                                     <span>
                                         add
                                     </span>
@@ -1630,7 +1637,7 @@
                             </button>
                             <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase">
                                 <span>
-                                    <i class="la la-arrow-right"></i>
+                                    <i class="la la-arrow-left"></i>
                                     <span>
                                         remove
                                     </span>
@@ -1662,8 +1669,8 @@
                                             </td>
                                         </tr>
                                     </thead>
-                                    <tbody class="">
-                                        <tr>
+                                    <tbody class="" *ngIf="selected_stages">
+                                        <tr *ngFor="let stage of selected_stages;let i=index;">
                                             <td class="table-action-col">
                                                 <div class="table-actions" style="width: 50px">
                                                     <label class="m-checkbox m-checkbox--bold">
@@ -1673,28 +1680,13 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span> Stage 3</span>
+                                                <span>{{stage.abbreviation}}</span>
                                             </td>
                                             <td>
                                                 <span> 6 </span>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions" style="width: 50px">
-                                                    <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox" >
-                                                        <span></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span> Stage 3</span>
-                                            </td>
-                                            <td>
-                                                <span> 6 </span>
-                                            </td>
-                                        </tr>
+                                   
                                     </tbody>
                                 </table>
                             </div>
