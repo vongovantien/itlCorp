@@ -99,22 +99,21 @@ namespace API.Mobile
             };
 
             services.AddSingleton(localizationOptions);
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(jwtBearerOptions =>
-            //    {
-            //        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
-            //        {
-            //            ValidateActor = false,
-            //            ValidateAudience = true,
-            //            ValidateLifetime = true,
-            //            ValidateIssuerSigningKey = true,
-            //            ValidIssuer = Configuration["Issuer"],
-            //            ValidAudience = Configuration["Audience"],
-            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SigningKey"])),
-            //            ClockSkew = TimeSpan.Zero
-            //        };
-            //        jwtBearerOptions.SaveToken = true;
-            //    });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(jwtBearerOptions =>
+                {
+                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateActor = false,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Issuer"],
+                        ValidAudience = Configuration["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SigningKey"]))
+                    };
+                    jwtBearerOptions.SaveToken = true;
+                });
             services.AddSwaggerGen(
                 options =>
                 {
@@ -134,14 +133,14 @@ namespace API.Mobile
                     }
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
 
-                    //options.AddSecurityDefinition("oauth2", new OAuth2Scheme
-                    //{
-                    //    Flow = "implicit", // just get token via browser (suitable for swagger SPA)
-                    //    AuthorizationUrl = "",
-                    //    Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
-                    //});
+                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    {
+                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
+                        AuthorizationUrl = "",
+                        Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
+                    });
 
-                    //options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
+                    options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
         }
 
@@ -172,7 +171,7 @@ namespace API.Mobile
                 });
             app.UseCors("AllowAllOrigins");
             app.UseHttpsRedirection();
-            //app.UseAuthentication();
+            app.UseAuthentication();
             app.UseMvc();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
         }
