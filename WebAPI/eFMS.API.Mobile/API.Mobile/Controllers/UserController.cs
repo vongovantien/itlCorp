@@ -54,23 +54,22 @@ namespace API.Mobile.Controllers
                 }
                 if (model.StaffId == user.StaffId && model.Password == user.Password)
                 {
-                    //var claims = new[]
-                    //{
-                    //    new Claim(JwtRegisteredClaimNames.Sub, user.StaffId),
-                    //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    //    new Claim("UserId", user.UserId),
-                    //    new Claim("Role", user.Role)
-                    //};
-                    string token = string.Empty;
-                    //var token = new JwtSecurityToken
-                    //(
-                    //    issuer: configuration["Issuer"],
-                    //    audience: configuration["Audience"],
-                    //    claims: claims,
-                    //    expires: DateTime.Now.AddDays(2),
-                    //    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SigningKey"])),
-                    //            SecurityAlgorithms.HmacSha256)
-                    //);
+                    var claims = new[]
+                    {
+                        new Claim(JwtRegisteredClaimNames.Sub, user.StaffId),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim("UserId", user.UserId),
+                        new Claim("Role", user.Role)
+                    };
+                    var token = new JwtSecurityToken
+                    (
+                        issuer: configuration["Issuer"],
+                        audience: configuration["Audience"],
+                        claims: claims,
+                        expires: DateTime.Now.AddDays(2),
+                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SigningKey"])),
+                                SecurityAlgorithms.HmacSha256)
+                    );
                     var u = new { user.StaffId, user.Role, user.UserId, user.Email };
                     return Ok(new { u, token });
                 }
