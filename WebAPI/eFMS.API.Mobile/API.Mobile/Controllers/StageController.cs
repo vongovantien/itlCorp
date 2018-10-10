@@ -16,7 +16,7 @@ namespace API.Mobile.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class StageController : ControllerBase
     {
         private readonly IStageRepository stateRepository;

@@ -45,7 +45,7 @@ namespace API.Mobile.Controllers
         {
             try
             {
-                var caheUser = _cache.Set("users", FakeData.users);
+                var cacheUser = _cache.Set("users", FakeData.users);
                 var users = (List<User>)_cache.Get("users");
                 var user = users.FirstOrDefault(x => x.StaffId == model.StaffId);
                 if (user == null)
@@ -54,23 +54,24 @@ namespace API.Mobile.Controllers
                 }
                 if (model.StaffId == user.StaffId && model.Password == user.Password)
                 {
-                    var claims = new[]
-                    {
-                        new Claim(JwtRegisteredClaimNames.Sub, user.StaffId),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim("UserId", user.UserId),
-                        new Claim("Role", user.Role)
-                    };
-                    var token = new JwtSecurityToken
-                    (
-                        issuer: configuration["Issuer"],
-                        audience: configuration["Audience"],
-                        claims: claims,
-                        expires: DateTime.Now.AddDays(2),
-                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SigningKey"])),
-                                SecurityAlgorithms.HmacSha256)
-                    );
+                    string token = string.Empty;
                     var u = new { user.StaffId, user.Role, user.UserId, user.Email };
+                    if (!string.IsNullOrEmpty(model.Token))
+                    {
+                        var lifeTime = new JwtSecurityTokenHandler().ReadToken(model.Token).ValidTo;
+                        if((lifeTime - DateTime.Now) <= TimeSpan.Zero)
+                        {
+                            token = GenerateToken(user);
+                        }
+                        else
+                        {
+                            token = model.Token;
+                        }
+                    }
+                    else
+                    {
+                        token = GenerateToken(user);
+                    }
                     return Ok(new { u, token });
                 }
                 else
@@ -85,8 +86,29 @@ namespace API.Mobile.Controllers
             }
         }
 
+        private string GenerateToken(User user)
+        {
+            var claims = new[]
+                               {
+                                new Claim(JwtRegisteredClaimNames.Sub, user.StaffId),
+                                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                                new Claim("UserId", user.UserId),
+                                new Claim("Role", user.Role)
+                            };
+            var token = new JwtSecurityToken
+            (
+                issuer: configuration["Issuer"],
+                audience: configuration["Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddDays(2),
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SigningKey"])),
+                        SecurityAlgorithms.HmacSha256)
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         [Route("Profile")]
         public User Profile(string userId)
         {
@@ -96,7 +118,7 @@ namespace API.Mobile.Controllers
         }
 
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         [Route("ChangePassword")]
         public LocalizedString ChangePassword(ChangePasswordModel model)
         {
