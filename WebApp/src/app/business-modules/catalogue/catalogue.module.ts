@@ -10,13 +10,15 @@ import { ChargeComponent } from './charge/charge.component';
 import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 
 
 
 @NgModule({
   imports: [
     CommonModule,
-    CatalogueRoutingModule
+    CatalogueRoutingModule,
+    FormsModule
   ],
   declarations:
     [LocationComponent,
