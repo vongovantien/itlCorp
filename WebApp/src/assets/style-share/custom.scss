@@ -19,7 +19,8 @@ label {
     &.btn-warning {
         color: #fff;
         background-color: #fcb34c;
-        &:hover {
+        &:hover,
+        &:focus {
             color: #fff;
         }
     }
