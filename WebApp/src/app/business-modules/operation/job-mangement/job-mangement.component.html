@@ -1601,7 +1601,7 @@
                                             <td class="table-action-col">
                                                 <div class="table-actions" style="width: 50px">
                                                     <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox" (change)="select_stage(i,$event)">
+                                                        <input type="checkbox" (change)="select_stage(i,stage.abbreviation,$event)" [id]="'st-'+i">
                                                         <span></span>
                                                     </label>
                                                 </div>
@@ -1627,7 +1627,7 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase" (click)="remove_selected_stages()">
                                 <span>
                                     <i class="la la-arrow-left"></i>
                                     <span>
@@ -1668,7 +1668,7 @@
                                             <td class="table-action-col">
                                                 <div class="table-actions" style="width: 50px">
                                                     <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox">
+                                                        <input type="checkbox" (change)="select_to_remove_stage(i,stage.abbreviation,$event)">
                                                         <span></span>
                                                     </label>
                                                 </div>
