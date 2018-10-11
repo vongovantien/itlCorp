@@ -20,7 +20,13 @@ export class JobMangementComponent implements OnInit {
     "seal_no": "", "type": "", "unit": "",
     "descrption": "", "n_w": "", "g_w": "", "cbm": ""
   }
+  house_bill = {
+    "customer":"",
+    "hb_l":"",
+    "sale_man":""
+  }
 
+  housebill_list:any = [];  
   container_list: any = [];
   temp_stages: any = [];
   temp_stages_remove: any = [];
@@ -69,9 +75,6 @@ export class JobMangementComponent implements OnInit {
     this.fcl_sum = lodash.sumBy(fcl_list, function (o) { return o.unit });
     this.lcl_sum = lodash.sumBy(lcl_list, function (o) { return o.unit });
 
-
-    //  / this.fcl_sum = lodash.sumBy(this.container_list,function(o){return o.cbm});
-
   }
 
   add_container() {
@@ -89,7 +92,6 @@ export class JobMangementComponent implements OnInit {
   list_id_enable: any = [];
   select_stage(i, abbr, event) {
     var id_input = event.target.id;
-
 
     // var index = lodash.findIndex(this.Stages_List, function (o) { return o.abbreviation == abbr });
 
@@ -111,6 +113,7 @@ export class JobMangementComponent implements OnInit {
       // /this.selected_stages = [];
    
       this.selected_stages =  lodash.concat(this.selected_stages,this.temp_stages);  //  this.temp_stages.map(x => Object.assign({}, x));
+      
       for (var i = 0; i < this.list_id_disabled.length; i++) {
         var element: any = document.getElementById(this.list_id_disabled[i]);
         element.disabled = true;
@@ -120,6 +123,8 @@ export class JobMangementComponent implements OnInit {
       }
     }
 
+    console.log(this.list_id_disabled);
+   
   }
 
   select_to_remove_stage(i, abbr, event) {
@@ -131,7 +136,7 @@ export class JobMangementComponent implements OnInit {
       this.list_id_enable.splice(i, 1);
     }
 
-    console.log(this.list_id_enable);
+   
   }
 
   remove_selected_stages() {
@@ -146,18 +151,58 @@ export class JobMangementComponent implements OnInit {
         var index1 = lodash.findIndex(this.Stages_List, function (o) { return o.abbreviation == lst1[i] });
         var id_el = "st-" + index1;
         var element: any = document.getElementById(id_el);
-        console.log(element);
+
+      
         element.disabled = false;
         element.checked = false;
+        var index_in_list_disabled_id = lodash.findIndex(this.list_id_disabled,function(o){return o==id_el});
+        this.list_id_disabled.splice(index_in_list_disabled_id,1);
+
 
         if (i == this.list_id_enable.length - 1) {
           this.list_id_enable = [];
-          console.log(this.list_id_enable);
+         
         }
       }
     }
 
 
+  }
+
+  remove_stage(abbr){
+    this.list_id_enable.push(abbr);
+    this.remove_selected_stages();
+  }
+
+  abort_add_stage(){    
+    this.list_id_enable = [];
+    this.temp_stages = [];
+    $("#form_source_stage :input").prop("checked",false);
+    for(var i =0;i<this.selected_stages.length;i++){
+      this.list_id_enable.push(this.selected_stages[i].abbreviation);
+      if(i==this.selected_stages.length-1){
+        this.remove_selected_stages();       
+      }
+    }
+  }
+
+
+  start_job(){
+    var new_job = {
+      "job_id":"",
+      "ops_ic":"",
+      "cs_ic":"",
+      "customer":"",
+      "stage_list":this.selected_stages.map(x=>Object.assign({},x))
+    }
+    this.Jobs_List.push(new_job);
+    this.abort_add_stage();
+    console.log(new_job);
+  }
+  count_percent(job){
+    var done_list = lodash.filter(job.stage_list,function(o){return o.status=="success"}).length;
+    var total = job.stage_list.length;
+    return Math.floor((done_list/total)*100);
   }
 
 

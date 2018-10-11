@@ -278,7 +278,7 @@
                                             <ng-container *ngFor="let stage of job.stage_list;let k = index;">
                                                 <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item"
                                                     *ngIf="stage.status=='default'">
-                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.stage_name}}</div>
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.abbreviation}}</div>
                                                     <span class="job-exp-timestamp">{{stage.exp_time}}</span>
                                                     <div class="dropdown dropup job-stage-item-actions">
                                                         <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
@@ -307,7 +307,7 @@
                                                 </div>
                                                 <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress"
                                                     *ngIf="stage.status=='process'">
-                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.stage_name}}</div>
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.abbreviation}}</div>
                                                     <span class="job-exp-timestamp">{{stage.exp_time}}</span>
                                                     <div class="dropdown dropup job-stage-item-actions">
                                                         <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
@@ -336,7 +336,7 @@
                                                 </div>
                                                 <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success"
                                                     *ngIf="stage.status=='success'">
-                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.stage_name}}</div>
+                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.abbreviation}}</div>
                                                     <span class="job-exp-timestamp">{{stage.exp_time}}</span>
                                                     <div class="dropdown dropup job-stage-item-actions">
                                                         <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
@@ -365,7 +365,7 @@
                                                 </div>
                                                 <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-overdue"
                                                     *ngIf="stage.status=='overdue'">
-                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.stage_name}}</div>
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.abbreviation}}</div>
                                                     <span class="job-exp-timestamp">{{stage.exp_time}}</span>
                                                     <div class="dropdown dropup job-stage-item-actions">
                                                         <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
@@ -395,7 +395,7 @@
 
                                                 <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-warning"
                                                     *ngIf="stage.status=='warning'">
-                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.stage_name}}</div>
+                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.abbreviation}}</div>
                                                     <span class="job-exp-timestamp">{{stage.exp_time}}</span>
                                                     <div class="dropdown dropup job-stage-item-actions">
                                                         <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
@@ -426,9 +426,9 @@
 
                                         </div>
                                         <div class="job-stage-progress">
-                                            <div class="progress-text">50%</div>
+                                            <div class="progress-text">{{count_percent(job)}} %</div>
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%"></div>
+                                                <div class="progress-bar bg-info" role="progressbar" [style.width]="count_percent(job) +'%'" ></div>
                                             </div>
                                         </div>
                                     </div>
@@ -1231,39 +1231,39 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <tr *ngFor="let stage of selected_stages;let i = index;">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Edit stage">
                                                         <i class="la la-edit"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="remove_stage(stage.abbreviation)"
                                                         style="margin-left: 5px" title="Remove stage">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span>1</span>
+                                                <span>{{i+1}}</span>
                                             </td>
                                             <td>
-                                                <span>Stage 2</span>
+                                                <span>{{stage.abbreviation}}</span>
                                             </td>
                                             <td>
-                                                <span>Preprade document</span>
+                                                <span>{{stage.name}}</span>
                                             </td>
                                             <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
+                                                <span>{{stage.description}}</span>
                                             </td>
                                             <td>
-                                                <span>Cargo O.P</span>
+                                                <span>{{stage.role}}</span>
                                             </td>
                                             <td>
                                                 <span>4</span>
                                             </td>
                                             <td>
-                                                <span>10/08/2018</span>
+                                                <span>{{stage.exp_time}}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -1362,7 +1362,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" (click)="start_job()" data-dismiss="modal">
                     <span>
                         <i class="la la-hand-o-up"></i>
                         <span>
@@ -1580,7 +1580,7 @@
                                             </td>
                                         </tr>
                                     </thead>
-                                    <tbody class="" *ngIf="Stages_List">
+                                    <tbody class="" *ngIf="Stages_List"  id="form_source_stage">
                                         <tr *ngFor="let stage of Stages_List;let i = index;">
                                             <td class="table-action-col">
                                                 <div class="table-actions" style="width: 50px">
@@ -1661,7 +1661,7 @@
                                                 <span>{{stage.abbreviation}}</span>
                                             </td>
                                             <td>
-                                                <span> 6 </span>
+                                                <span>{{i+1}}</span>
                                             </td>
                                         </tr>
 
@@ -1675,7 +1675,7 @@
                 <!--end:: add-stage-block-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1683,7 +1683,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;" (click)="abort_add_stage()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
