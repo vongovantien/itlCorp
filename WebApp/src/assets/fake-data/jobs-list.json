@@ -1,12 +1,57 @@
 [
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"},
-    {"jobId":"A1234","CargoOP":"DHA","OPIC":"anyting","AssignRoute":"Ha Noi - Da Nang","Commondity":"Lorem insprum"}
+
+    {
+        "job_id":"",
+        "ops_ic":"",
+        "cs_ic":"",
+        "customer":"",
+        "stage_list":[
+            {"abbreviation":"Stage 1","name":"Stage one","description":"description 1","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 2","name":"Stage two","description":"description 2","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 3","name":"Stage three","description":"description 3","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 4","name":"Stage four","description":"description 4","exp_time":"12:01 03/10/18","status":"process","role":"CS I.C"},
+            {"abbreviation":"Stage 5","name":"Stage five","description":"description 5","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+            {"abbreviation":"Stage 6","name":"Stage six","description":"description 6","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+            {"abbreviation":"Stage 7","name":"Stage seven","description":"description 7","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+            {"abbreviation":"Stage 8","name":"Stage eight","description":"description 8","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+            {"abbreviation":"Stage 9","name":"Stage nine","description":"description 9","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"},
+            {"abbreviation":"Stage 10","name":"Stage ten","description":"description 10","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"}
+        ]
+    },
+
+    {
+        "job_id":"",
+        "ops_ic":"",
+        "cs_ic":"",
+        "customer":"",
+        "stage_list":[
+            {"abbreviation":"Stage 1","name":"Stage one","description":"description 1","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 2","name":"Stage two","description":"description 2","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 3","name":"Stage three","description":"description 3","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 4","name":"Stage four","description":"description 4","exp_time":"12:01 03/10/18","status":"process","role":"CS I.C"},
+            {"abbreviation":"Stage 5","name":"Stage five","description":"description 5","exp_time":"12:01 03/10/18","status":"overdue","role":"CS I.C"},
+            {"abbreviation":"Stage 6","name":"Stage six","description":"description 6","exp_time":"12:01 03/10/18","status":"warning","role":"CS I.C"},
+            {"abbreviation":"Stage 7","name":"Stage seven","description":"description 7","exp_time":"12:01 03/10/18","status":"warning","role":"CS I.C"},
+            {"abbreviation":"Stage 8","name":"Stage eight","description":"description 8","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"}
+           
+        ]
+    },
+
+    {
+        "job_id":"",
+        "ops_ic":"",
+        "cs_ic":"",
+        "customer":"",
+        "stage_list":[
+            {"abbreviation":"Stage 1","name":"Stage one","description":"description 1","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 2","name":"Stage two","description":"description 2","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 3","name":"Stage three","description":"description 3","exp_time":"12:01 03/10/18","status":"success","role":"CS I.C"},
+            {"abbreviation":"Stage 4","name":"Stage four","description":"description 4","exp_time":"12:01 03/10/18","status":"process","role":"CS I.C"},
+            {"abbreviation":"Stage 5","name":"Stage five","description":"description 5","exp_time":"12:01 03/10/18","status":"warning","role":"CS I.C"},
+            {"abbreviation":"Stage 6","name":"Stage six","description":"description 6","exp_time":"12:01 03/10/18","status":"process","role":"CS I.C"},
+            {"abbreviation":"Stage 7","name":"Stage seven","description":"description 7","exp_time":"12:01 03/10/18","status":"overdue","role":"CS I.C"},
+            {"abbreviation":"Stage 8","name":"Stage eight","description":"description 8","exp_time":"12:01 03/10/18","status":"default","role":"CS I.C"}
+        ]
+    }
+
 ]

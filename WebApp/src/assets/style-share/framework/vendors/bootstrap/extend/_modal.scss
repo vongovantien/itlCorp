@@ -7,7 +7,8 @@
 //== Component Base
 @mixin m-build-component--modal-base() {
     //== Base
-    .modal {	
+    .modal {
+        overflow: auto;	
         .modal-content {
             border: 0;
             @include border-radius(0);
@@ -47,11 +48,6 @@
                 padding: 25px;
             }
         }    
-    }
-
-    .modal-open {
-        overflow: auto !important;
-        padding: 0 !important;
     }
 }
 

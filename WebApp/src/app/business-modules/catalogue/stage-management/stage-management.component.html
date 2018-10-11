@@ -1,24 +1,536 @@
-<div class="m-content">
-  <div class="row">
-      <div class="col-xl-12">
-          <!--begin:: m-portlet-->
-          <div class="m-portlet">
-              <div class="m-portlet__head">
-                  <div class="m-portlet__head-caption">
-                      <div class="m-portlet__head-title">
-                          <h3 class="m-portlet__head-text">
-                              Stage Management Page
-                          </h3>
-                      </div>
-                  </div>
-              </div>
-              <div class="m-portlet__body">
-                  <!--begin::Content-->
-                  <p>Stage Management Page</p>
-                  <!--end::Content-->
-              </div>
-          </div>
-          <!--end:: m-portlets-->
-      </div>
-  </div>
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                <li class="m-nav__item">
+                    <a href="javascript:void(0)" class="m-nav__link">
+                        <span class="m-nav__link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="m-nav__separator">-</li>
+                <li class="m-nav__item">
+                    <a href="javascript:void(0)" class="m-nav__link">
+                        <span class="m-nav__link-text">Catalogue</span>
+                    </a>
+                </li>
+                <li class="m-nav__separator">-</li>
+                <li class="m-nav__item">
+                    <a href="javascript:void(0)" class="m-nav__link">
+                        <span class="m-nav__link-text">Stage Management</span>
+                    </a>
+                </li>
+            </ul>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#add-stage-management-modal">
+                <span>
+                    <i class="icon-plus7"></i>
+                    <span>
+                        add new
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-download"></i>
+                    <span>
+                        import
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span>
+                        export
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
 </div>
+<!--end:: subheader-->
+<!--begin::m-content of stage-management-->
+<div class="m-content">
+    <!--begin:: m-portlet of search-form-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form">
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group m-input-group m-input-group--square">
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    Stage ID
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        All
+                                    </a>
+                                    <a class="dropdown-item active" href="javascript:void(0)">
+                                        Stage ID
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        Role
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        Name (EN)
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        Name (VI
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        Type
+                                    </a>
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" title="Search">
+                                    <i class="icon-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Reset
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet of search-form-->
+    <!--begin:: m-portlet of stage-management-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin: Datatable of stage-management-list-table -->
+            <div class="table-wrapper" id="">
+                <table class="table table-striped table-brand">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <span>Stage ID</span>
+                            </th>
+                            <th>
+                                <span>Role</span>
+                            </th>
+                            <th>
+                                <span>Stage ABBR</span>
+                            </th>
+                            <th>
+                                <span>Name (VN)</span>
+                            </th>
+                            <th>
+                                <span>Name (EN)</span>
+                            </th>
+                            <th>
+                                <span>Description (VN</span>
+                            </th>
+                            <th>
+                                <span>Description (EN)</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="table-acitons-col">
+                                <div class="table-acitons" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>LH001</span>
+                            </td>
+                            <td>
+                                <span>Customer services</span>
+                            </td>
+                            <td>
+                                <span>ABBR</span>
+                            </td>
+                            <td>
+                                <span>Ký kết hợp đồng ngoại thương</span>
+                            </td>
+                            <td>
+                                <span>Shipping Schedule</span>
+                            </td>
+                            <td>
+                                <span>Đây là mô tả bằng tiếng Việt</span>
+                            </td>
+                            <td>
+                                <span>This is description by EN</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-acitons-col">
+                                <div class="table-acitons" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>LH001</span>
+                            </td>
+                            <td>
+                                <span>Customer services</span>
+                            </td>
+                            <td>
+                                <span>ABBR</span>
+                            </td>
+                            <td>
+                                <span>Ký kết hợp đồng ngoại thương</span>
+                            </td>
+                            <td>
+                                <span>Shipping Schedule</span>
+                            </td>
+                            <td>
+                                <span>Đây là mô tả bằng tiếng Việt</span>
+                            </td>
+                            <td>
+                                <span>This is description by EN</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-acitons-col">
+                                <div class="table-acitons" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>LH001</span>
+                            </td>
+                            <td>
+                                <span>Customer services</span>
+                            </td>
+                            <td>
+                                <span>ABBR</span>
+                            </td>
+                            <td>
+                                <span>Ký kết hợp đồng ngoại thương</span>
+                            </td>
+                            <td>
+                                <span>Shipping Schedule</span>
+                            </td>
+                            <td>
+                                <span>Đây là mô tả bằng tiếng Việt</span>
+                            </td>
+                            <td>
+                                <span>This is description by EN</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--end: Datatable of stage-management-list-table -->
+            <!--begin::pagination-->
+            <div class="pagination-nav">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="tatable__pager-size" style="max-width: 190px">
+                            <div class="select-box">
+                                <select class="form-control m-input m-input--square" id="" aria-label="">
+                                    <option value="1">15 line/screen</option>
+                                    <option value="2">30 line/screen</option>
+                                    <option value="3">50 line/screen</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <nav aria-label="">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <!--end::pagination-->
+        </div>
+    </div>
+    <!--end:: m-portlet of stage-management-->
+</div>
+<!--end::m-content of stage-management-->
+
+<!--begin::add-stage-management-modal-->
+<div class="modal fade" id="add-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Stage</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-stage-management-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Stage ID
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Name (VN)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Name (EN)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Role
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    Stage ABBR
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Description (VN)
+                                </label>
+                                <textarea class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    rows="6"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Description (EN)
+                                </label>
+                                <textarea class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    rows="6"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-stage-management-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::add-stage-management-modal-->
+
+<!--begin::edit-stage-management-modal-->
+<div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Stage</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-stage-management-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Stage ID
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    value="Stage ID">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Name (VN)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    value="Name (VN)">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Name (EN)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    value="Name (EN)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Role
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    value="Role">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    Stage ABBR
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    value=" Stage ABBR">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Description (VN)
+                                </label>
+                                <textarea class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    rows="6">This is Description (VN)</textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Description (EN)
+                                </label>
+                                <textarea class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                    rows="6">This is Description (EN)</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-stage-management-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Edit
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::edit-stage-management-modal-->
+
+<!--begin::confirm-delete-modal-->
+<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>You want to delete this Stage</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Save
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-modal-->

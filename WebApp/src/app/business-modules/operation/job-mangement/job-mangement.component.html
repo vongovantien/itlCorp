@@ -5,19 +5,19 @@
             <!--begin:: breadcrumbs-->
             <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
                 <li class="m-nav__item">
-                    <a href="" class="m-nav__link">
+                    <a href="javascript:void(0)" class="m-nav__link">
                         <span class="m-nav__link-text">Dashboard</span>
                     </a>
                 </li>
                 <li class="m-nav__separator">-</li>
                 <li class="m-nav__item">
-                    <a href="" class="m-nav__link">
+                    <a href="javascript:void(0)" class="m-nav__link">
                         <span class="m-nav__link-text">Operation</span>
                     </a>
                 </li>
                 <li class="m-nav__separator">-</li>
                 <li class="m-nav__item">
-                    <a href="" class="m-nav__link">
+                    <a href="javascript:void(0)" class="m-nav__link">
                         <span class="m-nav__link-text">Job Management</span>
                     </a>
                 </li>
@@ -27,7 +27,7 @@
     </div>
 </div>
 <!--end:: subheader-->
-
+<!--begin:: m-content -->
 <div class="m-content">
     <div class="row">
         <div class="col-xl-12">
@@ -42,7 +42,7 @@
                                     <label>
                                         Search text
                                     </label>
-                                    <input type="text" class="form-control m-input" placeholder="Search text">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -50,17 +50,10 @@
                                     <label>
                                         Select filter
                                     </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Job ID
-                                        </option>
-                                        <option value="">
-                                            House Bill
-                                        </option>
-                                        <option value="">
-                                            Cont No
-                                        </option>
-                                    </select>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="No city selected">
+                                    </ng-select>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -69,7 +62,8 @@
                                         From date - To date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right">
-                                        <input type="text" class="form-control m-input" placeholder="From date - To date">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="From date - To date"
+                                            daterangepicker [options]="options" (selected)="selectedDate($event, daterange)">
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar glyphicon-th"></i>
@@ -80,98 +74,100 @@
                             </div>
                         </div>
                         <!--begin::Advance-search-->
-                        <div class="div-inside bg-secondary" style="padding: 20px; margin-bottom: 20px">
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Progress
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                80% - 100%
-                                            </option>
-                                            <option value="">
-                                                0% - 79%
-                                            </option>
-                                        </select>
+                        <div class="collapse" id="advance-search-of-job">
+                            <div class="div-inside bg-secondary">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Progress
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    80% - 100%
+                                                </option>
+                                                <option value="">
+                                                    0% - 79%
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Status
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Status 1
+                                                </option>
+                                                <option value="">
+                                                    Status 2
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Services
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Services 1
+                                                </option>
+                                                <option value="">
+                                                    Services 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Status
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Status 1
-                                            </option>
-                                            <option value="">
-                                                Status 2
-                                            </option>
-                                        </select>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Team
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Team 1
+                                                </option>
+                                                <option value="">
+                                                    Team 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Services
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Services 1
-                                            </option>
-                                            <option value="">
-                                                Services 2
-                                            </option>
-                                        </select>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Customer
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Customer 1
+                                                </option>
+                                                <option value="">
+                                                    Customer 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Team
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Team 1
-                                            </option>
-                                            <option value="">
-                                                Team 2
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Customer
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Customer 1
-                                            </option>
-                                            <option value="">
-                                                Customer 2
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>
-                                            Staff
-                                        </label>
-                                        <select class="form-control m-input m-input--square">
-                                            <option value="">
-                                                Staff 1
-                                            </option>
-                                            <option value="">
-                                                Staff 2
-                                            </option>
-                                        </select>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label>
+                                                Staff
+                                            </label>
+                                            <select class="form-control m-input m-input--square">
+                                                <option value="">
+                                                    Staff 1
+                                                </option>
+                                                <option value="">
+                                                    Staff 2
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -180,15 +176,15 @@
                         <div class="form-actions">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <a href="" class="btn btn-link">
+                                    <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job" role="button" aria-expanded="false" aria-controls="advance-search-of-job">
                                         <span>
-                                            <i class="la la-angle-down"></i>
+                                            <i class="la la-angle-up"></i>
                                             <span>Advance search</span>
                                         </span>
                                     </a>
                                 </div>
                                 <div class="col-lg-6 m--align-right">
-                                    <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                                         style="margin-left: 10px;">
                                         <span>
                                             <i class="la la-search"></i>
@@ -197,7 +193,7 @@
                                             </span>
                                         </span>
                                     </button>
-                                    <button type="reset" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
                                         style="margin-left: 10px;">
                                         <span>
                                             <i class="la la-refresh"></i>
@@ -246,217 +242,342 @@
         <div class="col-12">
             <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="" role="tab">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#job-stageview-tab" role="tab">
                         Stage View
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="" role="tab">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#job-tableview-tab" role="tab">
                         Table View
                     </a>
                 </li>
             </ul>
-            <!--begin:: m-portlet portlet-stageview-->
-            <div class="m-portlet portlet-stageview">
-                <div class="m-portlet__body">
-                    <!--begin::Content-->
-                    <div class="job-stage-row">
-                        <div class="job-stage-info">
-                        </div>
-                        <div class="job-stage-list">
-                            <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 1
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle  job-stage-item">
-                                    Stage 2
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success">
-                                    Stage 3
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress">
-                                    Stage 4
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 5
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 6
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 7
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 8
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 9
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 10
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 11
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
-                                </div>
-                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item">
-                                    Stage 12
-                                    <span class="job-exp-timestamp">12:01 03/10/18</span>
+            <div class="tab-content job-tab-content" id="jobTabContent">
+                <div class="tab-pane fade show active" id="job-stageview-tab" role="tabpanel" aria-labelledby="">
+                    <!--begin:: m-portlet portlet-stageview-->
+                    <div class="m-portlet portlet-stageview">
+                        <div class="m-portlet__body">
+                            <div class="job-stageview-list" *ngIf="Jobs_List">
+                                <!--begin::job-stage-row-->
+                                <div class="job-stage-row" *ngFor="let job of Jobs_List;let i = index;">
+                                    <div class="job-stage-info">
+                                        <div class="job-info-group">
+                                            <div class="block-text" title="Job ID: 12345678">Job ID</div>
+                                            <div class="block-text">OPS I.C</div>
+                                            <div class="block-text">CS/IC</div>
+                                            <div class="block-text">Cust</div>
+                                        </div>
+                                        <div class="dropdown dropup job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
+                                                <i class="la la-list m--font-success"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="job-stage-list">
+                                        <div class="m-stack m-stack--ver m-stack--general m-stack--inline">
+                                            <ng-container *ngFor="let stage of job.stage_list;let k = index;">
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item"
+                                                    *ngIf="stage.status=='default'">
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.abbreviation}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-inprogress"
+                                                    *ngIf="stage.status=='process'">
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.abbreviation}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-success"
+                                                    *ngIf="stage.status=='success'">
+                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.abbreviation}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-overdue"
+                                                    *ngIf="stage.status=='overdue'">
+                                                    <div class="stage-item-info"><i class="la la-truck"></i>{{stage.abbreviation}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle job-stage-item job-warning"
+                                                    *ngIf="stage.status=='warning'">
+                                                    <div class="stage-item-info"><i class="la la-file-text"></i>{{stage.abbreviation}}</div>
+                                                    <span class="job-exp-timestamp">{{stage.exp_time}}</span>
+                                                    <div class="dropdown dropup job-stage-item-actions">
+                                                        <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="dropdown"
+                                                            href="#" title="Setting">
+                                                            <i class="icon-more-horizontal"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu job-stage-action-menu">
+                                                            <div class="stage-detail-group">
+                                                                <div class="block-text">Stage description: This is
+                                                                    Stage description</div>
+                                                                <div class="block-text">Stage deadline: <span>12:01
+                                                                        03/10/18</span></div>
+                                                                <div class="block-text">Stage comment: Kris completed
+                                                                    before 29/09/2018</div>
+                                                            </div>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Edit stage detail</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Pending</a>
+                                                            <a class="dropdown-item" href="#">Cancel</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item" href="#">Delete stage</a>
+                                                            <a class="dropdown-item" href="#">Exit</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+
+                                        </div>
+                                        <div class="job-stage-progress">
+                                            <div class="progress-text">{{count_percent(job)}} %</div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar" [style.width]="count_percent(job) +'%'" ></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--end::job-stage-row-->
                                 </div>
                             </div>
-                        </div>
-                        <div class="job-stage-progress">
-                            <div class="progress">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%"></div>
+                            <!--begin::pagination-->
+                            <div class="pagination-nav">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="select-box" style="max-width: 190px">
+                                            <select class="form-control" id="" aria-label="">
+                                                <option value="1">15 line/screen</option>
+                                                <option value="2">30 line/screen</option>
+                                                <option value="3">50 line/screen</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <nav aria-label="">
+                                            <ul class="pagination  justify-content-end">
+                                                <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
                             </div>
+                            <!--end::pagination-->
+                        </div>
+                        <!--end:: m-portlets-->
+                    </div>
+                    <!--end:: m-portlet portlet-stageview-->
+                </div>
+
+                <div class="tab-pane fade" id="job-tableview-tab" role="tabpanel" aria-labelledby="">
+                    <!--begin:: m-portlet-->
+                    <div class="m-portlet">
+                        <div class="m-portlet__body">
+                            <!--begin: Datatable of stage-table-view -->
+                            <div class="table-wrapper" id="">
+                                <table class="table table-striped table-brand">
+                                    <thead class="">
+                                        <tr class="">
+                                            <th class="">
+                                                Actions
+                                            </th>
+                                            <th class="">
+                                                No
+                                            </th>
+                                            <th class="">
+                                                Customer
+                                            </th>
+                                            <th class="">
+                                                H-B/L (HAWB)
+                                            </th>
+                                            <th class="">
+                                                Salesman
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="">
+                                        <tr>
+                                            <td class="table-action-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>1</span>
+                                            </td>
+                                            <td>
+                                                <div class="select-wrapper">
+                                                    <select class="form-control m-input m-input--square">
+                                                        <option value="">
+                                                            Please select Customer
+                                                        </option>
+                                                        <option value="" selected>
+                                                            Scott Phuong 1
+                                                        </option>
+                                                        <option value="">
+                                                            Scott Phuong 2
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                                    value="H-B/L (HAWB)">
+                                            </td>
+                                            <td>
+                                                <span>Scott Phuong</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="table-action-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>2</span>
+                                            </td>
+                                            <td>
+                                                <div class="select-wrapper">
+                                                    <select class="form-control m-input m-input--square">
+                                                        <option value="">
+                                                            Please select Customer
+                                                        </option>
+                                                        <option value="" selected>
+                                                            Scott Phuong 1
+                                                        </option>
+                                                        <option value="">
+                                                            Scott Phuong 2
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail" value="H-B/L (HAWB)">
+                                            </td>
+                                            <td>
+                                                <span>Scott Phuong</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--end: Datatable of stage-table-view -->
                         </div>
                     </div>
-                    <!--end::Content-->
+                    <!--end:: m-portlets-->
                 </div>
             </div>
-            <!--end:: m-portlets-->
-            <!--begin:: m-portlet-->
-            <div class="m-portlet" style="display: none">
-                <div class="m-portlet__body">
-                    <!--begin: Datatable of stage-table-view -->
-                    <div class="m_datatable m-datatable m-datatable--default m-datatable--loaded" id="">
-                        <table class="m-datatable__table" style="display: block; min-height: 100px; overflow-x: auto;">
-                            <thead class="m-datatable__head">
-                                <tr class="m-datatable__row">
-                                    <th class="m-datatable__cell m-datatable__cell--sort">
-                                        <span style="width: 100px;">Actions</span>
-                                    </th>
-                                    <th class="m-datatable__cell m-datatable__cell--sort">
-                                        <span style="width: 110px;">No</span>
-                                    </th>
-                                    <th class="m-datatable__cell m-datatable__cell--sort">
-                                        <span style="width: 110px;">Customer</span>
-                                    </th>
-                                    <th class="m-datatable__cell m-datatable__cell--sort">
-                                        <span style="width: 110px;">H-B/L (HAWB)</span>
-                                    </th>
-                                    <th class="m-datatable__cell m-datatable__cell--sort">
-                                        <span style="width: 110px;">Salesman</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="m-datatable__body">
-                                <tr class="m-datatable__row" data-row="0">
-                                    <td class="m-datatable__cell">
-                                        <span style="width: 100px;"></span>
-                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                            <i class="la la-edit"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                            <i class="la la-trash"></i>
-                                        </a>
-                                    </td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                    <td class="m-datatable__cell">
-                                        <div style="width: 110px;">
-                                            <select class="form-control m-input m-input--square">
-                                                <option value="">
-                                                    Please select Customer
-                                                </option>
-                                                <option value="" selected>
-                                                    Scott Phuong 1
-                                                </option>
-                                                <option value="">
-                                                    Scott Phuong 2
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB) 100</span></td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
-                                </tr>
-                                <tr class="m-datatable__row" data-row="0">
-                                    <td class="m-datatable__cell">
-                                        <span style="width: 100px;"></span>
-                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                            <i class="la la-edit"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                            <i class="la la-trash"></i>
-                                        </a>
-                                    </td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB) 100</span></td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
-                                </tr>
-                                <tr class="m-datatable__row" data-row="0">
-                                    <td class="m-datatable__cell">
-                                        <span style="width: 100px;"></span>
-                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                            <i class="la la-edit"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                            <i class="la la-trash"></i>
-                                        </a>
-                                    </td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">Sanford-Halvorson</span></td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">H-B/L (HAWB) 100</span></td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">Scott Phuong</span></td>
-                                </tr>
-                                <tr class="m-datatable__row" data-row="0">
-                                    <td class="m-datatable__cell">
-                                        <span style="width: 100px;"></span>
-                                        <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                            <i class="la la-edit"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px">
-                                            <i class="la la-trash"></i>
-                                        </a>
-                                    </td>
-                                    <td class="m-datatable__cell"><span style="width: 110px;">1</span></td>
-                                    <td class="m-datatable__cell">
-                                        <div style="width: 110px;">
-                                            <select class="form-control m-input m-input--square">
-                                                <option value="">
-                                                    Please select Customer
-                                                </option>
-                                                <option value="">
-                                                    Scott Phuong 1
-                                                </option>
-                                                <option value="">
-                                                    Scott Phuong 2
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </td>
-                                    <td class="m-datatable__cell">
-                                        <div style="width: 110px;">
-                                            <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                                        </div>
-                                    </td>
-                                    <td class="m-datatable__cell">
-                                        <span style="width: 110px;"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!--end: Datatable of stage-table-view -->
-                </div>
-            </div>
-            <!--end:: m-portlets-->
         </div>
     </div>
 </div>
+<!--end:: m-content-->
 <!--begin:: create-job-modal-->
-<div class="modal fade" id="create-job-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="create-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -484,7 +605,7 @@
                                                         <label>
                                                             Job ID
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6">
@@ -493,7 +614,7 @@
                                                             Service Date
                                                         </label>
                                                         <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
+                                                            <input type="text" class="form-control m-input m-input--square" placeholder="//">
                                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                 <span>
                                                                     <i class="la la-calendar glyphicon-th"></i>
@@ -528,7 +649,7 @@
                                                             Finish Date
                                                         </label>
                                                         <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input" placeholder="//">
+                                                            <input type="text" class="form-control m-input m-input--square" placeholder="//">
                                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                 <span>
                                                                     <i class="la la-calendar glyphicon-th"></i>
@@ -627,47 +748,105 @@
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Qty">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        CBM
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{cbm_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="G.W">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        G.W
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{gw_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="Unit">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        CNTS
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{cnts_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="N.W">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        N.W
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{nw_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CBM">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        FCL(Cont)
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{fcl_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control m-input" placeholder="CNTS">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        LCL(Kg)
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{lcl_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
+
                                                 </div>
                                                 <div class="row">
+
                                                     <div class="col-lg-12 m--align-right">
-                                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                                            data-toggle="modal" data-target="#container-list-of-job-modal">
                                                             <span>
                                                                 <i class="icon-plus7"></i>
                                                                 <span>
                                                                     container
                                                                 </span>
+
                                                             </span>
                                                         </button>
                                                     </div>
@@ -736,7 +915,7 @@
                                                         <label>
                                                             P/O No.
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -782,7 +961,7 @@
                                                         <label>
                                                             Inv No.
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -792,7 +971,7 @@
                                                         <label>
                                                             Vessel/Flight
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4">
@@ -818,7 +997,7 @@
                                                         <label for="">
                                                             M - B/L
                                                         </label>
-                                                        <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -828,7 +1007,7 @@
                                                 <label>
                                                     Note
                                                 </label>
-                                                <textarea rows="10" type="text" class="form-control m-input"
+                                                <textarea rows="10" type="text" class="form-control m-input m-input--square"
                                                     placeholder="Please enter detail"></textarea>
                                             </div>
                                         </div>
@@ -855,7 +1034,7 @@
                                         <div class="form-group m-form__group row align-items-center">
                                             <div class="col-md-4">
                                                 <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
+                                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
                                                         id="generalSearch">
                                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                                         <span>
@@ -906,9 +1085,9 @@
                                         <tr>
                                             <td class="table-action-col">
                                                 <div class="table-actions">
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove bill">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
                                                         <i class="la la-trash"></i>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </td>
                                             <td>
@@ -930,7 +1109,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="H-B/L (HAWB)">
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                                    value="H-B/L (HAWB)">
                                             </td>
                                             <td>
                                                 <span>Scott Phuong</span>
@@ -939,9 +1119,9 @@
                                         <tr>
                                             <td class="table-action-col">
                                                 <div class="table-actions">
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove bill">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
                                                         <i class="la la-trash"></i>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </td>
                                             <td>
@@ -963,7 +1143,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="H-B/L (HAWB)">
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                                    value="H-B/L (HAWB)">
                                             </td>
                                             <td>
                                                 <span>Scott Phuong</span>
@@ -992,7 +1173,7 @@
                                         <div class="form-group m-form__group row align-items-center">
                                             <div class="col-md-4">
                                                 <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input" placeholder="Search..."
+                                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
                                                         id="generalSearch">
                                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                                         <span>
@@ -1004,7 +1185,8 @@
                                         </div>
                                     </div>
                                     <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                            data-toggle="modal" data-target="#add-stage-of-job-modal">
                                             <span>
                                                 <i class="icon-plus7"></i>
                                                 <span>
@@ -1029,7 +1211,7 @@
                                                 <span>Stage Order</span>
                                             </th>
                                             <th>
-                                                <span>Abbr</span>
+                                                <span>Abbreviation</span>
                                             </th>
                                             <th>
                                                 <span>Name</span>
@@ -1038,7 +1220,7 @@
                                                 <span>Description</span>
                                             </th>
                                             <th>
-                                                <span>Assignee</span>
+                                                <span>Role</span>
                                             </th>
                                             <th>
                                                 <span>Process Time</span>
@@ -1049,48 +1231,52 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
+                                        <tr *ngFor="let stage of selected_stages;let i = index;">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit stage">
                                                         <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="remove_stage(stage.abbreviation)"
+                                                        style="margin-left: 5px" title="Remove stage">
                                                         <i class="la la-trash"></i>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span>1</span>
+                                                <span>{{i+1}}</span>
                                             </td>
                                             <td>
-                                                <span>Stage 2</span>
+                                                <span>{{stage.abbreviation}}</span>
                                             </td>
                                             <td>
-                                                <span>Preprade document</span>
+                                                <span>{{stage.name}}</span>
                                             </td>
                                             <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
+                                                <span>{{stage.description}}</span>
                                             </td>
                                             <td>
-                                                <span>Cargo O.P</span>
+                                                <span>{{stage.role}}</span>
                                             </td>
                                             <td>
                                                 <span>4</span>
                                             </td>
                                             <td>
-                                                <span>10/08/2018</span>
+                                                <span>{{stage.exp_time}}</span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit stage">
                                                         <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        style="margin-left: 5px" title="Remove stage">
                                                         <i class="la la-trash"></i>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </td>
                                             <td>
@@ -1116,14 +1302,16 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="table-acitons-col">
-                                                <div class="table-acitons">
-                                                    <a href="#" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit stage">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit stage">
                                                         <i class="la la-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" style="margin-left: 5px" title="Remove stage">
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        style="margin-left: 5px" title="Remove stage">
                                                         <i class="la la-trash"></i>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </td>
                                             <td>
@@ -1158,7 +1346,7 @@
                 <!--end:: m-portlets-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="reset" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
                     <span>
                         <i class="la la-check"></i>
                         <span>
@@ -1166,7 +1354,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1174,7 +1362,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" (click)="start_job()" data-dismiss="modal">
                     <span>
                         <i class="la la-hand-o-up"></i>
                         <span>
@@ -1182,7 +1370,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -1195,3 +1383,316 @@
     </div>
 </div>
 <!--end::create-job-modal-->
+
+<!--begin::container-list-of-job-modal-->
+<div class="modal fade" id="container-list-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Container List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-list-table">
+                    <!--begin: Search Form -->
+                    <div class="m-form m-form--label-align-right m--margin-bottom-20">
+                        <div class="row align-items-center">
+                            <div class="col-xl-8 order-2 order-xl-1">
+                                <div class="form-group m-form__group row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="m-input-icon m-input-icon--left">
+                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." id="generalSearch">
+                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                <span>
+                                                    <i class="la la-search"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="add_container()">
+                                    <span>
+                                        <i class="icon-plus7"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button>
+                                <div class="m-separator m-separator--dashed d-xl-none"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end: Search Form -->
+                    <!--begin: Datatable of container-list-table -->
+                    <div class="table-wrapper" id="">
+                        <table class="table table-striped table-brand table--editable">
+                            <thead class="">
+                                <tr class="">
+                                    <th class=""></th>
+                                    <th class="">
+                                        Q'ty
+                                    </th>
+                                    <th class="">
+                                        Cont Type
+                                    </th>
+                                    <th class="">
+                                        Cont No
+                                    </th>
+                                    <th class="">
+                                        Seal No
+                                    </th>
+                                    <th class="">
+                                        Type
+                                    </th>
+                                    <th class="">
+                                        Unit
+                                    </th>
+                                    <th class="">
+                                        Description
+                                    </th>
+                                    <th class="">
+                                        N.W
+                                    </th>
+                                    <th class="">
+                                        G.W
+                                    </th>
+                                    <th class="">
+                                        CBM
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="" *ngFor="let con of container_list;let i = index;">
+                                <tr>
+                                    <td class="table-action-col">
+                                        <div class="table-actions">
+                                            <button type="button" (click)="remove_container(i)" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Remove bill">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="con.quantity" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="text" [(ngModel)]="con.cont_type" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="con.cont_no" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="con.seal_no" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="text" [(ngModel)]="con.type" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="con.unit" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="text" [(ngModel)]="con.descrption" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="con.n_w" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="con.g_w" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                    <td>
+                                        <input type="number" [(ngModel)]="con.cbm" class="form-control form-control-sm m-input m-input--square">
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable of container-list-table -->
+                </div>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-download"></i>
+                        <span>
+                            import
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
+                    data-dismiss="modal" (click)="save_container()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::container-list-of-job-modal-->
+
+<!--begin::add-stage-of-job-modal-->
+<div class="modal fade" id="add-stage-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Stage List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin:: add-stage-block-->
+                <div class="add-stage-block">
+                    <div class="row">
+                        <div class="col-sm-5 add-stage-list-table">
+                            <!--begin: add-stage-list-table -->
+                            <div class="table-wrapper" id="">
+                                <table class="table table-striped table-bordered">
+                                    <thead class="">
+                                        <tr class="">
+                                            <th class="table-action-col" style="width: 50px"></th>
+                                            <th class="">
+                                                Stage List
+                                            </th>
+                                        </tr>
+                                        <tr class="table-filter-row">
+                                            <td class=""></td>
+                                            <td class="">
+                                                <input _ngcontent-c3="" class="form-control form-control-sm m-input m-input--square"
+                                                    type="text" placeholder="Filter">
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="" *ngIf="Stages_List"  id="form_source_stage">
+                                        <tr *ngFor="let stage of Stages_List;let i = index;">
+                                            <td class="table-action-col">
+                                                <div class="table-actions" style="width: 50px">
+                                                    <label class="m-checkbox m-checkbox--bold">
+                                                        <input type="checkbox" (change)="select_stage(i,stage.abbreviation,$event)" [id]="'st-'+i">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>{{stage.abbreviation}}</span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--end: add-stage-list-table -->
+                        </div>
+
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-success btn-block m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="add_selected_stages()">
+                                <span>
+                                    <i class="la la-arrow-right"></i>
+                                    <span>
+                                        add
+                                    </span>
+                                </span>
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase" (click)="remove_selected_stages()">
+                                <span>
+                                    <i class="la la-arrow-left"></i>
+                                    <span>
+                                        remove
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+
+                        <div class="col-sm-5">
+                            <!--begin: add-stage-list-table -->
+                            <div class="table-wrapper" id="">
+                                <table class="table table-striped table-bordered">
+                                    <thead class="">
+                                        <tr class="">
+                                            <th class="table-action-col" style="width: 50px"></th>
+                                            <th class="">
+                                                Stage List
+                                            </th>
+                                            <th class="">
+                                                Stage Order
+                                            </th>
+                                        </tr>
+                                        <tr class="table-filter-row">
+                                            <td class=""></td>
+                                            <td class="">
+                                                <input type="text" class="form-control form-control-sm m-input m-input--square"
+                                                    placeholder="Filter">
+                                            </td>
+                                            <td class="">
+                                                <input type="text" class="form-control form-control-sm m-input m-input--square"
+                                                    placeholder="Filter">
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="" *ngIf="selected_stages">
+                                        <tr *ngFor="let stage of selected_stages;let i=index;">
+                                            <td class="table-action-col">
+                                                <div class="table-actions" style="width: 50px">
+                                                    <label class="m-checkbox m-checkbox--bold">
+                                                        <input type="checkbox" (change)="select_to_remove_stage(i,stage.abbreviation,$event)">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>{{stage.abbreviation}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{i+1}}</span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--end: add-stage-list-table -->
+                        </div>
+                    </div>
+                </div>
+                <!--end:: add-stage-block-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" data-dismiss="modal">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;" (click)="abort_add_stage()">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::add-stage-of-job-modal-->

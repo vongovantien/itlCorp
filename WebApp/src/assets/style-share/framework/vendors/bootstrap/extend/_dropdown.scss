@@ -25,7 +25,7 @@
         > li > a,
         > .dropdown-item {            
             display: block;
-            padding: 0.7rem 1.2rem;
+            padding: 0.4rem 1.2rem; //modifi by lee
 
             @include icons-size( array-get($m--bootstrap-extend-config, dropdown, icon, sizes) );
 

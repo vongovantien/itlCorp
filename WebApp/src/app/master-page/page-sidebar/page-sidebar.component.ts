@@ -243,11 +243,12 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
   }
 
   gotoJobManagement(){
-    this.router.navigate(['/home/operation/job-management']);
+    this.router.navigate(['/home/operation/job-management',{action:"create_job"}]);
     this.open_sub_menu(1);
     setTimeout(() => {
       this.sub_menu_click('Job Management',1,0);
     }, 200);
   }
+
 
 }
