@@ -63,7 +63,6 @@ export class BaseService implements ErrorHandler {
       this.spinnerService.show();
 
     return this._http.get(url, { headers: this.headers }).toPromise().then(res => {
-      this.toastr.success("success");
       this.spinnerService.hide();
       return res;
     }).catch(error => {
