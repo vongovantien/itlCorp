@@ -1,6 +1,5 @@
 html,
 body {
-    font-size: 13px;
     font-weight: normal;
 }
 label {
@@ -77,6 +76,7 @@ label {
 //table
 .table,
 .table-brand {
+    font-size: 13px;
     thead {
         th {
             padding-left: 3px;
