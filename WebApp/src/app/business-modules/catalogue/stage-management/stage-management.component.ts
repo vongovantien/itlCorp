@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import * as lodash from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
+import { ToastrService } from 'ngx-toastr';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 declare var jquery: any;
 declare var $: any;
 
@@ -12,7 +14,7 @@ declare var $: any;
 })
 export class StageManagementComponent implements OnInit {
 
-  constructor(private baseServices:BaseService) { }
+  constructor(private baseServices:BaseService,private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) { }
   Stages_List: any;
   New_Stage:any= {
     "stage_id":"",
@@ -30,7 +32,7 @@ export class StageManagementComponent implements OnInit {
   }
 
   async getStages() {
-    this.Stages_List = await this.baseServices.getAsync('./assets/fake-data/stages-list.json', true, true);
+    this.Stages_List = await this.baseServices.getAsync('./assets/fake-data/stages-list.json', false,false);
   }
 
   id_stage_remove=null;
@@ -40,12 +42,19 @@ export class StageManagementComponent implements OnInit {
     }
 
     if(action=='yes'){
-      this.Stages_List.splice(this.id_stage_remove,1);
+      this.spinnerService.show();
+      setTimeout(() => {
+        this.Stages_List.splice(this.id_stage_remove,1);
+        this.spinnerService.hide();
+        this.toastr.success("Delete Stage Successful !");
+      }, 1500);
+
+      
+      
     }
   }
 
   add_stage(){
-    this.Stages_List.push(this.New_Stage);
     this.New_Stage = {
       "stage_id":"",
       "abbreviation":"",
@@ -57,6 +66,14 @@ export class StageManagementComponent implements OnInit {
       "status:":"",
       "role":""
     }
+    this.spinnerService.show();
+    setTimeout(() => {     
+      this.Stages_List.push(this.New_Stage);
+      this.spinnerService.hide();
+      this.toastr.success("Add Stage Successful !");
+    }, 1500);
+    
+ 
   }
 
 }
