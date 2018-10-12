@@ -31,7 +31,8 @@ namespace API.Mobile.Common
             Processing = 3,
             NotStart = 4,
             Pending = 5,
-            Finish = 6
+            Finish = 6,
+            Canceled = 7
         }
         public enum JobStatusSearch
         {

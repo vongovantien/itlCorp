@@ -38,8 +38,8 @@ namespace API.Mobile.Controllers
         [Route("GetBy")]
         public JobViewModel Get(JobCriteria criteria, int? offset, int limit = 15)
         {
-            //var userId = User.FindFirst("UserId")?.Value;
-            var userId = FakeData.user.UserId;
+            var userId = User.FindFirst("UserId")?.Value;
+            //var userId = FakeData.user.UserId;
             return jobRepository.Get(criteria, userId, offset, limit);
         }
 
@@ -55,6 +55,13 @@ namespace API.Mobile.Controllers
             var stages = stateRepository.Get(jobId);
             var results = new JobDetailModel { Job = job, Stages = stages };
             return results;
+        }
+
+        [HttpPost]
+        [Route("PerformanceReports")]
+        public List<JobPerformance> Get(JobPerformanceCriteria criteria)
+        {
+            return jobRepository.Get(criteria);
         }
     }
 }
