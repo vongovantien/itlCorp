@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import * as lodash from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
+import { Observer, Observable } from 'rxjs';
 declare var jquery: any;
 declare var $: any;
 
@@ -15,6 +16,7 @@ export class JobMangementComponent implements OnInit {
 
   Jobs_List: any;
   Stages_List: any;
+  Const_Jobs_List:any;
   container = {
     "quantity": "", "cont_type": "", "cont_no": "",
     "seal_no": "", "type": "", "unit": "",
@@ -40,7 +42,7 @@ export class JobMangementComponent implements OnInit {
 
 
 
-  constructor(private route: ActivatedRoute, private router: Router, private baseServices: BaseService) { }
+  constructor(private route: ActivatedRoute, private router: Router, private baseServices: BaseService,private cdRef:ChangeDetectorRef) { }
 
   async ngOnInit() {
     this.route.params.subscribe(prams => {
@@ -48,15 +50,16 @@ export class JobMangementComponent implements OnInit {
         $("#create-job-modal").modal('show');
         this.router.navigate(['/home/operation/job-management']);
       }
-    });
-
+    }); 
     this.getJobs();
-    this.getStages();
+    this.getStages();    
   }
 
 
+  status = false;
   async getJobs() {
     this.Jobs_List = await this.baseServices.getAsync('./assets/fake-data/jobs-list.json', true, true);
+    this.Const_Jobs_List = this.Jobs_List.map(x=>Object.assign({},x));
   }
 
   async getStages() {
@@ -240,6 +243,17 @@ export class JobMangementComponent implements OnInit {
 
   public refreshValue(value: any): void {
     this.value = value;
+  }
+
+
+  /**
+   * paging
+   */
+
+  receiveData(data){
+    this.Jobs_List =  this.Const_Jobs_List.slice(data.startIndex, data.endIndex + 1);    
+    this.cdRef.detectChanges(); 
+    // return data;
   }
 
 }

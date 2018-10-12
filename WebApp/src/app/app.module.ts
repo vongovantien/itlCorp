@@ -19,6 +19,8 @@ import { ToastrModule } from 'ngx-toastr';
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 import { BreadcrumbComponent } from './master-page/breadcrumb/breadcrumb.component';
 import { Daterangepicker } from 'ng2-daterangepicker';
+import { PagingClientComponent } from './shared/paging-client/paging-client.component';
+import {PagingService} from 'src/app/shared/paging-client/paging-client-service';
 
 @NgModule({
   declarations: [
@@ -31,6 +33,7 @@ import { Daterangepicker } from 'ng2-daterangepicker';
     PageSidebarComponent,
     SubheaderComponent,
     BreadcrumbComponent
+    // PagingClientComponent
   ],
   imports: [    
     BrowserModule,
@@ -43,7 +46,8 @@ import { Daterangepicker } from 'ng2-daterangepicker';
     Ng4LoadingSpinnerModule.forRoot(),
     Daterangepicker
   ],
-  providers: [BaseService],
+  providers: [BaseService,PagingService],
   bootstrap: [AppComponent],
+  exports:[]
 })
 export class AppModule { }

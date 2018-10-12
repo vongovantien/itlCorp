@@ -436,7 +436,10 @@
                                 </div>
                             </div>
                             <!--begin::pagination-->
-                            <div class="pagination-nav">
+                            
+                            <app-paging-client *ngIf="Const_Jobs_List" [data]="Const_Jobs_List" [page_size]="1" [current_page]="1" (pagerObject)="receiveData($event)"></app-paging-client>
+
+                            <!-- <div class="pagination-nav">
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="select-box" style="max-width: 190px">
@@ -461,7 +464,7 @@
                                         </nav>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <!--end::pagination-->
                         </div>
                         <!--end:: m-portlets-->
