@@ -435,35 +435,8 @@
                                     <!--end::job-stage-row-->
                                 </div>
                             </div>
-                           <!--begin::pagination-->
-                            <div class="pagination-nav">
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="tatable__pager-size" style="max-width: 190px">
-                                            <div class="select-box">
-                                                <select class="form-control m-input m-input--square" id="" aria-label="">
-                                                    <option value="1">15 line/screen</option>
-                                                    <option value="2">30 line/screen</option>
-                                                    <option value="3">50 line/screen</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <nav aria-label="">
-                                            <ul class="pagination justify-content-end">
-                                                <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                                            </ul>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div>
+                            <!--begin::pagination-->
+                            <app-paging-client *ngIf="Const_Jobs_List" [data]="Const_Jobs_List" [page_size]="1" [current_page]="1" (pagerObject)="receiveData($event)"></app-paging-client>
                             <!--end::pagination-->
                         </div>
                         <!--end:: m-portlets-->
