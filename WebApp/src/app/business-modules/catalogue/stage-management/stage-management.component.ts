@@ -125,7 +125,7 @@ export class StageManagementComponent implements OnInit {
 reset_search(){
   this.search_key = "";
   this.Stages_List = this.Const_Stage_List.map(x=>Object.assign({},x));  
-  this.search_fields = ['stage_id','role','name','name_en','abbreviation'];
+ // this.search_fields = ['stage_id','role','name','name_en','abbreviation'];
 }
 
 
