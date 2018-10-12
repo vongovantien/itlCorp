@@ -21,8 +21,16 @@ label {
         background-color: #fcb34c;
         &:hover,
         &:focus {
-            color: #fff;
+            color: #fff !important;
         }
+    }
+}
+.btn-thirdary {
+    color: #fff;
+    background-color: #284985;
+    &:hover,
+    &:focus {
+        color: #fff;
     }
 }
 .m-checkbox {
@@ -34,6 +42,34 @@ label {
     .btn {
         & + .btn {
             margin-left: 10px;
+        }
+    }
+}
+//sidebar 
+.m-aside-menu.m-aside-menu--skin-dark {
+    .m-menu__nav--dropdown-submenu-arrow {
+        > .m-menu__item {
+            &.m-menu__item--active {
+                > .m-menu__link {
+                    background-color: #3966b6;
+                    position: relative;
+                    &:before {
+                        content: "";
+                        width: 5px;
+                        display: block;
+                        background-color: #fb4b58;
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        right: 0;
+                    }
+                    .m-menu__link-icon,
+                    .m-menu__link-text,
+                    .m-menu__ver-arrow {
+                        color: #fff;
+                    }
+                }
+            }
         }
     }
 }
@@ -83,6 +119,28 @@ label {
 //modal
 .modal {
     background-color: rgba(0,0,0,0.5);
+    .modal-content {
+        .modal-header {
+            padding: 10px 25px;
+            background-color: #3966b6;
+            .modal-title {
+                color: #fff;
+            }
+            .close {
+                width: 44px;
+                color: #91a5d1;
+                text-shadow: none;
+                position: absolute;
+                right: 0;
+                margin: 0;
+            }
+        }
+    }
+    .modal-footer {
+        &.m--align-center {
+            justify-content: center;
+        }
+    }
     .c-button-actions {
         .btn {
             & + .btn {
@@ -94,6 +152,10 @@ label {
 .modal-header {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+}
+.modal-actions {
+    float: right;
+    margin-right: 20px;
 }
 .modal-lg {
     max-width: 900px;
@@ -329,27 +391,6 @@ label {
 }
 
 //create job
-.modal {
-    .modal-content {
-        .modal-header {
-            padding: 10px 25px;
-            background-color: #3966b6;
-            .modal-title {
-                color: #fff;
-            }
-            .close {
-                padding: 1rem 0 0;
-                color: #91a5d1;
-                margin: 0;
-            }
-        }
-    }
-    .modal-footer {
-        &.m--align-center {
-            justify-content: center;
-        }
-    }
-}
 .c-modal-fullscreen {
     width: calc(100% - 1.75rem);
     max-width: 1200px;
@@ -359,5 +400,16 @@ label {
     border: 1px solid #e5e5e5;
     .form-group {
         margin-bottom: 20px;
+    }
+}
+//detail job
+.job-notification-dropdown {
+    > .btn {
+        padding-right: 30px;
+    }
+    .m-badge {
+        position: absolute;
+        right: 5px;
+        top: 5px;
     }
 }
