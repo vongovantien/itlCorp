@@ -21,7 +21,10 @@ label {
         background-color: #fcb34c;
         &:hover,
         &:focus {
-            color: #fff !important;
+            &,
+            &:not(:disabled):not(.disabled) {
+                color: #fff !important;
+            }
         }
     }
 }
@@ -30,7 +33,10 @@ label {
     background-color: #284985;
     &:hover,
     &:focus {
-        color: #fff;
+        &,
+        &:not(:disabled):not(.disabled) {
+            color: #fff;
+        }
     }
 }
 .m-checkbox {

@@ -551,6 +551,7 @@
     </div>
 </div>
 <!--end:: m-content-->
+
 <!--begin:: create-job-modal-->
 <div class="modal fade" id="create-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
@@ -560,6 +561,16 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                <div class="modal-actions c-button-actions">
+                    <button type="button" class="btn btn-sm btn-warning m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-check"></i>
+                            <span>
+                                choose default detail
+                            </span>
+                        </span>
+                    </button>
+                </div>
             </div>
             <div class="modal-body">
                 <!--begin:: m-portlet-->
@@ -1321,15 +1332,7 @@
                 <!--end:: m-portlets-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
-                    <span>
-                        <i class="la la-check"></i>
-                        <span>
-                            choose default detail
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -2554,7 +2557,7 @@
                             <tbody class="">
                                 <tr>
                                     <td class="">
-                                        <span>HH:MM:SS</span> <span>05/08/2018</span>
+                                        <span>HH:MM:SS</span> &nbsp; <span>05/08/2018</span>
                                     </td>
                                     <td class="">
                                         <span>Comment: Will finish before 5.pm</span>
