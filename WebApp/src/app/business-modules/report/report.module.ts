@@ -5,11 +5,13 @@ import { ReportRoutingModule } from './report-routing.module';
 import { PerformanceReportComponent } from './performance-report/performance-report.component';
 import { ShipmentOverviewComponent } from './shipment-overview/shipment-overview.component';
 import { PLReportComponent } from './p-l-report/p-l-report.component';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    ReportRoutingModule
+    ReportRoutingModule,
+    SharedModule
   ],
   declarations: [PerformanceReportComponent, ShipmentOverviewComponent, PLReportComponent]
 })

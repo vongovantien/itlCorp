@@ -17,10 +17,11 @@ import { BaseService } from 'src/services-base/base.service';
 import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
-import { BreadcrumbComponent } from './master-page/breadcrumb/breadcrumb.component';
 import { Daterangepicker } from 'ng2-daterangepicker';
 import { PagingClientComponent } from './shared/paging-client/paging-client.component';
 import {PagingService} from 'src/app/shared/paging-client/paging-client-service';
+import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -31,11 +32,10 @@ import {PagingService} from 'src/app/shared/paging-client/paging-client-service'
     HeaderComponent,
     FooterComponent,
     PageSidebarComponent,
-    SubheaderComponent,
-    BreadcrumbComponent
-    // PagingClientComponent
+    SubheaderComponent
   ],
   imports: [    
+    CommonModule,
     BrowserModule,
     AppRoutingModule,
     FormsModule,

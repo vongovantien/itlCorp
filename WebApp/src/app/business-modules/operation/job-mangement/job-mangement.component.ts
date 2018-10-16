@@ -14,13 +14,14 @@ declare var $: any;
 })
 export class JobMangementComponent implements OnInit {
 
+  ready= false;
   Jobs_List: any;
   Stages_List: any;
   Const_Jobs_List:any;
   container = {
-    "quantity": "", "cont_type": "", "cont_no": "",
-    "seal_no": "", "type": "", "unit": "",
-    "descrption": "", "n_w": "", "g_w": "", "cbm": ""
+    "quantity": 0, "cont_type": "", "cont_no": 0,
+    "seal_no": 0, "type": "", "unit": 0,
+    "descrption": "", "n_w": 0, "g_w": 0, "cbm": 0
   }
   house_bill = {
     "customer":"",
@@ -29,7 +30,7 @@ export class JobMangementComponent implements OnInit {
   }
 
   housebill_list:any = [];  
-  container_list: any = [];
+  container_list: any = [Object.assign({},this.container)];
   temp_stages: any = [];
   temp_stages_remove: any = [];
   selected_stages: any = [];
@@ -53,6 +54,7 @@ export class JobMangementComponent implements OnInit {
     }); 
     this.getJobs();
     this.getStages();    
+    this.ready= true;
   }
 
 
@@ -67,10 +69,10 @@ export class JobMangementComponent implements OnInit {
   }
 
   save_container() {
-    this.cbm_sum = lodash.sumBy(this.container_list, function (o) { return o.cbm });
-    this.gw_sum = lodash.sumBy(this.container_list, function (o) { return o.g_w });
+    this.cbm_sum = lodash.sumBy(this.container_list, function (o) { return o['cbm'] });
+    this.gw_sum = lodash.sumBy(this.container_list, function (o) { return o['g_w'] });
     this.cnts_sum = 0; // special formular 
-    this.nw_sum = lodash.sumBy(this.container_list, function (o) { return o.n_w });
+    this.nw_sum = lodash.sumBy(this.container_list, function (o) { return o['n_w'] });
     var fcl_list = lodash.filter(this.container_list, function (o) { return (o.type == 'FCL') });
     var lcl_list = lodash.filter(this.container_list, function (o) { return (o.type == 'LCL') });
 
@@ -80,8 +82,13 @@ export class JobMangementComponent implements OnInit {
 
   }
 
-  add_container() {
-    this.container_list.push(Object.assign({}, this.container));
+  add_container() {   
+   
+
+    if(this.container_list.length==0 || this.container_list[this.container_list.length-1]['quantity']!=0){
+      this.container_list.push(Object.assign({}, this.container));
+    }
+   
   }
 
   remove_container(i) {
@@ -103,7 +110,7 @@ export class JobMangementComponent implements OnInit {
       var selected_stage = Object.assign({}, this.Stages_List[i]);
       this.temp_stages.push(selected_stage);
     } else {
-      let i = lodash.findIndex(this.temp_stages, function (o) { return o.abbreviation == abbr });
+      let i = lodash.findIndex(this.temp_stages, function (o) { return o['abbreviation'] == abbr });
       let k = lodash.findIndex(this.list_id_disabled, function (o) { return o == id_input });
       this.list_id_disabled.splice(k, 1);
       this.temp_stages.splice(i, 1);
@@ -146,12 +153,12 @@ export class JobMangementComponent implements OnInit {
     if (this.list_id_enable.length != 0) {
       for (var i = 0; i < this.list_id_enable.length; i++) {
         var lst1 = this.list_id_enable;
-        var index = lodash.findIndex(this.selected_stages, function (o) { return o.abbreviation == lst1[i] });
+        var index = lodash.findIndex(this.selected_stages, function (o) { return o['abbreviation'] == lst1[i] });
         this.selected_stages.splice(index, 1);
 
 
         //  var lst2 = this.list_id_enable ;
-        var index1 = lodash.findIndex(this.Stages_List, function (o) { return o.abbreviation == lst1[i] });
+        var index1 = lodash.findIndex(this.Stages_List, function (o) { return o['abbreviation'] == lst1[i] });
         var id_el = "st-" + index1;
         var element: any = document.getElementById(id_el);
 
@@ -190,17 +197,55 @@ export class JobMangementComponent implements OnInit {
   }
 
 
+  job_to_add = {
+    job_id:"",
+    ops_ic:"",
+    cargo_op:"",
+    assign_route:"",
+    service_date:"",
+    finish_date:"",
+    commodity:"",
+    supplier:"",
+    w_house:"",
+    p_o_no:"",
+    note:"",
+    agent:"",
+    port_of_loading:"",
+    inventory_no:"",
+    vessel_flight:"",
+    port_of_delivery:"",
+    m_b_l:"",
+    cs_ic:"",
+    customer:"",
+    stage_list:null,
+    house_bill_list:null,
+    container_list:null
+  }
+
+
   start_job(){
-    var new_job = {
-      "job_id":"",
-      "ops_ic":"",
-      "cs_ic":"",
-      "customer":"",
-      "stage_list":this.selected_stages.map(x=>Object.assign({},x))
-    }
-    this.Jobs_List.push(new_job);
+    // var new_job = {
+    //   "job_id":"",
+    //   "ops_ic":"",
+    //   "cs_ic":"",
+    //   "customer":"",
+    //   "house_bill_list":this.housebill_list.map(x=>Object.assign({},x)),
+    //   "container_list":this.container_list.map(x=>Object.assign({},x)),
+    //   "stage_list":this.selected_stages.map(x=>Object.assign({},x))
+    // }
+
+    this.job_to_add.container_list = this.container_list.map(x=>Object.assign({},x));
+    this.job_to_add.stage_list = this.selected_stages.map(x=>Object.assign({},x));
+    this.job_to_add.house_bill_list = this.housebill_list.map(x=>Object.assign({},x));
+
+    console.log(this.job_to_add);
+    this.Jobs_List.push(this.job_to_add);
+    this.housebill_list = [];
+    this.container_list = [Object.assign({},this.container)];
     this.abort_add_stage();
-    console.log(new_job);
+    this.cbm_sum = 0; this.cnts_sum = 0; this.fcl_sum = 0;
+    this.gw_sum = 0; this.lcl_sum = 0; this.nw_sum =0
+  
   }
   count_percent(job){
     var done_list = lodash.filter(job.stage_list,function(o){return o.status=="success"}).length;
@@ -256,4 +301,22 @@ export class JobMangementComponent implements OnInit {
     // return data;
   }
 
+  addNew_HB(){
+    this.housebill_list.push(Object.assign({},this.house_bill));
+  }
+
+  deleteHouseBill(i){
+    this.housebill_list.splice(i,1);
+  }
+
+  selectHb(hb){
+    console.log(hb);
+  }
+
+
+  index_opening_job = null;
+  openJobDetails(index){
+    this.index_opening_job = index;
+    console.log(this.Jobs_List[index]);
+  }
 }

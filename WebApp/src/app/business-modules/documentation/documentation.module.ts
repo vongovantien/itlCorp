@@ -11,11 +11,13 @@ import { SeaFCLImportComponent } from './sea-fcl-import/sea-fcl-import.component
 import { SeaLCLImportComponent } from './sea-lcl-import/sea-lcl-import.component';
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    DocumentationRoutingModule
+    DocumentationRoutingModule,
+    SharedModule
   ],
   declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent]
 })
