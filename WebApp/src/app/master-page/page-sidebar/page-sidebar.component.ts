@@ -49,7 +49,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     if (parentInd != null && childInd != null) {
       setTimeout(() => {
         this.sub_menu_click(child_name, parentInd, childInd);
-      }, 500);
+      }, 400);
     }
 
   }

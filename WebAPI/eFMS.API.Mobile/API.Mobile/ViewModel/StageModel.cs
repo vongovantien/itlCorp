@@ -9,9 +9,10 @@ namespace API.Mobile.ViewModel
 {
     public class StageComment
     {
-        [Required]
+        [Required(ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         public string StageId { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         public StageStatus Status { get; set; }
         public string Content { get; set; }
     }

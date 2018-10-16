@@ -48,18 +48,21 @@ namespace API.Mobile.Controllers
                 var cacheUser = _cache.Set("users", FakeData.users);
                 var users = (List<User>)_cache.Get("users");
                 var user = users.FirstOrDefault(x => x.StaffId == model.StaffId);
+
+                //bool b = model.StaffId == user.StaffId && model.Password == user.Password;
+
                 if (user == null)
                 {
                     return Ok(stringLocalizer[LanguageSub.MSG_USER_NOT_FOUND]);
                 }
-                if (model.StaffId == user.StaffId && model.Password == user.Password)
+                if (model.StaffId == "6789" && model.Password == "123456")
                 {
                     string token = string.Empty;
-                    var u = new { user.StaffId, user.Role, user.UserId, user.Email };
+                    var u = new { user.StaffId, user.Role, user.UserId, user.Email, user.Password };
                     if (!string.IsNullOrEmpty(model.Token))
                     {
                         var lifeTime = new JwtSecurityTokenHandler().ReadToken(model.Token).ValidTo;
-                        if((lifeTime - DateTime.Now) <= TimeSpan.Zero)
+                        if ((lifeTime - DateTime.Now) <= TimeSpan.Zero)
                         {
                             token = GenerateToken(user);
                         }
@@ -76,12 +79,16 @@ namespace API.Mobile.Controllers
                 }
                 else
                 {
-                    return Ok(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+                    return BadRequest(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+                    //return BadRequest(string.Format("b {0} u {1} p {2} t {3} u {4} p {5}", b, model.StaffId, model.Password, model.Token, user.StaffId, user.Password) /*stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]*/);
                 }
             }
             catch (Exception Ex)
             {
-                return BadRequest(stringLocalizer[Ex.Message]);
+                if (Ex.Message.Contains("IDX12709"))
+                {
+                    return BadRequest(stringLocalizer[LanguageSub.MSG_TOKEN_WRONG]);
+                }
                 throw;
             }
         }
@@ -113,7 +120,6 @@ namespace API.Mobile.Controllers
         public User Profile(string userId)
         {
             var result = userRepository.Get(userId);
-            result.Password = null;
             return result;
         }
 
@@ -147,6 +153,14 @@ namespace API.Mobile.Controllers
             {
                 return stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
             }
+        }
+
+        [HttpGet]
+        [Route("GetInGroup")]
+        [Authorize]
+        public List<User> GetInGroup()
+        {
+            return FakeData.users;
         }
     }
 }
