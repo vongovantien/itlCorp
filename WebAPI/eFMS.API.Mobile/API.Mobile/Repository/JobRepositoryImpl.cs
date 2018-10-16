@@ -70,10 +70,73 @@ namespace API.Mobile.Repository
                 case JobStatus.Finish:
                     statusName = stringLocalizer[LanguageSub.JOB_STATUS_FINISH].Value;
                     break;
+                case JobStatus.Canceled:
+                    statusName = stringLocalizer[LanguageSub.JOB_STATUS_CANCELED].Value;
+                    break;
             }
             return statusName;
         }
+        public List<JobPerformance> Get(JobPerformanceCriteria criteria)
+        {
+            var listJob = jobs;
+            if (criteria.ThisWeek)
+            {
+                DateTime fromDate = DateTime.Now.StartOfWeek(DayOfWeek.Monday);
+                DateTime toDate = DateTime.Now.StartOfWeek(DayOfWeek.Sunday);
+                listJob.Where(x => (x.AssignTime >= fromDate && x.AssignTime <= toDate));
+            }
+            if (criteria.ThisMonth)
+            {
+                listJob.Where(x => (x.AssignTime.Month == DateTime.Now.Month));
+            }
+            if (criteria.ThisQuater)
+            {
 
+            }
+            if (criteria.ThisYear)
+            {
+                listJob.Where(x => (x.AssignTime.Year == DateTime.Now.Year));
+            }
+            var results = new List<JobPerformance>();
+            var list = listJob.GroupBy(x => x.CurrentStageStatus).Select(x => new { JobStatus = x.Key, NumberJob = x.Count() });
+            if(!list.Any(x => x.JobStatus == JobStatus.Canceled))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.Canceled, NumberJob = 0, StatusName = GetStatusName(JobStatus.Canceled) });
+            }
+            if (!list.Any(x => x.JobStatus == JobStatus.Finish))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.Finish, NumberJob = 0, StatusName = GetStatusName(JobStatus.Finish) });
+            }
+            if (!list.Any(x => x.JobStatus == JobStatus.NotStart))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.NotStart, NumberJob = 0, StatusName = GetStatusName(JobStatus.NotStart) });
+            }
+            if (!list.Any(x => x.JobStatus == JobStatus.Overdued))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.Overdued, NumberJob = 0, StatusName = GetStatusName(JobStatus.Overdued) });
+            }
+            if (!list.Any(x => x.JobStatus == JobStatus.Pending))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.Pending, NumberJob = 0, StatusName = GetStatusName(JobStatus.Pending) });
+            }
+            if (!list.Any(x => x.JobStatus == JobStatus.Processing))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.Processing, NumberJob = 0, StatusName = GetStatusName(JobStatus.Processing) });
+            }
+            if (!list.Any(x => x.JobStatus == JobStatus.WillOverDue))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.WillOverDue, NumberJob = 0, StatusName = GetStatusName(JobStatus.WillOverDue) });
+            }
+            foreach (var item in list)
+            {
+                var performance = new JobPerformance();
+                performance.JobStatus = item.JobStatus;
+                performance.NumberJob = item.NumberJob;
+                performance.StatusName = GetStatusName(item.JobStatus);
+                results.Add(performance);
+            }
+            return results;
+        }
         public Job Get(string id)
         {
             var job = jobs.Find(x => x.Id == id);
