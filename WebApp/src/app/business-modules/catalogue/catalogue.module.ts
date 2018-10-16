@@ -10,13 +10,15 @@ import { ChargeComponent } from './charge/charge.component';
 import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
-
+import { SharedModule } from '../../shared/shared.module';
+// import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    CatalogueRoutingModule
+    CatalogueRoutingModule,
+    SharedModule
   ],
   declarations:
     [LocationComponent,
@@ -26,8 +28,7 @@ import { PartnerComponent } from './partner-data/partner.component';
       ChargeComponent,
       UnitComponent,
       StageManagementComponent,
-      PartnerComponent,
-      
+      PartnerComponent
       ],
 })
 export class CatalogueModule { }
