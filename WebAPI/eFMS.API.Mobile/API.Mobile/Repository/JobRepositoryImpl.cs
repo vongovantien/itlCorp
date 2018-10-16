@@ -111,10 +111,10 @@ namespace API.Mobile.Repository
             {
                 results.Add(new JobPerformance { JobStatus = JobStatus.Finish, NumberJob = 0, StatusName = GetStatusName(JobStatus.Finish) });
             }
-            //if (!list.Any(x => x.JobStatus == JobStatus.NotStart))
-            //{
-            //    results.Add(new JobPerformance { JobStatus = JobStatus.NotStart, NumberJob = 0, StatusName = GetStatusName(JobStatus.NotStart) });
-            //}
+            if (!list.Any(x => x.JobStatus == JobStatus.InSchedule))
+            {
+                results.Add(new JobPerformance { JobStatus = JobStatus.InSchedule, NumberJob = 0, StatusName = GetStatusName(JobStatus.InSchedule) });
+            }
             if (!list.Any(x => x.JobStatus == JobStatus.Overdued))
             {
                 results.Add(new JobPerformance { JobStatus = JobStatus.Overdued, NumberJob = 0, StatusName = GetStatusName(JobStatus.Overdued) });
