@@ -364,8 +364,14 @@ label {
     position: absolute;
     top: 0;
     right: 0;
+    bottom: 0;
     .icon-more-horizontal {
         font-size: 16px;
+    }
+    .asignment-job-checkbox {
+        position: absolute;
+        bottom: -2px;
+        right: -4px;
     }  
 }
 .job-stage-action-menu {
@@ -438,5 +444,12 @@ label {
         &:last-child {
             border-bottom: 0;
         }
+        strong {
+            color: #3966b6;
+            font-weight: 500;
+        }
+    }
+    .timestamp {
+        font-weight: normal;
     }
 }
