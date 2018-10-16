@@ -1,5 +1,6 @@
 html,
 body {
+    color: #5a5a5a;
     font-weight: normal;
 }
 label {
@@ -174,9 +175,6 @@ label {
 .modal-actions {
     float: right;
     margin-right: 20px;
-}
-.modal-lg {
-    max-width: 900px;
 }
 .modal-backdrop {
     &.show {
@@ -429,5 +427,16 @@ label {
         position: absolute;
         right: 5px;
         top: 5px;
+    }
+}
+//
+.list-request-job {
+    margin-bottom: 0;
+    .list-group-item {
+        border-width: 0 0 1px 0;
+        margin-bottom: 0;
+        &:last-child {
+            border-bottom: 0;
+        }
     }
 }
