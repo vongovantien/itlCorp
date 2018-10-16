@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { SharedModule } from '../../shared/shared.module';
+
 import { CatalogueRoutingModule } from './catalogue-routing.module';
 import { LocationComponent } from './location/location.component';
 import { WarehouseComponent } from './warehouse/warehouse.component';
@@ -18,7 +20,8 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
   imports: [
     CommonModule,
     CatalogueRoutingModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ],
   declarations:
     [LocationComponent,

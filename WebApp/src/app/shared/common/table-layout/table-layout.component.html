@@ -1,0 +1,60 @@
+
+<!--begin: Datatable of port-index-list-table -->
+<div class="table-wrapper" id="">
+    <table class="table table-striped table-brand">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Order</th>
+                <th *ngFor="let map of columnMaps" class="sorting" (click)="sort(map.primaryKey)"><span *ngIf="map.isShow">{{ map.header }}</span></th>
+            </tr>
+        </thead>
+        <tbody *ngIf="records">
+            <tr *ngFor="let record of records; let i = index">
+                <td class="table-acitons-col">
+                    <div class="table-acitons">
+                        <!-- <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                            title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
+                            <i class="la la-edit"></i>
+                        </button> -->
+                        <app-addmodal-button [buttonSetting]="editButtonSetting" [dataTarget]="editButtonSetting.dataTarget" (click)="editClick(record)"></app-addmodal-button>
+                        <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                            <i class="la la-trash"></i>
+                        </button> -->
+                        <app-addmodal-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="deleteClick(record)"></app-addmodal-button>
+                    </div>
+                </td>
+                <!-- <td>
+                    <span>1</span>
+                </td>
+                <td>
+                    <span>Stage 2</span>
+                </td>
+                <td>
+                    <span>Preprade document</span>
+                </td>
+                <td style="width: 200px;">
+                    <span>Preprade document template and detail Verify and signed Check a</span>
+                </td>
+                <td>
+                    <span>Cargo O.P</span>
+                </td>
+                <td>
+                    <span>4</span>
+                </td>
+                <td>
+                    <span>10/08/2018</span>
+                </td> -->
+                <td>{{ (i+1) }}</td>
+                <td *ngFor="let map of columnMaps" [ctStyleCell]="record[map.primaryKey]">
+                    <!-- {{ record[map.primaryKey] }} -->
+                    <ng-container *ngIf="map.isShow">
+                        <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
+                    </ng-container>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!--end: Datatable of port-index-list-table -->

@@ -1,0 +1,11 @@
+<ng-container *ngIf="item && column">
+  <!-- number -->
+  <ng-container *ngIf="column.dataType == 'number'">
+      <span>{{ item[column.primaryKey] }}</span>
+  </ng-container>
+
+  <!-- text -->
+  <ng-container *ngIf="column.dataType != 'number'">
+      {{ item[column.primaryKey] }}
+  </ng-container>
+</ng-container>

@@ -1,24 +1,324 @@
-<div class="m-content">
-  <div class="row">
-      <div class="col-xl-12">
-          <!--begin:: m-portlet-->
-          <div class="m-portlet">
-              <div class="m-portlet__head">
-                  <div class="m-portlet__head-caption">
-                      <div class="m-portlet__head-title">
-                          <h3 class="m-portlet__head-text">
-                              Warehouse Page
-                          </h3>
-                      </div>
-                  </div>
-              </div>
-              <div class="m-portlet__body">
-                  <!--begin::Content-->
-                  <p>Warehouse page</p>
-                  <!--end::Content-->
-              </div>
-          </div>
-          <!--end:: m-portlets-->
-      </div>
-  </div>
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!-- breadcrum -->
+            <app-breadcrumb [breadcums]="breadcums"></app-breadcrumb>
+        </div>
+        <div class="c-button-actions">
+            <app-addmodal-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"></app-addmodal-button>
+            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#add-ware-house-modal">
+                <span>
+                    <i class="icon-plus7"></i>
+                    <span>
+                        add new
+                    </span>
+                </span>
+            </button> -->
+            <app-addmodal-button [buttonSetting]="importButtonSetting"></app-addmodal-button>
+            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-download"></i>
+                    <span>
+                        import
+                    </span>
+                </span>
+            </button> -->
+            <app-addmodal-button [buttonSetting]="exportButtonSetting"></app-addmodal-button>
+            <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span>
+                        export
+                    </span>
+                </span>
+            </button> -->
+        </div>
+    </div>
 </div>
+<!--end:: subheader-->
+<!--begin::m-content of Ware-house-->
+<div class="m-content">
+    
+    <!--begin:: m-portlet of search-form-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form">
+                <div class="input-group m-input-group m-input-group--square">
+                    <div class="input-group-prepend">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            Code
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item active" href="javascript:void(0)" [(ngModel)]="criteria.type" (click)="searchTypeChange()">
+                                Code
+                            </a>
+                            <a class="dropdown-item" href="javascript:void(0)" [(ngModel)]="criteria.type" (click)="searchTypeChange()">
+                                Name
+                            </a>
+                            <a class="dropdown-item" href="javascript:void(0)" [(ngModel)]="criteria.type" (click)="searchTypeChange()">
+                                Country
+                            </a>
+                            <a class="dropdown-item" href="javascript:void(0)" [(ngModel)]="criteria.type" (click)="searchTypeChange()">
+                                City/ Province
+                            </a>
+                            <a class="dropdown-item" href="javascript:void(0)" [(ngModel)]="criteria.type" (click)="searchTypeChange()">
+                                District
+                            </a>
+                            <a class="dropdown-item" href="javascript:void(0)" [(ngModel)]="criteria.type" (click)="searchTypeChange()">
+                                Address
+                            </a>
+                        </div>
+                    </div>
+                    <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" title="Search">
+                            <i class="icon-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet of search-form-->
+    
+    <!--begin:: m-portlet-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Content-->
+            <app-table-layout [records]="warehouses" [settings]="postSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameEditModal"
+            (edit)="onEdit($event)" (edit)="onDelete($event)">
+            </app-table-layout>
+            <!--end::Content-->
+        </div>
+    </div>
+    <!--end:: m-portlets-->
+</div>
+
+<!--end::m-content of Ware-house-->
+
+<!--begin::add-ware-house-modal-->
+<div class="modal fade" id="add-ware-house-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Warehouse</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-port-index-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Code
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Name
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Country
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    City/ Province
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    District
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Address
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-port-index-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button> -->
+                <app-addmodal-button [buttonSetting]="saveButtonSetting"></app-addmodal-button>
+                <app-addmodal-button [buttonSetting]="cancelButtonSetting"></app-addmodal-button>
+                <!-- <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::add-port-index-modal-->
+
+<!--begin::edit-ware-house-modall-->
+<div class="modal fade" attr.id="{{nameEditModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Warehouse</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-port-index-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Code
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port code">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Name
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port name">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Country
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Country">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    City/ Province
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Zone">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    District
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Local Zone ">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>
+                                    Address
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Mode">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-port-index-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Edit
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::edit-ware-house-modal-->
+
+<!--begin::confirm-delete-modal-->
+<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>You want to delete this warehouse</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Save
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-modal-->
