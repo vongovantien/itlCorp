@@ -248,7 +248,7 @@
                                             <div class="block-text">CS/IC</div>
                                             <div class="block-text">Cust</div>
                                         </div>
-                                        <div class="dropdown dropup job-stage-item-actions">
+                                        <div class="job-stage-item-actions">
                                             <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="modal" href="#detail-job-modal" title="Job detail" (click)="openJobDetails(i)">
                                                 <i class="la la-list m--font-success"></i>
                                             </a>
@@ -1558,7 +1558,7 @@
 <!--end::create-job-modal-->
 
 <!--begin:: detail-job-modal-->
-<div class="modal fade" id="detail-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true" *ngIf="index_opening_job">
+<div class="modal fade" id="detail-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true" *ngIf="index_opening_job!=null">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -2314,7 +2314,7 @@
                     </span>
                 </button>
                 <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
-                    (click)="start_job()" data-dismiss="modal">
+                    (click)="save_change_job()" data-dismiss="modal">
                     <span>
                         <i class="la la la-save"></i>
                         <span>
@@ -2960,7 +2960,7 @@
 <!--end::approval-job-modal-->
 
 <!--begin::cancel-job-modal-->
-<div class="modal fade" id="cancel-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="cancel-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true" *ngIf="index_opening_job!=null">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -2979,7 +2979,7 @@
                                 <label>
                                     Job Status
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Job curent status">
+                                <input type="text" value="Default" class="form-control m-input m-input--square" placeholder="Job curent status" readonly>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -2987,7 +2987,7 @@
                                 <label>
                                     M - B/L
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Master bill no">
+                                <input type="text" [(ngModel)]="Jobs_List[index_opening_job].m_b_l" class="form-control m-input m-input--square" placeholder="Master bill no" readonly>
                             </div>
                         </div>
                     </div>
@@ -2997,7 +2997,7 @@
                                 <label>
                                     Current Stage
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Stage abbr">
+                                <input type="text" [(ngModel)]="Jobs_List[index_opening_job].stage_list[0].name" class="form-control m-input m-input--square" placeholder="Stage abbr" readonly>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -3006,7 +3006,7 @@
                                     Deadline
                                 </label>
                                 <div class="m-input-icon m-input-icon--right">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="//">
+                                    <input type="text" [(ngModel)]="Jobs_List[index_opening_job].finish_date" class="form-control m-input m-input--square" placeholder="//" readonly>
                                     <span
                                         class="m-input-icon__icon m-input-icon__icon--right">
                                         <span><i class="la la-calendar glyphicon-th"></i></span>
@@ -3021,14 +3021,14 @@
                                 <label>
                                     Reason
                                 </label>
-                                <textarea name="" class="form-control m-input m-input--square" id="" rows="4"></textarea>
+                                <textarea name="reason" [(ngModel)]="reason_cancel_job" class="form-control m-input m-input--square" id="" rows="4"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="submit_cancel_job()" data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>

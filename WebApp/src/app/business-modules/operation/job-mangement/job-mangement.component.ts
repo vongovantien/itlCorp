@@ -3,6 +3,8 @@ import * as lodash from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
 import { Observer, Observable } from 'rxjs';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { ToastrService } from 'ngx-toastr';
 declare var jquery: any;
 declare var $: any;
 
@@ -43,7 +45,9 @@ export class JobMangementComponent implements OnInit {
 
 
 
-  constructor(private route: ActivatedRoute, private router: Router, private baseServices: BaseService,private cdRef:ChangeDetectorRef) { }
+  constructor(private route: ActivatedRoute, private router: Router,
+     private baseServices: BaseService,private cdRef:ChangeDetectorRef,
+     private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) { }
 
   async ngOnInit() {
     this.route.params.subscribe(prams => {
@@ -318,5 +322,23 @@ export class JobMangementComponent implements OnInit {
   openJobDetails(index){
     this.index_opening_job = index;
     console.log(this.Jobs_List[index]);
+  }
+
+  reason_cancel_job = "";
+
+  submit_cancel_job(){
+    this.spinnerService.show();
+    setTimeout(() => {
+      this.spinnerService.hide();
+      this.toastr.success("Request submited successful !");
+    }, 3000);
+  }
+
+  save_change_job(){
+    this.spinnerService.show();
+    setTimeout(() => {
+      this.spinnerService.hide();
+      this.toastr.success("All changes have been saved !");
+    }, 3000);
   }
 }
