@@ -11,6 +11,7 @@ import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
 import { SharedModule } from '../../shared/shared.module';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 // import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
 
 
@@ -18,7 +19,8 @@ import { SharedModule } from '../../shared/shared.module';
   imports: [
     CommonModule,
     CatalogueRoutingModule,
-    SharedModule
+    SharedModule,
+    FormsModule
   ],
   declarations:
     [LocationComponent,
