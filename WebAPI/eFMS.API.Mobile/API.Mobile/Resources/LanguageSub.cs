@@ -7,6 +7,7 @@ namespace API.Mobile.Resources
 {
     public class LanguageSub
     {
+        public static readonly string MSG_TOKEN_WRONG = "MSG_TOKEN_WRONG";
         public static readonly string MSG_DATA_NOT_FOUND = "MSG_DATA_NOT_FOUND";
         public static readonly string MSG_OBJECT_NOT_EXISTS = "MSG_OBJECT_NOT_EXISTS";
         public static readonly string MSG_OBJECT_DUPLICATED = "MSG_OBJECT_DUPLICATED";
@@ -32,6 +33,7 @@ namespace API.Mobile.Resources
         public static readonly string JOB_STATUS_NOTSTART = "JOB_STATUS_NOTSTART";
         public static readonly string JOB_STATUS_PENDING = "JOB_STATUS_PENDING";
         public static readonly string JOB_STATUS_FINISH = "JOB_STATUS_FINISH";
+        public static readonly string JOB_STATUS_CANCELED = "JOB_STATUS_CANCELED";
 
         public static readonly string STAGE_STATUS_OVERDUED = "STAGE_STATUS_OVERDUED";
         public static readonly string STAGE_STATUS_WILLOVERDUED = "STAGE_STATUS_WILLOVERDUED";
@@ -39,5 +41,6 @@ namespace API.Mobile.Resources
         public static readonly string STAGE_STATUS_INSCHEDULE = "STAGE_STATUS_INSCHEDULE";
         public static readonly string STAGE_STATUS_PENDING = "STAGE_STATUS_PENDING";
         public static readonly string STAGE_STATUS_DONE = "STAGE_STATUS_DONE";
+        public static readonly string EF_ANNOTATIONS_REQUIRED = "EF_ANNOTATIONS_REQUIRED";
     }
 }

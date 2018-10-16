@@ -28,29 +28,37 @@ namespace API.Mobile.Repository
         }
         public List<Stage> Get([Required]string jobId, int? offset = null, int? limit = null)
         {
-            var job = jobs.First(x => x.Id == jobId);
-            var results = stages.Where(x => x.JobId == jobId).OrderBy(x => x.Order).ToList();
+            //var job = jobs.First(x => x.Id == jobId);
+            var stageList = stages;
+            stageList = stageList.Where(x => x.JobId == jobId).OrderBy(x => x.Order).ToList();
             if(offset != null && limit != null)
             {
                 var skip = (int)offset;
                 var take = (int)limit;
-                results = results.Skip(skip).Take(take).ToList();
+                stageList = stageList.Skip(skip).Take(take).ToList();
             }
-            results.ForEach(x => {
-                x = GetStage(x);
-            });
+            var results = new List<Stage>();
+            foreach(var item in stageList)
+            {
+                var stage = GetStage(item);
+                results.Add(stage);
+            }
+            //results.ForEach(x => {
+            //    x = GetStage(x);
+            //});
             return results;
         }
         private Stage GetStage(Stage stage)
         {
-            if (stage.Status != StatusEnum.StageStatus.Done || stage.Status != StatusEnum.StageStatus.Pending)
+            //if (stage.Status != StatusEnum.StageStatus.Done && stage.Status != StatusEnum.StageStatus.Pending)
+            if (stage.Status == StatusEnum.StageStatus.Processing)
             {
-                var time = (stage.EndDate - DateTime.Now).Hours;
-                if (time <= 2)
+                var time = (stage.EndDate - DateTime.Now).TotalMinutes;
+                if (time <= 120 && time >0)
                 {
                     stage.Status = StatusEnum.StageStatus.WillOverdue;
                 }
-                if (time == 0)
+                if(time <= 0)
                 {
                     stage.Status = StatusEnum.StageStatus.Overdued;
                 }

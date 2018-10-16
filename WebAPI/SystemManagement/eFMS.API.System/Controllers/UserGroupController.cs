@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq.Expressions;
+using AutoMapper;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
+using eFMS.API.System.Models;
 using eFMS.API.System.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -20,10 +22,12 @@ namespace eFMS.API.System.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IUserGroupService userGroupService;
-        public UserGroupController(IStringLocalizer<LanguageSub> localizer, IUserGroupService service)
+        private readonly IMapper mapper;
+        public UserGroupController(IStringLocalizer<LanguageSub> localizer, IUserGroupService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             userGroupService = service;
+            mapper = iMapper;
         }
 
         [HttpGet]
@@ -60,12 +64,13 @@ namespace eFMS.API.System.Controllers
 
         [HttpPost]
         [Route("Add")]
-        public IActionResult Post(SysUserGroupModel model)
+        public IActionResult Post(SysUserGroupEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var messageExisted = CheckExisted(model);
+            var group = mapper.Map<SysUserGroupModel>(model);
+            var messageExisted = CheckExisted(group);
             if (messageExisted.Length > 0) return BadRequest(stringLocalizer[messageExisted]);
-            var result = userGroupService.Add(model);
+            var result = userGroupService.Add(group);
             var message = HandleError.GetMessage(result, Crud.Insert);
             if (!result.Success)
             {
@@ -74,13 +79,15 @@ namespace eFMS.API.System.Controllers
             return Ok(stringLocalizer[message]);
         }
 
-        [HttpPut("{Id}")]
-        public IActionResult Put(SysUserGroupModel  model)
+        [HttpPut("{id}")]
+        public IActionResult Put(short id, SysUserGroupEditModel model)
         {
             if(!ModelState.IsValid) return BadRequest();
-            var messageExisted = CheckExisted(model);
+            var group = mapper.Map<SysUserGroupModel>(model);
+            group.Id = id;
+            var messageExisted = CheckExisted(group);
             if (messageExisted.Length > 0) return BadRequest(stringLocalizer[messageExisted]);
-            var result = userGroupService.Update(model, x => x.Id == model.Id);
+            var result = userGroupService.Update(group, x => x.Id == id);
             var message = HandleError.GetMessage(result, Crud.Update);
             if (!result.Success)
             {
@@ -89,10 +96,10 @@ namespace eFMS.API.System.Controllers
             return Ok(stringLocalizer[message]);
         }
 
-        [HttpDelete("{Id}")]
-        public IActionResult Delete(short Id)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(short id)
         {
-            var result = userGroupService.Delete(x => x.Id == Id);
+            var result = userGroupService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(result, Crud.Delete);
             if (!result.Success)
             {
@@ -116,6 +123,10 @@ namespace eFMS.API.System.Controllers
             }
             else
             {
+                if (userGroupService.Any(x => x.Id != model.Id))
+                {
+                    return LanguageSub.MSG_DATA_NOT_FOUND;
+                }
                 if (userGroupService.Any(x => x.Code == model.Code && x.Id != model.Id))
                 {
                     return LanguageSub.MSG_CODE_EXISTED;

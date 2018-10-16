@@ -27,11 +27,12 @@ namespace API.Mobile.Common
         public enum JobStatus
         {
             Overdued = 1,
-            WillOverDue = 2,
-            Processing = 3,
-            NotStart = 4,
-            Pending = 5,
-            Finish = 6
+            //WillOverDue = 2,
+            Processing = 2,
+            InSchedule = 3,
+            Pending = 4,
+            Finish = 5,
+            Canceled = 6
         }
         public enum JobStatusSearch
         {

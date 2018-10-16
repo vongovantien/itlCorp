@@ -28,6 +28,7 @@ namespace API.Mobile.Models
         public string Route { get; set; }
         public DateTime AssignTime { get; set; }
         public int EstimateDate { get; set; }
+        public DateTime EstimateBeginDate { get; set; }
         public int NumberStage { get; set; }
         public int NumberStageFinish { get; set; }
         public decimal PercentFinish { get; set; }
@@ -52,5 +53,20 @@ namespace API.Mobile.Models
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public JobStatusSearch SearchStatus { get; set; } = JobStatusSearch.All;
+    }
+    public class JobPerformance
+    {
+        public JobStatus JobStatus { get; set; }
+        public string StatusName { get; set; }
+        public int NumberJob { get; set; }
+    }
+
+    public class JobPerformanceCriteria
+    {
+        public bool ThisWeek { get; set; }
+        public bool ThisMonth { get; set; }
+        public bool ThisQuater { get; set; }
+        public bool ThisYear { get; set; }
+        public string UserId { get; set; }
     }
 }
