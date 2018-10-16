@@ -7,6 +7,10 @@ import { AssigmentComponent } from './assigment/assigment.component';
 import { TruckingAssignmentComponent } from './trucking-assignment/trucking-assignment.component';
 import { Daterangepicker } from 'ng2-daterangepicker';
 import { SelectModule } from 'ng2-select';
+import { PagingClientComponent } from 'src/app/shared/paging-client/paging-client.component';
+import { AppModule } from '../../app.module';
+import { SharedModule } from '../../shared/shared.module';
+
 
 @NgModule({
   imports: [
@@ -14,7 +18,8 @@ import { SelectModule } from 'ng2-select';
     OperationRoutingModule,
     Daterangepicker,
     SelectModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ],
   declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent],
 })

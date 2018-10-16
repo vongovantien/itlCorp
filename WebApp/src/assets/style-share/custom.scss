@@ -1,5 +1,6 @@
 html,
 body {
+    color: #5a5a5a;
     font-weight: normal;
 }
 label {
@@ -21,6 +22,20 @@ label {
         background-color: #fcb34c;
         &:hover,
         &:focus {
+            &,
+            &:not(:disabled):not(.disabled) {
+                color: #fff !important;
+            }
+        }
+    }
+}
+.btn-thirdary {
+    color: #fff;
+    background-color: #284985;
+    &:hover,
+    &:focus {
+        &,
+        &:not(:disabled):not(.disabled) {
             color: #fff;
         }
     }
@@ -37,16 +52,44 @@ label {
         }
     }
 }
+//sidebar 
+.m-aside-menu.m-aside-menu--skin-dark {
+    .m-menu__nav--dropdown-submenu-arrow {
+        > .m-menu__item {
+            &.m-menu__item--active {
+                > .m-menu__link {
+                    background-color: #3966b6;
+                    position: relative;
+                    &:before {
+                        content: "";
+                        width: 5px;
+                        display: block;
+                        background-color: #fb4b58;
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        right: 0;
+                    }
+                    .m-menu__link-icon,
+                    .m-menu__link-text,
+                    .m-menu__ver-arrow {
+                        color: #fff;
+                    }
+                }
+            }
+        }
+    }
+}
 //table
-.table,
-.table-brand {
+.table {
+    font-size: 13px;
     thead {
         th {
-            padding-left: 3px;
-            padding-right: 3px;
-            color: #fff;
+            padding-left: 5px;
+            padding-right: 5px;
             font-weight: 500;
-            background-color: #3966b6;
+            vertical-align: middle;
+            background-color: #f2dedf;
             &:first-child {
                 padding-left: 10px
             }
@@ -64,11 +107,19 @@ label {
     tbody {
         tr {
             td {
-                padding: 3px;
+                padding: 8px 5px;
                 vertical-align: middle;
                 &:first-child {
                     padding-left: 10px
                 }
+            }
+        }
+    }
+    &.table-brand {
+        thead {
+            th {
+                color: #fff;
+                background-color: #3966b6;
             }
         }
     }
@@ -83,6 +134,32 @@ label {
 //modal
 .modal {
     background-color: rgba(0,0,0,0.5);
+    .modal-content {
+        .modal-header {
+            padding: 10px 15px;
+            background-color: #3966b6;
+            .modal-title {
+                color: #fff;
+            }
+            .close {
+                width: 44px;
+                color: #91a5d1;
+                text-shadow: none;
+                position: absolute;
+                right: 0;
+                margin: 0;
+            }
+        }
+        .modal-body {
+            padding: 15px;
+        }
+        .modal-footer {
+            padding: 15px;
+            &.m--align-center {
+                justify-content: center;
+            }
+        }
+    }
     .c-button-actions {
         .btn {
             & + .btn {
@@ -95,8 +172,9 @@ label {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
-.modal-lg {
-    max-width: 900px;
+.modal-actions {
+    float: right;
+    margin-right: 20px;
 }
 .modal-backdrop {
     &.show {
@@ -286,8 +364,14 @@ label {
     position: absolute;
     top: 0;
     right: 0;
+    bottom: 0;
     .icon-more-horizontal {
         font-size: 16px;
+    }
+    .asignment-job-checkbox {
+        position: absolute;
+        bottom: -2px;
+        right: -4px;
     }  
 }
 .job-stage-action-menu {
@@ -329,27 +413,6 @@ label {
 }
 
 //create job
-.modal {
-    .modal-content {
-        .modal-header {
-            padding: 10px 25px;
-            background-color: #3966b6;
-            .modal-title {
-                color: #fff;
-            }
-            .close {
-                padding: 1rem 0 0;
-                color: #91a5d1;
-                margin: 0;
-            }
-        }
-    }
-    .modal-footer {
-        &.m--align-center {
-            justify-content: center;
-        }
-    }
-}
 .c-modal-fullscreen {
     width: calc(100% - 1.75rem);
     max-width: 1200px;
@@ -359,5 +422,34 @@ label {
     border: 1px solid #e5e5e5;
     .form-group {
         margin-bottom: 20px;
+    }
+}
+//detail job
+.job-notification-dropdown {
+    > .btn {
+        padding-right: 30px;
+    }
+    .m-badge {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+    }
+}
+//
+.list-request-job {
+    margin-bottom: 0;
+    .list-group-item {
+        border-width: 0 0 1px 0;
+        margin-bottom: 0;
+        &:last-child {
+            border-bottom: 0;
+        }
+        strong {
+            color: #3966b6;
+            font-weight: 500;
+        }
+    }
+    .timestamp {
+        font-weight: normal;
     }
 }

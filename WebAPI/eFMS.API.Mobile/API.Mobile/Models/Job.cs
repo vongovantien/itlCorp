@@ -28,6 +28,7 @@ namespace API.Mobile.Models
         public string Route { get; set; }
         public DateTime AssignTime { get; set; }
         public int EstimateDate { get; set; }
+        public DateTime EstimateBeginDate { get; set; }
         public int NumberStage { get; set; }
         public int NumberStageFinish { get; set; }
         public decimal PercentFinish { get; set; }

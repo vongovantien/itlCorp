@@ -1,28 +1,8 @@
 <!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
-        <div class="mr-auto">
-            <!--begin:: breadcrumbs-->
-            <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-                <li class="m-nav__item">
-                    <a href="javascript:void(0)" class="m-nav__link">
-                        <span class="m-nav__link-text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="m-nav__separator">-</li>
-                <li class="m-nav__item">
-                    <a href="javascript:void(0)" class="m-nav__link">
-                        <span class="m-nav__link-text">Operation</span>
-                    </a>
-                </li>
-                <li class="m-nav__separator">-</li>
-                <li class="m-nav__item">
-                    <a href="javascript:void(0)" class="m-nav__link">
-                        <span class="m-nav__link-text">Job Management</span>
-                    </a>
-                </li>
-            </ul>
-            <!--end:: breadcrumbs-->
+        <div class="mr-auto">    
+            <app-breadcrumb></app-breadcrumb>          
         </div>
     </div>
 </div>
@@ -176,7 +156,8 @@
                         <div class="form-actions">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job" role="button" aria-expanded="false" aria-controls="advance-search-of-job">
+                                    <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
+                                        role="button" aria-expanded="false" aria-controls="advance-search-of-job">
                                         <span>
                                             <i class="la la-angle-up"></i>
                                             <span>Advance search</span>
@@ -267,8 +248,8 @@
                                             <div class="block-text">CS/IC</div>
                                             <div class="block-text">Cust</div>
                                         </div>
-                                        <div class="dropdown dropup job-stage-item-actions">
-                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" href="#" title="Link to detail">
+                                        <div class="job-stage-item-actions">
+                                            <a class="btn btn-sm m-btn--icon m-btn--icon-only" data-toggle="modal" href="#detail-job-modal" title="Job detail" (click)="openJobDetails(i)">
                                                 <i class="la la-list m--font-success"></i>
                                             </a>
                                         </div>
@@ -428,7 +409,7 @@
                                         <div class="job-stage-progress">
                                             <div class="progress-text">{{count_percent(job)}} %</div>
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" [style.width]="count_percent(job) +'%'" ></div>
+                                                <div class="progress-bar bg-info" role="progressbar" [style.width]="count_percent(job) +'%'"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -436,20 +417,350 @@
                                 </div>
                             </div>
                             <!--begin::pagination-->
+                            <app-paging-client *ngIf="Const_Jobs_List" [data]="Const_Jobs_List" [page_size]="10" [current_page]="1" (pagerObject)="receiveData($event)"></app-paging-client>
+                            <!--end::pagination-->
+                        </div>
+                        <!--end:: m-portlets-->
+                    </div>
+                    <!--end:: m-portlet portlet-stageview-->
+                </div>
+
+                <div class="tab-pane fade" id="job-tableview-tab" role="tabpanel" aria-labelledby="">
+                    <!--begin:: m-portlet-->
+                    <div class="m-portlet">
+                        <div class="m-portlet__body">
+                            <!--begin: Datatable of stage-table-view -->
+                            <div class="table-wrapper" id="">
+                                <table class="table table-striped table-brand">
+                                    <thead class="">
+                                        <tr class="">
+                                            <th class="table-acitons-col"></th>
+                                            <th class="">
+                                                Job ID
+                                            </th>
+                                            <th class="">
+                                                Doc. Date
+                                            </th>
+                                            <th class="">
+                                                Stage
+                                            </th>
+                                            <th class="">
+                                                Fleat/ Customer
+                                            </th>
+                                            <th class="">
+                                                M-B/L
+                                            </th>
+                                            <th class="">
+                                                Q’ty
+                                            </th>
+                                            <th class="">
+                                                CNTS
+                                            </th>
+                                            <th class="">
+                                                G.W
+                                            </th>
+                                            <th class="">
+                                                CBM
+                                            </th>
+                                            <th class="">
+                                                Customer No.
+                                            </th>
+                                            <th class="">
+                                                Port Name
+                                            </th>
+                                            <th class="">
+                                                Inv No.
+                                            </th>
+                                            <th class="">
+                                                Services
+                                            </th>
+                                            <th class="">
+                                                Status
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="">
+                                        <tr class="">
+                                            <td class="table-acitons-col">
+                                                <div class="table-acitons">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        data-toggle="modal" data-target="#detail-job-modal" title="Job detail">
+                                                        <i class="la la-list"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span>LG18/007</span>
+                                            </td>
+                                            <td class="">
+                                                <span>31/08/2018</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Stage 06</span>
+                                            </td>
+                                            <td class="">
+                                                <span>VCB ship</span>
+                                            </td>
+                                            <td class="">
+                                                <span>AHN13481</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12</span>
+                                            </td>
+                                            <td class="">
+                                                <span>4</span>
+                                            </td>
+                                            <td class="">
+                                                <span>50</span>
+                                            </td>
+                                            <td class="">
+                                                <span>20</span>
+                                            </td>
+                                            <td class="">
+                                                <span>A293AAN</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Singapore Port</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12345678</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Sea-Exp</span>
+                                            </td>
+                                            <td class="">
+                                                <span class="m-badge m-badge--success m-badge--wide job-success">Success</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="table-acitons-col">
+                                                <div class="table-acitons">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        data-toggle="modal" data-target="#detail-job-modal" title="Job detail">
+                                                        <i class="la la-list"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span>LG18/007</span>
+                                            </td>
+                                            <td class="">
+                                                <span>31/08/2018</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Stage 06</span>
+                                            </td>
+                                            <td class="">
+                                                <span>VCB ship</span>
+                                            </td>
+                                            <td class="">
+                                                <span>AHN13481</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12</span>
+                                            </td>
+                                            <td class="">
+                                                <span>4</span>
+                                            </td>
+                                            <td class="">
+                                                <span>50</span>
+                                            </td>
+                                            <td class="">
+                                                <span>20</span>
+                                            </td>
+                                            <td class="">
+                                                <span>A293AAN</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Singapore Port</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12345678</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Sea-Exp</span>
+                                            </td>
+                                            <td class="">
+                                                <span class="m-badge m-badge--danger m-badge--wide job-overdue">Overdue</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="table-acitons-col">
+                                                <div class="table-acitons">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        data-toggle="modal" data-target="#detail-job-modal" title="Job detail">
+                                                        <i class="la la-list"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span>LG18/007</span>
+                                            </td>
+                                            <td class="">
+                                                <span>31/08/2018</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Stage 06</span>
+                                            </td>
+                                            <td class="">
+                                                <span>VCB ship</span>
+                                            </td>
+                                            <td class="">
+                                                <span>AHN13481</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12</span>
+                                            </td>
+                                            <td class="">
+                                                <span>4</span>
+                                            </td>
+                                            <td class="">
+                                                <span>50</span>
+                                            </td>
+                                            <td class="">
+                                                <span>20</span>
+                                            </td>
+                                            <td class="">
+                                                <span>A293AAN</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Singapore Port</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12345678</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Sea-Exp</span>
+                                            </td>
+                                            <td class="">
+                                                <span class="m-badge m-badge--info m-badge--wide job-processing">Processing</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="table-acitons-col">
+                                                <div class="table-acitons">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        data-toggle="modal" data-target="#detail-job-modal" title="Job detail">
+                                                        <i class="la la-list"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span>LG18/007</span>
+                                            </td>
+                                            <td class="">
+                                                <span>31/08/2018</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Stage 06</span>
+                                            </td>
+                                            <td class="">
+                                                <span>VCB ship</span>
+                                            </td>
+                                            <td class="">
+                                                <span>AHN13481</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12</span>
+                                            </td>
+                                            <td class="">
+                                                <span>4</span>
+                                            </td>
+                                            <td class="">
+                                                <span>50</span>
+                                            </td>
+                                            <td class="">
+                                                <span>20</span>
+                                            </td>
+                                            <td class="">
+                                                <span>A293AAN</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Singapore Port</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12345678</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Sea-Exp</span>
+                                            </td>
+                                            <td class="">
+                                                <span class="m-badge m-badge--wide">In schedule</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="table-acitons-col">
+                                                <div class="table-acitons">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        data-toggle="modal" data-target="#detail-job-modal" title="Job detail">
+                                                        <i class="la la-list"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span>LG18/007</span>
+                                            </td>
+                                            <td class="">
+                                                <span>31/08/2018</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Stage 06</span>
+                                            </td>
+                                            <td class="">
+                                                <span>VCB ship</span>
+                                            </td>
+                                            <td class="">
+                                                <span>AHN13481</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12</span>
+                                            </td>
+                                            <td class="">
+                                                <span>4</span>
+                                            </td>
+                                            <td class="">
+                                                <span>50</span>
+                                            </td>
+                                            <td class="">
+                                                <span>20</span>
+                                            </td>
+                                            <td class="">
+                                                <span>A293AAN</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Singapore Port</span>
+                                            </td>
+                                            <td class="">
+                                                <span>12345678</span>
+                                            </td>
+                                            <td class="">
+                                                <span>Sea-Exp</span>
+                                            </td>
+                                            <td class="">
+                                                <span class="m-badge m-badge--warning m-badge--wide job-warning">Warning</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--end: Datatable of stage-table-view -->
+                            <!--begin::pagination-->
                             <div class="pagination-nav">
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <div class="select-box" style="max-width: 190px">
-                                            <select class="form-control" id="" aria-label="">
-                                                <option value="1">15 line/screen</option>
-                                                <option value="2">30 line/screen</option>
-                                                <option value="3">50 line/screen</option>
-                                            </select>
+                                        <div class="tatable__pager-size" style="max-width: 190px">
+                                            <div class="select-box">
+                                                <select class="form-control m-input m-input--square" id="" aria-label="">
+                                                    <option value="1">15 line/screen</option>
+                                                    <option value="2">30 line/screen</option>
+                                                    <option value="3">50 line/screen</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <nav aria-label="">
-                                            <ul class="pagination  justify-content-end">
+                                            <ul class="pagination justify-content-end">
                                                 <li class="page-item"><a class="page-link" href="#">First</a></li>
                                                 <li class="page-item"><a class="page-link" href="#">Back</a></li>
                                                 <li class="page-item active"><a class="page-link" href="#">1</a></li>
@@ -464,16 +775,568 @@
                             </div>
                             <!--end::pagination-->
                         </div>
-                        <!--end:: m-portlets-->
                     </div>
-                    <!--end:: m-portlet portlet-stageview-->
+                    <!--end:: m-portlets-->
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: m-content-->
 
-                <div class="tab-pane fade" id="job-tableview-tab" role="tabpanel" aria-labelledby="">
-                    <!--begin:: m-portlet-->
-                    <div class="m-portlet">
+<!--begin:: create-job-modal-->
+<div class="modal fade" id="create-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Job</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-actions c-button-actions">
+                    <button type="button" class="btn btn-sm btn-warning m-btn--square m-btn--icon m-btn--uppercase"
+                        data-toggle="modal" data-target="#default-job-modal">
+                        <span>
+                            <i class="la la-check"></i>
+                            <span>
+                                choose default detail
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Job Information</h3>
+                        </div>
+                        <div class="m-portlet-body">
+                            <!--begin::Form-->
+                            <div class="m-form">
+                                <div class="m-portlet__body">
+                                    <div class="row">
+                                        <div class="col-lg-8">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Job ID
+                                                        </label>
+                                                        <input type="text" [(ngModel)]="job_to_add.job_id" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Service Date
+                                                        </label>
+                                                        <div class="m-input-icon m-input-icon--right">
+                                                            <input type="text" [(ngModel)]="job_to_add.service_date" class="form-control m-input m-input--square" placeholder="//">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                                <span>
+                                                                    <i class="la la-calendar glyphicon-th"></i>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            C.S In Charge
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.cargo_op">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Option 1">
+                                                                Option 1
+                                                            </option>
+                                                            <option value="Option 2">
+                                                                Option 2
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Finish Date
+                                                        </label>
+                                                        <div class="m-input-icon m-input-icon--right">
+                                                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="job_to_add.finish_date" placeholder="//">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                                <span>
+                                                                    <i class="la la-calendar glyphicon-th"></i>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            O.P In Charge
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.ops_ic">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Option 1">
+                                                                Option 1
+                                                            </option>
+                                                            <option value="Option 2">
+                                                                Option 2
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Service
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.service">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Air Import">
+                                                                Air Import
+                                                            </option>
+                                                            <option value="Air Import">
+                                                                Air Export 
+                                                            </option>
+                                                            <option value="Sea Import">
+                                                                Sea Import 
+                                                            </option>
+                                                            <option value="Sea Import">
+                                                                Sea Export
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Assign Route
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.assign_route">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="">
+                                                                None
+                                                            </option>
+                                                            <option value="Green">
+                                                                Green
+                                                            </option>
+                                                            <option value="Yellow">
+                                                                Yellow
+                                                            </option>
+                                                            <option value="Red">
+                                                                Red
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Commodity
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.commodity">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Commodity 1">
+                                                                Commodity 1
+                                                            </option>
+                                                            <option value="Commodity 2">
+                                                                Commodity 2
+                                                            </option>
+                                                            <option value="Commodity 3">
+                                                                Commodity 3
+                                                            </option>
+                                                            <option value="Commodity 4">
+                                                                Commodity 4
+                                                            </option>
+                                                           
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <label>
+                                                        Container Summary
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="c-border-block">
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        CBM
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{cbm_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        G.W
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{gw_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        CNTS
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{cnts_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        N.W
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{nw_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        FCL(Cont)
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{fcl_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group m-input-group m-input-group--square">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">
+                                                                        LCL(Kg)
+                                                                    </span>
+                                                                    <span class="input-group-text">
+                                                                        {{lcl_sum}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-lg-12 m--align-right">
+                                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                                            data-toggle="modal" data-target="#container-list-of-job-modal">
+                                                            <span>
+                                                                <i class="icon-plus7"></i>
+                                                                <span>
+                                                                    container
+                                                                </span>
+
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Form-->
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlets-->
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Route/Trip/Bill Information</h3>
+                        </div>
+                        <div class="m-portlet-body">
+                            <!--begin::Form-->
+                            <div class="m-form">
+                                <div class="m-portlet__body">
+                                    <div class="row">
+                                        <div class="col-lg-9">
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Supplier
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.supplier">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Supplier 1">
+                                                                Supplier 1
+                                                            </option>
+                                                            <option value="Supplier 2">
+                                                                Supplier 2
+                                                            </option>
+                                                            <option value="Supplier 3">
+                                                                Supplier 3
+                                                            </option>
+                                                            <option value="Supplier 4">
+                                                                Supplier 4
+                                                            </option>
+                                                            <option value="Supplier 4">
+                                                                Supplier 5
+                                                            </option>
+                                                            <option value="Supplier 4">
+                                                                Supplier 6
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Warehouse
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.w_house">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Werehouse 1">
+                                                                Werehouse 1
+                                                            </option>
+                                                            <option value="Werehouse 2">
+                                                                Werehouse 2
+                                                            </option>
+                                                            <option value="Werehouse 3">
+                                                                Werehouse 3
+                                                            </option>
+                                                            <option value="Werehouse 4">
+                                                                Werehouse 4
+                                                            </option>
+                                                            <option value="Werehouse 5">
+                                                                Werehouse 5
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Purcharge Order No.
+                                                        </label>
+                                                        <input type="text" class="form-control m-input m-input--square" [(ngModel)]="job_to_add.p_o_no" placeholder="Please enter detail">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Agent
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.agent">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Agent 1">
+                                                                Agent 1
+                                                            </option>
+                                                            <option value="Agent 2">
+                                                                Agent 2
+                                                            </option>
+                                                            <option value="Agent 3">
+                                                                Agent 3
+                                                            </option>
+                                                            <option value="Agent 4">
+                                                                Agent 4
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Port Of Loading
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.port_of_loading" >
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Port 1">
+                                                                Port 1
+                                                            </option>
+                                                            <option value="Port 2">
+                                                                Port 2
+                                                            </option>
+                                                            <option value="Port 3">
+                                                                Port 3
+                                                            </option>
+                                                            <option value="Port 4">
+                                                                Port 4
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Inventory No.
+                                                        </label>
+                                                        <input type="text" class="form-control m-input m-input--square" [(ngModel)]="job_to_add.inventory_no" placeholder="Please enter detail">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Vessel/Flight
+                                                        </label>
+                                                        <input type="text" class="form-control m-input m-input--square" [(ngModel)]="job_to_add.vessel_flight" placeholder="Please enter detail">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            Port Of Delivery
+                                                        </label>
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="job_to_add.port_of_delivery">
+                                                            <option value="">
+                                                                Please select
+                                                            </option>
+                                                            <option value="Port 1">
+                                                                Port 1
+                                                            </option>
+                                                            <option value="Port 2">
+                                                                Port 2
+                                                            </option>
+                                                            <option value="Port 3">
+                                                                Port 3
+                                                            </option>
+                                                            <option value="Port 4">
+                                                                Port 4
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="">
+                                                            M - B/L
+                                                        </label>
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail" [(ngModel)]="job_to_add.m_b_l">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>
+                                                    Note
+                                                </label>
+                                                <textarea rows="10" type="text" class="form-control m-input m-input--square" [(ngModel)]="job_to_add.note"
+                                                    placeholder="Please enter detail"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Form-->
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlets-->
+
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">House Bill List</h3>
+                        </div>
                         <div class="m-portlet__body">
-                            <!--begin: Datatable of stage-table-view -->
+                            <!--begin: Search Form -->
+                            <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                                <div class="row align-items-center">
+                                    <div class="col-xl-8 order-2 order-xl-1">
+                                        <div class="form-group m-form__group row align-items-center">
+                                            <div class="col-md-4">
+                                                <div class="m-input-icon m-input-icon--left">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Search..." id="generalSearch">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span>
+                                                            <i class="la la-search"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="addNew_HB()">
+                                            <span>
+                                                <i class="icon-plus7"></i>
+                                                <span>
+                                                    add new
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <div class="m-separator m-separator--dashed d-xl-none"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end: Search Form -->
+                            <!--begin: Datatable of house-bill-list -->
                             <div class="table-wrapper" id="">
                                 <table class="table table-striped table-brand">
                                     <thead class="">
@@ -496,95 +1359,230 @@
                                         </tr>
                                     </thead>
                                     <tbody class="">
-                                        <tr>
+                                        <tr *ngFor="let hb of housebill_list;let i = index;">
                                             <td class="table-action-col">
                                                 <div class="table-actions">
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill" (click)="deleteHouseBill(i)">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span>1</span>
+                                                <span>{{i+1}}</span>
                                             </td>
                                             <td>
                                                 <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
+                                                    <select class="form-control m-input m-input--square" (change)="selectHb(hb)" [(ngModel)]="hb.customer">
+                                                        <option value="" selected>
                                                             Please select Customer
                                                         </option>
-                                                        <option value="" selected>
+                                                        <option value="Scott Phuong 1">
                                                             Scott Phuong 1
                                                         </option>
-                                                        <option value="">
+                                                        <option value="Scott Phuong 2">
                                                             Scott Phuong 2
+                                                        </option>
+                                                        <option value="Scott Phuong 3">
+                                                            Scott Phuong 3
+                                                        </option>
+                                                        <option value="Scott Phuong 4">
+                                                            Scott Phuong 4
                                                         </option>
                                                     </select>
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                                    value="H-B/L (HAWB)">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    placeholder="Please enter detail" value="H-B/L (HAWB)">
                                             </td>
                                             <td>
-                                                <span>Scott Phuong</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>2</span>
-                                            </td>
-                                            <td>
-                                                <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="" selected>
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail" value="H-B/L (HAWB)">
-                                            </td>
-                                            <td>
-                                                <span>Scott Phuong</span>
+                                                <span *ngIf="hb.customer!=''">Sale man of {{hb.customer}}</span>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <!--end: Datatable of stage-table-view -->
+                            <!--end: Datatable of house-bill-list -->
                         </div>
                     </div>
-                    <!--end:: m-portlets-->
                 </div>
+                <!--end:: m-portlets-->
+
+                <!--begin:: m-portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet m-portlet--tabs m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Stage List</h3>
+                        </div>
+                        <div class="m-portlet__body">
+                            <!--begin: Search Form -->
+                            <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                                <div class="row align-items-center">
+                                    <div class="col-xl-8 order-2 order-xl-1">
+                                        <div class="form-group m-form__group row align-items-center">
+                                            <div class="col-md-4">
+                                                <div class="m-input-icon m-input-icon--left">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Search..." id="generalSearch">
+                                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span>
+                                                            <i class="la la-search"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                            data-toggle="modal" data-target="#add-stage-of-job-modal">
+                                            <span>
+                                                <i class="icon-plus7"></i>
+                                                <span>
+                                                    add new
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <div class="m-separator m-separator--dashed d-xl-none"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end: Search Form -->
+                            <!--begin: Datatable of stage-list -->
+                            <div class="table-wrapper" id="">
+                                <table class="table table-striped table-brand">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <span>Actions</span>
+                                            </th>
+                                            <th>
+                                                <span>Stage Order</span>
+                                            </th>
+                                            <th>
+                                                <span>Abbreviation</span>
+                                            </th>
+                                            <th>
+                                                <span>Name</span>
+                                            </th>
+                                            <th>
+                                                <span>Description</span>
+                                            </th>
+                                            <th>
+                                                <span>Role</span>
+                                            </th>
+                                            <th>
+                                                <span>Process Time</span>
+                                            </th>
+                                            <th>
+                                                <span>Deadline</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let stage of selected_stages;let i = index;">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit stage">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        (click)="remove_stage(stage.abbreviation)" style="margin-left: 5px"
+                                                        title="Remove stage">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>{{i+1}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{stage.abbreviation}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{stage.name}}</span>
+                                            </td>
+                                            <td style="width: 200px;">
+                                                <span>{{stage.description}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{stage.role}}</span>
+                                            </td>
+                                            <td>
+                                                <span>4</span>
+                                            </td>
+                                            <td>
+                                                <span>{{stage.exp_time}}</span>
+                                            </td>
+                                        </tr>                                      
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--end: Datatable of stage-list -->
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlets-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save as default
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
+                    (click)="start_job()" data-dismiss="modal">
+                    <span>
+                        <i class="la la-hand-o-up"></i>
+                        <span>
+                            start job
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
 </div>
-<!--end:: m-content-->
-<!--begin:: create-job-modal-->
-<div class="modal fade" id="create-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!--end::create-job-modal-->
+
+<!--begin:: detail-job-modal-->
+<div class="modal fade" id="detail-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true" *ngIf="index_opening_job!=null">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create New Job</h5>
+                <h5 class="modal-title">
+                    Job Detail <span class="job-id-text m--font-danger">123456789</span>
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                <div class="modal-actions c-button-actions">
+                    <button type="button" class="btn btn-sm btn-default m-btn--square" data-toggle="modal" data-target="#request-of-job-modal">
+                        Job request
+                        <span class="m-badge m-badge--danger">
+                            2
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-sm  btn-default m-btn--icon m-btn--square" data-toggle="modal"
+                        data-target="#history-of-job-modal">
+                        <span>
+                            <i class="la la-history"></i>
+                            <span>History</span>
+                        </span>
+                    </button>
+                </div>
             </div>
             <div class="modal-body">
                 <!--begin:: m-portlet-->
@@ -605,7 +1603,7 @@
                                                         <label>
                                                             Job ID
                                                         </label>
-                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].job_id" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6">
@@ -614,7 +1612,7 @@
                                                             Service Date
                                                         </label>
                                                         <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input m-input--square" placeholder="//">
+                                                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].service_date" placeholder="//">
                                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                 <span>
                                                                     <i class="la la-calendar glyphicon-th"></i>
@@ -628,16 +1626,16 @@
                                                 <div class="col-lg-6">
                                                     <div class="form-group">
                                                         <label>
-                                                            Cargo O.P
+                                                           C.S In Charge
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].cargo_op">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
+                                                            <option value="Option 1">
                                                                 Option 1
                                                             </option>
-                                                            <option value="">
+                                                            <option value="Option 2">
                                                                 Option 2
                                                             </option>
                                                         </select>
@@ -649,7 +1647,7 @@
                                                             Finish Date
                                                         </label>
                                                         <div class="m-input-icon m-input-icon--right">
-                                                            <input type="text" class="form-control m-input m-input--square" placeholder="//">
+                                                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].finish_date" placeholder="//">
                                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                                 <span>
                                                                     <i class="la la-calendar glyphicon-th"></i>
@@ -663,16 +1661,16 @@
                                                 <div class="col-lg-6">
                                                     <div class="form-group">
                                                         <label>
-                                                            O.P IC
+                                                            O.P In Charge
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].ops_ic">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
+                                                            <option value="Option 1">
                                                                 Option 1
                                                             </option>
-                                                            <option value="">
+                                                            <option value="Option 2">
                                                                 Option 2
                                                             </option>
                                                         </select>
@@ -683,15 +1681,21 @@
                                                         <label>
                                                             Service
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].service">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
-                                                                Option 1
+                                                            <option value="Air Import">
+                                                                Air Import
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Air Import">
+                                                                Air Export 
+                                                            </option>
+                                                            <option value="Sea Import">
+                                                                Sea Import 
+                                                            </option>
+                                                            <option value="Sea Import">
+                                                                Sea Export
                                                             </option>
                                                         </select>
                                                     </div>
@@ -703,15 +1707,21 @@
                                                         <label>
                                                             Assign Route
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].assign_route">
                                                             <option value="">
                                                                 Please select
                                                             </option>
                                                             <option value="">
-                                                                Option 1
+                                                                None
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Green">
+                                                                Green
+                                                            </option>
+                                                            <option value="Yellow">
+                                                                Yellow
+                                                            </option>
+                                                            <option value="Red">
+                                                                Red
                                                             </option>
                                                         </select>
                                                     </div>
@@ -721,15 +1731,21 @@
                                                         <label>
                                                             Commodity
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].commodity">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
-                                                                Option 1
+                                                            <option value="Commodity 1">
+                                                                Commodity 1
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Commodity 2">
+                                                                Commodity 2
+                                                            </option>
+                                                            <option value="Commodity 3">
+                                                                Commodity 3
+                                                            </option>
+                                                            <option value="Commodity 4">
+                                                                Commodity 4
                                                             </option>
                                                         </select>
                                                     </div>
@@ -879,15 +1895,27 @@
                                                         <label>
                                                             Supplier
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].supplier">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
-                                                                Option 1
+                                                            <option value="Supplier 1">
+                                                                Supplier 1
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Supplier 2">
+                                                                Supplier 2
+                                                            </option>
+                                                            <option value="Supplier 3">
+                                                                Supplier 3
+                                                            </option>
+                                                            <option value="Supplier 4">
+                                                                Supplier 4
+                                                            </option>
+                                                            <option value="Supplier 4">
+                                                                Supplier 5
+                                                            </option>
+                                                            <option value="Supplier 4">
+                                                                Supplier 6
                                                             </option>
                                                         </select>
                                                     </div>
@@ -895,17 +1923,26 @@
                                                 <div class="col-lg-4">
                                                     <div class="form-group">
                                                         <label>
-                                                            W. House
+                                                            Warehouse
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].w_house">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
-                                                                Option 1
+                                                            <option value="Werehouse 1">
+                                                                Werehouse 1
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Werehouse 2">
+                                                                Werehouse 2
+                                                            </option>
+                                                            <option value="Werehouse 3">
+                                                                Werehouse 3
+                                                            </option>
+                                                            <option value="Werehouse 4">
+                                                                Werehouse 4
+                                                            </option>
+                                                            <option value="Werehouse 5">
+                                                                Werehouse 5
                                                             </option>
                                                         </select>
                                                     </div>
@@ -913,9 +1950,9 @@
                                                 <div class="col-lg-4">
                                                     <div class="form-group">
                                                         <label>
-                                                            P/O No.
+                                                            Purcharge Order No.
                                                         </label>
-                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].p_o_no"  placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -925,15 +1962,21 @@
                                                         <label>
                                                             Agent
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].agent">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
-                                                                Option 1
+                                                            <option value="Agent 1">
+                                                                Agent 1
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Agent 2">
+                                                                Agent 2
+                                                            </option>
+                                                            <option value="Agent 3">
+                                                                Agent 3
+                                                            </option>
+                                                            <option value="Agent 4">
+                                                                Agent 4
                                                             </option>
                                                         </select>
                                                     </div>
@@ -941,17 +1984,23 @@
                                                 <div class="col-lg-4">
                                                     <div class="form-group">
                                                         <label>
-                                                            P.O.L
+                                                            Port Of Loading
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].port_of_loading">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
-                                                                Option 1
+                                                            <option value="Port 1">
+                                                                Port 1
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Port 2">
+                                                                Port 2
+                                                            </option>
+                                                            <option value="Port 3">
+                                                                Port 3
+                                                            </option>
+                                                            <option value="Port 4">
+                                                                Port 4
                                                             </option>
                                                         </select>
                                                     </div>
@@ -959,9 +2008,9 @@
                                                 <div class="col-lg-4">
                                                     <div class="form-group">
                                                         <label>
-                                                            Inv No.
+                                                            Inventory No.
                                                         </label>
-                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].inventory_no" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                             </div>
@@ -971,23 +2020,29 @@
                                                         <label>
                                                             Vessel/Flight
                                                         </label>
-                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].vessel_flight" placeholder="Please enter detail">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4">
                                                     <div class="form-group">
                                                         <label>
-                                                            P.O.D
+                                                            Port Of Delivery
                                                         </label>
-                                                        <select class="form-control m-input m-input--square">
+                                                        <select class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].port_of_delivery">
                                                             <option value="">
                                                                 Please select
                                                             </option>
-                                                            <option value="">
-                                                                Option 1
+                                                            <option value="Port 1">
+                                                                Port 1
                                                             </option>
-                                                            <option value="">
-                                                                Option 2
+                                                            <option value="Port 2">
+                                                                Port 2
+                                                            </option>
+                                                            <option value="Port 3">
+                                                                Port 3
+                                                            </option>
+                                                            <option value="Port 4">
+                                                                Port 4
                                                             </option>
                                                         </select>
                                                     </div>
@@ -997,7 +2052,7 @@
                                                         <label for="">
                                                             M - B/L
                                                         </label>
-                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                                                        <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail" [(ngModel)]="Jobs_List[index_opening_job].m_b_l">
                                                     </div>
                                                 </div>
                                             </div>
@@ -1007,7 +2062,7 @@
                                                 <label>
                                                     Note
                                                 </label>
-                                                <textarea rows="10" type="text" class="form-control m-input m-input--square"
+                                                <textarea rows="10" type="text" class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[index_opening_job].note"
                                                     placeholder="Please enter detail"></textarea>
                                             </div>
                                         </div>
@@ -1034,8 +2089,8 @@
                                         <div class="form-group m-form__group row align-items-center">
                                             <div class="col-md-4">
                                                 <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
-                                                        id="generalSearch">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Search..." id="generalSearch">
                                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                                         <span>
                                                             <i class="la la-search"></i>
@@ -1082,10 +2137,11 @@
                                         </tr>
                                     </thead>
                                     <tbody class="">
-                                        <tr>
+                                        <tr *ngFor="let hb of Jobs_List[index_opening_job].house_bill_list;let i = index;">
                                             <td class="table-action-col">
                                                 <div class="table-actions">
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove bill">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
@@ -1095,61 +2151,33 @@
                                             </td>
                                             <td>
                                                 <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
+                                                    <select class="form-control m-input m-input--square" [(ngModel)]="hb.customer">
+                                                        <option value="" selected>
                                                             Please select Customer
                                                         </option>
-                                                        <option value="" selected>
+                                                        <option value="Scott Phuong 1">
                                                             Scott Phuong 1
                                                         </option>
-                                                        <option value="">
+                                                        <option value="Scott Phuong 2">
                                                             Scott Phuong 2
+                                                        </option>
+                                                        <option value="Scott Phuong 3">
+                                                            Scott Phuong 3
+                                                        </option>
+                                                        <option value="Scott Phuong 4">
+                                                            Scott Phuong 4
                                                         </option>
                                                     </select>
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                                    value="H-B/L (HAWB)">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    placeholder="Please enter detail" value="H-B/L (HAWB)">
                                             </td>
                                             <td>
-                                                <span>Scott Phuong</span>
+                                                <span>Sale man of {{hb.customer}}</span>
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-action-col">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"  title="Remove bill">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>2</span>
-                                            </td>
-                                            <td>
-                                                <div class="select-wrapper">
-                                                    <select class="form-control m-input m-input--square">
-                                                        <option value="">
-                                                            Please select Customer
-                                                        </option>
-                                                        <option value="" selected>
-                                                            Scott Phuong 1
-                                                        </option>
-                                                        <option value="">
-                                                            Scott Phuong 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                                    value="H-B/L (HAWB)">
-                                            </td>
-                                            <td>
-                                                <span>Scott Phuong</span>
-                                            </td>
-                                        </tr>
+                                        </tr>                                   
                                     </tbody>
                                 </table>
                             </div>
@@ -1173,8 +2201,8 @@
                                         <div class="form-group m-form__group row align-items-center">
                                             <div class="col-md-4">
                                                 <div class="m-input-icon m-input-icon--left">
-                                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
-                                                        id="generalSearch">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Search..." id="generalSearch">
                                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                                         <span>
                                                             <i class="la la-search"></i>
@@ -1231,15 +2259,16 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let stage of selected_stages;let i = index;">
+                                        <tr *ngFor="let stage of Jobs_List[index_opening_job].stage_list;let i = index;">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Edit stage">
                                                         <i class="la la-edit"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="remove_stage(stage.abbreviation)"
-                                                        style="margin-left: 5px" title="Remove stage">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        (click)="remove_stage(stage.abbreviation)" style="margin-left: 5px"
+                                                        title="Remove stage">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
@@ -1265,77 +2294,7 @@
                                             <td>
                                                 <span>{{stage.exp_time}}</span>
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-actions-col">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>2</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 3</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="table-actions-col">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit stage">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        style="margin-left: 5px" title="Remove stage">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>3</span>
-                                            </td>
-                                            <td>
-                                                <span>Stage 1</span>
-                                            </td>
-                                            <td>
-                                                <span>Preprade document</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>Preprade document template and detail Verify and signed Check a</span>
-                                            </td>
-                                            <td>
-                                                <span>Cargo O.P</span>
-                                            </td>
-                                            <td>
-                                                <span>4</span>
-                                            </td>
-                                            <td>
-                                                <span>10/08/2018</span>
-                                            </td>
-                                        </tr>
+                                        </tr>                               
                                     </tbody>
                                 </table>
                             </div>
@@ -1346,27 +2305,20 @@
                 <!--end:: m-portlets-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#cancel-job-modal">
                     <span>
-                        <i class="la la-check"></i>
+                        <i class="la la-times-circle"></i>
                         <span>
-                            choose default detail
+                            Cancel job
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
+                    (click)="save_change_job()" data-dismiss="modal">
                     <span>
-                        <i class="la la-save"></i>
+                        <i class="la la la-save"></i>
                         <span>
-                            save as default
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" (click)="start_job()" data-dismiss="modal">
-                    <span>
-                        <i class="la la-hand-o-up"></i>
-                        <span>
-                            start job
+                            save change
                         </span>
                     </span>
                 </button>
@@ -1382,7 +2334,118 @@
         </div>
     </div>
 </div>
-<!--end::create-job-modal-->
+<!--end::detail-job-modal-->
+
+<!--begin:default-job-modal-->
+<div class="modal fade" id="default-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Default Job List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="deafault-job-list-table-wrapper">
+                    <!--begin: Search Form -->
+                    <div class="m-form m-form--label-align-right m--margin-bottom-20">
+                        <div class="row align-items-center">
+                            <div class="col-xl-8 order-2 order-xl-1">
+                                <div class="form-group m-form__group row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="m-input-icon m-input-icon--left">
+                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
+                                                id="generalSearch">
+                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                <span>
+                                                    <i class="la la-search"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end: Search Form -->
+                    <!--begin: Datatable of deafault-job-list-table -->
+                    <div class="table-wrapper" id="">
+                        <table class="table table-striped">
+                            <thead class="">
+                                <tr class="">
+                                    <th class=""></th>
+                                    <th class="">
+                                        Job ID
+                                    </th>
+                                    <th class="">
+                                        Partner
+                                    </th>
+                                    <th class="">
+                                        Stage Number
+                                    </th>
+                                    <th class="">
+                                        Service
+                                    </th>
+                                    <th class="">
+                                        Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="">
+                                <tr class="">
+                                    <td class="table-action-col">
+                                        <div class="table-actions" style="width: 50px">
+                                            <label class="m-checkbox m-checkbox--bold">
+                                                <input type="checkbox">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="">
+                                        <span>LG18/003</span>
+                                    </td>
+                                    <td class="">
+                                        <span>Thor Thế</span>
+                                    </td>
+                                    <td class="">
+                                        <span>20</span>
+                                    </td>
+                                    <td class="">
+                                        <span>Border-Exp</span>
+                                    </td>
+                                    <td class="">
+                                        <span>Default</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable of deafault-job-list-table -->
+                </div>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-check"></i>
+                        <span>
+                            Select
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:default-job-modal-->
 
 <!--begin::container-list-of-job-modal-->
 <div class="modal fade" id="container-list-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -1404,7 +2467,8 @@
                                 <div class="form-group m-form__group row align-items-center">
                                     <div class="col-md-6">
                                         <div class="m-input-icon m-input-icon--left">
-                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." id="generalSearch">
+                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
+                                                id="generalSearch">
                                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                                 <span>
                                                     <i class="la la-search"></i>
@@ -1580,12 +2644,13 @@
                                             </td>
                                         </tr>
                                     </thead>
-                                    <tbody class="" *ngIf="Stages_List"  id="form_source_stage">
+                                    <tbody class="" *ngIf="Stages_List" id="form_source_stage">
                                         <tr *ngFor="let stage of Stages_List;let i = index;">
                                             <td class="table-action-col">
                                                 <div class="table-actions" style="width: 50px">
                                                     <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox" (change)="select_stage(i,stage.abbreviation,$event)" [id]="'st-'+i">
+                                                        <input type="checkbox" (change)="select_stage(i,stage.abbreviation,$event)"
+                                                            [id]="'st-'+i">
                                                         <span></span>
                                                     </label>
                                                 </div>
@@ -1611,7 +2676,8 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase" (click)="remove_selected_stages()">
+                            <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="remove_selected_stages()">
                                 <span>
                                     <i class="la la-arrow-left"></i>
                                     <span>
@@ -1675,7 +2741,8 @@
                 <!--end:: add-stage-block-->
             </div>
             <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;" data-dismiss="modal">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" style="margin-left: 10px;"
+                    data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1683,7 +2750,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;" (click)="abort_add_stage()">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" style="margin-left: 10px;"
+                    (click)="abort_add_stage()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -1696,3 +2764,288 @@
     </div>
 </div>
 <!--end::add-stage-of-job-modal-->
+
+<!--begin::history-of-job-modal-->
+<div class="modal fade" id="history-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Job History</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="history-list-table">
+                    <!--begin: Search Form -->
+                    <div class="m-form m-form--label-align-right m--margin-bottom-20">
+                        <div class="row align-items-center">
+                            <div class="col-xl-8 order-2 order-xl-1">
+                                <div class="form-group m-form__group row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="m-input-icon m-input-icon--left">
+                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
+                                                id="">
+                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                <span>
+                                                    <i class="la la-search"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end: Search Form -->
+                    <!--begin: Datatable of history-list-table -->
+                    <div class="table-wrapper" id="">
+                        <table class="table table-striped table-brand">
+                            <thead class="">
+                                <tr class="">
+                                    <th class="">
+                                        Time
+                                    </th>
+                                    <th class="">
+                                        Action
+                                    </th>
+                                    <th class="">
+                                        Person
+                                    </th>
+                                    <th class="">
+                                        Role
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="">
+                                <tr>
+                                    <td class="">
+                                        <span>HH:MM:SS</span> &nbsp; <span>05/08/2018</span>
+                                    </td>
+                                    <td class="">
+                                        <span>Comment: Will finish before 5.pm</span>
+                                    </td>
+                                    <td class="">
+                                        <span>Scott.Phuong</span>
+                                    </td>
+                                    <td class="">
+                                        <span>OPS staff</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end:Datatable of history-list-table -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-close"></i>
+                        <span>
+                            close
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::history-of-job-modal-->
+
+<!--begin::request-of-job-modal-->
+<div class="modal fade" id="request-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Job Request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group list-request-job">
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div class="item-content mb-1">
+                                <span><strong>User name B</strong> request your approval to unlock</span> <br />
+                                <small class="timestamp">11 days ago</small>
+                            </div>
+                            <div class="item-action">
+                                <button class="btn btn-sm btn-success m-btn--square" data-toggle="modal" data-target="#approval-job-modal">
+                                    Process
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div class="item-content mb-1">
+                                <span><strong>User name B</strong> request your approval to unlock</span> <br />
+                                <small class="timestamp">11 days ago</small>
+                            </div>
+                            <div class="item-action">
+                                <button class="btn btn-sm btn-success m-btn--square" data-toggle="modal" data-target="#approval-job-modal">
+                                    Process
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div class="item-content mb-1">
+                                <span><strong>User name B</strong> request your approval to unlock</span> <br />
+                                <small class="timestamp">11 days ago</small>
+                            </div>
+                            <div class="item-action">
+                                <button class="btn btn-sm btn-success m-btn--square" data-toggle="modal" data-target="#approval-job-modal">
+                                    Process
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-close"></i>
+                        <span>
+                            close
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::request-of-job-modal-->
+
+<!--begin::approval-job-modal-->
+<div class="modal fade" id="approval-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Approve Request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure you want to Approve this request</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-check"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::approval-job-modal-->
+
+<!--begin::cancel-job-modal-->
+<div class="modal fade" id="cancel-job-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true" *ngIf="index_opening_job!=null">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Cancel Job <span class="job-id-text m--font-danger">123456789</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Job Status
+                                </label>
+                                <input type="text" value="Default" class="form-control m-input m-input--square" placeholder="Job curent status" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    M - B/L
+                                </label>
+                                <input type="text" [(ngModel)]="Jobs_List[index_opening_job].m_b_l" class="form-control m-input m-input--square" placeholder="Master bill no" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Current Stage
+                                </label>
+                                <input type="text" [(ngModel)]="Jobs_List[index_opening_job].stage_list[0].name" class="form-control m-input m-input--square" placeholder="Stage abbr" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Deadline
+                                </label>
+                                <div class="m-input-icon m-input-icon--right">
+                                    <input type="text" [(ngModel)]="Jobs_List[index_opening_job].finish_date" class="form-control m-input m-input--square" placeholder="//" readonly>
+                                    <span
+                                        class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span><i class="la la-calendar glyphicon-th"></i></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>
+                                    Reason
+                                </label>
+                                <textarea name="reason" [(ngModel)]="reason_cancel_job" class="form-control m-input m-input--square" id="" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="submit_cancel_job()" data-dismiss="modal">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Submit
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::cancel-job-modal-->
