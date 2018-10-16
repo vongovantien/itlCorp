@@ -38,7 +38,12 @@
                             <label>
                                 Select filter
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                            <select name="" class="form-control m-input m-input--square" id="">
+                                <option value="">Select filter</option>
+                                <option value="1">Job ID</option>
+                                <option value="2">Supplier</option>
+                                <option value="3">Cont</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -113,133 +118,275 @@
                     <thead>
                         <tr>
                             <th class="table-acitons-col"></th>
+                            <th class="table-acitons-col"></th>
                             <th>
-                                <span>Stage ID</span>
+                                <span>Job ID</span>
                             </th>
                             <th>
-                                <span>Role</span>
+                                <span>Service Date</span>
                             </th>
                             <th>
-                                <span>Stage ABBR</span>
+                                <span>Cont No.</span>
                             </th>
                             <th>
-                                <span>Name (VN)</span>
+                                <span>Seal No.</span>
                             </th>
                             <th>
-                                <span>Name (EN)</span>
+                                <span>Type</span>
                             </th>
                             <th>
-                                <span>Description (VN</span>
+                                <span>Unit</span>
                             </th>
                             <th>
-                                <span>Description (EN)</span>
+                                <span>Supplier</span>
+                            </th>
+                            <th>
+                                <span>Truck No.</span>
+                            </th>
+                            <th>
+                                <span>Driver Phone</span>
+                            </th>
+                            <th>
+                                <span>Place From</span>
+                            </th>
+                            <th>
+                                <span>Place To</span>
+                            </th>
+                            <th>
+                                <span>EDT</span>
+                            </th>
+                            <th>
+                                <span>ADT</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="table-acitons-col">
-                                <div class="table-acitons" style="width: 70px">
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <label class="m-checkbox m-checkbox--bold">
+                                        <input type="checkbox">
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="table-actions-col">
+                                <div class="table-actions">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
                                 </div>
                             </td>
                             <td>
-                                <span>LH001</span>
+                                <span>Job 123456</span>
                             </td>
                             <td>
-                                <span>Customer services</span>
+                                <span>20/10/2018</span>
                             </td>
                             <td>
-                                <span>ABBR</span>
+                                <span>Cont No A</span>
                             </td>
                             <td>
-                                <span>Ký kết hợp đồng ngoại thương</span>
+                                <span>Seal No A</span>
                             </td>
                             <td>
-                                <span>Shipping Schedule</span>
+                                <span>FCL</span>
                             </td>
                             <td>
-                                <span>Đây là mô tả bằng tiếng Việt</span>
+                                <span>40DC</span>
                             </td>
                             <td>
-                                <span>This is description by EN</span>
+                                <span>Supplier A</span>
+                            </td>
+                            <td>
+                                <span>RT1234567</span>
+                            </td>
+                            <td>
+                                <span>0909584491</span>
+                            </td>
+                            <td>
+                                <span>Address A</span>
+                            </td>
+                            <td>
+                                <span>Address B</span>
+                            </td>
+                            <td>
+                                <span>dd/mm/yyyy</span>
+                            </td>
+                            <td>
+                                <span></span>
                             </td>
                         </tr>
                         <tr>
-                            <td class="table-acitons-col">
-                                <div class="table-acitons" style="width: 70px">
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <label class="m-checkbox m-checkbox--bold">
+                                        <input type="checkbox">
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="table-actions-col">
+                                <div class="table-actions">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
                                 </div>
                             </td>
                             <td>
-                                <span>LH001</span>
+                                <span>Job 123456</span>
                             </td>
                             <td>
-                                <span>Customer services</span>
+                                <span>20/10/2018</span>
                             </td>
                             <td>
-                                <span>ABBR</span>
+                                <span>Cont No A</span>
                             </td>
                             <td>
-                                <span>Ký kết hợp đồng ngoại thương</span>
+                                <span>Seal No A</span>
                             </td>
                             <td>
-                                <span>Shipping Schedule</span>
+                                <span>FCL</span>
                             </td>
                             <td>
-                                <span>Đây là mô tả bằng tiếng Việt</span>
+                                <span>40DC</span>
                             </td>
                             <td>
-                                <span>This is description by EN</span>
+                                <span>Supplier A</span>
+                            </td>
+                            <td>
+                                <span>RT1234567</span>
+                            </td>
+                            <td>
+                                <span>0909584491</span>
+                            </td>
+                            <td>
+                                <span>Address A</span>
+                            </td>
+                            <td>
+                                <span>Address B</span>
+                            </td>
+                            <td>
+                                <span>dd/mm/yyyy</span>
+                            </td>
+                            <td>
+                                <span></span>
                             </td>
                         </tr>
                         <tr>
-                            <td class="table-acitons-col">
-                                <div class="table-acitons" style="width: 70px">
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <label class="m-checkbox m-checkbox--bold">
+                                        <input type="checkbox">
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="table-actions-col">
+                                <div class="table-actions">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <span>Job 123456</span>
+                            </td>
+                            <td>
+                                <span>20/10/2018</span>
+                            </td>
+                            <td>
+                                <span>Cont No A</span>
+                            </td>
+                            <td>
+                                <span>Seal No A</span>
+                            </td>
+                            <td>
+                                <span>FCL</span>
+                            </td>
+                            <td>
+                                <span>40DC</span>
+                            </td>
+                            <td>
+                                <span>Supplier A</span>
+                            </td>
+                            <td>
+                                <span>RT1234567</span>
+                            </td>
+                            <td>
+                                <span>0909584491</span>
+                            </td>
+                            <td>
+                                <span>Address A</span>
+                            </td>
+                            <td>
+                                <span>Address B</span>
+                            </td>
+                            <td>
+                                <span>dd/mm/yyyy</span>
+                            </td>
+                            <td>
+                                <span></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <label class="m-checkbox m-checkbox--bold">
+                                        <input type="checkbox">
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
                                     </button>
                                 </div>
                             </td>
                             <td>
-                                <span>LH001</span>
+                                <span>Job 123456</span>
                             </td>
                             <td>
-                                <span>Customer services</span>
+                                <span>20/10/2018</span>
                             </td>
                             <td>
-                                <span>ABBR</span>
+                                <span>Cont No A</span>
                             </td>
                             <td>
-                                <span>Ký kết hợp đồng ngoại thương</span>
+                                <span>Seal No A</span>
                             </td>
                             <td>
-                                <span>Shipping Schedule</span>
+                                <span>FCL</span>
                             </td>
                             <td>
-                                <span>Đây là mô tả bằng tiếng Việt</span>
+                                <span>40DC</span>
                             </td>
                             <td>
-                                <span>This is description by EN</span>
+                                <span>Supplier A</span>
+                            </td>
+                            <td>
+                                <span>RT1234567</span>
+                            </td>
+                            <td>
+                                <span>0909584491</span>
+                            </td>
+                            <td>
+                                <span>Address A</span>
+                            </td>
+                            <td>
+                                <span>Address B</span>
+                            </td>
+                            <td>
+                                <span>dd/mm/yyyy</span>
+                            </td>
+                            <td>
+                                <span></span>
                             </td>
                         </tr>
                     </tbody>
