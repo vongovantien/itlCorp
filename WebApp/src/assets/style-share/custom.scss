@@ -85,8 +85,8 @@ label {
     font-size: 13px;
     thead {
         th {
-            padding-left: 3px;
-            padding-right: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
             font-weight: 500;
             vertical-align: middle;
             background-color: #f2dedf;
@@ -107,7 +107,7 @@ label {
     tbody {
         tr {
             td {
-                padding: 3px;
+                padding: 8px 5px;
                 vertical-align: middle;
                 &:first-child {
                     padding-left: 10px
