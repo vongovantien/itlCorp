@@ -132,7 +132,7 @@
                         <tr *ngFor="let stage of Stages_List;let i = index;">
                             <td class="table-acitons-col">
                                 <div class="table-acitons" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="edit_stage(i,'confirm')"
                                         title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
                                         <i class="la la-edit"></i>
                                     </button>
@@ -305,7 +305,7 @@
 <!--end::add-stage-management-modal-->
 
 <!--begin::edit-stage-management-modal-->
-<div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="id_stage_edit!=null"
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -324,7 +324,7 @@
                                 <label>
                                     Stage ID
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].stage_id" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     value="Stage ID">
                             </div>
                         </div>
@@ -333,7 +333,7 @@
                                 <label>
                                     Name (VN)
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].name" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     value="Name (VN)">
                             </div>
                         </div>
@@ -342,7 +342,7 @@
                                 <label>
                                     Name (EN)
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].name_en" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     value="Name (EN)">
                             </div>
                         </div>
@@ -353,14 +353,14 @@
                                 <label>
                                     Role
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].role" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     value="Role">
                             </div>
                             <div class="form-group">
                                 <label>
                                     Stage ABBR
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].abbreviation" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     value=" Stage ABBR">
                             </div>
                         </div>
@@ -369,7 +369,7 @@
                                 <label>
                                     Description (VN)
                                 </label>
-                                <textarea class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <textarea [(ngModel)]="Stages_List[id_stage_edit].description" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     rows="6">This is Description (VN)</textarea>
                             </div>
                         </div>
@@ -378,7 +378,7 @@
                                 <label>
                                     Description (EN)
                                 </label>
-                                <textarea class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <textarea [(ngModel)]="Stages_List[id_stage_edit].description_en" class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     rows="6">This is Description (EN)</textarea>
                             </div>
                         </div>
@@ -387,11 +387,11 @@
                 <!--end:add-stage-management-form -->
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="edit_stage(-1,'yes')" data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>
-                            Edit
+                            Save Change
                         </span>
                     </span>
                 </button>
@@ -399,7 +399,7 @@
                     <span>
                         <i class="la la-ban"></i>
                         <span>
-                            cancel
+                            Cancel
                         </span>
                     </span>
                 </button>
