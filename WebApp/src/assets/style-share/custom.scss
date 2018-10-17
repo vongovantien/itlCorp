@@ -46,6 +46,11 @@ label {
     margin-bottom: 0;
 }
 .c-button-actions {
+    > * {
+        + * {
+            margin-left: 10px;
+        }
+    }
     .btn {
         & + .btn {
             margin-left: 10px;
@@ -124,7 +129,14 @@ label {
         }
     }
 }
-.table-acitons-col {
+.table-actions-col {
+    .table-actions {
+        > * {
+            + * {
+                margin-left: 5px;
+            }
+        }
+    }
     .btn {
         & + .btn {
             margin-left: 5px;
@@ -174,7 +186,7 @@ label {
 }
 .modal-actions {
     float: right;
-    margin-right: 20px;
+    margin-right: 26px;
 }
 .modal-backdrop {
     &.show {
