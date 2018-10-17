@@ -57,6 +57,18 @@ export class StageManagementComponent implements OnInit {
       
     }
   }
+  id_stage_edit=null;
+  edit_stage(index,action){
+    if(action=="confirm"){
+      this.id_stage_edit = index;
+    }else{
+      this.spinnerService.show();
+      setTimeout(() => {
+        this.spinnerService.hide();
+        this.toastr.success("Edit Stage Successful !");
+      }, 1500);
+    }
+  }
 
   add_stage(){   
     this.spinnerService.show();
