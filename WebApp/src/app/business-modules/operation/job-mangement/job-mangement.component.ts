@@ -347,7 +347,7 @@ export class JobMangementComponent implements OnInit {
   edit_stage_detail(index_job, index_stage, action) {
     console.log(index_job + "  |  " + index_stage)
     if (action == "confirm") {
-      this.job_index = index_job;
+      index_job == -1 ? this.job_index = this.index_opening_job:index_job;     
       this.stage_index = index_stage;
       console.log(this.Jobs_List[this.job_index].stage_list[this.stage_index]);
     } else {
@@ -363,4 +363,8 @@ export class JobMangementComponent implements OnInit {
     await this.getJobs();
     await this.getStages();
   }
+
+
+
+
 }

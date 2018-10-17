@@ -539,7 +539,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" (click)="assign_supplier()" data-dismiss="modal"
                     data-target="#confirm-assign-modal">
                     <span>
                         <i class="la la-save"></i>
@@ -580,7 +580,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="unlock_assign()"  data-dismiss="modal" >
                     <span>
                         <i class="la la-check"></i>
                         <span>
