@@ -5,6 +5,7 @@ import { BaseService } from 'src/services-base/base.service';
 import { Observer, Observable } from 'rxjs';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 declare var jquery: any;
 declare var $: any;
 
@@ -43,6 +44,12 @@ export class JobMangementComponent implements OnInit {
   fcl_sum = 0;
   lcl_sum = 0;
 
+  pager: PagerSetting = {
+    currentPage: 1,
+    pageSize: 15,
+    numberToShow: [3,5,10,15, 30, 50],
+    totalPageBtn:7
+  };
 
 
   constructor(private route: ActivatedRoute, private router: Router,
@@ -56,16 +63,22 @@ export class JobMangementComponent implements OnInit {
         this.router.navigate(['/home/operation/job-management']);
       }
     });
-    this.getJobs();
+   // this.getJobs();
+    await this.setPage(this.pager);
     this.getStages();
     this.ready = true;
   }
 
 
   status = false;
-  async getJobs() {
+  async getJobs(pager) {
     this.Jobs_List = await this.baseServices.getAsync('./assets/fake-data/jobs-list.json', true, true);
     this.Const_Jobs_List = this.Jobs_List.map(x => Object.assign({}, x));
+
+    var const_data = this.Const_Jobs_List.map(x => Object.assign({}, x));
+    pager.totalItems = const_data.length;
+    var return_data = const_data.splice((pager.currentPage - 1) * pager.pageSize, pager.pageSize);
+    return return_data;
   }
 
   async getStages() {
@@ -360,10 +373,13 @@ export class JobMangementComponent implements OnInit {
   }
 
   async cancel_edit_stage() {
-    await this.getJobs();
+    await this.getJobs(this.pager);
     await this.getStages();
   }
 
+  async setPage(pager) {
+    this.Jobs_List = await this.getJobs(pager);
+  }
 
 
 
