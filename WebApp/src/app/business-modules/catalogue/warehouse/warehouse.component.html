@@ -96,7 +96,7 @@
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
-            <app-pagination currentPage [config]="pager" (pageChange)="setPage($event)" (selectPageSize)="setPage($event)"></app-pagination>
+            <app-pagination currentPage [config]="pager" (pageChange)="setPage($event)" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
             <!--end::Content-->
         </div>

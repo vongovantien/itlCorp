@@ -41,4 +41,5 @@ export class PagingClientComponent implements OnInit {
     this.pager = this.pagerService.getPager(this.allItems.length, page, this.page_size);
     this.pagerObject.emit(this.pager);
   }
+  
 }

@@ -1,25 +1,31 @@
 import * as lodash from 'lodash';
 
 export class PagingService {
-    getPager(totalItems: number, currentPage: number = 1, pageSize: number = 7) {
+    getPager(totalItems: number, currentPage: number = 1, pageSize: number = 7,totalPageBtn=5) {
         // calculate total pages
         let totalPages = Math.ceil(totalItems / pageSize);
 
         let startPage: number, endPage: number;
      
-        if (totalPages <= 5) {
+        if (totalPages <= totalPageBtn) {
             startPage = 1;
             endPage = totalPages;
         } else {
-            if (currentPage <= 3) {
+            if (currentPage <= Math.floor(totalPageBtn/2)) {
                 startPage = 1;
-                endPage = 5;
+                endPage = totalPageBtn;
             } else if (currentPage + 1 >= totalPages) {
-                startPage = totalPages - 4;
+                startPage = totalPages - totalPageBtn+1;
                 endPage = totalPages;
             } else {
-                startPage = currentPage - 2;
-                endPage = currentPage+2;
+              
+                if(totalPageBtn%2==0){
+                    startPage = currentPage - (Math.floor(totalPageBtn/2)-1);
+                }
+                else{
+                    startPage = currentPage - (Math.floor(totalPageBtn/2));
+                }
+                endPage = currentPage + (Math.floor(totalPageBtn/2));
             }
         }
 
