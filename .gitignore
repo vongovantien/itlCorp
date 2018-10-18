@@ -16,3 +16,5 @@
 /WebAPI/eFMS.API.Mobile/eFMS.API.Mobile.DL/obj
 /WebAPI/eFMS.API.Mobile/eFMS.API.Mobile.Service/obj
 /WebAPI/SystemManagement/bin
+/WebAPI/eFMS.API.Common/.vs
+/WebAPI/eFMS.API.Common/obj

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,7 +19,12 @@ namespace eFMS.API.System.DL.Models.Criteria
         public string LocalAreaId { get; set; }
         public string ModeOfTransport { get; set; }
         public string GeoCode { get; set; }
-        public string PlaceTypeId { get; set; }
-        public string Note { get; set; }
+        public CatPlaceTypeEnum PlaceType { get; set; }
+        public string CountryNameVN { get; set; }
+        public string CountryNameEN { get; set; }
+        public string DistrictNameEN { get; set; }
+        public string DistrictNameVN { get; set; }
+        public string ProvinceNameEN { get; set; }
+        public string ProvinceNAmeVN { get; set; }
     }
 }

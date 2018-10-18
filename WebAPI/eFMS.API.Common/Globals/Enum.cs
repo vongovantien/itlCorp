@@ -1,5 +1,21 @@
 ﻿namespace eFMS.API.Common.Globals
 {
+    public enum CatPlaceTypeEnum
+    {
+        BorderGate,
+        Branch,
+        Depot,
+        District,
+        Hub,
+        IndustrialZone,
+        Other,
+        Port,
+        Province,
+        Station,
+        Ward,
+        Warehouse
+    }
+
     public enum TemplateMaintenance
     {
         PlanReplaceOil,

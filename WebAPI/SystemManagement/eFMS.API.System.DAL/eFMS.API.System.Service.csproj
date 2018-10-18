@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
     </Reference>

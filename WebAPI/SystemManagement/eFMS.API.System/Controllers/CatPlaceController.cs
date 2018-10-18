@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.Infrastructure.Common;
+using eFMS.API.System.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -20,10 +24,12 @@ namespace eFMS.API.System.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPlaceService catPlaceService;
-        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service)
+        private readonly IMapper mapper;
+        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             catPlaceService = service;
+            mapper = iMapper;
         }
 
         [HttpGet]
@@ -33,11 +39,70 @@ namespace eFMS.API.System.Controllers
             return Ok(results);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("Query")]
-        public IActionResult Get(CatPlaceCriteria criteria, string orderByProperty, bool isAscendingOrder)
+        public IActionResult Get(CatPlaceCriteria criteria)
         {
+            var results = catPlaceService.Query(criteria);
             return Ok();
+        }
+
+        [HttpPost]
+        [Route("Paging")]
+        public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
+        {
+            var data = catPlaceService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult Get(Guid id)
+        {
+            var data = catPlaceService.First(x => x.Id == id);
+            return Ok(data);
+        }
+
+        [HttpPost]
+        [Route("Add")]
+        public IActionResult Post(CatPlaceEditModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var catPlace = mapper.Map<CatPlaceModel>(model);
+            var result = catPlaceService.Add(catPlace);
+            var message = HandleError.GetMessage(result, Crud.Insert);
+            if (!result.Success)
+            {
+                return BadRequest(stringLocalizer[message]);
+            }
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Put(Guid id, CatPlaceEditModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var catPlace = mapper.Map<CatPlaceModel>(model);
+            catPlace.Id = id;
+            var result = catPlaceService.Update(catPlace, x => x.Id == id);
+            var message = HandleError.GetMessage(result, Crud.Update);
+            if (!result.Success)
+            {
+                return BadRequest(stringLocalizer[message]);
+            }
+            return Ok(stringLocalizer[message]);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var result = catPlaceService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(result, Crud.Delete);
+            if (!result.Success)
+            {
+                return BadRequest(stringLocalizer[message]);
+            }
+            return Ok(stringLocalizer[message]);
         }
     }
 }
