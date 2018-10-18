@@ -21,9 +21,9 @@ namespace eFMS.API.System.DL.Services
             SetChildren<SysUser>("Id", "UserGroupId");
         }
 
-        public IQueryable<SysUserGroup> Paging(UserGroupCriteria criteria, int page, int size, string orderByProperty, bool isAscendingOrder, out int rowsCount)
+        public IQueryable<SysUserGroupModel> Paging(UserGroupCriteria criteria, int page, int size, string orderByProperty, bool isAscendingOrder, out int rowsCount)
         {
-            Expression<Func<SysUserGroup, bool>> query = x => (x.Code ?? "").Contains(criteria.Code ?? "")
+            Expression<Func<SysUserGroupModel, bool>> query = x => (x.Code ?? "").Contains(criteria.Code ?? "")
                                           && (x.Decription ?? "").Contains(criteria.Decription ?? "")
                                           && (x.Name ?? "").Contains(criteria.Name ?? "")
                                           && (x.UserCreated ?? "").Contains(criteria.UserCreated ?? "")
@@ -36,26 +36,26 @@ namespace eFMS.API.System.DL.Services
                 }
                 if (!string.IsNullOrEmpty(orderByProperty) && (isAscendingOrder || !isAscendingOrder))
                 {
-                    var orderBy = ExpressionExtension.CreateExpression<SysUserGroup, object>(orderByProperty);
-                    return DataContext.Paging(query, page, size, orderBy, isAscendingOrder, out rowsCount);
+                    var orderBy = ExpressionExtension.CreateExpression<SysUserGroupModel, object>(orderByProperty);
+                    return base.Paging(query, page, size, orderBy, isAscendingOrder, out rowsCount);
                 }
                 else
                 {
-                    return DataContext.Paging(query, page, size, out rowsCount);
+                    return base.Paging(query, page, size, out rowsCount);
                 }
             }
             else
             {
-                var data = DataContext.Get(query);
+                var data = base.Get(query);
                 rowsCount = data.Count();
                 return data;
             }
 
         }
 
-        public IQueryable<SysUserGroup> Paging(string searchText, int page, int size, string orderByProperty, bool isAscendingOrder, out int rowsCount)
+        public IQueryable<SysUserGroupModel> Paging(string searchText, int page, int size, string orderByProperty, bool isAscendingOrder, out int rowsCount)
         {
-            Expression<Func<SysUserGroup, bool>> query = x => (x.Code ?? "").Contains(searchText ?? "")
+            Expression<Func<SysUserGroupModel, bool>> query = x => (x.Code ?? "").Contains(searchText ?? "")
                                               && (x.Decription ?? "").Contains(searchText ?? "")
                                               && (x.Name ?? "").Contains(searchText ?? "")
                                               && (x.UserCreated ?? "").Contains(searchText ?? "");
@@ -67,48 +67,48 @@ namespace eFMS.API.System.DL.Services
                 }
                 if (!string.IsNullOrEmpty(orderByProperty) && (isAscendingOrder || !isAscendingOrder))
                 {
-                    var orderBy = ExpressionExtension.CreateExpression<SysUserGroup, object>(orderByProperty);
-                    return DataContext.Paging(query, page, size, orderBy, isAscendingOrder, out rowsCount);
+                    var orderBy = ExpressionExtension.CreateExpression<SysUserGroupModel, object>(orderByProperty);
+                    return base.Paging(query, page, size, orderBy, isAscendingOrder, out rowsCount);
                 }
                 else
                 {
-                    return DataContext.Paging(query, page, size, out rowsCount);
+                    return base.Paging(query, page, size, out rowsCount);
                 }
             }
             else
             {
-                var data = DataContext.Get(query);
+                var data = base.Get(query);
                 rowsCount = data.Count();
                 return data;
             }
         }
 
-        public IQueryable<SysUserGroup> Query(UserGroupCriteria criteria, string orderByProperty, bool isAscendingOrder)
+        public IQueryable<SysUserGroupModel> Query(UserGroupCriteria criteria, string orderByProperty, bool isAscendingOrder)
         {
-            Expression<Func<SysUserGroup, bool>> query = x => (x.Code ?? "").Contains(criteria.Code ?? "")
+            Expression<Func<SysUserGroupModel, bool>> query = x => (x.Code ?? "").Contains(criteria.Code ?? "")
                                             && (x.Decription ?? "").Contains(criteria.Decription ?? "")
                                             && (x.Name ?? "").Contains(criteria.Name ?? "")
                                             && (x.UserCreated ?? "").Contains(criteria.UserCreated ?? "")
                                             && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
-            var results = DataContext.Get(query);
+            var results = base.Get(query);
             if (!string.IsNullOrEmpty(orderByProperty) && (isAscendingOrder || !isAscendingOrder))
             {
-                var orderBy = ExpressionExtension.CreateExpression<SysUserGroup, object>(orderByProperty);
+                var orderBy = ExpressionExtension.CreateExpression<SysUserGroupModel, object>(orderByProperty);
                 results = isAscendingOrder ? results.OrderBy(orderBy) : results.OrderByDescending(orderBy);
             }
             return results;
         }
 
-        public IQueryable<SysUserGroup> Query(string searchText, string orderByProperty, bool isAscendingOrder)
+        public IQueryable<SysUserGroupModel> Query(string searchText, string orderByProperty, bool isAscendingOrder)
         {
-            Expression<Func<SysUserGroup, bool>> query = x => (x.Code ?? "").Contains(searchText ?? "")
+            Expression<Func<SysUserGroupModel, bool>> query = x => (x.Code ?? "").Contains(searchText ?? "")
                                                && (x.Decription ?? "").Contains(searchText ?? "")
                                                && (x.Name ?? "").Contains(searchText ?? "")
                                                && (x.UserCreated ?? "").Contains(searchText ?? "");
-            var results = DataContext.Get(query);
+            var results = base.Get(query);
             if (!string.IsNullOrEmpty(orderByProperty) && (isAscendingOrder || !isAscendingOrder))
             {
-                var orderBy = ExpressionExtension.CreateExpression<SysUserGroup, object>(orderByProperty);
+                var orderBy = ExpressionExtension.CreateExpression<SysUserGroupModel, object>(orderByProperty);
                 results = isAscendingOrder ? results.OrderBy(orderBy) : results.OrderByDescending(orderBy);
             }
             return results;

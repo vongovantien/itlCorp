@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BreadcrumbComponent } from './breadcrumb.component';
+import { PaginationComponent } from './pagination.component';
 
-describe('BreadcrumbComponent', () => {
-  let component: BreadcrumbComponent;
-  let fixture: ComponentFixture<BreadcrumbComponent>;
+describe('PaginationComponent', () => {
+  let component: PaginationComponent;
+  let fixture: ComponentFixture<PaginationComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BreadcrumbComponent ]
+      declarations: [ PaginationComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BreadcrumbComponent);
+    fixture = TestBed.createComponent(PaginationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
