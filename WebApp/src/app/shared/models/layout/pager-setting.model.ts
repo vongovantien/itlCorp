@@ -12,4 +12,7 @@ export class PagerSetting {
     endIndex?: number;
     pages?: number[];
     numberToShow?: number[];
+    //total page buttons
+    totalPageBtn?:number;
+
 }
