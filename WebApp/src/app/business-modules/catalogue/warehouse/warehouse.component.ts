@@ -5,6 +5,7 @@ import { WAREHOUSEDATA } from './fakedata';
 import { SortService } from '../../../shared/services/sort.service';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
+import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
 
 @Component({
   selector: 'app-warehouse',
@@ -13,8 +14,14 @@ import { ButtonType } from '../../../shared/enums/type-button.enum';
 })
 export class WarehouseComponent implements OnInit {
   warehouses: Array<Warehouse>;
+  warehouse: Warehouse;
   breadcums: string[] = ["Dashboard", "Catalog", "Warehouse"];
   criteria: any = {};
+  pager: PagerSetting = { 
+    currentPage: 1,
+    pageSize: 15,
+    numberToShow: [15, 30, 50]
+  };
   addButtonSetting: ButtonModalSetting = {
     // buttonAttribute: 
     // {
@@ -61,6 +68,7 @@ export class WarehouseComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   nameEditModal = "edit-ware-house-modal";
+  titleConfirmDelete = "You want to delete this warehouse";
   postSettings: ColumnSetting[] = 
       [
           {
@@ -104,23 +112,36 @@ export class WarehouseComponent implements OnInit {
   constructor(private sortService: SortService) { }
 
   ngOnInit() {
-    this.warehouses = this.getProjects();
+    this.setPage(this.pager);
     console.log(this.warehouses);
   }
-  getProjects(): Warehouse[] {
+  getWarehouse(page): Warehouse[] {
+    //call api get data
+    this.pager.totalItems = WAREHOUSEDATA.length;
     return WAREHOUSEDATA;
   }
   onSortChange(property){
     this.isDesc = !this.isDesc; 
     this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
   }
-  onEdit(item){
+  showDetail(item){
     console.log(item);
+    this.warehouse = item;
   }
-  onDelete(item){
+  onDelete(event){
+    console.log(event);
+    if(event){
+      //call api
+    }
+  }
+  showConfirmDelete(item){
+    this.warehouse = item;
     console.log(item);
   }
   searchTypeChange(){
 
+  }
+  setPage(pager){
+    this.warehouses = this.getWarehouse(pager.currentPage);
   }
 }

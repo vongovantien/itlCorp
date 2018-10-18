@@ -15,8 +15,8 @@ namespace eFMS.API.System.Models
         [DisplayName("Code")]
         public string Code { get; set; }
 
-        [AppRequired]
-        //[Required(ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
+        //[AppRequired]
+        [Required(ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "EF_ANNOTATIONS_STRING_LENGTH")]
         [DisplayName("Name")]
         public string Name { get; set; }

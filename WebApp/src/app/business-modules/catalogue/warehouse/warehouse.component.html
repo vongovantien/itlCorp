@@ -90,9 +90,14 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Content-->
+            <!--begin: Datatable of port-index-list-table -->
             <app-table-layout [records]="warehouses" [settings]="postSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameEditModal"
-            (edit)="onEdit($event)" (edit)="onDelete($event)">
+            (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
+            <!--end: Datatable of port-index-list-table -->
+            <!--begin::pagination-->
+            <app-pagination currentPage [config]="pager" (pageChange)="setPage($event)" (selectPageSize)="setPage($event)"></app-pagination>
+            <!--end::pagination-->
             <!--end::Content-->
         </div>
     </div>
@@ -286,7 +291,7 @@
 <!--end::edit-ware-house-modal-->
 
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -320,5 +325,6 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->
