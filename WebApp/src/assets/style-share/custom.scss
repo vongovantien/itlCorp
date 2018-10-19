@@ -57,6 +57,14 @@ label {
         }
     }
 }
+//dropdown ver3
+.dropdown {
+    &.open {
+        .dropdown-menu {
+            display: block;
+        }
+    }
+}
 //sidebar 
 .m-aside-menu.m-aside-menu--skin-dark {
     .m-menu__nav--dropdown-submenu-arrow {

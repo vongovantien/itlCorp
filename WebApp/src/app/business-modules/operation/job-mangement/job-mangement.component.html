@@ -32,7 +32,7 @@
                                     </label>
                                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="No city selected">
+                                        placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </div>
@@ -277,7 +277,8 @@
                                                                     before 29/09/2018</div>
                                                             </div>
                                                             <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item" data-toggle="modal" (click)="edit_stage_detail(i,k,'confirm')" href="#edit-stage-detail-modal" >Edit
+                                                            <a class="dropdown-item" data-toggle="modal" (click)="edit_stage_detail(i,k,'confirm')"
+                                                                href="#edit-stage-detail-modal">Edit
                                                                 stage detail</a>
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item" href="javascript:void(0)">Pending</a>
@@ -308,7 +309,8 @@
                                                                     before 29/09/2018</div>
                                                             </div>
                                                             <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal" (click)="edit_stage_detail(i,k,'confirm')">Edit
+                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal"
+                                                                (click)="edit_stage_detail(i,k,'confirm')">Edit
                                                                 stage detail</a>
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item" href="javascript:void(0)">Pending</a>
@@ -339,7 +341,8 @@
                                                                     before 29/09/2018</div>
                                                             </div>
                                                             <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal" (click)="edit_stage_detail(i,k,'confirm')">Edit
+                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal"
+                                                                (click)="edit_stage_detail(i,k,'confirm')">Edit
                                                                 stage detail</a>
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item" href="javascript:void(0)">Pending</a>
@@ -370,7 +373,8 @@
                                                                     before 29/09/2018</div>
                                                             </div>
                                                             <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal" (click)="edit_stage_detail(i,k,'confirm')">Edit
+                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal"
+                                                                (click)="edit_stage_detail(i,k,'confirm')">Edit
                                                                 stage detail</a>
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item" href="javascript:void(0)">Pending</a>
@@ -402,7 +406,8 @@
                                                                     before 29/09/2018</div>
                                                             </div>
                                                             <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal" (click)="edit_stage_detail(i,k,'confirm')">Edit
+                                                            <a class="dropdown-item" data-toggle="modal" href="#edit-stage-detail-modal"
+                                                                (click)="edit_stage_detail(i,k,'confirm')">Edit
                                                                 stage detail</a>
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item" href="javascript:void(0)">Pending</a>
@@ -428,8 +433,10 @@
                                 </div>
                             </div>
                             <!--begin::pagination-->
-                            <app-paging-client *ngIf="Const_Jobs_List" [data]="Const_Jobs_List" [page_size]="10"
-                                [current_page]="1" (pagerObject)="receiveData($event)"></app-paging-client>
+                            <!-- <app-paging-client *ngIf="Const_Jobs_List" [data]="Const_Jobs_List" [page_size]="10"
+                                [current_page]="1" (pagerObject)="receiveData($event)"></app-paging-client> -->
+
+                            <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)" (pagerObject)="setPage($event)"></app-pagination>
                             <!--end::pagination-->
                         </div>
                         <!--end:: m-portlets-->
@@ -2319,8 +2326,9 @@
                                         <tr *ngFor="let stage of Jobs_List[index_opening_job].stage_list;let i = index;">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" data-toggle="modal" data-target="#edit-stage-detail-modal" (click)="edit_stage_detail(-1,i,'confirm')"
-                                                        title="Edit stage">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        data-toggle="modal" data-target="#edit-stage-detail-modal"
+                                                        (click)="edit_stage_detail(-1,i,'confirm')" title="Edit stage">
                                                         <i class="la la-edit"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -3125,7 +3133,8 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
-                    <button type="button" class="btn btn-sm  btn-default m-btn--icon m-btn--square" data-toggle="modal" data-target="#history-of-stage-modal">
+                    <button type="button" class="btn btn-sm  btn-default m-btn--icon m-btn--square" data-toggle="modal"
+                        data-target="#history-of-stage-modal">
                         <span>
                             <i class="la la-history"></i>
                             <span>History</span>
@@ -3142,14 +3151,16 @@
                                 <label>
                                     Stage name
                                 </label>
-                                <input type="text" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].abbreviation" class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <input type="text" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].abbreviation"
+                                    class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     value="">
                             </div>
                             <div class="form-group">
                                 <label>
                                     Process time
                                 </label>
-                                <input type="text" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].process_time"  class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                <input type="text" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].process_time"
+                                    class="form-control m-input m-input--square" placeholder="Please enter detail"
                                     value="">
                             </div>
                             <div class="form-group">
@@ -3170,7 +3181,8 @@
                                     Deadline
                                 </label>
                                 <div class="m-input-icon m-input-icon--right">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="//" value="" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].exp_time">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="//"
+                                        value="" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].exp_time">
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar glyphicon-th"></i>
@@ -3189,7 +3201,7 @@
                                         <option value="success">Done</option>
                                         <option value="process">Processing</option>
                                         <option value="overdue">Overdue</option>
-                                        <option value="warning">Warning</option>            
+                                        <option value="warning">Warning</option>
                                     </select>
                                 </div>
                             </div>
@@ -3199,13 +3211,15 @@
                                 <label>
                                     Description
                                 </label>
-                                <textarea class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].description" placeholder="Please enter detail" rows="8">This is Description (VN)</textarea>
+                                <textarea class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].description"
+                                    placeholder="Please enter detail" rows="8">This is Description (VN)</textarea>
                             </div>
                             <div class="form-group">
                                 <label>
                                     Comment
                                 </label>
-                                <textarea class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].comment"  placeholder="Please enter detail" rows="8">This is Comment</textarea>
+                                <textarea class="form-control m-input m-input--square" [(ngModel)]="Jobs_List[job_index].stage_list[stage_index].comment"
+                                    placeholder="Please enter detail" rows="8">This is Comment</textarea>
                             </div>
                         </div>
                     </div>
@@ -3213,7 +3227,8 @@
                 <!--end:add-stage-detail-form -->
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="edit_stage_detail(-1,-1,'yes')" data-dismiss="modal">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="edit_stage_detail(-1,-1,'yes')" data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -3221,7 +3236,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="cancel_edit_stage()">
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="cancel_edit_stage()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

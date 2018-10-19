@@ -1,16 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { TableLayoutComponent } from './common/table-layout/table-layout.component';
 import { StyleCellDirective } from './directives/style-cell.directive';
-import { SortService } from './services/sort.service';
 import { InputTableLayoutComponent } from './common/input-table-layout/input-table-layout.component';
 import { BreadcrumbComponent } from './common/breadcrumb/breadcrumb.component';
 import { AddmodalButtonComponent } from './common/addmodal-button/addmodal-button.component';
 import { PagingClientComponent } from 'src/app/shared/paging-client/paging-client.component';
+import { PaginationComponent } from './common/pagination/pagination.component';
+
+import { SortService } from './services/sort.service';
+import { PagerService } from './services/pager.service';
+import { DeleteConfirmModalComponent } from './common/delete-confirm-modal/delete-confirm-modal.component';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 
@@ -18,7 +23,7 @@ import { PagingClientComponent } from 'src/app/shared/paging-client/paging-clien
     BreadcrumbComponent, 
     AddmodalButtonComponent, 
     //BreadcrumbComponent,
-    PagingClientComponent
+    PagingClientComponent, PaginationComponent, DeleteConfirmModalComponent
   ],
   exports: [
     CommonModule,
@@ -26,10 +31,13 @@ import { PagingClientComponent } from 'src/app/shared/paging-client/paging-clien
     BreadcrumbComponent,
     AddmodalButtonComponent,
     // BreadcrumbComponent, 
-     PagingClientComponent
+     PagingClientComponent,
+     PaginationComponent,
+     DeleteConfirmModalComponent
   ],
   providers: [
-    SortService
+    SortService,
+    PagerService
   ]
 })
 export class SharedModule { }

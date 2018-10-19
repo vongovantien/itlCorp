@@ -1,0 +1,15 @@
+﻿{
+  "MSG_DATA_NOT_FOUND": "Data not found",
+  "MSG_OBJECT_NOT_EXISTS": "Object does nont exist",
+  "MSG_OBJECT_DUPLICATED": "Object is douplicated",
+  "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object", //204
+  "MSG_INSERT_SUCCESS": "New data added",
+  "MSG_UPDATE_SUCCESS": "Data update success",
+  "MSG_DELETE_SUCCESS": "Data delete success",
+
+  "MSG_NAME_EXISTED": "Tên đã tồn tại",
+  "MSG_CODE_EXISTED": "Code đã tồn tại",
+  "MSG_DELETE_FAIL_INCLUDED_CHILD": "Dữ liệu có quan hệ, không thể xóa",
+  "EF_ANNOTATIONS_REQUIRED": "Field [{0}] là bắt buộc",
+  "EF_ANNOTATIONS_STRING_LENGTH": "Trường [{0}] phải là chuỗi và có {2}-{1} ký tự"
+}

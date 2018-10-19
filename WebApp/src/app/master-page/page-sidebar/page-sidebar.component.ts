@@ -229,7 +229,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     current_parent.classList.add('m-menu__item--active');
     current_children.classList.add('m-menu__item--active');
 
-
+    
     for (var i = 0; i < this.Menu.length; i++) {
       for (var j = 0; j < this.Menu[i].childs.length; j++) {
         if (this.Menu[i].childs[j].name == sub_menu_name) {

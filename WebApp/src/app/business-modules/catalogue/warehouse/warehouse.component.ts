@@ -5,6 +5,7 @@ import { WAREHOUSEDATA } from './fakedata';
 import { SortService } from '../../../shared/services/sort.service';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
+import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
 
 @Component({
   selector: 'app-warehouse',
@@ -13,8 +14,15 @@ import { ButtonType } from '../../../shared/enums/type-button.enum';
 })
 export class WarehouseComponent implements OnInit {
   warehouses: Array<Warehouse>;
+  warehouse: Warehouse;
   breadcums: string[] = ["Dashboard", "Catalog", "Warehouse"];
   criteria: any = {};
+  pager: PagerSetting = {
+    currentPage: 1,
+    pageSize: 15,
+    numberToShow: [3,5,10,15, 30, 50],
+    totalPageBtn:7
+  };
   addButtonSetting: ButtonModalSetting = {
     // buttonAttribute: 
     // {
@@ -51,7 +59,7 @@ export class WarehouseComponent implements OnInit {
     // },
     typeButton: ButtonType.save
   };
-  
+
   cancelButtonSetting: ButtonModalSetting = {
     // buttonAttribute: {
     //   titleButton: "export",
@@ -61,66 +69,85 @@ export class WarehouseComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   nameEditModal = "edit-ware-house-modal";
-  postSettings: ColumnSetting[] = 
-      [
-          {
-              primaryKey: 'id',
-              header: 'Id',
-              dataType: "number"
-          },
-          {
-              primaryKey: 'code',
-              header: 'Code',
-              isShow: true
-          },
-          {
-              primaryKey: 'name',
-              header: 'Name',
-              isShow: true
-          },
-          {
-            primaryKey: 'countryName',
-            header: 'Country',
-            isShow: true
-          },
-          {
-              primaryKey: 'provinceName',
-              header: 'City/ Province',
-              isShow: true
-          },
-          {
-            primaryKey: 'districtName',
-            header: 'District',
-            isShow: true
-          },
-          {
-            primaryKey: 'address',
-            header: 'Address',
-            isShow: true
-          }
-      ];
+  titleConfirmDelete = "You want to delete this warehouse";
+  postSettings: ColumnSetting[] =
+    [
+      {
+        primaryKey: 'id',
+        header: 'Id',
+        dataType: "number"
+      },
+      {
+        primaryKey: 'code',
+        header: 'Code',
+        isShow: true
+      },
+      {
+        primaryKey: 'name',
+        header: 'Name',
+        isShow: true
+      },
+      {
+        primaryKey: 'countryName',
+        header: 'Country',
+        isShow: true
+      },
+      {
+        primaryKey: 'provinceName',
+        header: 'City/ Province',
+        isShow: true
+      },
+      {
+        primaryKey: 'districtName',
+        header: 'District',
+        isShow: true
+      },
+      {
+        primaryKey: 'address',
+        header: 'Address',
+        isShow: true
+      }
+    ];
   isDesc: boolean = false;
 
   constructor(private sortService: SortService) { }
 
   ngOnInit() {
-    this.warehouses = this.getProjects();
-    console.log(this.warehouses);
+    this.setPage(this.pager);
   }
-  getProjects(): Warehouse[] {
-    return WAREHOUSEDATA;
+  getWarehouse(pager: PagerSetting): Warehouse[] {
+   
+    var page_number = pager.currentPage;
+    var page_size = pager.pageSize;
+    var const_data = WAREHOUSEDATA.map(x => Object.assign({}, x));
+    this.pager.totalItems = const_data.length;
+    var return_data = const_data.splice((page_number - 1) * page_size, page_size);
+    return return_data;
   }
-  onSortChange(property){
-    this.isDesc = !this.isDesc; 
+  onSortChange(property) {
+    this.isDesc = !this.isDesc;
     this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
   }
-  onEdit(item){
+  showDetail(item) {
+    console.log(item);
+    this.warehouse = item;
+  }
+  onDelete(event) {
+    console.log(event);
+    if (event) {
+      //call api
+    }
+  }
+  showConfirmDelete(item) {
+    this.warehouse = item;
     console.log(item);
   }
-  onDelete(item){
-    console.log(item);
-  }
-  searchTypeChange(){
+  searchTypeChange() {
 
+  }
+
+
+  setPage(pager) {
+    this.warehouses = this.getWarehouse(pager);
   }
 }
