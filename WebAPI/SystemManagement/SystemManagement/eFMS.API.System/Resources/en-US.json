@@ -1,0 +1,14 @@
+﻿{
+  "MSG_DATA_NOT_FOUND": "Data not found",
+  "MSG_OBJECT_NOT_EXISTS": "Object does nont exist",
+  "MSG_OBJECT_DUPLICATED": "Object is douplicated",
+  "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object", //204
+  "MSG_INSERT_SUCCESS": "New data added",
+  "MSG_UPDATE_SUCCESS": "Data update success",
+  "MSG_DELETE_SUCCESS": "Data delete success",
+  "MSG_NAME_EXISTED": "Name has existed",
+  "MSG_CODE_EXISTED": "Code has existed",
+  "MSG_DELETE_FAIL_INCLUDED_CHILD": "Data include child. Delete denied",
+  "EF_ANNOTATIONS_REQUIRED": "The [{0}] field is required",
+  "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters"
+}
