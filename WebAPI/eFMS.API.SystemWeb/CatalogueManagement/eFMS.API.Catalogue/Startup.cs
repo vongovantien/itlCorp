@@ -261,7 +261,8 @@ namespace SystemManagementAPI
                             .WithHeaders("accept", "content-type", "origin", "x-custom-header")
                             .AllowAnyOrigin()
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                     });
             });
             //services.AddCustomAuthentication(Configuration);
@@ -373,8 +374,8 @@ namespace SystemManagementAPI
                 }
             });
 
-            //app.UseCors("AllowAllOrigins");
-            app.UseCors("CorsPolicy");
+            app.UseCors("AllowAllOrigins");
+            //app.UseCors("CorsPolicy");
             //ConfigureAuth(app);
 
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));

@@ -63,6 +63,22 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        [HttpGet]
+        [Route("GetProvinces")]
+        public IActionResult GetProvinces(short? countryId)
+        {
+            var results = catPlaceService.GetProvinces(countryId);
+            return Ok(results);
+        }
+
+        [HttpGet]
+        [Route("GetDistricts")]
+        public IActionResult GetDistricts(Guid? provinceId)
+        {
+            var results = catPlaceService.GetDistricts(provinceId);
+            return Ok(results);
+        }
+
         [HttpPost]
         [Route("Add")]
         public IActionResult Post(CatPlaceEditModel model)

@@ -14,5 +14,7 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         List<vw_catPlace> Query(CatPlaceCriteria criteria);
         List<vw_catPlace> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount);
+        List<vw_catProvince> GetProvinces(short? countryId);
+        List<vw_catDistrict> GetDistricts(Guid? provinceId);
     }
 }

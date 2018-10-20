@@ -1,11 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { Warehouse } from '../../../shared/models/ware-house';
 import { ColumnSetting } from '../../../shared/models/layout/column-setting.model';
-import { WAREHOUSEDATA } from './fakedata';
 import { SortService } from '../../../shared/services/sort.service';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
 import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
+import { BaseService } from 'src/services-base/base.service';
+import { ToastrService } from 'ngx-toastr';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { PagingService } from 'src/app/shared/common/pagination/paging-service';
+import { config } from 'rxjs';
+import { CountryModel } from '../../../shared/models/catalogue/country.model';
+import { ProviceModel } from '../../../shared/models/catalogue/province.model';
+import { DistrictModel } from '../../../shared/models/catalogue/district.model';
 
 @Component({
   selector: 'app-warehouse',
@@ -14,6 +21,9 @@ import { PagerSetting } from '../../../shared/models/layout/pager-setting.model'
 })
 export class WarehouseComponent implements OnInit {
   warehouses: Array<Warehouse>;
+  countries: Array<CountryModel>;
+  provinces: Array<ProviceModel>;
+  districts: Array<DistrictModel>;
   warehouse: Warehouse;
   breadcums: string[] = ["Dashboard", "Catalog", "Warehouse"];
   criteria: any = {};
@@ -21,7 +31,7 @@ export class WarehouseComponent implements OnInit {
     currentPage: 1,
     pageSize: 15,
     numberToShow: [3,5,10,15, 30, 50],
-    totalPageBtn:7
+    numberPageDisplay: 7
   };
   addButtonSetting: ButtonModalSetting = {
     // buttonAttribute: 
@@ -68,6 +78,9 @@ export class WarehouseComponent implements OnInit {
     // },
     typeButton: ButtonType.cancel
   };
+  resetButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.reset
+  }
   nameEditModal = "edit-ware-house-modal";
   titleConfirmDelete = "You want to delete this warehouse";
   postSettings: ColumnSetting[] =
@@ -109,20 +122,50 @@ export class WarehouseComponent implements OnInit {
       }
     ];
   isDesc: boolean = false;
-
-  constructor(private sortService: SortService) { }
+  
+  constructor(private sortService: SortService, private baseService: BaseService,private toastr: ToastrService, 
+    private spinnerService: Ng4LoadingSpinnerService, private pagingService: PagingService) { }
 
   ngOnInit() {
     this.setPage(this.pager);
+    this.getDataCombobox();
   }
-  getWarehouse(pager: PagerSetting): Warehouse[] {
-   
-    var page_number = pager.currentPage;
-    var page_size = pager.pageSize;
-    var const_data = WAREHOUSEDATA.map(x => Object.assign({}, x));
-    this.pager.totalItems = const_data.length;
-    var return_data = const_data.splice((page_number - 1) * page_size, page_size);
-    return return_data;
+  getDataCombobox(){
+    this.getCountries();
+    this.getProvinces();
+    this.getDistricts();
+  }
+  getCountries(){
+    this.baseService.get("http://localhost:44361/api/v1/1/CatCountry").subscribe((response: any) => {
+      this.countries = response;
+    });
+  }
+  getProvinces(id?: number){
+    let url = "http://localhost:44361/api/v1/1/CatPlace/GetProvinces";
+    if(id != undefined){
+      url = url + "?countryId=" + id; 
+    }
+    this.baseService.get(url).subscribe((response: any) => {
+      this.provinces = response;
+      console.log(this.provinces);
+    });
+  }
+  getDistricts(id?: number){
+    let url = "http://localhost:44361/api/v1/1/CatPlace/GetDistricts";
+    if(id != undefined){
+      url = url + "?provinceId=" + id; 
+    }
+    this.baseService.get(url).subscribe((response: any) => {
+      this.districts = response;
+    });
+  }
+  getWarehouses(pager: PagerSetting) {
+    this.spinnerService.show();
+    this.baseService.post("http://localhost:44361/api/v1/1/CatPlace/Paging?page=" + pager.currentPage + "&size=" + pager.pageSize, {"placeType": 11}).subscribe((response: any) => {
+      this.spinnerService.hide();
+      this.warehouses = response.data;
+      console.log(this.warehouses);
+    });
   }
   onSortChange(property) {
     this.isDesc = !this.isDesc;
@@ -148,6 +191,9 @@ export class WarehouseComponent implements OnInit {
 
 
   setPage(pager) {
-    this.warehouses = this.getWarehouse(pager);
+    this.getWarehouses(pager);
+  }
+  resetSearch(){
+    
   }
 }

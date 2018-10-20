@@ -21,6 +21,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? InactiveOn { get; set; }
 
         public SysUserGroup UserGroup { get; set; }
-        public CatBranch WorkPlace { get; set; }
     }
 }

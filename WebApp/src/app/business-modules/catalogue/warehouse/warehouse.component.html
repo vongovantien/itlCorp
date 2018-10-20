@@ -46,38 +46,53 @@
         <div class="m-portlet__body">
             <!--begin::Form-->
             <div class="m-form">
-                <div class="input-group m-input-group m-input-group--square">
-                    <div class="input-group-prepend">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            Code
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange()">
-                                Code
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                Name
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                Country
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                City/ Province
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                District
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                Address
-                            </a>
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group m-input-group m-input-group--square">
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    Code
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange()">
+                                        Code
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
+                                        Name
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
+                                        Country
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
+                                        City/ Province
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
+                                        District
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
+                                        Address
+                                    </a>
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" title="Search">
+                                    <i class="icon-search"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" type="button" title="Search">
-                            <i class="icon-search"></i>
-                        </button>
+                    <div class="col-md-auto">
+                        <app-addmodal-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()" ></app-addmodal-button>
+                        <!-- <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="reset_search()">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Reset
+                                </span>
+                            </span>
+                        </button> -->
                     </div>
                 </div>
             </div>
@@ -137,30 +152,69 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>
                                     Country
                                 </label>
                                 <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div> -->
+                            <div class="form-group">
+                                <label>
+                                    Country
+                                </label>
+                                <select class="form-control m-input m-input--square">
+                                    <option value="">
+                                        Please select
+                                    </option>
+                                    <option *ngFor='let country of countries' [value]="country.id">
+                                        {{ country.nameEn }}
+                                    </option>
+                                </select>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>
                                     City/ Province
                                 </label>
                                 <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                            </div> -->
+                            <div class="form-group">
+                                <label>
+                                    City/ Province
+                                </label>
+                                <select class="form-control m-input m-input--square">
+                                    <option value="">
+                                        Please select
+                                    </option>
+                                    <option *ngFor='let province of provinces' [value]="province.id">
+                                            {{ province.name_VN }}
+                                    </option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>
                                     District
                                 </label>
                                 <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
+                            </div> -->
+                            <div class="form-group">
+                                    <label>
+                                        District
+                                    </label>
+                                    <select class="form-control m-input m-input--square">
+                                        <option value="">
+                                            Please select
+                                        </option>
+                                        <option *ngFor='let district of districts' [value]="district.id">
+                                                {{ district.name_VN }}
+                                        </option>
+                                    </select>
+                                </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
