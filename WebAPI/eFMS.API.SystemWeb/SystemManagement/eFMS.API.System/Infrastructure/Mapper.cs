@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalog.DL.Models;
-using eFMS.API.Catalog.Models;
-using eFMS.API.Catalog.Service.Models;
+using eFMS.API.System.DL.Models;
+using eFMS.API.System.Models;
+using eFMS.API.System.Service.Models;
 
-namespace eFMS.API.Catalog.Infrastructure
+namespace eFMS.API.System.Infrastructure
 {
     public class MappingProfile : Profile
     {

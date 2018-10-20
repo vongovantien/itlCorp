@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalog.DL.Infrastructure;
-using eFMS.API.Catalog.DL.IService;
-using eFMS.API.Catalog.DL.Models;
-using eFMS.API.Catalog.DL.Models.Criteria;
-using eFMS.API.Catalog.Service.Models;
+using eFMS.API.System.DL.Infrastructure;
+using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.Service.Models;
+using eFMS.API.System.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -12,7 +13,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace eFMS.API.Catalog.DL.Services
+namespace eFMS.API.System.DL.Services
 {
     public class UserGroupService : RepositoryBase<SysUserGroup, SysUserGroupModel>, IUserGroupService
     {

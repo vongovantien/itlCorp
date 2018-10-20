@@ -9,7 +9,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Code { get; set; }
         public string StageNameVn { get; set; }
         public string StageNameEn { get; set; }
-        public string TypeId { get; set; }
+        public int? DepartmentId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

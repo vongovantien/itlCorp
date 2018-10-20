@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace eFMS.API.Catalog.Models
+namespace eFMS.API.System.Models
 {
     public class CatPlaceEditModel
     {

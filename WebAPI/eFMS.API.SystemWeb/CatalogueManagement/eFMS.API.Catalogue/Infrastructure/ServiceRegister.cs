@@ -20,6 +20,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<IUserGroupService, UserGroupService>();
             services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
+            services.AddTransient<ICatStageService, CatStageService>();
         }
     }
 }

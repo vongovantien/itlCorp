@@ -18,9 +18,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
         public virtual DbSet<CatPlaceType> CatPlaceType { get; set; }
-        public virtual DbSet<SysUser> SysUser { get; set; }
-        public virtual DbSet<SysUserGroup> SysUserGroup { get; set; }
-        public virtual DbSet<SysUserLog> SysUserLog { get; set; }
+        public virtual DbSet<CatStage> CatStage { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -47,11 +45,11 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.AddressEn)
                     .HasColumnName("Address_EN")
-                    .HasMaxLength(150);
+                    .HasMaxLength(300);
 
                 entity.Property(e => e.AddressVn)
                     .HasColumnName("Address_VN")
-                    .HasMaxLength(150);
+                    .HasMaxLength(300);
 
                 entity.Property(e => e.BankAccountUsd)
                     .HasColumnName("BankAccount_USD")
@@ -63,19 +61,19 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.BankAddress).HasMaxLength(255);
+                entity.Property(e => e.BankAddress).HasMaxLength(510);
 
-                entity.Property(e => e.BankName).HasMaxLength(150);
+                entity.Property(e => e.BankName).HasMaxLength(300);
 
                 entity.Property(e => e.BranchNameEn)
                     .HasColumnName("BranchName_EN")
-                    .HasMaxLength(150);
+                    .HasMaxLength(300);
 
                 entity.Property(e => e.BranchNameVn)
                     .HasColumnName("BranchName_VN")
-                    .HasMaxLength(150);
+                    .HasMaxLength(300);
 
-                entity.Property(e => e.Code).HasMaxLength(20);
+                entity.Property(e => e.Code).HasMaxLength(40);
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasMaxLength(50)
@@ -122,7 +120,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.Address).HasMaxLength(50);
+                entity.Property(e => e.Address).HasMaxLength(100);
 
                 entity.Property(e => e.AreaId)
                     .HasColumnName("AreaID")
@@ -130,7 +128,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Code)
-                    .IsRequired()
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
@@ -140,7 +137,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
 
-                entity.Property(e => e.DisplayName).HasMaxLength(200);
+                entity.Property(e => e.DisplayName).HasMaxLength(400);
 
                 entity.Property(e => e.DistrictId).HasColumnName("DistrictID");
 
@@ -161,17 +158,15 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.NameEn)
                     .HasColumnName("Name_EN")
-                    .HasMaxLength(200);
+                    .HasMaxLength(400);
 
                 entity.Property(e => e.NameVn)
-                    .IsRequired()
                     .HasColumnName("Name_VN")
-                    .HasMaxLength(200);
+                    .HasMaxLength(400);
 
-                entity.Property(e => e.Note).HasMaxLength(500);
+                entity.Property(e => e.Note).HasMaxLength(1000);
 
                 entity.Property(e => e.PlaceTypeId)
-                    .IsRequired()
                     .HasColumnName("PlaceTypeID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -203,75 +198,24 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.NameEn)
                     .HasColumnName("Name_EN")
-                    .HasMaxLength(50);
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.NameVn)
                     .HasColumnName("Name_VN")
-                    .HasMaxLength(50);
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<SysUser>(entity =>
+            modelBuilder.Entity<CatStage>(entity =>
             {
-                entity.ToTable("sysUser");
+                entity.ToTable("catStage");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.EmployeeId)
-                    .HasColumnName("EmployeeID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.Password)
-                    .IsRequired()
-                    .HasMaxLength(200);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserGroupId).HasColumnName("UserGroupID");
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
-
-                entity.HasOne(d => d.UserGroup)
-                    .WithMany(p => p.SysUser)
-                    .HasForeignKey(d => d.UserGroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysUser_sysUserGroup");
-
-                entity.HasOne(d => d.WorkPlace)
-                    .WithMany(p => p.SysUser)
-                    .HasForeignKey(d => d.WorkPlaceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysUser_catBranch");
-            });
-
-            modelBuilder.Entity<SysUserGroup>(entity =>
-            {
-                entity.ToTable("sysUserGroup");
+                entity.HasIndex(e => e.Code)
+                    .HasName("U_catStage")
+                    .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -284,13 +228,17 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
 
-                entity.Property(e => e.Decription).HasMaxLength(500);
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
 
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                entity.Property(e => e.StageNameEn)
+                    .HasColumnName("StageName_EN")
+                    .HasMaxLength(510);
+
+                entity.Property(e => e.StageNameVn)
+                    .HasColumnName("StageName_VN")
+                    .HasMaxLength(510);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -299,32 +247,6 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<SysUserLog>(entity =>
-            {
-                entity.ToTable("sysUserLog");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.ComputerName).HasMaxLength(50);
-
-                entity.Property(e => e.Ip)
-                    .HasColumnName("IP")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.LoggedInOn).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.LoggedOffOn).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.UserId)
-                    .IsRequired()
-                    .HasColumnName("UserID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
             });
         }
     }
