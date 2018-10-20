@@ -16,9 +16,6 @@ namespace eFMS.API.Catalogue.Service.Models
         }
 
         public virtual DbSet<CatCountry> CatCountry { get; set; }
-        public virtual DbSet<SysUser> SysUser { get; set; }
-        public virtual DbSet<SysUserGroup> SysUserGroup { get; set; }
-        public virtual DbSet<SysUserLog> SysUserLog { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -67,106 +64,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
-
-            modelBuilder.Entity<SysUser>(entity =>
-            {
-                entity.ToTable("sysUser");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.EmployeeId)
-                    .HasColumnName("EmployeeID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.Password).HasMaxLength(400);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserGroupId).HasColumnName("UserGroupID");
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Username)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
-
-                entity.HasOne(d => d.UserGroup)
-                    .WithMany(p => p.SysUser)
-                    .HasForeignKey(d => d.UserGroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysUser_sysUserGroup");
-            });
-
-            modelBuilder.Entity<SysUserGroup>(entity =>
-            {
-                entity.ToTable("sysUserGroup");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Code)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.Decription).HasMaxLength(1000);
-
-                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.Name).HasMaxLength(200);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<SysUserLog>(entity =>
-            {
-                entity.ToTable("sysUserLog");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.ComputerName).HasMaxLength(100);
-
-                entity.Property(e => e.Ip)
-                    .HasColumnName("IP")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.LoggedInOn).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.LoggedOffOn).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.UserId)
-                    .HasColumnName("UserID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
-            });
+            
         }
     }
 }
