@@ -1,4 +1,4 @@
-﻿namespace eFMS.API.Catalog.DL.Infrastructure.ErrorHandler
+﻿namespace eFMS.API.System.DL.Infrastructure.ErrorHandler
 {
     public interface IErrorHandler
     {

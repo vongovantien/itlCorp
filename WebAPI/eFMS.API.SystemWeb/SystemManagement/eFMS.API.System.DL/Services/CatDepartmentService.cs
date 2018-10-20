@@ -11,10 +11,11 @@ using System.Text;
 
 namespace eFMS.API.System.DL.Services
 {
-    public class CatBranchService : RepositoryBase<CatBranch, CatBranchModel>, ICatBranchService
+    public class CatDepartmentService : RepositoryBase<CatDepartment,CatDepartmentModel>,ICatDepartmentService
     {
-        public CatBranchService(IContextBase<CatBranch> repository, IMapper mapper) : base(repository, mapper)
+        public CatDepartmentService(IContextBase<CatDepartment> repository, IMapper mapper) : base(repository, mapper)
         {
+
         }
     }
 }

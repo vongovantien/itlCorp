@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Catalog.Service.Models
+namespace eFMS.API.System.Service.Models
 {
     public partial class CsShipment
     {

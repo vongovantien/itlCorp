@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalog.Infrastructure;
-using eFMS.API.Catalog.Infrastructure.Filters;
-using eFMS.API.Catalog.Infrastructure.Middlewares;
-using eFMS.API.Catalog.Service.Models;
+using eFMS.API.System.Infrastructure;
+using eFMS.API.System.Infrastructure.Filters;
+using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.API.System.Service.Models;
+using eFMS.API.System.Service.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;

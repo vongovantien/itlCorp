@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Catalog.Service.Models
+namespace eFMS.API.System.Service.Models
 {
     public partial class SysUser
     {
@@ -21,6 +21,5 @@ namespace eFMS.API.Catalog.Service.Models
         public DateTime? InactiveOn { get; set; }
 
         public SysUserGroup UserGroup { get; set; }
-        public CatBranch WorkPlace { get; set; }
     }
 }

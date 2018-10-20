@@ -5,6 +5,7 @@ import * as SearchHelper from 'src/helper/SearchHelper';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import {API_MENU} from 'src/constants/api-menu.const';
 declare var jquery: any;
 declare var $: any;
 
@@ -15,7 +16,9 @@ declare var $: any;
 })
 export class StageManagementComponent implements OnInit {
 
-  constructor(private baseServices:BaseService,private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) { }
+  constructor(private baseServices:BaseService,private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService,private api_menu:API_MENU) { 
+    
+  } 
   Stages_List: any;
   Const_Stage_List
   New_Stage:any= {
@@ -32,6 +35,7 @@ export class StageManagementComponent implements OnInit {
   selected_filter= "All";
   ngOnInit() {
     this.getStages();
+    console.log(this.api_menu.Catalogue.Stage_Management.CatStage);
   }
 
   async getStages() {

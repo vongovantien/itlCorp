@@ -5,6 +5,8 @@ export class SystemConstants {
     public static readonly LSK_CURRENT_WORKPLACE_ID: string = 'CURRENT_WORKPLACE_ID';
     public static readonly LSK_CURRENT_LANG: string = 'CURRENT_LANG';
     public static readonly LSL_CACHE_REMEMBER: string = 'CACHE_REMEMBER';
+    public static readonly CURRENT_LANGUAGE:string = "CURRENT_LANGUAGE";
+    public static readonly CURRENT_VERSION:string = "CURRENT_VERSION";
 
     //Security
     public static readonly PATH_RSA_PUBLIC_KEY = './auth/z_rsa_public.key';
@@ -17,8 +19,8 @@ export class SystemConstants {
     public static CURRENT_USER;
 
     //Language
-    public static CURRENT_LANGUAGE: string = localStorage.getItem(SystemConstants.LSK_CURRENT_LANG);
-    public static CURRENT_WORKPLACE_ID: string = localStorage.getItem(SystemConstants.LSK_CURRENT_WORKPLACE_ID);
+    // public static CURRENT_LANGUAGE: string = localStorage.getItem(SystemConstants.LSK_CURRENT_LANG);
+    // public static CURRENT_WORKPLACE_ID: string = localStorage.getItem(SystemConstants.LSK_CURRENT_WORKPLACE_ID);
 
     public static readonly DEFAULT_LANGUAGE: string = "en-US";    
     public static readonly DEFAULT_HOME_PAGE: string = "/app/main/home";

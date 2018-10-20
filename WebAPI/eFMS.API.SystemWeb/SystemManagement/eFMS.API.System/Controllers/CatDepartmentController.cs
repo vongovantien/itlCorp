@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Models.Criteria;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -15,29 +16,21 @@ namespace eFMS.API.System.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class TestController : ControllerBase
+    public class CatDepartmentController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatBranchService catbranchService;
-        public TestController(IStringLocalizer<LanguageSub> localizer, ICatBranchService service)
+        private readonly ICatDepartmentService catDepartmentService;
+        public CatDepartmentController(IStringLocalizer<LanguageSub> localizer, ICatDepartmentService service)
         {
             stringLocalizer = localizer;
-            catbranchService = service;
+            catDepartmentService = service;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+            return Ok(catDepartmentService.Get());
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(Guid id)
-        {
-            var s = catbranchService.Any(x => x.Id == id);
-            var t = catbranchService.First(x => x.Id == id);
-            var result = catbranchService.Get();
-            return Ok();
-        }
     }
 }

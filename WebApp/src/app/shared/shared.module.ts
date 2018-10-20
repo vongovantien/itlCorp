@@ -13,6 +13,7 @@ import { PaginationComponent } from './common/pagination/pagination.component';
 import { SortService } from './services/sort.service';
 import { PagerService } from './services/pager.service';
 import { DeleteConfirmModalComponent } from './common/delete-confirm-modal/delete-confirm-modal.component';
+import { API_MENU } from '../../constants/api-menu.const';
 import { PagingService } from './paging-client/paging-client-service';
 
 @NgModule({
@@ -39,7 +40,7 @@ import { PagingService } from './paging-client/paging-client-service';
   providers: [
     SortService,
     PagerService,
-    PagingService
+	API_MENU,    PagingService
   ]
 })
 export class SharedModule { }

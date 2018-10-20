@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SystemManagementAPI.Resources;
 
-namespace eFMS.API.Catalog.Infrastructure.AttributeEx
+namespace eFMS.API.System.Infrastructure.AttributeEx
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
     public class AppRequiredAttribute : RequiredAttribute
