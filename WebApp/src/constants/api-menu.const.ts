@@ -10,9 +10,17 @@ export class API_MENU {
 
     private PORT = {
         System:44360,
-        Catalogue:44361
+        Catalogue:44361,
+        Department:44242
     }
 
+    private PROTOCOL = "http://";
+
+    /**
+     * Use HOST.Local to run on local environment
+     * Use HOST.Test to run on test environment
+     * Use HOST.Staging to run on staging environment 
+     */
     private CURRENT_HOST : String = this.HOST.Local;
 
     private getCurrentLanguage(){
@@ -27,17 +35,15 @@ export class API_MENU {
     private getUrlMainPath(Module:String){
         
         if(this.CURRENT_HOST == this.HOST.Local){
-            return this.HOST.Local + this.getPort(Module) + "/" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
+            return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/api" + "/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
         if(this.CURRENT_HOST == this.HOST.Test){
-            return this.HOST.Test + "/" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/" ;
+            return this.PROTOCOL + this.HOST.Test + "/" + this.getCurrentVersion() + "/v" + this.getCurrentLanguage() + "/" ;
         }
         if(this.CURRENT_HOST == this.HOST.Staging){
-            return this.HOST.Staging + "/" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
+            return this.PROTOCOL + this.HOST.Staging + "/" + this.getCurrentVersion() + "/v" + this.getCurrentLanguage() + "/";
         }
     }
-
-
 
     private getPort(Module:String){        
         return eval("this.PORT."+Module);
@@ -64,8 +70,11 @@ export class API_MENU {
             /**
              * Get all stages 
              */
-            CatStage: this.getUrlMainPath("Catalogue") + "CatStage",
-
+            Get_All: this.getUrlMainPath("Catalogue") + "CatStage/get_all",
+            Get_By_Id: this.getUrlMainPath("Catalogue") + "CatStage/get_by_id/",
+            Add_New: this.getUrlMainPath("Cataloge") + "CatStage/add_new",
+            Update: this.getUrlMainPath("Catalogue") + "CatStage/update",
+            Delete: this.getUrlMainPath("Catalogue") + "CatStage/delete/"
         },
         Unit:{
 
@@ -97,10 +106,10 @@ export class API_MENU {
 
         },
         Department:{
-
+            CatDeparment: this.getUrlMainPath("Department") + "CatDepartment"
         },
         Company_Info:{
-            
+
         }
     }
 
