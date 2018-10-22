@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using eFMS.API.Catalogue.DL.Common;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -20,7 +21,6 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper) : base(repository, mapper)
         {
-            SetUnique(new string[] { "Code", "NameVn", "NameEn" });
         }
 
         public List<vw_catProvince> GetProvinces(short? countryId)
@@ -39,7 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                list = list.Skip(page).Take(size).ToList();
+                list = list.Skip(page-1).Take(size).ToList();
             }
             return list;
         }
@@ -48,18 +48,36 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var list = GetView();
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
-            list = list.Where(x => (x.Code ?? "").Contains(criteria.Code ?? "")
-                                && (x.Name_EN ?? "").Contains(criteria.NameEn ?? "")
-                                && (x.Name_VN ?? "").Contains(criteria.NameVn ?? "")
-                                && (x.CountryNameEN ?? "").Contains(criteria.CountryNameEN ?? "")
-                                && (x.CountryNameVN ?? "").Contains(criteria.CountryNameVN ?? "")
-                                && (x.DistrictNameEN?? "").Contains(criteria.DistrictNameEN ?? "")
-                                && (x.DistrictNameVN ?? "").Contains(criteria.DistrictNameVN ?? "")
-                                && (x.ProvinceNameEN ?? "").Contains(criteria.ProvinceNameEN ?? "")
-                                && (x.ProvinceNameVN ?? "").Contains(criteria.ProvinceNAmeVN ?? "")
-                                && (x.Address ?? "").Contains(criteria.Address ?? "")
-                                && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
-                ).ToList();
+            if(criteria.All == null)
+            {
+                list = list.Where(x => (x.Code ?? "").Contains(criteria.Code ?? "")
+                                    && (x.Name_EN ?? "").Contains(criteria.NameEn ?? "")
+                                    && (x.Name_VN ?? "").Contains(criteria.NameVn ?? "")
+                                    && (x.CountryNameEN ?? "").Contains(criteria.CountryNameEN ?? "")
+                                    && (x.CountryNameVN ?? "").Contains(criteria.CountryNameVN ?? "")
+                                    && (x.DistrictNameEN ?? "").Contains(criteria.DistrictNameEN ?? "")
+                                    && (x.DistrictNameVN ?? "").Contains(criteria.DistrictNameVN ?? "")
+                                    && (x.ProvinceNameEN ?? "").Contains(criteria.ProvinceNameEN ?? "")
+                                    && (x.ProvinceNameVN ?? "").Contains(criteria.ProvinceNAmeVN ?? "")
+                                    && (x.Address ?? "").Contains(criteria.Address ?? "")
+                                    && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
+                    ).ToList();
+            }
+            else
+            {
+                list = list.Where(x => ((x.Code ?? "").Contains(criteria.All ?? "")
+                                   || (x.Name_EN ?? "").Contains(criteria.All ?? "")
+                                   || (x.Name_VN ?? "").Contains(criteria.All ?? "")
+                                   || (x.CountryNameEN ?? "").Contains(criteria.All ?? "")
+                                   || (x.CountryNameVN ?? "").Contains(criteria.All ?? "")
+                                   || (x.DistrictNameEN ?? "").Contains(criteria.All ?? "")
+                                   || (x.DistrictNameVN ?? "").Contains(criteria.All ?? "")
+                                   || (x.ProvinceNameEN ?? "").Contains(criteria.All ?? "")
+                                   || (x.ProvinceNameVN ?? "").Contains(criteria.All ?? "")
+                                   || (x.Address ?? "").Contains(criteria.All ?? ""))
+                                   && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
+                                   ).ToList();
+            }
             return list;
         }
 

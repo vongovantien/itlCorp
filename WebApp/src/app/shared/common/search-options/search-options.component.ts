@@ -1,4 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { ButtonModalSetting } from '../../models/layout/button-modal-setting.model';
+import { ButtonType } from '../../enums/type-button.enum';
 
 @Component({
   selector: 'app-search-options',
@@ -14,6 +16,10 @@ export class SearchOptionsComponent implements OnInit {
     fieldDisplayName: "",
     searchString: ""
   };
+  
+  resetButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.reset
+  }
 
   constructor() { }
 
@@ -38,6 +44,14 @@ export class SearchOptionsComponent implements OnInit {
     }
   }
   searchClick(){
+    this.search.emit(this.searchObject);
+  }
+  resetSearch(){
+    this.searchObject = {
+      field: "All",
+      fieldDisplayName: "All",
+      searchString: ""
+    };
     this.search.emit(this.searchObject);
   }
 }

@@ -52,27 +52,34 @@
                                     {{selected_filter}}
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item active" (click)="select_filter('All',$event)" id="filter_all" href="javascript:void(0)">
+                                    <a class="dropdown-item active" (click)="select_filter('All',$event)" id="filter_all"
+                                        href="javascript:void(0)">
                                         All
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Stage ID',$event)" id="filter_id" href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Stage ID',$event)" id="filter_id"
+                                        href="javascript:void(0)">
                                         Stage ID
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Role',$event)" id="filter_role" href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Role',$event)" id="filter_role"
+                                        href="javascript:void(0)">
                                         Role
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Name (EN)',$event)" id="filter_name_en" href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Name (EN)',$event)" id="filter_name_en"
+                                        href="javascript:void(0)">
                                         Name (EN)
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Name (VI)',$event)" id="filter_name_vi" href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Name (VI)',$event)" id="filter_name_vi"
+                                        href="javascript:void(0)">
                                         Name (VI)
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Abbreviation',$event)" id="filter_type" href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Abbreviation',$event)" id="filter_type"
+                                        href="javascript:void(0)">
                                         Abbreviation
                                     </a>
                                 </div>
                             </div>
-                            <input type="text" class="form-control" aria-label="Text input with dropdown button" name="search_key" [(ngModel)]="search_key">
+                            <input type="text" class="form-control" aria-label="Text input with dropdown button" name="search_key"
+                                [(ngModel)]="search_key">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="button" title="Search" (click)="search_stage()">
                                     <i class="icon-search"></i>
@@ -81,7 +88,8 @@
                         </div>
                     </div>
                     <div class="col-md-auto">
-                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="reset_search()">
+                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="reset_search()">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>
@@ -109,7 +117,7 @@
                                 <span>Stage ID</span>
                             </th>
                             <th>
-                                <span>Role</span>
+                                <span>Department</span>
                             </th>
                             <th>
                                 <span>Stage ABBR</span>
@@ -128,42 +136,44 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody *ngIf="Stages_List">
-                        <tr *ngFor="let stage of Stages_List;let i = index;">
+                    <tbody *ngIf="ListStages">
+                        <tr *ngFor="let stage of ListStages;let i = index;">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="edit_stage(i,'confirm')"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        (click)="edit_stage(i,'confirm')" title="Edit stage" data-toggle="modal"
+                                        data-target="#edit-stage-management-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="remove_stage(i,'confirm')"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        (click)="remove_stage(i,'confirm')" title="Remove stage" data-toggle="modal"
+                                        data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
                             </td>
                             <td>
-                                <span>{{stage.stage_id}}</span>
+                                <span>{{stage.stage.id}}</span>
                             </td>
                             <td>
-                                <span>{{stage.role}}</span>
+                                <span>{{stage.deptName}}</span>
                             </td>
                             <td>
-                                <span>{{stage.abbreviation}}</span>
+                                <span>{{stage.stage.code}}</span>
                             </td>
                             <td>
-                                <span>{{stage.name}}</span>
+                                <span>{{stage.stage.stageNameVn}}</span>
                             </td>
                             <td>
-                                <span>{{stage.name_en}}</span>
+                                <span>{{stage.stage.stageNameEn}}</span>
                             </td>
                             <td>
-                                <span>{{stage.description}}</span>
+                                <span>{{stage.stage.descriptionVn}}</span>
                             </td>
                             <td>
-                                <span>{{stage.description_en}}</span>
+                                <span>{{stage.stage.descriptionEn}}</span>
                             </td>
-                       
+
                     </tbody>
                 </table>
             </div>
@@ -224,7 +234,8 @@
                                 <label>
                                     Stage ID
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="New_Stage.stage_id" name="id" placeholder="Please enter detail">
+                                <input disabled type="text" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.id"
+                                    name="id" placeholder="Please enter detail">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -232,7 +243,8 @@
                                 <label>
                                     Name (VN)
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="New_Stage.name" name="name" placeholder="Please enter detail">
+                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.stageNameVn"
+                                    name="name" placeholder="Please enter detail">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -240,7 +252,8 @@
                                 <label>
                                     Name (EN)
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="New_Stage.name_en" name="name_en" placeholder="Please enter detail">
+                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.stageNameEn"
+                                    name="name_en" placeholder="Please enter detail">
                             </div>
                         </div>
                     </div>
@@ -248,15 +261,21 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>
-                                    Role
+                                    Department
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="New_Stage.role" name="role" placeholder="Please enter detail">
+                                <!-- <ng-select [allowClear]="true" [items]="ListDepartment" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select department">
+                                </ng-select> -->
+                                <input type="number" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.departmentId" name="role" placeholder="Please enter detail">
+
                             </div>
                             <div class="form-group">
                                 <label>
                                     Stage ABBR
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="New_Stage.abbreviation" name="abbreviation" placeholder="Please enter detail">
+                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.code"
+                                    name="abbreviation" placeholder="Please enter detail">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -264,8 +283,8 @@
                                 <label>
                                     Description (VN)
                                 </label>
-                                <textarea class="form-control m-input m-input--square" [(ngModel)]="New_Stage.description" name="description" placeholder="Please enter detail"
-                                    rows="6"></textarea>
+                                <textarea class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.descriptionVn"
+                                    name="description" placeholder="Please enter detail" rows="6"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -273,8 +292,8 @@
                                 <label>
                                     Description (EN)
                                 </label>
-                                <textarea class="form-control m-input m-input--square" [(ngModel)]="New_Stage.description_en" name="description_en" placeholder="Please enter detail"
-                                    rows="6"></textarea>
+                                <textarea class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.descriptionEn"
+                                    name="description_en" placeholder="Please enter detail" rows="6"></textarea>
                             </div>
                         </div>
                     </div>
@@ -282,7 +301,8 @@
                 <!--end:add-stage-management-form -->
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="add_stage()">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="add_stage()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -324,8 +344,8 @@
                                 <label>
                                     Stage ID
                                 </label>
-                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].stage_id" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                    value="Stage ID">
+                                <input disabled type="text" [(ngModel)]="ListStages[id_stage_edit].stage.id" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" value="Stage ID">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -333,8 +353,8 @@
                                 <label>
                                     Name (VN)
                                 </label>
-                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].name" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                    value="Name (VN)">
+                                <input type="text" [(ngModel)]="ListStages[id_stage_edit].stage.stageNameVn" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" value="Name (VN)">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -342,8 +362,8 @@
                                 <label>
                                     Name (EN)
                                 </label>
-                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].name_en" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                    value="Name (EN)">
+                                <input type="text" [(ngModel)]="ListStages[id_stage_edit].stage.stageNameEn" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" value="Name (EN)">
                             </div>
                         </div>
                     </div>
@@ -351,17 +371,17 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>
-                                    Role
+                                    Department
                                 </label>
-                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].role" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                    value="Role">
+                                <input type="number" [(ngModel)]="ListStages[id_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" value="Role">
                             </div>
                             <div class="form-group">
                                 <label>
                                     Stage ABBR
                                 </label>
-                                <input type="text" [(ngModel)]="Stages_List[id_stage_edit].abbreviation" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                    value=" Stage ABBR">
+                                <input type="text" [(ngModel)]="ListStages[id_stage_edit].stage.code" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" value=" Stage ABBR">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -369,8 +389,8 @@
                                 <label>
                                     Description (VN)
                                 </label>
-                                <textarea [(ngModel)]="Stages_List[id_stage_edit].description" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                    rows="6">This is Description (VN)</textarea>
+                                <textarea [(ngModel)]="ListStages[id_stage_edit].stage.descriptionVn" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" rows="6">This is Description (VN)</textarea>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -378,8 +398,8 @@
                                 <label>
                                     Description (EN)
                                 </label>
-                                <textarea [(ngModel)]="Stages_List[id_stage_edit].description_en" class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                    rows="6">This is Description (EN)</textarea>
+                                <textarea [(ngModel)]="ListStages[id_stage_edit].stage.descriptionEn" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" rows="6">This is Description (EN)</textarea>
                             </div>
                         </div>
                     </div>
@@ -387,7 +407,8 @@
                 <!--end:add-stage-management-form -->
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="edit_stage(-1,'yes')" data-dismiss="modal">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="edit_stage(-1,'yes')"
+                    data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -425,7 +446,8 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="remove_stage(-1,'yes')" data-dismiss="modal"> 
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="remove_stage(-1,'yes')"
+                    data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>

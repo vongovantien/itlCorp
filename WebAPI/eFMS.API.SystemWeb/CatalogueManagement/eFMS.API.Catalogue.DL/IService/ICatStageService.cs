@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -9,5 +10,11 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatStageService : IRepositoryBase<CatStage, CatStageModel>
     {
+        List<Object> GetStages();
+        HandleState AddStage(CatStageModel catStage);
+        HandleState UpdateStage(CatStageModel catStage);
+        HandleState DeleteStage(int id);
     }
+
+
 }

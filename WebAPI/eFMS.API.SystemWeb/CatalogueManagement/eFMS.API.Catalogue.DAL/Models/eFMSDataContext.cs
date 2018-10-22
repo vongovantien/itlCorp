@@ -17,6 +17,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
+        public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
         public virtual DbSet<CatPlaceType> CatPlaceType { get; set; }
         public virtual DbSet<CatStage> CatStage { get; set; }
@@ -27,10 +28,10 @@ namespace eFMS.API.Catalogue.Service.Models
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
-                    options =>
-                    {
-                        options.UseRowNumberForPaging();
-                    });
+                   options =>
+                   {
+                       options.UseRowNumberForPaging();
+                   });
             }
         }
 
@@ -132,6 +133,39 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.NameVn)
                     .HasColumnName("Name_VN")
                     .HasMaxLength(300);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatDepartment>(entity =>
+            {
+                entity.ToTable("catDepartment");
+
+                entity.HasIndex(e => e.Code)
+                    .HasName("U_catDepartment_Code")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DeptName).HasMaxLength(100);
+
+                entity.Property(e => e.Description).HasMaxLength(300);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

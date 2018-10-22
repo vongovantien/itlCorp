@@ -10,7 +10,7 @@ import { BreadcrumbComponent } from './common/breadcrumb/breadcrumb.component';
 import { DefaultButtonComponent } from './common/default-button/default-button.component';
 import { PagingClientComponent } from 'src/app/shared/paging-client/paging-client.component';
 import { PaginationComponent } from './common/pagination/pagination.component';
-
+import { SelectModule } from 'ng2-select';
 import { SortService } from './services/sort.service';
 import { PagerService } from './services/pager.service';
 import { DeleteConfirmModalComponent } from './common/delete-confirm-modal/delete-confirm-modal.component';
@@ -21,7 +21,7 @@ import { ModifiedModalComponent } from './common/modified-modal/modified-modal.c
 import { InputFormComponent } from './common/input-form/input-form.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ModalModule],
+  imports: [CommonModule, FormsModule, ModalModule,SelectModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 

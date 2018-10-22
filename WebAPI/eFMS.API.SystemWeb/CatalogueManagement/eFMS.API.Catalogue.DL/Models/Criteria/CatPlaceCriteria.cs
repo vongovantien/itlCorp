@@ -7,6 +7,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
 {
     public class CatPlaceCriteria
     {
+        public string All { get; set; }
         public string Code { get; set; }
         public string NameVn { get; set; }
         public string NameEn { get; set; }

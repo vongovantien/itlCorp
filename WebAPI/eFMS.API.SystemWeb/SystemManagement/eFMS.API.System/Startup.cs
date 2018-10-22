@@ -374,8 +374,8 @@ namespace SystemManagementAPI
                 }
             });
 
-            //app.UseCors("AllowAllOrigins");
-            app.UseCors("CorsPolicy");
+            app.UseCors("AllowAllOrigins");
+            //app.UseCors("CorsPolicy");
             //ConfigureAuth(app);
 
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
@@ -402,26 +402,27 @@ namespace SystemManagementAPI
             //}).AddControllersAsServices();  //Injecting Controllers themselves thru DI
             //                                //For further info see: http://docs.autofac.org/en/latest/integration/aspnetcore.html#controllers-as-services
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
-            });
             //services.AddCors(options =>
             //{
-            //    options.AddPolicy("AllowAllOrigins",
-            //        builder =>
-            //        {
-            //            builder
-            //                .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-            //                .AllowAnyOrigin()
-            //                .AllowAnyHeader()
-            //                .AllowAnyMethod();
-            //        });
+            //    options.AddPolicy("CorsPolicy",
+            //        builder => builder.AllowAnyOrigin()
+            //        .AllowAnyMethod()
+            //        .AllowAnyHeader()
+            //        .AllowCredentials());
             //});
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder
+                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+            });
 
 
             services.AddRouting(options => options.LowercaseUrls = true);
