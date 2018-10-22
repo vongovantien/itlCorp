@@ -9,4 +9,5 @@ export class Warehouse {
     provinceName: string;
     districtName: string;
     address: string;
+    placeType: number;
 }

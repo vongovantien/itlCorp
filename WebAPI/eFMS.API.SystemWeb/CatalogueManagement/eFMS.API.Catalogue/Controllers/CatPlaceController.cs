@@ -46,7 +46,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Get(CatPlaceCriteria criteria)
         {
             var results = catPlaceService.Query(criteria);
-            return Ok();
+            return Ok(results);
         }
 
         [HttpPost]
@@ -86,9 +86,14 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatPlaceEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var checkExistMessage = CheckExist(Guid.Empty, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
             model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.Id = new Guid();
+            catPlace.Id = Guid.NewGuid();
             catPlace.UserCreated = "01";
             catPlace.DatetimeCreated = DateTime.Now;
             var hs = catPlaceService.Add(catPlace);
@@ -105,6 +110,11 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Put(Guid id, CatPlaceEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var checkExistMessage = CheckExist(id, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
             var catPlace = mapper.Map<CatPlaceModel>(model);
             catPlace.UserModified = "01";
             catPlace.DatetimeModified = DateTime.Now;
@@ -130,6 +140,26 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private string CheckExist(Guid id, CatPlaceEditModel model)
+        {
+            string message = string.Empty;
+            if (id == Guid.Empty)
+            {
+                if (catPlaceService.Any(x => x.Code == model.Code))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+            }
+            else
+            {
+                if (catPlaceService.Any(x => x.Code == model.Code && x.Id != id))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+            }
+            return message;
         }
     }
 }

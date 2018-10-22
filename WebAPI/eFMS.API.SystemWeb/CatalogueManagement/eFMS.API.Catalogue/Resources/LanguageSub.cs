@@ -29,5 +29,6 @@ namespace SystemManagementAPI.Resources
         public static readonly string MSG_CODE_EXISTED = "MSG_CODE_EXISTED";
         public static readonly string MSG_DELETE_FAIL_INCLUDED_CHILD = "MSG_DELETE_FAIL_INCLUDED_CHILD";
         public static readonly string EF_ANNOTATIONS_REQUIRED = "EF_ANNOTATIONS_REQUIRED";
+        public static readonly string EF_ANNOTATIONS_STRING_LENGTH = "EF_ANNOTATIONS_STRING_LENGTH";
     }
 }

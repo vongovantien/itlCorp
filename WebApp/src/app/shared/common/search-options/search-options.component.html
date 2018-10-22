@@ -1,27 +1,33 @@
-
-<div class="input-group m-input-group m-input-group--square">
-  <div class="input-group-prepend">
-      <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          {{searchObject.fieldDisplayName}}
-      </button>
-      <div class="dropdown-menu">
-        
-        <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" attr.id="AllField">
-            All
-        </a>
-        <ng-container *ngFor="let map of settingFields">
-            <a *ngIf="map.allowSearch" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
-                {{ map.header }}
-            </a>
-        </ng-container>
-      </div>
-  </div>
-  <input type="text" class="form-control" aria-label="Text input with dropdown button"
-    [(ngModel)]="searchObject.searchString" name="searchString">
-  <div class="input-group-append">
-      <button class="btn btn-primary" type="button" title="Search" (click)="searchClick()">
-          <i class="icon-search"></i>
-      </button>
-  </div>
+<div class="row">
+    <div class="col">
+        <div class="input-group m-input-group m-input-group--square">
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    {{searchObject.fieldDisplayName}}
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" attr.id="AllField">
+                        All
+                    </a>
+                    <ng-container *ngFor="let map of settingFields">
+                        <a *ngIf="map.allowSearch" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
+                            {{ map.header }}
+                        </a>
+                    </ng-container>
+                </div>
+            </div>
+            <input type="text" class="form-control" aria-label="Text input with dropdown button"
+                [(ngModel)]="searchObject.searchString" name="searchString">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button" title="Search" (click)="searchClick()">
+                    <i class="icon-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-auto">
+        <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()" ></app-default-button>
+    </div>
 </div>
