@@ -1,4 +1,4 @@
-import { Warehouse } from '../../../shared/models/ware-house';
+import { Warehouse } from '../../../shared/models/catalogue/ware-house';
 export const WAREHOUSEDATA: Warehouse[] = [
     {
         id: 1,
