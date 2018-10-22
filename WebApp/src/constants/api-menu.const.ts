@@ -70,9 +70,9 @@ export class API_MENU {
             /**
              * Get all stages 
              */
-            Get_All: this.getUrlMainPath("Catalogue") + "CatStage/get_all",
-            Get_By_Id: this.getUrlMainPath("Catalogue") + "CatStage/get_by_id/",
-            Add_New: this.getUrlMainPath("Cataloge") + "CatStage/add_new",
+            Get_All: this.getUrlMainPath("Catalogue") + "CatStage/getAll",
+            Get_By_Id: this.getUrlMainPath("Catalogue") + "CatStage/getById/",
+            Add_New: this.getUrlMainPath("Catalogue") + "CatStage/addnew",
             Update: this.getUrlMainPath("Catalogue") + "CatStage/update",
             Delete: this.getUrlMainPath("Catalogue") + "CatStage/delete/"
         },
