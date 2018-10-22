@@ -2,14 +2,14 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ButtonModalSetting, ButtonAttributeSetting } from '../../models/layout/button-modal-setting.model';
 import { ButtonType } from '../../enums/type-button.enum';
 import { SelectModule } from 'ng2-select';
-import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton } from '../../enums/default-button-enum';
+import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton } from '../../enums/default-button-enum';
 
 @Component({
-  selector: 'app-addmodal-button',
-  templateUrl: './addmodal-button.component.html',
-  styleUrls: ['./addmodal-button.component.scss']
+  selector: 'app-default-button',
+  templateUrl: './default-button.component.html',
+  styleUrls: ['./default-button.component.scss']
 })
-export class AddmodalButtonComponent implements OnInit {
+export class DefaultButtonComponent implements OnInit {
   @Input() buttonSetting: ButtonModalSetting;
   @Input() dataTarget: string;
   isAdd: boolean = false;
@@ -56,6 +56,10 @@ export class AddmodalButtonComponent implements OnInit {
     if(typeButton == ButtonType.cancel){
       this.isCancel = true;
       this.setSyleButton(CancelDefaultButton);
+    }
+    if(typeButton == ButtonType.reset){
+      this.isCancel = true;
+      this.setSyleButton(ResetDefaultButton);
     }
   }
   setSyleButton(DefaultButton: ButtonAttributeSetting): any {

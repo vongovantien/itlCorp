@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using eFMS.API.Catalog.DL.IService;
-using eFMS.API.Catalog.DL.Models;
-using eFMS.API.Catalog.DL.Models.Criteria;
-using eFMS.API.Catalog.Infrastructure.Common;
-using eFMS.API.Catalog.Models;
+using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.Infrastructure.Common;
+using eFMS.API.System.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
-namespace eFMS.API.Catalog.Controllers
+namespace eFMS.API.System.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]

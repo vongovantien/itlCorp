@@ -10,9 +10,9 @@ import { ChargeComponent } from './charge/charge.component';
 import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
-
+import { ModalModule } from 'ngx-bootstrap';
+import { SelectModule } from 'ng2-select';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
-// import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
 
 
 @NgModule({
@@ -20,7 +20,9 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
     CommonModule,
     CatalogueRoutingModule,
     SharedModule,
-    FormsModule
+    FormsModule,
+    SelectModule,
+    ModalModule.forRoot()
   ],
   declarations:
     [LocationComponent,

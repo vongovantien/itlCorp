@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -127,6 +128,7 @@ export class BaseService implements ErrorHandler {
     return this._http.put(url, data, { headers: this.headers }).toPromise().then(res => {
       this.spinnerService.hide();
       this.handleState(res, display_notify);
+      return res;
     }).catch(error => {
       this.handleError(error);
     });
@@ -154,6 +156,7 @@ export class BaseService implements ErrorHandler {
     return this._http.delete(url, { headers: this.headers }).toPromise().then(res => {
       this.spinnerService.hide()
       this.handleState(res, display_notify);
+      return res;
     }).catch(error => {
       this.handleError(error);
     });
@@ -179,7 +182,8 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
-    this.toastr.error(error.statusText.toString());
+    
+    this.toastr.error(error.error.message.toString());
   }
 
 

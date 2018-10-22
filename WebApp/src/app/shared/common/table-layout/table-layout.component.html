@@ -15,12 +15,12 @@
                             title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
                             <i class="la la-edit"></i>
                         </button> -->
-                        <app-addmodal-button [buttonSetting]="editButtonSetting" [dataTarget]="editButtonSetting.dataTarget" (click)="editClick(record)"></app-addmodal-button>
+                        <app-default-button [buttonSetting]="editButtonSetting" [dataTarget]="editButtonSetting.dataTarget" (click)="editClick(record)"></app-default-button>
                         <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                             title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
                             <i class="la la-trash"></i>
                         </button> -->
-                        <app-addmodal-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="deleteClick(record)"></app-addmodal-button>
+                        <app-default-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="deleteClick(record)"></app-default-button>
                     </div>
                 </td>
                 <!-- <td>

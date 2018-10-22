@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using eFMS.API.Catalogue.DL.Common;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -19,7 +21,12 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper) : base(repository, mapper)
         {
-            SetUnique(new string[] { "Code", "NameVn", "NameEn" });
+        }
+
+        public List<vw_catProvince> GetProvinces(short? countryId)
+        {
+            var data = GetProvinces().Where(x => x.CountryID == countryId || countryId == null).ToList();
+            return data;
         }
 
         public List<vw_catPlace> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount)
@@ -32,7 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                list = list.Skip(page).Take(size).ToList();
+                list = list.Skip(page-1).Take(size).ToList();
             }
             return list;
         }
@@ -40,72 +47,61 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<vw_catPlace> Query(CatPlaceCriteria criteria)
         {
             var list = GetView();
-            string placetype = GetPlaceType(criteria.PlaceType);
-            list = list.Where(x => (x.Code ?? "").Contains(criteria.Code ?? "")
-                                && (x.Name_EN ?? "").Contains(criteria.NameEn ?? "")
-                                && (x.Name_VN ?? "").Contains(criteria.NameVn ?? "")
-                                && (x.CountryNameEN ?? "").Contains(criteria.CountryNameEN ?? "")
-                                && (x.CountryNameVN ?? "").Contains(criteria.CountryNameVN ?? "")
-                                && (x.DistrictNameEN?? "").Contains(criteria.DistrictNameEN ?? "")
-                                && (x.DistrictNameVN ?? "").Contains(criteria.DistrictNameVN ?? "")
-                                && (x.ProvinceNameEN ?? "").Contains(criteria.ProvinceNameEN ?? "")
-                                && (x.ProvinceNameVN ?? "").Contains(criteria.ProvinceNAmeVN ?? "")
-                                && (x.Address ?? "").Contains(criteria.Address ?? "")
-                                && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
-                ).ToList();
-            return list;
-        }
-
-        private string GetPlaceType(CatPlaceTypeEnum placeType)
-        {
-            string result = "";
-            switch (placeType)
+            string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
+            if(criteria.All == null)
             {
-                case CatPlaceTypeEnum.BorderGate:
-                    result = "BorderGate";
-                    break;
-                case CatPlaceTypeEnum.Branch:
-                    result = "Branch";
-                    break;
-                case CatPlaceTypeEnum.Depot:
-                    result = "Depot";
-                    break;
-                case CatPlaceTypeEnum.District:
-                    result = "District";
-                    break;
-                case CatPlaceTypeEnum.Hub:
-                    result = "Hub";
-                    break;
-                case CatPlaceTypeEnum.IndustrialZone:
-                    result = "IndustrialZone";
-                    break;
-                case CatPlaceTypeEnum.Other:
-                    result = "Other";
-                    break;
-                case CatPlaceTypeEnum.Port:
-                    result = "Port";
-                    break;
-                case CatPlaceTypeEnum.Province:
-                    result = "Province";
-                    break;
-                case CatPlaceTypeEnum.Station:
-                    result = "Station";
-                    break;
-                case CatPlaceTypeEnum.Ward:
-                    result = "Ward";
-                    break;
-                case CatPlaceTypeEnum.Warehouse:
-                    result = "Warehouse";
-                    break;
-                default:
-                    break;
+                list = list.Where(x => (x.Code ?? "").Contains(criteria.Code ?? "")
+                                    && (x.Name_EN ?? "").Contains(criteria.NameEn ?? "")
+                                    && (x.Name_VN ?? "").Contains(criteria.NameVn ?? "")
+                                    && (x.CountryNameEN ?? "").Contains(criteria.CountryNameEN ?? "")
+                                    && (x.CountryNameVN ?? "").Contains(criteria.CountryNameVN ?? "")
+                                    && (x.DistrictNameEN ?? "").Contains(criteria.DistrictNameEN ?? "")
+                                    && (x.DistrictNameVN ?? "").Contains(criteria.DistrictNameVN ?? "")
+                                    && (x.ProvinceNameEN ?? "").Contains(criteria.ProvinceNameEN ?? "")
+                                    && (x.ProvinceNameVN ?? "").Contains(criteria.ProvinceNAmeVN ?? "")
+                                    && (x.Address ?? "").Contains(criteria.Address ?? "")
+                                    && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
+                    ).ToList();
             }
-            return result;
+            else
+            {
+                list = list.Where(x => ((x.Code ?? "").Contains(criteria.All ?? "")
+                                   || (x.Name_EN ?? "").Contains(criteria.All ?? "")
+                                   || (x.Name_VN ?? "").Contains(criteria.All ?? "")
+                                   || (x.CountryNameEN ?? "").Contains(criteria.All ?? "")
+                                   || (x.CountryNameVN ?? "").Contains(criteria.All ?? "")
+                                   || (x.DistrictNameEN ?? "").Contains(criteria.All ?? "")
+                                   || (x.DistrictNameVN ?? "").Contains(criteria.All ?? "")
+                                   || (x.ProvinceNameEN ?? "").Contains(criteria.All ?? "")
+                                   || (x.ProvinceNameVN ?? "").Contains(criteria.All ?? "")
+                                   || (x.Address ?? "").Contains(criteria.All ?? ""))
+                                   && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
+                                   ).ToList();
+            }
+            return list;
         }
 
         private List<vw_catPlace> GetView()
         {
             List<vw_catPlace> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catPlace>();
+            return lvCatPlace;
+        }
+
+        private List<vw_catProvince> GetProvinces()
+        {
+            List<vw_catProvince> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catProvince>();
+            return lvCatPlace;
+        }
+
+        public List<vw_catDistrict> GetDistricts(Guid? provinceId)
+        {
+            var data = GetDistricts();
+            return data.Where(x => x.ProvinceID == provinceId || provinceId == null).ToList();
+        }
+
+        private List<vw_catDistrict> GetDistricts()
+        {
+            List<vw_catDistrict> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catDistrict>();
             return lvCatPlace;
         }
     }

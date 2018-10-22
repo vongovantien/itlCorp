@@ -21,6 +21,7 @@ import { Daterangepicker } from 'ng2-daterangepicker';
 import { PagingClientComponent } from './shared/paging-client/paging-client.component';
 import {PagingService} from './shared/common/pagination/paging-service';
 import { CommonModule } from '@angular/common';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { CommonModule } from '@angular/common';
     SubheaderComponent
   ],
   imports: [    
+    SharedModule,
     CommonModule,
     BrowserModule,
     AppRoutingModule,

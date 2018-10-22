@@ -1,7 +1,8 @@
-﻿using eFMS.API.Catalog.Service.Models;
+﻿using eFMS.API.System.Service.Models;
+using eFMS.API.System.Service.Models;
 using ITL.NetCore.Connection.EF;
 
-namespace eFMS.API.Catalog.Service.Contexts
+namespace eFMS.API.System.Service.Contexts
 {
     public class Base<T> : ContextBase<T>
         where T : class, new()
