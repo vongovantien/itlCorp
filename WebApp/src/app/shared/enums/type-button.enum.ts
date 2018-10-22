@@ -5,5 +5,6 @@ export enum ButtonType{
     import="import",
     export="export",
     save="save",
-    cancel="cancel"
+    cancel="cancel",
+    reset="reset"
 }

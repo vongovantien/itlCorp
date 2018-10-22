@@ -43,3 +43,10 @@ export const CancelDefaultButton: ButtonAttributeSetting = {
     //targetModal: "add-ware-house-modal",
     icon: "la la-ban"
   };
+
+  export const ResetDefaultButton: ButtonAttributeSetting = {
+    titleButton: "reset",
+    classStyle: "btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase",
+    //targetModal: "add-ware-house-modal",
+    icon: "la la-refresh"
+  };

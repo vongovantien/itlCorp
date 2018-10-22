@@ -22,6 +22,12 @@ namespace eFMS.API.Catalogue.DL.Services
             SetUnique(new string[] { "Code", "NameVn", "NameEn" });
         }
 
+        public List<vw_catProvince> GetProvinces(short? countryId)
+        {
+            var data = GetProvinces().Where(x => x.CountryID == countryId || countryId == null).ToList();
+            return data;
+        }
+
         public List<vw_catPlace> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount)
         {
             var list = Query(criteria);
@@ -106,6 +112,24 @@ namespace eFMS.API.Catalogue.DL.Services
         private List<vw_catPlace> GetView()
         {
             List<vw_catPlace> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catPlace>();
+            return lvCatPlace;
+        }
+
+        private List<vw_catProvince> GetProvinces()
+        {
+            List<vw_catProvince> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catProvince>();
+            return lvCatPlace;
+        }
+
+        public List<vw_catDistrict> GetDistricts(Guid? provinceId)
+        {
+            var data = GetDistricts();
+            return data.Where(x => x.ProvinceID == provinceId || provinceId == null).ToList();
+        }
+
+        private List<vw_catDistrict> GetDistricts()
+        {
+            List<vw_catDistrict> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catDistrict>();
             return lvCatPlace;
         }
     }

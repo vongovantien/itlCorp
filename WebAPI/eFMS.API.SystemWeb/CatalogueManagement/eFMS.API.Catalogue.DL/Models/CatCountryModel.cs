@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Models
 {
-    public class SysUserGroupModel: SysUserGroup
+    public class CatCountryModel: CatCountry
     {
     }
 }

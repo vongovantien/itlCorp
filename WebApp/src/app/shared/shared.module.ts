@@ -14,6 +14,7 @@ import { SortService } from './services/sort.service';
 import { PagerService } from './services/pager.service';
 import { DeleteConfirmModalComponent } from './common/delete-confirm-modal/delete-confirm-modal.component';
 import { API_MENU } from '../../constants/api-menu.const';
+import { PagingService } from './paging-client/paging-client-service';
 
 @NgModule({
   imports: [CommonModule, FormsModule],
@@ -39,7 +40,7 @@ import { API_MENU } from '../../constants/api-menu.const';
   providers: [
     SortService,
     PagerService,
-    API_MENU
+	API_MENU,    PagingService
   ]
 })
 export class SharedModule { }
