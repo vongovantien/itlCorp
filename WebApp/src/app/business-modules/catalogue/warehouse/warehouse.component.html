@@ -6,7 +6,7 @@
             <app-breadcrumb ></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-addmodal-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"></app-addmodal-button>
+            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"></app-default-button>
             <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                 data-target="#add-ware-house-modal">
                 <span>
@@ -16,7 +16,7 @@
                     </span>
                 </span>
             </button> -->
-            <app-addmodal-button [buttonSetting]="importButtonSetting"></app-addmodal-button>
+            <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
             <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-download"></i>
@@ -25,7 +25,7 @@
                     </span>
                 </span>
             </button> -->
-            <app-addmodal-button [buttonSetting]="exportButtonSetting"></app-addmodal-button>
+            <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
             <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-upload"></i>
@@ -48,51 +48,10 @@
             <div class="m-form">
                 <div class="row">
                     <div class="col">
-                        <div class="input-group m-input-group m-input-group--square">
-                            <div class="input-group-prepend">
-                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                    Code
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange()">
-                                        Code
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                        Name
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                        Country
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                        City/ Province
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                        District
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange()">
-                                        Address
-                                    </a>
-                                </div>
-                            </div>
-                            <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button" title="Search">
-                                    <i class="icon-search"></i>
-                                </button>
-                            </div>
-                        </div>
+                        <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"></app-search-options>
                     </div>
                     <div class="col-md-auto">
-                        <app-addmodal-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()" ></app-addmodal-button>
-                        <!-- <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="reset_search()">
-                            <span>
-                                <i class="la la-refresh"></i>
-                                <span>
-                                    Reset
-                                </span>
-                            </span>
-                        </button> -->
+                        <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()" ></app-default-button>
                     </div>
                 </div>
             </div>
@@ -106,12 +65,12 @@
         <div class="m-portlet__body">
             <!--begin::Content-->
             <!--begin: Datatable of port-index-list-table -->
-            <app-table-layout [records]="warehouses" [settings]="postSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameEditModal"
+            <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameEditModal"
             (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
-            <app-pagination currentPage [config]="pager" (pageChange)="setPage($event)" (pagerObject)="setPage($event)"></app-pagination>
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
             <!--end::Content-->
         </div>
@@ -125,133 +84,146 @@
 <div class="modal fade" id="add-ware-house-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Warehouse</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-port-index-form-->
-                <div class="m-form">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Code
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Name
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <!-- <div class="form-group">
-                                <label>
-                                    Country
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div> -->
-                            <div class="form-group">
-                                <label>
-                                    Country
-                                </label>
-                                <select class="form-control m-input m-input--square">
-                                    <option value="">
-                                        Please select
-                                    </option>
-                                    <option *ngFor='let country of countries' [value]="country.id">
-                                        {{ country.nameEn }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <!-- <div class="form-group">
-                                <label>
-                                    City/ Province
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div> -->
-                            <div class="form-group">
-                                <label>
-                                    City/ Province
-                                </label>
-                                <select class="form-control m-input m-input--square">
-                                    <option value="">
-                                        Please select
-                                    </option>
-                                    <option *ngFor='let province of provinces' [value]="province.id">
-                                            {{ province.name_VN }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <!-- <div class="form-group">
-                                <label>
-                                    District
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div> -->
-                            <div class="form-group">
-                                    <label>
-                                        District
+            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid && onSubmit($event)">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Warehouse</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::add-port-index-form-->
+                    <div class="m-form m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <!-- <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
+                                    <label class="form-control-label">
+                                        Code
                                     </label>
-                                    <select class="form-control m-input m-input--square">
+                                    <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code"
+                                        [(ngModel)]="warehouse.code" #code="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
+                                            Code is required
+                                    </div>
+                                </div> -->
+                                <app-input-form [item]="warehouse" [columnMap]="getColumn('code')" [form]="formAddEdit"></app-input-form>
+                            </div>
+                            <div class="col-lg-4">
+                                <!-- <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouseName.invalid }">
+                                    <label class="form-control-label">
+                                        Name
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseName"
+                                        [(ngModel)]="warehouse.name" #warehouseName="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseName.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseName.invalid" >
+                                        Name is required
+                                    </div>
+                                </div> -->
+                                <app-input-form [item]="warehouse" [columnMap]="getColumn('name')" [form]="formAddEdit"></app-input-form>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && country.invalid }">
+                                    <label class="form-control-label">
+                                        Country
+                                    </label>
+                                    <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && country.invalid }" required  (change)="onCountrychange(warehouse.countryID)">
                                         <option value="">
                                             Please select
                                         </option>
-                                        <option *ngFor='let district of districts' [value]="district.id">
-                                                {{ district.name_VN }}
+                                        <option *ngFor='let country of countries' [value]="country.id">
+                                            {{ country.nameEn }}
                                         </option>
                                     </select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && country.invalid" >
+                                        Country is required
+                                    </div>
                                 </div>
+                                <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('countryID')" [form]="formAddEdit" [itemlookups]="countryLookup"></app-input-form> -->
+                            </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Address
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && province.invalid }">
+                                    <label class="form-control-label">
+                                        City/ Province
+                                    </label>
+                                    <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
+                                        (change)="onProvincechange(warehouse.provinceID)"
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && province.invalid }" required >
+                                        <option value="">
+                                            Please select
+                                        </option>
+                                        <option *ngFor='let province of provinces' [value]="province.id">
+                                                {{ province.name_VN }}
+                                        </option>
+                                    </select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && province.invalid" >
+                                        Province is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && district.invalid }">
+                                        <label class="form-control-label">
+                                            District
+                                        </label>
+                                        <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
+                                            [ngClass]="{ 'm-input--square': formAddEdit.submitted && district.invalid }" required >
+                                            <option value="">
+                                                Please select
+                                            </option>
+                                            <option *ngFor='let district of districts' [value]="district.id">
+                                                    {{ district.name_VN }}
+                                            </option>
+                                        </select>
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && district.invalid" >
+                                            District is required
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <app-input-form [item]="warehouse" [columnMap]="getColumn('address')" [form]="formAddEdit"></app-input-form>
+                                <!-- <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
+                                    <label  class="form-control-label">
+                                        Address
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter address"  name="address"
+                                        [(ngModel)]="warehouse.address" #address="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && address.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && address.invalid" >
+                                        Address is required
+                                    </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
+                    <!--end:add-port-index-form -->
                 </div>
-                <!--end:add-port-index-form -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
-                            save
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
                         </span>
-                    </span>
-                </button> -->
-                <app-addmodal-button [buttonSetting]="saveButtonSetting"></app-addmodal-button>
-                <app-addmodal-button [buttonSetting]="cancelButtonSetting"></app-addmodal-button>
-                <!-- <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
+                    </button> -->
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit($event)"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
+                    <!-- <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
                         <span>
-                            cancel
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
                         </span>
-                    </span>
-                </button> -->
-            </div>
+                    </button> -->
+                </div>
+            </form>
         </div>
     </div>
 </div>
-<!--end::add-port-index-modal-->
+<!--end::add-warehouse-modal-->
 
 <!--begin::edit-ware-house-modall-->
 <div class="modal fade" attr.id="{{nameEditModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">

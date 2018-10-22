@@ -15,7 +15,11 @@ namespace eFMS.API.Catalogue.Service.Models
         {
         }
 
+        public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
+        public virtual DbSet<CatPlace> CatPlace { get; set; }
+        public virtual DbSet<CatPlaceType> CatPlaceType { get; set; }
+        public virtual DbSet<CatStage> CatStage { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -32,6 +36,79 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CatBranch>(entity =>
+            {
+                entity.ToTable("catBranch");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AddressEn)
+                    .HasColumnName("Address_EN")
+                    .HasMaxLength(300);
+
+                entity.Property(e => e.AddressVn)
+                    .HasColumnName("Address_VN")
+                    .HasMaxLength(300);
+
+                entity.Property(e => e.BankAccountUsd)
+                    .HasColumnName("BankAccount_USD")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankAccountVnd)
+                    .HasColumnName("BankAccount_VND")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankAddress).HasMaxLength(510);
+
+                entity.Property(e => e.BankName).HasMaxLength(300);
+
+                entity.Property(e => e.BranchNameEn)
+                    .HasColumnName("BranchName_EN")
+                    .HasMaxLength(300);
+
+                entity.Property(e => e.BranchNameVn)
+                    .HasColumnName("BranchName_VN")
+                    .HasMaxLength(300);
+
+                entity.Property(e => e.Code).HasMaxLength(40);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Fax)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Logo).HasColumnType("image");
+
+                entity.Property(e => e.Taxcode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Tel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Website)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<CatCountry>(entity =>
             {
                 entity.ToTable("catCountry");
@@ -64,7 +141,155 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
-            
+
+            modelBuilder.Entity<CatPlace>(entity =>
+            {
+                entity.ToTable("catPlace");
+
+                entity.HasIndex(e => new { e.Code, e.PlaceTypeId })
+                    .HasName("U_Place_Code")
+                    .IsUnique();
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Address).HasMaxLength(100);
+
+                entity.Property(e => e.AreaId)
+                    .HasColumnName("AreaID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DisplayName).HasMaxLength(400);
+
+                entity.Property(e => e.DistrictId).HasColumnName("DistrictID");
+
+                entity.Property(e => e.GeoCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.LocalAreaId)
+                    .HasColumnName("LocalAreaID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModeOfTransport)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("Name_EN")
+                    .HasMaxLength(400);
+
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("Name_VN")
+                    .HasMaxLength(400);
+
+                entity.Property(e => e.Note).HasMaxLength(1000);
+
+                entity.Property(e => e.PlaceTypeId)
+                    .HasColumnName("PlaceTypeID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatPlaceType>(entity =>
+            {
+                entity.ToTable("catPlaceType");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("Name_EN")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("Name_VN")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatStage>(entity =>
+            {
+                entity.ToTable("catStage");
+
+                entity.HasIndex(e => e.Code)
+                    .HasName("U_catStage")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.DescriptionEn)
+                    .HasColumnName("Description_EN")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.DescriptionVn)
+                    .HasColumnName("Description_VN")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.StageNameEn)
+                    .HasColumnName("StageName_EN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.StageNameVn)
+                    .HasColumnName("StageName_VN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
         }
     }
 }

@@ -26,7 +26,9 @@ export class SystemConstants {
     public static readonly DEFAULT_HOME_PAGE: string = "/app/main/home";
 
     //Page size for ngx-pageination options
-    public static readonly OPTIONS_PAGE_SIZE: number = 10;
-    public static readonly MAX_ITEMS_PER_REQUEST:Number=100;
+    public static readonly OPTIONS_PAGE_SIZE: number = 15;
+    public static readonly OPTIONS_NUMBERPAGES_DISPLAY: number = 10;
+    public static readonly MAX_ITEMS_PER_REQUEST:number=100;
+    public static readonly ITEMS_PER_PAGE: number[] = [15, 30, 50];
     
 }

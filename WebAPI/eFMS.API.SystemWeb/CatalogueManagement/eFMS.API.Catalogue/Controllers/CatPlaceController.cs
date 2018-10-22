@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -84,17 +86,19 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatPlaceEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
             catPlace.Id = new Guid();
             catPlace.UserCreated = "01";
             catPlace.DatetimeCreated = DateTime.Now;
-            var result = catPlaceService.Add(catPlace);
-            var message = HandleError.GetMessage(result, Crud.Insert);
-            if (!result.Success)
+            var hs = catPlaceService.Add(catPlace);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
             {
-                return BadRequest(stringLocalizer[message]);
+                return BadRequest(result);
             }
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
@@ -105,25 +109,27 @@ namespace eFMS.API.Catalogue.Controllers
             catPlace.UserModified = "01";
             catPlace.DatetimeModified = DateTime.Now;
             catPlace.Id = id;
-            var result = catPlaceService.Update(catPlace, x => x.Id == id);
-            var message = HandleError.GetMessage(result, Crud.Update);
-            if (!result.Success)
+            var hs = catPlaceService.Update(catPlace, x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
             {
-                return BadRequest(stringLocalizer[message]);
+                return BadRequest(result);
             }
-            return Ok(stringLocalizer[message]);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
-            var result = catPlaceService.Delete(x => x.Id == id);
-            var message = HandleError.GetMessage(result, Crud.Delete);
-            if (!result.Success)
+            var hs = catPlaceService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
             {
-                return BadRequest(stringLocalizer[message]);
+                return BadRequest(result);
             }
-            return Ok(stringLocalizer[message]);
+            return Ok(result);
         }
     }
 }

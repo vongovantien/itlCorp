@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Warehouse } from '../../../shared/models/ware-house';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Warehouse } from '../../../shared/models/catalogue/ware-house';
 import { ColumnSetting } from '../../../shared/models/layout/column-setting.model';
 import { SortService } from '../../../shared/services/sort.service';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
@@ -8,11 +8,11 @@ import { PagerSetting } from '../../../shared/models/layout/pager-setting.model'
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
-import { PagingService } from 'src/app/shared/common/pagination/paging-service';
-import { config } from 'rxjs';
 import { CountryModel } from '../../../shared/models/catalogue/country.model';
 import { ProviceModel } from '../../../shared/models/catalogue/province.model';
 import { DistrictModel } from '../../../shared/models/catalogue/district.model';
+import { NgForm } from '@angular/forms';
+import { SystemConstants } from '../../../../constants/system.const';
 
 @Component({
   selector: 'app-warehouse',
@@ -24,107 +24,132 @@ export class WarehouseComponent implements OnInit {
   countries: Array<CountryModel>;
   provinces: Array<ProviceModel>;
   districts: Array<DistrictModel>;
-  warehouse: Warehouse;
-  breadcums: string[] = ["Dashboard", "Catalog", "Warehouse"];
+  warehouse: Warehouse = new Warehouse();
+  countryLookup: any = { 
+    dataLookup: {},
+    value: null,
+    displayName: null
+  };
+  provinceLookup: any;
+  districtLookup: any;
   criteria: any = {};
+  // @ViewChild('formAddEdit') form: NgForm;
   pager: PagerSetting = {
     currentPage: 1,
-    pageSize: 15,
-    numberToShow: [3,5,10,15, 30, 50],
-    numberPageDisplay: 7
+    pageSize: SystemConstants.OPTIONS_PAGE_SIZE,
+    numberToShow: SystemConstants.ITEMS_PER_PAGE,
+    numberPageDisplay: SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY
   };
   addButtonSetting: ButtonModalSetting = {
-    // buttonAttribute: 
-    // {
-    //   titleButton: "add new",
-    //   classStyle: "btn btn-success m-btn--square m-btn--icon m-btn--uppercase",
-    //   targetModal: "add-ware-house-modal",
-    //   icon: "icon-plus7"
-    // }
-    //,
     dataTarget: "add-ware-house-modal",
     typeButton: ButtonType.add
   };
   importButtonSetting: ButtonModalSetting = {
-    // buttonAttribute: {
-    //   titleButton: "import",
-    //   classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
-    //   icon: "la la-download"
-    // },
     typeButton: ButtonType.export
   };
   exportButtonSetting: ButtonModalSetting = {
-    // buttonAttribute: {
-    //   titleButton: "export",
-    //   classStyle: "btn btn-danger m-btn--square m-btn--icon m-btn--uppercase",
-    //   icon: "la la-upload"
-    // },
     typeButton: ButtonType.import
   };
   saveButtonSetting: ButtonModalSetting = {
-    // buttonAttribute: {
-    //   titleButton: "export",
-    //   classStyle: "btn btn-danger m-btn--square m-btn--icon m-btn--uppercase",
-    //   icon: "la la-upload"
-    // },
     typeButton: ButtonType.save
   };
 
   cancelButtonSetting: ButtonModalSetting = {
-    // buttonAttribute: {
-    //   titleButton: "export",
-    //   classStyle: "btn btn-danger m-btn--square m-btn--icon m-btn--uppercase",
-    //   icon: "la la-upload"
-    // },
     typeButton: ButtonType.cancel
   };
   resetButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.reset
   }
+  @ViewChild('formAddEdit') form: NgForm;
   nameEditModal = "edit-ware-house-modal";
+  selectedFilter = "All";
   titleConfirmDelete = "You want to delete this warehouse";
-  postSettings: ColumnSetting[] =
+  warehouseSettings: ColumnSetting[] =
     [
       {
         primaryKey: 'id',
         header: 'Id',
-        dataType: "number"
+        dataType: "number",
+        lookup: ''
       },
       {
         primaryKey: 'code',
         header: 'Code',
-        isShow: true
+        isShow: true,
+        allowSearch: true,
+        dataType: "text",
+        required: true,
+        lookup:''
       },
       {
         primaryKey: 'name',
         header: 'Name',
-        isShow: true
+        isShow: true,
+        dataType: 'text',
+        allowSearch: true,
+        required: true,
+        lookup: ''
       },
       {
         primaryKey: 'countryName',
         header: 'Country',
-        isShow: true
+        isShow: true,
+        allowSearch: true,
+        lookup: ''
+      },
+      {
+        primaryKey: 'countryID',
+        header: 'Country',
+        isShow: false,
+        required: true,
+        lookup: 'countries'
       },
       {
         primaryKey: 'provinceName',
         header: 'City/ Province',
-        isShow: true
+        isShow: true,
+        allowSearch: true,
+        lookup: ''
+      },
+      {
+        primaryKey: 'provinceID',
+        header: 'City/ Province',
+        isShow: false,
+        required: true,
+        lookup: 'provinces'
       },
       {
         primaryKey: 'districtName',
         header: 'District',
-        isShow: true
+        isShow: true,
+        allowSearch: true,
+        lookup: ''
+      },
+      {
+        primaryKey: 'districtID',
+        header: 'District',
+        isShow: false,
+        required: true,
+        lookup: 'districts'
       },
       {
         primaryKey: 'address',
         header: 'Address',
-        isShow: true
+        isShow: true,
+        dataType: 'text',
+        allowSearch: true,
+        required: true,
+        lookup: ''
       }
     ];
   isDesc: boolean = false;
+  configSearch: any = {
+    selectedFilter: this.selectedFilter,
+    settingFields: this.warehouseSettings
+  };
   
   constructor(private sortService: SortService, private baseService: BaseService,private toastr: ToastrService, 
-    private spinnerService: Ng4LoadingSpinnerService, private pagingService: PagingService) { }
+    private spinnerService: Ng4LoadingSpinnerService) { }
 
   ngOnInit() {
     this.setPage(this.pager);
@@ -147,6 +172,9 @@ export class WarehouseComponent implements OnInit {
     }
     this.baseService.get(url).subscribe((response: any) => {
       this.provinces = response;
+      this.countryLookup.dataLookup = this.provinces;
+      this.countryLookup.value = "id";
+      this.countryLookup.displayName = "nameEn";
       console.log(this.provinces);
     });
   }
@@ -185,15 +213,43 @@ export class WarehouseComponent implements OnInit {
     this.warehouse = item;
     console.log(item);
   }
-  searchTypeChange() {
-
-  }
-
 
   setPage(pager) {
     this.getWarehouses(pager);
   }
   resetSearch(){
     
+  }
+  onSubmit(event){
+    // if(event.valid){
+    //   console.log("submit success");
+    //   event.onReset();
+    // }
+    // else{
+    //   console.log("submit");
+    // }
+    console.log(this.warehouse);
+    if(this.form.valid){
+      this.form.onReset();
+      console.log("submit success");
+    }
+    else{
+      console.log("submit");
+    }
+  }
+  onSearch(event){
+    console.log(event);
+  }
+  onCancel(){
+    this.form.onReset();
+  }
+  getColumn(field){
+    return this.warehouseSettings.find(x => x.primaryKey == field);
+  }
+  onCountrychange(countryId){
+    this.getProvinces(countryId);
+  }
+  onProvincechange(provinceId){
+    this.getDistricts(provinceId);
   }
 }

@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using eFMS.API.Catalogue.DL.Common;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -46,7 +47,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<vw_catPlace> Query(CatPlaceCriteria criteria)
         {
             var list = GetView();
-            string placetype = GetPlaceType(criteria.PlaceType);
+            string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
             list = list.Where(x => (x.Code ?? "").Contains(criteria.Code ?? "")
                                 && (x.Name_EN ?? "").Contains(criteria.NameEn ?? "")
                                 && (x.Name_VN ?? "").Contains(criteria.NameVn ?? "")
@@ -60,53 +61,6 @@ namespace eFMS.API.Catalogue.DL.Services
                                 && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
                 ).ToList();
             return list;
-        }
-
-        private string GetPlaceType(CatPlaceTypeEnum placeType)
-        {
-            string result = "";
-            switch (placeType)
-            {
-                case CatPlaceTypeEnum.BorderGate:
-                    result = "BorderGate";
-                    break;
-                case CatPlaceTypeEnum.Branch:
-                    result = "Branch";
-                    break;
-                case CatPlaceTypeEnum.Depot:
-                    result = "Depot";
-                    break;
-                case CatPlaceTypeEnum.District:
-                    result = "District";
-                    break;
-                case CatPlaceTypeEnum.Hub:
-                    result = "Hub";
-                    break;
-                case CatPlaceTypeEnum.IndustrialZone:
-                    result = "IndustrialZone";
-                    break;
-                case CatPlaceTypeEnum.Other:
-                    result = "Other";
-                    break;
-                case CatPlaceTypeEnum.Port:
-                    result = "Port";
-                    break;
-                case CatPlaceTypeEnum.Province:
-                    result = "Province";
-                    break;
-                case CatPlaceTypeEnum.Station:
-                    result = "Station";
-                    break;
-                case CatPlaceTypeEnum.Ward:
-                    result = "Ward";
-                    break;
-                case CatPlaceTypeEnum.Warehouse:
-                    result = "Warehouse";
-                    break;
-                default:
-                    break;
-            }
-            return result;
         }
 
         private List<vw_catPlace> GetView()

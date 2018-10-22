@@ -50,3 +50,4 @@ export const CancelDefaultButton: ButtonAttributeSetting = {
     //targetModal: "add-ware-house-modal",
     icon: "la la-refresh"
   };
+  

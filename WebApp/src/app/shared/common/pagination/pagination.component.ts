@@ -8,7 +8,6 @@ import { PagingService } from './paging-service';
   styleUrls: ['./pagination.component.scss']
 })
 export class PaginationComponent implements OnInit {
-   @Output() pageChange: EventEmitter<number> = new EventEmitter<number>();
    @Input() config: PagerSetting = {};
    @Output() pagerObject = new EventEmitter<any[]>();
    count = 0;
@@ -16,7 +15,7 @@ export class PaginationComponent implements OnInit {
    selectPageSize(){
     this.pager.pageSize = this.config.pageSize;
     this.setPage(this.pager.currentPage);
-    this.pageChange.emit(this.pager);
+    this.pagerObject.emit(this.pager);
     
   }
 

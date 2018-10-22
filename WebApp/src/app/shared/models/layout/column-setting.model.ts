@@ -4,5 +4,8 @@ export class ColumnSetting {
     format?: string;
     dataType?: string;
     alternativeKeys?: string[];
-    isShow?: boolean = true;
+    isShow?: boolean = false;
+    allowSearch?: boolean = false;
+    required?:boolean;
+    lookup?: string;
 }

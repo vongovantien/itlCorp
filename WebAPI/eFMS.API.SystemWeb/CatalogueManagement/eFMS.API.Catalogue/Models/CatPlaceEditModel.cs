@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace eFMS.API.Catalogue.Models
         public string LocalAreaId { get; set; }
         public string ModeOfTransport { get; set; }
         public string GeoCode { get; set; }
+        public CatPlaceTypeEnum PlaceType { get; set; }
         public string PlaceTypeId { get; set; }
         public string Note { get; set; }
         [Required]
