@@ -1,34 +1,85 @@
 <div class="m-content">
-    <div class="row">
-        <div class="col-xl-12">
-            <!--begin:: m-portlet of form-->
-            <div class="m-portlet">
-                <div class="m-portlet__head">
-                    <div class="m-portlet__head-caption">
-                        <div class="m-portlet__head-title">
-                            <h3 class="m-portlet__head-text">
-                                Form with validate states
-                            </h3>
-                        </div>
-                    </div>
+    <!--begin:: m-portlet of form-->
+    <div class="m-portlet">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">
+                        Form with validate states
+                    </h3>
                 </div>
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <div class="m-form m-form--state">
                 <div class="m-portlet__body">
-                    <div class="m-form m-form--state">
-                        <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-lg-4">
                             <div class="form-group m-form__group has-danger">
                                 <label class="form-control-label" for="">
-                                    Input with danger
+                                    Input with error
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" id="">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
                                 <div class="form-control-feedback">
-                                    Sorry, that username's taken. Try another?
+                                    Sorry, that's not correct. Try another?
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group m-form__group has-danger">
+                                <label class="form-control-label" for="">
+                                    Input group with error
+                                </label>
+                                <div class="m-input-icon m-input-icon--right">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i _ngcontent-c5="" class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="form-control-feedback">
+                                    Please enter the detail!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group m-form__group has-danger">
+                                <label class="form-control-label" for="">
+                                    Dropdowns Addon Validation States
+                                </label>
+                                <div class="input-group m-input-group m-input-group--square">
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" >
+                                            Action
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="javascript:void(0)">
+                                                Action
+                                            </a>
+                                            <a class="dropdown-item" href="javascript:void(0)">
+                                                Another action
+                                            </a>
+                                            <a class="dropdown-item" href="javascript:void(0)">
+                                                Something else here
+                                            </a>
+                                            <div class="dropdown-divider" role="separator"></div>
+                                            <a class="dropdown-item" href="javascript:void(0)">
+                                                Separated link
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <input  type="text" class="form-control form-control-success" aria-label="">
+                                </div>
+                                <div class="form-control-feedback">
+                                    Sorry, that's not correct'. Try another?
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!--end:: m-portlet of form-->
         </div>
     </div>
+    <!--end:: m-portlet of form-->
 </div>

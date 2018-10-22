@@ -65,6 +65,34 @@ label {
         }
     }
 }
+//header
+.m-subheader__title {
+    padding: 22px 20px;
+    font-size: 20px;
+    font-weight: normal;
+    margin-bottom: 0;
+}
+.m-topbar .m-topbar__nav.m-nav .m-nav__item {
+    padding: 0;
+    position: relative;
+    > a {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    &:hover {
+        background-color: #f2f3f8;
+    }
+    &:before {
+        // content: "";
+        width: 1px;
+        display: block;
+        background-color: rgba(46, 53, 79, 0.11);
+        position: absolute;
+        top: 15px;
+        bottom: 15px;
+        left: 0;
+    }
+}
 //sidebar 
 .m-aside-menu.m-aside-menu--skin-dark {
     .m-menu__nav--dropdown-submenu-arrow {
