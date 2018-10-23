@@ -39,7 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                list = list.Skip(page-1).Take(size).ToList();
+                list = list.Skip((page-1)* size).Take(size).ToList();
             }
             return list;
         }
@@ -50,32 +50,34 @@ namespace eFMS.API.Catalogue.DL.Services
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
             if(criteria.All == null)
             {
-                list = list.Where(x => (x.Code ?? "").Contains(criteria.Code ?? "")
-                                    && (x.Name_EN ?? "").Contains(criteria.NameEn ?? "")
-                                    && (x.Name_VN ?? "").Contains(criteria.NameVn ?? "")
-                                    && (x.CountryNameEN ?? "").Contains(criteria.CountryNameEN ?? "")
-                                    && (x.CountryNameVN ?? "").Contains(criteria.CountryNameVN ?? "")
-                                    && (x.DistrictNameEN ?? "").Contains(criteria.DistrictNameEN ?? "")
-                                    && (x.DistrictNameVN ?? "").Contains(criteria.DistrictNameVN ?? "")
-                                    && (x.ProvinceNameEN ?? "").Contains(criteria.ProvinceNameEN ?? "")
-                                    && (x.ProvinceNameVN ?? "").Contains(criteria.ProvinceNAmeVN ?? "")
-                                    && (x.Address ?? "").Contains(criteria.Address ?? "")
-                                    && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
+                list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >=0)
+                                    && ((x.Name_EN ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.Name_VN ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >=0)
+                                    && ((x.CountryNameEN ?? "").IndexOf(criteria.CountryNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.CountryNameVN ?? "").IndexOf(criteria.CountryNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.DistrictNameEN ?? "").IndexOf(criteria.DistrictNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.DistrictNameVN ?? "").IndexOf(criteria.DistrictNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.ProvinceNameEN ?? "").IndexOf(criteria.ProvinceNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                     ).ToList();
             }
             else
             {
-                list = list.Where(x => ((x.Code ?? "").Contains(criteria.All ?? "")
-                                   || (x.Name_EN ?? "").Contains(criteria.All ?? "")
-                                   || (x.Name_VN ?? "").Contains(criteria.All ?? "")
-                                   || (x.CountryNameEN ?? "").Contains(criteria.All ?? "")
-                                   || (x.CountryNameVN ?? "").Contains(criteria.All ?? "")
-                                   || (x.DistrictNameEN ?? "").Contains(criteria.All ?? "")
-                                   || (x.DistrictNameVN ?? "").Contains(criteria.All ?? "")
-                                   || (x.ProvinceNameEN ?? "").Contains(criteria.All ?? "")
-                                   || (x.ProvinceNameVN ?? "").Contains(criteria.All ?? "")
-                                   || (x.Address ?? "").Contains(criteria.All ?? ""))
-                                   && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
+                list = list.Where(x => (
+                                      ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.Name_EN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.Name_VN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.CountryNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.CountryNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.DistrictNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.DistrictNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   )
+                                   && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    ).ToList();
             }
             return list;
