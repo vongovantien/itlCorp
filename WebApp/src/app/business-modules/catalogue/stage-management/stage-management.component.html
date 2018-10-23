@@ -263,11 +263,11 @@
                                 <label>
                                     Department
                                 </label>
-                                <!-- <ng-select [allowClear]="true" [items]="ListDepartment" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                <ng-select [allowClear]="true" [items]="ListDepartment" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event,'add')" (removed)="removed($event)" (typed)="typed($event)"
                                     placeholder="Select department">
-                                </ng-select> -->
-                                <input type="number" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.departmentId" name="role" placeholder="Please enter detail">
+                                </ng-select>
+                                <!-- <input type="number" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.departmentId" name="role" placeholder="Please enter detail"> -->
 
                             </div>
                             <div class="form-group">
@@ -373,8 +373,12 @@
                                 <label>
                                     Department
                                 </label>
-                                <input type="number" [(ngModel)]="ListStages[id_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
-                                    placeholder="Please enter detail" value="Role">
+                                <ng-select [allowClear]="true" [items]="ListDepartment" [active]="[ListDepartment[id_stage_edit]]"  [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event,'edit')" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select department">
+                                </ng-select>
+                                <!-- <input type="number" [(ngModel)]="ListStages[id_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
+                                    placeholder="Please enter detail" value="Role"> -->
                             </div>
                             <div class="form-group">
                                 <label>
