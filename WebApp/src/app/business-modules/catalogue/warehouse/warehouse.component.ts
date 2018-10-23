@@ -8,13 +8,9 @@ import { PagerSetting } from '../../../shared/models/layout/pager-setting.model'
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
-import { CountryModel } from '../../../shared/models/catalogue/country.model';
-import { ProviceModel } from '../../../shared/models/catalogue/province.model';
-import { DistrictModel } from '../../../shared/models/catalogue/district.model';
 import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
-import { ModalDirective } from 'ngx-bootstrap';
 declare var $:any;
 
 @Component({
@@ -308,6 +304,7 @@ export class WarehouseComponent implements OnInit {
         this.criteria.address = event.searchString;
       }
     }
+    this.pager.currentPage = 1;
     this.getWarehouses(this.pager);
   }
   onCancel(){
