@@ -57,12 +57,10 @@ label {
         }
     }
 }
-//dropdown ver3
-.dropdown {
-    &.open {
-        .dropdown-menu {
-            display: block;
-        }
+.form-control {
+    font-family: inherit;
+    &::placeholder {
+        color: #b3b3b3;
     }
 }
 //header
