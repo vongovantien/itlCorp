@@ -11,6 +11,7 @@ import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
+import { SelectComponent } from 'ng2-select';
 declare var $:any;
 
 @Component({
@@ -21,8 +22,11 @@ declare var $:any;
 export class WarehouseComponent implements OnInit {
   warehouses: Array<Warehouse>;
   countries: any[];
+  countryActive: {};
   provinces: any[];
+  provinceActive: {};
   districts: any[];
+  districtActive: {};
   warehouse: Warehouse = new Warehouse();
   showModal: boolean = false;
   countryLookup: any = { 
@@ -178,7 +182,12 @@ export class WarehouseComponent implements OnInit {
   }
   getCountries(){
     this.baseService.get(this.api_menu.Catalogue.country.getAll).subscribe((response: any) => {
-      this.countries = response;
+      if(response != null){
+        this.countries = response.map(x=>({"text":x.nameEn,"id":x.id}));
+      }
+      else{
+        this.countries = [];
+      }
     });
   }
   getProvinces(id?: number){
@@ -187,7 +196,12 @@ export class WarehouseComponent implements OnInit {
       url = url + "?countryId=" + id; 
     }
     this.baseService.get(url).subscribe((response: any) => {
-      this.provinces = response;
+      if(response != null){
+        this.provinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
+      }
+      else{
+        this.provinces = [];
+      }
       this.countryLookup.dataLookup = this.provinces;
       this.countryLookup.value = "id";
       this.countryLookup.displayName = "nameEn";
@@ -200,7 +214,12 @@ export class WarehouseComponent implements OnInit {
       url = url + "?provinceId=" + id; 
     }
     this.baseService.get(url).subscribe((response: any) => {
-      this.districts = response;
+      if(response != null){
+        this.districts = response.map(x=>({"text":x.name_VN,"id":x.id}));
+      }
+      else{
+        this.districts = [];
+      }
     });
   }
   getWarehouses(pager: PagerSetting) {
@@ -217,6 +236,9 @@ export class WarehouseComponent implements OnInit {
   }
   showDetail(item) {
     this.warehouse = item;
+    this.countryActive = this.countries.find(x => x.id == this.warehouse.countryID);
+    this.provinceActive = this.provinces.find(x => x.id == this.warehouse.provinceID);
+    this.districtActive = this.districts.find(x => x.id == this.warehouse.districtID);
   }
   async onDelete(event) {
     console.log(event);
@@ -314,14 +336,50 @@ export class WarehouseComponent implements OnInit {
   getColumn(field){
     return this.warehouseSettings.find(x => x.primaryKey == field);
   }
-  onCountrychange(countryId){
-    this.getProvinces(countryId);
+  onCountrychange(country){
+    this.warehouse.countryID = country.id;
+    this.getProvinces(country.id);
+    this.refreshProvinceValue(null);
   }
-  onProvincechange(provinceId){
-    this.getDistricts(provinceId);
+  onProvincechange(province){
+    this.warehouse.provinceID = province.id;
+    this.getDistricts(province.id);
   }
   showAdd(){
     this.showModal = true;
     this.form.onReset();
+  }
+  valueCountry: any = {};
+  valueProvince: any = {};
+  valueDistrict: any = {};
+  public refreshCountryValue(value:any):void {
+    this.valueCountry = value;
+    this.chooseCountryReset();
+  }
+  public refreshDistrictValue(value:any):void {
+    this.valueDistrict = value;
+  }
+  public refreshProvinceValue(value: any): void{
+    this.valueDistrict = value;
+    this.chooseProvinceReset();
+  }
+  public removed(value:any):void {
+    console.log('Removed value is: ', value);
+  }
+  public typed(value:any):void {
+    console.log('New search input: ', value);
+  }
+  @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseProvince') public ngSelectProvince: SelectComponent;
+  @ViewChild('chooseDistrict') public ngSelectDistrict: SelectComponent;
+  chooseCountryReset(){
+    this.ngSelectProvince.active = [];
+    this.ngSelectDistrict.active = [];
+  }
+  chooseProvinceReset(){
+    this.ngSelectDistrict.active = [];
+  }
+  onDistrictchange(district){
+    this.warehouse.districtID = district.id;
   }
 }

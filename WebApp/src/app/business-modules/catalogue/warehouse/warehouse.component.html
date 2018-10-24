@@ -124,11 +124,11 @@
                                 <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('displayName')" [form]="formAddEdit"></app-input-form> -->
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && country.invalid }">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null }">
                                     <label class="form-control-label">
                                         Country
                                     </label>
-                                    <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
+                                    <!-- <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
                                         [ngClass]="{ 'm-input--square': formAddEdit.submitted && country.invalid }" required  (change)="onCountrychange(warehouse.countryID)">
                                         <option value="">
                                             Please select
@@ -136,8 +136,12 @@
                                         <option *ngFor='let country of countries' [value]="country.id">
                                             {{ country.nameEn }}
                                         </option>
-                                    </select>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && country.invalid" >
+                                    </select> -->
+                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                        (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select country">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.countryID == null" >
                                         Country is required
                                     </div>
                                 </div>
@@ -146,11 +150,11 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && province.invalid }">
+                                <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                     <label class="form-control-label">
                                         City/ Province
                                     </label>
-                                    <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
+                                    <!-- <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
                                         (change)="onProvincechange(warehouse.provinceID)"
                                         [ngClass]="{ 'm-input--square': formAddEdit.submitted && province.invalid }" required >
                                         <option value="">
@@ -159,18 +163,22 @@
                                         <option *ngFor='let province of provinces' [value]="province.id">
                                                 {{ province.name_VN }}
                                         </option>
-                                    </select>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && province.invalid" >
+                                    </select> -->
+                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshProvinceValue($event)"
+                                        (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select province">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.provinceID == null" >
                                         Province is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && district.invalid }">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
                                     <label class="form-control-label">
                                         District
                                     </label>
-                                    <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
+                                    <!-- <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
                                         [ngClass]="{ 'm-input--square': formAddEdit.submitted && district.invalid }" required >
                                         <option value="">
                                             Please select
@@ -178,8 +186,12 @@
                                         <option *ngFor='let district of districts' [value]="district.id">
                                                 {{ district.name_VN }}
                                         </option>
-                                    </select>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && district.invalid" >
+                                    </select> -->
+                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshDistrictValue($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" (selected)="onDistrictchange($event)" 
+                                        placeholder="Select district">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.districtID == null" >
                                         District is required
                                     </div>
                                 </div>
@@ -286,11 +298,15 @@
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Country">
                                     </div> -->
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && country.invalid }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null}">
                                         <label class="form-control-label">
                                             Country
                                         </label>
-                                        <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
+                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive==null?[]:[countryActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                            (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select country">
+                                        </ng-select>
+                                        <!-- <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
                                             [ngClass]="{ 'm-input--square': formAddEdit.submitted && country.invalid }" required  (change)="onCountrychange(warehouse.countryID)">
                                             <option value="">
                                                 Please select
@@ -298,8 +314,8 @@
                                             <option *ngFor='let country of countries' [value]="country.id">
                                                 {{ country.nameEn }}
                                             </option>
-                                        </select>
-                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && country.invalid" >
+                                        </select> -->
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.countryID == null" >
                                             Country is required
                                         </div>
                                     </div>
@@ -307,11 +323,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && province.invalid }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                         <label class="form-control-label">
                                             City/ Province
                                         </label>
-                                        <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
+                                        <!-- <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
                                             (change)="onProvincechange(warehouse.provinceID)"
                                             [ngClass]="{ 'm-input--square': formAddEdit.submitted && province.invalid }" required >
                                             <option value="">
@@ -320,18 +336,26 @@
                                             <option *ngFor='let province of provinces' [value]="province.id">
                                                     {{ province.name_VN }}
                                             </option>
-                                        </select>
-                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && province.invalid" >
+                                        </select> -->
+                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive==null?[]:[provinceActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                            (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select province">
+                                        </ng-select>
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.provinceID == null" >
                                             Province is required
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && district.invalid }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
                                         <label class="form-control-label">
                                             District
                                         </label>
-                                        <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
+                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive==null?[]:[districtActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                            (selected)="onDistrictchange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select district">
+                                        </ng-select>
+                                        <!-- <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
                                             [ngClass]="{ 'm-input--square': formAddEdit.submitted && district.invalid }" required >
                                             <option value="">
                                                 Please select
@@ -339,8 +363,8 @@
                                             <option *ngFor='let district of districts' [value]="district.id">
                                                     {{ district.name_VN }}
                                             </option>
-                                        </select>
-                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && district.invalid" >
+                                        </select> -->
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.districtID == null" >
                                             District is required
                                         </div>
                                     </div>
