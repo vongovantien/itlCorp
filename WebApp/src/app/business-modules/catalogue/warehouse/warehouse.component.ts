@@ -12,6 +12,7 @@ import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
 import { SelectComponent } from 'ng2-select';
+import { PaginationComponent } from 'ngx-bootstrap';
 declare var $:any;
 
 @Component({
@@ -77,6 +78,10 @@ export class WarehouseComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   
+  @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseProvince') public ngSelectProvince: SelectComponent;
+  @ViewChild('chooseDistrict') public ngSelectDistrict: SelectComponent;
+  @ViewChild(PaginationComponent) child; 
   @ViewChild('formAddEdit') form: NgForm;
   nameEditModal = "edit-ware-house-modal";
   selectedFilter = "All";
@@ -248,6 +253,10 @@ export class WarehouseComponent implements OnInit {
           this.toastr.success(response.message);
           this.pager.currentPage = 1;
           this.getWarehouses(this.pager);
+          if(this.pager.currentPage>this.pager.totalPages){
+            this.pager.currentPage = this.pager.totalPages;
+            this.child.setPage(this.pager.currentPage);
+          }
         }
         if (response.status == false) {
           this.toastr.error(response.message);
@@ -265,35 +274,39 @@ export class WarehouseComponent implements OnInit {
   onSubmit(){
     if(this.form.valid){
       if(this.warehouse.id == null){
-        this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
-          if (response.status == true){
-            this.toastr.success(response.message);
-            this.resetWarehouse();
-            this.form.onReset();
-            this.getWarehouses(this.pager);
-            $('#' + this.addButtonSetting.dataTarget).modal('hide');
-          }
-          else{
-            this.toastr.error(response.message);
-          }
-        }, error => this.baseService.handleError(error));
+        this.addNew();
       }
       else{
-        this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => {
-          if (response.status == true){
-            $('#edit-ware-house-modal').modal('hide');
-            this.toastr.success(response.message);
-            this.getWarehouses(this.pager);
-          }
-        }, error => this.baseService.handleError(error));
+        this.update();
       }
     }
     else{
       console.log("submit");
     }
   }
+  update(){
+    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => {
+      if (response.status == true){
+        $('#edit-ware-house-modal').modal('hide');
+        this.toastr.success(response.message);
+        this.getWarehouses(this.pager);
+        
+      }
+    }, error => this.baseService.handleError(error));
+  }
   addNew(){
-    
+    this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
+      if (response.status == true){
+        this.toastr.success(response.message);
+        this.resetWarehouse();
+        this.form.onReset();
+        this.getWarehouses(this.pager);
+        $('#' + this.addButtonSetting.dataTarget).modal('hide');
+      }
+      else{
+        this.toastr.error(response.message);
+      }
+    }, error => this.baseService.handleError(error));
   }
   resetSearch(event){
     this.criteria = {
@@ -346,8 +359,15 @@ export class WarehouseComponent implements OnInit {
     this.getDistricts(province.id);
   }
   showAdd(){
+    this.resetWarehouse();
     this.showModal = true;
     this.form.onReset();
+    this.warehouse.countryID = null;
+    this.warehouse.provinceID = null;
+    this.warehouse.districtID = null;
+    this.ngSelectCountry.active = [];
+    this.ngSelectProvince.active = [];
+    this.ngSelectDistrict.active = [];
   }
   valueCountry: any = {};
   valueProvince: any = {};
@@ -369,9 +389,6 @@ export class WarehouseComponent implements OnInit {
   public typed(value:any):void {
     console.log('New search input: ', value);
   }
-  @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
-  @ViewChild('chooseProvince') public ngSelectProvince: SelectComponent;
-  @ViewChild('chooseDistrict') public ngSelectDistrict: SelectComponent;
   chooseCountryReset(){
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];

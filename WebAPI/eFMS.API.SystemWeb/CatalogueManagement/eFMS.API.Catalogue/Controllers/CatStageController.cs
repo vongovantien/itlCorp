@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Common;
 using ITL.NetCore.Common;
@@ -31,11 +32,13 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
 
-        [HttpGet]
-        [Route("getAll")]
-        public IActionResult Get()
+        [HttpPost]
+        [Route("getAll/{pageNumber}/{pageSize}")]
+        public IActionResult Get(CatStageCriteria criteria,int pageNumber,int pageSize)
         {
-            return Ok(catStageService.GetStages());
+            var data = catStageService.GetStages(criteria, pageNumber, pageSize, out int rowCount);
+            var result = new { data, totalItems = rowCount, pageNumber, pageSize };
+            return Ok(result);
         }
 
         [HttpGet]
