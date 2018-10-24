@@ -57,6 +57,10 @@ export class JobMangementComponent implements OnInit {
     private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) { }
 
   async ngOnInit() {
+    this.toastr.success("mess","title",{
+      timeOut:20000
+    });
+
     this.route.params.subscribe(prams => {
       if (prams.action == "create_job") {
         $("#create-job-modal").modal('show');
