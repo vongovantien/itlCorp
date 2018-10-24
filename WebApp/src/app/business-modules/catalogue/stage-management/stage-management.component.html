@@ -179,34 +179,7 @@
             </div>
             <!--end: Datatable of stage-management-list-table -->
             <!--begin::pagination-->
-            <div class="pagination-nav">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="tatable__pager-size" style="max-width: 190px">
-                            <div class="select-box">
-                                <select class="form-control m-input m-input--square" id="" aria-label="">
-                                    <option value="1">15 line/screen</option>
-                                    <option value="2">30 line/screen</option>
-                                    <option value="3">50 line/screen</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <nav aria-label="">
-                            <ul class="pagination justify-content-end">
-                                <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+            <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
         </div>
     </div>
@@ -325,7 +298,7 @@
 <!--end::add-stage-management-modal-->
 
 <!--begin::edit-stage-management-modal-->
-<div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="id_stage_edit!=null"
+<div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="index_stage_edit!=null"
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -344,7 +317,7 @@
                                 <label>
                                     Stage ID
                                 </label>
-                                <input disabled type="text" [(ngModel)]="ListStages[id_stage_edit].stage.id" class="form-control m-input m-input--square"
+                                <input disabled type="text" [(ngModel)]="ListStages[index_stage_edit].stage.id" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Stage ID">
                             </div>
                         </div>
@@ -353,7 +326,7 @@
                                 <label>
                                     Name (VN)
                                 </label>
-                                <input type="text" [(ngModel)]="ListStages[id_stage_edit].stage.stageNameVn" class="form-control m-input m-input--square"
+                                <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.stageNameVn" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Name (VN)">
                             </div>
                         </div>
@@ -362,7 +335,7 @@
                                 <label>
                                     Name (EN)
                                 </label>
-                                <input type="text" [(ngModel)]="ListStages[id_stage_edit].stage.stageNameEn" class="form-control m-input m-input--square"
+                                <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.stageNameEn" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Name (EN)">
                             </div>
                         </div>
@@ -373,18 +346,18 @@
                                 <label>
                                     Department
                                 </label>
-                                <ng-select [allowClear]="true" [items]="ListDepartment" [active]="[ListDepartment[id_stage_edit]]"  [disabled]="disabled" (data)="refreshValue($event)"
+                                <ng-select [allowClear]="true" [items]="ListDepartment" [active]="[ListDepartment[index_stage_edit]]"  [disabled]="disabled" (data)="refreshValue($event)"
                                     (selected)="selected($event,'edit')" (removed)="removed($event)" (typed)="typed($event)"
                                     placeholder="Select department">
                                 </ng-select>
-                                <!-- <input type="number" [(ngModel)]="ListStages[id_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
+                                <!-- <input type="number" [(ngModel)]="ListStages[index_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Role"> -->
                             </div>
                             <div class="form-group">
                                 <label>
                                     Stage ABBR
                                 </label>
-                                <input type="text" [(ngModel)]="ListStages[id_stage_edit].stage.code" class="form-control m-input m-input--square"
+                                <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.code" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value=" Stage ABBR">
                             </div>
                         </div>
@@ -393,7 +366,7 @@
                                 <label>
                                     Description (VN)
                                 </label>
-                                <textarea [(ngModel)]="ListStages[id_stage_edit].stage.descriptionVn" class="form-control m-input m-input--square"
+                                <textarea [(ngModel)]="ListStages[index_stage_edit].stage.descriptionVn" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" rows="6">This is Description (VN)</textarea>
                             </div>
                         </div>
@@ -402,7 +375,7 @@
                                 <label>
                                     Description (EN)
                                 </label>
-                                <textarea [(ngModel)]="ListStages[id_stage_edit].stage.descriptionEn" class="form-control m-input m-input--square"
+                                <textarea [(ngModel)]="ListStages[index_stage_edit].stage.descriptionEn" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" rows="6">This is Description (EN)</textarea>
                             </div>
                         </div>
