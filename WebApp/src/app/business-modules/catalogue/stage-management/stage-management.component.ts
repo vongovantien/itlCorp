@@ -9,6 +9,8 @@ import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SystemConstants } from '../../../../constants/system.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
+import * as DataGen from 'src/helper/data.generation';
+import { setDayOfWeek } from 'ngx-bootstrap/chronos/units/day-of-week';
 declare var jquery: any;
 declare var $: any;
 
@@ -53,8 +55,10 @@ export class StageManagementComponent implements OnInit {
 
   getDepartments(){
     this.baseServices.get(this.api_menu.System.Department.getAll).subscribe(data=>{
+      console.log(data);
       this.ListDepartment = data;
-      this.ListDepartment = this.ListDepartment.map(x=>({"text":x.Code,"id":x.id}));
+      this.ListDepartment = this.ListDepartment.map(x=>({"text":x.code,"id":x.id}));
+      console.log(this.ListDepartment);
     });
   }
 
@@ -70,6 +74,7 @@ export class StageManagementComponent implements OnInit {
       await this.getStages();
     }
   }
+
   id_stage_edit = null;
   async edit_stage(index, action) {
     if (action == "confirm") {
@@ -125,12 +130,6 @@ export class StageManagementComponent implements OnInit {
     this.search_fields = SearchHelper.PrepareListFieldSearch(null, this.search_fields, this.search_key, this.condition);
     var source_list = this.ConstStageList.map(x => Object.assign({}, x));
     this.ListStages = SearchHelper.SearchEngine(this.search_fields, source_list, this.condition);
-    // this.spinnerService.show();
-    // setTimeout(() => {
-      
-    //   this.spinnerService.hide();
-    // }, 3000);
-
   }
 
 
@@ -153,8 +152,17 @@ export class StageManagementComponent implements OnInit {
     this.disabled = this._disabledV === '1';
   }
  
-  public selected(value:any):void {
-    console.log('Selected value is: ', value);
+  public selected(value:any,action):void {
+
+    if(action=='add'){
+      this.StageToAdd.departmentId = value.id;
+    }
+
+    if(action=='edit'){    
+      this.ListStages[this.id_stage_edit].stage.departmentId = value.id;    
+    }
+    
+    
   }
  
   public removed(value:any):void {
