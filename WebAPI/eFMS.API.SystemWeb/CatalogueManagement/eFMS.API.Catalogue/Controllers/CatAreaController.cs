@@ -19,27 +19,27 @@ namespace eFMS.API.Catalogue.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CatCountryController : ControllerBase
+    public class CatAreaController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatCountryService catCountryService;
-        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service)
+        private readonly ICatAreaService catAreaService;
+        public CatAreaController(IStringLocalizer<LanguageSub> localizer, ICatAreaService service)
         {
             stringLocalizer = localizer;
-            catCountryService = service;
+            catAreaService = service;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(catCountryService.Get());
+            return Ok(catAreaService.Get());
         }
 
         [HttpGet]
         [Route("GetByLanguage")]
         public IActionResult GetByLanguage()
         {
-            var results = catCountryService.GetByLanguage();
+            var results = catAreaService.GetByLanguage();
             return Ok(results);
         }
     }

@@ -14,28 +14,27 @@ using System.Threading;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatCountryService : RepositoryBase<CatCountry, CatCountryModel>, ICatCountryService
+    public class CatAreaService : RepositoryBase<CatArea, CatAreaModel>, ICatAreaService
     {
-        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper) : base(repository, mapper)
+        public CatAreaService(IContextBase<CatArea> repository, IMapper mapper) : base(repository, mapper)
         {
         }
 
-        public List<CatCountryViewModel> GetByLanguage()
+        public List<CatAreaViewModel> GetByLanguage()
         {
             var data = DataContext.Get();
             return GetDataByLanguage(data);
         }
 
-
-        private List<CatCountryViewModel> GetDataByLanguage(IQueryable<CatCountry> data)
+        private List<CatAreaViewModel> GetDataByLanguage(IQueryable<CatArea> data)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var results = new List<CatCountryViewModel>();
+            var results = new List<CatAreaViewModel>();
             if (currentCulture.Name == "vi-VN")
             {
                 foreach (var item in data)
                 {
-                    var country = new CatCountryViewModel
+                    var area = new CatAreaViewModel
                     {
                         Id = item.Id,
                         Name = item.NameVn,
@@ -46,14 +45,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         Inactive = item.Inactive,
                         InactiveOn = item.InactiveOn
                     };
-                    results.Add(country);
+                    results.Add(area);
                 }
             }
             else
             {
                 foreach (var item in data)
                 {
-                    var country = new CatCountryViewModel
+                    var area = new CatAreaViewModel
                     {
                         Id = item.Id,
                         Name = item.NameEn,
@@ -64,7 +63,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         Inactive = item.Inactive,
                         InactiveOn = item.InactiveOn
                     };
-                    results.Add(country);
+                    results.Add(area);
                 }
             }
             return results;

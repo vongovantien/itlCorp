@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Warehouse } from '../../../shared/models/catalogue/ware-house';
+import { Warehouse } from '../../../shared/models/catalogue/ware-house.model';
 import { ColumnSetting } from '../../../shared/models/layout/column-setting.model';
 import { SortService } from '../../../shared/services/sort.service';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
@@ -13,6 +13,8 @@ import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
 import { SelectComponent } from 'ng2-select';
 import { PaginationComponent } from 'ngx-bootstrap';
+import { WAREHOUSECOLUMNSETTING } from 'src/app/business-modules/catalogue/warehouse/warehouse.columns';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 declare var $:any;
 
 @Component({
@@ -39,12 +41,7 @@ export class WarehouseComponent implements OnInit {
   districtLookup: any;
   criteria: any = { placeType: 12 };
   // @ViewChild('formAddEdit') form: NgForm;
-  pager: PagerSetting = {
-    currentPage: 1,
-    pageSize: SystemConstants.OPTIONS_PAGE_SIZE,
-    numberToShow: SystemConstants.ITEMS_PER_PAGE,
-    numberPageDisplay: SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY
-  };
+  pager: PagerSetting = PAGINGSETTING;
   addButtonSetting: ButtonModalSetting = {
     dataTarget: "add-ware-house-modal",
     typeButton: ButtonType.add
@@ -86,84 +83,7 @@ export class WarehouseComponent implements OnInit {
   nameEditModal = "edit-ware-house-modal";
   selectedFilter = "All";
   titleConfirmDelete = "You want to delete this warehouse";
-  warehouseSettings: ColumnSetting[] =
-    [
-      {
-        primaryKey: 'id',
-        header: 'Id',
-        dataType: "number",
-        lookup: ''
-      },
-      {
-        primaryKey: 'code',
-        header: 'Code',
-        isShow: true,
-        allowSearch: true,
-        dataType: "text",
-        required: true,
-        lookup:''
-      },
-      {
-        primaryKey: 'displayName',
-        header: 'Name',
-        isShow: true,
-        dataType: 'text',
-        allowSearch: true,
-        required: true,
-        lookup: ''
-      },
-      {
-        primaryKey: 'countryNameVN',
-        header: 'Country',
-        isShow: true,
-        allowSearch: true,
-        lookup: ''
-      },
-      {
-        primaryKey: 'countryID',
-        header: 'Country',
-        isShow: false,
-        required: true,
-        lookup: 'countries'
-      },
-      {
-        primaryKey: 'provinceNameVN',
-        header: 'City/ Province',
-        isShow: true,
-        allowSearch: true,
-        lookup: ''
-      },
-      {
-        primaryKey: 'provinceID',
-        header: 'City/ Province',
-        isShow: false,
-        required: true,
-        lookup: 'provinces'
-      },
-      {
-        primaryKey: 'districtNameVN',
-        header: 'District',
-        isShow: true,
-        allowSearch: true,
-        lookup: ''
-      },
-      {
-        primaryKey: 'districtID',
-        header: 'District',
-        isShow: false,
-        required: true,
-        lookup: 'districts'
-      },
-      {
-        primaryKey: 'address',
-        header: 'Address',
-        isShow: true,
-        dataType: 'text',
-        allowSearch: true,
-        required: true,
-        lookup: ''
-      }
-    ];
+  warehouseSettings: ColumnSetting[] = WAREHOUSECOLUMNSETTING;
   isDesc: boolean = false;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
@@ -186,9 +106,9 @@ export class WarehouseComponent implements OnInit {
     this.getDistricts();
   }
   getCountries(){
-    this.baseService.get(this.api_menu.Catalogue.country.getAll).subscribe((response: any) => {
+    this.baseService.get(this.api_menu.Catalogue.Country.getAllByLanguage).subscribe((response: any) => {
       if(response != null){
-        this.countries = response.map(x=>({"text":x.nameEn,"id":x.id}));
+        this.countries = response.map(x=>({"text":x.name,"id":x.id}));
       }
       else{
         this.countries = [];
@@ -326,13 +246,13 @@ export class WarehouseComponent implements OnInit {
       if(event.field == "displayName"){
         this.criteria.displayName = event.searchString;
       }
-      if(event.field == "countryNameVN"){
+      if(event.field == "countryName"){
         this.criteria.countryNameEN = event.searchString;
       }
-      if(event.field == "provinceNameVN"){
+      if(event.field == "provinceName"){
         this.criteria.provinceNameVN = event.searchString;
       }
-      if(event.field == "districtNameVN"){
+      if(event.field == "districtName"){
         this.criteria.districtNameVN = event.searchString;
       }
       if(event.field == "address"){
@@ -344,7 +264,8 @@ export class WarehouseComponent implements OnInit {
   }
   onCancel(){
     this.form.onReset();
-    this.getWarehouses(this.pager);
+    this.resetWarehouse();
+    // this.getWarehouses(this.pager);
   }
   getColumn(field){
     return this.warehouseSettings.find(x => x.primaryKey == field);

@@ -2,22 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.API.Catalogue.Service.ViewModels
+namespace eFMS.API.Catalogue.DL.ViewModels
 {
-    public partial class vw_catPlace
+    public class CatPlaceViewModel
     {
         public Guid ID { get; set; }
         public string Code { get; set; }
-        public string Name_VN { get; set; }
-        public string Name_EN { get; set; }
         public string DisplayName { get; set; }
         public string Address { get; set; }
         public Nullable<Guid> DistrictID { get; set; }
-        public string DistrictNameEN { get; set; }
-        public string DistrictNameVN { get; set; }
+        public string DistrictName { get; set; }
         public Nullable<Guid> ProvinceID { get; set; }
-        public string ProvinceNameEN { get; set; }
-        public string ProvinceNameVN { get; set; }
+        public string ProvinceName { get; set; }
         public Nullable<short> CountryID { get; set; }
         public string AreaID { get; set; }
         public string LocalAreaID { get; set; }
@@ -31,11 +27,8 @@ namespace eFMS.API.Catalogue.Service.ViewModels
         public Nullable<DateTime> DatetimeModified { get; set; }
         public Nullable<bool> Inactive { get; set; }
         public Nullable<DateTime> InactiveOn { get; set; }
-        public string CountryNameVN { get; set; }
-        public string CountryNameEN { get; set; }
-        public string AreaNameVN { get; set; }
-        public string AreaNameEN { get; set; }
-        public string LocalAreaNameEN { get; set; }
-        public string LocalAreaNameVN { get; set; }
+        public string CountryName { get; set; }
+        public string AreaName { get; set; }
+        public string LocalAreaName { get; set; }
     }
 }
