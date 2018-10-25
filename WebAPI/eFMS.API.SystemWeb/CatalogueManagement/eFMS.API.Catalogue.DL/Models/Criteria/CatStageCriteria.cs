@@ -12,6 +12,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string StageNameEn { get; set; }
         public int? DepartmentId { get; set; }
         public Condition condition { get; set; }
+        public string DepartmentName { get; set; }
         //public string DescriptionVn { get; set; }
         //public string DescriptionEn { get; set; }
         //public string UserCreated { get; set; }
