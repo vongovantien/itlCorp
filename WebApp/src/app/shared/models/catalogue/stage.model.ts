@@ -1,15 +1,18 @@
+import { moment } from "ngx-bootstrap/chronos/test/chain";
+
 export class StageModel {
-    id: Number;
-    code: String;
-    stageNameVn: String;
-    stageNameEn: String;
-    departmentId: Number;
-    descriptionVn: String;
-    descriptionEn: String;
-    userCreated: String;
-    datetimeCreated: Date;
-    userModified: String;
-    datetimeModified: Date;
-    inactive?: Boolean;
-    inactiveOn?: Date;
+    constructor(){}
+    public id: Number;
+    public code: String;
+    public stageNameVn: String;
+    public stageNameEn: String;
+    public departmentId: Number;
+    public descriptionVn: String;
+    public descriptionEn: String;
+    public userCreated: String;
+    public datetimeCreated: Date;
+    public userModified: String;
+    public datetimeModified: Date;
+    public inactive?: Boolean;
+    public inactiveOn?: Date;
 }

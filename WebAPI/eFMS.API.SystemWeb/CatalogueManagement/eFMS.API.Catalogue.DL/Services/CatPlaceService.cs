@@ -14,6 +14,9 @@ using System.Linq;
 using System.Text;
 using eFMS.API.Catalogue.DL.Common;
 using System.Linq.Expressions;
+using eFMS.API.Catalogue.DL.ViewModels;
+using System.Threading;
+using System.Globalization;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -29,7 +32,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public List<vw_catPlace> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount)
+        public List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount)
         {
             var list = Query(criteria);
             rowsCount = list.Count;
@@ -39,46 +42,113 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                list = list.Skip(page-1).Take(size).ToList();
+                list = list.Skip((page-1)* size).Take(size).ToList();
             }
-            return list;
+            return GetCulturalData(list);
         }
 
         public List<vw_catPlace> Query(CatPlaceCriteria criteria)
         {
             var list = GetView();
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
-            if(criteria.All == null)
+            if (criteria.All == null)
             {
-                list = list.Where(x => (x.Code ?? "").Contains(criteria.Code ?? "")
-                                    && (x.Name_EN ?? "").Contains(criteria.NameEn ?? "")
-                                    && (x.Name_VN ?? "").Contains(criteria.NameVn ?? "")
-                                    && (x.CountryNameEN ?? "").Contains(criteria.CountryNameEN ?? "")
-                                    && (x.CountryNameVN ?? "").Contains(criteria.CountryNameVN ?? "")
-                                    && (x.DistrictNameEN ?? "").Contains(criteria.DistrictNameEN ?? "")
-                                    && (x.DistrictNameVN ?? "").Contains(criteria.DistrictNameVN ?? "")
-                                    && (x.ProvinceNameEN ?? "").Contains(criteria.ProvinceNameEN ?? "")
-                                    && (x.ProvinceNameVN ?? "").Contains(criteria.ProvinceNAmeVN ?? "")
-                                    && (x.Address ?? "").Contains(criteria.Address ?? "")
-                                    && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
-                    ).ToList();
+                list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >=0)
+                                    && ((x.Name_EN ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.Name_VN ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >=0)
+                                    && ((x.CountryNameEN ?? "").IndexOf(criteria.CountryNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.CountryNameVN ?? "").IndexOf(criteria.CountryNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.DistrictNameEN ?? "").IndexOf(criteria.DistrictNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.DistrictNameVN ?? "").IndexOf(criteria.DistrictNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.ProvinceNameEN ?? "").IndexOf(criteria.ProvinceNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                    ).OrderBy(x => x.Code).ToList();
             }
             else
             {
-                list = list.Where(x => ((x.Code ?? "").Contains(criteria.All ?? "")
-                                   || (x.Name_EN ?? "").Contains(criteria.All ?? "")
-                                   || (x.Name_VN ?? "").Contains(criteria.All ?? "")
-                                   || (x.CountryNameEN ?? "").Contains(criteria.All ?? "")
-                                   || (x.CountryNameVN ?? "").Contains(criteria.All ?? "")
-                                   || (x.DistrictNameEN ?? "").Contains(criteria.All ?? "")
-                                   || (x.DistrictNameVN ?? "").Contains(criteria.All ?? "")
-                                   || (x.ProvinceNameEN ?? "").Contains(criteria.All ?? "")
-                                   || (x.ProvinceNameVN ?? "").Contains(criteria.All ?? "")
-                                   || (x.Address ?? "").Contains(criteria.All ?? ""))
-                                   && (x.PlaceTypeID ?? "").Contains(placetype ?? "")
-                                   ).ToList();
+                list = list.Where(x => (
+                                      ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.Name_EN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.Name_VN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.CountryNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.CountryNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.DistrictNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.DistrictNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   )
+                                   && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   ).OrderBy(x => x.Code).ToList();
             }
             return list;
+        }
+
+        private List<CatPlaceViewModel> GetCulturalData(List<vw_catPlace> list)
+        {
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            if (currentCulture.Name == "vi-VN")
+            {
+                 return list.Select(x => new CatPlaceViewModel
+                {
+                    ID = x.ID,
+                    Code = x.Code,
+                    DisplayName = x.DisplayName,
+                    Address = x.Address,
+                    DistrictID = x.DistrictID,
+                    DistrictName = x.DistrictNameVN,
+                    ProvinceID = x.ProvinceID,
+                    ProvinceName = x.ProvinceNameVN,
+                    CountryID = x.CountryID,
+                    AreaID = x.AreaID,
+                    LocalAreaID = x.LocalAreaID,
+                    ModeOfTransport = x.ModeOfTransport,
+                    GeoCode = x.GeoCode,
+                    PlaceTypeID = x.PlaceTypeID,
+                    Note = x.Note,
+                    UserCreated = x.UserCreated,
+                    DatetimeCreated = x.DatetimeCreated,
+                    UserModified = x.UserModified,
+                    DatetimeModified = x.DatetimeModified,
+                    Inactive = x.Inactive,
+                    InactiveOn = x.InactiveOn,
+                    CountryName = x.CountryNameVN,
+                    AreaName = x.AreaNameVN,
+                    LocalAreaName = x.LocalAreaNameVN
+                }).ToList();
+            }
+            else
+            {
+                return list.Select(x => new CatPlaceViewModel
+                {
+                    ID = x.ID,
+                    Code = x.Code,
+                    DisplayName = x.DisplayName,
+                    Address = x.Address,
+                    DistrictID = x.DistrictID,
+                    DistrictName = x.DistrictNameEN,
+                    ProvinceID = x.ProvinceID,
+                    ProvinceName = x.ProvinceNameEN,
+                    CountryID = x.CountryID,
+                    AreaID = x.AreaID,
+                    LocalAreaID = x.LocalAreaID,
+                    ModeOfTransport = x.ModeOfTransport,
+                    GeoCode = x.GeoCode,
+                    PlaceTypeID = x.PlaceTypeID,
+                    Note = x.Note,
+                    UserCreated = x.UserCreated,
+                    DatetimeCreated = x.DatetimeCreated,
+                    UserModified = x.UserModified,
+                    DatetimeModified = x.DatetimeModified,
+                    Inactive = x.Inactive,
+                    InactiveOn = x.InactiveOn,
+                    CountryName = x.CountryNameEN,
+                    AreaName = x.AreaNameVN,
+                    LocalAreaName = x.LocalAreaNameEN
+                }).ToList();
+            }
         }
 
         private List<vw_catPlace> GetView()
@@ -103,6 +173,11 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             List<vw_catDistrict> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catDistrict>();
             return lvCatPlace;
+        }
+
+        public List<ModeOfTransport> GetModeOfTransport()
+        {
+            return ModeOfTransports.ModeOfTransportData;
         }
     }
 }

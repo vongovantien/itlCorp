@@ -133,12 +133,12 @@ $m-config-header: (
 					link: (
 						// link icon
 						icon: (
-							font-size: 14px,
+							font-size: 1.7rem,
 							align: center,
 							font-color:	(
-								default: get-brand-color(),
-								open: get-brand-color(),
-								hover:get-brand-color()
+								default: #ad5beb,
+								open: #ad5beb,
+								hover:#ad5beb
 							),
 							gradient-font-color: (
 								default: "180deg, #ad5beb 25%, #c678db 50%, #da6ea9 75%, #e76e92 100%"
@@ -150,10 +150,9 @@ $m-config-header: (
 							// username
 							username: (
 								align: left,
-								// font-size: 0.9rem,
-								font-size: 14px,
+								font-size: 0.9rem,
 								font-weight: 400,
-								font-transform:	capitalize,
+								font-transform:	uppercase,
 								font-color:	(
 									default: #fff,
 									active: get-brand-color(),

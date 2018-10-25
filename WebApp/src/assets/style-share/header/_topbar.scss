@@ -46,12 +46,12 @@
                             font-size: array-get($layout, default, nav, item, link, icon, font-size);
 
                             &:before {
-                                @include text-gradient(array-get($layout, default, nav, item, link, icon, gradient-font-color, default));
+                                // @include text-gradient(array-get($layout, default, nav, item, link, icon, gradient-font-color, default));
+                                color: #858ead;
                             }
                         }
 
                         i:before {
-                            font-weight: bold;
                             padding: 1px;
 
                             @include hack-ie8-11() {
@@ -64,18 +64,11 @@
                     .m-topbar__username {
                         display: table-cell;
                         vertical-align: middle;
-                        padding-left: 10px;
                         text-transform: array-get($layout, default, nav, item, link, user, username, font-transform);
                         font-size: array-get($layout, default, nav, item, link, user, username, font-size);
                         font-weight: array-get($layout, default, nav, item, link, user, username, font-weight);
                         text-align: array-get($layout, default, nav, item, link, user, username, align);
-                        color: array-get($layout, default, nav, item, link, user, username, #000, default);
-
-                        // username dropdown arrow
-                        .m-menu__ver-arrow {
-                            font-size: 14px;
-                            margin-left: 15px;
-                        }
+                        color: array-get($layout, default, nav, item, link, user, username, font-color, default);
                     }
 
                     // userpic
@@ -91,7 +84,7 @@
                             max-width: array-get($layout, default, nav, item, link, user, userpic, max-width, desktop) !important;
                             margin: array-get($layout, default, nav, item, link, user, userpic, margin);
                         }                    
-                    }  
+                    }    
                 }
 
                 &.m-topbar__notifications.m-topbar__notifications--img {
@@ -109,44 +102,6 @@
                 // offcanvas dropdown mode
                 &.m-dropdown.m-dropdown--offcanvas.m-dropdown--header-bg-fil.m-dropdown--arrow { 
                     @include m-component--dropdown--set-arrow-color(array-get($layout, default, self, bg-color), bottom); 
-                }
-            }   
-            //logout item
-            .m-topbar__item {
-                position: relative; 
-                &:before {
-                    content: "";
-                    width: 1px;
-                    display: block;
-                    background-color: rgba(#2e354f, 0.11);
-                    position: absolute;
-                    top: 10px;
-                    bottom: 10px;
-                    left: 0;
-                }
-                .m-menu__link {
-                    height: 100%;
-                    display: table;
-                    table-layout: fixed;
-                    text-decoration: none;
-                    position: relative;
-                    vertical-align: middle;
-                    outline: 0!important;
-                    text-decoration: none;
-                    .m-menu__link-icon,
-                    .m-menu__link-text {
-                        display: table-cell;
-                        vertical-align: middle;
-                    }
-                    .m-menu__link-icon {
-                        color: #858ead;
-                    }
-                    .m-menu__link-text {
-                        padding-left: 10px;
-                        font-size: 13px;
-                        font-weight: 500;
-                        text-transform: uppercase;
-                    }
                 }
             }
         }

@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using eFMS.API.Catalogue.DL.IService;
+using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -29,6 +33,14 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Get()
         {
             return Ok(catCountryService.Get());
+        }
+
+        [HttpGet]
+        [Route("GetByLanguage")]
+        public IActionResult GetByLanguage()
+        {
+            var results = catCountryService.GetByLanguage();
+            return Ok(results);
         }
     }
 }

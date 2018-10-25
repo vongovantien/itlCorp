@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
@@ -81,11 +83,19 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        [HttpGet]
+        [Route("GetModeOfTransport")]
+        public IActionResult GetModeOfTransport()
+        {
+            return Ok(catPlaceService.GetModeOfTransport());
+        }
+
         [HttpPost]
         [Route("Add")]
         public IActionResult Post(CatPlaceEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
             var checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
             {
@@ -96,6 +106,15 @@ namespace eFMS.API.Catalogue.Controllers
             catPlace.Id = Guid.NewGuid();
             catPlace.UserCreated = "01";
             catPlace.DatetimeCreated = DateTime.Now;
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            if (currentCulture.Name == "vi-VN")
+            {
+                catPlace.NameVn = catPlace.DisplayName;
+            }
+            else
+            {
+                catPlace.NameEn = catPlace.DisplayName;
+            }
             var hs = catPlaceService.Add(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -119,6 +138,15 @@ namespace eFMS.API.Catalogue.Controllers
             catPlace.UserModified = "01";
             catPlace.DatetimeModified = DateTime.Now;
             catPlace.Id = id;
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            if (currentCulture.Name == "vi-VN")
+            {
+                catPlace.NameVn = catPlace.DisplayName;
+            }
+            else
+            {
+                catPlace.NameEn = catPlace.DisplayName;
+            }
             var hs = catPlaceService.Update(catPlace, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

@@ -46,7 +46,7 @@
         <div class="m-portlet__body">
             <!--begin::Form-->
             <div class="m-form">
-                    <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"></app-search-options>
+                    <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (search)=resetSearch($event)></app-search-options>
                 <!-- <div class="row"> -->
                         
                     <!-- <div class="col">
@@ -83,13 +83,13 @@
 <!--end::m-content of Ware-house-->
 
 <!--begin::add-ware-house-modal-->
-<div class="modal fade" *ngIf="warehouse" id="add-ware-house-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" *ngIf="warehouse" id="{{addButtonSetting.dataTarget}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Warehouse</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
+                    <button id="closeButton" type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -102,10 +102,10 @@
                                     <label class="form-control-label">
                                         Code
                                     </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="off"
-                                        [(ngModel)]="warehouse.code" #code="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required >
+                                    <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="warehouse.code" #code="ngModel" (change)="warehouse.code = warehouse.code.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required >
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
-                                            Code is required
+                                        Code is required least 3 characters
                                     </div>
                                 </div>
                                 <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('code')" [form]="formAddEdit"></app-input-form> -->
@@ -115,20 +115,20 @@
                                     <label class="form-control-label">
                                         Name
                                     </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseName" autocomplete="off"
-                                        [(ngModel)]="warehouse.displayName" #warehouseName="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseName.invalid }" required >
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseName" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="warehouse.displayName" #warehouseName="ngModel" (change)="warehouse.displayName = warehouse.displayName.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseName.invalid }" required >
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseName.invalid" >
-                                        Name is required
+                                        Name is required least 3 characters
                                     </div>
                                 </div>
                                 <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('displayName')" [form]="formAddEdit"></app-input-form> -->
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && country.invalid }">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null }">
                                     <label class="form-control-label">
                                         Country
                                     </label>
-                                    <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
+                                    <!-- <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
                                         [ngClass]="{ 'm-input--square': formAddEdit.submitted && country.invalid }" required  (change)="onCountrychange(warehouse.countryID)">
                                         <option value="">
                                             Please select
@@ -136,8 +136,12 @@
                                         <option *ngFor='let country of countries' [value]="country.id">
                                             {{ country.nameEn }}
                                         </option>
-                                    </select>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && country.invalid" >
+                                    </select> -->
+                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                        (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select country">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.countryID == null" >
                                         Country is required
                                     </div>
                                 </div>
@@ -146,11 +150,11 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && province.invalid }">
+                                <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                     <label class="form-control-label">
                                         City/ Province
                                     </label>
-                                    <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
+                                    <!-- <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
                                         (change)="onProvincechange(warehouse.provinceID)"
                                         [ngClass]="{ 'm-input--square': formAddEdit.submitted && province.invalid }" required >
                                         <option value="">
@@ -159,18 +163,22 @@
                                         <option *ngFor='let province of provinces' [value]="province.id">
                                                 {{ province.name_VN }}
                                         </option>
-                                    </select>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && province.invalid" >
+                                    </select> -->
+                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshProvinceValue($event)"
+                                        (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select province">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.provinceID == null" >
                                         Province is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && district.invalid }">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
                                     <label class="form-control-label">
                                         District
                                     </label>
-                                    <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
+                                    <!-- <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
                                         [ngClass]="{ 'm-input--square': formAddEdit.submitted && district.invalid }" required >
                                         <option value="">
                                             Please select
@@ -178,8 +186,12 @@
                                         <option *ngFor='let district of districts' [value]="district.id">
                                                 {{ district.name_VN }}
                                         </option>
-                                    </select>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && district.invalid" >
+                                    </select> -->
+                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshDistrictValue($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" (selected)="onDistrictchange($event)" 
+                                        placeholder="Select district">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.districtID == null" >
                                         District is required
                                     </div>
                                 </div>
@@ -190,7 +202,8 @@
                                     <label  class="form-control-label">
                                         Address
                                     </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter address"  name="address" autocomplete="off"
+                                    <input type="text" class="form-control m-input" placeholder="Please enter address"  name="address" autocomplete="nope"
+                                        (change)="warehouse.address = warehouse.address.trim()"
                                         [(ngModel)]="warehouse.address" #address="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && address.invalid }" required >
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && address.invalid" >
                                         Address is required
@@ -231,7 +244,7 @@
 <div class="modal fade" *ngIf="warehouse" attr.id="{{nameEditModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid"  autocomplete="off">
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Warehouse</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -251,10 +264,11 @@
                                         <label class="form-control-label">
                                             Code
                                         </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="off"
+                                        <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="nope" minlength="3"
+                                            (change)="warehouse.code = warehouse.code.trim()"
                                             [(ngModel)]="warehouse.code" #code="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required >
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
-                                                Code is required
+                                            Code is required least 3 characters
                                         </div>
                                     </div>
                                 </div>
@@ -269,10 +283,11 @@
                                         <label class="form-control-label">
                                             Name
                                         </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseName" autocomplete="off"
+                                        <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseName" autocomplete="nope" minlength="3"
+                                            (change)="warehouse.displayName = warehouse.displayName.trim()"
                                             [(ngModel)]="warehouse.displayName" #warehouseName="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseName.invalid }" required >
-                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseName.invalid" >
-                                            Name is required
+                                       <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseName.invalid" >
+                                            Code is required least 3 characters
                                         </div>
                                     </div>
                                 </div>
@@ -283,11 +298,15 @@
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Country">
                                     </div> -->
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && country.invalid }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null}">
                                         <label class="form-control-label">
                                             Country
                                         </label>
-                                        <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
+                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive==null?[]:[countryActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                            (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select country">
+                                        </ng-select>
+                                        <!-- <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
                                             [ngClass]="{ 'm-input--square': formAddEdit.submitted && country.invalid }" required  (change)="onCountrychange(warehouse.countryID)">
                                             <option value="">
                                                 Please select
@@ -295,8 +314,8 @@
                                             <option *ngFor='let country of countries' [value]="country.id">
                                                 {{ country.nameEn }}
                                             </option>
-                                        </select>
-                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && country.invalid" >
+                                        </select> -->
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.countryID == null" >
                                             Country is required
                                         </div>
                                     </div>
@@ -304,11 +323,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && province.invalid }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                         <label class="form-control-label">
                                             City/ Province
                                         </label>
-                                        <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
+                                        <!-- <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
                                             (change)="onProvincechange(warehouse.provinceID)"
                                             [ngClass]="{ 'm-input--square': formAddEdit.submitted && province.invalid }" required >
                                             <option value="">
@@ -317,18 +336,26 @@
                                             <option *ngFor='let province of provinces' [value]="province.id">
                                                     {{ province.name_VN }}
                                             </option>
-                                        </select>
-                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && province.invalid" >
+                                        </select> -->
+                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive==null?[]:[provinceActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                            (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select province">
+                                        </ng-select>
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.provinceID == null" >
                                             Province is required
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && district.invalid }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
                                         <label class="form-control-label">
                                             District
                                         </label>
-                                        <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
+                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive==null?[]:[districtActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                            (selected)="onDistrictchange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select district">
+                                        </ng-select>
+                                        <!-- <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
                                             [ngClass]="{ 'm-input--square': formAddEdit.submitted && district.invalid }" required >
                                             <option value="">
                                                 Please select
@@ -336,8 +363,8 @@
                                             <option *ngFor='let district of districts' [value]="district.id">
                                                     {{ district.name_VN }}
                                             </option>
-                                        </select>
-                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && district.invalid" >
+                                        </select> -->
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.districtID == null" >
                                             District is required
                                         </div>
                                     </div>
@@ -347,8 +374,9 @@
                                         <label  class="form-control-label">
                                             Address
                                         </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter address"  name="address" autocomplete="off"
-                                            [(ngModel)]="warehouse.address" #address="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && address.invalid }" required >
+                                        <input type="text" class="form-control m-input" placeholder="Please enter address"  name="address" autocomplete="nope"
+                                            [(ngModel)]="warehouse.address" #address="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && address.invalid }" required
+                                            (change)="warehouse.address = warehouse.address.trim()" >
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && address.invalid" >
                                             Address is required
                                         </div>
