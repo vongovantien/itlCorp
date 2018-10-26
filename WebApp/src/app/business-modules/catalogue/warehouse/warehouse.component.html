@@ -247,7 +247,7 @@
             <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid"  autocomplete="off">
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Warehouse</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>

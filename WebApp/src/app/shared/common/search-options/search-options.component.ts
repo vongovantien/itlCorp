@@ -32,15 +32,22 @@ export class SearchOptionsComponent implements OnInit {
     this.searchObject.fieldDisplayName = configSearch.selectedFilter;
   }
   searchTypeChange(field, event) {
+    if(field.primaryKey == undefined){
+      this.searchObject.fieldDisplayName = "All";
+    }
+    else{
+      this.searchObject.fieldDisplayName = field.header;
+    }
     this.searchObject.field = field.primaryKey;
-    this.searchObject.fieldDisplayName = field.header;
     this.setActiveStyle(event);
   }
   setActiveStyle(event: any): any {
     var id_element = document.getElementById(event.target.id);
     if($(id_element).hasClass("active")==false){      
       $(id_element).siblings().removeClass('active');
-      id_element.classList.add("active");
+      if(id_element != null){
+        id_element.classList.add("active");
+      }
     }
   }
   searchClick(){

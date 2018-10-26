@@ -11,6 +11,10 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { NgForm } from '@angular/forms';
+import { SelectComponent } from 'ng2-select';
+import { SortService } from 'src/app/shared/services/sort.service';
+import { SystemConstants } from 'src/constants/system.const';
+import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 declare var $:any;
 
 @Component({
@@ -25,8 +29,9 @@ export class PortIndexComponent implements OnInit {
   portIndex: PortIndex= new PortIndex();
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: 8 };
+  nameEditModal = "add-port-index-modal";
   addButtonSetting: ButtonModalSetting = {
-    dataTarget: "add-port-index-modal",
+    dataTarget: this.nameEditModal,
     typeButton: ButtonType.add
   };
   selectedFilter = "All";
@@ -48,14 +53,22 @@ export class PortIndexComponent implements OnInit {
     settingFields: this.portIndexSettings
   };
   @ViewChild('formAddEdit') form: NgForm;
+  @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseArea') public ngSelectArea: SelectComponent;
+  @ViewChild(PaginationComponent) child; 
   countries: any[];
   areas: any[];
   modes: any[];
+  countryActive: any;
+  areaActive: any;
+  isDesc: boolean = false;
+  titleConfirmDelete = "You want to delete this port index";
 
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
-    private api_menu: API_MENU) { }
+    private api_menu: API_MENU,
+    private sortService: SortService) { }
 
   ngOnInit() {
     this.setPage(this.pager);
@@ -64,30 +77,68 @@ export class PortIndexComponent implements OnInit {
   setPage(pager: PagerSetting): any {
     this.getPortIndexs(pager);
   }
-  getPortIndexs(pager: PagerSetting): any {
-    this.spinnerService.show();
-    this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
-      this.portIndexs = response.data.map(x=>Object.assign({},x));
-      this.pager.totalItems = response.totalItems;
-    });
+  async getPortIndexs(pager: PagerSetting) {
+    // this.spinnerService.show();
+    // this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
+    //   this.spinnerService.hide();
+    //   this.portIndexs = response.data.map(x=>Object.assign({},x));
+    //   this.pager.totalItems = response.totalItems;
+    // });
+    var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    this.portIndexs = response.data.map(x=>Object.assign({},x));
+    this.pager.totalItems = response.totalItems;
   }
-  onSearch(event){}
-  resetSearch(event){}
+  onSearch(event){
+    if(event.field == "All"){
+      this.criteria.all = event.searchString;
+    }
+    else{
+      this.criteria.all = null;
+      let language = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
+      if(language == SystemConstants.LANGUAGES.ENGLISH){
+        if(event.field == "countryName"){
+          this.criteria.countryNameEN = event.searchString;
+        }
+        if(event.field == "areaName"){
+          this.criteria.areaNameEN = event.searchString;
+        }
+      }
+      else{
+        if(event.field == "countryName"){
+          this.criteria.countryNameVN = event.searchString;
+        }
+        if(event.field == "areaName"){
+          this.criteria.areaNameVN = event.searchString;
+        }
+      }
+      if(language == SystemConstants.LANGUAGES.VIETNAM){
+      }
+      if(event.field == "code"){
+        this.criteria.code = event.searchString;
+      }
+      if(event.field == "displayName"){
+        this.criteria.displayName = event.searchString;
+      }
+      if(event.field == "modeOfTransport"){
+        this.criteria.modeOfTransport = event.searchString;
+      }
+    }
+    this.pager.currentPage = 1;
+    this.setPage(this.pager);
+  }
+  resetSearch(event){
+    this.criteria = {
+      placeType: 8
+    };
+  }
   showAdd(){
+    this.initPortIndex();
+    this.ngSelectCountry.active = [];
+    this.ngSelectArea.active = [];
   }
   initPortIndex(){
-    this.portIndex = { 
-      id: null,
-      code: null,
-      name: null,
-      countryID: null,
-      areaID: null,
-      countryName: null,
-      areaName: null,
-      modeOfTransport: null,
-      placeType: 8
-    }
+    this.portIndex = new PortIndex();
+    this.portIndex.placeType = 8;
   }
   onSubmit(){
     if(this.form.valid){
@@ -100,7 +151,13 @@ export class PortIndexComponent implements OnInit {
     }
   }
   update(): any {
-    throw new Error("Method not implemented.");
+    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.portIndex.id, this.portIndex).subscribe((response: any) => {
+    if (response.status == true){
+      $('#add-port-index-modal').modal('hide');
+      this.toastr.success(response.message);
+      this.setPage(this.pager);
+    }
+  }, error => this.baseService.handleError(error));
   }
   addNew(): any {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.portIndex).subscribe((response: any) => {
@@ -119,6 +176,7 @@ export class PortIndexComponent implements OnInit {
   onCancel(){
     this.form.onReset();
     this.initPortIndex();
+    this.setPage(this.pager);
   }
 
   getDataCombobox(){
@@ -175,5 +233,50 @@ export class PortIndexComponent implements OnInit {
   }
   onAreachange(area){
     this.portIndex.areaID = area.id;
+  }
+  showConfirmDelete(item) {
+    this.portIndex = item;
+  }
+  showDetail(item) {
+    this.portIndex = item;
+    this.countryActive = this.countries.find(x => x.id == this.portIndex.countryID);
+    this.areaActive = this.areas.find(x => x.id == this.portIndex.areaID);
+    // this.baseService.get(this.api_menu.Catalogue.CatPlace.getById + item.id).subscribe((response: any) => {
+    //   if(response != null){
+    //     this.portIndex = response;
+    //     this.countryActive = this.countries.find(x => x.id == this.portIndex.countryID);
+    //     this.areaActive = this.areas.find(x => x.id == this.portIndex.areaID);
+    //   }
+    //   else{
+    //     this.portIndex = item;
+    //   }
+    // });
+  }
+  async onDelete(event) {
+    console.log(event);
+    if (event) {
+      await this.baseService.deleteAsync(this.api_menu.Catalogue.CatPlace.delete + this.portIndex, true, true);
+      await this.getPortIndexs(this.pager);
+      this.pager.currentPage = 1;
+      this.child.setPage(this.pager.currentPage);
+      // this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.portIndex.id).subscribe((response: any) => {
+      //   if (response.status == true) {
+      //     this.toastr.success(response.message);
+      //     this.setPage(this.pager);
+      //     setTimeout(() => {
+      //       this.pager.currentPage = 1;
+      //       this.child.setPage(this.pager.currentPage);
+      //     }, 500);
+         
+      //   }
+      //   if (response.status == false) {
+      //     this.toastr.error(response.message);
+      //   }
+      // }, error => this.baseService.handleError(error));
+    }
+  }
+  onSortChange(property) {
+    this.isDesc = !this.isDesc;
+    this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
   }
 }

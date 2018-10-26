@@ -12,7 +12,7 @@ export class AppComponent implements OnInit{
   ngOnInit(): void {
  
     if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)==null){
-      localStorage.setItem("CURRENT_LANGUAGE","VI");
+      localStorage.setItem("CURRENT_LANGUAGE", SystemConstants.DEFAULT_LANGUAGE);
     }
     if(localStorage.getItem(SystemConstants.CURRENT_VERSION)==null){
       localStorage.setItem("CURRENT_VERSION","1");

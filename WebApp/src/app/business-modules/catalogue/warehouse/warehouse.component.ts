@@ -240,20 +240,34 @@ export class WarehouseComponent implements OnInit {
     }
     else{
       this.criteria.all = null;
+      let language = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
+      if(language == SystemConstants.LANGUAGES.ENGLISH){
+        if(event.field == "countryName"){
+          this.criteria.countryNameEN = event.searchString;
+        }
+        if(event.field == "provinceName"){
+          this.criteria.provinceNameEN = event.searchString;
+        }
+        if(event.field == "districtName"){
+          this.criteria.districtNameEN = event.searchString;
+        }
+      }
+      if(language == SystemConstants.LANGUAGES.VIETNAM){
+        if(event.field == "countryName"){
+          this.criteria.countryNameVN = event.searchString;
+        }
+        if(event.field == "provinceName"){
+          this.criteria.provinceNameVN = event.searchString;
+        }
+        if(event.field == "districtName"){
+          this.criteria.districtNameVN = event.searchString;
+        }
+      }
       if(event.field == "code"){
         this.criteria.code = event.searchString;
       }
       if(event.field == "displayName"){
         this.criteria.displayName = event.searchString;
-      }
-      if(event.field == "countryName"){
-        this.criteria.countryNameEN = event.searchString;
-      }
-      if(event.field == "provinceName"){
-        this.criteria.provinceNameVN = event.searchString;
-      }
-      if(event.field == "districtName"){
-        this.criteria.districtNameVN = event.searchString;
       }
       if(event.field == "address"){
         this.criteria.address = event.searchString;
@@ -265,7 +279,7 @@ export class WarehouseComponent implements OnInit {
   onCancel(){
     this.form.onReset();
     this.resetWarehouse();
-    // this.getWarehouses(this.pager);
+    this.setPage(this.pager);
   }
   getColumn(field){
     return this.warehouseSettings.find(x => x.primaryKey == field);
