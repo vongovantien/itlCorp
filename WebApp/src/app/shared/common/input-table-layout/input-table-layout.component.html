@@ -8,4 +8,10 @@
   <ng-container *ngIf="column.dataType != 'number'">
       {{ item[column.primaryKey] }}
   </ng-container>
+
+  <!-- checkbox -->
+  <ng-container *ngIf="column.dataType == 'boolean'">
+      <!-- {{ item[column.primaryKey] }} -->
+      <input type="checkbox" disabled="true" [checked]="item[column.primaryKey]" />
+  </ng-container>
 </ng-container>
