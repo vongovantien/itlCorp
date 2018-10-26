@@ -12,6 +12,7 @@ import { StageManagementComponent } from './stage-management/stage-management.co
 import { PartnerComponent } from './partner-data/partner.component';
 
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
 // import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
 
 
@@ -30,7 +31,8 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
       ChargeComponent,
       UnitComponent,
       StageManagementComponent,
-      PartnerComponent
+      PartnerComponent,
+      PartnerDataAddnewComponent
       ],
 })
 export class CatalogueModule { }

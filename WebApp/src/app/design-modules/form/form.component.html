@@ -1,5 +1,134 @@
 <div class="m-content">
-    <!--begin:: m-portlet of form-->
+    <!--begin:: m-portlet of form-control-->
+    <div class="m-portlet">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">
+                        Form control
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <div class="m-form m-form--state">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Input regular with caption
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <span class="m-form__help">
+                                We'll never share your email with anyone else.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Input group with icon
+                            </label>
+                            <div class="m-input-icon m-input-icon--right">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-search"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Input group with dropdown
+                            </label>
+                            <div class="input-group m-input-group m-input-group--square">
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                        aria-expanded="false" aria-haspopup="true">
+                                        Action
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="javascript:void(0)">
+                                            Action
+                                        </a>
+                                        <a class="dropdown-item" href="javascript:void(0)">
+                                            Another action
+                                        </a>
+                                        <a class="dropdown-item" href="javascript:void(0)">
+                                            Something else here
+                                        </a>
+                                        <div class="dropdown-divider" role="separator"></div>
+                                        <a class="dropdown-item" href="javascript:void(0)">
+                                            Separated link
+                                        </a>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control m-input" aria-label="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Select single with search
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Daterange picker
+                            </label>
+                            <div class="m-input-icon m-input-icon--right">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="From date - To date"
+                                    daterangepicker [options]="options" (selected)="selectedDate($event, daterange)">
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-lg-6"></div>
+                        <div class="col-lg-6 m--align-right">
+                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la la-save"></i>
+                                    <span> 
+                                        save
+                                    </span>
+                                </span>
+                            </button>
+                            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-ban"></i>
+                                    <span>
+                                        cancel
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end:: m-portlet of form-control-->
+
+    <!--begin:: m-portlet of form-validate-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -12,68 +141,67 @@
         </div>
         <div class="m-portlet__body">
             <div class="m-form m-form--state">
-                <div class="m-portlet__body">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group m-form__group has-danger">
-                                <label class="form-control-label" for="">
-                                    Input with error
-                                </label>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group has-danger">
+                            <label class="form-control-label" for="">
+                                Input with error
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <div class="form-control-feedback">
+                                Sorry, that's not correct. Try another?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group has-danger">
+                            <label class="form-control-label" for="">
+                                Input group with error
+                            </label>
+                            <div class="m-input-icon m-input-icon--right">
                                 <input type="text" class="form-control m-input m-input--square" placeholder="">
-                                <div class="form-control-feedback">
-                                    Sorry, that's not correct. Try another?
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group m-form__group has-danger">
-                                <label class="form-control-label" for="">
-                                    Input group with error
-                                </label>
-                                <div class="m-input-icon m-input-icon--right">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i _ngcontent-c5="" class="la la-calendar"></i>
-                                        </span>
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i _ngcontent-c5="" class="la la-calendar"></i>
                                     </span>
-                                </div>
-                                <div class="form-control-feedback">
-                                    Please enter the detail!
-                                </div>
+                                </span>
+                            </div>
+                            <div class="form-control-feedback">
+                                Please enter the detail!
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="form-group m-form__group has-danger">
-                                <label class="form-control-label" for="">
-                                    Dropdowns Addon Validation States
-                                </label>
-                                <div class="input-group m-input-group m-input-group--square">
-                                    <div class="input-group-prepend">
-                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" >
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group has-danger">
+                            <label class="form-control-label" for="">
+                                Dropdowns Addon Validation States
+                            </label>
+                            <div class="input-group m-input-group m-input-group--square">
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                        aria-expanded="false" aria-haspopup="true">
+                                        Action
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="javascript:void(0)">
                                             Action
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="javascript:void(0)">
-                                                Action
-                                            </a>
-                                            <a class="dropdown-item" href="javascript:void(0)">
-                                                Another action
-                                            </a>
-                                            <a class="dropdown-item" href="javascript:void(0)">
-                                                Something else here
-                                            </a>
-                                            <div class="dropdown-divider" role="separator"></div>
-                                            <a class="dropdown-item" href="javascript:void(0)">
-                                                Separated link
-                                            </a>
-                                        </div>
+                                        </a>
+                                        <a class="dropdown-item" href="javascript:void(0)">
+                                            Another action
+                                        </a>
+                                        <a class="dropdown-item" href="javascript:void(0)">
+                                            Something else here
+                                        </a>
+                                        <div class="dropdown-divider" role="separator"></div>
+                                        <a class="dropdown-item" href="javascript:void(0)">
+                                            Separated link
+                                        </a>
                                     </div>
-                                    <input  type="text" class="form-control form-control-success" aria-label="">
                                 </div>
-                                <div class="form-control-feedback">
-                                    Sorry, that's not correct'. Try another?
-                                </div>
+                                <input type="text" class="form-control form-control-success" aria-label="">
+                            </div>
+                            <div class="form-control-feedback">
+                                Sorry, that's not correct'. Try another?
                             </div>
                         </div>
                     </div>
@@ -81,5 +209,5 @@
             </div>
         </div>
     </div>
-    <!--end:: m-portlet of form-->
+    <!--end:: m-portlet of form-validate-->
 </div>
