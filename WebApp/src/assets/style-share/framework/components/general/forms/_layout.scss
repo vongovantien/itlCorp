@@ -13,15 +13,18 @@
     	.m-form__group {
             .form-control-label,
     		label {
-    			font-weight: get-font-weight(bold);
                 font-size: get-font-size(regular);
-
+                font-weight: get-font-weight(bold);
                 &.col-form-label {
                     padding-top: array-get($m--forms, input, layout, self, size, default, padding, y); 
                     //padding-bottom: array-get($m--forms, input, layout, self, size, default, padding, y); 
                 }
     		}
-
+            
+            .form-control-label {
+                color: #575962;
+    			font-weight: 500;
+            }
             // margin-bottom: 0;    		
             padding-top: 15px;
             padding-bottom: 15px;
