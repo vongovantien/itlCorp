@@ -8,8 +8,8 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatCountryService : IRepositoryBase<CatCountry, CatCountryModel>
+    public interface ICatAreaService : IRepositoryBase<CatArea, CatAreaModel>
     {
-        List<CatCountryViewModel> GetByLanguage();
+        List<CatAreaViewModel> GetByLanguage();
     }
 }

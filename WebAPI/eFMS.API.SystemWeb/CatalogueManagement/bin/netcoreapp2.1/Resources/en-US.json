@@ -1,7 +1,7 @@
 ﻿{
   "MSG_DATA_NOT_FOUND": "Data not found",
-  "MSG_OBJECT_NOT_EXISTS": "Object does nont exist",
-  "MSG_OBJECT_DUPLICATED": "Object is douplicated",
+  "MSG_OBJECT_NOT_EXISTS": "Object does not exist",
+  "MSG_OBJECT_DUPLICATED": "Object is duplicated",
   "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object", //204
   "MSG_INSERT_SUCCESS": "New data added",
   "MSG_UPDATE_SUCCESS": "Data update success",

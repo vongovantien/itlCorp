@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Catalogue.Service.Models;
 

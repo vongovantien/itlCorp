@@ -14,8 +14,7 @@ export class PaginationComponent implements OnInit {
    count = 0;
   
    selectPageSize(){
-    this.pager.pageSize = this.config.pageSize;
-    this.setPage(this.pager.currentPage);
+    this.setPage(1);
     this.pagerObject.emit(this.pager);    
   }
 

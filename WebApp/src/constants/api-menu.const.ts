@@ -54,8 +54,16 @@ export class API_MENU {
      * CATALOGUE MODULE API URL DEFINITION 
      */
     public Catalogue = {
-        Warehouse: {
-
+        CatPlace: {
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Query",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Paging",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/",
+            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
+            getProvinces: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetProvinces",
+            getDistricts: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetDistricts",
+            getModeOfTransport: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetModeOfTransport",
         },
         PortIndex: {
 
@@ -70,11 +78,11 @@ export class API_MENU {
             /**
              * Get all stages 
              */
-            getAll: this.getUrlMainPath("Catalogue") + "CatStage/getAll",
-            getById: this.getUrlMainPath("Catalogue") + "CatStage/getById/",
-            addNew: this.getUrlMainPath("Catalogue") + "CatStage/addnew",
-            update: this.getUrlMainPath("Catalogue") + "CatStage/update",
-            delete: this.getUrlMainPath("Catalogue") + "CatStage/delete/"
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/getAll",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/getById/",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/addnew",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/delete/"
         },
         Unit: {
 
@@ -84,9 +92,14 @@ export class API_MENU {
         },
         Charge: {
 
+        },
+        Country:{
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry",
+            getAllByLanguage: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/GetByLanguage"
+        },
+        Area: {
+            getAllByLanguage: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatArea/GetByLanguage"
         }
-
-
     }
 
     /**
@@ -106,7 +119,7 @@ export class API_MENU {
 
         },
         Department: {
-            getAll: this.getUrlMainPath("System") + "CatDepartment"
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "CatDepartment"
         },
         Company_Info: {
 
