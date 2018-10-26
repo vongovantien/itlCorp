@@ -128,7 +128,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async add_stage(form: NgForm, action) {
-      console.log(form);
+      console.log(this.StageToAdd);
         if (action == "yes") {
             console.log(this.StageToAdd);
             delete this.StageToAdd.id;
@@ -184,6 +184,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async search_stage() {
+     
         if (this.selected_filter == "All") {
             this.searchObject.code = this.search_key.trim() == "" ? "" : this.search_key.trim();
             this.searchObject.condition = "OR";
@@ -204,11 +205,11 @@ export class StageManagementComponent implements OnInit {
             this.searchObject.condition = "AND";
             this.searchObject.stageNameEn = this.search_key.trim() == "" ? "" : this.search_key.trim();
         }
-        if (this.selected_filter == "Name (VI)") {
+        if (this.selected_filter == "Name (Local)") {
             this.searchObject.condition = "AND";
             this.searchObject.stageNameVn = this.search_key.trim() == "" ? "" : this.search_key.trim();
         }
-        if (this.selected_filter == "Abbreviation") {
+        if (this.selected_filter == "Code") {
             this.searchObject.condition = "AND";
             this.searchObject.code = this.search_key.trim() == "" ? "" : this.search_key.trim();
         }

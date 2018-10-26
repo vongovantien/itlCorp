@@ -56,6 +56,7 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
         { name: "Unit", route_child: "unit" },
         { name: "Location", route_child: "location" },
         { name: "Charge", route_child: "charge" },
+        { name: "New Partner Data", route_child: "partner-data-addnew" },
       ]
     },
     //Operation Module 

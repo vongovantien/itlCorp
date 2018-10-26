@@ -342,11 +342,6 @@
 //== Component Skin
 @mixin m-build-component--form-validation-state($state, $color) {
     .has-#{$state} {
-        label:not([class]),
-        label.col-form-label,
-        label.form-control-label {
-            color: $color;
-        }
 
         .form-control-feedback {
             color: $color;
