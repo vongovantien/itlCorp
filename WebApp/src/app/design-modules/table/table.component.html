@@ -7,37 +7,50 @@
                     <div class="m-portlet__head-caption">
                         <div class="m-portlet__head-title">
                             <h3 class="m-portlet__head-text">
-                                Table simple
+                                Table simple with sorting
                             </h3>
                         </div>
                     </div>
                 </div>
                 <div class="m-portlet__body">
+                    <div class="form-group m-form__group m--margin-top-10">
+                        <div class="alert m-alert m-alert--default" role="alert">
+                            Add
+                            <code>
+                                dataTable
+                            </code>
+                            class to the table element and
+                            <code>
+                                sorting, sorting_asc, sorting_desc
+                            </code>
+                            to the th element to sorting table
+                        </div>
+                    </div>
                     <!--begin: Datatable of table-simple -->
                     <div class="table-wrapper" id="">
-                        <table class="table table-striped table-brand">
+                        <table class="table table-striped table-brand dataTable">
                             <thead>
                                 <tr>
-                                    <th class="table-actions-col"></th>
-                                    <th>
+                                    <th class="table-actions-col no-sorting"></th>
+                                    <th class="sorting_asc">
                                         <span>Stage ID</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting">
                                         <span>Role</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting">
                                         <span>Stage ABBR</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting">
                                         <span>Name (VN)</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting">
                                         <span>Name (EN)</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting">
                                         <span>Description (VN</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting">
                                         <span>Description (EN)</span>
                                     </th>
                                 </tr>
