@@ -9,12 +9,8 @@ import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SystemConstants } from '../../../../constants/system.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
-import * as DataGen from 'src/helper/data.generation';
-import * as validate from 'validator';
-import { setDayOfWeek } from 'ngx-bootstrap/chronos/units/day-of-week';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { isNumber } from 'util';
 import { NgForm } from '@angular/forms';
 declare var jquery: any;
 declare var $: any;
@@ -41,7 +37,7 @@ export class StageManagementComponent implements OnInit {
     pager: PagerSetting = {
         currentPage: 1,
         pageSize: 15,
-        numberToShow: [3, 5, 10, 15, 30, 50],
+        numberToShow: [10, 15, 30, 50],
         totalPageBtn: 7
     };
 

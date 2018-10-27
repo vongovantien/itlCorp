@@ -58,20 +58,23 @@ export class BaseService implements ErrorHandler {
    * @param display_error
    * @param display_spinner 
    */
-  public getAsync(url: string, display_error = false, display_spinner = false): Promise<any> {
+  public async getAsync(url: string, display_error = false, display_spinner = false): Promise<any> {
 
     if (display_spinner)
       this.spinnerService.show();
 
-    return this._http.get(url, { headers: this.headers }).toPromise().then(res => {
+    try {
+      const res = await this._http.get(url, { headers: this.headers }).toPromise();
       this.spinnerService.hide();
       return res;
-    }).catch(error => {
+    }
+    catch (error) {
+      this.spinnerService.hide();
       if (display_error) {
         this.handleError(error);
       }
       return error;
-    });
+    }
   }
 
   /**
@@ -92,16 +95,19 @@ export class BaseService implements ErrorHandler {
    * @param display_notify 
    * @param display_spinner 
    */
-  public postAsync(url: string, data?: any, display_notify = true, display_spinner = false): Promise<any> {
+  public async postAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
     if (display_spinner)
       this.spinnerService.show();
-    return this._http.post(url, data, { headers: this.headers }).toPromise().then(res => {
+    try {
+      const res = await this._http.post(url, data, { headers: this.headers }).toPromise();
       this.spinnerService.hide();
       this.handleState(res, display_notify);
       return res;
-    }).catch(error => {
+    }
+    catch (error) {
+      this.spinnerService.hide();
       this.handleError(error);
-    });
+    }
   }
 
   /**
@@ -122,16 +128,19 @@ export class BaseService implements ErrorHandler {
    * @param display_notify 
    * @param display_spinner 
    */
-  public putAsync(url: string, data?: any, display_notify = true, display_spinner = false): Promise<any> {
+  public async putAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
     if (display_spinner)
       this.spinnerService.show();
-    return this._http.put(url, data, { headers: this.headers }).toPromise().then(res => {
+    try {
+      const res = await this._http.put(url, data, { headers: this.headers }).toPromise();
       this.spinnerService.hide();
       this.handleState(res, display_notify);
       return res;
-    }).catch(error => {
+    }
+    catch (error) {
+      this.spinnerService.hide();
       this.handleError(error);
-    });
+    }
   }
 
   /**
@@ -150,16 +159,19 @@ export class BaseService implements ErrorHandler {
    * @param display_notify
    * @param display_spinner 
    */
-  public deleteAsync(url: string, display_notify = true, display_spinner = false): Promise<any> {
+  public async deleteAsync(url: string, display_notify = true, display_spinner = true): Promise<any> {
     if (display_spinner)
       this.spinnerService.show();
-    return this._http.delete(url, { headers: this.headers }).toPromise().then(res => {
-      this.spinnerService.hide()
+    try {
+      const res = await this._http.delete(url, { headers: this.headers }).toPromise();
+      this.spinnerService.hide();
       this.handleState(res, display_notify);
       return res;
-    }).catch(error => {
+    }
+    catch (error) {
+      this.spinnerService.hide();
       this.handleError(error);
-    });
+    }
   }
 
 

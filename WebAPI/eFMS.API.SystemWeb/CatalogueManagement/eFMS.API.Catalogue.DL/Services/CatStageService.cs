@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -36,7 +37,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<Object> returnList = new List<Object>();
             var result = new List<CatStage>();
             var departmentList = new List<CatDepartment>();
-            if (criteria.condition == Condition.AND)
+            if (criteria.condition == SearchCondition.AND)
             {
                 var s = DataContext.Get(stage => (stage.Id == criteria.Id || criteria.Id == 0)
                                     && ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
