@@ -33,10 +33,38 @@
                 <div class="m-portlet__body">
                     <!--begin:: Search-form-->
                     <div class="m-form m--margin-bottom-15">
+                        <div class="clearfix m--margin-bottom-15">
+                            <div class="c-button-actions m--align-right">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-commodity-modal">
+                                    <span>
+                                        <i class="icon-plus7"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button>
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="la la-download"></i>
+                                        <span>
+                                            import
+                                        </span>
+                                    </span>
+                                </button>
+                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="la la-upload"></i>
+                                        <span>
+                                            export
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                         <div class="bg-secondary m--padding-10">
                             <div class="row">
                                 <div class="col">
-                                    <div class="input-group m-input-group m-input-group--square">
+                                    <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
                                         <div class="input-group-prepend">
                                             <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                                                 aria-haspopup="true" aria-expanded="false">
@@ -87,35 +115,6 @@
                                         </span>
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div class="clearfix m--margin-top-15">
-                            <div class="c-button-actions m--align-right">
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                    <span>
-                                        <i class="icon-plus7"></i>
-                                        <span>
-                                            add new
-                                        </span>
-                                    </span>
-                                </button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                    <span>
-                                        <i class="la la-download"></i>
-                                        <span>
-                                            import
-                                        </span>
-                                    </span>
-                                </button>
-                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
-                                    <span>
-                                        <i class="la la-upload"></i>
-                                        <span>
-                                            export
-                                        </span>
-                                    </span>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -353,7 +352,7 @@
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size" style="max-width: 190px">
                                     <div class="select-box">
-                                        <select class="form-control m-input m-input--square" id="" aria-label="">
+                                        <select class="form-control m-input m-input--square m-input m-input--square--square" id="" aria-label="">
                                             <option value="1">15 line/screen</option>
                                             <option value="2">30 line/screen</option>
                                             <option value="3">50 line/screen</option>
@@ -390,7 +389,7 @@
                     <div class="m-form m--margin-bottom-15">
                         <div class="clearfix m--margin-bottom-15">
                             <div class="c-button-actions m--align-right">
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-commodity-group-modal">
                                     <span>
                                         <i class="icon-plus7"></i>
                                         <span>
@@ -419,7 +418,7 @@
                         <div class="bg-secondary m--padding-10">
                             <div class="row">
                                 <div class="col">
-                                    <div class="input-group m-input-group m-input-group--square">
+                                    <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
                                         <div class="input-group-prepend">
                                             <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                                                 aria-haspopup="true" aria-expanded="false">
@@ -707,7 +706,7 @@
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size" style="max-width: 190px">
                                     <div class="select-box">
-                                        <select class="form-control m-input m-input--square" id="" aria-label="">
+                                        <select class="form-control m-input m-input--square m-input m-input--square--square" id="" aria-label="">
                                             <option value="1">15 line/screen</option>
                                             <option value="2">30 line/screen</option>
                                             <option value="3">50 line/screen</option>
@@ -740,6 +739,156 @@
 
 </div>
 <!--end::m-content of Commodity-->
+
+<!--begin::add-commodity-modal-->
+<div class="modal fade" id="add-commodity-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Commodity</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-commodity-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Port code
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Port name
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Zone (Optional)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Local Zone (Optional)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-commodity-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::add-commodity-modal-->
+
+<!--begin::add-commodity-group-modal-->
+<div class="modal fade" id="add-commodity-group-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Commodity Group</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-commodity-group-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Port code
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Port name
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Zone (Optional)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Local Zone (Optional)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-commodity-group-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::add-commodity-group-modal-->
 
 <!--begin::confirm-delete-modal-->
 <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
