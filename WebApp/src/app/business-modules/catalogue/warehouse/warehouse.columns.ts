@@ -76,5 +76,14 @@ export const WAREHOUSECOLUMNSETTING: ColumnSetting[] =
     allowSearch: true,
     required: true,
     lookup: ''
+  },
+  {
+    primaryKey: 'inactive',
+    header: 'Inactive',
+    isShow: true,
+    dataType: 'boolean',
+    allowSearch: true,
+    required: true,
+    lookup: ''
   }
 ]

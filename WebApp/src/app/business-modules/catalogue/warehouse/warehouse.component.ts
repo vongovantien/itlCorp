@@ -12,7 +12,7 @@ import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
 import { SelectComponent } from 'ng2-select';
-import { PaginationComponent } from 'ngx-bootstrap';
+import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { WAREHOUSECOLUMNSETTING } from 'src/app/business-modules/catalogue/warehouse/warehouse.columns';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 declare var $:any;
@@ -147,7 +147,7 @@ export class WarehouseComponent implements OnInit {
       }
     });
   }
-  getWarehouses(pager: PagerSetting) {
+  async getWarehouses(pager: PagerSetting) {
     this.spinnerService.show();
     this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.spinnerService.hide();
@@ -173,10 +173,9 @@ export class WarehouseComponent implements OnInit {
           this.toastr.success(response.message);
           this.pager.currentPage = 1;
           this.getWarehouses(this.pager);
-          if(this.pager.currentPage>this.pager.totalPages){
-            this.pager.currentPage = this.pager.totalPages;
+           setTimeout(() => {
             this.child.setPage(this.pager.currentPage);
-          }
+          }, 500);
         }
         if (response.status == false) {
           this.toastr.error(response.message);
@@ -218,9 +217,13 @@ export class WarehouseComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
       if (response.status == true){
         this.toastr.success(response.message);
+        this.getWarehouses(this.pager);
+        setTimeout(() => {
+          this.pager.currentPage = 1;
+          this.child.setPage(this.pager.currentPage);
+        }, 500);
         this.resetWarehouse();
         this.form.onReset();
-        this.getWarehouses(this.pager);
         $('#' + this.addButtonSetting.dataTarget).modal('hide');
       }
       else{
@@ -240,20 +243,34 @@ export class WarehouseComponent implements OnInit {
     }
     else{
       this.criteria.all = null;
+      let language = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
+      if(language == SystemConstants.LANGUAGES.ENGLISH){
+        if(event.field == "countryName"){
+          this.criteria.countryNameEN = event.searchString;
+        }
+        if(event.field == "provinceName"){
+          this.criteria.provinceNameEN = event.searchString;
+        }
+        if(event.field == "districtName"){
+          this.criteria.districtNameEN = event.searchString;
+        }
+      }
+      if(language == SystemConstants.LANGUAGES.VIETNAM){
+        if(event.field == "countryName"){
+          this.criteria.countryNameVN = event.searchString;
+        }
+        if(event.field == "provinceName"){
+          this.criteria.provinceNameVN = event.searchString;
+        }
+        if(event.field == "districtName"){
+          this.criteria.districtNameVN = event.searchString;
+        }
+      }
       if(event.field == "code"){
         this.criteria.code = event.searchString;
       }
       if(event.field == "displayName"){
         this.criteria.displayName = event.searchString;
-      }
-      if(event.field == "countryName"){
-        this.criteria.countryNameEN = event.searchString;
-      }
-      if(event.field == "provinceName"){
-        this.criteria.provinceNameVN = event.searchString;
-      }
-      if(event.field == "districtName"){
-        this.criteria.districtNameVN = event.searchString;
       }
       if(event.field == "address"){
         this.criteria.address = event.searchString;
@@ -265,7 +282,7 @@ export class WarehouseComponent implements OnInit {
   onCancel(){
     this.form.onReset();
     this.resetWarehouse();
-    // this.getWarehouses(this.pager);
+    this.setPage(this.pager);
   }
   getColumn(field){
     return this.warehouseSettings.find(x => x.primaryKey == field);

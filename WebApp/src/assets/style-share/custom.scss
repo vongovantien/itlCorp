@@ -45,7 +45,8 @@ label {
     height: 20px;
     margin-bottom: 0;
 }
-.c-button-actions {
+.c-button-actions,
+.form-actions {
     > * {
         + * {
             margin-left: 10px;
@@ -231,6 +232,20 @@ label {
     padding: 10px 0;
     text-align: center;
 }
+//m-portlet
+.m-portlet {
+    &.m-portlet--danger.m-portlet--head-solid-bg {
+        border-color: #f2dedf;
+    }
+    .m-portlet__head {
+        height: 46px;
+        padding: 0.7rem 1.5rem;
+        .portlet__title {
+            font-size: 16px;
+            margin: 0;
+        }
+    }
+} 
 // job management
 .collapse-toggle {
     .la-angle-up {
@@ -499,3 +514,4 @@ label {
         font-weight: normal;
     }
 }
+

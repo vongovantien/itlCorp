@@ -145,7 +145,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     Inactive = x.Inactive,
                     InactiveOn = x.InactiveOn,
                     CountryName = x.CountryNameEN,
-                    AreaName = x.AreaNameVN,
+                    AreaName = x.AreaNameEN,
                     LocalAreaName = x.LocalAreaNameEN
                 }).ToList();
             }

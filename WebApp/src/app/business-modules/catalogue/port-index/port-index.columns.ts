@@ -62,5 +62,14 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     allowSearch: true,
     required: true,
     lookup: ''
+  },
+  {
+    primaryKey: 'inactive',
+    header: 'Inactive',
+    isShow: true,
+    dataType: 'boolean',
+    allowSearch: true,
+    required: true,
+    lookup: ''
   }
 ]

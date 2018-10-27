@@ -4,8 +4,8 @@ import { SystemConstants } from "./system.const";
 export class API_MENU {
     private HOST = {
         Local: "localhost:",
-        Test: "test.efms.itlvn.com",
-        Staging: "staging.efms.itlvn.com"
+        Test: "test.api-efms.itlvn.com",
+        Staging: "staging.api-efms.itlvn.com"
     }
 
     private PORT = {
@@ -38,10 +38,10 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
         if (this.CURRENT_HOST == this.HOST.Test) {
-            return this.PROTOCOL + this.HOST.Test + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
+            return this.PROTOCOL + this.HOST.Test + "/" + Module + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
         if (this.CURRENT_HOST == this.HOST.Staging) {
-            return this.PROTOCOL + this.HOST.Staging + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
+            return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
     }
 

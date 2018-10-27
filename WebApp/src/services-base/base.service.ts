@@ -169,6 +169,7 @@ export class BaseService implements ErrorHandler {
    * @param display_notify 
    */
   public handleState(response, display_notify = false) {
+    console.log(response);
     if (response.status == true && display_notify == true) {
       this.toastr.success(response.message);
     }
@@ -182,7 +183,7 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
-    
+    console.log(error);
     this.toastr.error(error.error.message.toString());
   }
 

@@ -138,6 +138,10 @@ namespace eFMS.API.Catalogue.Controllers
             catPlace.UserModified = "01";
             catPlace.DatetimeModified = DateTime.Now;
             catPlace.Id = id;
+            if(catPlace.Inactive == true)
+            {
+                catPlace.InactiveOn = DateTime.Now;
+            }
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             if (currentCulture.Name == "vi-VN")
             {

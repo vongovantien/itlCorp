@@ -95,7 +95,7 @@
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
-            <div class="pagination-nav">
+            <!-- <div class="pagination-nav">
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="select-box" style="max-width: 190px">
@@ -120,7 +120,8 @@
                         </nav>
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
         </div>
     </div>
@@ -135,7 +136,7 @@
             <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Port Index</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -172,7 +173,7 @@
                                     <label class="form-control-label">
                                         Country
                                     </label>
-                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)"
+                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)" [active]="countryActive==null?[]:[countryActive]"
                                         (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
                                         placeholder="Select country">
                                     </ng-select>
@@ -194,7 +195,7 @@
                                     <label class="form-control-label">
                                             Zone (Optional)
                                     </label>
-                                    <ng-select #chooseArea [allowClear]="true" [items]="areas"  [disabled]="disabled" (data)="refreshAreaValue($event)"
+                                    <ng-select #chooseArea [allowClear]="true" [items]="areas"  [disabled]="disabled" (data)="refreshAreaValue($event)" [active]="areaActive==null?[]:[areaActive]"
                                         (selected)="onAreachange($event)" (removed)="removed($event)" (typed)="typed($event)"
                                         placeholder="Select zone">
                                     </ng-select>
@@ -213,8 +214,8 @@
                                     <label class="form-control-label">
                                         Mode
                                     </label>
-                                    <input list="modes" type="text" class="form-control m-input" placeholder="Please enter detail" name="modePort" autocomplete="nope" minlength="3"
-                                    [(ngModel)]="portIndex.ModeOfTransport" #modePort="ngModel" (change)="portIndex.ModeOfTransport = portIndex.code.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && modePort.invalid }" required>
+                                    <input list="modes" type="text" class="form-control m-input" placeholder="Please enter mode" name="modePort" autocomplete="nope" minlength="3"
+                                    [(ngModel)]="portIndex.modeOfTransport" #modePort="ngModel" (change)="portIndex.modeOfTransport = portIndex.modeOfTransport.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && modePort.invalid }" required>
                                     <datalist id="modes" *ngIf="modes">
                                         <option *ngFor="let mode of modes" [value]="mode.id"></option>
                                     </datalist>
@@ -223,6 +224,15 @@
                                         </div>
                                 </div>
                             </div>
+                            <!-- <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        In Active
+                                    </label>
+                                    <input type="checkbox" class="form-control m-input" name="inActive"
+                                        [(ngModel)]="portIndex.inActive" #inActive="ngModel">
+                                </div>
+                            </div> -->
                         </div>
                     </div>
                     <!--end:add-port-index-form -->
@@ -254,7 +264,7 @@
 <!--end::add-port-index-modal-->
 
 <!--begin::edit-port-index-modal-->
-<div class="modal fade" id="edit-port-index-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="{{nameEditModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -345,7 +355,7 @@
 <!--end::edit-port-index-modal-->
 
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -379,5 +389,6 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

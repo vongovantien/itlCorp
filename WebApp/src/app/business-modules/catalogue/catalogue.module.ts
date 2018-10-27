@@ -11,8 +11,9 @@ import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
 import { ModalModule } from 'ngx-bootstrap';
-import { SelectModule } from 'ng2-select';
-import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { SelectModule } from 'ng2-select';import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
+// import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
 
 
 @NgModule({
@@ -22,8 +23,7 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
     SharedModule,
     FormsModule,
     SelectModule,
-    ModalModule.forRoot()
-  ],
+    ModalModule.forRoot()  ],
   declarations:
     [LocationComponent,
       WarehouseComponent,
@@ -32,7 +32,8 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
       ChargeComponent,
       UnitComponent,
       StageManagementComponent,
-      PartnerComponent
+      PartnerComponent,
+      PartnerDataAddnewComponent
       ],
 })
 export class CatalogueModule { }
