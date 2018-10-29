@@ -29,9 +29,9 @@ export class PortIndexComponent implements OnInit {
   portIndex: PortIndex= new PortIndex();
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: 8 };
-  nameEditModal = "add-port-index-modal";
+  nameModal = "edit-port-index-modal";
   addButtonSetting: ButtonModalSetting = {
-    dataTarget: this.nameEditModal,
+    dataTarget: this.nameModal,
     typeButton: ButtonType.add
   };
   selectedFilter = "All";

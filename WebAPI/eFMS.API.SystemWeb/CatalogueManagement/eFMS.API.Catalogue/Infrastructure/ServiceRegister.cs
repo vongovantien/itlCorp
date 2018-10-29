@@ -22,6 +22,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatCountryService, CatCountryService>();
             services.AddTransient<ICatStageService, CatStageService>();
             services.AddTransient<ICatAreaService, CatAreaService>();
+            services.AddTransient<ICatCommodityGroupService, CatCommodityGroupService>();
+            services.AddTransient<ICatCommodityService, CatCommodityService>();
         }
     }
 }

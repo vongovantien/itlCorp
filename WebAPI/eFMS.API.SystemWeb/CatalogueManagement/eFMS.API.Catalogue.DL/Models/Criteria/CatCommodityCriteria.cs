@@ -4,11 +4,15 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Models.Criteria
 {
-    public class CatCommodityGroupCriteria
+    public class CatCommodityCriteria
     {
         public string All { get; set; }
-        public string GroupNameVn { get; set; }
-        public string GroupNameEn { get; set; }
+        public string CommodityNameVn { get; set; }
+        public string CommodityNameEn { get; set; }
+        public short? CommodityGroupId { get; set; }
+        public string CommodityGroupNameVn { get; set; }
+        public string CommodityGroupNameEn { get; set; }
+        public string Note { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public bool? Inactive { get; set; }

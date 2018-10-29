@@ -107,14 +107,6 @@ namespace eFMS.API.Catalogue.Controllers
             catPlace.UserCreated = "01";
             catPlace.DatetimeCreated = DateTime.Now;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            if (currentCulture.Name == "vi-VN")
-            {
-                catPlace.NameVn = catPlace.DisplayName;
-            }
-            else
-            {
-                catPlace.NameEn = catPlace.DisplayName;
-            }
             var hs = catPlaceService.Add(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -143,14 +135,6 @@ namespace eFMS.API.Catalogue.Controllers
                 catPlace.InactiveOn = DateTime.Now;
             }
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            if (currentCulture.Name == "vi-VN")
-            {
-                catPlace.NameVn = catPlace.DisplayName;
-            }
-            else
-            {
-                catPlace.NameEn = catPlace.DisplayName;
-            }
             var hs = catPlaceService.Update(catPlace, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
