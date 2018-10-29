@@ -111,18 +111,33 @@
                                 <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('code')" [form]="formAddEdit"></app-input-form> -->
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouseName.invalid }">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameEN.invalid }">
                                     <label class="form-control-label">
-                                        Name
+                                        Name(EN)
                                     </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseName" autocomplete="nope" minlength="3"
-                                        [(ngModel)]="warehouse.displayName" #warehouseName="ngModel" (change)="warehouse.displayName = warehouse.displayName.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseName.invalid }" required >
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseName.invalid" >
-                                        Name is required least 3 characters
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameEN" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="warehouse.nameEN" #warewhouseNameEN="ngModel" (change)="warehouse.nameEN = warehouse.nameEN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameEN.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warewhouseNameEN.invalid" >
+                                        Name(EN) is required least 3 characters
                                     </div>
                                 </div>
                                 <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('displayName')" [form]="formAddEdit"></app-input-form> -->
                             </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameLocal.invalid }">
+                                    <label class="form-control-label">
+                                        Name(Local)
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameLocal" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="warehouse.nameVN" #warewhouseNameLocal="ngModel" (change)="warehouse.nameVN = warehouse.nameVN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameLocal.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warewhouseNameLocal.invalid" >
+                                        Name(Local) is required least 3 characters
+                                    </div>
+                                </div>
+                                <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('displayName')" [form]="formAddEdit"></app-input-form> -->
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null }">
                                     <label class="form-control-label">
@@ -147,8 +162,6 @@
                                 </div>
                                 <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('countryID')" [form]="formAddEdit" [itemlookups]="countryLookup"></app-input-form> -->
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                     <label class="form-control-label">
@@ -196,6 +209,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-lg-4">
                                 <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('address')" [form]="formAddEdit"></app-input-form> -->
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
@@ -279,18 +294,39 @@
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port name">
                                     </div> -->
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouseName.invalid }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouseNameEN.invalid }">
                                         <label class="form-control-label">
-                                            Name
+                                            Name(EN)
                                         </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseName" autocomplete="nope" minlength="3"
-                                            (change)="warehouse.displayName = warehouse.displayName.trim()"
-                                            [(ngModel)]="warehouse.displayName" #warehouseName="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseName.invalid }" required >
-                                       <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseName.invalid" >
-                                            Code is required least 3 characters
+                                        <input type="text" class="form-control m-input" placeholder="Please enter name" name="warehouseNameEN" autocomplete="nope" minlength="3"
+                                            (change)="warehouse.nameEN = warehouse.nameEN.trim()"
+                                            [(ngModel)]="warehouse.nameEN" #warehouseNameEN="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseNameEN.invalid }" required >
+                                       <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseNameEN.invalid" >
+                                            Name(EN) is required least 3 characters
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-lg-4">
+                                    <!-- <div class="form-group">
+                                        <label>
+                                            Name
+                                        </label>
+                                        <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port name">
+                                    </div> -->
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameVN.invalid }">
+                                        <label class="form-control-label">
+                                            Name(VN)
+                                        </label>
+                                        <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameVN" autocomplete="nope" minlength="3"
+                                            (change)="warehouse.nameVN = warehouse.nameVN.trim()"
+                                            [(ngModel)]="warehouse.nameVN" #warewhouseNameVN="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameVN.invalid }" required >
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warewhouseNameVN.invalid" >
+                                            Name(VN) is required least 3 characters
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-4">
                                     <!-- <div class="form-group">
                                         <label>
@@ -320,8 +356,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                         <label class="form-control-label">
@@ -369,6 +403,8 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
                                         <label  class="form-control-label">
@@ -379,6 +415,19 @@
                                             (change)="warehouse.address = warehouse.address.trim()" >
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && address.invalid" >
                                             Address is required
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4" *ngIf="warehouse.id">
+                                    <div class="form-group m-form__group">
+                                        <label class="form-control-label" for="">
+                                        </label>
+                                        <div>
+                                            <label class="m-checkbox m-checkbox--bold">
+                                                <input type="checkbox" [checked]="warehouse.inactive" (change)="warehouse.inactive = !warehouse.inactive">
+                                                Inactive
+                                                <span></span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>

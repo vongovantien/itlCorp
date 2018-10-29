@@ -30,6 +30,8 @@ export class PortIndexComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: 8 };
   nameModal = "edit-port-index-modal";
+  titleAddModal = "Add Port Index";
+  titleEditModal = "Edit Port Index";
   addButtonSetting: ButtonModalSetting = {
     dataTarget: this.nameModal,
     typeButton: ButtonType.add
