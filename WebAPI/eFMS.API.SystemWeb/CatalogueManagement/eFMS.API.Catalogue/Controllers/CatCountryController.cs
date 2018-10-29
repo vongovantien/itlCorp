@@ -122,14 +122,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == 0)
             {
-                if (catCountryService.Any(x => x.Code == model.Code))
+                if (catCountryService.Any(x => x.Code.ToLower() == model.Code.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catCountryService.Any(x => x.Code == model.Code && x.Id != id))
+                if (catCountryService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
