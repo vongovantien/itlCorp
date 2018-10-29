@@ -258,7 +258,8 @@
             .form-control-label,
             .col-form-label,
     		> label {
-    			color: get-color($skin, regular, '+');
+                // color: get-color($skin, regular, '+');
+                color: inherit;
     		}
 
             .m-form__control-static {
