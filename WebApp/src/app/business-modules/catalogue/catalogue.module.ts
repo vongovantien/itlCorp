@@ -14,6 +14,7 @@ import { PartnerComponent } from './partner-data/partner.component';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
 // import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
+import { SelectModule } from 'ng2-select';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-a
     CommonModule,
     CatalogueRoutingModule,
     SharedModule,
-    FormsModule
+    FormsModule,
+    SelectModule
   ],
   declarations:
     [LocationComponent,
