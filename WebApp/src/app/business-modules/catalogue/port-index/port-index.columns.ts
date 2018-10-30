@@ -18,8 +18,17 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     lookup:''
   },
   {
-    primaryKey: 'displayName',
-    header: 'Port Name',
+    primaryKey: 'nameEN',
+    header: 'Name (EN)',
+    isShow: true,
+    dataType: 'text',
+    allowSearch: true,
+    required: true,
+    lookup: ''
+  },
+  {
+    primaryKey: 'nameVN',
+    header: 'Name (Local)',
     isShow: true,
     dataType: 'text',
     allowSearch: true,
@@ -30,6 +39,7 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     primaryKey: 'countryName',
     header: 'Country',
     isShow: true,
+    dataType: 'text',
     allowSearch: true,
     lookup: ''
   },
@@ -44,6 +54,7 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     primaryKey: 'areaName',
     header: 'Zone',
     isShow: true,
+    dataType: 'text',
     allowSearch: true,
     lookup: ''
   },
@@ -59,6 +70,15 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     header: 'Mode',
     isShow: true,
     dataType: 'text',
+    allowSearch: true,
+    required: true,
+    lookup: ''
+  },
+  {
+    primaryKey: 'inactive',
+    header: 'Inactive',
+    isShow: true,
+    dataType: 'boolean',
     allowSearch: true,
     required: true,
     lookup: ''

@@ -143,11 +143,13 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
                                             <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#update-country-modal" (click)="showUpdateCountry(country.id)">
+                                                title="Edit stage" data-toggle="modal" data-target="#update-country-modal"
+                                                (click)="showUpdateCountry(country.id)">
                                                 <i class="la la-edit"></i>
                                             </button>
                                             <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal" (click)="prepareDelete(country.id,'country')">
+                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal"
+                                                (click)="prepareDeleteCountry(country.id)">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </div>
@@ -212,42 +214,58 @@
                     <!--begin:: search-form-->
                     <div class="m-form m--margin-bottom-15">
                         <div class="row">
-                            <div class="col">
-                                <div class="input-group m-input-group m-input-group--square">
-                                    <div class="input-group-prepend">
-                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            Code
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item active" href="javascript:void(0)">
-                                                Code
-                                            </a>
-                                            <a class="dropdown-item" href="javascript:void(0)">
-                                                Name En
-                                            </a>
-                                            <a class="dropdown-item" href="javascript:void(0)">
-                                                Name Local
-                                            </a>
-                                            <a class="dropdown-item" href="javascript:void(0)">
-                                                Country
-                                            </a>
+                            <div class="col-md-8 col-lg-10">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group m-input-group m-input-group--square">
+                                            <div class="input-group-prepend">
+                                                <button type="button" class="btn btn-secondary dropdown-toggle"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Code
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item active" href="javascript:void(0)">
+                                                        Code
+                                                    </a>
+                                                    <a class="dropdown-item" href="javascript:void(0)">
+                                                        Name En
+                                                    </a>
+                                                    <a class="dropdown-item" href="javascript:void(0)">
+                                                        Name Local
+                                                    </a>
+                                                    <a class="dropdown-item" href="javascript:void(0)">
+                                                        Country
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="button" title="Search">
+                                                    <i class="icon-search"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button" title="Search">
-                                            <i class="icon-search"></i>
+                                    <div class="col-md-auto">
+                                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                            <span>
+                                                <i class="la la-refresh"></i>
+                                                <span>
+                                                    Reset
+                                                </span>
+                                            </span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-auto">
-                                <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                            <div class="col-md-4 col-lg-2 m--align-right">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    data-toggle="modal" data-target="#add-city-province-modal">
                                     <span>
-                                        <i class="la la-refresh"></i>
+                                        <i class="la la-plus"></i>
                                         <span>
-                                            Reset
+                                            add new
                                         </span>
                                     </span>
                                 </button>
@@ -280,180 +298,36 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr *ngFor="let item of ListProvinceCities;let index=index;">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
                                             <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                                title="Edit stage" data-toggle="modal" data-target="#update-city-province-modal" (click)="showUpdateProvince(item.id)">
                                                 <i class="la la-edit"></i>
                                             </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="prepareDeleteProvince(item.id)"
                                                 title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                     <td>
-                                        <span>VNM-05</span>
+                                        <span>{{item.code}}</span>
                                     </td>
                                     <td>
-                                        <span>Hanoi</span>
+                                        <span>{{item.nameEN}}</span>
                                     </td>
                                     <td>
-                                        <span>Hà Nội</span>
+                                        <span>{{item.nameVN}}</span>
                                     </td>
                                     <td>
-                                        <span>Vietnam</span>
+                                        <span>{{item.countryName}}</span>
                                     </td>
                                     <td>
-                                        <input type="checkbox" />
+                                        <input type="checkbox" [checked]="item.inactive" disabled/>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>VNM-01</span>
-                                    </td>
-                                    <td>
-                                        <span>Ho Chi Minh</span>
-                                    </td>
-                                    <td>
-                                        <span>Hồ Chí Minh</span>
-                                    </td>
-                                    <td>
-                                        <span>Vietnam</span>
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>CNH-01</span>
-                                    </td>
-                                    <td>
-                                        <span>Shanghai</span>
-                                    </td>
-                                    <td>
-                                        <span>Thượng Hải</span>
-                                    </td>
-                                    <td>
-                                        <span>China</span>
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>FRA-04</span>
-                                    </td>
-                                    <td>
-                                        <span>Paris</span>
-                                    </td>
-                                    <td>
-                                        <span>Pa-ri</span>
-                                    </td>
-                                    <td>
-                                        <span>France</span>
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>VNM-09</span>
-                                    </td>
-                                    <td>
-                                        <span>Danang</span>
-                                    </td>
-                                    <td>
-                                        <span>Đà Nẵng </span>
-                                    </td>
-                                    <td>
-                                        <span>Vietnam</span>
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>VNM-01</span>
-                                    </td>
-                                    <td>
-                                        <span>Ho Chi Minh</span>
-                                    </td>
-                                    <td>
-                                        <span>Hồ Chí Minh</span>
-                                    </td>
-                                    <td>
-                                        <span>Vietnam</span>
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" />
-                                    </td>
-                                </tr>
+                             
                             </tbody>
                         </table>
                     </div>
@@ -1122,7 +996,7 @@
                                     <input type="text" [(ngModel)]="CountryToAdd.code" class="form-control m-input m-input--square"
                                         #country_code="ngModel" name="country_code" required placeholder="Please enter country code">
                                     <div class="form-control-feedback" *ngIf="addCountryForm.submitted && country_code.invalid">
-                                        Country code is required 
+                                        Country code is required
                                     </div>
                                 </div>
                             </div>
@@ -1135,22 +1009,22 @@
                                     </label>
                                     <input type="text" [(ngModel)]="CountryToAdd.nameEn" class="form-control m-input m-input--square"
                                         #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name">
-                                        <div class="form-control-feedback" *ngIf="addCountryForm.submitted && english_name.invalid">
-                                            English name is required at least 3 characters 
-                                        </div>
+                                    <div class="form-control-feedback" *ngIf="addCountryForm.submitted && english_name.invalid">
+                                        English name is required at least 3 characters
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-12"> 
+                            <div class="col-lg-12">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addCountryForm.submitted && local_name.invalid }">
                                     <label>
                                         Local Name
                                     </label>
                                     <input type="text" [(ngModel)]="CountryToAdd.nameVn" class="form-control m-input m-input--square"
-                                      #local_name="ngModel" required minlength="3"  name="local_name" placeholder="Please enter local name">
-                                      <div class="form-control-feedback" *ngIf="addCountryForm.submitted && local_name.invalid">
-                                        Local name is required at least 3 characters 
+                                        #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name">
+                                    <div class="form-control-feedback" *ngIf="addCountryForm.submitted && local_name.invalid">
+                                        Local name is required at least 3 characters
                                     </div>
                                 </div>
                             </div>
@@ -1210,7 +1084,7 @@
                                     <input type="text" [(ngModel)]="CountryToUpdate.code" class="form-control m-input m-input--square"
                                         #country_code="ngModel" name="country_code" required placeholder="Please enter country code">
                                     <div class="form-control-feedback" *ngIf="updateCountryForm.submitted && country_code.invalid">
-                                        Country code is required 
+                                        Country code is required
                                     </div>
                                 </div>
                             </div>
@@ -1223,27 +1097,38 @@
                                     </label>
                                     <input type="text" [(ngModel)]="CountryToUpdate.nameEn" class="form-control m-input m-input--square"
                                         #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name">
-                                        <div class="form-control-feedback" *ngIf="updateCountryForm.submitted && english_name.invalid">
-                                            English name is required at least 3 characters 
-                                        </div>
+                                    <div class="form-control-feedback" *ngIf="updateCountryForm.submitted && english_name.invalid">
+                                        English name is required at least 3 characters
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-12"> 
+                            <div class="col-lg-12">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': updateCountryForm.submitted && local_name.invalid }">
                                     <label>
                                         Local Name
                                     </label>
                                     <input type="text" [(ngModel)]="CountryToUpdate.nameVn" class="form-control m-input m-input--square"
-                                      #local_name="ngModel" required minlength="3"  name="local_name" placeholder="Please enter local name">
-                                      <div class="form-control-feedback" *ngIf="updateCountryForm.submitted && local_name.invalid">
-                                        Local name is required at least 3 characters 
+                                        #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name">
+                                    <div class="form-control-feedback" *ngIf="updateCountryForm.submitted && local_name.invalid">
+                                        Local name is required at least 3 characters
                                     </div>
                                 </div>
                             </div>
                         </div>
-
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" >
+                                    <label class="m-checkbox m-checkbox--bold">
+                                            Inactive
+                                        <input type="checkbox" >                                       
+                                        <span></span>
+                                    </label>
+                                 
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer m--align-center c-button-actions">
                         <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateCountry(updateCountryForm,'yes')">
@@ -1275,6 +1160,208 @@
 <!-- END UPDATE COUNTRY MODAL -->
 
 
+<!-- BEGIN ADD CITY PROVINCE MODAL -->
+<div class="modal fade" id="add-city-province-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add City-Province</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-stage-management-form-->
+                <form novalidate #addProvinceForm="ngForm" *ngIf="ProvinceCityToAdd" (ngSubmit)="addProvinceForm.form.valid">
+                    <div class="m-form m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && province_code.invalid }">
+                                    <label>
+                                        Province - City Code
+                                    </label>
+                                    <input type="text" [(ngModel)]="ProvinceCityToAdd.code" class="form-control m-input m-input--square"
+                                        #province_code="ngModel" name="province_code" required placeholder="Please enter province-city code">
+                                    <div class="form-control-feedback" *ngIf="addProvinceForm.submitted && province_code.invalid">
+                                        Province - City code is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && english_name.invalid }">
+                                    <label>
+                                        English Name
+                                    </label>
+                                    <input type="text" [(ngModel)]="ProvinceCityToAdd.nameEn" class="form-control m-input m-input--square"
+                                        #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name">
+                                    <div class="form-control-feedback" *ngIf="addProvinceForm.submitted && english_name.invalid">
+                                        English name is required at least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && local_name.invalid }">
+                                    <label>
+                                        Local Name
+                                    </label>
+                                    <input type="text" [(ngModel)]="ProvinceCityToAdd.nameVn" class="form-control m-input m-input--square"
+                                        #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name">
+                                    <div class="form-control-feedback" *ngIf="addProvinceForm.submitted && local_name.invalid">
+                                        Local name is required at least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && ProvinceCityToAdd.countryId==null }">
+                                    <label>
+                                        Country
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [disabled]="disabled" *ngIf="resetNg2Select && ngSelectDataCountries.length>0"
+                                        (data)="refreshValue($event)" (selected)="selectedCountry($event,'add','province-city')" (removed)="removed($event,'add')"
+                                        (typed)="typed($event)" placeholder="Select department">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer m--align-center c-button-actions">
+                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addProvinceCity(addProvinceForm,'yes')">
+                            <span>
+                                <i class="la la-save"></i>
+                                <span>
+                                    save
+                                </span>
+                            </span>
+                        </button>
+                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="addProvinceCity(addProvinceForm,'cancel')">
+                            <span>
+                                <i class="la la-ban"></i>
+                                <span>
+                                    cancel
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+                <!--end:add-stage-management-form -->
+                <!-- (click)="add_stage()" -->
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- END ADD CITY PROVINCE MODAL -->
+
+<!-- BEGIN EDIT CITY PROVINCE MODAL -->
+<div class="modal fade" id="update-city-province-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add City-Province</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-stage-management-form-->
+                <form novalidate #updateProvinceForm="ngForm" *ngIf="ProvinceCityToUpdate" (ngSubmit)="updateProvinceForm.form.valid">
+                    <div class="m-form m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && province_code.invalid }">
+                                    <label>
+                                        Province - City Code
+                                    </label>
+                                    <input type="text" [(ngModel)]="ProvinceCityToUpdate.code" class="form-control m-input m-input--square"
+                                        #province_code="ngModel" name="province_code" required placeholder="Please enter province-city code">
+                                    <div class="form-control-feedback" *ngIf="updateProvinceForm.submitted && province_code.invalid">
+                                        Province - City code is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && english_name.invalid }">
+                                    <label>
+                                        English Name
+                                    </label>
+                                    <input type="text" [(ngModel)]="ProvinceCityToUpdate.nameEn" class="form-control m-input m-input--square"
+                                        #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name">
+                                    <div class="form-control-feedback" *ngIf="updateProvinceForm.submitted && english_name.invalid">
+                                        English name is required at least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && local_name.invalid }">
+                                    <label>
+                                        Local Name
+                                    </label>
+                                    <input type="text" [(ngModel)]="ProvinceCityToUpdate.nameVn" class="form-control m-input m-input--square"
+                                        #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name">
+                                    <div class="form-control-feedback" *ngIf="updateProvinceForm.submitted && local_name.invalid">
+                                        Local name is required at least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && ProvinceCityToUpdate.countryId==null }">
+                                    <label>
+                                        Country
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [active]="[ngSelectDataCountries[indexCurrentCountry]]"  [disabled]="disabled" *ngIf="resetNg2Select && ngSelectDataCountries.length>0 && indexCurrentCountry>=0"
+                                        (data)="refreshValue($event)" (selected)="selectedCountry($event,'update','province-city')" (removed)="removed($event,'add')"
+                                        (typed)="typed($event)" placeholder="Select department">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer m--align-center c-button-actions">
+                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateProvinceCity(updateProvinceForm,'yes')">
+                            <span>
+                                <i class="la la-save"></i>
+                                <span>
+                                    save
+                                </span>
+                            </span>
+                        </button>
+                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="updateProvinceCity(updateProvinceForm,'cancel')">
+                            <span>
+                                <i class="la la-ban"></i>
+                                <span>
+                                    cancel
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+                <!--end:add-stage-management-form -->
+                <!-- (click)="add_stage()" -->
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- END EDIT CITY PROVINCE MODAL -->
+
 <!--begin::confirm-delete-modal-->
 <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
@@ -1287,7 +1374,7 @@
             </div>
             <div class="modal-body">
                 <div class="confirm-text-block">
-                    <span>You want to delete this {{ObjectToDelete}}}</span>
+                    <span>You want to delete this {{ObjectToDelete}}</span>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">

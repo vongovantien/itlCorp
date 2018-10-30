@@ -8,6 +8,8 @@ namespace eFMS.API.Catalogue.DL.ViewModels
     {
         public Guid ID { get; set; }
         public string Code { get; set; }
+        public string NameVN { get; set; }
+        public string NameEN { get; set; }
         public string DisplayName { get; set; }
         public string Address { get; set; }
         public Nullable<Guid> DistrictID { get; set; }

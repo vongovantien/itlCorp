@@ -29,9 +29,9 @@ export class PortIndexComponent implements OnInit {
   portIndex: PortIndex= new PortIndex();
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: 8 };
-  nameEditModal = "add-port-index-modal";
+  nameModal = "edit-port-index-modal";
   addButtonSetting: ButtonModalSetting = {
-    dataTarget: this.nameEditModal,
+    dataTarget: this.nameModal,
     typeButton: ButtonType.add
   };
   selectedFilter = "All";
@@ -77,16 +77,13 @@ export class PortIndexComponent implements OnInit {
   setPage(pager: PagerSetting): any {
     this.getPortIndexs(pager);
   }
-  async getPortIndexs(pager: PagerSetting) {
-    // this.spinnerService.show();
-    // this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-    //   this.spinnerService.hide();
-    //   this.portIndexs = response.data.map(x=>Object.assign({},x));
-    //   this.pager.totalItems = response.totalItems;
-    // });
-    var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
-    this.portIndexs = response.data.map(x=>Object.assign({},x));
-    this.pager.totalItems = response.totalItems;
+  getPortIndexs(pager: PagerSetting): any {
+    this.spinnerService.show();
+    this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
+      this.spinnerService.hide();
+      this.portIndexs = response.data.map(x=>Object.assign({},x));
+      this.pager.totalItems = response.totalItems;
+    });
   }
   onSearch(event){
     if(event.field == "All"){
@@ -163,10 +160,14 @@ export class PortIndexComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.portIndex).subscribe((response: any) => {
       if (response.status == true){
         this.toastr.success(response.message);
+        this.getPortIndexs(this.pager);
         this.form.onReset();
         this.initPortIndex();
-        this.setPage(this.pager);
         $('#' + this.addButtonSetting.dataTarget).modal('hide');
+        setTimeout(() => {
+          this.pager.currentPage = 1;
+          this.child.setPage(this.pager.currentPage);
+        }, 500);
       }
       else{
         this.toastr.error(response.message);
@@ -255,24 +256,20 @@ export class PortIndexComponent implements OnInit {
   async onDelete(event) {
     console.log(event);
     if (event) {
-      await this.baseService.deleteAsync(this.api_menu.Catalogue.CatPlace.delete + this.portIndex, true, true);
-      await this.getPortIndexs(this.pager);
-      this.pager.currentPage = 1;
-      this.child.setPage(this.pager.currentPage);
-      // this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.portIndex.id).subscribe((response: any) => {
-      //   if (response.status == true) {
-      //     this.toastr.success(response.message);
-      //     this.setPage(this.pager);
-      //     setTimeout(() => {
-      //       this.pager.currentPage = 1;
-      //       this.child.setPage(this.pager.currentPage);
-      //     }, 500);
+      this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.portIndex.id).subscribe((response: any) => {
+        if (response.status == true) {
+          this.toastr.success(response.message);
+          this.pager.currentPage = 1;
+          this.getPortIndexs(this.pager);
+          setTimeout(() => {
+            this.child.setPage(this.pager.currentPage);
+          }, 300);
          
-      //   }
-      //   if (response.status == false) {
-      //     this.toastr.error(response.message);
-      //   }
-      // }, error => this.baseService.handleError(error));
+        }
+        if (response.status == false) {
+          this.toastr.error(response.message);
+        }
+      }, error => this.baseService.handleError(error));
     }
   }
   onSortChange(property) {

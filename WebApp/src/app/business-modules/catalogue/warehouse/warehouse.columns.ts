@@ -18,8 +18,17 @@ export const WAREHOUSECOLUMNSETTING: ColumnSetting[] =
     lookup:''
   },
   {
-    primaryKey: 'displayName',
-    header: 'Name',
+    primaryKey: 'nameEN',
+    header: 'Name(EN)',
+    isShow: true,
+    dataType: 'text',
+    allowSearch: true,
+    required: true,
+    lookup: ''
+  },
+  {
+    primaryKey: 'nameVN',
+    header: 'Name(Local)',
     isShow: true,
     dataType: 'text',
     allowSearch: true,
@@ -30,6 +39,7 @@ export const WAREHOUSECOLUMNSETTING: ColumnSetting[] =
     primaryKey: 'countryName',
     header: 'Country',
     isShow: true,
+    dataType: 'text',
     allowSearch: true,
     lookup: ''
   },
@@ -44,6 +54,7 @@ export const WAREHOUSECOLUMNSETTING: ColumnSetting[] =
     primaryKey: 'provinceName',
     header: 'City/ Province',
     isShow: true,
+    dataType: 'text',
     allowSearch: true,
     lookup: ''
   },
@@ -58,6 +69,7 @@ export const WAREHOUSECOLUMNSETTING: ColumnSetting[] =
     primaryKey: 'districtName',
     header: 'District',
     isShow: true,
+    dataType: 'text',
     allowSearch: true,
     lookup: ''
   },
@@ -73,6 +85,15 @@ export const WAREHOUSECOLUMNSETTING: ColumnSetting[] =
     header: 'Address',
     isShow: true,
     dataType: 'text',
+    allowSearch: true,
+    required: true,
+    lookup: ''
+  },
+  {
+    primaryKey: 'inactive',
+    header: 'Inactive',
+    isShow: true,
+    dataType: 'boolean',
     allowSearch: true,
     required: true,
     lookup: ''

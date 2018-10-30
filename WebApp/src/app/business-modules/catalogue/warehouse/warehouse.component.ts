@@ -12,7 +12,7 @@ import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
 import { SelectComponent } from 'ng2-select';
-import { PaginationComponent } from 'ngx-bootstrap';
+import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { WAREHOUSECOLUMNSETTING } from 'src/app/business-modules/catalogue/warehouse/warehouse.columns';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 declare var $:any;
@@ -147,7 +147,7 @@ export class WarehouseComponent implements OnInit {
       }
     });
   }
-  getWarehouses(pager: PagerSetting) {
+  async getWarehouses(pager: PagerSetting) {
     this.spinnerService.show();
     this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.spinnerService.hide();
@@ -173,10 +173,9 @@ export class WarehouseComponent implements OnInit {
           this.toastr.success(response.message);
           this.pager.currentPage = 1;
           this.getWarehouses(this.pager);
-          if(this.pager.currentPage>this.pager.totalPages){
-            this.pager.currentPage = this.pager.totalPages;
+           setTimeout(() => {
             this.child.setPage(this.pager.currentPage);
-          }
+          }, 500);
         }
         if (response.status == false) {
           this.toastr.error(response.message);
@@ -218,9 +217,13 @@ export class WarehouseComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
       if (response.status == true){
         this.toastr.success(response.message);
+        this.getWarehouses(this.pager);
+        setTimeout(() => {
+          this.pager.currentPage = 1;
+          this.child.setPage(this.pager.currentPage);
+        }, 500);
         this.resetWarehouse();
         this.form.onReset();
-        this.getWarehouses(this.pager);
         $('#' + this.addButtonSetting.dataTarget).modal('hide');
       }
       else{

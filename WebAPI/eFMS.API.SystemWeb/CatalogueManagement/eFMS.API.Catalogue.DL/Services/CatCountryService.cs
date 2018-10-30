@@ -20,6 +20,7 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper) : base(repository, mapper)
         {
+            SetChildren<CatPlace>("Id", "CountryId");
         }
 
         public List<CatCountryViewModel> GetByLanguage()

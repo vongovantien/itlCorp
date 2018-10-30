@@ -5,7 +5,13 @@
   </ng-container>
 
   <!-- text -->
-  <ng-container *ngIf="column.dataType != 'number'">
+  <ng-container *ngIf="column.dataType == 'text'">
       {{ item[column.primaryKey] }}
+  </ng-container>
+
+  <!-- checkbox -->
+  <ng-container *ngIf="column.dataType == 'boolean'">
+      <!-- {{ item[column.primaryKey] }} -->
+      <input type="checkbox" disabled="true" [checked]="item[column.primaryKey]" />
   </ng-container>
 </ng-container>
