@@ -95,6 +95,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     ID = x.ID,
                     Code = x.Code,
+                    NameEN = x.Name_EN,
+                    NameVN = x.Name_VN,
                     DisplayName = x.DisplayName,
                     Address = x.Address,
                     DistrictID = x.DistrictID,
@@ -125,6 +127,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     ID = x.ID,
                     Code = x.Code,
+                    NameEN = x.Name_EN,
+                    NameVN = x.Name_VN,
                     DisplayName = x.DisplayName,
                     Address = x.Address,
                     DistrictID = x.DistrictID,
