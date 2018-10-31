@@ -54,6 +54,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult AddStage(CatStageModel catStageModel)
         {
             catStageModel.DatetimeCreated = DateTime.Now;
+            catStageModel.UserCreated = "Thor";
             var hs = catStageService.Add(catStageModel);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
