@@ -13,8 +13,8 @@ import { PartnerComponent } from './partner-data/partner.component';
 
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
-// import { BreadcrumbComponent } from 'src/app/shared/breadcrumb/breadcrumb.component';
 import { SelectModule } from 'ng2-select';
+import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
 
 
 @NgModule({
@@ -34,7 +34,8 @@ import { SelectModule } from 'ng2-select';
       UnitComponent,
       StageManagementComponent,
       PartnerComponent,
-      PartnerDataAddnewComponent
+      PartnerDataAddnewComponent,
+      PartnerDataDetailComponent
     ],
 })
 export class CatalogueModule { }
