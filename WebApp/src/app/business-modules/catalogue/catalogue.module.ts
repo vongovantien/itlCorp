@@ -35,6 +35,6 @@ import { SelectModule } from 'ng2-select';
       StageManagementComponent,
       PartnerComponent,
       PartnerDataAddnewComponent
-      ],
+    ],
 })
 export class CatalogueModule { }

@@ -39,7 +39,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Partner ID
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -47,15 +47,17 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Type
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Partner Name Abreviation
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -65,7 +67,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Partner Name EN Full
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -73,7 +75,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Partner Name Local Full
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -81,9 +83,21 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Tax Code
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Category
+                            </label>
+                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            </ng-select>
                         </div>
                     </div>
                 </div>
@@ -101,7 +115,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Contact Person
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -109,7 +123,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Contact Phone Number
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -117,233 +131,124 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Fax No
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Input
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                <div class="div-inside bg-secondary m--margin-bottom-15">
+                    <h3 class="c-block-title">Billing Address</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Country
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            City
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Zipcode
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Input
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address EN
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Input
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address Local
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="div-inside bg-secondary">
-                    <div class="clearfix m--margin-bottom-15">
-                        <h3 class="c-block-title">Shipping Address</h3>
-                        <hr>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Progress
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            80% - 100%
-                                        </option>
-                                        <option value="">
-                                            0% - 79%
-                                        </option>
-                                    </select>
+                    <h3 class="c-block-title">Shipping Address</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Country
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            City
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Status
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Status 1
-                                        </option>
-                                        <option value="">
-                                            Status 2
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Services
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Services 1
-                                        </option>
-                                        <option value="">
-                                            Services 2
-                                        </option>
-                                    </select>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Zipcode
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Team
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Team 1
-                                        </option>
-                                        <option value="">
-                                            Team 2
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Customer
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Customer 1
-                                        </option>
-                                        <option value="">
-                                            Customer 2
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Staff
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Staff 1
-                                        </option>
-                                        <option value="">
-                                            Staff 2
-                                        </option>
-                                    </select>
-                                </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address EN
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="clearfix">
-                        <h3 class="c-block-title">Billing Address</h3>
-                        <hr>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Progress
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            80% - 100%
-                                        </option>
-                                        <option value="">
-                                            0% - 79%
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Status
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Status 1
-                                        </option>
-                                        <option value="">
-                                            Status 2
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Services
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Services 1
-                                        </option>
-                                        <option value="">
-                                            Services 2
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Team
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Team 1
-                                        </option>
-                                        <option value="">
-                                            Team 2
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Customer
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Customer 1
-                                        </option>
-                                        <option value="">
-                                            Customer 2
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>
-                                        Staff
-                                    </label>
-                                    <select class="form-control m-input m-input--square">
-                                        <option value="">
-                                            Staff 1
-                                        </option>
-                                        <option value="">
-                                            Staff 2
-                                        </option>
-                                    </select>
-                                </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address Local
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
                             </div>
                         </div>
                     </div>
@@ -351,8 +256,21 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Saleman
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Work Phone (Ext No)
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -360,7 +278,17 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Personal Phone
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Email Address
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -368,7 +296,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Localtion (Workplace)
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -381,14 +309,14 @@
         <!--begin::m-portlet -->   
         <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
             <div class="alert-block__heading">
-                <h3 class="alert-block__title">Job Information</h3>
+                <h3 class="alert-block__title">Other Information</h3>
             </div>
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Office Agent
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -396,15 +324,17 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                A/C Ref
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Website
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -414,7 +344,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Term (Days)
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -422,7 +352,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Credit $
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
                         </div>
@@ -430,9 +360,69 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Input
+                                Profile
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner Account ID
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Bank
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Swift Code
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Bank Address
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Note
+                            </label>
+                            <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="m-form__group form-group row">
+                    <label class="col-lg-2 col-form-label form-control-label">Management:</label>
+                    <div class="col-lg-10">
+                        <div class="m-checkbox-inline">
+                            <label class="m-checkbox"><input type="checkbox" checked="checked"> Denied <span></span></label> 
+                            <label class="m-checkbox"><input type="checkbox" checked="checked"> Warming <span></span></label> 
+                            <label class="m-checkbox"><input type="checkbox"> Public <span></span></label>
                         </div>
                     </div>
                 </div>
