@@ -40,6 +40,17 @@ label {
         }
     }
 }
+.form-group {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0;  
+}
+.m-form {
+    .m-form__group {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+}
 .c-button-actions,
 .form-actions {
     > * {
