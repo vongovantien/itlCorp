@@ -42,6 +42,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("GetByLanguage")]
+        public IActionResult GetByLanguage()
+        {
+            var results = catComonityGroupService.GetByLanguage();
+            return Ok(results);
+        }
+
         [HttpGet("{id}")]
         public IActionResult Get(short id)
         {

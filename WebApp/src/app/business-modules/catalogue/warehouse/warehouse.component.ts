@@ -15,6 +15,7 @@ import { SelectComponent } from 'ng2-select';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { WAREHOUSECOLUMNSETTING } from 'src/app/business-modules/catalogue/warehouse/warehouse.columns';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 declare var $:any;
 
 @Component({
@@ -87,7 +88,8 @@ export class WarehouseComponent implements OnInit {
   isDesc: boolean = false;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.warehouseSettings
+    settingFields: this.warehouseSettings,
+    typeSearch: TypeSearch.outtab
   };
   
   constructor(private sortService: SortService, private baseService: BaseService,
@@ -269,8 +271,11 @@ export class WarehouseComponent implements OnInit {
       if(event.field == "code"){
         this.criteria.code = event.searchString;
       }
-      if(event.field == "displayName"){
-        this.criteria.displayName = event.searchString;
+      if(event.field == "nameEN"){
+        this.criteria.nameEN = event.searchString;
+      }
+      if(event.field == "nameVN"){
+        this.criteria.nameEN = event.searchString;
       }
       if(event.field == "address"){
         this.criteria.address = event.searchString;

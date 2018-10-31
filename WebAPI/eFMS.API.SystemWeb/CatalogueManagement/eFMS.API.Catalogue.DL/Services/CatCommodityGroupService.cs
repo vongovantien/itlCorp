@@ -9,6 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using eFMS.API.Catalogue.DL.ViewModels;
+using System.Globalization;
+using System.Threading;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -16,6 +19,55 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper) : base(repository, mapper)
         {
+        }
+
+        public List<CatCommodityGroupViewModel> GetByLanguage()
+        {
+            var data = DataContext.Get();
+            return GetDataByLanguage(data);
+        }
+
+        private List<CatCommodityGroupViewModel> GetDataByLanguage(IQueryable<CatCommodityGroup> data)
+        {
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            var results = new List<CatCommodityGroupViewModel>();
+            if (currentCulture.Name == "vi-VN")
+            {
+                foreach (var item in data)
+                {
+                    var group = new CatCommodityGroupViewModel
+                    {
+                        Id = item.Id,
+                        GroupName = item.GroupNameVn,
+                        UserCreated = item.UserCreated,
+                        DatetimeCreated = item.DatetimeCreated,
+                        UserModified = item.UserModified,
+                        DatetimeModified = item.DatetimeModified,
+                        Inactive = item.Inactive,
+                        InactiveOn = item.InactiveOn
+                    };
+                    results.Add(group);
+                }
+            }
+            else
+            {
+                foreach (var item in data)
+                {
+                    var group = new CatCommodityGroupViewModel
+                    {
+                        Id = item.Id,
+                        GroupName = item.GroupNameEn,
+                        UserCreated = item.UserCreated,
+                        DatetimeCreated = item.DatetimeCreated,
+                        UserModified = item.UserModified,
+                        DatetimeModified = item.DatetimeModified,
+                        Inactive = item.Inactive,
+                        InactiveOn = item.InactiveOn
+                    };
+                    results.Add(group);
+                }
+            }
+            return results;
         }
 
         public List<CatCommodityGroupModel> Paging(CatCommodityGroupCriteria criteria, int page, int size, out int rowsCount)
@@ -40,13 +92,13 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 results = Get(x =>((x.GroupNameEn ?? "").IndexOf(criteria.GroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                         && ((x.GroupNameVn ?? "").IndexOf(criteria.GroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                    ).ToList();
+                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn).ToList();
             }
             else
             {
                 results = Get(x => ((x.GroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                         || ((x.GroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                    ).ToList();
+                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn).ToList();
             }
             return results;
         }
