@@ -19,6 +19,7 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper) : base(repository, mapper)
         {
+            SetChildren<CatCommodity>("Id", "CommodityGroupId");
         }
 
         public List<CatCommodityGroupViewModel> GetByLanguage()

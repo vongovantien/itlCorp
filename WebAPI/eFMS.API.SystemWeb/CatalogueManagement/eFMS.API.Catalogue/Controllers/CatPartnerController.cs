@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -21,58 +22,58 @@ namespace eFMS.API.Catalogue.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CatCommonityController : ControllerBase
+    public class CatPartnerController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatCommodityService catComonityService;
+        private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
-        public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper)
+        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
-            catComonityService = service;
+            catPartnerService = service;
             mapper = iMapper;
         }
 
         [HttpPost]
         [Route("Query")]
-        public IActionResult Get(CatCommodityCriteria criteria)
+        public IActionResult Get(CatPartnerCriteria criteria)
         {
-            var results = catComonityService.Query(criteria);
+            var results = catPartnerService.Query(criteria);
             return Ok(results);
         }
 
         [HttpPost]
         [Route("Paging")]
-        public IActionResult Get(CatCommodityCriteria criteria, int page, int size)
+        public IActionResult Get(CatPartnerCriteria criteria, int page, int size)
         {
-            var data = catComonityService.Paging(criteria, page, size, out int rowCount);
+            var data = catPartnerService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(short id)
+        public IActionResult Get(string id)
         {
-            var data = catComonityService.First(x => x.Id == id);
+            var data = catPartnerService.First(x => x.Id == id);
             return Ok(data);
         }
-
         [HttpPost]
         [Route("Add")]
-        public IActionResult Post(CatCommodityEditModel model)
+        public IActionResult Post(CatPartnerEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var checkExistMessage = CheckExist(0, model);
+            var checkExistMessage = CheckExist(string.Empty, model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var commonity = mapper.Map<CatCommodityModel>(model);
-            commonity.UserCreated = "01";
-            commonity.DatetimeCreated = DateTime.Now;
-            commonity.Inactive = false;
-            var hs = catComonityService.Add(commonity);
+            var partner = mapper.Map<CatPartnerModel>(model);
+            partner.UserCreated = "01";
+            partner.DatetimeCreated = DateTime.Now;
+            partner.Inactive = false;
+            partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
+            var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -81,8 +82,9 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
         [HttpPut("{id}")]
-        public IActionResult Put(short id, CatCommodityEditModel model)
+        public IActionResult Put(string id, CatPartnerEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(id, model);
@@ -90,15 +92,16 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var commonity = mapper.Map<CatCommodityModel>(model);
-            commonity.UserModified = "01";
-            commonity.DatetimeModified = DateTime.Now;
-            commonity.Id = id;
-            if (commonity.Inactive == true)
+            var partner = mapper.Map<CatPartnerModel>(model);
+            partner.UserModified = "01";
+            partner.DatetimeModified = DateTime.Now;
+            partner.Id = id;
+            partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
+            if (partner.Inactive == true)
             {
-                commonity.InactiveOn = DateTime.Now;
+                partner.InactiveOn = DateTime.Now;
             }
-            var hs = catComonityService.Update(commonity, x => x.Id == id);
+            var hs = catPartnerService.Update(partner, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -107,10 +110,11 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
         [HttpDelete("{id}")]
-        public IActionResult Delete(short id)
+        public IActionResult Delete(string id)
         {
-            var hs = catComonityService.Delete(x => x.Id == id);
+            var hs = catPartnerService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -119,19 +123,19 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
-        private string CheckExist(short id, CatCommodityEditModel model)
+        private string CheckExist(string id, CatPartnerEditModel model)
         {
             string message = string.Empty;
-            if (id == 0)
+            if (id.Length == 0)
             {
-                if (catComonityService.Any(x => x.CommodityNameEn == model.CommodityNameEn || x.CommodityNameVn == model.CommodityNameVn))
+                if (catPartnerService.Any(x => x.PartnerNameEn == model.PartnerNameEn || x.PartnerNameVn == model.PartnerNameVn || x.ShortName == model.ShortName))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }
             }
             else
             {
-                if (catComonityService.Any(x => (x.CommodityNameEn == model.CommodityNameEn || x.CommodityNameVn == model.CommodityNameVn) && x.Id != id))
+                if (catPartnerService.Any(x => (x.PartnerNameEn == model.PartnerNameEn || x.PartnerNameVn == model.PartnerNameVn) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }

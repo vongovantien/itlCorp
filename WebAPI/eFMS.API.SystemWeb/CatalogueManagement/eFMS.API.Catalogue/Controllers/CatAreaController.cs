@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.ViewModels;
@@ -23,6 +24,7 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatAreaService catAreaService;
+        private readonly IMapper mapper;
         public CatAreaController(IStringLocalizer<LanguageSub> localizer, ICatAreaService service)
         {
             stringLocalizer = localizer;
