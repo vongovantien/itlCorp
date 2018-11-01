@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th class="table-actions-col no-sorting">Actions</th>
-                <th class="sorting_asc">Order</th>
+                <!-- <th class="sorting_asc">Order</th> -->
                 <ng-container *ngFor="let map of columnMaps">
                     <th [ngClass]="{ 'sorting': map.dataType != 'boolean' }" id="hearder_{{map.primaryKey}}" (click)="sort(map.primaryKey)" *ngIf="map.isShow"><span>{{ map.header }}</span></th>
                 </ng-container>
@@ -47,7 +47,7 @@
                 <td>
                     <span>10/08/2018</span>
                 </td> -->
-                <td>{{ (i+1) }}</td>
+                <!-- <td>{{ (i+1) }}</td> -->
                 <ng-container *ngFor="let map of columnMaps">
                     <!-- {{ record[map.primaryKey] }} -->
                     <td [ctStyleCell]="record[map.primaryKey]" *ngIf="map.isShow">

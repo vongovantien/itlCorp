@@ -1,22 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-partner-data-addnew',
-  templateUrl: './partner-data-addnew.component.html',
-  styleUrls: ['./partner-data-addnew.component.scss']
+  selector: 'app-partner-data-detail',
+  templateUrl: './partner-data-detail.component.html',
+  styleUrls: ['./partner-data-detail.component.scss']
 })
-export class PartnerDataAddnewComponent implements OnInit {
+export class PartnerDataDetailComponent implements OnInit {
 
   constructor() { }
 
   ngOnInit() {
   }
-
   /**
    * ng2-select
    */
   public items: Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
-  'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',];
+  'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest'];
 
   private value: any = {};
   private _disabledV: string = '0';
@@ -46,4 +45,5 @@ export class PartnerDataAddnewComponent implements OnInit {
   public refreshValue(value: any): void {
     this.value = value;
   }
+
 }

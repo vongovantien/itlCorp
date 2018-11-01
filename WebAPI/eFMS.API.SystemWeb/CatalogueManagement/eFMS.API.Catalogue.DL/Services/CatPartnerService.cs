@@ -46,8 +46,8 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                query = x => ((x.Id ?? "").IndexOf(criteria.Id ?? "") >= 0
-                           || (x.ShortName ?? "").IndexOf(criteria.ShortName ?? "") >= 0
+                query = x => ((x.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            )&&((x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             }
             return query;

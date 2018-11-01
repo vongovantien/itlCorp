@@ -14,4 +14,10 @@
       <!-- {{ item[column.primaryKey] }} -->
       <input type="checkbox" disabled="true" [checked]="item[column.primaryKey]" />
   </ng-container>
+
+  <!-- Date -->
+  <ng-container *ngIf="column.dataType == 'Date'">
+    <!-- <span>15:25</span> &nbsp; -->
+    <span> {{ item[column.primaryKey] }}</span>
+  </ng-container>
 </ng-container>

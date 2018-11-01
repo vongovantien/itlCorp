@@ -13,7 +13,7 @@
                             All
                         </a>
                         <ng-container *ngFor="let map of settingFields">
-                            <a *ngIf="map.allowSearch" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
+                            <a *ngIf="map.allowSearch == true" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
                                 {{ map.header }}
                             </a>
                         </ng-container>
@@ -41,7 +41,7 @@
                             All
                         </a>
                         <ng-container *ngFor="let map of settingFields">
-                            <a *ngIf="map.allowSearch" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
+                            <a *ngIf="map.allowSearch == true" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
                                 {{ map.header }}
                             </a>
                         </ng-container>

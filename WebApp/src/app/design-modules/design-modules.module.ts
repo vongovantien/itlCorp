@@ -14,7 +14,7 @@ import { Daterangepicker } from 'ng2-daterangepicker';
     DesignModulesRoutingModule,
     SharedModule,
     Daterangepicker,
-    SelectModule,
+    SelectModule
   ],
   declarations: [FormComponent, TableComponent]
 })
