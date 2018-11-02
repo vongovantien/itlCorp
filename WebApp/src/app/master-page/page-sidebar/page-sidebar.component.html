@@ -5,53 +5,35 @@
 <div id="m_aside_left" class="m-grid__item	m-aside-left  m-aside-left--skin-dark ">
     <!-- BEGIN: Aside Menu -->
     <div id="m_ver_menu" class="m-aside-menu  m-aside-menu--skin-dark m-aside-menu--submenu-skin-dark " m-menu-vertical="1" m-menu-scrollable="0" m-menu-dropdown-timeout="500">
-        <ul class="m-menu__nav" style="padding: 30px 30px 0">
-            <li class="m-menu__item" style="margin-bottom: 20px;">
-                <div class="m-input-icon m-input-icon--right">
-                    <input type="text" class="form-control m-input" placeholder="Search">
-                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                        <span>
-                            <i class="la la-search"></i>
+        <perfect-scrollbar style="position: absolute; top: 0; bottom: 0" [config]="config">
+            <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
+                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" m-menu-submenu-toggle="hover" *ngFor="let item of Menu;let i = index;" #parrent [id]="i">
+                    <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(i)">
+                        <i [class]="'m-menu__link-icon '+item.icon"></i>
+                        <span class="m-menu__link-text">
+                            {{item.parent_name}}
                         </span>
-                    </span>
-                </div>
-            </li>
-            <li class="m-menu__item">
-                <a class="btn btn-danger m-btn--icon m-btn--uppercase btn-block" data-toggle="modal" href="#create-job-modal" (click)="gotoJobManagement()">
-                    <span>
-                        <i class="la la-plus"></i>
-                        <span>Create Job</span>
-                    </span>
-                </a>
-            </li>
-        </ul>
-        <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
-            <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" m-menu-submenu-toggle="hover" *ngFor="let item of Menu;let i = index;" #parrent [id]="i">
-                <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(i)">
-                    <i [class]="'m-menu__link-icon '+item.icon"></i>
-                    <span class="m-menu__link-text">
-                        {{item.parent_name}}
-                    </span>
-                    <i class="m-menu__ver-arrow la la-angle-right"></i>
-                </a>
-                <div class="m-menu__submenu" *ngIf="item.display_child">
-                    <span class="m-menu__arrow"></span>
-                    <ul class="m-menu__subnav">
-                        <li class="m-menu__item m-menu__item" aria-haspopup="true" *ngFor="let sub_item of item.childs;let k = index;" [id]="i+'-'+k">
-                            <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link " (click)="sub_menu_click(sub_item.name,i,k)">
-                                <i class="m-menu__link-bullet m-menu__link-bullet--dot">
-                                    <span></span>
-                                </i>
-                                <span class="m-menu__link-text">
-                                    {{sub_item.name}}
-                                </span>
-                            </a>
-                        </li>
-                       
-                    </ul>
-                </div>
-            </li>           
-        </ul>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
+                    <div class="m-menu__submenu" *ngIf="item.display_child">
+                        <span class="m-menu__arrow"></span>
+                        <ul class="m-menu__subnav">
+                            <li class="m-menu__item m-menu__item" aria-haspopup="true" *ngFor="let sub_item of item.childs;let k = index;" [id]="i+'-'+k">
+                                <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link " (click)="sub_menu_click(sub_item.name,i,k)">
+                                    <i class="m-menu__link-bullet m-menu__link-bullet--dot">
+                                        <span></span>
+                                    </i>
+                                    <span class="m-menu__link-text">
+                                        {{sub_item.name}}
+                                    </span>
+                                </a>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                </li>           
+            </ul>
+        </perfect-scrollbar>
     </div>
     <!-- END: Aside Menu -->
 </div>

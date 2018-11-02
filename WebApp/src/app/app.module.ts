@@ -21,7 +21,11 @@ import { Daterangepicker } from 'ng2-daterangepicker';
 import { PagingClientComponent } from './shared/paging-client/paging-client.component';
 import {PagingService} from './shared/common/pagination/paging-service';
 import { CommonModule } from '@angular/common';
+import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 
+const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+  // wheelPropagation: true
+};
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,9 +47,17 @@ import { CommonModule } from '@angular/common';
     BrowserAnimationsModule, // required animations module
     ToastrModule.forRoot(), // ToastrModule added
     Ng4LoadingSpinnerModule.forRoot(),
-    Daterangepicker
+    Daterangepicker,
+    PerfectScrollbarModule // Scrollbar
   ],
-  providers: [BaseService,PagingService],
+  providers: [
+    BaseService,
+    PagingService,
+    { 
+      provide: PERFECT_SCROLLBAR_CONFIG, // Scrollbar
+      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG // Scrollbar
+    }
+  ],
   bootstrap: [AppComponent],
   exports:[]
 })
