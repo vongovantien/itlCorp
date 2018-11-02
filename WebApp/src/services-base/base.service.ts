@@ -108,6 +108,7 @@ export class BaseService implements ErrorHandler {
       this.spinnerService.hide();
       this.handleError(error);
     }
+
   }
 
   /**
@@ -181,7 +182,6 @@ export class BaseService implements ErrorHandler {
    * @param display_notify 
    */
   public handleState(response, display_notify = false) {
-    console.log(response);
     if (response.status == true && display_notify == true) {
       this.toastr.success(response.message);
     }

@@ -1,24 +1,446 @@
-<div class="m-content">
-  <div class="row">
-      <div class="col-xl-12">
-          <!--begin:: m-portlet-->
-          <div class="m-portlet">
-              <div class="m-portlet__head">
-                  <div class="m-portlet__head-caption">
-                      <div class="m-portlet__head-title">
-                          <h3 class="m-portlet__head-text">
-                              Charge Page
-                          </h3>
-                      </div>
-                  </div>
-              </div>
-              <div class="m-portlet__body">
-                  <!--begin::Content-->
-                  <p>Charge page</p>
-                  <!--end::Content-->
-              </div>
-          </div>
-          <!--end:: m-portlets-->
-      </div>
-  </div>
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#add-charge-modal">
+                <span>
+                    <i class="icon-plus7"></i>
+                    <span>
+                        add new
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-download"></i>
+                    <span>
+                        import
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span>
+                        export
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
 </div>
+<!--end:: subheader-->
+<!--begin::m-content of charge-->
+<div class="m-content">
+    <!--begin:: m-portlet of search-form-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form">
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group m-input-group m-input-group--square">
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Charge ID
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item active" href="javascript:void(0)">
+                                        Charge ID
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        Code
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        Name (EN)
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        Name (local)
+                                    </a>
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" aria-label="">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" title="Search">
+                                    <i class="icon-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Reset
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet of search-form-->
+    <!--begin:: m-portlet of charge-table-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin: Datatable -->
+            <div class="table-wrapper" id="">
+                <table class="table table-striped table-brand dataTable">
+                    <thead>
+                        <tr>
+                            <th class="table-actions-col no-sorting"></th>
+                            <th class="sorting_asc">
+                                <span>ID</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Code</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Name EN</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Name Local</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Type</span>
+                            </th>
+                            <th class="no-sorting">
+                                <span>Inactive</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit stage" data-toggle="modal" data-target="#edit-charge-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>LH001</span>
+                            </td>
+                            <td>
+                                <span>SS_REF_Sea</span>
+                            </td>
+                            <td>
+                                <span>Refund fee</span>
+                            </td>
+                            <td>
+                                <span>Phí refund</span>
+                            </td>
+                            <td>
+                                <span>All</span>
+                            </td>
+                            <td>
+                                <span>
+                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                        <input type="checkbox" disabled>
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit stage" data-toggle="modal" data-target="#edit-charge-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>LH001</span>
+                            </td>
+                            <td>
+                                <span>SS_REF_Sea</span>
+                            </td>
+                            <td>
+                                <span>Refund fee</span>
+                            </td>
+                            <td>
+                                <span>Phí refund</span>
+                            </td>
+                            <td>
+                                <span>All</span>
+                            </td>
+                            <td>
+                                <span>
+                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                        <input type="checkbox" checked="checked" disabled>
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--end: Datatable -->
+            <!--begin::pagination-->
+            <div class="pagination-nav">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="tatable__pager-size" style="max-width: 190px">
+                            <div class="select-box">
+                                <select class="form-control m-input m-input--square" id="" aria-label="">
+                                    <option value="1">15 line/screen</option>
+                                    <option value="2">30 line/screen</option>
+                                    <option value="3">50 line/screen</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <nav aria-label="">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <!--end::pagination-->
+        </div>
+    </div>
+    <!--end:: m-portlet of charge-table-->
+</div>
+<!--end::m-content of charge-->
+
+<!--begin::add-charge-modal-->
+<div class="modal fade" id="add-charge-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Charge</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-charge-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Charge ID
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Code
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Name EN
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Name Local
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>
+                                    Type
+                                </label>
+                                <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select type">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-charge-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::add-charge-modal-->
+
+<!--begin::add-charge-modal-->
+<div class="modal fade" id="edit-charge-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Charge</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::add-charge-form-->
+                <div class="m-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Charge ID
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Code
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Name EN
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>
+                                    Name Local
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>
+                                    Type
+                                </label>
+                                <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select type">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:add-charge-form -->
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Edit
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::edit-charge-modal-->
+
+<!--begin::confirm-delete-modal-->
+<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>You want to delete this Charge?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"> 
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-modal-->
