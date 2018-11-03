@@ -1,4 +1,5 @@
-export enum PartenrGroupEnum{
+export enum PartnerGroupEnum{
+    ALL = 0,
     AGENT = 1,
     CONSIGNEE = 2,
     CUSTOMER = 3,
@@ -7,5 +8,7 @@ export enum PartenrGroupEnum{
     SHIPPER = 6,
     SHIPPINGLINE = 7,
     SUPPLIER = 8,
-    SUPPLIERMATERIAL = 9
+    SUPPLIERMATERIAL = 9,
+    CARRIER = 10,
+    AIRSHIPSUP = 11
 }

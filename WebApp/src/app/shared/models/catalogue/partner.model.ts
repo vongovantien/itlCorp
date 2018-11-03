@@ -3,10 +3,15 @@ export class Partner {
     partnerGroup: string;
     partnerNameVn: string;
     partnerNameEn: string;
+    contactPerson: string;
     addressVn: string;
     addressEn: string
+    addressShippingVn: string;
+    addressShippingEn: string;
     shortName: string;
+    departmentId: string;
     countryId: number;
+    countryShippingId: number;
     accountNo: string;
     tel: string;
     fax: string;
@@ -27,7 +32,8 @@ export class Partner {
     taxExemption: true;
     receiveEtaemail: true;
     showInDashboard: true;
-    provinceId: Date;
+    provinceId: string;
+    provinceShippingId: string;
     parentId: string;
     percentCredit: number;
     alertPercentCreditEmail: boolean;
@@ -36,10 +42,13 @@ export class Partner {
     sugarId: string;
     bookingOverdueDay: number;
     fixRevenueByProject: boolean;
+    zipCode: string;
+    swiftCode: string;
     userCreated: string;
     datetimeCreated: Date;
     userModified: string;
     datetimeModified: Date;
     inactive?: boolean;
-    inactiveOn?: Date
+    inactiveOn?: Date;
+    workPlaceId: string;
 }

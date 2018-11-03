@@ -21,7 +21,7 @@ import { CarrierComponent } from './partner-data/carrier/carrier.component';
 import { ConsigneeComponent } from './partner-data/consignee/consignee.component';
 import { AirShipSupComponent } from './partner-data/air-ship-sup/air-ship-sup.component';
 import { ShipperComponent } from './partner-data/shipper/shipper.component';
-import { AllComponent } from './partner-data/all/all.component';
+import { AllPartnerComponent } from './partner-data/all/all-partner.component';
 
 
 @NgModule({
@@ -49,7 +49,7 @@ import { AllComponent } from './partner-data/all/all.component';
       ConsigneeComponent,
       AirShipSupComponent,
       ShipperComponent,
-      AllComponent
+      AllPartnerComponent
     ],
 })
 export class CatalogueModule { }

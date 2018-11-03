@@ -5,7 +5,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <a routerLink="/home/catalogue/partner-data-addnew" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+            <a class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)=addPartner()>
                 <span>
                     <i class="icon-plus7"></i>
                     <span>
@@ -145,30 +145,30 @@
     <!--begin:: m-portlet of partnerDataTabContent-->
     <div class="tab-content job-tab-content" id="partnerDataTabContent">
         <div class="tab-pane fade show active" role="tabpanel" id="customer-tabview-tab">
-            <app-customer></app-customer>
+            <app-customer (deleteConfirm)="onDelete($event)"></app-customer>
         </div>
         <div class="tab-pane fade" id="agent-tabview-tab" role="tabpanel" aria-labelledby="">
-           <app-agent></app-agent>
+           <app-agent (deleteConfirm)="onDelete($event)"></app-agent>
         </div>
 
         <div class="tab-pane fade" id="carrier-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-carrier></app-carrier>
+            <app-carrier (deleteConfirm)="onDelete($event)"></app-carrier>
         </div>
 
         <div class="tab-pane fade" id="consignee-tabview-data" role="tabpanel" aria-labelledby="">
-           <app-consignee></app-consignee>
+           <app-consignee (deleteConfirm)="onDelete($event)"></app-consignee>
         </div>
 
         <div class="tab-pane fade" id="air-ship-sup-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-air-ship-sup></app-air-ship-sup>
+            <app-air-ship-sup (deleteConfirm)="onDelete($event)"></app-air-ship-sup>
         </div>
 
         <div class="tab-pane fade" id="shipper-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-shipper></app-shipper>
+            <app-shipper (deleteConfirm)="onDelete($event)"></app-shipper>
         </div>
 
         <div class="tab-pane fade" id="all-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-all></app-all>
+            <app-all-partner (deleteConfirm)="onDelete($event)"></app-all-partner>
         </div>
     </div>
     <!--end:: m-portlet of partnerDataTabContent-->

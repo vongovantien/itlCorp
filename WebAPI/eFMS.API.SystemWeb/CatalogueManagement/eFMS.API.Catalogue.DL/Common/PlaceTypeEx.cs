@@ -62,7 +62,7 @@ namespace eFMS.API.Catalogue.DL.Common
                     result = "AGENT";
                     break;
                 case CatPartnerGroupEnum.CONSIGNEE:
-                    result = "AGENT";
+                    result = "CONSIGNEE";
                     break;
                 case CatPartnerGroupEnum.CUSTOMER:
                     result = "CUSTOMER";
@@ -81,6 +81,12 @@ namespace eFMS.API.Catalogue.DL.Common
                     break;
                 case CatPartnerGroupEnum.SUPPLIERMATERIAL:
                     result = "SUPPLIERMATERIAL";
+                    break;
+                case CatPartnerGroupEnum.CARRIER:
+                    result = "CARRIER";
+                    break;
+                case CatPartnerGroupEnum.AIRSHIPSUP:
+                    result = "AIRSHIPSUP";
                     break;
                 default:
                     break;

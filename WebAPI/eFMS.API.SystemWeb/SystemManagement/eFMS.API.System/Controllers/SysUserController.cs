@@ -1,46 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using eFMS.API.Catalogue.DL.IService;
-using eFMS.API.Catalogue.DL.Models;
-using eFMS.API.Catalogue.DL.ViewModels;
+using eFMS.API.System.DL.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
-namespace eFMS.API.Catalogue.Controllers
+namespace eFMS.API.System.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CatAreaController : ControllerBase
+    public class SysUserController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatAreaService catAreaService;
-        public CatAreaController(IStringLocalizer<LanguageSub> localizer, ICatAreaService service)
+        private readonly ISysUserService sysUserService;
+        private readonly IMapper mapper;
+        public SysUserController(IStringLocalizer<LanguageSub> localizer, ISysUserService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
-            catAreaService = service;
+            sysUserService = service;
+            mapper = iMapper;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(catAreaService.Get());
-        }
-
-        [HttpGet]
-        [Route("GetByLanguage")]
-        public IActionResult GetByLanguage()
-        {
-            var results = catAreaService.GetByLanguage();
+            var results = sysUserService.GetAll();
             return Ok(results);
         }
     }

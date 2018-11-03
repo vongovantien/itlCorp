@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.Catalogue.Service.Models
+namespace eFMS.API.Catalogue.DL.ViewModels
 {
-    public partial class CatPartner
+    public class CatPartnerViewModel
     {
         public string Id { get; set; }
         public string PartnerGroup { get; set; }
         public string PartnerNameVn { get; set; }
         public string PartnerNameEn { get; set; }
-        public string ContactPerson { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
-        public string AddressShippingVn { get; set; }
-        public string AddressShippingEn { get; set; }
         public string ShortName { get; set; }
-        public string DepartmentId { get; set; }
         public short? CountryId { get; set; }
-        public short? CountryShippingId { get; set; }
         public string AccountNo { get; set; }
         public string Tel { get; set; }
         public string Fax { get; set; }
@@ -39,7 +35,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? ReceiveEtaemail { get; set; }
         public bool? ShowInDashboard { get; set; }
         public Guid? ProvinceId { get; set; }
-        public Guid? ProvinceShippingId { get; set; }
         public string ParentId { get; set; }
         public decimal? PercentCredit { get; set; }
         public bool? AlertPercentCreditEmail { get; set; }
@@ -48,15 +43,12 @@ namespace eFMS.API.Catalogue.Service.Models
         public string SugarId { get; set; }
         public int? BookingOverdueDay { get; set; }
         public bool? FixRevenueByProject { get; set; }
-        public string ZipCode { get; set; }
-        public string ZipCodeShipping { get; set; }
-        public string SwiftCode { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public Guid? WorkPlaceId { get; set; }
+        public string UserCreatedName { get; set; }
     }
 }

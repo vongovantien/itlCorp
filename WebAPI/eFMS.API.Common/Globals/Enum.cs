@@ -32,6 +32,8 @@
         SHIPPER = 6,
         SHIPPINGLINE = 7,
         SUPPLIER = 8,
-        SUPPLIERMATERIAL = 9
+        SUPPLIERMATERIAL = 9,
+        CARRIER = 10,
+        AIRSHIPSUP = 11
     }
 }

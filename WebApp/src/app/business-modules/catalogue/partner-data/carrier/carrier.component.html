@@ -2,7 +2,7 @@
 <div class="m-portlet">
   <div class="m-portlet__body">
       <!--begin: Datatable of table-simple -->
-      <div class="table-wrapper" id="">
+      <!-- <div class="table-wrapper" id="">
           <table class="table table-striped table-brand dataTable">
               <thead>
                   <tr>
@@ -133,7 +133,10 @@
                   </tr>
               </tbody>
           </table>
-      </div>
+      </div> -->
+      <app-table-layout [records]="carriers" [settings]="partnerDataSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
+            (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+        </app-table-layout>
       <!--end: Datatable of table-simple -->
       <!--begin::pagination-->
       <div class="pagination-nav">

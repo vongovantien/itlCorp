@@ -36,14 +36,14 @@
                       </th>
                   </tr>
               </thead>
-              <tbody>
+              <tbody *ngFor="let item of customers;let i = index;">
                   <tr style="background-color: #f2dedf">
                       <td colspan="10">
-                          <span><strong>Sale man: Thor Thế</strong></span>
-                          <span style="margin-left: 10px;"><strong>Customer: 4</strong></span>
+                          <span><strong>Sale man: {{item.salePersonName}}</strong></span>
+                          <span style="margin-left: 10px;"><strong>Customer: {{item.sumNumberPartner}}</strong></span>
                       </td>
                   </tr>
-                  <tr>
+                  <tr *ngFor= "let _item of item.catPartnerModels">
                       <td class="table-actions-col">
                           <div class="table-actions" style="width: 70px">
                               <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -57,188 +57,40 @@
                           </div>
                       </td>
                       <td>
-                          <span>LH001</span>
+                          <span>{{_item.id}}</span>
                       </td>
                       <td>
-                          <span>Logtechub</span>
+                          <span>{{_item.shortName}}</span>
                       </td>
                       <td>
-                          <span>52 Truong Son street, Tan Binh District, Ho Chi Minh city </span>
+                          <span>{{_item.addressVn}}</span>
                       </td>
                       <td>
-                          <span>B3XHGT3</span>
+                          <span>{{_item.taxCode}}</span>
                       </td>
                       <td>
-                          <span>0982736574</span>
+                          <span>{{_item.tel}}</span>
                       </td>
                       <td>
-                          <span>(038)892-284</span>
+                          <span>{{_item.fax}}</span>
                       </td>
                       <td>
-                          <span>Thor The</span>
-                      </td>
-                      <td>
-                          <span>15:25</span> &nbsp;
-                          <span>18/05/2017</span>
-                      </td>
-                      <td>
-                          <span>
-                              <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                  <input type="checkbox" checked="checked" disabled>
-                                  <span></span>
-                              </label>
-                          </span>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td class="table-actions-col">
-                          <div class="table-actions" style="width: 70px">
-                              <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                  title="Edit stage" routerLink="/home/catalogue/partner-data-detail">
-                                  <i class="la la-edit"></i>
-                              </button>
-                              <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                  title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                  <i class="la la-trash"></i>
-                              </button>
-                          </div>
-                      </td>
-                      <td>
-                          <span>LH001</span>
-                      </td>
-                      <td>
-                          <span>Logtechub</span>
-                      </td>
-                      <td>
-                          <span>52 Truong Son street, Tan Binh District, Ho Chi Minh city </span>
-                      </td>
-                      <td>
-                          <span>B3XHGT3</span>
-                      </td>
-                      <td>
-                          <span>0982736574</span>
-                      </td>
-                      <td>
-                          <span>(038)892-284</span>
-                      </td>
-                      <td>
-                          <span>Thor The</span>
+                          <span>{{_item.userCreated}}</span>
                       </td>
                       <td>
                           <span>15:25</span> &nbsp;
-                          <span>18/05/2017</span>
+                          <span>{{_item.datetimeModified}}</span>
                       </td>
                       <td>
                           <span>
-                              <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                  <input type="checkbox" disabled>
-                                  <span></span>
-                              </label>
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input type="checkbox" disabled [checked]="_item.inactive">
+                                    <span></span>
+                                </label>
                           </span>
                       </td>
                   </tr>
-              </tbody>
-              <tbody>
-                  <tr style="background-color: #f2dedf">
-                      <td colspan="10">
-                          <span><strong>Sale man: Thor Thế</strong></span>
-                          <span style="margin-left: 10px;"><strong>Customer: 4</strong></span>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td class="table-actions-col">
-                          <div class="table-actions" style="width: 70px">
-                              <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                  title="Edit stage" routerLink="/home/catalogue/partner-data-detail">
-                                  <i class="la la-edit"></i>
-                              </button>
-                              <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                  title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                  <i class="la la-trash"></i>
-                              </button>
-                          </div>
-                      </td>
-                      <td>
-                          <span>LH001</span>
-                      </td>
-                      <td>
-                          <span>Logtechub</span>
-                      </td>
-                      <td>
-                          <span>52 Truong Son street, Tan Binh District, Ho Chi Minh city </span>
-                      </td>
-                      <td>
-                          <span>B3XHGT3</span>
-                      </td>
-                      <td>
-                          <span>0982736574</span>
-                      </td>
-                      <td>
-                          <span>(038)892-284</span>
-                      </td>
-                      <td>
-                          <span>Thor The</span>
-                      </td>
-                      <td>
-                          <span>15:25</span> &nbsp;
-                          <span>18/05/2017</span>
-                      </td>
-                      <td>
-                          <span>
-                              <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                  <input type="checkbox" checked="checked" disabled>
-                                  <span></span>
-                              </label>
-                          </span>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td class="table-actions-col">
-                          <div class="table-actions" style="width: 70px">
-                              <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                  title="Edit stage" routerLink="/home/catalogue/partner-data-detail">
-                                  <i class="la la-edit"></i>
-                              </button>
-                              <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                  title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                  <i class="la la-trash"></i>
-                              </button>
-                          </div>
-                      </td>
-                      <td>
-                          <span>LH001</span>
-                      </td>
-                      <td>
-                          <span>Logtechub</span>
-                      </td>
-                      <td>
-                          <span>52 Truong Son street, Tan Binh District, Ho Chi Minh city </span>
-                      </td>
-                      <td>
-                          <span>B3XHGT3</span>
-                      </td>
-                      <td>
-                          <span>0982736574</span>
-                      </td>
-                      <td>
-                          <span>(038)892-284</span>
-                      </td>
-                      <td>
-                          <span>Thor The</span>
-                      </td>
-                      <td>
-                          <span>15:25</span> &nbsp;
-                          <span>18/05/2017</span>
-                      </td>
-                      <td>
-                          <span>
-                              <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                  <input type="checkbox" disabled>
-                                  <span></span>
-                              </label>
-                          </span>
-                      </td>
-                  </tr>
+                
               </tbody>
           </table>
       </div>

@@ -12,7 +12,11 @@
   <!-- checkbox -->
   <ng-container *ngIf="column.dataType == 'boolean'">
       <!-- {{ item[column.primaryKey] }} -->
-      <input type="checkbox" disabled="true" [checked]="item[column.primaryKey]" />
+      <!-- <input type="checkbox" disabled="true" [checked]="item[column.primaryKey]" /> -->
+        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+            <input type="checkbox" disabled [checked]="item[column.primaryKey]">
+            <span></span>
+        </label>
   </ng-container>
 
   <!-- Date -->

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Common
 {
-    public static class ModeOfTransports
+    public static class DataEnums
     {
         public static List<ModeOfTransport> ModeOfTransportData = new List<ModeOfTransport>
         {
@@ -21,6 +21,15 @@ namespace eFMS.API.Catalogue.DL.Common
             new ModeOfTransport { Id = "SEA&AIR&INLAND&DEPOT&EXPRESS", Name = "SEA&AIR&INLAND&DEPOT&EXPRESS" },
             new ModeOfTransport { Id = "EXPRESS", Name = "EXPRESS" },
             new ModeOfTransport { Id = "AIR&EXPRESS", Name = "AIR&EXPRESS" }
+        };
+
+        public static List<DepartmentPartner> Departments = new List<DepartmentPartner> {
+            new DepartmentPartner { Id = 1, Name = "Accountant" },
+            new DepartmentPartner { Id = 2, Name = "CS" },
+            new DepartmentPartner { Id = 3, Name = "ICT" },
+            new DepartmentPartner { Id = 4, Name = "OPS" },
+            new DepartmentPartner { Id = 5, Name = "Sale" },
+            new DepartmentPartner { Id = 6, Name = "Maintenance" }
         };
     }
 }

@@ -2,7 +2,7 @@
 <div class="m-portlet">
   <div class="m-portlet__body">
       <!--begin: Datatable of table-simple -->
-      <div class="table-wrapper" id="">
+      <!-- <div class="table-wrapper" id="">
           <table class="table table-striped table-brand dataTable">
               <thead>
                   <tr>
@@ -133,8 +133,11 @@
                   </tr>
               </tbody>
           </table>
-      </div>
+      </div> -->
       <!--end: Datatable of table-simple -->
+      <app-table-layout [records]="partners" [settings]="partnerDataSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
+            (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+        </app-table-layout>
       <!--begin::pagination-->
       <div class="pagination-nav">
           <div class="row">
@@ -164,6 +167,7 @@
               </div>
           </div>
       </div>
+      <!-- <app-pagination *ngIf="pagerAll.totalItems>0" [config]="pagerAll" (pagerObject)="setPage($event)"></app-pagination> -->
       <!--end::pagination-->
   </div>
 </div>

@@ -51,6 +51,15 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("PagingCustomer")]
+        public IActionResult GetCustomer(CatPartnerCriteria criteria, int page, int size)
+        {
+            var data = catPartnerService.PagingCustomer(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
@@ -122,6 +131,12 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+        [HttpGet]
+        [Route("GetDepartments")]
+        public IActionResult GetDepartments()
+        {
+            return Ok(catPartnerService.GetDepartments());
         }
         private string CheckExist(string id, CatPartnerEditModel model)
         {

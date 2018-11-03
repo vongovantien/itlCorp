@@ -181,7 +181,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<ModeOfTransport> GetModeOfTransport()
         {
-            return ModeOfTransports.ModeOfTransportData;
+            return DataEnums.ModeOfTransportData;
         }
     }
 }
