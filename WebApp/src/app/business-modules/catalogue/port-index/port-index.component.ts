@@ -15,6 +15,7 @@ import { SelectComponent } from 'ng2-select';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 declare var $:any;
 
 @Component({
@@ -30,6 +31,8 @@ export class PortIndexComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: 8 };
   nameModal = "edit-port-index-modal";
+  titleAddModal = "Add Port Index";
+  titleEditModal = "Edit Port Index";
   addButtonSetting: ButtonModalSetting = {
     dataTarget: this.nameModal,
     typeButton: ButtonType.add
@@ -50,7 +53,8 @@ export class PortIndexComponent implements OnInit {
   };
   configSearch: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.portIndexSettings
+    settingFields: this.portIndexSettings,
+    typeSearch: TypeSearch.outtab
   };
   @ViewChild('formAddEdit') form: NgForm;
   @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
@@ -113,8 +117,11 @@ export class PortIndexComponent implements OnInit {
       if(event.field == "code"){
         this.criteria.code = event.searchString;
       }
-      if(event.field == "displayName"){
-        this.criteria.displayName = event.searchString;
+      if(event.field == "nameEN"){
+        this.criteria.nameEN = event.searchString;
+      }
+      if(event.field == "nameVN"){
+        this.criteria.nameVN = event.searchString;
       }
       if(event.field == "modeOfTransport"){
         this.criteria.modeOfTransport = event.searchString;
@@ -150,7 +157,7 @@ export class PortIndexComponent implements OnInit {
   update(): any {
     this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.portIndex.id, this.portIndex).subscribe((response: any) => {
     if (response.status == true){
-      $('#add-port-index-modal').modal('hide');
+      $('#' + this.nameModal).modal('hide');
       this.toastr.success(response.message);
       this.setPage(this.pager);
     }
@@ -163,7 +170,7 @@ export class PortIndexComponent implements OnInit {
         this.getPortIndexs(this.pager);
         this.form.onReset();
         this.initPortIndex();
-        $('#' + this.addButtonSetting.dataTarget).modal('hide');
+        $('#' + this.nameModal).modal('hide');
         setTimeout(() => {
           this.pager.currentPage = 1;
           this.child.setPage(this.pager.currentPage);

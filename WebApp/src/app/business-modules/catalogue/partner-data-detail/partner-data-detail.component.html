@@ -1,0 +1,515 @@
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la la-save"></i>
+                    <span> 
+                        edit
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-ban"></i>
+                    <span>
+                        cancel
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<!--begin::m-content of Partner-data-detail-->
+<div class="m-content">
+    <!--begin::Form-->
+    <div class="m-form m-form--state">    
+        <!--begin::m-portlet -->   
+        <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="alert-block__heading">
+                <h3 class="alert-block__title">General Information</h3>
+            </div>
+            <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Partner ID
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Type
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Partner Name Abreviation
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Partner Name EN Full
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Partner Name Local Full
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Tax Code
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Category
+                            </label>
+                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::m-portlet --> 
+
+        <!--begin::m-portlet -->   
+        <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="alert-block__heading">
+                <h3 class="alert-block__title">Detail Information</h3>
+            </div>
+            <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Contact Person
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Contact Phone Number
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Fax No
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="div-inside bg-secondary m--margin-bottom-15">
+                    <h3 class="c-block-title">Billing Address</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Country
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            City
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Zipcode
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address EN
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address Local
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-inside bg-secondary">
+                    <h3 class="c-block-title">Shipping Address</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Country
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            City
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            Zipcode
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address EN
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Address Local
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Saleman
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Work Phone (Ext No)
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Personal Phone
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Email Address
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Localtion (Workplace)
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::m-portlet --> 
+
+        <!--begin::m-portlet -->   
+        <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="alert-block__heading">
+                <h3 class="alert-block__title">Other Information</h3>
+            </div>
+            <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Office Agent
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                A/C Ref
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Website
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Term (Days)
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Credit $
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Profile
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner Account ID
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Bank
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Swift Code
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Bank Address
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Note
+                            </label>
+                            <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-form__group row">
+                    <label class="col-lg-2 col-form-label form-control-label">Management</label>
+                    <div class="col-lg-10">
+                        <div class="m-checkbox-inline">
+                            <label class="m-checkbox"><input type="checkbox" checked="checked"> Denied <span></span></label> 
+                            <label class="m-checkbox"><input type="checkbox" checked="checked"> Warming <span></span></label> 
+                            <label class="m-checkbox"><input type="checkbox"> Public <span></span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-form__group row">
+                    <label class="col-lg-2 col-form-label form-control-label">Inactive</label>
+                    <div class="col-lg-10">
+                        <div class="m-checkbox-inline">
+                            <label class="m-checkbox"><input type="checkbox"> &nbsp; <span></span></label> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::m-portlet --> 
+
+        <!--begin:: form-actions-->
+        <div class="form-actions">
+          <div class="row">
+            <div class="col-6">
+                <button type="button" class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase" data-toggle="modal" data-target="#confirm-delete-modal">
+                    <span>
+                        <i class="la la-trash"></i>
+                        <span> 
+                            Delete
+                        </span>
+                    </span>
+                </button>
+            </div>
+            <div class="col-6 m--align-right">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span> 
+                            Edit
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+          </div>
+            
+        </div>
+        <!--end:: form-actions-->
+    </div>
+    <!--end::Form-->
+</div>
+<!--end::m-content of Partner-data-detail-->
+<!--begin::confirm-delete-modal-->
+<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Partner</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>You want to delete this Partner?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"> 
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!--end::confirm-delete-modal-->

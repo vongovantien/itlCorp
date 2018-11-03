@@ -243,54 +243,38 @@
             </div>
             <div class="modal-body">
                 <!--begin::add-charge-form-->
-                <div class="m-form">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Charge ID
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Code
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
+                <div class="m-form m-form--state">
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Charge ID</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Name EN
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Name Local
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Code</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label>
-                                    Type
-                                </label>
-                                <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                    placeholder="Select type">
-                                </ng-select>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Name EN</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label"> Name Local</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Type</label>
+                        <div class="col-lg-8">
+                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select type">
+                            </ng-select>
                         </div>
                     </div>
                 </div>
@@ -319,7 +303,7 @@
 </div>
 <!--end::add-charge-modal-->
 
-<!--begin::add-charge-modal-->
+<!--begin::edit-charge-modal-->
 <div class="modal fade" id="edit-charge-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -330,59 +314,43 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!--begin::add-charge-form-->
+                <!--begin::edit-charge-form-->
                 <div class="m-form">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Charge ID
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Code
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Charge ID</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Name EN
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>
-                                    Name Local
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Code</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label>
-                                    Type
-                                </label>
-                                <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                    placeholder="Select type">
-                                </ng-select>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Name EN</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label"> Name Local</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 col-form-label form-control-label">Type</label>
+                        <div class="col-lg-8">
+                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select type">
+                            </ng-select>
                         </div>
                     </div>
                 </div>
-                <!--end:add-charge-form -->
+                <!--end:edit-charge-form -->
             </div>
             <div class="modal-footer m--align-center c-button-actions">
                 <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">

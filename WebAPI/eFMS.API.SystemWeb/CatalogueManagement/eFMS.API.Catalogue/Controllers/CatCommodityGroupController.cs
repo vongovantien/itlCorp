@@ -34,12 +34,28 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPost]
+        [Route("Query")]
+        public IActionResult Get(CatCommodityGroupCriteria criteria)
+        {
+            var results = catComonityGroupService.Query(criteria);
+            return Ok(results);
+        }
+
+        [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatCommodityGroupCriteria criteria, int page, int size)
         {
             var data = catComonityGroupService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("GetByLanguage")]
+        public IActionResult GetByLanguage()
+        {
+            var results = catComonityGroupService.GetByLanguage();
+            return Ok(results);
         }
 
         [HttpGet("{id}")]

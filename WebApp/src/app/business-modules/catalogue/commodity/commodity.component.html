@@ -35,14 +35,15 @@
                     <div class="m-form m--margin-bottom-15">
                         <div class="clearfix m--margin-bottom-15">
                             <div class="c-button-actions m--align-right">
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-commodity-modal">
+                                <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-commodity-modal">
                                     <span>
                                         <i class="icon-plus7"></i>
                                         <span>
                                             add new
                                         </span>
                                     </span>
-                                </button>
+                                </button> -->
+                                <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget" (click)="showAdd('commodity')"></app-default-button>
                                 <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                                     <span>
                                         <i class="la la-download"></i>
@@ -62,7 +63,7 @@
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <div class="row">
+                            <!-- <div class="row">
                                 <div class="col">
                                     <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
                                         <div class="input-group-prepend">
@@ -115,12 +116,13 @@
                                         </span>
                                     </button>
                                 </div>
-                            </div>
+                            </div> -->
+                            <app-search-options [configSearch]="configSearchCommonity" (search)="onSearch($event, 'commodity')" (search)=resetSearch($event)></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
                     <!--begin: Datatable -->
-                    <div class="table-wrapper" id="">
+                    <!-- <div class="table-wrapper" id="">
                         <table class="table table-striped table-brand">
                             <thead>
                                 <tr>
@@ -344,10 +346,14 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                    </div> -->
+                    <app-table-layout [records]="commonities" [settings]="commoditySettings" (sortChange)="onSortChange($event)" 
+                        [nameEditModal]="nameCommodityModal"
+                        (edit)="showDetail($event, 'commodity')" (delete)="showConfirmDelete($event, 'commodity')">
+                    </app-table-layout>
                     <!--end: Datatable -->
                     <!--begin::pagination-->
-                    <div class="pagination-nav">
+                    <!-- <div class="pagination-nav">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size" style="max-width: 190px">
@@ -374,7 +380,8 @@
                                 </nav>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+                    <app-pagination *ngIf="pagerCommodity.totalItems>0" [config]="pagerCommodity" (pagerObject)="setPage($event, 'commodity')"></app-pagination>
                     <!--end::pagination-->
                 </div>
             </div>
@@ -389,319 +396,47 @@
                     <div class="m-form m--margin-bottom-15">
                         <div class="clearfix m--margin-bottom-15">
                             <div class="c-button-actions m--align-right">
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-commodity-group-modal">
+                                <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-commodity-group-modal">
                                     <span>
                                         <i class="icon-plus7"></i>
                                         <span>
                                             add new
                                         </span>
                                     </span>
-                                </button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                </button> -->
+                                <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget" (click)="showAdd('commodityGroup')"></app-default-button>
+                                <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
                                             import
                                         </span>
                                     </span>
-                                </button>
-                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                                </button> -->
+                                <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
+                                <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
                                     <span>
                                         <i class="la la-upload"></i>
                                         <span>
                                             export
                                         </span>
                                     </span>
-                                </button>
+                                </button> -->
+                                <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
-                                        <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="false">
-                                                Partner ID
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item active" href="javascript:void(0)">
-                                                    Partner ID
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0)">
-                                                    Company Name (Abbr)
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0)">
-                                                    Address
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0)">
-                                                    Creator
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0)">
-                                                    Taxcode
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0)">
-                                                    Tel
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0)">
-                                                    Fax
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0)">
-                                                    Modify
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button" title="Search">
-                                                <i class="icon-search"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-auto">
-                                    <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-refresh"></i>
-                                            <span>
-                                                Reset
-                                            </span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
+                            <app-search-options [configSearch]="configSearchGroup" (search)="onSearch($event, 'commodityGroup')" (search)=resetSearch($event)></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
                     <!--begin: Datatable-->
-                    <div class="table-wrapper" id="">
-                        <table class="table table-striped table-brand">
-                            <thead>
-                                <tr>
-                                    <th class="table-actions-col"></th>
-                                    <th>
-                                        <span>Partner ID</span>
-                                    </th>
-                                    <th>
-                                        <span>Company Name</span>
-                                    </th>
-                                    <th>
-                                        <span>Address</span>
-                                    </th>
-                                    <th>
-                                        <span>Creator</span>
-                                    </th>
-                                    <th>
-                                        <span>Tax Code</span>
-                                    </th>
-                                    <th>
-                                        <span>Tel</span>
-                                    </th>
-                                    <th>
-                                        <span>Fax</span>
-                                    </th>
-                                    <th>
-                                        <span>Last Modified</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>LH001</span>
-                                    </td>
-                                    <td>
-                                        <span>ITL Cop</span>
-                                    </td>
-                                    <td>
-                                        <span>52 Truong Son, Tan Binh Distric, Ho Chi Minh city</span>
-                                    </td>
-                                    <td>
-                                        <span>Thor The</span>
-                                    </td>
-                                    <td>
-                                        <span>XSMB</span>
-                                    </td>
-                                    <td>
-                                        <span>0986278364</span>
-                                    </td>
-                                    <td>
-                                        <span>(038)392-384</span>
-                                    </td>
-                                    <td>
-                                        <span>18/05/2017 15:25:00</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>LH001</span>
-                                    </td>
-                                    <td>
-                                        <span>ITL Cop</span>
-                                    </td>
-                                    <td>
-                                        <span>52 Truong Son, Tan Binh Distric, Ho Chi Minh city</span>
-                                    </td>
-                                    <td>
-                                        <span>Thor The</span>
-                                    </td>
-                                    <td>
-                                        <span>XSMB</span>
-                                    </td>
-                                    <td>
-                                        <span>0986278364</span>
-                                    </td>
-                                    <td>
-                                        <span>(038)392-384</span>
-                                    </td>
-                                    <td>
-                                        <span>18/05/2017 15:25:00</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>LH001</span>
-                                    </td>
-                                    <td>
-                                        <span>ITL Cop</span>
-                                    </td>
-                                    <td>
-                                        <span>52 Truong Son, Tan Binh Distric, Ho Chi Minh city</span>
-                                    </td>
-                                    <td>
-                                        <span>Thor The</span>
-                                    </td>
-                                    <td>
-                                        <span>XSMB</span>
-                                    </td>
-                                    <td>
-                                        <span>0986278364</span>
-                                    </td>
-                                    <td>
-                                        <span>(038)392-384</span>
-                                    </td>
-                                    <td>
-                                        <span>18/05/2017 15:25:00</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>LH001</span>
-                                    </td>
-                                    <td>
-                                        <span>ITL Cop</span>
-                                    </td>
-                                    <td>
-                                        <span>52 Truong Son, Tan Binh Distric, Ho Chi Minh city</span>
-                                    </td>
-                                    <td>
-                                        <span>Thor The</span>
-                                    </td>
-                                    <td>
-                                        <span>XSMB</span>
-                                    </td>
-                                    <td>
-                                        <span>0986278364</span>
-                                    </td>
-                                    <td>
-                                        <span>(038)392-384</span>
-                                    </td>
-                                    <td>
-                                        <span>18/05/2017 15:25:00</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>LH001</span>
-                                    </td>
-                                    <td>
-                                        <span>ITL Cop</span>
-                                    </td>
-                                    <td>
-                                        <span>52 Truong Son, Tan Binh Distric, Ho Chi Minh city</span>
-                                    </td>
-                                    <td>
-                                        <span>Thor The</span>
-                                    </td>
-                                    <td>
-                                        <span>XSMB</span>
-                                    </td>
-                                    <td>
-                                        <span>0986278364</span>
-                                    </td>
-                                    <td>
-                                        <span>(038)392-384</span>
-                                    </td>
-                                    <td>
-                                        <span>18/05/2017 15:25:00</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameGroupModal"
+                        (edit)="showDetail($event, 'commodityGroup')" (delete)="showConfirmDelete($event, 'commodityGroup')">
+                    </app-table-layout>
                     <!--end: Datatable-->
                     <!--begin::pagination-->
-                    <div class="pagination-nav">
+                    <!-- <div class="pagination-nav">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size" style="max-width: 190px">
@@ -728,7 +463,8 @@
                                 </nav>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+                    <app-pagination *ngIf="pagerGroup.totalItems>0" [config]="pagerGroup" (pagerObject)="setPage($event, 'commodityGroup')"></app-pagination>
                     <!--end::pagination-->
                 </div>
             </div>
@@ -741,111 +477,181 @@
 <!--end::m-content of Commodity-->
 
 <!--begin::add-commodity-modal-->
-<div class="modal fade" id="add-commodity-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div *ngIf="commodity" class="modal fade" id="{{nameCommodityModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Commodity</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-commodity-form-->
-                <div class="m-form m-form--state">
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Full Name:</label>
-                        <div class="col-lg-8">
-                            <input type="input" class="form-control m-input m-input-group--square" placeholder="Enter full name" > 
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Email address:</label>
-                        <div class="col-lg-8">
-                            <input  type="input" class="form-control m-input m-input-group--square" placeholder="Enter email"> 
-                        </div>
-                    </div>
+            <form name="formCommodity" #formCommodity="ngForm" novalidate (ngSubmit)="formCommodity.form.valid">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" *ngIf="commodity.id == null">{{ titleAddCommodityModal }}</h5>
+                    <h5 class="modal-title" *ngIf="commodity.id">{{ titleEditCommodityModal }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel('commodity')">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <!--end:add-commodity-form -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
+                <div class="modal-body">
+                    <!--begin::add-commodity-form-->
+                    <div class="m-form m-form--state">
+                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameEn.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Name (EN):
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" [(ngModel)]="commodity.commodityNameEn" (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()" 
+                                    class="form-control m-input m-input-group--square"
+                                    #commodityNameEn="ngModel" name="commodityNameEn" required placeholder="Please enter group name">
+                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameEn.invalid">
+                                    Name(EN) is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameVn.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Name (Local):
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" [(ngModel)]="commodity.commodityNameVn" (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()" 
+                                    class="form-control m-input m-input-group--square"
+                                    #commodityNameVn="ngModel" name="commodityNameVn" required placeholder="Please enter group name">
+                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameVn.invalid">
+                                    Name (Local) is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodity.commodityGroupId == null }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Group:
+                            </label>
+                            <div class="col-lg-8">
+                                <ng-select #chooseGroup [allowClear]="true" [items]="groups"  [disabled]="disabled" (data)="refreshGroupValue($event)"
+                                    (selected)="onGroupchange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    [active]="groupActive==null?[]:[groupActive]" placeholder="Select group commdity">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodity.commodityGroupId == null" >
+                                    Group commdity is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" *ngIf="commodity.id">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Inactive
+                            </label>
+                            <div class="col-lg-8">
+                                <label class="m-checkbox"><input [checked]="commodity.inactive" (change)="commodity.inactive=!commodity.inactive"
+                                        type="checkbox"><span></span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end:add-commodity-form -->
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
-                            save
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
                         </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
+                    </button>
+                    <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
                         <span>
-                            cancel
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
                         </span>
-                    </span>
-                </button>
-            </div>
+                    </button> -->
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel('commodity')"></app-default-button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 <!--end::add-commodity-modal-->
 
 <!--begin::add-commodity-group-modal-->
-<div class="modal fade" id="add-commodity-group-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div *ngIf="commodityGroup" class="modal fade" id="{{nameGroupModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Commodity Group</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-commodity-group-form-->
-                <div class="m-form">
-                    <div class="m-form m-form--state">
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label">Full Name:</label>
-                            <div class="col-lg-8">
-                                <input type="input" class="form-control m-input m-input-group--square" placeholder="Enter full name" > 
+            <form name="formGroupCommodity" #formGroupCommodity="ngForm" novalidate (ngSubmit)="formGroupCommodity.form.valid">
+                <div class="modal-header">
+                    <h5 class="modal-title" *ngIf="commodityGroup.id == null">{{titleAddGroupModal}}</h5>
+                    <h5 class="modal-title" *ngIf="commodityGroup.id">{{titleEditGroupModal}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel('commodityGroup')">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::add-commodity-group-form-->
+                    <div class="m-form">
+                        <div class="m-form m-form--state">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameEN.invalid }">
+                                <label class="col-lg-4 col-form-label form-control-label">
+                                    Group Name(EN):
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" [(ngModel)]="commodityGroup.groupNameEn" (change)="commodityGroup.groupNameEn = commodityGroup.groupNameEn.trim()" 
+                                        class="form-control m-input m-input-group--square"
+                                        #groupNameEN="ngModel" name="groupNameEN" required placeholder="Please enter group name">
+                                    <div class="form-control-feedback" *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
+                                        Group Name(EN) is required
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label">Email address:</label>
-                            <div class="col-lg-8">
-                                <input  type="input" class="form-control m-input m-input-group--square" placeholder="Enter email"> 
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameVN.invalid }">
+                                <label class="col-lg-4 col-form-label form-control-label">Group Name(Local):</label>
+                                <div class="col-lg-8">
+                                    <input  type="input" class="form-control m-input m-input-group--square" placeholder="Enter group name (VN)" name="groupNameVN"
+                                        [(ngModel)]="commodityGroup.groupNameVn" #groupNameVN="ngModel" (change)="commodityGroup.groupNameVn = commodityGroup.groupNameVn.trim()" 
+                                        [ngClass]="{ 'm-input--square': formGroupCommodity.submitted && groupNameVN.invalid }"
+                                        minlength="3" required> 
+                                    <div class="form-control-feedback" *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
+                                        Group Name(Local) is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row" *ngIf="commodityGroup.id">
+                                <label class="col-lg-4 col-form-label form-control-label">
+                                    Inactive
+                                </label>
+                                <div class="col-lg-8">
+                                    <label class="m-checkbox"><input [checked]="commodityGroup.inactive" (change)="commodityGroup.inactive=!commodityGroup.inactive"
+                                            type="checkbox"><span></span></label>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!--end:add-commodity-group-form -->
                 </div>
-                <!--end:add-commodity-group-form -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
-                            save
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
                         </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
+                    </button>
+                    <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
                         <span>
-                            cancel
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
                         </span>
-                    </span>
-                </button>
-            </div>
+                    </button> -->
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel('commodityGroup')"></app-default-button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 <!--end::add-commodity-group-modal-->
 
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -879,5 +685,6 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

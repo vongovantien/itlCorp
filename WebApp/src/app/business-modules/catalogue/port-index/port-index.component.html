@@ -90,7 +90,7 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin: Datatable of port-index-list-table -->
-            <app-table-layout [records]="portIndexs" [settings]="portIndexSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameEditModal"
+            <app-table-layout [records]="portIndexs" [settings]="portIndexSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
                 (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->
@@ -135,7 +135,8 @@
         <div class="modal-content">
             <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Port Index</h5>
+                    <h5 class="modal-title" *ngIf="portIndex.id == null">{{ titleAddModal }}</h5>
+                    <h5 class="modal-title" *ngIf="portIndex.id">{{ titleEditModal }}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
                         <span aria-hidden="true">&times;</span>
                     </button>

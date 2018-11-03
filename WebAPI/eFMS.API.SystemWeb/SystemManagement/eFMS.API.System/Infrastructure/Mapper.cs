@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Models;
 using eFMS.API.System.Service.Models;
 
@@ -13,6 +14,7 @@ namespace eFMS.API.System.Infrastructure
             //CreateMap<SysUserGroup, SysUserGroupModel>();
             //CreateMap<SysUserGroupModel, SysUserGroup>();
             CreateMap<SysUserGroupEditModel, SysUserGroupModel>();
+            CreateMap<SysUserGroupModel, SysUserViewModel>();
         }
     }
 }

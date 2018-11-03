@@ -49,7 +49,7 @@ export class TableLayoutComponent implements OnInit, OnChanges {
     if (this.settings) { // when settings provided
       this.columnMaps = this.settings;
       this.editButtonSetting.dataTarget = this.nameEditModal;
-      console.log(this.columnMaps);
+      //console.log(this.columnMaps);
     } else { // no settings, create column maps with defaults
         this.columnMaps = Object.keys(this.records[0])
             .map( key => {

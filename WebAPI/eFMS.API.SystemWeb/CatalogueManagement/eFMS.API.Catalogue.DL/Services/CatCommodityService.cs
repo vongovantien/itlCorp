@@ -70,10 +70,10 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 results = commonities.Join(catCommonityGroups, com => com.CommodityGroupId, group => group.Id,
                                         (com, group) => new { com, group })
-                                     .Where(x => ((x.com.CommodityNameVn ?? "").IndexOf(criteria.CommodityNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              || ((x.com.CommodityNameEn ?? "").IndexOf(criteria.CommodityNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              || ((x.group.GroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              || ((x.group.GroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                     .Where(x => ((x.com.CommodityNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                              || ((x.com.CommodityNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                              || ((x.group.GroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                              || ((x.group.GroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                      ).Select(x => new CatCommodityViewModel
                                      {
                                          Id = x.com.Id,

@@ -79,7 +79,6 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     header: 'Inactive',
     isShow: true,
     dataType: 'boolean',
-    allowSearch: true,
     required: true,
     lookup: ''
   }

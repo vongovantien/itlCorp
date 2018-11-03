@@ -299,12 +299,10 @@ dropdown ver3 */
 .ui-select-match .glyphicon-remove:hover {
     color: red;
 }
-.ui-select-choices .ui-select-choices-row .dropdown-item,
-.ui-select-choices .ui-select-choices-row[_ngcontent-c5] > a[_ngcontent-c5] {
+.ui-select-choices .ui-select-choices-row .dropdown-item {
     color: #6c6c6c;
     font-family: inherit;
 }
-.ui-select-choices .ui-select-choices-row.active>a,
-.ui-select-choices .ui-select-choices-row.active[_ngcontent-c5] > a[_ngcontent-c5] {
+.ui-select-choices .ui-select-choices-row.active>a {
     background-color: #3966b6;
 }
