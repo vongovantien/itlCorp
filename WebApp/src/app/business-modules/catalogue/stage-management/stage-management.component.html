@@ -206,12 +206,22 @@
                     <div class="m-form m-form m-form--state">
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label>
                                         Stage ID
                                     </label>
                                     <input disabled type="text" class="form-control m-input m-input--square"
                                         [(ngModel)]="StageToAdd.id" name="id" placeholder="Please enter detail">
+                                </div> -->
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && abbreviation.invalid }">
+                                    <label>
+                                        Code
+                                    </label>
+                                    <input type="text" required #abbreviation="ngModel" class="form-control m-input m-input--square"
+                                        [(ngModel)]="StageToAdd.code" name="abbreviation" placeholder="Please enter detail">
+                                    <div class="form-control-feedback" *ngIf="addStageForm.submitted && abbreviation.invalid">
+                                        Code is required
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -256,16 +266,7 @@
                                     <!-- <input type="number" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.departmentId" name="role" placeholder="Please enter detail"> -->
 
                                 </div>
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && abbreviation.invalid }">
-                                    <label>
-                                        Code
-                                    </label>
-                                    <input type="text" required #abbreviation="ngModel" class="form-control m-input m-input--square"
-                                        [(ngModel)]="StageToAdd.code" name="abbreviation" placeholder="Please enter detail">
-                                    <div class="form-control-feedback" *ngIf="addStageForm.submitted && abbreviation.invalid">
-                                        Code is required
-                                    </div>
-                                </div>
+                             
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
@@ -332,13 +333,23 @@
                     <form #editStageForm="ngForm" *ngIf="StageToAdd" (ngSubmit)="editStageForm.form.valid">
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label>
                                         Stage ID
                                     </label>
                                     <input disabled type="text" [(ngModel)]="ListStages[index_stage_edit].stage.id" name="id_edt"
                                         class="form-control m-input m-input--square" placeholder="Please enter detail"
                                         value="Stage ID">
+                                </div> -->
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && code_edt.invalid }">
+                                    <label>
+                                        Code
+                                    </label>
+                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.code" required name="code_edit" #code_edt="ngModel" class="form-control m-input m-input--square"
+                                        placeholder="Please enter detail" value=" Code">
+                                        <div class="form-control-feedback" *ngIf="editStageForm.submitted && code_edt.invalid">
+                                                Code is required
+                                         </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -385,16 +396,7 @@
                                     <!-- <input type="number" [(ngModel)]="ListStages[index_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Role"> -->
                                 </div>
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && code_edt.invalid }">
-                                    <label>
-                                        Code
-                                    </label>
-                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.code" required name="code_edit" #code_edt="ngModel" class="form-control m-input m-input--square"
-                                        placeholder="Please enter detail" value=" Code">
-                                        <div class="form-control-feedback" *ngIf="editStageForm.submitted && code_edt.invalid">
-                                                Code is required
-                                         </div>
-                                </div>
+                         
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">

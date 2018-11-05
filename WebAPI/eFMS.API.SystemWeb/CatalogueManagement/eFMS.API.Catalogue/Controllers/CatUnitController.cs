@@ -20,91 +20,66 @@ namespace eFMS.API.Catalogue.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CatPlaceController : ControllerBase
+    public class CatUnitController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatPlaceService catPlaceService;
+        private readonly ICatUnitService catUnitService;
         private readonly IMapper mapper;
-        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper)
+
+        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper)
         {
             stringLocalizer = localizer;
-            catPlaceService = service;
-            mapper = iMapper;
+            catUnitService = service;
+            mapper = imapper;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var results = catPlaceService.Get();
-            return Ok(results);
+            var result = catUnitService.Get();
+            return Ok(result);
         }
 
         [HttpPost]
         [Route("Query")]
-        public IActionResult Get(CatPlaceCriteria criteria)
+        public IActionResult Get(CatUnitCriteria criteria)
         {
-            var results = catPlaceService.Query(criteria);
-            return Ok(results);
+            var result = catUnitService.Query(criteria);
+            return Ok(result);
         }
 
         [HttpPost]
         [Route("Paging")]
-        public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
+        public IActionResult Get(CatUnitCriteria criteria,int page,int size)
         {
-            var data = catPlaceService.Paging(criteria, page, size, out int rowCount);
+            var data = catUnitService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(Guid id)
+        public IActionResult Get(int id)
         {
-            var data = catPlaceService.First(x => x.Id == id);
+            var data = catUnitService.First(x => x.Id == id);
             return Ok(data);
-        }
-
-        [HttpGet]
-        [Route("GetProvinces")]
-        public IActionResult GetProvinces(short? countryId)
-        {
-            var results = catPlaceService.GetProvinces(countryId);
-            return Ok(results);
-        }
-
-        [HttpGet]
-        [Route("GetDistricts")]
-        public IActionResult GetDistricts(Guid? provinceId)
-        {
-            var results = catPlaceService.GetDistricts(provinceId);
-            return Ok(results);
-        }
-
-        [HttpGet]
-        [Route("GetModeOfTransport")]
-        public IActionResult GetModeOfTransport()
-        {
-            return Ok(catPlaceService.GetModeOfTransport());
         }
 
         [HttpPost]
         [Route("Add")]
-        public IActionResult Post(CatPlaceEditModel model)
+        public IActionResult Post(CatUnitModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-
-            var checkExistMessage = CheckExist(Guid.Empty, model);
+            var checkExistMessage = CheckExist(0, model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
-            var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.Id = Guid.NewGuid();
-            catPlace.UserCreated = "01";
-            catPlace.DatetimeCreated = DateTime.Now;
-            catPlace.Inactive = false;
+            var catUnit = mapper.Map<CatUnitModel>(model);
+            catUnit.UserCreated = "01";
+            catUnit.DatetimeCreated = DateTime.Now;
+            catUnit.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catPlaceService.Add(catPlace);
+            var hs = catUnitService.Add(catUnit);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -114,38 +89,37 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(Guid id, CatPlaceEditModel model)
+        [HttpPut]
+        [Route("Update")]
+        public IActionResult Put(CatUnitModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(id, model);
+            var checkExistMessage = CheckExist(model.Id, model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.UserModified = "01";
-            catPlace.DatetimeModified = DateTime.Now;
-            catPlace.Id = id;
-            if(catPlace.Inactive == true)
-            {
-                catPlace.InactiveOn = DateTime.Now;
-            }
+            var catUnit = mapper.Map<CatUnitModel>(model);
+            catUnit.UserModified = "01";
+            catUnit.DatetimeModified = DateTime.Now;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catPlaceService.Update(catPlace, x => x.Id == id);
-            var message = HandleError.GetMessage(hs, Crud.Update);
+            var hs = catUnitService.Update(catUnit,x=>x.Id==model.Id);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
             return Ok(result);
+
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+
+        [HttpDelete]
+        [Route("Delete/{id}")]
+        public IActionResult Delete(int id)
         {
-            var hs = catPlaceService.Delete(x => x.Id == id);
+            var hs = catUnitService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -155,19 +129,21 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        private string CheckExist(Guid id, CatPlaceEditModel model)
+
+
+        private string CheckExist(int id, CatUnitModel model)
         {
             string message = string.Empty;
-            if (id == Guid.Empty)
+            if (id == 0)
             {
-                if (catPlaceService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower()== model.NameEN.ToLower()) || (x.NameVn.ToLower()==model.NameVN.ToLower()) ))
+                if (catUnitService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower()) || (x.UnitNameVn.ToLower() == model.UnitNameEn.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => ((x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower() == model.NameEN.ToLower()) || (x.NameVn.ToLower() == model.NameVN.ToLower())) && x.Id != id))
+                if (catUnitService.Any(x => ((x.Code.ToLower() == model.Code.ToLower()) || (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower()) || (x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower())) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

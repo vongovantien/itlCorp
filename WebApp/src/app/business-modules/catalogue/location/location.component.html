@@ -161,7 +161,7 @@
                                         <span>{{country.nameVn}}</span>
                                     </td>
                                     <td>
-                                        <label class="m-checkbox"><input [checked]="country.inactive" disabled type="checkbox"><span></span></label>
+                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="country.inactive" disabled type="checkbox"><span></span></label>
                                     </td>
                                 </tr>
 
@@ -281,7 +281,7 @@
                                         <span>{{item.countryName}}</span>
                                     </td>
                                     <td>
-                                        <label class="m-checkbox"><input [checked]="item.inactive" disabled type="checkbox"><span></span></label>
+                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="item.inactive" disabled type="checkbox"><span></span></label>
                                     </td>
                                 </tr>
 
@@ -406,7 +406,7 @@
                                         <span>{{district.countryName}}</span>
                                     </td>
                                     <td>
-                                        <label class="m-checkbox"><input [checked]="district.inactive" disabled type="checkbox"><span></span></label>
+                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="district.inactive" disabled type="checkbox"><span></span></label>
                                     </td>
                                 </tr>
 
@@ -539,7 +539,7 @@
                                         <span>{{ward.countryName}}</span>
                                     </td>
                                     <td>
-                                        <label class="m-checkbox"><input [checked]="ward.inactive" disabled type="checkbox"><span></span></label>
+                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="ward.inactive" disabled type="checkbox"><span></span></label>
                                     </td>
                                 </tr>
 
@@ -728,7 +728,7 @@
                                 Inactive
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox"><input [checked]="CountryToUpdate.inactive" (change)="CountryToUpdate.inactive=!CountryToUpdate.inactive"
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="CountryToUpdate.inactive" (change)="CountryToUpdate.inactive=!CountryToUpdate.inactive"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>
@@ -882,7 +882,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Add City-Province</h5>
+                <h5 class="modal-title">Update City-Province</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -958,7 +958,7 @@
                                 Inactive
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox"><input [checked]="ProvinceCityToUpdate.inactive" (change)="ProvinceCityToUpdate.inactive=!ProvinceCityToUpdate.inactive"
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="ProvinceCityToUpdate.inactive" (change)="ProvinceCityToUpdate.inactive=!ProvinceCityToUpdate.inactive"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>
@@ -1222,7 +1222,7 @@
                                 Inactive
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox"><input [checked]="DistrictToUpdate.inactive" (change)="DistrictToUpdate.inactive=!DistrictToUpdate.inactive"
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="DistrictToUpdate.inactive" (change)="DistrictToUpdate.inactive=!DistrictToUpdate.inactive"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>
@@ -1523,7 +1523,7 @@
                                 Inactive
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox"><input [checked]="WardToUpdate.inactive" (change)="WardToUpdate.inactive=!WardToUpdate.inactive"
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="WardToUpdate.inactive" (change)="WardToUpdate.inactive=!WardToUpdate.inactive"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>

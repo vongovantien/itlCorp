@@ -104,7 +104,11 @@ export class API_MENU {
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/delete/"
         },
         Unit: {
-
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Paging",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Delete/",
         },    
         Charge: {
 
