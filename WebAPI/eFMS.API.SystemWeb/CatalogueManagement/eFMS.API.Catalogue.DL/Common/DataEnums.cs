@@ -24,12 +24,24 @@ namespace eFMS.API.Catalogue.DL.Common
         };
 
         public static List<DepartmentPartner> Departments = new List<DepartmentPartner> {
-            new DepartmentPartner { Id = 1, Name = "Accountant" },
-            new DepartmentPartner { Id = 2, Name = "CS" },
-            new DepartmentPartner { Id = 3, Name = "ICT" },
-            new DepartmentPartner { Id = 4, Name = "OPS" },
-            new DepartmentPartner { Id = 5, Name = "Sale" },
-            new DepartmentPartner { Id = 6, Name = "Maintenance" }
+            new DepartmentPartner { Id = 1, Code = "00", Name = "Head Office" },
+            new DepartmentPartner { Id = 2, Code = "01", Name = "OPS" },
+            new DepartmentPartner { Id = 3, Code = "02", Name = "HR" },
+            new DepartmentPartner { Id = 4, Code = "03", Name = "Sale" },
+            new DepartmentPartner { Id = 5, Code= "04", Name = "Admin" },
+            new DepartmentPartner { Id = 6, Code="05", Name = "Accounting" },
+            new DepartmentPartner { Id = 7, Code="06", Name = "CS" }
+        };
+
+        public static List<CatPartnerGroupModel> CatPartnerGroups = new List<CatPartnerGroupModel>
+        {
+            new CatPartnerGroupModel { Id = "AGENT", GroupNameVn = "Agent", GroupNameEn ="Agent" },
+            new CatPartnerGroupModel { Id = "AIRSHIPSUP", GroupNameVn = "AIRSHIPSUP", GroupNameEn = "Air Ship Sub" },
+            new CatPartnerGroupModel { Id = "CARRIER", GroupNameVn = "Người vận chuyển", GroupNameEn = "Carrier"},
+            new CatPartnerGroupModel { Id = "CONSIGNEE", GroupNameVn = "Người nhận hàng", GroupNameEn = "Consignee" },
+            new CatPartnerGroupModel { Id = "CUSTOMER", GroupNameVn = "Khách hàng", GroupNameEn = "Customer" },
+            new CatPartnerGroupModel { Id = "SHIPPER", GroupNameVn = "Người gửi", GroupNameEn = "Shipper" },
+            new CatPartnerGroupModel { Id = "ALL", GroupNameVn = "All", GroupNameEn = "All" }
         };
     }
 }

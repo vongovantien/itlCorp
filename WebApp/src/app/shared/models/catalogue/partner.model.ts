@@ -51,4 +51,5 @@ export class Partner {
     inactive?: boolean;
     inactiveOn?: Date;
     workPlaceId: string;
+    userCreatedName: string;
 }

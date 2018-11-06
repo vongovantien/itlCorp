@@ -50,5 +50,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string UserCreatedName { get; set; }
+        public string SalePersonName { get; set; }
     }
 }

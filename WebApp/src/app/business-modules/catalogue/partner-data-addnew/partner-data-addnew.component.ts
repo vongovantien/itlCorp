@@ -16,40 +16,45 @@ import { SelectComponent } from 'ng2-select';
   styleUrls: ['./partner-data-addnew.component.scss']
 })
 export class PartnerDataAddnewComponent implements OnInit {
+   activeNg:boolean= true;
    partner: Partner = new Partner();
    partnerGroups: any;
-   partnerGroupActive: any;
+   partnerGroupActives: any=[];
    countries: any[];
    billingCountryActive: any;
-   provinces: any[];
-   billingProvinceActive: any;
+   billingProvinces: any[];
+   shippingProvinces: any[];
    saleMans: any[];
    workPlaces: any[];
-   customers: any[];
+   parentCustomers: any[];
    departments: any[];
+   partnerType: any;
+  isRequiredSaleman = false;
    @ViewChild('formAddEdit') form: NgForm;
    @ViewChild('chooseBillingCountry') public chooseBillingCountry: SelectComponent;
    @ViewChild('chooseBillingProvince') public chooseBillingProvince: SelectComponent;
    @ViewChild('chooseShippingCountry') public chooseShippingCountry: SelectComponent;
    @ViewChild('chooseShippingProvince') public chooseShippingProvince: SelectComponent;
+   @ViewChild('chooseSaleman') public chooseSaleman: SelectComponent;
+   @ViewChild('chooseDepartment') public chooseDepartment: SelectComponent;
+   @ViewChild('chooseAccountRef') public chooseAccountRef: SelectComponent;
+   @ViewChild('chooseWorkplace') public chooseWorkplace: SelectComponent;
 
   constructor(private route:ActivatedRoute,
-    private router:Router,
     private baseService: BaseService,
     private toastr: ToastrService, 
-    private spinnerService: Ng4LoadingSpinnerService,
-    private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private api_menu: API_MENU) { }
 
   ngOnInit() {
     this.route.params.subscribe(prams => {
       console.log({param:prams});
       if(prams.partnerType != undefined){
-        this.partner.partnerGroup = prams.partnerType;
+        this.partnerType = prams.partnerType;
       }
     });
 
     this.getComboboxData();
+    
   }
   getComboboxData(): any {
     this.getPartnerGroups();
@@ -57,7 +62,7 @@ export class PartnerDataAddnewComponent implements OnInit {
     //this.getProvinces();
     this.getSalemans();
     this.getWorkPlaces();
-    this.getCustomers();
+    this.getparentCustomers();
     this.getDepartments();
   }
   getDepartments(): any {
@@ -67,11 +72,11 @@ export class PartnerDataAddnewComponent implements OnInit {
       }
      });
   }
-  getCustomers(): any { 
+  getparentCustomers(): any { 
     this.baseService.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup : 3 }).subscribe((response: any) => {
       if(response.length > 0){
-        this.customers = response.data.map(x=>({"text":x.PartnerNameVn,"id":x.id}));
-        console.log(this.customers);
+        this.parentCustomers = response.map(x=>({"text":x.partnerNameVn,"id":x.id}));
+        console.log(this.parentCustomers);
       }
     });
   }
@@ -89,17 +94,17 @@ export class PartnerDataAddnewComponent implements OnInit {
       }
      });
   }
-  getProvinces(id?: number){
+  getProvinces(id: number, isBilling: boolean){
     let url = this.api_menu.Catalogue.CatPlace.getProvinces;
     if(id != undefined){
       url = url + "?countryId=" + id; 
     }
     this.baseService.get(url).subscribe((response: any) => {
-      if(response != null){
-        this.provinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
+      if(isBilling){
+        this.billingProvinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
       }
       else{
-        this.provinces = [];
+        this.shippingProvinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
       }
     });
   }
@@ -114,46 +119,100 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.baseService.get(this.api_menu.Catalogue.partnerGroup.getAll).subscribe((response: any) => {
       if(response != null){
         this.partnerGroups = response.map(x=>({"text":x.id,"id":x.id}));
-        this.getPartnerGroupActive(this.partner.partnerGroup);
+        this.getPartnerGroupActive(this.partnerType);
       }
     });
   }
   getPartnerGroupActive(partnerGroup: any): any {
     if(partnerGroup == PartnerGroupEnum.AGENT){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "AGENT");
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "AGENT"));
     }
     if(partnerGroup == PartnerGroupEnum.AIRSHIPSUP){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "AIRSHIPSUP");
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "AIRSHIPSUP"));
     }
     if(partnerGroup == PartnerGroupEnum.CARRIER){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "CARRIER");
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "CARRIER"));
     }
     if(partnerGroup == PartnerGroupEnum.CONSIGNEE){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "CONSIGNEE");
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "CONSIGNEE"));
     }
     if(partnerGroup == PartnerGroupEnum.CUSTOMER){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "CUSTOMER");
-    }
-    if(partnerGroup == PartnerGroupEnum.PAYMENTOBJECT){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "PAYMENTOBJECT");
-    }
-    if(partnerGroup == PartnerGroupEnum.PETROLSTATION){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "PETROLSTATION");
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "CUSTOMER"));
     }
     if(partnerGroup == PartnerGroupEnum.SHIPPER){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "SHIPPER");
-    }
-    if(partnerGroup == PartnerGroupEnum.SHIPPINGLINE){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "SHIPPINGLINE");
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "SHIPPER"));
     }
     if(partnerGroup == PartnerGroupEnum.SUPPLIER){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "SUPPLIER");
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "SUPPLIER"));
     }
-    if(partnerGroup == PartnerGroupEnum.SUPPLIERMATERIAL){
-      this.partnerGroupActive = this.partnerGroups.find(x => x.id == "SUPPLIERMATERIAL");
+    if(partnerGroup == PartnerGroupEnum.ALL){
+      this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "ALL"));
     }
+    this.partner.partnerGroup = '';
+    if(this.partnerGroupActives.find(x => x.id == "ALL")){
+      this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+    }
+    else{
+      this.partnerGroupActives.forEach(element => {
+        this.partner.partnerGroup = element.text + ';' + this.partner.partnerGroup;
+      });
+      if(this.partnerGroupActives.length>0){
+        this.partner.partnerGroup.substring(0, (this.partner.partnerGroup.length-1));
+      }
+    }
+    if(this.partner.partnerGroup.includes('CUSTOMER')){
+      this.isRequiredSaleman = true;
+    }
+    else{
+      this.isRequiredSaleman = false;
+    }
+    console.log(this.partner.partnerGroup);
+    this.activeNg = false;
+    setTimeout(() => {
+      this.activeNg = true;
+    }, 200);
   }
 
+  onSubmit(){
+    if(this.form.valid && (this.partner.salePersonId != null && this.isRequiredSaleman)){
+      this.partner.accountNo = this.partner.id= this.partner.taxCode;
+      this.addNew();
+    }
+  }
+  addNew(): any {
+    this.baseService.post(this.api_menu.Catalogue.PartnerData.add, this.partner).subscribe((response: any) => {
+      if (response.status == true){
+        this.toastr.success(response.message);
+        this.resetForm();
+      }
+      else{
+        this.toastr.error(response.message);
+      }
+    }, error => this.baseService.handleError(error));
+  }
+  resetForm(): any {
+    this.form.onReset();
+    this.partner.parentId = null;
+    this.partner.countryId = null;
+    this.partner.provinceId = null;
+    this.partner.countryShippingId = null;
+    this.partner.provinceShippingId = null;
+    this.partner.departmentId = null;
+    this.partner.partnerGroup = '';
+    this.partner.salePersonId = null;
+    this.partner.workPlaceId = null;
+    this.partner.public = false;
+    this.partnerGroupActives = [];
+    this.chooseBillingCountry.active = [];
+    this.chooseBillingProvince.active = [];
+    this.chooseShippingCountry.active = [];
+    this.chooseShippingProvince.active = [];
+    this.chooseSaleman.active = [];
+    this.chooseDepartment.active = [];
+    this.chooseAccountRef.active = [];
+    this.chooseWorkplace.active = [];
+  }
+  
   /**
    * ng2-select
    */
@@ -172,23 +231,59 @@ export class PartnerDataAddnewComponent implements OnInit {
     this._disabledV = value;
     this.disabled = this._disabledV === '1';
   }
-
   public selected(value: any, selectName?: string): void {
     if(selectName == 'billingCountry'){
       this.partner.countryId = value.id;
       this.partner.provinceId = null;
-      this.getProvinces(value.id);
+      this.getProvinces(value.id, true);
     }
     if(selectName == 'billingProvince'){
       this.partner.provinceId = value.id;
     }
     if(selectName == 'shippingCountry'){
       this.partner.countryShippingId = value.id;
-      this.partner.provinceId = null;
+      this.partner.provinceShippingId = null;
+      this.getProvinces(value.id, false);
     }
     if(selectName == 'shippingProvince'){
       this.partner.provinceShippingId = value.id;
-      this.getProvinces(value.id);
+    }
+    if(selectName == 'saleman'){
+      this.partner.salePersonId = value.id;
+    }
+    if(selectName == 'department'){
+      this.partner.departmentId = value.id;
+    }
+    if(selectName == 'accountRef'){
+      this.partner.parentId = value.id;
+    }
+    if(selectName == 'accountRef'){
+      this.partner.parentId = value.id;
+    }
+    if(selectName == 'workplace'){
+      this.partner.workPlaceId = value.id;
+    }
+    if(selectName == 'category'){
+      this.partner.partnerGroup = '';
+      if(value.id=="ALL"){
+        this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+      }
+      else{
+        this.partnerGroupActives.push({ id: value.id, text: value.text});
+        this.partnerGroupActives.forEach(element => {
+          this.partner.partnerGroup = element.text + ';' + this.partner.partnerGroup;
+        });
+        if(this.partnerGroupActives.length>0){
+          this.partner.partnerGroup.substring(0, (this.partner.partnerGroup.length-1));
+        }
+      }
+      if(this.partner.partnerGroup.includes('CUSTOMER')){
+        this.isRequiredSaleman = true;
+      }
+      else{
+        this.isRequiredSaleman = false;
+      }
+      console.log(this.partner.partnerGroup);
     }
   }
 
@@ -196,17 +291,59 @@ export class PartnerDataAddnewComponent implements OnInit {
     if(selectName == 'billingCountry'){
       this.partner.countryId = null;
       this.partner.provinceId = null;
+      this.billingProvinces = [];
+      this.chooseBillingProvince.active = [];
     }
     if(selectName == 'billingProvince'){
-      this.partner.provinceId = value.id;
+      this.partner.provinceId = null;
     }
     if(selectName == 'shippingCountry'){
       this.partner.countryShippingId = null;
-      this.partner.provinceId = null;
+      this.partner.provinceShippingId = null;
+      this.shippingProvinces = [];
+      this.chooseShippingProvince.active = [];
     }
     if(selectName == 'shippingProvince'){
-      this.partner.provinceShippingId = value.id;
-      this.getProvinces(value.id);
+      this.partner.provinceShippingId = null;
+    }
+    if(selectName == 'category'){
+      var index = this.partnerGroupActives.indexOf(this.partnerGroupActives.find(x => x.id == value.id));
+      if (index > -1) {
+        this.partnerGroupActives.splice(index, 1);
+      }
+      this.partner.partnerGroup = '';
+      if(value.id=="ALL"){
+        this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+      }
+      else{
+        this.partnerGroupActives.forEach(element => {
+          this.partner.partnerGroup = element.text + ';' + this.partner.partnerGroup;
+        });
+        if(this.partnerGroupActives.length>0){
+          this.partner.partnerGroup.substring(0, (this.partner.partnerGroup.length-1));
+        }
+      }
+      if(this.partner.partnerGroup.includes('CUSTOMER')){
+        this.isRequiredSaleman = true;
+      }
+      else{
+        this.isRequiredSaleman = false;
+      }
+    }
+    if(selectName == 'saleman'){
+      this.partner.salePersonId = null;
+    }
+    if(selectName == 'department'){
+      this.partner.departmentId = null;
+    }
+    if(selectName == 'accountRef'){
+      this.partner.parentId = null;
+    }
+    if(selectName == 'accountRef'){
+      this.partner.parentId = null;
+    }
+    if(selectName == 'workplace'){
+      this.partner.workPlaceId = null;
     }
     console.log('Removed value is: ', value);
   }
@@ -219,20 +356,4 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.value = value;
   }
 
-  onSubmit(){
-    if(this.form.valid){
-      this.addNew();
-    }
-  }
-  addNew(): any {
-    this.baseService.post(this.api_menu.Catalogue.PartnerData.add, this.partner).subscribe((response: any) => {
-      if (response.status == true){
-        this.toastr.success(response.message);
-        this.form.onReset();
-      }
-      else{
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
-  }
 }

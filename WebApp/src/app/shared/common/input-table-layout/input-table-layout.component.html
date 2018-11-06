@@ -22,6 +22,7 @@
   <!-- Date -->
   <ng-container *ngIf="column.dataType == 'Date'">
     <!-- <span>15:25</span> &nbsp; -->
-    <span> {{ item[column.primaryKey] }}</span>
+    <span>{{ item[column.primaryKey] | date: 'h:mm'}}</span> &nbsp;
+    <span>{{ item[column.primaryKey] | date: 'dd/MM/yyyy'}}</span>
   </ng-container>
 </ng-container>

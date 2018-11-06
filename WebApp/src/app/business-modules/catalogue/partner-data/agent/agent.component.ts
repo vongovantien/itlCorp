@@ -19,13 +19,13 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 })
 export class AgentComponent implements OnInit {
   agents: Array<Partner>;
-  agent: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.AGENT };
   isDesc: boolean = false;
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
+  @Output() detail = new EventEmitter<any>();
 
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
@@ -57,10 +57,10 @@ export class AgentComponent implements OnInit {
     this.agents = this.sortService.sort(this.agents, property, this.isDesc);
   }
   showConfirmDelete(item) {
-    this.agent = item;
-    this.deleteConfirm.emit(this.agent);
+    //this.partner = item;
+    this.deleteConfirm.emit(item);
   }
   showDetail(item) {
-    this.agent = item;
+    this.detail.emit(item);
   }
 }

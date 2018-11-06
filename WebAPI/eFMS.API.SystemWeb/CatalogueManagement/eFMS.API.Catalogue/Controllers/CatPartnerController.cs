@@ -81,7 +81,7 @@ namespace eFMS.API.Catalogue.Controllers
             partner.UserCreated = "01";
             partner.DatetimeCreated = DateTime.Now;
             partner.Inactive = false;
-            partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
+            //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
             var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -105,7 +105,7 @@ namespace eFMS.API.Catalogue.Controllers
             partner.UserModified = "01";
             partner.DatetimeModified = DateTime.Now;
             partner.Id = id;
-            partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
+            //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
             if (partner.Inactive == true)
             {
                 partner.InactiveOn = DateTime.Now;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,8 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(catPartnerGroupService.Get());
+            //return Ok(catPartnerGroupService.Get());
+            return Ok(DataEnums.CatPartnerGroups);
         }
     }
 }

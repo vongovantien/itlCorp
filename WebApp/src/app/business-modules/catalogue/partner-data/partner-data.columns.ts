@@ -55,7 +55,7 @@ export const PARTNERDATACOLUMNSETTING: ColumnSetting[] =
     lookup: ''
   },
   {
-    primaryKey: 'userCreated',
+    primaryKey: 'userCreatedName',
     header: 'Creator',
     isShow: true,
     dataType: 'text',
@@ -67,6 +67,7 @@ export const PARTNERDATACOLUMNSETTING: ColumnSetting[] =
     header: 'Modify',
     isShow: true,
     required: true,
+    dataType: 'Date',
     allowSearch: false,
     lookup: 'provinces'
   },

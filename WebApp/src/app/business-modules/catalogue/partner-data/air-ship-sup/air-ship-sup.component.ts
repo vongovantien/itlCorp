@@ -19,13 +19,14 @@ import { SortService } from 'src/app/shared/services/sort.service';
 })
 export class AirShipSupComponent implements OnInit {
   airShips: Array<Partner>;
-  airShip: Partner;
+  //airShip: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.AIRSHIPSUP };
   isDesc: boolean = false;
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
+  @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
@@ -53,11 +54,12 @@ export class AirShipSupComponent implements OnInit {
     this.isDesc = !this.isDesc;
     this.airShips = this.sortService.sort(this.airShips, property, this.isDesc);
   }
+  
   showConfirmDelete(item) {
-    this.airShip = item;
-    this.deleteConfirm.emit(this.airShip);
+    //this.partner = item;
+    this.deleteConfirm.emit(item);
   }
   showDetail(item) {
-    this.airShip = item;
+    this.detail.emit(item);
   }
 }

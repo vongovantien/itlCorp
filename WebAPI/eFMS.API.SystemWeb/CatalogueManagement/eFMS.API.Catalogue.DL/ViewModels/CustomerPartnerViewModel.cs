@@ -10,6 +10,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string SalePersonId { get; set; }
         public string SalePersonName { get; set; }
         public int SumNumberPartner { get; set; }
-        public List<CatPartnerModel> CatPartnerModels { get; set; }
+        public List<CatPartnerViewModel> CatPartnerModels { get; set; }
     }
 }

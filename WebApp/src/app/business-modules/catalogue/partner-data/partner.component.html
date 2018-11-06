@@ -5,7 +5,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <a class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)=addPartner()>
+            <a class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" href="javascript:void(0)"  (click)=addPartner()>
                 <span>
                     <i class="icon-plus7"></i>
                     <span>
@@ -145,30 +145,30 @@
     <!--begin:: m-portlet of partnerDataTabContent-->
     <div class="tab-content job-tab-content" id="partnerDataTabContent">
         <div class="tab-pane fade show active" role="tabpanel" id="customer-tabview-tab">
-            <app-customer (deleteConfirm)="onDelete($event)"></app-customer>
+            <app-customer (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-customer>
         </div>
         <div class="tab-pane fade" id="agent-tabview-tab" role="tabpanel" aria-labelledby="">
-           <app-agent (deleteConfirm)="onDelete($event)"></app-agent>
+           <app-agent (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-agent>
         </div>
 
         <div class="tab-pane fade" id="carrier-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-carrier (deleteConfirm)="onDelete($event)"></app-carrier>
+            <app-carrier (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-carrier>
         </div>
 
         <div class="tab-pane fade" id="consignee-tabview-data" role="tabpanel" aria-labelledby="">
-           <app-consignee (deleteConfirm)="onDelete($event)"></app-consignee>
+           <app-consignee (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-consignee>
         </div>
 
         <div class="tab-pane fade" id="air-ship-sup-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-air-ship-sup (deleteConfirm)="onDelete($event)"></app-air-ship-sup>
+            <app-air-ship-sup (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-air-ship-sup>
         </div>
 
         <div class="tab-pane fade" id="shipper-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-shipper (deleteConfirm)="onDelete($event)"></app-shipper>
+            <app-shipper (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-shipper>
         </div>
 
         <div class="tab-pane fade" id="all-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-all-partner (deleteConfirm)="onDelete($event)"></app-all-partner>
+            <app-all-partner (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-all-partner>
         </div>
     </div>
     <!--end:: m-portlet of partnerDataTabContent-->

@@ -18,14 +18,15 @@ import { SortService } from 'src/app/shared/services/sort.service';
   styleUrls: ['./customer.component.scss']
 })
 export class CustomerComponent implements OnInit {
-  customers: Array<Partner>;
-  customer: Partner;
+  customers: any;
+  //customer: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
   isDesc: boolean = false;
   @ViewChild(PaginationComponent) child; 
-  @Output() deleteConfirm = new EventEmitter<any>();
+  @Output() deleteConfirm = new EventEmitter<Partner>();
+  @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
@@ -44,21 +45,15 @@ export class CustomerComponent implements OnInit {
     }
     this.baseService.post(this.api_menu.Catalogue.PartnerData.customerPaging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.spinnerService.hide();
-      this.customers = response.data.map(x=>Object.assign({},x));
+      this.customers = response.data;
       console.log(this.customers);
       this.pager.totalItems = response.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.customers = this.sortService.sort(this.customers, property, this.isDesc);
-  }
   showConfirmDelete(item) {
-    this.customer = item;
-    this.deleteConfirm.emit(this.customer);
+    this.deleteConfirm.emit(item);
   }
-
-  showDetail(item) {
-    this.customer = item;
+  showDetail(item){
+    this.detail.emit(item);
   }
 }

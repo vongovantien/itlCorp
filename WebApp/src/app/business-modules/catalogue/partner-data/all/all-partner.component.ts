@@ -19,13 +19,14 @@ import { BaseService } from 'src/services-base/base.service';
 })
 export class AllPartnerComponent implements OnInit {
   partners: Array<Partner>;
-  partner: Partner;
+  //partner: Partner;
   pagerAll: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.ALL };
   isDesc: boolean = false;
   @ViewChild(PaginationComponent) child; 
-  @Output() deleteConfirm = new EventEmitter<any>();
+  @Output() deleteConfirm = new EventEmitter<Partner>();
+  @Output() detail = new EventEmitter<Partner>();
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
@@ -56,10 +57,10 @@ export class AllPartnerComponent implements OnInit {
     this.partners = this.sortService.sort(this.partners, property, this.isDesc);
   }
   showConfirmDelete(item) {
-    this.partner = item;
-    this.deleteConfirm.emit(this.partner);
+    //this.partner = item;
+    this.deleteConfirm.emit(item);
   }
   showDetail(item) {
-    this.partner = item;
+    this.detail.emit(item);
   }
 }

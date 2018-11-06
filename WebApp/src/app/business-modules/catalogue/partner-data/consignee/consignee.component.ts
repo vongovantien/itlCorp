@@ -19,13 +19,14 @@ import { SortService } from 'src/app/shared/services/sort.service';
 })
 export class ConsigneeComponent implements OnInit {
   consignees: Array<Partner>;
-  consignee: Partner;
+  //consignee: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CONSIGNEE };
   isDesc: boolean = false;
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
+  @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
@@ -53,11 +54,12 @@ export class ConsigneeComponent implements OnInit {
     this.isDesc = !this.isDesc;
     this.consignees = this.sortService.sort(this.consignees, property, this.isDesc);
   }
+  
   showConfirmDelete(item) {
-    this.consignee = item;
-    this.deleteConfirm.emit(this.consignee);
+    //this.partner = item;
+    this.deleteConfirm.emit(item);
   }
   showDetail(item) {
-    this.consignee = item;
+    this.detail.emit(item);
   }
 }

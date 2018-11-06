@@ -19,13 +19,14 @@ import { SortService } from 'src/app/shared/services/sort.service';
 })
 export class CarrierComponent implements OnInit {
   carriers: Array<Partner>;
-  carrier: Partner;
+  //carrier: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CARRIER };
   isDesc: boolean = false;
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
+  @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
@@ -53,11 +54,12 @@ export class CarrierComponent implements OnInit {
     this.isDesc = !this.isDesc;
     this.carriers = this.sortService.sort(this.carriers, property, this.isDesc);
   }
+  
   showConfirmDelete(item) {
-    this.carrier = item;
-    this.deleteConfirm.emit(this.carrier);
+    //this.partner = item;
+    this.deleteConfirm.emit(item);
   }
   showDetail(item) {
-    this.carrier = item;
+    this.detail.emit(item);
   }
 }
