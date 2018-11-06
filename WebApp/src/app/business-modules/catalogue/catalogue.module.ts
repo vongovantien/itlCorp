@@ -10,12 +10,19 @@ import { ChargeComponent } from './charge/charge.component';
 import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
-
+import { ModalModule } from 'ngx-bootstrap';
+import { SelectModule } from 'ng2-select';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
-import { SelectModule } from 'ng2-select';
 import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
 import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
+import { CustomerComponent } from './partner-data/customer/customer.component';
+import { AgentComponent } from './partner-data/agent/agent.component';
+import { CarrierComponent } from './partner-data/carrier/carrier.component';
+import { ConsigneeComponent } from './partner-data/consignee/consignee.component';
+import { AirShipSupComponent } from './partner-data/air-ship-sup/air-ship-sup.component';
+import { ShipperComponent } from './partner-data/shipper/shipper.component';
+import { AllPartnerComponent } from './partner-data/all/all-partner.component';
 
 
 @NgModule({
@@ -24,8 +31,8 @@ import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
     CatalogueRoutingModule,
     SharedModule,
     FormsModule,
-    SelectModule
-  ],
+    SelectModule,
+    ModalModule.forRoot()  ],
   declarations:
     [LocationComponent,
       WarehouseComponent,
@@ -37,7 +44,14 @@ import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
       PartnerComponent,
       PartnerDataAddnewComponent,
       PartnerDataDetailComponent,
-      ChargeAddnewComponent
+      ChargeAddnewComponent,
+      CustomerComponent,
+      AgentComponent,
+      CarrierComponent,
+      ConsigneeComponent,
+      AirShipSupComponent,
+      ShipperComponent,
+      AllPartnerComponent
     ],
 })
 export class CatalogueModule { }

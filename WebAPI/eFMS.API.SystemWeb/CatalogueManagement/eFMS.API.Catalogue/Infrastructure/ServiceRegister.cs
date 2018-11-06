@@ -17,9 +17,16 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
 
-            services.AddTransient<IUserGroupService, UserGroupService>();
             services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
+            services.AddTransient<ICatCountryService, CatCountryService>();
+            services.AddTransient<ICatStageService, CatStageService>();
+            services.AddTransient<ICatAreaService, CatAreaService>();
+            services.AddTransient<ICatCommodityGroupService, CatCommodityGroupService>();
+            services.AddTransient<ICatCommodityService, CatCommodityService>();
+            services.AddTransient<ICatPartnerService, CatPartnerService>();
+            services.AddTransient<ICatPartnerGroupService, CatPartnerGroupService>();
+            services.AddTransient<ICatUnitService, CatUnitService>();
         }
     }
 }

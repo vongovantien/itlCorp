@@ -6,6 +6,7 @@ export class ButtonModalSetting {
     dataTarget?: string;
 }
 export class ButtonAttributeSetting {
+    type?: string;
     titleButton: string;
     classStyle: string;
     //targetModal?: string;

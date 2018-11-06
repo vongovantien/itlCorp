@@ -5,6 +5,8 @@ export class SystemConstants {
     public static readonly LSK_CURRENT_WORKPLACE_ID: string = 'CURRENT_WORKPLACE_ID';
     public static readonly LSK_CURRENT_LANG: string = 'CURRENT_LANG';
     public static readonly LSL_CACHE_REMEMBER: string = 'CACHE_REMEMBER';
+    public static readonly CURRENT_LANGUAGE:string = "CURRENT_LANGUAGE";
+    public static readonly CURRENT_VERSION:string = "CURRENT_VERSION";
 
     //Security
     public static readonly PATH_RSA_PUBLIC_KEY = './auth/z_rsa_public.key';
@@ -17,14 +19,24 @@ export class SystemConstants {
     public static CURRENT_USER;
 
     //Language
-    public static CURRENT_LANGUAGE: string = localStorage.getItem(SystemConstants.LSK_CURRENT_LANG);
-    public static CURRENT_WORKPLACE_ID: string = localStorage.getItem(SystemConstants.LSK_CURRENT_WORKPLACE_ID);
+    // public static CURRENT_LANGUAGE: string = localStorage.getItem(SystemConstants.LSK_CURRENT_LANG);
+    // public static CURRENT_WORKPLACE_ID: string = localStorage.getItem(SystemConstants.LSK_CURRENT_WORKPLACE_ID);
 
     public static readonly DEFAULT_LANGUAGE: string = "en-US";    
     public static readonly DEFAULT_HOME_PAGE: string = "/app/main/home";
 
     //Page size for ngx-pageination options
-    public static readonly OPTIONS_PAGE_SIZE: number = 10;
-    public static readonly MAX_ITEMS_PER_REQUEST:Number=100;
+    public static readonly OPTIONS_PAGE_SIZE: number = 15;
+    public static readonly OPTIONS_NUMBERPAGES_DISPLAY: number = 10;
+    public static readonly MAX_ITEMS_PER_REQUEST:number=100;
+    public static readonly ITEMS_PER_PAGE: number[] = [3, 15, 30, 50];
     
+    public static readonly MODULE_NAME = {
+        CATALOUGE: "Catalogue",
+        SYSTEM: "System"
+    }
+    public static readonly LANGUAGES = {
+        ENGLISH: SystemConstants.DEFAULT_LANGUAGE,
+        VIETNAM: "vi-VN"
+    }
 }

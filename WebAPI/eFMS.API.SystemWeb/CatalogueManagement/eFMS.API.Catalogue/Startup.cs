@@ -261,7 +261,8 @@ namespace SystemManagementAPI
                             .WithHeaders("accept", "content-type", "origin", "x-custom-header")
                             .AllowAnyOrigin()
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                     });
             });
             //services.AddCustomAuthentication(Configuration);
@@ -324,7 +325,7 @@ namespace SystemManagementAPI
                         AuthorizationUrl = "",
                         Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
                     });
-
+                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
         }
@@ -373,8 +374,8 @@ namespace SystemManagementAPI
                 }
             });
 
-            //app.UseCors("AllowAllOrigins");
-            app.UseCors("CorsPolicy");
+            app.UseCors("AllowAllOrigins");
+            //app.UseCors("CorsPolicy");
             //ConfigureAuth(app);
 
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));

@@ -1,14 +1,11 @@
-﻿using eFMS.API.Catalog.DL.Models;
-using eFMS.API.Catalog.DL.Models.Criteria;
-using eFMS.API.Catalog.Service.Models;
-using eFMS.API.Catalog.Service.ViewModels;
+﻿using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.Service.Models;
+using eFMS.API.System.Service.ViewModels;
 using ITL.NetCore.Connection.BL;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace eFMS.API.Catalog.DL.IService
+namespace eFMS.API.System.DL.IService
 {
     public interface ICatPlaceService : IRepositoryBase<CatPlace, CatPlaceModel>
     {

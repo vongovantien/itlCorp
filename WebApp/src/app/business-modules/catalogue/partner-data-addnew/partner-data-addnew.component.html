@@ -1,3 +1,5 @@
+<form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+
 <!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
@@ -5,7 +7,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                 <span>
                     <i class="la la la-save"></i>
                     <span> 
@@ -13,7 +15,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/partner-data">
                 <span>
                     <i class="la la-ban"></i>
                     <span>
@@ -37,67 +39,84 @@
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partnerAccountNo.invalid }">
                             <label class="form-control-label" for="">
-                                Partner ID
+                                Account No 
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" disabled name="partnerAccountNo" autocomplete="nope" minlength="3" maxlength="20"
+                             [(ngModel)]="partner.accountNo" #partnerAccountNo="ngModel" (change)="partner.accountNo = partner.taxCode.trim()" 
+                             [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerAccountNo.invalid }" required >
+                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerAccountNo.invalid" >
+                                Account No  required least 3 characters
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Type
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Partner Name Abreviation
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && nameENFull.invalid }">
                             <label class="form-control-label" for="">
                                 Partner Name EN Full
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" autofocus placeholder="Please enter Name EN Full" name="nameENFull" autocomplete="nope" minlength="3" maxlength="100"
+                                [(ngModel)]="partner.partnerNameEn" #nameENFull="ngModel" (change)="partner.partnerNameEn = partner.partnerNameEn.trim()" 
+                                [ngClass]="{ 'm-input--square': formAddEdit.submitted && nameENFull.invalid }" required>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && nameENFull.invalid" >
+                                Partner Name EN Full is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && nameLocalFull.invalid }">
                             <label class="form-control-label" for="">
                                 Partner Name Local Full
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Tax Code
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Name Local" name="nameLocalFull" autocomplete="nope" minlength="3" maxlength="100"
+                                [(ngModel)]="partner.partnerNameVn" #nameLocalFull="ngModel" (change)="partner.partnerNameVn = partner.partnerNameVn.trim()" 
+                                [ngClass]="{ 'm-input--square': formAddEdit.submitted && nameLocalFull.invalid }" required>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && nameLocalFull.invalid" >
+                                Partner Name Local Full is required
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && nameAbreviation.invalid }">
+                            <label class="form-control-label" for="">
+                                Partner Name Abreviation
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="please enter Name Abreviation" name="nameAbreviation" autocomplete="nope" minlength="3" maxlength="10"
+                                [(ngModel)]="partner.shortName" #nameAbreviation="ngModel" (change)="partner.shortName = partner.shortName.trim()" 
+                                [ngClass]="{ 'm-input--square': formAddEdit.submitted && nameAbreviation.invalid }" required>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && nameAbreviation.invalid" >
+                                Partner Name Abreviation is required
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partnerTaxCode.invalid }">
+                            <label class="form-control-label" for="">
+                                Tax Code
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Tax Code" autocomplete="nope" minlength="3" maxlength="100"
+                                name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" (change)="partner.taxCode = partner.taxCode.trim()" 
+                                [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerTaxCode.invalid }" required>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerTaxCode.invalid" >
+                                Partner Tax Code is required
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.partnerGroup == null }">
                             <label class="form-control-label" for="">
                                 Category
                             </label>
-                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            <ng-select [multiple]="true" *ngIf="activeNg" [active]="partnerGroupActives" [items]="partnerGroups" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event, 'category')" (removed)="removed($event,'category')" placeholder="Select partner group">
                             </ng-select>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.partnerGroup == null" >
+                                Category is required
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -117,7 +136,8 @@
                             <label class="form-control-label" for="">
                                 Contact Person
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerContactPerson" autocomplete="nope"
+                                [(ngModel)]="partner.contactPerson" (change)="partner.contactPerson = partner.contactPerson.trim()">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -125,7 +145,8 @@
                             <label class="form-control-label" for="">
                                 Contact Phone Number
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" maxlength="50" name="partnerContactNumber" autocomplete="nope"
+                            [(ngModel)]="partner.tel" (change)="partner.tel = partner.tel.trim()">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -133,7 +154,8 @@
                             <label class="form-control-label" for="">
                                 Fax No
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" maxlength="50" name="partnerContactFaxNo" autocomplete="nope"
+                            [(ngModel)]="partner.fax" (change)="partner.fax = partner.fax.trim()">
                         </div>
                     </div>
                 </div>
@@ -148,9 +170,9 @@
                                         <label class="form-control-label">
                                             Country
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                            placeholder="">
+                                        <ng-select #chooseBillingCountry [allowClear]="true" [items]="countries" [disabled]="disabled" (data)="refreshValue($event)" 
+                                            (selected)="selected($event, 'billingCountry')" (removed)="removed($event, 'billingCountry')" (typed)="typed($event)"
+                                            placeholder="Select country">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -159,9 +181,9 @@
                                         <label class="form-control-label">
                                             City
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                            placeholder="">
+                                        <ng-select #chooseBillingProvince [allowClear]="true" [items]="billingProvinces" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event, 'billingProvince')" (removed)="removed($event, 'billingProvince')" (typed)="typed($event)"
+                                            placeholder="Select city/ province">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -172,7 +194,8 @@
                                         <label class="form-control-label">
                                             Zipcode
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" maxlength="20" autocomplete="nope"
+                                            name="billingZipcode" [(ngModel)]="partner.zipCode" (change)="partner.zipCode = partner.zipCode.trim()">
                                     </div>
                                 </div>
                             </div>
@@ -182,7 +205,9 @@
                                 <label class="form-control-label">
                                     Address EN
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" maxlength="300" autocomplete="nope"
+                                    name="billingAddressEN" [(ngModel)]="partner.addressEn" (change)="partner.addressEn = partner.addressEn.trim()"
+                                ></textarea>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -190,7 +215,9 @@
                                 <label class="form-control-label">
                                     Address Local
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" maxlength="300" autocomplete="nope"
+                                    name="billingAddressLocal" [(ngModel)]="partner.addressVn" (change)="partner.addressVn = partner.addressVn.trim()"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
@@ -206,9 +233,9 @@
                                         <label class="form-control-label">
                                             Country
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                            placeholder="">
+                                        <ng-select #chooseShippingCountry [allowClear]="true" [items]="countries" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event, 'shippingCountry')" (removed)="removed($event, 'shippingCountry')" (typed)="typed($event)"
+                                            placeholder="Select country">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -217,9 +244,9 @@
                                         <label class="form-control-label">
                                             City
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                            placeholder="">
+                                        <ng-select #chooseShippingProvince [allowClear]="true" [items]="shippingProvinces" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event, 'shippingProvince')" (removed)="removed($event, 'shippingProvince')" (typed)="typed($event)"
+                                            placeholder="Select province/ city">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -230,7 +257,8 @@
                                         <label class="form-control-label">
                                             Zipcode
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            name="shippingZipcode" [(ngModel)]="partner.zipCodeShipping" (change)="partner.zipCodeShipping = partner.zipCodeShipping.trim()">
                                     </div>
                                 </div>
                             </div>
@@ -240,7 +268,8 @@
                                 <label class="form-control-label">
                                     Address EN
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" autocomplete="nope"
+                                    name="shippingAddressEN" [(ngModel)]="partner.addressShippingEn" (change)="partner.addressShippingEn = partner.addressShippingEn.trim()"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -248,7 +277,8 @@
                                 <label class="form-control-label">
                                     Address Local
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
+                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" autocomplete="nope"
+                                name="shippingAddressVN" [(ngModel)]="partner.addressShippingVn" (change)="partner.addressShippingVn = partner.addressShippingVn.trim()"></textarea>
                             </div>
                         </div>
                     </div>
@@ -256,14 +286,17 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
                                 <label class="form-control-label">
                                     Saleman
                                 </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
+                                    (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"
                                     placeholder="">
                                 </ng-select>
+                                <div class="form-control-feedback" *ngIf="(partner.salePersonId == null && isRequiredSaleman)" >
+                                    Saleman is required
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -272,7 +305,7 @@
                             <label class="form-control-label" for="">
                                 Work Phone (Ext No)
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -280,7 +313,7 @@
                             <label class="form-control-label" for="">
                                 Personal Phone
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
                         </div>
                     </div>
                 </div>
@@ -290,7 +323,7 @@
                             <label class="form-control-label" for="">
                                 Email Address
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -298,7 +331,7 @@
                             <label class="form-control-label" for="">
                                 Localtion (Workplace)
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
                         </div>
                     </div>
                 </div>
@@ -316,9 +349,11 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Office Agent
+                                Department
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <ng-select #chooseDepartment [allowClear]="true" [items]="departments" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
+                                (selected)="selected($event, 'department')" (removed)="removed($event,'department')" placeholder="Select filter">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -326,8 +361,8 @@
                             <label class="form-control-label" for="">
                                 A/C Ref
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" placeholder="Select filter">
+                            <ng-select #chooseAccountRef [allowClear]="true" [items]="parentCustomers" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
+                                (selected)="selected($event, 'accountRef')" (removed)="removed($event)" placeholder="Select A/C Ref">
                             </ng-select>
                         </div>
                     </div>
@@ -336,7 +371,8 @@
                             <label class="form-control-label" for="">
                                 Website
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                name="partnerWebsite"  [(ngModel)]="partner.website">
                         </div>
                     </div>
                 </div>
@@ -344,17 +380,19 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Term (Days)
+                                Partners Bank Account
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerbankAccountNo" autocomplete="nope"
+                                [(ngModel)]="partner.bankAccountNo">
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Credit $
+                                Bank Name
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerBankAccountName" autocomplete="nope"
+                                [(ngModel)]="partner.bankAccountName">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -362,7 +400,9 @@
                             <label class="form-control-label" for="">
                                 Profile
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <ng-select #chooseWorkplace [allowClear]="true" [items]="workPlaces" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
+                                (selected)="selected($event, 'workplace')" (removed)="removed($event)" placeholder="Select filter">
+                            </ng-select>
                         </div>
                     </div>
                 </div>
@@ -372,28 +412,10 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Partner Account ID
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Bank
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
                                         Swift Code
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerSwiftCode"
+                                        [(ngModel)]="partner.swiftCode">
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -401,9 +423,19 @@
                                     <label class="form-control-label" for="">
                                         Bank Address
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerBankAccountAddress" autocomplete="nope"
+                                        [(ngModel)]="partner.bankAccountAddress">
                                 </div>
                             </div>
+                        </div>
+                        
+                        <div class="row">
+                                <label class="col-lg-2 col-form-label form-control-label">Public</label>
+                                <div class="col-lg-10">
+                                    <div class="m-checkbox-inline">
+                                        <label class="m-checkbox"><input type="checkbox" checked="checked" [checked]="partner.public" (change)="partner.public = !partner.public"><span></span></label> 
+                                    </div>
+                                </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -411,18 +443,7 @@
                             <label class="form-control-label" for="">
                                 Note
                             </label>
-                            <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6"></textarea>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="m-form__group form-group row">
-                    <label class="col-lg-2 col-form-label form-control-label">Management</label>
-                    <div class="col-lg-10">
-                        <div class="m-checkbox-inline">
-                            <label class="m-checkbox"><input type="checkbox" checked="checked"> Denied <span></span></label> 
-                            <label class="m-checkbox"><input type="checkbox" checked="checked"> Warming <span></span></label> 
-                            <label class="m-checkbox"><input type="checkbox"> Public <span></span></label>
+                            <textarea  class="form-control m-input m-input--square" id=""  name="partnerNote" [(ngModel)]="partner.note" autocomplete="nope" rows="6"></textarea>
                         </div>
                     </div>
                 </div>
@@ -432,7 +453,7 @@
 
         <!--begin:: form-actions-->
         <div class="form-actions m--align-right">
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                 <span>
                     <i class="la la la-save"></i>
                     <span> 
@@ -440,7 +461,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/partner-data">  
                 <span>
                     <i class="la la-ban"></i>
                     <span>
@@ -454,3 +475,4 @@
     <!--end::Form-->
 </div>
 <!--end::m-content of Partner-data-addnew-->
+</form>

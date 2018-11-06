@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.API.Catalog.Service.ViewModels
+namespace eFMS.API.System.Service.ViewModels
 {
     public partial class vw_catPlace
     {

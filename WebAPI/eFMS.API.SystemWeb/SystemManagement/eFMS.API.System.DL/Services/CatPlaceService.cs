@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
-using eFMS.API.Catalog.DL.IService;
-using eFMS.API.Catalog.DL.Models;
-using eFMS.API.Catalog.DL.Models.Criteria;
-using eFMS.API.Catalog.Service.Models;
-using eFMS.API.Catalog.Service.ViewModels;
+using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.Service.Models;
+using eFMS.API.System.Service.ViewModels;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -12,8 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using eFMS.API.System.Service.Models;
 
-namespace eFMS.API.Catalog.DL.Services
+namespace eFMS.API.System.DL.Services
 {
     public class CatPlaceService : RepositoryBase<CatPlace, CatPlaceModel>, ICatPlaceService
     {

@@ -22,6 +22,7 @@ import { PagingClientComponent } from './shared/paging-client/paging-client.comp
 import {PagingService} from './shared/common/pagination/paging-service';
 import { CommonModule } from '@angular/common';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+import { SharedModule } from './shared/shared.module';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
@@ -38,6 +39,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     SubheaderComponent
   ],
   imports: [    
+    SharedModule,
     CommonModule,
     BrowserModule,
     AppRoutingModule,

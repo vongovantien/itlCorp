@@ -1,7 +1,8 @@
-﻿using System;
+﻿using eFMS.API.System.Service.Models;
+using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Catalog.Service.Models
+namespace eFMS.API.System.Service.Models
 {
     public partial class CatBranch
     {

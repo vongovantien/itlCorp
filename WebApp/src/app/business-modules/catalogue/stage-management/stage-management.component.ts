@@ -1,144 +1,269 @@
-import { Component, OnInit } from '@angular/core';
-import * as lodash from 'lodash';
-import { ActivatedRoute, Router } from '@angular/router';
-import * as SearchHelper from 'src/helper/SearchHelper';
+import { Component, OnInit, Output, ViewChild, AfterViewChecked, AfterContentInit, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { NgForm } from '@angular/forms';
 declare var jquery: any;
 declare var $: any;
 
 @Component({
-  selector: 'app-stage-management',
-  templateUrl: './stage-management.component.html',
-  styleUrls: ['./stage-management.component.sass']
+    selector: 'app-stage-management',
+    templateUrl: './stage-management.component.html',
+    styleUrls: ['./stage-management.component.sass']
 })
 export class StageManagementComponent implements OnInit {
 
-  constructor(private baseServices:BaseService,private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) { }
-  Stages_List: any;
-  Const_Stage_List
-  New_Stage:any= {
-    "stage_id":"",
-    "abbreviation":"",
-    "name":"",
-    "description":"",
-    "name_en":"",
-    "description_en":"",
-    "exp_time":"",
-    "status:":"",
-    "role":""
-  };
-  selected_filter= "All";
-  ngOnInit() {
-    this.getStages();
-  }
 
-  async getStages() {
-    this.Stages_List = await this.baseServices.getAsync('./assets/fake-data/stages-list.json', false,false);
-    this.Const_Stage_List = this.Stages_List.map(x=>Object.assign({},x));
-  }
+    // Stages_List: any;
+    // Const_Stage_List:any;
+    // StageNew:StageModel;
 
-  id_stage_remove=null;
-  remove_stage(index,action){
-    if(action=="confirm"){
-      this.id_stage_remove = index;
+    selected_filter = "All";
+
+    ListStages: any = [];
+    ConstStageList: any = [];
+    StageToAdd = new StageModel();
+    StageToUpdate = new StageModel();
+    ListDepartment: any = [];
+    pager: PagerSetting = {
+        currentPage: 1,
+        pageSize: 15,
+        numberToShow: [10, 15, 30, 50],
+        totalPageBtn: 7
+    };
+
+    @ViewChild(PaginationComponent) child;
+
+    constructor(private baseServices: BaseService, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService, private api_menu: API_MENU) {
+
     }
 
-    if(action=='yes'){
-      this.spinnerService.show();
-      setTimeout(() => {
-        this.Stages_List.splice(this.id_stage_remove,1);
-        this.spinnerService.hide();
-        this.toastr.success("Delete Stage Successful !");
-      }, 1500);
-
-      
-      
-    }
-  }
-  id_stage_edit=null;
-  edit_stage(index,action){
-    if(action=="confirm"){
-      this.id_stage_edit = index;
-    }else{
-      this.spinnerService.show();
-      setTimeout(() => {
-        this.spinnerService.hide();
-        this.toastr.success("Edit Stage Successful !");
-      }, 1500);
-    }
-  }
-
-  add_stage(){   
-    this.spinnerService.show();
-    setTimeout(() => {     
-      this.Stages_List.push(this.New_Stage);
-      this.spinnerService.hide();
-      this.toastr.success("Add Stage Successful !");
-      this.New_Stage = {
-        "stage_id":"",
-        "abbreviation":"",
-        "name":"",
-        "description":"",
-        "name_en":"",
-        "description_en":"",
-        "exp_time":"",
-        "status:":"",
-        "role":""
-      }
-    }, 1500);    
-  }
-
-  search_fields:any = ['stage_id','role','name','name_en','abbreviation'];
-  condition = "or";
-  search_key = "";
-  select_filter(filter,event){
-    this.search_fields = [];
-    this.selected_filter = filter;
-    var id_element = document.getElementById(event.target.id);
-    if($(id_element).hasClass("active")==false){      
-      $(id_element).siblings().removeClass('active');
-      id_element.classList.add("active");
+    async ngOnInit() {
+        this.getDepartments();
+        await this.setPage(this.pager);
     }
 
-    if(filter == "All"){
-      this.search_fields = ['stage_id','role','name','name_en','abbreviation'];
+    async setPage(pager) {
+        this.pager.currentPage = pager.currentPage;
+        this.pager.totalPages = pager.totalPages;
+        this.ListStages = await this.getStages(pager);
     }
-    if(filter == "Stage ID"){
-      this.search_fields = ['stage_id'];
-    }
-    if(filter == "Role"){
-      this.search_fields = ['role'];
-    }
-    if(filter == "Name (EN)"){
-      this.search_fields = ['name_en'];
-    }
-    if(filter == "Name (VI)"){
-      this.search_fields = ['name'];
-    }
-    if(filter == "Abbreviation"){
-      this.search_fields = ['abbreviation'];
-    }    
-  }
 
-   search_stage(){
-    this.search_fields = SearchHelper.PrepareListFieldSearch(null,this.search_fields,this.search_key,this.condition);
-    var source_list = this.Const_Stage_List.map(x=>Object.assign({},x));
-    this.spinnerService.show();
-    setTimeout(() => {
-      this.Stages_List =  SearchHelper.SearchEngine(this.search_fields,source_list,this.condition);
-      this.spinnerService.hide();
-    }, 3000);
-    
-  }
+    async getStages(pager: PagerSetting) {
+        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.getAll + "/" + pager.currentPage + "/" + pager.pageSize, this.searchObject, false, true);
+        this.ConstStageList = response.data.map(x => Object.assign({}, x));
+        console.log(response);
+        pager.totalItems = response.totalItems;
+        return response.data;
+    }
 
-  
-reset_search(){
-  this.search_key = "";
-  this.Stages_List = this.Const_Stage_List.map(x=>Object.assign({},x));  
- // this.search_fields = ['stage_id','role','name','name_en','abbreviation'];
-}
+    getDepartments() {
+        this.baseServices.get(this.api_menu.System.Department.getAll).subscribe(data => {
+            console.log(data);
+            this.ListDepartment = data;
+            this.ListDepartment = this.ListDepartment.map(x => ({ "text": x.code, "id": x.id }));
+            console.log(this.ListDepartment);
+        });
+    }
+
+    index_stage_remove = null;
+    async remove_stage(index, action) {
+        if (action == "confirm") {
+            this.index_stage_remove = index;
+        }
+
+        if (action == 'yes') {
+            var id_stage = this.ListStages[this.index_stage_remove].stage.id;
+            await this.baseServices.deleteAsync(this.api_menu.Catalogue.Stage_Management.delete + id_stage, true, true)
+            // await this.setPage(this.pager);
+            await this.getStages(this.pager);
+
+            this.child.setPage(this.pager.currentPage);
+            if (this.pager.currentPage > this.pager.totalPages) {
+                this.pager.currentPage = this.pager.totalPages;
+                this.child.setPage(this.pager.currentPage);
+            }
+
+
+        }
+    }
+
+    index_stage_edit = null;
+    async edit_stage(index, action, form: NgForm) {
+
+        if (action == "confirm") {
+            this.index_stage_edit = index;
+        } else {
+            if (form.form.status != "INVALID") {
+                this.StageToUpdate = this.ListStages[this.index_stage_edit].stage;
+                await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
+                this.StageToUpdate = new StageModel();
+                $('#edit-stage-management-modal').modal('hide');
+            }
+
+
+        }
+    }
+
+
+    resetNg2Select = true;
+    resetNgSelect() {
+        this.resetNg2Select = false;
+        setTimeout(() => {
+            this.resetNg2Select = true;
+        }, 200);
+    }
+
+    async add_stage(form: NgForm, action) {
+      console.log(this.StageToAdd);
+        if (action == "yes") {
+            console.log(this.StageToAdd);
+            delete this.StageToAdd.id;
+            if (form.form.status != "INVALID") {
+                var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
+                this.StageToAdd = new StageModel();
+                await this.getStages(this.pager);
+                this.child.setPage(this.pager.currentPage);
+                if (this.pager.currentPage < this.pager.totalPages) {
+                    this.pager.currentPage = this.pager.totalPages;
+                    this.child.setPage(this.pager.currentPage);
+                }
+
+                this.resetNgSelect();
+                form.onReset();
+                $('#add-stage-management-modal').modal('hide');
+            }
+        } else {
+            this.resetNgSelect();
+            form.onReset();
+            $('#add-stage-management-modal').modal('hide');
+        }
+
+    }
+
+    search_fields: any = ['id', 'deparmentId', 'stageNameVn', 'stageNameEn', 'code'];
+    condition = "or";
+    search_key = "";
+    searchObject = {
+        id: 0,
+        code: "",
+        stageNameVn: "",
+        stageNameEn: "",
+        condition: "OR",
+        departmentName: ""
+    }
+
+    select_filter(filter, event) {
+        this.searchObject = {
+            id: 0,
+            code: "",
+            stageNameVn: "",
+            stageNameEn: "",
+            condition: "OR",
+            departmentName: ""
+        }
+        this.selected_filter = filter;
+        var id_element = document.getElementById(event.target.id);
+        if ($(id_element).hasClass("active") == false) {
+            $(id_element).siblings().removeClass('active');
+            id_element.classList.add("active");
+        }
+    }
+
+    async search_stage() {
+     
+        if (this.selected_filter == "All") {
+            this.searchObject.code = this.search_key.trim() == "" ? "" : this.search_key.trim();
+            this.searchObject.condition = "OR";
+            this.searchObject.departmentName = this.search_key.trim() == "" ? "" : this.search_key.trim();
+            this.searchObject.id = (this.search_key.trim() == "" || isNaN(Number(this.search_key)) ? 0 : parseInt(this.search_key));
+            this.searchObject.stageNameEn = this.search_key.trim() == "" ? "" : this.search_key.trim();
+            this.searchObject.stageNameVn = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        }
+        if (this.selected_filter == "Stage ID") {
+            this.searchObject.condition = "AND";
+            this.searchObject.id = (this.search_key.trim() == "" || isNaN(Number(this.search_key)) ? 0 : parseInt(this.search_key));
+        }
+        if (this.selected_filter == "Department") {
+            this.searchObject.condition = "AND";
+            this.searchObject.departmentName = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        }
+        if (this.selected_filter == "Name (EN)") {
+            this.searchObject.condition = "AND";
+            this.searchObject.stageNameEn = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        }
+        if (this.selected_filter == "Name (Local)") {
+            this.searchObject.condition = "AND";
+            this.searchObject.stageNameVn = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        }
+        if (this.selected_filter == "Code") {
+            this.searchObject.condition = "AND";
+            this.searchObject.code = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        }
+
+        await this.setPage(this.pager);
+
+    }
+
+
+    async reset_search() {
+        this.searchObject = {
+            id: 0,
+            code: "",
+            stageNameVn: "",
+            stageNameEn: "",
+            condition: "OR",
+            departmentName: ""
+        }
+        this.search_key = "";
+        await this.setPage(this.pager);
+    }
+
+    private value: any = {};
+    private _disabledV: string = '0';
+    private disabled: boolean = false;
+
+    private get disabledV(): string {
+        return this._disabledV;
+    }
+
+    private set disabledV(value: string) {
+        this._disabledV = value;
+        this.disabled = this._disabledV === '1';
+    }
+
+    public selected(value: any, action): void {
+
+        if (action == 'add') {
+            this.StageToAdd.departmentId = value.id;
+        }
+
+        if (action == 'edit') {
+            this.ListStages[this.index_stage_edit].stage.departmentId = value.id;
+        }
+
+
+    }
+
+    public removed(value: any, action): void {
+        if (action == "add") {
+            this.StageToAdd.departmentId = null;
+            console.log(this.StageToAdd.departmentId);
+        }
+        console.log('Removed value is: ', value);
+    }
+
+    public typed(value: any): void {
+        console.log('New search input: ', value);
+    }
+
+    public refreshValue(value: any): void {
+        this.value = value;
+    }
 
 
 }

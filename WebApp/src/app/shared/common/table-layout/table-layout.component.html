@@ -1,10 +1,13 @@
 <div class="table-wrapper" id="">
-    <table class="table table-striped table-brand">
+    <table class="table table-striped table-brand dataTable">
         <thead>
             <tr>
-                <th></th>
-                <th>Order</th>
-                <th *ngFor="let map of columnMaps" class="sorting" (click)="sort(map.primaryKey)"><span *ngIf="map.isShow">{{ map.header }}</span></th>
+                <th class="table-actions-col no-sorting">Actions</th>
+                <!-- <th class="sorting_asc">Order</th> -->
+                <ng-container *ngFor="let map of columnMaps">
+                    <th [ngClass]="{ 'sorting': map.dataType != 'boolean' }" id="hearder_{{map.primaryKey}}" (click)="sort(map.primaryKey)" *ngIf="map.isShow"><span>{{ map.header }}</span></th>
+                </ng-container>
+                <!-- <th *ngFor="let map of columnMaps" class="sorting" (click)="sort(map.primaryKey)"><span *ngIf="map.isShow">{{ map.header }}</span></th> -->
             </tr>
         </thead>
         <tbody *ngIf="records">
@@ -15,12 +18,12 @@
                             title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
                             <i class="la la-edit"></i>
                         </button> -->
-                        <app-addmodal-button [buttonSetting]="editButtonSetting" [dataTarget]="editButtonSetting.dataTarget" (click)="editClick(record)"></app-addmodal-button>
+                        <app-default-button [buttonSetting]="editButtonSetting" [dataTarget]="editButtonSetting.dataTarget" (click)="editClick(record)"></app-default-button>
                         <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                             title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
                             <i class="la la-trash"></i>
                         </button> -->
-                        <app-addmodal-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="deleteClick(record)"></app-addmodal-button>
+                        <app-default-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="deleteClick(record)"></app-default-button>
                     </div>
                 </td>
                 <!-- <td>
@@ -44,13 +47,18 @@
                 <td>
                     <span>10/08/2018</span>
                 </td> -->
-                <td>{{ (i+1) }}</td>
-                <td *ngFor="let map of columnMaps" [ctStyleCell]="record[map.primaryKey]">
+                <!-- <td>{{ (i+1) }}</td> -->
+                <ng-container *ngFor="let map of columnMaps">
                     <!-- {{ record[map.primaryKey] }} -->
+                    <td [ctStyleCell]="record[map.primaryKey]" *ngIf="map.isShow">
+                        <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
+                    </td>
+                </ng-container>
+                <!-- <td *ngFor="let map of columnMaps" [ctStyleCell]="record[map.primaryKey]">
                     <ng-container *ngIf="map.isShow">
                         <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
                     </ng-container>
-                </td>
+                </td> -->
             </tr>
         </tbody>
     </table>

@@ -1,12 +1,12 @@
 ﻿using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.DependencyInjection;
-using eFMS.API.Catalog.Service.Contexts;
+using eFMS.API.System.Service.Contexts;
 using Microsoft.Extensions.Localization;
 using LocalizationCultureCore.StringLocalizer;
-using eFMS.API.Catalog.DL.IService;
-using eFMS.API.Catalog.DL.Services;
+using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Services;
 
-namespace eFMS.API.Catalog.Infrastructure
+namespace eFMS.API.System.Infrastructure
 {
     public static class ServiceRegister
     {
@@ -20,6 +20,8 @@ namespace eFMS.API.Catalog.Infrastructure
             services.AddTransient<IUserGroupService, UserGroupService>();
             services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
+            services.AddTransient<ICatDepartmentService, CatDepartmentService>();
+            services.AddTransient<ISysUserService, SysUserService>();
         }
     }
 }

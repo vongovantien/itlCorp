@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SystemManagementAPI.Resources;
 
-namespace eFMS.API.Catalog.Infrastructure.Common
+namespace eFMS.API.System.Infrastructure.Common
 {
     public enum Crud
     {

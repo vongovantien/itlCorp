@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using eFMS.API.Catalog.DL.IService;
+using eFMS.API.System.DL.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
-namespace eFMS.API.Catalog.Controllers
+namespace eFMS.API.System.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]

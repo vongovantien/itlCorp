@@ -7,7 +7,7 @@
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                 data-target="#add-port-index-modal">
                 <span>
                     <i class="icon-plus7"></i>
@@ -15,23 +15,26 @@
                         add new
                     </span>
                 </span>
-            </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            </button> -->
+            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
+            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-download"></i>
                     <span>
                         import
                     </span>
                 </span>
-            </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+            </button> -->
+            <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
+            <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-upload"></i>
                     <span>
                         export
                     </span>
                 </span>
-            </button>
+            </button> -->
+            <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
         </div>
     </div>
 </div>
@@ -43,7 +46,7 @@
         <div class="m-portlet__body">
             <!--begin::Form-->
             <div class="m-form">
-                <div class="input-group m-input-group m-input-group--square">
+                <!-- <div class="input-group m-input-group m-input-group--square">
                     <div class="input-group-prepend">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
@@ -76,7 +79,8 @@
                             <i class="icon-search"></i>
                         </button>
                     </div>
-                </div>
+                </div> -->
+                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (search)=resetSearch($event)></app-search-options>
             </div>
             <!--end::Form-->
         </div>
@@ -86,331 +90,12 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin: Datatable of port-index-list-table -->
-            <div class="table-wrapper" id="">
-                <table class="table table-striped table-brand">
-                    <thead>
-                        <tr>
-                            <th>
-                                <span>Actions</span>
-                            </th>
-                            <th>
-                                <span>Port Code</span>
-                            </th>
-                            <th>
-                                <span>Port Name</span>
-                            </th>
-                            <th>
-                                <span>Country</span>
-                            </th>
-                            <th>
-                                <span>Zone</span>
-                            </th>
-                            <th>
-                                <span>Local Zone</span>
-                            </th>
-                            <th>
-                                <span>Mode</span>
-                            </th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="table-actions-col">
-                                <div class="table-actions">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <span>AAC</span>
-                            </td>
-                            <td>
-                                <span>Al ARISH</span>
-                            </td>
-                            <td>
-                                <span>EGYPT</span>
-                            </td>
-                            <td style="width: 200px;">
-                                <span>EUROPE</span>
-                            </td>
-                            <td>
-                                <span></span>
-                            </td>
-                            <td>
-                                <span>AIR</span>
-                            </td>
-                        </tr>
-                        <tr>
-                                <td class="table-actions-col">
-                                    <div class="table-actions">
-                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                            <i class="la la-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>AAE</span>
-                                </td>
-                                <td>
-                                    <span>Al AIN</span>
-                                </td>
-                                <td>
-                                    <span>ALGERIA</span>
-                                </td>
-                                <td style="width: 200px;">
-                                    <span>AFRICA</span>
-                                </td>
-                                <td>
-                                    <span></span>
-                                </td>
-                                <td>
-                                    <span>AIR SEA</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>AAL</span>
-                                    </td>
-                                    <td>
-                                        <span>ANNABA</span>
-                                    </td>
-                                    <td>
-                                        <span>EGRYP</span>
-                                    </td>
-                                    <td style="width: 200px;">
-                                        <span>AFRICA</span>
-                                    </td>
-                                    <td>
-                                        <span></span>
-                                    </td>
-                                    <td>
-                                        <span>AIR</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                        <td class="table-actions-col">
-                                            <div class="table-actions">
-                                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                    title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                                    <i class="la la-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                    title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                    <i class="la la-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span>AAC</span>
-                                        </td>
-                                        <td>
-                                            <span>Al ARISH</span>
-                                        </td>
-                                        <td>
-                                            <span>EGYPT</span>
-                                        </td>
-                                        <td style="width: 200px;">
-                                            <span>EUROPE</span>
-                                        </td>
-                                        <td>
-                                            <span></span>
-                                        </td>
-                                        <td>
-                                            <span>AIR</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                            <td class="table-actions-col">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>AAE</span>
-                                            </td>
-                                            <td>
-                                                <span>Al AIN</span>
-                                            </td>
-                                            <td>
-                                                <span>ALGERIA</span>
-                                            </td>
-                                            <td style="width: 200px;">
-                                                <span>AFRICA</span>
-                                            </td>
-                                            <td>
-                                                <span></span>
-                                            </td>
-                                            <td>
-                                                <span>AIR SEA</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                                <td class="table-actions-col">
-                                                    <div class="table-actions">
-                                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                                            <i class="la la-edit"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                            <i class="la la-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span>AAL</span>
-                                                </td>
-                                                <td>
-                                                    <span>ANNABA</span>
-                                                </td>
-                                                <td>
-                                                    <span>EGRYP</span>
-                                                </td>
-                                                <td style="width: 200px;">
-                                                    <span>AFRICA</span>
-                                                </td>
-                                                <td>
-                                                    <span></span>
-                                                </td>
-                                                <td>
-                                                    <span>AIR</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                    <td class="table-actions-col">
-                                                        <div class="table-actions">
-                                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                                                <i class="la la-edit"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                                <i class="la la-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <span>AAC</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Al ARISH</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>EGYPT</span>
-                                                    </td>
-                                                    <td style="width: 200px;">
-                                                        <span>EUROPE</span>
-                                                    </td>
-                                                    <td>
-                                                        <span></span>
-                                                    </td>
-                                                    <td>
-                                                        <span>AIR</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                        <td class="table-actions-col">
-                                                            <div class="table-actions">
-                                                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                    title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                                                    <i class="la la-edit"></i>
-                                                                </button>
-                                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                    title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                                    <i class="la la-trash"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <span>AAE</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Al AIN</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>ALGERIA</span>
-                                                        </td>
-                                                        <td style="width: 200px;">
-                                                            <span>AFRICA</span>
-                                                        </td>
-                                                        <td>
-                                                            <span></span>
-                                                        </td>
-                                                        <td>
-                                                            <span>AIR SEA</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                            <td class="table-actions-col">
-                                                                <div class="table-actions">
-                                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                        title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                                                                        <i class="la la-edit"></i>
-                                                                    </button>
-                                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                                        <i class="la la-trash"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <span>AAL</span>
-                                                            </td>
-                                                            <td>
-                                                                <span>ANNABA</span>
-                                                            </td>
-                                                            <td>
-                                                                <span>EGRYP</span>
-                                                            </td>
-                                                            <td style="width: 200px;">
-                                                                <span>AFRICA</span>
-                                                            </td>
-                                                            <td>
-                                                                <span></span>
-                                                            </td>
-                                                            <td>
-                                                                <span>AIR</span>
-                                                            </td>
-                                                        </tr>
-                    
-
-                    </tbody>
-                </table>
-            </div>
+            <app-table-layout [records]="portIndexs" [settings]="portIndexSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
+                (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+            </app-table-layout>
             <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
-            <div class="pagination-nav">
+            <!-- <div class="pagination-nav">
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="select-box" style="max-width: 190px">
@@ -435,7 +120,8 @@
                         </nav>
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
         </div>
     </div>
@@ -444,189 +130,167 @@
 <!--end::m-content of Port-index-->
 
 <!--begin::add-port-index-modal-->
-<div class="modal fade" id="add-port-index-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" *ngIf="portIndex" id="{{nameModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Port Index</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-port-index-form-->
-                <div class="m-form">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Port code
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Port name
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Country
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Zone (Optional)
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Local Zone (Optional)
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Mode
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail">
-                            </div>
-                        </div>
-                    </div>
+            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+                <div class="modal-header">
+                    <h5 class="modal-title" *ngIf="portIndex.id == null">{{ titleAddModal }}</h5>
+                    <h5 class="modal-title" *ngIf="portIndex.id">{{ titleEditModal }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <!--end:add-port-index-form -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
+                <div class="modal-body">
+                    <!--begin::add-port-index-form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
+                                    <label class="form-control-label">
+                                        Port code
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter detail" name="code" autocomplete="nope" minlength="3"
+                                    [(ngModel)]="portIndex.code" #code="ngModel" (change)="portIndex.code = portIndex.code.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
+                                        Code is required least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameEN.invalid }">
+                                    <label class="form-control-label">
+                                        Name(EN)
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="portIndexeNameEN" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="portIndex.nameEN" #portIndexeNameEN="ngModel" (change)="portIndex.nameEN = portIndex.nameEN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameEN.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && portIndexeNameEN.invalid" >
+                                            Name(EN) is required least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameLocal.invalid }">
+                                    <label class="form-control-label">
+                                        Name(Local)
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="portIndexeNameLocal" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="portIndex.nameVN" #portIndexeNameLocal="ngModel" (change)="portIndex.nameVN = portIndex.nameVN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameLocal.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && portIndexeNameLocal.invalid" >
+                                        Name(Local) is required least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndex.countryID == null }">
+                                    <label class="form-control-label">
+                                        Country
+                                    </label>
+                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)" [active]="countryActive==null?[]:[countryActive]"
+                                        (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select country">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && portIndex.countryID == null" >
+                                        Country is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <!-- <div class="form-group">
+                                    <label>
+                                        Zone (Optional)
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                </div> -->
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                            Zone (Optional)
+                                    </label>
+                                    <ng-select #chooseArea [allowClear]="true" [items]="areas"  [disabled]="disabled" (data)="refreshAreaValue($event)" [active]="areaActive==null?[]:[areaActive]"
+                                        (selected)="onAreachange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select zone">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>
+                                        Local Zone (Optional)
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter detail">
+                                </div>
+                            </div> -->
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && modePort.invalid }">
+                                    <label class="form-control-label">
+                                        Mode
+                                    </label>
+                                    <input list="modes" type="text" class="form-control m-input" placeholder="Please enter mode" name="modePort" autocomplete="nope" minlength="3"
+                                    [(ngModel)]="portIndex.modeOfTransport" #modePort="ngModel" (change)="portIndex.modeOfTransport = portIndex.modeOfTransport.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && modePort.invalid }" required>
+                                    <datalist id="modes" *ngIf="modes">
+                                        <option *ngFor="let mode of modes" [value]="mode.id"></option>
+                                    </datalist>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && modePort.invalid" >
+                                            Mode is required least 3 characters
+                                        </div>
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        In Active
+                                    </label>
+                                    <input type="checkbox" class="form-control m-input" name="inActive"
+                                        [(ngModel)]="portIndex.inActive" #inActive="ngModel">
+                                </div>
+                            </div> -->
+                        </div>
+                        <div class="row" *ngIf="portIndex.id">
+                            <div class="col-lg-4">
+                                <div class="form-group m-form__group">
+                                    <div>
+                                        <label class="m-checkbox m-checkbox--bold">
+                                            <input type="checkbox" [checked]="portIndex.inactive" (change)="portIndex.inactive = !portIndex.inactive">
+                                            Inactive
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end:add-port-index-form -->
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
-                            save
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
                         </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
+                    </button>
+                    <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
                         <span>
-                            cancel
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
                         </span>
-                    </span>
-                </button>
-            </div>
+                    </button> -->
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 <!--end::add-port-index-modal-->
 
-<!--begin::edit-port-index-modal-->
-<div class="modal fade" id="edit-port-index-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Port Index</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-port-index-form-->
-                <div class="m-form">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Port code
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port code">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Port name
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port name">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Country
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Country">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Zone (Optional)
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Zone">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Local Zone (Optional)
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Local Zone ">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>
-                                    Mode
-                                </label>
-                                <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Mode">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--end:add-port-index-form -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Edit
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::edit-port-index-modal-->
-
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -660,5 +324,6 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

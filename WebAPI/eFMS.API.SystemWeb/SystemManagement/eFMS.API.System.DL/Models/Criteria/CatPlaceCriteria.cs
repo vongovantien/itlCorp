@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.API.Catalog.DL.Models.Criteria
+namespace eFMS.API.System.DL.Models.Criteria
 {
     public class CatPlaceCriteria
     {

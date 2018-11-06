@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace eFMS.API.Catalog.DL.Models.Criteria
+namespace eFMS.API.System.DL.Models.Criteria
 {
     public class UserGroupCriteria
     {
