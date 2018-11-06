@@ -104,7 +104,7 @@ namespace eFMS.API.Catalogue.Controllers
             catUnit.DatetimeModified = DateTime.Now;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catUnitService.Update(catUnit,x=>x.Id==model.Id);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
+            var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
@@ -128,7 +128,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
-
 
 
         private string CheckExist(int id, CatUnitModel model)
