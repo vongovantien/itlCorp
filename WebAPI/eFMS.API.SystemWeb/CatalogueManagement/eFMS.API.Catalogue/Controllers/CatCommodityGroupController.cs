@@ -34,6 +34,14 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPost]
+        [Route("Query")]
+        public IActionResult Get(CatCommodityGroupCriteria criteria)
+        {
+            var results = catComonityGroupService.Query(criteria);
+            return Ok(results);
+        }
+
+        [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatCommodityGroupCriteria criteria, int page, int size)
         {

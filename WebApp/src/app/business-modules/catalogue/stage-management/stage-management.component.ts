@@ -1,13 +1,8 @@
 import { Component, OnInit, Output, ViewChild, AfterViewChecked, AfterContentInit, EventEmitter } from '@angular/core';
-import * as lodash from 'lodash';
-import * as moment from 'moment';
-import { ActivatedRoute, Router } from '@angular/router';
-import * as SearchHelper from 'src/helper/SearchHelper';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { SystemConstants } from '../../../../constants/system.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
@@ -211,14 +206,6 @@ export class StageManagementComponent implements OnInit {
         }
 
         await this.setPage(this.pager);
-
-        // if(this.searchObject.id != NaN){
-
-        // }else{
-        //   this.toastr.error("Stage ID must be number !");
-        //   alert("the stage id must be number !");
-        // }
-
 
     }
 

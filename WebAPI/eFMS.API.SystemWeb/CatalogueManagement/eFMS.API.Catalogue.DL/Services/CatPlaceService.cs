@@ -24,6 +24,9 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper) : base(repository, mapper)
         {
+            SetChildren<CatPlace>("Id", "CountryId");
+            SetChildren<CatPlace>("Id", "ProvinceId");
+            SetChildren<CatPlace>("Id", "DistrictId");
         }
 
         public List<vw_catProvince> GetProvinces(short? countryId)
@@ -53,13 +56,16 @@ namespace eFMS.API.Catalogue.DL.Services
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
             if (criteria.All == null)
             {
-                list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >=0)
+                list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.Name_EN ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.Name_VN ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >=0)
+                                    && ((x.Name_VN ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.CountryNameEN ?? "").IndexOf(criteria.CountryNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.CountryNameVN ?? "").IndexOf(criteria.CountryNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.DistrictNameEN ?? "").IndexOf(criteria.DistrictNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.DistrictNameVN ?? "").IndexOf(criteria.DistrictNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.CountryID  == criteria.CountryId || criteria.CountryId==null)
+                                    && (x.ProvinceID == criteria.ProvinceId || criteria.ProvinceId == null)
+                                    && (x.DistrictID == criteria.DistrictId || criteria.DistrictId == null)
                                     && ((x.ProvinceNameEN ?? "").IndexOf(criteria.ProvinceNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -181,7 +187,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<ModeOfTransport> GetModeOfTransport()
         {
-            return ModeOfTransports.ModeOfTransportData;
+            return DataEnums.ModeOfTransportData;
         }
     }
 }

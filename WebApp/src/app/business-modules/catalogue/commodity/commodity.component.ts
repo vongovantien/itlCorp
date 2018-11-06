@@ -92,7 +92,7 @@ export class CommodityComponent implements OnInit {
   }
   getComboboxData(): any {
     this.baseService.get(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage).subscribe((response: any) => {
-    this.groups = response.map(x=>({"text":x.groupName,"id":x.id}));;
+    this.groups = response.map(x=>({"text":x.groupName,"id":x.id}));
   });
   }
   setPage(pager: PagerSetting, tabName): any {

@@ -325,7 +325,7 @@ namespace SystemManagementAPI
                         AuthorizationUrl = "",
                         Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
                     });
-
+                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
         }

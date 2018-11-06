@@ -33,7 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPost]
-        [Route("getAll/{pageNumber}/{pageSize}")]
+        [Route("paging/{pageNumber}/{pageSize}")]
         public IActionResult Get(CatCountryCriteria criteria,int pageNumber,int pageSize)
         {
             var data = catCountryService.GetCountries(criteria,pageNumber,pageSize, out int rowCount);
@@ -49,6 +49,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("getAll")]
+        public IActionResult GetAll()
+        {
+            var data = catCountryService.Get();
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("addNew")]
         public IActionResult Add(CatCountryModel catCountry)
@@ -61,7 +69,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             catCountry.DatetimeCreated = DateTime.Now;
             catCountry.UserCreated = "Thor";
-            catCountry.Inactive = true;
+            catCountry.Inactive = false;
             var hs = catCountryService.Add(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

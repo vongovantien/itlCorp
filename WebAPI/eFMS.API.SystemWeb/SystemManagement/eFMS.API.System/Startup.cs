@@ -3,7 +3,6 @@ using eFMS.API.System.Infrastructure;
 using eFMS.API.System.Infrastructure.Filters;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.API.System.Service.Models;
-using eFMS.API.System.Service.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;

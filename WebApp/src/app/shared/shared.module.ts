@@ -34,6 +34,7 @@ import { InputFormComponent } from './common/input-form/input-form.component';
     SearchOptionsComponent, 
     ModifiedModalComponent, 
     InputFormComponent
+    
   ],
   exports: [
     CommonModule,

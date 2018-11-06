@@ -49,18 +49,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                           join department in t on i.DepartmentId equals department.Id
                           select i).ToList();
-                //var s = DataContext.Get();
-                //var t = ((eFMSDataContext)DataContext.DC).CatDepartment;
-                //result = (from stage in DataContext.Get()
-                //         join department in ((eFMSDataContext)DataContext.DC).CatDepartment on stage.DepartmentId equals department.Id
-                //         where ((department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0)
-                //                && (stage.Id == criteria.Id || criteria.Id == 0)
-                //                    && (stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0
-                //                    && (stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0
-                //                    && (stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0
-                //          select stage).ToList();
-
-
+            
             }
             else
             {
@@ -74,27 +63,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     || (x.stage.Id == criteria.Id))
                     .Select(x => x.stage).ToList();
 
-                //var s = DataContext.Get(stage => (stage.Id == criteria.Id || criteria.Id == 0)
-                //                     || ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
-                //                     || ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
-                //                     || ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0));
-
-                //var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
-                //result = (from i in s
-
-                //          join department in t on i.DepartmentId equals department.Id
-                //          select i).ToList();
-                         
-
-                //var s = DataContext.Get();
-                //var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
-                //result = (from stage in DataContext.Get()
-                //          join department in t on stage.DepartmentId equals department.Id
-                //          where ((stage.Id == criteria.Id || criteria.Id == 0)
-                //                     || ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
-                //                     || ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
-                //                     || ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0))
-                //          select stage).ToList();
+              
             }
 
             rowsCount = result.Count;

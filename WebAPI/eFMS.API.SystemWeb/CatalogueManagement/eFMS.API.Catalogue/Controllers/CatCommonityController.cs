@@ -34,6 +34,14 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPost]
+        [Route("Query")]
+        public IActionResult Get(CatCommodityCriteria criteria)
+        {
+            var results = catComonityService.Query(criteria);
+            return Ok(results);
+        }
+
+        [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatCommodityCriteria criteria, int page, int size)
         {
@@ -116,14 +124,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == 0)
             {
-                if (catComonityService.Any(x => x.CommodityNameEn == model.CommodityNameEn && x.CommodityNameVn == model.CommodityNameVn))
+                if (catComonityService.Any(x => x.CommodityNameEn == model.CommodityNameEn || x.CommodityNameVn == model.CommodityNameVn))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }
             }
             else
             {
-                if (catComonityService.Any(x => x.CommodityNameEn == model.CommodityNameEn && x.CommodityNameVn == model.CommodityNameVn && x.Id != id))
+                if (catComonityService.Any(x => (x.CommodityNameEn == model.CommodityNameEn || x.CommodityNameVn == model.CommodityNameVn) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }

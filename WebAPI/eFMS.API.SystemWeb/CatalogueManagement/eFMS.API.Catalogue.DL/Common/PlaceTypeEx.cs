@@ -53,5 +53,45 @@ namespace eFMS.API.Catalogue.DL.Common
             }
             return result;
         }
+        public static string GetPartnerGroup(CatPartnerGroupEnum partnerGroup)
+        {
+            string result = "";
+            switch (partnerGroup)
+            {
+                case CatPartnerGroupEnum.AGENT:
+                    result = "AGENT";
+                    break;
+                case CatPartnerGroupEnum.CONSIGNEE:
+                    result = "CONSIGNEE";
+                    break;
+                case CatPartnerGroupEnum.CUSTOMER:
+                    result = "CUSTOMER";
+                    break;
+                case CatPartnerGroupEnum.PAYMENTOBJECT:
+                    result = "PAYMENTOBJECT";
+                    break;
+                case CatPartnerGroupEnum.PETROLSTATION:
+                    result = "PETROLSTATION";
+                    break;
+                case CatPartnerGroupEnum.SHIPPER:
+                    result = "SHIPPER";
+                    break;
+                case CatPartnerGroupEnum.SHIPPINGLINE:
+                    result = "SUPPLIER";
+                    break;
+                case CatPartnerGroupEnum.SUPPLIERMATERIAL:
+                    result = "SUPPLIERMATERIAL";
+                    break;
+                case CatPartnerGroupEnum.CARRIER:
+                    result = "CARRIER";
+                    break;
+                case CatPartnerGroupEnum.AIRSHIPSUP:
+                    result = "AIRSHIPSUP";
+                    break;
+                default:
+                    break;
+            }
+            return result;
+        }
     }
 }

@@ -5,6 +5,13 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CatBranch
     {
+        public CatBranch()
+        {
+            SysUser = new HashSet<SysUser>();
+            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
+            SysUserRole = new HashSet<SysUserRole>();
+        }
+
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
@@ -25,5 +32,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Code { get; set; }
         public string UserCreated { get; set; }
         public string DatetimeCreated { get; set; }
+
+        public ICollection<SysUser> SysUser { get; set; }
+        public ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
+        public ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

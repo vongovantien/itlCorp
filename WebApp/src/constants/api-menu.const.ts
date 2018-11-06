@@ -69,7 +69,17 @@ export class API_MENU {
 
         },
         PartnerData: {
-
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Query",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Paging",
+            customerPaging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/PagingCustomer" ,
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/",
+            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/",
+            getDepartments: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/GetDepartments"
+        },
+        partnerGroup: {
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartnerGroup"
         },
         Commodity: {
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/Paging",
@@ -94,20 +104,22 @@ export class API_MENU {
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/delete/"
         },
         Unit: {
-
-        },
-        Location: {
-            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getAll",
-            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getById/",
-            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/addNew",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/update",
-            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/delete/",
-        },
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Paging",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Delete/",
+        },    
         Charge: {
 
         },
         Country:{
-            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry",
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getAll",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/paging",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getById/",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/addNew",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/delete/",
             getAllByLanguage: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/GetByLanguage"
         },
         Area: {
@@ -120,7 +132,7 @@ export class API_MENU {
     */
     public System = {
         User_Management: {
-
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser"
         },
         Group: {
 

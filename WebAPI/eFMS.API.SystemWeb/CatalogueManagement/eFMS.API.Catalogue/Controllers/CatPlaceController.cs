@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
@@ -12,7 +9,6 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
