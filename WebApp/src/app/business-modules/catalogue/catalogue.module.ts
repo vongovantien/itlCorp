@@ -15,6 +15,7 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
 import { SelectModule } from 'ng2-select';
 import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
+import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
 
 
 @NgModule({
@@ -35,7 +36,8 @@ import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-d
       StageManagementComponent,
       PartnerComponent,
       PartnerDataAddnewComponent,
-      PartnerDataDetailComponent
+      PartnerDataDetailComponent,
+      ChargeAddnewComponent
     ],
 })
 export class CatalogueModule { }
