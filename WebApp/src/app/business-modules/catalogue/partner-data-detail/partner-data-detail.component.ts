@@ -128,7 +128,9 @@ export class PartnerDataDetailComponent implements OnInit {
   }
   async getSalemans(){
     let responses = await this.baseService.getAsync(this.api_menu.System.User_Management.getAll);
-    this.saleMans = responses.map(x=>({"text":x.username,"id":x.id}));
+    if(responses != null){
+      this.saleMans = responses.map(x=>({"text":x.username,"id":x.id}));
+    }
   }
   async getCountries() {
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage);
@@ -138,7 +140,9 @@ export class PartnerDataDetailComponent implements OnInit {
   }
   async getPartnerGroups() {
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.partnerGroup.getAll);
-    this.partnerGroups = responses.map(x=>({"text":x.id,"id":x.id}));
+    if(responses != null){
+      this.partnerGroups = responses.map(x=>({"text":x.id,"id":x.id}));
+    }
   }
   getProvincesByCountry(countryId: number, isBilling: boolean): any {
     this.baseService.get(this.api_menu.Catalogue.CatPlace.getProvinces + "?countryId=" + countryId).subscribe((response: any) => {
