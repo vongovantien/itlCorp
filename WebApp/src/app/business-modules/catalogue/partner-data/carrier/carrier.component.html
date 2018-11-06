@@ -139,34 +139,7 @@
         </app-table-layout>
       <!--end: Datatable of table-simple -->
       <!--begin::pagination-->
-      <div class="pagination-nav">
-          <div class="row">
-              <div class="col-sm-6">
-                  <div class="tatable__pager-size" style="max-width: 190px">
-                      <div class="select-box">
-                          <select class="form-control m-input m-input--square" id="" aria-label="">
-                              <option value="1">15 line/screen</option>
-                              <option value="2">30 line/screen</option>
-                              <option value="3">50 line/screen</option>
-                          </select>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-sm-6">
-                  <nav aria-label="">
-                      <ul class="pagination justify-content-end">
-                          <li class="page-item"><a class="page-link" href="#">First</a></li>
-                          <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                          <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                          <li class="page-item"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                          <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                      </ul>
-                  </nav>
-              </div>
-          </div>
-      </div>
+      <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPageCarrier($event)"></app-pagination> 
       <!--end::pagination-->
   </div>
 </div>

@@ -35,7 +35,7 @@ export class AllPartnerComponent implements OnInit {
 
   ngOnInit() {
   }
-  setPage(pager: PagerSetting): any {
+  setPageAll(pager: PagerSetting): any {
     console.log(pager);
     this.getPartnerData(pager, this.criteria);
   }

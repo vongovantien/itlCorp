@@ -48,7 +48,6 @@ export class PagingService {
             endIndex: endIndex,
             pages: pages
         };
-        console.log(returnObj);
         return {
             totalItems: totalItems,
             currentPage: currentPage,

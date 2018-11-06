@@ -139,7 +139,7 @@
             (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
         </app-table-layout>
       <!--begin::pagination-->
-      <div class="pagination-nav">
+      <!-- <div class="pagination-nav">
           <div class="row">
               <div class="col-sm-6">
                   <div class="tatable__pager-size" style="max-width: 190px">
@@ -166,8 +166,8 @@
                   </nav>
               </div>
           </div>
-      </div>
-      <!-- <app-pagination *ngIf="pagerAll.totalItems>0" [config]="pagerAll" (pagerObject)="setPage($event)"></app-pagination> -->
+      </div> -->
+      <app-pagination *ngIf="pagerAll.totalItems>0" [config]="pagerAll" (pagerObject)="setPageAll($event)"></app-pagination>
       <!--end::pagination-->
   </div>
 </div>

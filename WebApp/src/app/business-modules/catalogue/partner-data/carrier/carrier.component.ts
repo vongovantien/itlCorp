@@ -35,7 +35,7 @@ export class CarrierComponent implements OnInit {
 
   ngOnInit() {
   }
-  setPage(pager: PagerSetting): any {
+  setPageCarrier(pager: PagerSetting): any {
     this.getPartnerData(pager, this.criteria);
   }
   getPartnerData(pager: PagerSetting, criteria?: any): any {

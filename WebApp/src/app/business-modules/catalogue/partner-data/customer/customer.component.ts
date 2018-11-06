@@ -35,7 +35,7 @@ export class CustomerComponent implements OnInit {
 
   ngOnInit() {
   }
-  setPage(pager: PagerSetting): any {
+  setPageCustommer(pager: PagerSetting): any {
     this.getPartnerData(pager, this.criteria);
   }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
