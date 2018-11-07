@@ -143,74 +143,47 @@
         </div>
     </div>
     <!--begin:: m-portlet of partnerDataTabContent-->
-    <div class="tab-content job-tab-content" id="partnerDataTabContent">
-        <div class="tab-pane fade show active" role="tabpanel" id="customer-tabview-tab">
-            <app-customer (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-customer>
-        </div>
-        <div class="tab-pane fade" id="agent-tabview-tab" role="tabpanel" aria-labelledby="">
-           <app-agent (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-agent>
-        </div>
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <div class="tab-content" id="partnerDataTabContent">
+                <div class="tab-pane fade show active" role="tabpanel" id="customer-tabview-tab">
+                    <app-customer (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-customer>
+                </div>
+                <div class="tab-pane fade" id="agent-tabview-tab" role="tabpanel" aria-labelledby="">
+                <app-agent (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-agent>
+                </div>
 
-        <div class="tab-pane fade" id="carrier-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-carrier (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-carrier>
-        </div>
+                <div class="tab-pane fade" id="carrier-tabview-data" role="tabpanel" aria-labelledby="">
+                    <app-carrier (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-carrier>
+                </div>
 
-        <div class="tab-pane fade" id="consignee-tabview-data" role="tabpanel" aria-labelledby="">
-           <app-consignee (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-consignee>
-        </div>
+                <div class="tab-pane fade" id="consignee-tabview-data" role="tabpanel" aria-labelledby="">
+                <app-consignee (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-consignee>
+                </div>
 
-        <div class="tab-pane fade" id="air-ship-sup-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-air-ship-sup (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-air-ship-sup>
-        </div>
+                <div class="tab-pane fade" id="air-ship-sup-tabview-data" role="tabpanel" aria-labelledby="">
+                    <app-air-ship-sup (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-air-ship-sup>
+                </div>
 
-        <div class="tab-pane fade" id="shipper-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-shipper (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-shipper>
-        </div>
+                <div class="tab-pane fade" id="shipper-tabview-data" role="tabpanel" aria-labelledby="">
+                    <app-shipper (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-shipper>
+                </div>
 
-        <div class="tab-pane fade" id="all-tabview-data" role="tabpanel" aria-labelledby="">
-            <app-all-partner (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-all-partner>
+                <div class="tab-pane fade" id="all-tabview-data" role="tabpanel" aria-labelledby="">
+                    <app-all-partner (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-all-partner>
+                </div>
+                
+                <!--begin::pagination-->
+                <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                    (pagerObject)="setPage($event)"></app-pagination>
+                <!--end::pagination-->
+            </div>
         </div>
     </div>
     <!--end:: m-portlet of partnerDataTabContent-->
-
 </div>
 <!--end::m-content of Partner-data-->
 
 <!--begin::confirm-delete-modal-->
-<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Delete Partner</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>You want to delete this Partner?</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"> 
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Yes
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            Cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div> -->
 <app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

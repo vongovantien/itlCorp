@@ -174,9 +174,14 @@ export class PartnerDataAddnewComponent implements OnInit {
   }
 
   onSubmit(){
-    if(this.form.valid && (this.partner.salePersonId != null && this.isRequiredSaleman)){
+    if(this.form.valid){
       this.partner.accountNo = this.partner.id= this.partner.taxCode;
-      this.addNew();
+      if(this.isRequiredSaleman && this.partner.salePersonId != null){
+        this.addNew();
+      }
+      else{
+        this.addNew();
+      }
     }
   }
   addNew(): any {

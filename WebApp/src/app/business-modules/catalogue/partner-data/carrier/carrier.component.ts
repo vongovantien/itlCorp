@@ -35,9 +35,6 @@ export class CarrierComponent implements OnInit {
 
   ngOnInit() {
   }
-  setPageCarrier(pager: PagerSetting): any {
-    this.getPartnerData(pager, this.criteria);
-  }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
     this.spinnerService.show();
     if(criteria != undefined){
@@ -48,6 +45,7 @@ export class CarrierComponent implements OnInit {
       this.carriers = response.data.map(x=>Object.assign({},x));
       console.log(this.carriers);
       this.pager.totalItems = response.totalItems;
+      return this.pager.totalItems;
     });
   }
   onSortChange(property) {

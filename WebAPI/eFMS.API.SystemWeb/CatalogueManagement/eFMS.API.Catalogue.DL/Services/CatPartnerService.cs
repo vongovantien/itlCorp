@@ -73,10 +73,18 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             //var query = GetQueryExpression(criteria);
             //var results = Get(query);
-            var query = ((eFMSDataContext)DataContext.DC).CatPartner.Join(((eFMSDataContext)DataContext.DC).SysUser,
-                    partner => partner.UserCreated, user => user.Id,
-                    (partner, user) => new { partner, user }).Join(((eFMSDataContext)DataContext.DC).SysUser,
-                    partnerA => partnerA.partner.SalePersonId, saleman => saleman.Id, (partnerA, saleman) => new { partnerA.partner, partnerA.user, saleman });
+            //var query = ((eFMSDataContext)DataContext.DC).CatPartner.Join(((eFMSDataContext)DataContext.DC).SysUser,
+            //        partner => partner.UserCreated, user => user.Id,
+            //        (partner, user) => new { partner, user }).GroupJoin(((eFMSDataContext)DataContext.DC).SysUser,
+            //        partnerA => partnerA.partner.SalePersonId, saleman => saleman.Id, (partnerA, saleman) 
+            //        => new { partnerA.partner, partnerA.user, saleman });
+            var query = (from user in ((eFMSDataContext)DataContext.DC).SysUser
+                         join partner in ((eFMSDataContext)DataContext.DC).CatPartner on user.Id equals partner.UserCreated into userPartners
+                         from y in userPartners.DefaultIfEmpty()
+                         join saleman in ((eFMSDataContext)DataContext.DC).SysUser on y.SalePersonId equals saleman.Id into prods
+                         from x in prods.DefaultIfEmpty()
+                         select new { user, partner = y, saleman = x }
+                         );
             IQueryable<CatPartnerViewModel> results = null;
             string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
             if (criteria.All == null)

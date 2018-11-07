@@ -25,27 +25,35 @@ declare var $:any;
   styleUrls: ['./commodity.component.sass']
 })
 export class CommodityComponent implements OnInit {
-  commonities: Array<Commodity>;
+
+  /*
+  declare variable
+  */
+  @ViewChild(PaginationComponent) child; 
+  @ViewChild('formCommodity') formCommodity: NgForm;
+  @ViewChild('formGroupCommodity') formGroupCommodity: NgForm;
+  commodities: Array<Commodity>;
   commodity: Commodity;
   commodityGroups: Array<CommodityGroup>;
   commodityGroup: CommodityGroup;
-  pagerGroup: PagerSetting = PAGINGSETTING;
-  pagerCommodity: PagerSetting = PAGINGSETTING;
+  pager: PagerSetting = PAGINGSETTING;
   commoditySettings: ColumnSetting[] = COMMODITYCOLUMNSETTING;
   commodityGroupSettings: ColumnSetting[] = COMMODITYGROUPCOLUMNSETTING;
   groups: any[];
   criteria: any = {};
-  @ViewChild(PaginationComponent) child; 
-  @ViewChild('formCommodity') formCommodity: NgForm;
-  @ViewChild('formGroupCommodity') formGroupCommodity: NgForm;
+
   nameGroupModal = "edit-commodity-group-modal";
   nameCommodityModal = "edit-commodity-modal";
   titleAddGroupModal = "Add New Commodity Group";
   titleEditGroupModal = "Edit Commodity Group";
   titleAddCommodityModal = "Add New Commodity";
   titleEditCommodityModal = "Edit Commodity";
+  tabName = {
+    commodity: "commodity",
+    commodityGroup: "commodityGroup"
+  };
+  activeTab: string = this.tabName.commodity;
   groupActive: any;
-  //isTabGroup = false;
   addCommodityButtonSetting: ButtonModalSetting = {
     dataTarget: this.nameCommodityModal,
     typeButton: ButtonType.add
@@ -80,6 +88,10 @@ export class CommodityComponent implements OnInit {
   };
   titleConfirmDelete = "You want to delete this Commodity Group";
   isDesc = false;
+  /*
+  end declare variable
+  */
+
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
@@ -87,43 +99,57 @@ export class CommodityComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
-    this.setPage(this.pagerCommodity, 'commodity');
-    this.getComboboxData();
+    this.setPage(this.pager);
+    this.getGroups();
   }
-  getComboboxData(): any {
-    this.baseService.get(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage).subscribe((response: any) => {
-    this.groups = response.map(x=>({"text":x.groupName,"id":x.id}));
-  });
-  }
-  setPage(pager: PagerSetting, tabName): any {
-    if(tabName == 'commodityGroup'){
-      this.getGroupCommodities(pager);
-    }
-    if(tabName == 'commodity'){
-      this.getCommodities(pager);
+  async getGroups(){
+    var response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage, false, false);
+    if(response){
+      this.groups = response.map(x=>({"text":x.groupName,"id":x.id}));
     }
   }
-  getCommodities(pager: PagerSetting): any {this.spinnerService.show();
-    this.baseService.post(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
-      this.commonities = response.data.map(x=>Object.assign({},x));
-      this.pagerCommodity.totalItems = response.totalItems;
-    });
+  async setPage(pager: PagerSetting){
+    this.pager.currentPage = pager.currentPage;
+    this.pager.pageSize = pager.pageSize;
+    this.pager.totalPages = pager.totalPages;
+    if(this.activeTab == this.tabName.commodityGroup){
+      await this.getGroupCommodities(pager);
+    }
+    if(this.activeTab == this.tabName.commodity){
+      await this.getCommodities(pager);
+    }
+  }
+  tabSelect(tabName: string){
+    this.activeTab = tabName;
+    this.pager.currentPage = 1;
+    this.pager.pageSize = 15;
+    if(tabName == this.tabName.commodityGroup){
+      this.getGroupCommodities(this.pager);
+    }
+    if(tabName == this.tabName.commodity){
+      this.getCommodities(this.pager);
+    }
+  }
+  async getCommodities(pager: PagerSetting) {
+    var responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
+    if(responses){
+      this.commodities = responses.data;
+      this.pager.totalItems = responses.totalItems;
+    }
   }
 
-  getGroupCommodities(pager: PagerSetting): any {
-    this.spinnerService.show();
-    this.baseService.post(this.api_menu.Catalogue.CommodityGroup.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
-      this.commodityGroups = response.data.map(x=>Object.assign({},x));
-      this.pagerGroup.totalItems = response.totalItems;
-    });
+  async getGroupCommodities(pager: PagerSetting){
+    var responses = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
+    if(responses){
+      this.commodityGroups = responses.data;
+      this.pager.totalItems = responses.totalItems;
+    }
   }
   onSearch(event, tabName){
-    if(tabName == 'commodityGroup'){
+    if(tabName == this.tabName.commodityGroup){
       this.searchCommodityGroup(event);
     }
-    if(tabName == 'commodity'){
+    if(tabName == this.tabName.commodityGroup){
       this.searchCommodity(event);
     }
   }
@@ -143,8 +169,8 @@ export class CommodityComponent implements OnInit {
         this.criteria.commonityGroupNameEn = event.searchString;
       }
     }
-    this.pagerCommodity.currentPage = 1;
-    this.getCommodities(this.pagerCommodity);
+    this.pager.currentPage = 1;
+    this.getCommodities(this.pager);
   }
   searchCommodityGroup(event: any): any {
     if(event.field == "All"){
@@ -159,24 +185,30 @@ export class CommodityComponent implements OnInit {
         this.criteria.groupNameVn = event.searchString;
       }
     }
-    this.pagerGroup.currentPage = 1;
-    this.getGroupCommodities(this.pagerGroup);
+    this.pager.currentPage = 1;
+    this.getGroupCommodities(this.pager);
   }
   resetSearch(event){
     this.criteria = {};
   }
   
   onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
+    if(this.activeTab == this.tabName.commodity){
+      this.isDesc = !this.isDesc;
+      this.commodities = this.sortService.sort(this.commodities, property, this.isDesc);
+    }
+    if(this.activeTab ==  this.tabName.commodityGroup){
+      this.isDesc = !this.isDesc;
+      this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
+    }
   }
   async showDetail(item, tabName){
-    if(tabName == 'commodityGroup'){
+    if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = item;
       var response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getById + item.id,false, false);
       this.commodityGroup = response;
     }
-    if(tabName == 'commodity'){
+    if(tabName == this.tabName.commodity){
       this.commodity = item;
       var response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id,false, false);
       this.commodity = response;
@@ -186,81 +218,58 @@ export class CommodityComponent implements OnInit {
   async onDelete(event){
     if (event) {
       if(this.commodityGroup){
-        this.deleteGroupCommodity();
+        await this.deleteGroupCommodity();
       }
       if(this.commodity){
-        this.deleteCommodity();
+        await this.deleteCommodity();
       }
     }
   }
-  deleteCommodity(): any {
-    
-    this.baseService.delete(this.api_menu.Catalogue.Commodity.delete + this.commodity.id).subscribe((response: any) => {
-      if (response.status == true) {
-        this.toastr.success(response.message);
-        this.pagerCommodity.currentPage = 1;
-        this.getCommodities(this.pagerCommodity);
-        setTimeout(() => {
-          this.child.setPage(this.pagerCommodity.currentPage, 'commodity');
-        }, 300);
-      
-      }
-      if (response.status == false) {
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+  async deleteCommodity() {
+    await this.baseService.deleteAsync(this.api_menu.Catalogue.Commodity.delete + this.commodity.id, true, false);
+    await this.getCommodities(this.pager);
+    this.setPageAfterDelete();
   }
-  deleteGroupCommodity(): any {
-    
-    this.baseService.delete(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id).subscribe((response: any) => {
-      if (response.status == true) {
-        this.toastr.success(response.message);
-        this.pagerGroup.currentPage = 1;
-        this.getGroupCommodities(this.pagerGroup);
-        setTimeout(() => {
-          this.child.setPage(this.pagerCommodity.currentPage, 'commodityGroup');
-        }, 300);
-      
-      }
-      if (response.status == false) {
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+  async deleteGroupCommodity(){
+    var response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
+    if(response.status){
+      this.getGroups();
+      await this.getGroupCommodities(this.pager);
+      this.setPageAfterDelete();
+    }
+  }
+  setPageAfterDelete(){
+    this.child.setPage(this.pager.currentPage);
+    if (this.pager.currentPage > this.pager.totalPages) {
+      this.pager.currentPage = this.pager.totalPages;
+      this.child.setPage(this.pager.currentPage);
+    }
+  }
+  setPageAfterAdd() {
+    this.child.setPage(this.pager.currentPage);
+    if (this.pager.currentPage < this.pager.totalPages) {
+      this.pager.currentPage = this.pager.totalPages;
+      this.child.setPage(this.pager.currentPage);
+    }
   }
   showAdd(tabName){
-    if(tabName == 'commodityGroup'){
+    if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = new CommodityGroup();
     }
-    if(tabName == 'commodity'){
+    if(tabName == this.tabName.commodity){
       this.commodity = new Commodity();
     }
   }
   onSubmit(){
     if(this.formGroupCommodity){
-      // if(this.formGroupCommodity.valid){
-      //   if(this.commodityGroup.id == null){
-      //     this.addNewGroup();
-      //   }
-      //   else{
-      //     this.updateGroup();
-      //   }
-      // }
       this.saveGroupCommodity();
     }
     if(this.formCommodity){
-      // if(this.formCommodity.valid){
-      //   if(this.commodityGroup.id == null){
-      //     this.addNewCommodity();
-      //   }
-      //   else{
-      //     this.updateCommodity();
-      //   }
-      // }
       this.saveCommodity();
     }
   }
   saveCommodity(): any {
-    if(this.formCommodity.valid){
+    if(this.formCommodity.valid && this.commodity.commodityGroupId != null){
       if(this.commodity.id == null){
         this.addNewCommodity();
       }
@@ -269,13 +278,13 @@ export class CommodityComponent implements OnInit {
       }
     }
   }
-  saveGroupCommodity(){
+  async saveGroupCommodity(){
     if(this.formGroupCommodity.valid){
       if(this.commodityGroup.id == null){
-        this.addNewGroup();
+        await this.addNewGroup();
       }
       else{
-        this.updateGroup();
+        await this.updateGroup();
       }
     }
   }
@@ -284,73 +293,57 @@ export class CommodityComponent implements OnInit {
       if (response.status == true){
         $('#' + this.nameCommodityModal).modal('hide');
         this.toastr.success(response.message);
-        this.setPage(this.pagerCommodity, 'commodity');
+        this.setPage(this.pager);
       }
     }, error => this.baseService.handleError(error));
   }
-  addNewCommodity(): any {
-    this.baseService.post(this.api_menu.Catalogue.Commodity.add, this.commodity).subscribe((response: any) => {
-    if (response.status == true){
-      this.toastr.success(response.message);
-      this.getCommodities(this.pagerGroup);
+  async addNewCommodity() {
+    var response = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity, true, false);
       this.formCommodity.onReset();
       this.commodity = new Commodity();
       $('#' + this.nameCommodityModal).modal('hide');
-      setTimeout(() => {
-        this.pagerCommodity.currentPage = 1;
-        this.child.setPage(this.pagerCommodity.currentPage);
-      }, 500);
-    }
-    else{
-      this.toastr.error(response.message);
-    }
-  }, error => this.baseService.handleError(error));
+      await this.getCommodities(this.pager);
+      this.setPageAfterAdd();
   }
   updateGroup(): any {
     this.baseService.put(this.api_menu.Catalogue.CommodityGroup.update + this.commodityGroup.id, this.commodityGroup).subscribe((response: any) => {
     if (response.status == true){
       $('#' + this.nameGroupModal).modal('hide');
       this.toastr.success(response.message);
-      this.setPage(this.pagerGroup, true);
+      this.setPage(this.pager);
     }
   }, error => this.baseService.handleError(error));
   }
-  addNewGroup(): any {
-    this.baseService.post(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup).subscribe((response: any) => {
-      if (response.status == true){
-        this.toastr.success(response.message);
-        this.getGroupCommodities(this.pagerGroup);
-        this.formCommodity.onReset();
-        this.commodityGroup = new CommodityGroup();
-        $('#' + this.nameGroupModal).modal('hide');
-        setTimeout(() => {
-          this.pagerGroup.currentPage = 1;
-          this.child.setPage(this.pagerGroup.currentPage);
-        }, 500);
-      }
-      else{
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+  async addNewGroup() {
+    var response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
+    if (response.status == true){
+      this.getGroups();
+      await this.getGroupCommodities(this.pager);
+      this.formGroupCommodity.onReset();
+      this.commodityGroup = new CommodityGroup();
+      $('#' + this.nameGroupModal).modal('hide');
+      this.child.setPage(this.pager.currentPage);
+      this.setPageAfterAdd();
+    }
   }
   showConfirmDelete(item, tabName) {
-    if(tabName == 'commodityGroup'){
+    if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = item;
     }
-    if(tabName == 'commodity'){
+    if(tabName == this.tabName.commodity){
       this.commodity = item;
     }
   }
   onCancel(tabName){
-    if(tabName == 'commodityGroup'){
+    if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = new CommodityGroup();
       this.formGroupCommodity.onReset();
-      this.setPage(this.pagerGroup, tabName);
+      this.setPage(this.pager);
     }
-    if(tabName == 'commodity'){
+    if(tabName == this.tabName.commodity){
       this.commodity = new Commodity();
       this.formCommodity.onReset();
-      this.setPage(this.pagerCommodity, tabName);
+      this.setPage(this.pager);
     }
   }
   public removed(value:any):void {

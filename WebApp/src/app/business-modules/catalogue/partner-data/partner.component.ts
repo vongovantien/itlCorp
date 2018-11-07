@@ -19,6 +19,8 @@ import { Router } from '@angular/router';
 import { AirShipSupComponent } from './air-ship-sup/air-ship-sup.component';
 import { CarrierComponent } from './carrier/carrier.component';
 import { ShipperComponent } from './shipper/shipper.component';
+import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
   selector: 'app-partner',
@@ -37,6 +39,8 @@ export class PartnerComponent implements OnInit {
   titleConfirmDelete: string = "Do you want to delete this partner?";
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
   partner: Partner;
+  activeTab: string = 'customerTab';
+  @ViewChild(PaginationComponent) child;
   //partnerType: any;
 
   @ViewChild(AgentComponent) agentComponent; 
@@ -51,11 +55,10 @@ export class PartnerComponent implements OnInit {
     private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
-    private sortService: SortService,
     private router:Router) { }
 
   ngOnInit() {
-    this.tabSelect('customerTab');
+    this.tabSelect(this.activeTab);
   }
   onSearch(event){
     if(event.field == "All"){
@@ -108,36 +111,38 @@ export class PartnerComponent implements OnInit {
     }
   }
   tabSelect(tabName){
+    this.pager.currentPage = 1;
+    this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
+    this.activeTab = tabName;
+    
     if(tabName == "customerTab"){
       this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
-      this.customerComponent.getPartnerData(this.pager, this.criteria);
+      this.pager.totalItems = this.customerComponent.getPartnerData(this.pager, this.criteria);
     }
     if(tabName == "agentTab"){
       this.criteria.partnerGroup = PartnerGroupEnum.AGENT;
-      this.agentComponent.getPartnerData(this.pager, this.criteria);
+      this.pager.totalItems = this.agentComponent.getPartnerData(this.pager, this.criteria);
     }
     if(tabName == "carrierTab"){
       this.criteria.partnerGroup = PartnerGroupEnum.CARRIER;
-      this.carrierComponent.getPartnerData(this.pager, this.criteria);
+      this.pager.totalItems = this.carrierComponent.getPartnerData(this.pager, this.criteria);
     }
     if(tabName == "consigneeTab"){
       this.criteria.partnerGroup = PartnerGroupEnum.CONSIGNEE;
-      this.consigneeComponent.getPartnerData(this.pager, this.criteria);
+      this.pager.totalItems = this.consigneeComponent.getPartnerData(this.pager, this.criteria);
     }
     if(tabName == "airshipsupTab"){
       this.criteria.partnerGroup = PartnerGroupEnum.AIRSHIPSUP;
-      this.airShipSupComponent.getPartnerData(this.pager, this.criteria);
+      this.pager.totalItems = this.airShipSupComponent.getPartnerData(this.pager, this.criteria);
     }
     if(tabName == "shipperTab"){
       this.criteria.partnerGroup = PartnerGroupEnum.SHIPPER;
-      this.shipperComponent.getPartnerData(this.pager, this.criteria);
+      this.pager.totalItems = this.shipperComponent.getPartnerData(this.pager, this.criteria);
     }
     if(tabName == "allTab"){
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
-      this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
+      this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
     }
-  }
-  resetSearch(event){
   }
 
   showConfirmDelete(event){
@@ -160,31 +165,77 @@ export class PartnerComponent implements OnInit {
       }, error => this.baseService.handleError(error));
     }
   }
+  setPageAfterDelete() {
+    this.child.setPage(this.pager.currentPage);
+    if (this.pager.currentPage > this.pager.totalPages) {
+      this.pager.currentPage = this.pager.totalPages;
+      this.child.setPage(this.pager.currentPage);
+    }
+  }
+  
   RefreshData(): any {
     if(this.criteria.partnerGroup == PartnerGroupEnum.CUSTOMER){
-      this.tabSelect('customerTab');
+      this.pager.totalItems = this.customerComponent.getPartnerData(this.pager, this.criteria);
+      this.setPageAfterDelete();
     }
     if(this.criteria.partnerGroup == PartnerGroupEnum.AGENT){
-      this.tabSelect('agentTab');
+      this.pager.totalItems = this.agentComponent.getPartnerData(this.pager, this.criteria);
+      this.setPageAfterDelete();
     }
     if(this.criteria.partnerGroup == PartnerGroupEnum.CARRIER){
-      this.tabSelect('carrierTab');
+      this.pager.totalItems = this.carrierComponent.getPartnerData(this.pager, this.criteria);
+      this.setPageAfterDelete();
     }
     if(this.criteria.partnerGroup == PartnerGroupEnum.CONSIGNEE){
-      this.tabSelect('consigneeTab');
+      this.pager.totalItems = this.consigneeComponent.getPartnerData(this.pager, this.criteria);
+      this.setPageAfterDelete();
     }
     if(this.criteria.partnerGroup == PartnerGroupEnum.AIRSHIPSUP){
-      this.tabSelect('airshipsupTab');
+      this.pager.totalItems = this.airShipSupComponent.getPartnerData(this.pager, this.criteria);
+      this.setPageAfterDelete();
     }
     if(this.criteria.partnerGroup == PartnerGroupEnum.SHIPPER){
-      this.tabSelect('shipperTab');
+      this.pager.totalItems = this.shipperComponent.getPartnerData(this.pager, this.criteria);
+      this.setPageAfterDelete();
     }
     if(this.criteria.partnerGroup == PartnerGroupEnum.ALL){
-      this.tabSelect('allTab');
+      this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
+      this.setPageAfterDelete();
     }
   }
 
   addPartner(){
    this.router.navigate(["/home/catalogue/partner-data-addnew",{ partnerType: this.criteria.partnerGroup }]);
+  }
+  setPage(pager:PagerSetting){
+    if(this.activeTab == "customerTab"){
+      this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
+      this.customerComponent.getPartnerData(pager, this.criteria);
+    }
+    if(this.activeTab == "agentTab"){
+      this.criteria.partnerGroup = PartnerGroupEnum.AGENT;
+      this.agentComponent.getPartnerData(pager, this.criteria);
+    }
+    if(this.activeTab == "carrierTab"){
+      this.criteria.partnerGroup = PartnerGroupEnum.CARRIER;
+      this.carrierComponent.getPartnerData(pager, this.criteria);
+    }
+    if(this.activeTab == "consigneeTab"){
+      this.criteria.partnerGroup = PartnerGroupEnum.CONSIGNEE;
+      this.consigneeComponent.getPartnerData(pager, this.criteria);
+    }
+    if(this.activeTab == "airshipsupTab"){
+      this.criteria.partnerGroup = PartnerGroupEnum.AIRSHIPSUP;
+      this.airShipSupComponent.getPartnerData(pager, this.criteria);
+    }
+    if(this.activeTab == "shipperTab"){
+      this.criteria.partnerGroup = PartnerGroupEnum.SHIPPER;
+      this.shipperComponent.getPartnerData(pager, this.criteria);
+    }
+    if(this.activeTab == "allTab"){
+      this.criteria.partnerGroup = PartnerGroupEnum.ALL;
+      this.allPartnerComponent.getPartnerData(pager, this.criteria);
+    }
+    this.pager.currentPage = pager.currentPage;
   }
 }

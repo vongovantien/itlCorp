@@ -163,9 +163,15 @@ export class PartnerDataDetailComponent implements OnInit {
     });
   }
   onSubmit(){
-    if(this.form.valid && !(this.partner.salePersonId == null && this.isRequiredSaleman)){
+    if(this.form.valid){
       this.partner.accountNo = this.partner.id= this.partner.taxCode;
-      this.update();
+      if(this.isRequiredSaleman && this.partner.salePersonId != null){
+        this.update();
+      }
+      else{
+        this.partner.accountNo = this.partner.id= this.partner.taxCode;
+        this.update();
+      }
     }
   }
   update(): any {
