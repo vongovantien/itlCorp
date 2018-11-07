@@ -120,11 +120,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-charge-modal">
+                                        title="Edit charge" routerLink="/home/catalogue/charge-detail">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="Remove charge" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -157,11 +157,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-charge-modal">
+                                        title="Edit charge" routerLink="/home/catalogue/charge-detail">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="Remove charge" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -229,150 +229,6 @@
     <!--end:: m-portlet of charge-table-->
 </div>
 <!--end::m-content of charge-->
-
-<!--begin::add-charge-modal-->
-<div class="modal fade" id="add-charge-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Charge</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-charge-form-->
-                <div class="m-form m-form--state">
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Charge ID</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Code</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Name EN</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label"> Name Local</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Type</label>
-                        <div class="col-lg-8">
-                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select type">
-                            </ng-select>
-                        </div>
-                    </div>
-                </div>
-                <!--end:add-charge-form -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::add-charge-modal-->
-
-<!--begin::edit-charge-modal-->
-<div class="modal fade" id="edit-charge-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Charge</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::edit-charge-form-->
-                <div class="m-form">
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Charge ID</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Code</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Name EN</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label"> Name Local</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter detail">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label form-control-label">Type</label>
-                        <div class="col-lg-8">
-                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select type">
-                            </ng-select>
-                        </div>
-                    </div>
-                </div>
-                <!--end:edit-charge-form -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Edit
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::edit-charge-modal-->
 
 <!--begin::confirm-delete-modal-->
 <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
