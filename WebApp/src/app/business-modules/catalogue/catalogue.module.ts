@@ -15,6 +15,7 @@ import { SelectModule } from 'ng2-select';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
 import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
+import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
 import { CustomerComponent } from './partner-data/customer/customer.component';
 import { AgentComponent } from './partner-data/agent/agent.component';
 import { CarrierComponent } from './partner-data/carrier/carrier.component';
@@ -43,6 +44,7 @@ import { AllPartnerComponent } from './partner-data/all/all-partner.component';
       PartnerComponent,
       PartnerDataAddnewComponent,
       PartnerDataDetailComponent,
+      ChargeAddnewComponent,
       CustomerComponent,
       AgentComponent,
       CarrierComponent,

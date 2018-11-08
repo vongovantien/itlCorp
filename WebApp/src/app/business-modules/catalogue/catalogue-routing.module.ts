@@ -4,6 +4,7 @@ import { LocationComponent } from './location/location.component';
 import { PartnerComponent } from './partner-data/partner.component';
 import { WarehouseComponent } from './warehouse/warehouse.component';
 import { ChargeComponent } from './charge/charge.component';
+import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
 import { CommodityComponent } from './commodity/commodity.component';
 import { PortIndexComponent } from './port-index/port-index.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
@@ -29,6 +30,10 @@ const routes: Routes = [
   {
     path:'charge',
     component:ChargeComponent
+  },
+  {
+    path:'charge-addnew',
+    component:ChargeAddnewComponent
   },
   {
     path:'commodity',

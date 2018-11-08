@@ -27,6 +27,9 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatPartnerService, CatPartnerService>();
             services.AddTransient<ICatPartnerGroupService, CatPartnerGroupService>();
             services.AddTransient<ICatUnitService, CatUnitService>();
+            services.AddTransient<ICatChargeService, CatChargeService>();
+            services.AddTransient<ICatChargeDefaultAccountService, CatChargeDefaultService>();
+            services.AddTransient<ICatCurrencyService, CatCurrencyService>();
         }
     }
 }

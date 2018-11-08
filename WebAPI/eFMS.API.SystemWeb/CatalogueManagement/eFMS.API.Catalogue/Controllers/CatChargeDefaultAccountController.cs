@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -23,57 +20,44 @@ namespace eFMS.API.Catalogue.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CatChargeController : ControllerBase
+    public class CatChargeDefaultAccountController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatChargeService catChargeService;
+        private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
 
-        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, IMapper imapper)
+        public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper)
         {
             stringLocalizer = localizer;
-            catChargeService = service;
+            catChargeDefaultAccountService = service;
             mapper = imapper;
-        }
-
-        [HttpPost]
-        [Route("Paging")]
-        public IActionResult Get(CatChargeCriteria criteria,int pageNumber,int pageSize)
-        {
-            var data = catChargeService.GetCharges(criteria, pageNumber, pageSize, out int rowCount);
-            var result = new { data, totalItems = rowCount, pageNumber, pageSize };
-            return Ok(result);
-        }
-
-
-        [HttpGet]
-        [Route("getById/{id}")]
-        public IActionResult Get(Guid id)
-        {
-            var result = catChargeService.Get(x => x.Id == id).FirstOrDefault();
-            return Ok(result);
         }
 
         [HttpGet]
         [Route("getAll")]
-        public IActionResult All()
+        public IActionResult Get()
         {
-            var data = catChargeService.Get();
-            return Ok(data);
+            var results = catChargeDefaultAccountService.Get();
+            return Ok(results);
         }
 
         [HttpPost]
         [Route("addNew")]
-        public IActionResult Add(CatChargeAddOrUpdateModel model)
+        public IActionResult Add(CatChargeDefaultAccountModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(Guid.Empty, model);
+            var checkExistMessage = CheckExist(0, model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
+            var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
+            catChargeDefaultAccount.UserCreated = "01";
+            catChargeDefaultAccount.DatetimeCreated = DateTime.Now;
+            catChargeDefaultAccount.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catChargeService.AddCharge(model);
+            var hs = catChargeDefaultAccountService.Add(catChargeDefaultAccount);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -85,17 +69,36 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("update")]
-        public IActionResult Update(CatChargeAddOrUpdateModel model)
+        public IActionResult Update(CatChargeDefaultAccountModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(model.Charge.Id, model);
+            var checkExistMessage = CheckExist(model.Id, model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
+            var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
+            catChargeDefaultAccount.UserModified = "01";
+            catChargeDefaultAccount.DatetimeModified = DateTime.Now;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catChargeService.UpdateCharge(model);
+            var hs = catChargeDefaultAccountService.Update(catChargeDefaultAccount,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+
+        }
+
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public IActionResult Delete(int id)
+        {
+            var hs = catChargeDefaultAccountService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
@@ -104,31 +107,24 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        private string CheckExist(Guid id, CatChargeAddOrUpdateModel model)
+        private string CheckExist(int id, CatChargeDefaultAccountModel model)
         {
             string message = string.Empty;
-            if (id == Guid.Empty)
+            if (id == 0)
             {
-                if (catChargeService.Any(x => (x.Code.ToLower() == model.Charge.Code.ToLower())))
+                if (catChargeDefaultAccountService.Any(x => (x.Type.ToLower() == model.Type.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catChargeService.Any(x => ((x.Code.ToLower() == model.Charge.Code.ToLower())) && x.Id != id))
+                if (catChargeDefaultAccountService.Any(x => ((x.Type.ToLower() == model.Type.ToLower())) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             return message;
         }
-
-
-
-
-
-
-
     }
 }

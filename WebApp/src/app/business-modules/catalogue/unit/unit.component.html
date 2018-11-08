@@ -303,13 +303,13 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateUnitForm.submitted && code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City Code
+                                Unit Code
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.code" (change)="UnitToUpdate.code=UnitToUpdate.code.trim()" class="form-control m-input m-input--square"
-                                    #code="ngModel" name="code" required placeholder="Please enter province-city code">
+                                    #code="ngModel" name="code" required placeholder="Please enter unit code">
                                 <div class="form-control-feedback" *ngIf="updateUnitForm.submitted && code.invalid">
-                                    Province - City code is required
+                                    Unit code is required
                                 </div>
                             </div>
                         </div>

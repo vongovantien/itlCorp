@@ -5,8 +5,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                data-target="#add-charge-modal">
+            <button routerLink="/home/catalogue/charge-addnew" type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="icon-plus7"></i>
                     <span>
@@ -96,9 +95,6 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col no-sorting"></th>
-                            <th class="sorting_asc">
-                                <span>ID</span>
-                            </th>
                             <th class="sorting">
                                 <span>Code</span>
                             </th>
@@ -116,8 +112,8 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
+                    <tbody *ngIf="ListCharges.length>0">
+                        <tr *ngFor="let item of ListCharges">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -130,67 +126,29 @@
                                     </button>
                                 </div>
                             </td>
+                      
                             <td>
-                                <span>LH001</span>
+                                <span>{{item.charge.code}}</span>
                             </td>
                             <td>
-                                <span>SS_REF_Sea</span>
+                                <span>{{item.charge.chargeNameEn}}</span>
                             </td>
                             <td>
-                                <span>Refund fee</span>
+                                <span>P{{item.charge.chargeNameVn}}</span>
                             </td>
                             <td>
-                                <span>Phí refund</span>
-                            </td>
-                            <td>
-                                <span>All</span>
+                                <span>{{item.charge.type}}</span>
                             </td>
                             <td>
                                 <span>
                                     <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                        <input type="checkbox" disabled>
+                                        <input type="checkbox" disabled [checked]="item.charge.inactive">
                                         <span></span>
                                     </label>
                                 </span>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-charge-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <span>LH001</span>
-                            </td>
-                            <td>
-                                <span>SS_REF_Sea</span>
-                            </td>
-                            <td>
-                                <span>Refund fee</span>
-                            </td>
-                            <td>
-                                <span>Phí refund</span>
-                            </td>
-                            <td>
-                                <span>All</span>
-                            </td>
-                            <td>
-                                <span>
-                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                        <input type="checkbox" checked="checked" disabled>
-                                        <span></span>
-                                    </label>
-                                </span>
-                            </td>
-                        </tr>
+                      
                     </tbody>
                 </table>
             </div>
