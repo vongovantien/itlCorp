@@ -134,7 +134,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                if (catCurrencyService.Any(x => ((x.Id.ToLower() == model.Id.ToLower())) && x.Id != id))
+                if (catCurrencyService.Any(x => ((x.Id.ToLower() == model.Id.ToLower()))))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
