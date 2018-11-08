@@ -33,16 +33,76 @@ export class ChargeAddnewComponent implements OnInit {
     private api_menu: API_MENU,
     private el:ElementRef) { }
     ChargeToAdd : CatChargeToAddOrUpdate = new CatChargeToAddOrUpdate();
+    
     ngDataUnit:any=[];
     ngDataCurrency:any=[];
+    ngDataType = [
+      {id:1,text:"CREDIT"},
+      {id:2,text:"DEBIT"},
+      {id:3,text:"OBH"}
+    ];
+    ngDataTypeChargeDefault = [
+      {id:1,text:"Công Nợ"},
+      {id:2,text:"Giải Chi"},
+      {id:3,text:"Loại Khác"}
+    ];
 
-  ngOnInit() {
-    
+    /**
+     * Need to update ngDataServices by get data from databse after implement documentation module 
+     */
+    ngDataService = [
+      {text:"Landing Truckinng",id:"LT"},
+      {text:"Air Import",id:"AI"},
+      {text:"Air Export",id:"AE"},
+      {text:"Sea Import",id:"SI"},
+      {text:"Sea Export",id:"SE"},      
+      {text:"Sea FCL Export",id:"SFCLE"},
+      {text:"Sea FCL Import",id:"SFCLI"},
+      {text:"Sea LCL Export",id:"SLCLE"},
+      {text:"Sea LCL Import",id:"SLCLI"},
+      {text:"Sea Consol Export",id:"SCE"},
+      {text:"Sea Consol Import",id:"SCI"}
+    ];
+
+  async ngOnInit() {
+    await this.getNeccessaryData();
+   
   }
 
   async getNeccessaryData(){
     var units = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getAll,false,false);
-    this.ngDataUnit = units.map(x=>({text:x.code,id:x.id}));
+    this.ngDataUnit = units.length==0?[]: units.map(x=>({text:x.code,id:x.id}));
+
+    var currencies = await this.baseServices.getAsync(this.api_menu.Catalogue.Currency.getAll,false,false);
+    this.ngDataCurrency = currencies.length==0?[]:currencies.map(x=>({text:x.id + " - "+x.currencyName,id:x.id}));
+
+    console.log({unit:this.ngDataUnit,currency:this.ngDataCurrency});
+  }
+
+  addNewChargeDedaultAccount(){
+    var obj = new CatChargeDefaultAccount();
+    // this.ChargeToAdd.listChargeDefaultAccount.push(obj);   
+
+    if(this.ChargeToAdd.listChargeDefaultAccount.length==0){
+      this.ChargeToAdd.listChargeDefaultAccount.push(obj);   
+    }
+    else{
+      if(this.validatateDefaultAcountLine()){
+        this.ChargeToAdd.listChargeDefaultAccount.push(obj);
+      }else{
+        
+      }
+
+    }
+ 
+    console.log(this.validateChargeDefault);
+   
+  }
+
+  async addCharge(){
+    console.log(this.ChargeToAdd.charge.serviceTypeId);
+  //  await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.addNew,this.ChargeToAdd,true,true);
+
   }
 
 
@@ -85,17 +145,72 @@ export class ChargeAddnewComponent implements OnInit {
     this.disabled = this._disabledV === '1';
   }
 
-  public selected(value: any): void {
-    console.log('Selected value is: ', value);
+  public selected(value: any,action): void {
+    if(action=="unit"){
+      this.ChargeToAdd.charge.unitId = value.id;
+      
+    }
+    if(action=="currency"){
+      this.ChargeToAdd.charge.currencyId = value.id;
+    }
+    if(action=="type"){
+      this.ChargeToAdd.charge.type = value.id;
+    }
+    if(action=="service"){
+      this.ChargeToAdd.charge.serviceTypeId =this.ChargeToAdd.charge.serviceTypeId==undefined?(value.id+";"): this.ChargeToAdd.charge.serviceTypeId += (value.id+";");
+      console.log(this.ChargeToAdd.charge.serviceTypeId);
+    }
+    //console.log('Selected value is: ', value);
   }
 
-  public removed(value: any): void {
+  selectedTypeDefault(value:any,index:number){
+    this.ChargeToAdd.listChargeDefaultAccount[index].type =  value.text;
+  }
+
+  removedTypeDefault(value:any,index:number){
+    this.ChargeToAdd.listChargeDefaultAccount[index].type = null;
+  }
+
+  validateChargeDefault = false;
+
+  validatateDefaultAcountLine(){
+    if(this.ChargeToAdd.listChargeDefaultAccount.length>0){
+      var index = this.ChargeToAdd.listChargeDefaultAccount.length-1;
+      if((this.ChargeToAdd.listChargeDefaultAccount[index].debitAccountNo == '' || this.ChargeToAdd.listChargeDefaultAccount[index].debitAccountNo==null)
+        && (this.ChargeToAdd.listChargeDefaultAccount[index].creditAccountNo==''|| this.ChargeToAdd.listChargeDefaultAccount[index].creditAccountNo==null)
+        && (this.ChargeToAdd.listChargeDefaultAccount[index].creditVat==null)
+        && (this.ChargeToAdd.listChargeDefaultAccount[index].debitVat==null)){
+         // this.validateChargeDefault = false;
+          return false;
+        }else{
+          // this.validateChargeDefault = true;
+          return true;
+        }
+    }
+  
+  }
+
+  public removed(value: any,action): void {
+    if(action=="service"){
+      var s = value.id+";";
+      this.ChargeToAdd.charge.serviceTypeId = this.ChargeToAdd.charge.serviceTypeId.replace(s,"");
+      console.log(this.ChargeToAdd.charge.serviceTypeId);
+    }
+    if(action=="unit"){
+      this.ChargeToAdd.charge.unitId = null;
+    }
+    if(action=="currency"){
+      this.ChargeToAdd.charge.currencyId = null;
+    }
+    if(action==="type"){
+      this.ChargeToAdd.charge.type = null;
+    }
     console.log('Removed value is: ', value);
   }
 
-  public typed(value: any): void {
-    console.log('New search input: ', value);
-  }
+  // public typed(value: any): void {
+  //   console.log('New search input: ', value);
+  // }
 
   public refreshValue(value: any): void {
     this.value = value;

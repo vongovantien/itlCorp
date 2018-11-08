@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -11,6 +12,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public decimal? DebitVat { get; set; }
         public string CreditAccountNo { get; set; }
         public decimal? CreditVat { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         public string Type { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

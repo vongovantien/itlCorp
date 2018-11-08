@@ -39,8 +39,8 @@ export class ChargeComponent implements OnInit {
       numberToShow: [3, 5, 10, 15, 30, 50],
       totalPageBtn: 7
     }
-    ChargeToUpdate : CatChargeToAddOrUpdate = new CatChargeToAddOrUpdate();
-    ChargeToAdd : CatChargeToAddOrUpdate = new CatChargeToAddOrUpdate();
+    // ChargeToUpdate : CatChargeToAddOrUpdate ;
+    // ChargeToAdd : CatChargeToAddOrUpdate ;
     ListCharges:any=[];
     idChargeToUpdate:any="";
     idChargeToAdd:any="";
