@@ -83,6 +83,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         { name: "Unit", route_child: "unit" },
         { name: "Location", route_child: "location" },
         { name: "Charge", route_child: "charge" },
+        { name: "Currency", route_child: "currency" }
       ]
     },
     //Operation Module 
