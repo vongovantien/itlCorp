@@ -22,6 +22,7 @@ import { PagingClientComponent } from './shared/paging-client/paging-client.comp
 import {PagingService} from './shared/common/pagination/paging-service';
 import { CommonModule } from '@angular/common';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+import { SelectModule } from 'ng2-select';
 import { SharedModule } from './shared/shared.module';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -50,7 +51,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ToastrModule.forRoot(), // ToastrModule added
     Ng4LoadingSpinnerModule.forRoot(),
     Daterangepicker,
-    PerfectScrollbarModule // Scrollbar
+    PerfectScrollbarModule,
+    SelectModule // Scrollbar
   ],
   providers: [
     BaseService,

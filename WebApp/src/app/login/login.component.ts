@@ -12,4 +12,8 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
+  /**
+   * ng2-select
+   */
+  public items: Array<string> = ['option 1', 'option 2', 'option 3'];
 }
