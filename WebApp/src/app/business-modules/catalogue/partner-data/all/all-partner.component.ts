@@ -52,9 +52,12 @@ export class AllPartnerComponent implements OnInit {
       return this.pager.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.partners = this.sortService.sort(this.partners, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.partners = this.sortService.sort(this.partners, property, this.isDesc);
+    }
   }
   showConfirmDelete(item) {
     this.deleteConfirm.emit(item);

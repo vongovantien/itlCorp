@@ -52,9 +52,12 @@ export class AgentComponent implements OnInit {
       // this.child.setPage(this.pager.currentPage);
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.agents = this.sortService.sort(this.agents, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.agents = this.sortService.sort(this.agents, property, this.isDesc);
+    }
   }
   showConfirmDelete(item) {
     //this.partner = item;

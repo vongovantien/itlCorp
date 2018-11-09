@@ -132,7 +132,7 @@ export class API_MENU {
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/paging",
             addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/add",
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/update",
-            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/delete/",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/",
         }
     }
 
@@ -157,6 +157,9 @@ export class API_MENU {
         },
         Company_Info: {
 
+        },
+        Employee: {
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysEmployee/query"
         }
     }
 

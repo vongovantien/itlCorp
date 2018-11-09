@@ -22,6 +22,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ICatPlaceService, CatPlaceService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysUserService, SysUserService>();
+            services.AddTransient<ISysEmployeeService, SysEmployeeService>();
         }
     }
 }

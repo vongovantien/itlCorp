@@ -47,9 +47,12 @@ export class ShipperComponent implements OnInit {
       return this.pager.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.shippers = this.sortService.sort(this.shippers, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.shippers = this.sortService.sort(this.shippers, property, this.isDesc);
+    }
   }
   showConfirmDelete(item) {
     this.shipper = item;

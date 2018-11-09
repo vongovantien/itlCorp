@@ -48,9 +48,12 @@ export class ConsigneeComponent implements OnInit {
       return this.pager.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.consignees = this.sortService.sort(this.consignees, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.consignees = this.sortService.sort(this.consignees, property, this.isDesc);
+    }
   }
   
   showConfirmDelete(item) {

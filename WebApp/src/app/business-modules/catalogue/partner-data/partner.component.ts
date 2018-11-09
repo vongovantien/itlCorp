@@ -58,6 +58,7 @@ export class PartnerComponent implements OnInit {
     private router:Router) { }
 
   ngOnInit() {
+    this.spinnerService.show();
     this.tabSelect(this.activeTab);
   }
   onSearch(event){
@@ -143,6 +144,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
       this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
     }
+    this.spinnerService.hide();
   }
 
   showConfirmDelete(event){

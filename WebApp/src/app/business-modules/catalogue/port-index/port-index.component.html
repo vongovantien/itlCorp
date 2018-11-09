@@ -7,33 +7,8 @@
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
-            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                data-target="#add-port-index-modal">
-                <span>
-                    <i class="icon-plus7"></i>
-                    <span>
-                        add new
-                    </span>
-                </span>
-            </button> -->
             <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
-            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-download"></i>
-                    <span>
-                        import
-                    </span>
-                </span>
-            </button> -->
             <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
-            <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
-                </span>
-            </button> -->
             <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
         </div>
     </div>
@@ -46,40 +21,6 @@
         <div class="m-portlet__body">
             <!--begin::Form-->
             <div class="m-form">
-                <!-- <div class="input-group m-input-group m-input-group--square">
-                    <div class="input-group-prepend">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            Port code
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item active" href="javascript:void(0)">
-                                Port code
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)">
-                                Port name
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)">
-                                Country
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)">
-                                Zone
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)">
-                                Local zone
-                            </a>
-                            <a class="dropdown-item" href="javascript:void(0)">
-                                Mode
-                            </a>
-                        </div>
-                    </div>
-                    <input type="text" class="form-control" aria-label="Text input with dropdown button">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" type="button" title="Search">
-                            <i class="icon-search"></i>
-                        </button>
-                    </div>
-                </div> -->
                 <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (search)=resetSearch($event)></app-search-options>
             </div>
             <!--end::Form-->
@@ -95,32 +36,7 @@
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
-            <!-- <div class="pagination-nav">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="select-box" style="max-width: 190px">
-                            <select class="form-control" id="" aria-label="">
-                                <option value="1">15 line/screen</option>
-                                <option value="2">30 line/screen</option>
-                                <option value="3">50 line/screen</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <nav aria-label="">
-                            <ul class="pagination  justify-content-end">
-                                <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div> -->
+            
             <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
         </div>
@@ -237,15 +153,6 @@
                                         </div>
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label">
-                                        In Active
-                                    </label>
-                                    <input type="checkbox" class="form-control m-input" name="inActive"
-                                        [(ngModel)]="portIndex.inActive" #inActive="ngModel">
-                                </div>
-                            </div> -->
                         </div>
                         <div class="row" *ngIf="portIndex.id">
                             <div class="col-lg-4">
@@ -264,22 +171,6 @@
                     <!--end:add-port-index-form -->
                 </div>
                 <div class="modal-footer m--align-center c-button-actions">
-                    <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span>
-                                save
-                            </span>
-                        </span>
-                    </button>
-                    <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                        <span>
-                            <i class="la la-ban"></i>
-                            <span>
-                                cancel
-                            </span>
-                        </span>
-                    </button> -->
                     <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
                     <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
                 </div>
@@ -290,40 +181,5 @@
 <!--end::add-port-index-modal-->
 
 <!--begin::confirm-delete-modal-->
-<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Notification</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>You want to delete this port index</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Save
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div> -->
 <app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

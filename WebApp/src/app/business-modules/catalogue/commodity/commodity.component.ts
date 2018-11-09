@@ -192,14 +192,18 @@ export class CommodityComponent implements OnInit {
     this.criteria = {};
   }
   
-  onSortChange(property) {
-    if(this.activeTab == this.tabName.commodity){
-      this.isDesc = !this.isDesc;
-      this.commodities = this.sortService.sort(this.commodities, property, this.isDesc);
-    }
-    if(this.activeTab ==  this.tabName.commodityGroup){
-      this.isDesc = !this.isDesc;
-      this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      
+      if(this.activeTab == this.tabName.commodity){
+        this.isDesc = !this.isDesc;
+        this.commodities = this.sortService.sort(this.commodities, property, this.isDesc);
+      }
+      if(this.activeTab ==  this.tabName.commodityGroup){
+        this.isDesc = !this.isDesc;
+        this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
+      }
     }
   }
   async showDetail(item, tabName){

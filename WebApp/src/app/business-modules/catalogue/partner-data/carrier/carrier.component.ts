@@ -48,9 +48,12 @@ export class CarrierComponent implements OnInit {
       return this.pager.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.carriers = this.sortService.sort(this.carriers, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.carriers = this.sortService.sort(this.carriers, property, this.isDesc);
+    }
   }
   
   showConfirmDelete(item) {

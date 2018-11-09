@@ -9,12 +9,17 @@
                     </button>
                     <div class="dropdown-menu">
                         
-                        <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" id="AllField">
+                        <!-- <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" id="AllField">
                             All
                         </a>
                         <ng-container *ngFor="let map of settingFields">
                             <a *ngIf="map.allowSearch == true" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
                                 {{ map.header }}
+                            </a>
+                        </ng-container> -->
+                        <ng-container *ngFor="let item of settingFields">
+                            <a class="dropdown-item" [ngClass]="{ 'active': item.header == searchObject.fieldDisplayName}"  href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.header}}Field">
+                                {{ item.header }}
                             </a>
                         </ng-container>
                     </div>
@@ -37,12 +42,17 @@
                     </button>
                     <div class="dropdown-menu">
                         
-                        <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" id="AllField">
+                        <!-- <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" id="AllField">
                             All
                         </a>
                         <ng-container *ngFor="let map of settingFields">
                             <a *ngIf="map.allowSearch == true" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
                                 {{ map.header }}
+                            </a>
+                        </ng-container> -->
+                        <ng-container *ngFor="let item of settingFields">
+                            <a class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.header}}Field">
+                                {{ item.header }}
                             </a>
                         </ng-container>
                     </div>
