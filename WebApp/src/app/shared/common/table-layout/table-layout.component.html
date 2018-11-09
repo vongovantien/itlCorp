@@ -5,7 +5,7 @@
                 <th class="table-actions-col no-sorting">Actions</th>
                 <!-- <th class="sorting_asc">Order</th> -->
                 <ng-container *ngFor="let map of columnMaps">
-                    <th [ngClass]="{ 'sorting': map.dataType != 'boolean' }" id="hearder_{{map.primaryKey}}" (click)="sort(map.primaryKey)" *ngIf="map.isShow"><span>{{ map.header }}</span></th>
+                    <th [ngClass]="{ 'sorting': map.dataType != 'boolean' }" id="hearder_{{map.primaryKey}}" (click)="sort(map)" *ngIf="map.isShow"><span>{{ map.header }}</span></th>
                 </ng-container>
                 <!-- <th *ngFor="let map of columnMaps" class="sorting" (click)="sort(map.primaryKey)"><span *ngIf="map.isShow">{{ map.header }}</span></th> -->
             </tr>

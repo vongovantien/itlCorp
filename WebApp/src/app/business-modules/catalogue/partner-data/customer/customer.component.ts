@@ -19,7 +19,6 @@ import { SortService } from 'src/app/shared/services/sort.service';
 })
 export class CustomerComponent implements OnInit {
   customers: any;
-  //customer: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
@@ -28,15 +27,10 @@ export class CustomerComponent implements OnInit {
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
-    private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
-    private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private api_menu: API_MENU) { }
 
   ngOnInit() {
-  }
-  setPageCustommer(pager: PagerSetting): any {
-    this.getPartnerData(pager, this.criteria);
   }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
     this.spinnerService.show();
@@ -48,6 +42,7 @@ export class CustomerComponent implements OnInit {
       this.customers = response.data;
       console.log(this.customers);
       this.pager.totalItems = response.totalItems;
+      return this.pager.totalItems;
     });
   }
   showConfirmDelete(item) {

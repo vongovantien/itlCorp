@@ -4,7 +4,7 @@
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
-            <!-- <app-breadcrumb></app-breadcrumb> -->
+            <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
             <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
@@ -308,7 +308,7 @@
                             <label class="form-control-label" for="">
                                 Work Phone (Ext No)
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="" name="employeeWorkPhone" [(ngModel)]="employee.extNo">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -316,7 +316,7 @@
                             <label class="form-control-label" for="">
                                 Personal Phone
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="" name="employeePhone" [(ngModel)]="employee.tel">
                         </div>
                     </div>
                 </div>
@@ -326,7 +326,7 @@
                             <label class="form-control-label" for="">
                                 Email Address
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="" name="employeeEmail" [(ngModel)]="employee.email">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -334,7 +334,7 @@
                             <label class="form-control-label" for="">
                                 Localtion (Workplace)
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" disabled placeholder="" name="employeeWorkplace" [(ngModel)]="employee.workplaceAddress">
                         </div>
                     </div>
                 </div>

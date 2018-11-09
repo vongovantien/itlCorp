@@ -11,23 +11,46 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
   parent_name = null;
   children_name = null;
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      var route = this.router.url.split("/");
-      var child_path = route[route.length - 1];
-      var parent_path = route[route.length - 2];
-      var index_module = lodash.findIndex(this.Menu, function (o) {
-        var route_module = o.route_parent.split("/");
-        return route_module[route_module.length - 2] == parent_path;
-      });
-      var index_child = lodash.findIndex(this.Menu[index_module].childs, function (o) {
-        return child_path == o.route_child;
-      });
+    console.log(this.router.url);
+    var _route = "";
+    if(this.router.url.includes(";")){
+      _route = this.router.url.split(";")[0];
+    }else{
+      _route = this.router.url;
+    }
+    var route = _route.split("/");
+
+    var child_path = route[route.length - 1];
+    var parent_path = route[route.length - 2];
+    var index_module = lodash.findIndex(this.Menu, function (o) {
+      var route_module = o.route_parent.split("/");
+      return route_module[route_module.length - 2] == parent_path;
+    });
+    var index_child = lodash.findIndex(this.Menu[index_module].childs, function (o) {
+      return child_path == o.route_child;
+    });
+
+    this.parent_name = this.Menu[index_module].parent_name;
+    this.children_name = this.Menu[index_module].childs[index_child].name;
+    this.cdRef.detectChanges();
+
+    // setTimeout(() => {
+    //   var route = this.router.url.split("/");
+    //   var child_path = route[route.length - 1];
+    //   var parent_path = route[route.length - 2];
+    //   var index_module = lodash.findIndex(this.Menu, function (o) {
+    //     var route_module = o.route_parent.split("/");
+    //     return route_module[route_module.length - 2] == parent_path;
+    //   });
+    //   var index_child = lodash.findIndex(this.Menu[index_module].childs, function (o) {
+    //     return child_path == o.route_child;
+    //   });
   
-      this.parent_name = this.Menu[index_module].parent_name;
-      this.children_name = this.Menu[index_module].childs[index_child].name;
-      this.cdRef.detectChanges();
+    //   this.parent_name = this.Menu[index_module].parent_name;
+    //   this.children_name = this.Menu[index_module].childs[index_child].name;
+    //   this.cdRef.detectChanges();
   
-    }, 500);
+    // }, 500);
  
 
   }
@@ -56,8 +79,8 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
         { name: "Unit", route_child: "unit" },
         { name: "Location", route_child: "location" },
         { name: "Charge", route_child: "charge" },
-        { name: "New Partner Data", route_child: "partner-data-addnew" },
-        { name: "Partner Data Detail", route_child: "partner-data-detail" },
+        { name: "Partner Data - Add New", route_child: "partner-data-addnew" },
+        { name: "Partner Data - Edit", route_child: "partner-data-detail" },
       ]
     },
     //Operation Module 

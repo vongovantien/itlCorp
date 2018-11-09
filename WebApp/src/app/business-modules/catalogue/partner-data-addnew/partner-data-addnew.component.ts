@@ -30,6 +30,8 @@ export class PartnerDataAddnewComponent implements OnInit {
    departments: any[];
    partnerType: any;
   isRequiredSaleman = false;
+  employee: any = {};
+  users: any[] = [];
    @ViewChild('formAddEdit') form: NgForm;
    @ViewChild('chooseBillingCountry') public chooseBillingCountry: SelectComponent;
    @ViewChild('chooseBillingProvince') public chooseBillingProvince: SelectComponent;
@@ -90,6 +92,7 @@ export class PartnerDataAddnewComponent implements OnInit {
   getSalemans(): any {
     this.baseService.get(this.api_menu.System.User_Management.getAll).subscribe((response: any) => {
       if(response != null){
+        this.users = response;
         this.saleMans = response.map(x=>({"text":x.username,"id":x.id}));
       }
      });
@@ -174,9 +177,14 @@ export class PartnerDataAddnewComponent implements OnInit {
   }
 
   onSubmit(){
-    if(this.form.valid && (this.partner.salePersonId != null && this.isRequiredSaleman)){
+    if(this.form.valid){
       this.partner.accountNo = this.partner.id= this.partner.taxCode;
-      this.addNew();
+      if(this.isRequiredSaleman && this.partner.salePersonId != null){
+        this.addNew();
+      }
+      else{
+        this.addNew();
+      }
     }
   }
   addNew(): any {
@@ -212,7 +220,17 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.chooseAccountRef.active = [];
     this.chooseWorkplace.active = [];
   }
-  
+  getEmployee(employeeId: any): any {
+    this.baseService.post(this.api_menu.System.Employee.query, { id : employeeId}).subscribe((responses: any) => {
+      if(responses.length>0){
+        this.employee = responses[0];
+      }
+      else{
+        this.employee = {};
+      }
+      console.log(this.employee);
+    });
+  }
   /**
    * ng2-select
    */
@@ -250,6 +268,10 @@ export class PartnerDataAddnewComponent implements OnInit {
     }
     if(selectName == 'saleman'){
       this.partner.salePersonId = value.id;
+      let user = this.users.find(x => x.id == value.id);
+      if(user){
+        this.getEmployee(user.employeeId);
+      }
     }
     if(selectName == 'department'){
       this.partner.departmentId = value.id;

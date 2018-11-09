@@ -34,9 +34,6 @@ export class ShipperComponent implements OnInit {
 
   ngOnInit() {
   }
-  setPage(pager: PagerSetting): any {
-    this.getPartnerData(pager, this.criteria);
-  }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
     this.spinnerService.show();
     if(criteria != undefined){
@@ -47,11 +44,15 @@ export class ShipperComponent implements OnInit {
       this.shippers = response.data.map(x=>Object.assign({},x));
       console.log(this.shippers);
       this.pager.totalItems = response.totalItems;
+      return this.pager.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.shippers = this.sortService.sort(this.shippers, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.shippers = this.sortService.sort(this.shippers, property, this.isDesc);
+    }
   }
   showConfirmDelete(item) {
     this.shipper = item;

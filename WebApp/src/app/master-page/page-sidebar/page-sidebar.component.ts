@@ -53,6 +53,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }
 
   }
+  constructor(private router: Router) { }
 
 
   ngOnInit() {
@@ -82,6 +83,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         { name: "Unit", route_child: "unit" },
         { name: "Location", route_child: "location" },
         { name: "Charge", route_child: "charge" },
+        { name: "Currency", route_child: "currency" }
       ]
     },
     //Operation Module 
@@ -183,7 +185,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
   ]
 
 
-  constructor(private router: Router) { }
+
 
 
   open_sub_menu(index) {
@@ -248,6 +250,14 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.sub_menu_click('Job Management',1,0);
     }, 200);
+  }
+
+  mouseenter(){
+    document.body.style.overflow = 'hidden';
+  }  
+
+  mouseleave(){
+    document.body.style.overflow = 'auto';
   }
 
 

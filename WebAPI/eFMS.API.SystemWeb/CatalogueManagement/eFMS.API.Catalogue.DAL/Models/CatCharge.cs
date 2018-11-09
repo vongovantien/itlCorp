@@ -5,10 +5,16 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CatCharge
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
+        public string Code { get; set; }
         public string ChargeNameVn { get; set; }
         public string ChargeNameEn { get; set; }
-        public string ShipmentTypeId { get; set; }
+        public string ServiceTypeId { get; set; }
+        public string Type { get; set; }
+        public string CurrencyId { get; set; }
+        public double UnitPrice { get; set; }
+        public short UnitId { get; set; }
+        public double Vat { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
