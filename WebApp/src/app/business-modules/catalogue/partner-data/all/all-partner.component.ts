@@ -20,7 +20,7 @@ import { BaseService } from 'src/services-base/base.service';
 export class AllPartnerComponent implements OnInit {
   partners: Array<Partner>;
   //partner: Partner;
-  pagerAll: PagerSetting = PAGINGSETTING;
+  pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.ALL };
   isDesc: boolean = false;
@@ -48,16 +48,18 @@ export class AllPartnerComponent implements OnInit {
       this.spinnerService.hide();
       this.partners = response.data.map(x=>Object.assign({},x));
       console.log(this.partners);
-      this.pagerAll.totalItems = response.totalItems;
-     
+      this.pager.totalItems = response.totalItems;
+      return this.pager.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.partners = this.sortService.sort(this.partners, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.partners = this.sortService.sort(this.partners, property, this.isDesc);
+    }
   }
   showConfirmDelete(item) {
-    //this.partner = item;
     this.deleteConfirm.emit(item);
   }
   showDetail(item) {

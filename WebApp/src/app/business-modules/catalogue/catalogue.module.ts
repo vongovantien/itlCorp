@@ -23,6 +23,7 @@ import { ConsigneeComponent } from './partner-data/consignee/consignee.component
 import { AirShipSupComponent } from './partner-data/air-ship-sup/air-ship-sup.component';
 import { ShipperComponent } from './partner-data/shipper/shipper.component';
 import { AllPartnerComponent } from './partner-data/all/all-partner.component';
+import { CurrencyComponent } from './currency/currency.component';
 import { ChargeDetailsComponent } from './charge-details/charge-details.component';
 
 
@@ -52,6 +53,7 @@ import { ChargeDetailsComponent } from './charge-details/charge-details.componen
       ConsigneeComponent,
       AirShipSupComponent,
       ShipperComponent,
+ 	  CurrencyComponent,
       AllPartnerComponent,
       ChargeDetailsComponent
     ],

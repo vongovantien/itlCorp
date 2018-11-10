@@ -95,9 +95,13 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
             catCurrencyModel.UserModified = "01";
-            catCurrencyModel.DatetimeModified = DateTime.Now;           
+            catCurrencyModel.DatetimeModified = DateTime.Now;         
+            if(catCurrencyModel.Inactive == true)
+            {
+                catCurrencyModel.InactiveOn = DateTime.Now;
+            }
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catCurrencyService.Update(catCurrencyModel,x=>x.Id==model.Id);
+            var hs = catCurrencyService.Update(catCurrencyModel);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -107,8 +111,7 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
-        [Route("delete/{id}")]
+        [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
             var hs = catCurrencyService.Delete(x => x.Id == id);
@@ -127,16 +130,20 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == string.Empty)
             {
-                if (catCurrencyService.Any(x => (x.Id.ToLower() == model.Id.ToLower())))
+                if (catCurrencyService.Any(x => x.Id.ToLower() == model.Id.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+                if (catCurrencyService.Any(x => x.Id.ToLower() == model.Id.ToLower() && x.CurrencyName.ToLower() == model.CurrencyName.ToLower()))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }
             }
             else
             {
-                if (catCurrencyService.Any(x => ((x.Id.ToLower() == model.Id.ToLower()))))
+                if (catCurrencyService.Any(x => x.CurrencyName.ToLower() == model.CurrencyName.ToLower() && x.Id.ToLower() != id.ToLower()))
                 {
-                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                    message = stringLocalizer[LanguageSub.MSG_NAME_EXISTED].Value;
                 }
             }
             return message;

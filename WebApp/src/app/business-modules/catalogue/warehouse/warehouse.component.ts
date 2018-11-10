@@ -275,7 +275,7 @@ export class WarehouseComponent implements OnInit {
         this.criteria.nameEN = event.searchString;
       }
       if(event.field == "nameVN"){
-        this.criteria.nameEN = event.searchString;
+        this.criteria.nameVN = event.searchString;
       }
       if(event.field == "address"){
         this.criteria.address = event.searchString;

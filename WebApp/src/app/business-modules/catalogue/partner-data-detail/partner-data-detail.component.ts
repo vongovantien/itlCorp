@@ -16,6 +16,7 @@ import { SelectComponent } from 'ng2-select';
 })
 export class PartnerDataDetailComponent implements OnInit {
   departments: any[];
+  users: any[] = [];
   departmentActive: any;
   partner: Partner;
   parentCustomers: any[];
@@ -35,6 +36,7 @@ export class PartnerDataDetailComponent implements OnInit {
   salemanActive: any;
   activeNg = true;
   isRequiredSaleman = false;
+  employee: any ={};
   titleConfirmDelete = "You want to delete this Partner?";
   @ViewChild('formAddEdit') form: NgForm;
   @ViewChild('chooseBillingCountry') public chooseBillingCountry: SelectComponent;
@@ -85,6 +87,12 @@ export class PartnerDataDetailComponent implements OnInit {
     if(this.shippingCountryActive){
       this.getProvincesByCountry(this.shippingCountryActive.id, false);
     }
+    if(this.partner.salePersonId){
+      let user = this.users.find(x => x.id == this.partner.salePersonId);
+      if(user){
+        this.getEmployee(user.employeeId);
+      }
+    }
   }
   getPartnerGroupActives(arg0: string[]): any {
     if(arg0.length > 0){
@@ -129,6 +137,7 @@ export class PartnerDataDetailComponent implements OnInit {
   async getSalemans(){
     let responses = await this.baseService.getAsync(this.api_menu.System.User_Management.getAll);
     if(responses != null){
+      this.users = responses;
       this.saleMans = responses.map(x=>({"text":x.username,"id":x.id}));
     }
   }
@@ -163,9 +172,15 @@ export class PartnerDataDetailComponent implements OnInit {
     });
   }
   onSubmit(){
-    if(this.form.valid && !(this.partner.salePersonId == null && this.isRequiredSaleman)){
+    if(this.form.valid){
       this.partner.accountNo = this.partner.id= this.partner.taxCode;
-      this.update();
+      if(this.isRequiredSaleman && this.partner.salePersonId != null){
+        this.update();
+      }
+      else{
+        this.partner.accountNo = this.partner.id= this.partner.taxCode;
+        this.update();
+      }
     }
   }
   update(): any {
@@ -234,6 +249,10 @@ export class PartnerDataDetailComponent implements OnInit {
     }
     if(selectName == 'saleman'){
       this.partner.salePersonId = value.id;
+      let user = this.users.find(x => x.id == value.id);
+      if(user){
+        this.getEmployee(user.employeeId);
+      }
       if(this.partner.partnerGroup.includes('CUSTOMER')){
         this.isRequiredSaleman = true;
       }
@@ -259,6 +278,17 @@ export class PartnerDataDetailComponent implements OnInit {
         this.isRequiredSaleman = false;
       }
     }
+  }
+  getEmployee(employeeId: any): any {
+    this.baseService.post(this.api_menu.System.Employee.query, { id : employeeId}).subscribe((responses: any) => {
+      if(responses.length>0){
+        this.employee = responses[0];
+      }
+      else{
+        this.employee = {};
+      }
+      console.log(this.employee);
+    });
   }
   public removed(value: any, selectName?: string): void {
     if(selectName == 'billingCountry'){
@@ -305,6 +335,7 @@ export class PartnerDataDetailComponent implements OnInit {
     }
     if(selectName == 'saleman'){
       this.partner.salePersonId = null;
+      this.employee = {};
       if(this.partner.partnerGroup.includes('CUSTOMER')){
         this.isRequiredSaleman = true;
       }

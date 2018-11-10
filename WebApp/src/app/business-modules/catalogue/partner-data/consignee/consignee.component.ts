@@ -35,9 +35,6 @@ export class ConsigneeComponent implements OnInit {
 
   ngOnInit() {
   }
-  setPage(pager: PagerSetting): any {
-    this.getPartnerData(pager, this.criteria);
-  }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
     this.spinnerService.show();
     if(criteria != undefined){
@@ -48,11 +45,15 @@ export class ConsigneeComponent implements OnInit {
       this.consignees = response.data.map(x=>Object.assign({},x));
       console.log(this.consignees);
       this.pager.totalItems = response.totalItems;
+      return this.pager.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.consignees = this.sortService.sort(this.consignees, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.consignees = this.sortService.sort(this.consignees, property, this.isDesc);
+    }
   }
   
   showConfirmDelete(item) {
