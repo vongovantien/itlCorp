@@ -27,12 +27,14 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatChargeService catChargeService;
+        private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
 
-        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, IMapper imapper)
+        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, ICatChargeDefaultAccountService catChargeDefaultAccount, IMapper imapper)
         {
             stringLocalizer = localizer;
             catChargeService = service;
+            catChargeDefaultAccountService = catChargeDefaultAccount;
             mapper = imapper;
         }
 
@@ -50,7 +52,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getById/{id}")]
         public IActionResult Get(Guid id)
         {
-            var result = catChargeService.Get(x => x.Id == id).FirstOrDefault();
+            var result = catChargeService.GetChargeById(id);
             return Ok(result);
         }
 
@@ -103,6 +105,21 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var hs = catChargeService.DeleteCharge(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
 
         private string CheckExist(Guid id, CatChargeAddOrUpdateModel model)
         {

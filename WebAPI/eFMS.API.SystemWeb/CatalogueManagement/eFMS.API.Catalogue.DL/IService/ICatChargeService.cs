@@ -14,6 +14,8 @@ namespace eFMS.API.Catalogue.DL.IService
         List<Object> GetCharges(CatChargeCriteria criteria, int page, int size, out int rowsCount);
         HandleState AddCharge(CatChargeAddOrUpdateModel model);
         HandleState UpdateCharge(CatChargeAddOrUpdateModel model);
+        HandleState DeleteCharge(Guid id);
+        CatChargeAddOrUpdateModel GetChargeById(Guid id);
 
     }
 }

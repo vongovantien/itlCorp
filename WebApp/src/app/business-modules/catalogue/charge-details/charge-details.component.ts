@@ -16,38 +16,49 @@ import { from } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { reserveSlots } from '@angular/core/src/render3/instructions';
+import { Router, ActivatedRoute } from '@angular/router';
+import { async } from 'q';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
-@Component({
-  selector: 'app-charge-addnew',
-  templateUrl: './charge-addnew.component.html',
-  styleUrls: ['./charge-addnew.component.scss']
-})
-export class ChargeAddnewComponent implements OnInit {
 
+@Component({
+  selector: 'app-charge-details',
+  templateUrl: './charge-details.component.html',
+  styleUrls: ['./charge-details.component.scss']
+})
+export class ChargeDetailsComponent implements OnInit {
   constructor(
     private baseServices: BaseService,
     private toastr: ToastrService,
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
-    private el:ElementRef) { }
-    ChargeToAdd : CatChargeToAddOrUpdate = new CatChargeToAddOrUpdate();
+    private el:ElementRef,
+    private router:Router,
+    private route:ActivatedRoute) { }
+    //Charge : CatChargeOrUpdate = new CatChargeOrUpdate();
     isAddNewLine:boolean = false;
     isMaximumAccountRow:boolean =false;
     isSameVoucherType:boolean = false;
     ngDataUnit:any=[];
     ngDataCurrency:any=[];
+    Charge:CatChargeToAddOrUpdate = null;
     ngDataType = [
       {id:"CREDIT",text:"CREDIT"},
       {id:"DEBIT",text:"DEBIT"},
       {id:"OBH",text:"OBH"}
     ];
     ngDataTypeChargeDefault = [
-      {id:"Công Nợ",text:"Công Nợ"},
-      {id:"Giải Chi",text:"Giải Chi"},
-      {id:"Loại Khác",text:"Loại Khác"}
+      {id:"Công-Nợ",text:"Công Nợ"},
+      {id:"Giải-Chi",text:"Giải Chi"},
+      {id:"Loại-Khác",text:"Loại Khác"}
     ];
+
+    activeUnit:any = null;
+    activeCurrency:any = null;
+    activeType:any = null;
+    activeServices:any = null;
+
 
     /**
      * Need to update ngDataServices by get data from databse after implement documentation module 
@@ -66,9 +77,47 @@ export class ChargeAddnewComponent implements OnInit {
       {text:"Sea Consol Import",id:"SCI"}
     ];
 
-  async ngOnInit() {
+  async ngOnInit() {    
     await this.getNeccessaryData();
-   
+    await this.getChargeDetail();    
+  }
+
+    getChargeDetail(){
+    try {
+      this.route.params.subscribe(async params => {
+        var id = params.id;
+        this.Charge = await this.baseServices.getAsync(this.api_menu.Catalogue.Charge.getById+id,true,true);
+        this.activeServices = this.getCurrentActiveService(this.Charge.charge.serviceTypeId);
+       
+        const idUnit = this.Charge.charge.unitId;
+        const idCurrency = this.Charge.charge.currencyId;
+        const type = this.Charge.charge.type;
+
+        var indexCurrentUnit = lodash.findIndex(this.ngDataUnit,function(o){return o.id===idUnit});
+        var indexCurrentCurrency = lodash.findIndex(this.ngDataCurrency,function(o){return o.id===idCurrency});
+        var indexType = lodash.findIndex(this.ngDataType,function(o){return o.id===type});
+
+        this.activeUnit = [this.ngDataUnit[indexCurrentUnit]];
+        this.activeType = [this.ngDataType[indexType]];
+        this.activeCurrency = [this.ngDataCurrency[indexCurrentCurrency]];
+
+      });
+    } catch (error) {
+      this.toastr.error("Cannot Get Charge Details !");
+    }
+  }
+
+  getCurrentActiveService(ChargeService:any){
+    var listService = ChargeService.split(";");
+    var activeServiceList :any = [];
+    listService.forEach(item => {
+        const index = lodash.findIndex(this.ngDataService,function(o){return o.id===item});
+        if(index!=-1){
+          const activeService = this.ngDataService[index];
+          activeServiceList.push(activeService);
+        }
+    });
+    return activeServiceList;
   }
 
   async getNeccessaryData(){
@@ -83,18 +132,18 @@ export class ChargeAddnewComponent implements OnInit {
 
   addNewChargeDedaultAccount(){
     var obj = new CatChargeDefaultAccount();
-    // this.ChargeToAdd.listChargeDefaultAccount.push(obj);   
+    // this.Charge.listChargeDefaultAccount.push(obj);   
 
-    if(this.ChargeToAdd.listChargeDefaultAccount.length==0){
-      this.ChargeToAdd.listChargeDefaultAccount.push(obj);   
+    if(this.Charge.listChargeDefaultAccount.length==0){
+      this.Charge.listChargeDefaultAccount.push(obj);   
     }
     else{
       if(this.validatateDefaultAcountLine()){
-        if(this.ChargeToAdd.listChargeDefaultAccount.length==3){
+        if(this.Charge.listChargeDefaultAccount.length==3){
           this.isMaximumAccountRow = true;
         }else{
-          this.ChargeToAdd.listChargeDefaultAccount.push(obj);
-          this.isAddNewLine = false;
+          this.Charge.listChargeDefaultAccount.push(obj);
+          this.isAddNewLine = false;;
         }        
       }else{
         this.isAddNewLine = true;
@@ -106,39 +155,34 @@ export class ChargeAddnewComponent implements OnInit {
   }
 
   RemoveDefaultAccount(index){
-    this.ChargeToAdd.listChargeDefaultAccount.splice(index,1);
+    this.Charge.listChargeDefaultAccount.splice(index,1);
     this.isMaximumAccountRow = false;
   }
 
-  async addCharge(form:NgForm){ 
-   
-      if (form.form.status != "INVALID" && this.validatateDefaultAcountLine() && this.isSameVoucherType == false) {
-        delete this.ChargeToAdd.charge.Id;
-        await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.addNew,this.ChargeToAdd,true,true);
+  async updateCharge(form:NgForm){ 
+      // console.log(this.isAddNewLine);
+      this.isAddNewLine = true;
+      if (form.form.status != "INVALID" && this.validatateDefaultAcountLine() && this.isSameVoucherType == false) {      
+         await this.baseServices.putAsync(this.api_menu.Catalogue.Charge.update,this.Charge,true,true);
       }  
 
   }
 
 
+  getActiveVoucherType(index){
+    // console.log(index);
+    const voucherType = this.Charge.listChargeDefaultAccount[index].type;
+    if(voucherType===null || voucherType===undefined){
+      return [];
+    }else{
+      const indexCurrenVoucher = lodash.findIndex(this.ngDataTypeChargeDefault,function(o){return o.text===voucherType});
+      const aciveVoucherType = [this.ngDataTypeChargeDefault[indexCurrenVoucher]];
+      // console.log(aciveVoucherType);
+      return aciveVoucherType;
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  }
 
   /**
  * ng2-select
@@ -161,47 +205,47 @@ export class ChargeAddnewComponent implements OnInit {
 
   public selected(value: any,action): void {
     if(action=="unit"){
-      this.ChargeToAdd.charge.unitId = value.id;
+      this.Charge.charge.unitId = value.id;
       
     }
     if(action=="currency"){
-      this.ChargeToAdd.charge.currencyId = value.id;
+      this.Charge.charge.currencyId = value.id;
     }
     if(action=="type"){
-      this.ChargeToAdd.charge.type = value.id;
+      this.Charge.charge.type = value.id;
     }
     if(action=="service"){
-      this.ChargeToAdd.charge.serviceTypeId =this.ChargeToAdd.charge.serviceTypeId==undefined?(value.id+";"): this.ChargeToAdd.charge.serviceTypeId += (value.id+";");
-      console.log(this.ChargeToAdd.charge.serviceTypeId);
+      this.Charge.charge.serviceTypeId =this.Charge.charge.serviceTypeId==undefined?(value.id+";"): this.Charge.charge.serviceTypeId += (value.id+";");
+      console.log(this.Charge.charge.serviceTypeId);
     }
     //console.log('Selected value is: ', value);
   }
 
   selectedTypeDefault(value:any,index:number){
-    var listAcc = this.ChargeToAdd.listChargeDefaultAccount;
+    var listAcc = this.Charge.listChargeDefaultAccount;
     if(lodash.findIndex(listAcc,function(o){return o.type===value.text})!=-1){
       this.isSameVoucherType =  true;
     }
     else{
       this.isSameVoucherType = false;
-      this.ChargeToAdd.listChargeDefaultAccount[index].type =  value.text;
+      this.Charge.listChargeDefaultAccount[index].type =  value.text;
     } 
 
   }
 
   removedTypeDefault(value:any,index:number){
-    this.ChargeToAdd.listChargeDefaultAccount[index].type = null;
+    this.Charge.listChargeDefaultAccount[index].type = null;
   }
 
   validateChargeDefault = false;
 
   validatateDefaultAcountLine(){
-    if(this.ChargeToAdd.listChargeDefaultAccount.length>0){
-      var index = this.ChargeToAdd.listChargeDefaultAccount.length-1;
-      if((this.ChargeToAdd.listChargeDefaultAccount[index].debitAccountNo == '' || this.ChargeToAdd.listChargeDefaultAccount[index].debitAccountNo==null)
-        && (this.ChargeToAdd.listChargeDefaultAccount[index].creditAccountNo==''|| this.ChargeToAdd.listChargeDefaultAccount[index].creditAccountNo==null)
-        && (this.ChargeToAdd.listChargeDefaultAccount[index].creditVat==null)
-        && (this.ChargeToAdd.listChargeDefaultAccount[index].debitVat==null) || this.ChargeToAdd.listChargeDefaultAccount[index].type == null){
+    if(this.Charge.listChargeDefaultAccount.length>0){
+      var index = this.Charge.listChargeDefaultAccount.length-1;
+      if((this.Charge.listChargeDefaultAccount[index].debitAccountNo == '' || this.Charge.listChargeDefaultAccount[index].debitAccountNo==null)
+        && (this.Charge.listChargeDefaultAccount[index].creditAccountNo==''|| this.Charge.listChargeDefaultAccount[index].creditAccountNo==null)
+        && (this.Charge.listChargeDefaultAccount[index].creditVat==null)
+        && (this.Charge.listChargeDefaultAccount[index].debitVat==null) || this.Charge.listChargeDefaultAccount[index].type == null){
          // this.validateChargeDefault = false;
           return false;
         }else{
@@ -215,18 +259,19 @@ export class ChargeAddnewComponent implements OnInit {
   public removed(value: any,action): void {
     if(action=="service"){
       var s = value.id+";";
-      this.ChargeToAdd.charge.serviceTypeId = this.ChargeToAdd.charge.serviceTypeId.replace(s,"");
-      console.log(this.ChargeToAdd.charge.serviceTypeId);
+      this.Charge.charge.serviceTypeId = this.Charge.charge.serviceTypeId.replace(s,"");
+      console.log(this.Charge.charge.serviceTypeId);
     }
     if(action=="unit"){
-      this.ChargeToAdd.charge.unitId = null;
+      this.Charge.charge.unitId = null;
     }
     if(action=="currency"){
-      this.ChargeToAdd.charge.currencyId = null;
+      this.Charge.charge.currencyId = null;
     }
     if(action==="type"){
-      this.ChargeToAdd.charge.type = null;
+      this.Charge.charge.type = null;
     }
+   
     console.log('Removed value is: ', value);
   }
 

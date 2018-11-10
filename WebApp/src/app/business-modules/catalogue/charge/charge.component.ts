@@ -16,6 +16,7 @@ import { from } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { reserveSlots } from '@angular/core/src/render3/instructions';
+import { Router } from '@angular/router';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -31,18 +32,25 @@ export class ChargeComponent implements OnInit {
     private toastr: ToastrService,
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
-    private el:ElementRef) { }
+    private el:ElementRef,
+    private router:Router) { }
+
+    listFilter = [
+      { filter: "All", field: "all" }, { filter: "Code", field: "code" },
+      { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
+    selectedFilter = this.listFilter[0].filter;
 
     pager: PagerSetting = {
       currentPage: 1,
-      pageSize: 30,
+      pageSize: 3,
       numberToShow: [3, 5, 10, 15, 30, 50],
       totalPageBtn: 7
     }
     // ChargeToUpdate : CatChargeToAddOrUpdate ;
     // ChargeToAdd : CatChargeToAddOrUpdate ;
     ListCharges:any=[];
-    idChargeToUpdate:any="";
+    idChargeToUpdate:any="";   
+    idChargeToDelete:any=""
     idChargeToAdd:any="";
     searchKey:string="";
     searchObject:any={};
@@ -54,11 +62,63 @@ export class ChargeComponent implements OnInit {
     await this.getCharges();
   }
 
+  async searchCharge(){
+    this.searchObject = {};
+    if (this.selectedFilter == "All") {
+      this.searchObject.All = this.searchKey;
+    } else {
+      this.searchObject = {};
+      for (var i = 1; i < this.listFilter.length; i++) {
+        if (this.selectedFilter == this.listFilter[i].filter) {
+          eval("this.searchObject[this.listFilter[i].field]=this.searchKey");
+        }
+
+      }
+    }
+    await this.getCharges();
+  }
+
+  async resetSearch(){
+    this.searchKey = "";
+    this.searchObject = {};
+    this.selectedFilter = this.listFilter[0].filter;
+    await this.getCharges();
+  }
+
+  async setPage(pager:PagerSetting){
+    this.pager.currentPage = pager.currentPage;
+    this.pager.pageSize = pager.pageSize;
+    this.pager.totalPages = pager.totalPages;
+    await this.getCharges();
+  }
+
+  setPageAfterDelete() {
+    this.child.setPage(this.pager.currentPage);
+    if (this.pager.currentPage > this.pager.totalPages) {
+      this.pager.currentPage = this.pager.totalPages;
+      this.child.setPage(this.pager.currentPage);
+    }
+  }
+
   async getCharges(){
     var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging+"?pageNumber="+this.pager.currentPage+"&pageSize="+this.pager.pageSize,this.searchObject,false,true);
     this.ListCharges = response.data;
     console.log(this.ListCharges);
     this.pager.totalItems = response.totalItems;
+  }
+
+  prepareDeleteCharge(id){
+    this.idChargeToDelete = id;
+  }
+
+  async deleteCharge(){
+    await this.baseServices.deleteAsync(this.api_menu.Catalogue.Charge.delete+this.idChargeToDelete,true,true);
+    await this.getCharges();
+    this.setPageAfterDelete();
+  }
+
+  gotoEditPage(id){
+    this.router.navigate(["/home/catalogue/charge-edit",{id:id}]);
   }
 
 

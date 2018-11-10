@@ -77,7 +77,15 @@ namespace eFMS.API.Catalogue.DL.Services
             
         }
 
-
+        public CatChargeAddOrUpdateModel GetChargeById(Guid id)
+        {
+            CatChargeAddOrUpdateModel returnCharge = new CatChargeAddOrUpdateModel();
+            var charge = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            var listChargeDefault = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == id).ToList();
+            returnCharge.Charge = charge;
+            returnCharge.ListChargeDefaultAccount = listChargeDefault;
+            return returnCharge;
+        }
 
 
 
@@ -114,16 +122,42 @@ namespace eFMS.API.Catalogue.DL.Services
             if(criteria.All == null)
             {
                 list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                && ((x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
             else
             {
                list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               || ((x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+               || ((x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+               || ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
             return list.ToList(); ;
         }
 
-        
+        public HandleState DeleteCharge(Guid id)
+        {
+            DataContext.Delete(x => x.Id == id);
+            try
+            {
+                DataContext.Delete(x => x.Id == id);
+                var listChargeDefaultAccount = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == id).ToList();
+                foreach(var item in listChargeDefaultAccount)
+                {
+                    ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Remove(item);
+                }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
+                var hs = new HandleState();
+                return hs;
+
+            }
+            catch(Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+
+        }
+
+  
     }
 }
