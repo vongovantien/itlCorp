@@ -2,6 +2,7 @@
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Service.Models;
 using eFMS.API.System.Service.ViewModels;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,8 @@ namespace eFMS.API.System.DL.IService
     {
         List<SysUserViewModel> GetAll();
         List<vw_sysUser> GetUserWorkplace();
-    }
+        HandleState AddUser(SysUserAddModel model);
+        LoginModel Login(string username, string password);
+
+     }
 }

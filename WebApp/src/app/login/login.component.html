@@ -1,56 +1,132 @@
 <!-- begin:: Page -->
 <div class="m-grid m-grid--hor login-background"  style="background-image: url(src/assets/app/media/img/bg/bg-login.jpg);">
-    <div class="m-login m-login--signin" id="m_login">
+    <div class="m-login-wrap">
+        <div class="lang-nav">
+            <span>Language:</span>
+            <a class="btn-link lang-item active" href="javascript:void(0)">
+                <img alt="" class="m--img-rounded m--marginless m--img-centered" src="src/assets/app/media/img/lang/vi-login.png">
+            </a>
+            <a class="btn-link lang-item" href="javascript:void(0)">
+                <img alt="" class="m--img-rounded m--marginless m--img-centered" src="src/assets/app/media/img/lang/en-login.png">
+            </a>
+        </div>
+        <div class="m-login m-login--signin" id="m_login">
             <div class="m-login__wrapper-1 m-portlet-full-height" style="background-color: #fff">
                 <div class="m-login__wrapper-1-1">
                     <div class="m-login__contanier">
                         <div class="m-login__content">
                             <div class="m-login__logo">
-                                <img src="src/assets/app/media/img/logo/logo-login.png">
+                                <img src="src/assets/app/media/img/logo/logo-login-1.png">
                             </div>
                             <div class="m-login__title">
                                 <h3>Welcome To Our Site</h3>
                             </div>
                             <div class="m-login__desc">
-                                Login your account by filling the right side  form
+                                Login your account by filling the <br>right side  form
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="m-login__wrapper-2 m-portlet-full-height"  style="background-color: #000">
+            <div class="m-login__wrapper-2 m-portlet-full-height">
                 <div class="m-login__contanier">
-                    <div class="m-login__signin">
-                        <div class="m-login__head">
-                            <h3 class="m-login__title">
-                                Login To Your Account
-                            </h3>
+                    <div class="m-login__content">
+                        <div class="m-login__logo">
+                            <img src="src/assets/app/media/img/logo/logo-login.png">
                         </div>
-                        <form class="m-login__form m-form">
-                            <div class="form-group m-form__group">
-                                <input class="form-control m-input" type="text" placeholder="Username" name="username"
-                                    autocomplete="off">
+                        <div class="m-login__title">
+                            <h3>Welcome To Our Site</h3>
+                        </div>
+                        <div class="m-login__desc">
+                            Login your account by filling the form below
+                        </div>
+                    </div>
+                    <ul class="nav nav-pills" role="tablist">
+                        <li class="nav-item ">
+                            <a class="nav-link active" data-toggle="tab" href="#login-form">
+                                <i class="icon-user12"></i> sign in
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#setting-form">
+                                <i class="la la-gear"></i> setting
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane m-login__form m-form active" id="login-form">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    User Name
+                                </label>
+                                <input class="form-control m-input m-input--square" type="text" placeholder="" name="username" autocomplete="off" pattern="^\d*(\.\d{0,2})?$">
                             </div>
-                            <div class="form-group m-form__group">
-                                <input class="form-control m-input m-login__form-input--last" type="Password" placeholder="Password"
-                                    name="password">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Password
+                                </label>
+                                <input class="form-control m-input m-input--square" type="password" placeholder="" name="password" autocomplete="off">
                             </div>
                             <div class="m-login__form-action">
                                 <button type="button" class="btn btn-danger btn-block m-btn--uppercase m-btn--square"> Login </button>
                             </div>
                             <div class="row m-login__form-sub">
-                                <div class="col m--align-left">
-                                    <label class="m-checkbox ">
+                                <div class="col">
+                                    <label class="m-checkbox m-checkbox--solid">
                                         <input type="checkbox" name="remember" checked>
                                         Remember my ID & Password?
                                         <span></span>
                                     </label>
                                 </div>
                             </div>
-                        </form>
+                        </div>
+                        <div class="tab-pane m-setting__form m-form" id="setting-form">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Server Name
+                                </label>
+                                <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="">
+                                </ng-select>
+                                
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    DBMS
+                                </label>
+                                <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="">
+                                </ng-select>
+                                
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    User Name
+                                </label>
+                                <input class="form-control m-input m-input--square" type="text" placeholder="" name="" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    DB Name
+                                </label>
+                                <input class="form-control m-input m-input--square" type="text" placeholder="" name="" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Password
+                                </label>
+                                <input class="form-control m-input m-input--square" type="password" placeholder="" name="password" autocomplete="off">
+                            </div>
+                            <div class="m-login__form-action">
+                                <button type="button" class="btn btn-danger btn-block m-btn--uppercase m-btn--square"> Save </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
 <!-- end:: Page -->

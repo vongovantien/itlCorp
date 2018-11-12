@@ -5,6 +5,7 @@ import { PartnerComponent } from './partner-data/partner.component';
 import { WarehouseComponent } from './warehouse/warehouse.component';
 import { ChargeComponent } from './charge/charge.component';
 import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
+import { ChargeDetailComponent } from './charge-detail/charge-detail.component';
 import { CommodityComponent } from './commodity/commodity.component';
 import { PortIndexComponent } from './port-index/port-index.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
