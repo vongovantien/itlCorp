@@ -196,6 +196,9 @@ export class BaseService implements ErrorHandler {
    */
   handleError(error: HttpErrorResponse) {
     console.log(error);
+    if(error.ok==false){
+      this.toastr.error(error.statusText);
+    }
     this.toastr.error(error.error.message.toString());
   }
 

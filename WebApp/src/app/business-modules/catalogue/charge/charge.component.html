@@ -44,34 +44,29 @@
                     <div class="col">
                         <div class="input-group m-input-group m-input-group--square">
                             <div class="input-group-prepend">
-                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Charge ID
+                                <button type="button" class="btn btn-secondary dropdown-toggle"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{selectedFilter}}
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item active" href="javascript:void(0)">
-                                        Charge ID
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        Code
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        Name (EN)
-                                    </a>
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        Name (local)
+                                    <a *ngFor="let filter of listFilter;let index=index;"
+                                        [ngClass]="{ 'active': filter.filter == selectedFilter}"
+                                        class="dropdown-item" href="javascript:void(0)" (click)="selectedFilter=filter.filter">
+                                        {{filter.filter}}
                                     </a>
                                 </div>
                             </div>
-                            <input type="text" class="form-control" aria-label="">
+                            <input type="text" [(ngModel)]="searchKey" (change)="searchKey=searchKey.trim()"
+                                class="form-control" aria-label="Text input with dropdown button">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button" title="Search">
+                                <button class="btn btn-primary" type="button" title="Search" (click)="searchCharge()">
                                     <i class="icon-search"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-auto">
-                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>
@@ -95,9 +90,6 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col no-sorting"></th>
-                            <th class="sorting_asc">
-                                <span>ID</span>
-                            </th>
                             <th class="sorting">
                                 <span>Code</span>
                             </th>
@@ -115,115 +107,51 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
+                    <tbody *ngIf="ListCharges.length>0">
+                        <tr *ngFor="let item of ListCharges">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit charge" routerLink="/home/catalogue/charge-detail">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="gotoEditPage(item.charge.id)"
+                                        title="Edit stage">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove charge" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal" (click)="prepareDeleteCharge(item.charge.id)">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
                             </td>
+                      
                             <td>
-                                <span>LH001</span>
+                                <span>{{item.charge.code}}</span>
                             </td>
                             <td>
-                                <span>SS_REF_Sea</span>
+                                <span>{{item.charge.chargeNameEn}}</span>
                             </td>
                             <td>
-                                <span>Refund fee</span>
+                                <span>{{item.charge.chargeNameVn}}</span>
                             </td>
                             <td>
-                                <span>Phí refund</span>
-                            </td>
-                            <td>
-                                <span>All</span>
+                                <span>{{item.charge.type}}</span>
                             </td>
                             <td>
                                 <span>
                                     <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                        <input type="checkbox" disabled>
+                                        <input type="checkbox" disabled [checked]="item.charge.inactive">
                                         <span></span>
                                     </label>
                                 </span>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit charge" routerLink="/home/catalogue/charge-detail">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove charge" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <span>LH001</span>
-                            </td>
-                            <td>
-                                <span>SS_REF_Sea</span>
-                            </td>
-                            <td>
-                                <span>Refund fee</span>
-                            </td>
-                            <td>
-                                <span>Phí refund</span>
-                            </td>
-                            <td>
-                                <span>All</span>
-                            </td>
-                            <td>
-                                <span>
-                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                        <input type="checkbox" checked="checked" disabled>
-                                        <span></span>
-                                    </label>
-                                </span>
-                            </td>
-                        </tr>
+                      
                     </tbody>
                 </table>
             </div>
             <!--end: Datatable -->
-            <!--begin::pagination-->
-            <div class="pagination-nav">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="tatable__pager-size" style="max-width: 190px">
-                            <div class="select-box">
-                                <select class="form-control m-input m-input--square" id="" aria-label="">
-                                    <option value="1">15 line/screen</option>
-                                    <option value="2">30 line/screen</option>
-                                    <option value="3">50 line/screen</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <nav aria-label="">
-                            <ul class="pagination justify-content-end">
-                                <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-            <!--end::pagination-->
+          <!--begin::pagination-->
+          <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+            (pagerObject)="setPage($event)"></app-pagination>
+        <!--end::pagination-->
         </div>
     </div>
     <!--end:: m-portlet of charge-table-->
@@ -246,7 +174,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"> 
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="deleteCharge()"> 
                     <span>
                         <i class="la la-save"></i>
                         <span>

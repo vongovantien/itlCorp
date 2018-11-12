@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.Catalogue.DL.Models.Criteria
 {
-    public partial class CatStage
+    public class CatCurrrencyCriteria
     {
-        public int Id { get; set; }
-        public string Code { get; set; }
-        public string StageNameVn { get; set; }
-        public string StageNameEn { get; set; }
-        public string TypeId { get; set; }
+        public string All { get; set; }
+        public string Id { get; set; }       
+        public string CurrencyName { get; set; }
+        public bool IsDefault { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

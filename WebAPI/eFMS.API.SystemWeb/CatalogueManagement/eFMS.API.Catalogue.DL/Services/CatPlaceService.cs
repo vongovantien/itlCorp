@@ -24,7 +24,7 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper) : base(repository, mapper)
         {
-            SetChildren<CatPlace>("Id", "CountryId");
+            SetChildren<CatCountry>("Id", "CountryId");
             SetChildren<CatPlace>("Id", "ProvinceId");
             SetChildren<CatPlace>("Id", "DistrictId");
         }

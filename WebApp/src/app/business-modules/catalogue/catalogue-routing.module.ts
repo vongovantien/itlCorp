@@ -12,6 +12,8 @@ import { StageManagementComponent } from './stage-management/stage-management.co
 import { UnitComponent } from './unit/unit.component';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
 import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
+import { ChargeDetailsComponent } from './charge-details/charge-details.component';
+import { CurrencyComponent } from './currency/currency.component';
 
 const routes: Routes = [
 
@@ -37,8 +39,8 @@ const routes: Routes = [
     component:ChargeAddnewComponent
   },
   {
-    path:'charge-detail',
-    component:ChargeDetailComponent
+    path:'charge-edit',
+    component:ChargeDetailsComponent
   },
   {
     path:'commodity',
@@ -67,6 +69,10 @@ const routes: Routes = [
   {
     path:'partner-data-detail',
     component:PartnerDataDetailComponent
+  },
+  {
+    path:'currency',
+    component:CurrencyComponent
   }
 ];
 

@@ -18,9 +18,11 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatArea> CatArea { get; set; }
         public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
+        public virtual DbSet<CatChargeDefaultAccount> CatChargeDefaultAccount { get; set; }
         public virtual DbSet<CatCommodity> CatCommodity { get; set; }
         public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
+        public virtual DbSet<CatCurrency> CatCurrency { get; set; }
         public virtual DbSet<CatCustomerPlace> CatCustomerPlace { get; set; }
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
@@ -63,7 +65,6 @@ namespace eFMS.API.Catalogue.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                
                 optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
                     options =>
                     {
@@ -186,17 +187,27 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.ChargeNameEn)
+                    .IsRequired()
                     .HasColumnName("ChargeName_EN")
                     .HasMaxLength(510);
 
                 entity.Property(e => e.ChargeNameVn)
+                    .IsRequired()
                     .HasColumnName("ChargeName_VN")
                     .HasMaxLength(510);
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CurrencyId)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
 
@@ -204,10 +215,55 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
 
-                entity.Property(e => e.ShipmentTypeId)
-                    .HasColumnName("ShipmentTypeID")
-                    .HasMaxLength(30)
+                entity.Property(e => e.ServiceTypeId)
+                    .IsRequired()
+                    .HasColumnName("ServiceTypeID")
+                    .HasMaxLength(250)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Vat).HasColumnName("VAT");
+            });
+
+            modelBuilder.Entity<CatChargeDefaultAccount>(entity =>
+            {
+                entity.ToTable("catChargeDefaultAccount");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
+
+                entity.Property(e => e.CreditAccountNo).HasMaxLength(50);
+
+                entity.Property(e => e.CreditVat)
+                    .HasColumnName("CreditVAT")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DebitAccountNo).HasMaxLength(50);
+
+                entity.Property(e => e.DebitVat)
+                    .HasColumnName("DebitVAT")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -307,6 +363,35 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.NameVn)
                     .HasColumnName("Name_VN")
                     .HasMaxLength(300);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatCurrency>(entity =>
+            {
+                entity.ToTable("catCurrency");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.CurrencyName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

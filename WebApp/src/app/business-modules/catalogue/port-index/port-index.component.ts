@@ -249,16 +249,6 @@ export class PortIndexComponent implements OnInit {
     this.portIndex = item;
     this.countryActive = this.countries.find(x => x.id == this.portIndex.countryID);
     this.areaActive = this.areas.find(x => x.id == this.portIndex.areaID);
-    // this.baseService.get(this.api_menu.Catalogue.CatPlace.getById + item.id).subscribe((response: any) => {
-    //   if(response != null){
-    //     this.portIndex = response;
-    //     this.countryActive = this.countries.find(x => x.id == this.portIndex.countryID);
-    //     this.areaActive = this.areas.find(x => x.id == this.portIndex.areaID);
-    //   }
-    //   else{
-    //     this.portIndex = item;
-    //   }
-    // });
   }
   async onDelete(event) {
     console.log(event);
@@ -279,8 +269,11 @@ export class PortIndexComponent implements OnInit {
       }, error => this.baseService.handleError(error));
     }
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
+    }
   }
 }

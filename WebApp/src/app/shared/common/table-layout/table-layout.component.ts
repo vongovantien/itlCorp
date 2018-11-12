@@ -63,8 +63,8 @@ export class TableLayoutComponent implements OnInit, OnChanges {
     }
   }
   
-  sort(property){
-    this.sortChange.emit(property);
+  sort(column){
+    this.sortChange.emit(column);
   }
   editClick(item) {
     this.edit.emit(item);

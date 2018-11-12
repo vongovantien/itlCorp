@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using eFMS.API.System.Service.ViewModels;
+using ITL.NetCore.Connection;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -23,6 +25,12 @@ namespace eFMS.API.System.DL.Services
             var data = Get().ToList();
             var results = mapper.Map<List<SysUserViewModel>>(data);
             return results;
+        }
+
+        public List<vw_sysUser> GetUserWorkplace()
+        {
+            List<vw_sysUser> lvWorkspace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_sysUser>();
+            return lvWorkspace;
         }
     }
 }
