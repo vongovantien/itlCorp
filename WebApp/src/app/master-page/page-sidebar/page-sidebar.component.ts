@@ -183,10 +183,6 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }
   ]
 
-
-
-
-
   open_sub_menu(index) {
     if (this.previous_menu_index != null) {
       this.Menu[this.previous_menu_index].display_child = false;
@@ -252,12 +248,11 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
   }
 
   mouseenter(){
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('body-fixed');
   }  
 
   mouseleave(){
-    document.body.style.overflow = 'auto';
+    document.body.classList.remove('body-fixed');
   }
-
 
 }
