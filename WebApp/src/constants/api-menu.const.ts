@@ -109,9 +109,14 @@ export class API_MENU {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Update",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Delete/",
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit"
         },    
         Charge: {
-
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/Paging",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/addnew",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/delete/",
+            getById:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/getById/",
+            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/update",
         },
         Country:{
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getAll",
@@ -124,6 +129,14 @@ export class API_MENU {
         },
         Area: {
             getAllByLanguage: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatArea/GetByLanguage"
+        },
+        Currency:{
+            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getAll",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getById/",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/paging",
+            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/add",
+            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/update",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/",
         }
     }
 
@@ -148,6 +161,9 @@ export class API_MENU {
         },
         Company_Info: {
 
+        },
+        Employee: {
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysEmployee/query"
         }
     }
 
