@@ -240,7 +240,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  gotoJobManagement(){
+  gotoJobManagement() {
     this.router.navigate(['/home/operation/job-management',{action:"create_job"}]);
     this.open_sub_menu(1);
     setTimeout(() => {
@@ -248,12 +248,20 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }, 200);
   }
 
-  mouseenter(){
+  mouseenter() {
     document.body.classList.add('body-fixed');
+    if (document.body.classList.contains('m-aside-left--minimize')) {
+      document.body.classList.remove('m-aside-left--minimize');
+      document.body.classList.add('m-aside-left--minimize-hover');
+    }
   }  
 
-  mouseleave(){
+  mouseleave() {
     document.body.classList.remove('body-fixed');
+    if (document.body.classList.contains('m-aside-left--minimize-hover')) {
+      document.body.classList.remove('m-aside-left--minimize-hover');
+      document.body.classList.add('m-aside-left--minimize');
+    }
   }
 
 }
