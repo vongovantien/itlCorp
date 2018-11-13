@@ -270,23 +270,17 @@ export class StageManagementComponent implements OnInit {
     isDesc = true;
     sortKey: string = "code";
     sort(property){
-        this.isDesc = !this.isDesc;
-        //this.sortKey = property;
+        this.isDesc = !this.isDesc;  
         const temp = this.ListStages.map(x=>Object.assign({},x));
         this.ListStages = this.sortService.sort(this.ListStages.map(x=>Object.assign({},x.stage)), property, this.isDesc);
-        this.ListStages = this.ListStages.map(x=>({stage:x}));
-        console.log(this.ListStages);
-        var temp2 = this.ListStages.map(x=>Object.assign({},x));
-        this.ListStages = lodash.map(temp2,function(o){
-            var index = lodash.findIndex(temp,function(k){return k.stage.id===o.id});
-            if(index!=-1){
-                return  {
-                    stage:o,
-                    deptName: temp[index].deptName
-                }
-            }
-                      
-        });
-        console.log({stages:this.ListStages});
+        var getDept = this.getDepartmentname;
+        this.ListStages = this.ListStages.map(x=>({stage:x,deptName:getDept(x.id,temp)}));              
+    }
+
+    getDepartmentname(stageId,ListStages:any[]){
+        var inx = lodash.findIndex(ListStages,function(o){return o.stage.id===stageId});      
+        if(inx!=-1){                    
+            return ListStages[inx].deptName;
+        }
     }
 }
