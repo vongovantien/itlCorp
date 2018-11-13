@@ -11,7 +11,7 @@ const routes: Routes = [
     },
     {
         path: '',
-        redirectTo: 'home', // redirect to 'login' page after login page implement 
+        redirectTo: 'login', // redirect to 'login' page after login page implement 
         pathMatch: 'full'
     },    
   

@@ -66,9 +66,9 @@ namespace eFMS.API.System.DL.Services
             return lvWorkspace;
         }
 
-        public LoginModel Login(string username, string password)
+        public LoginReturnModel Login(string username, string password)
         {
-            LoginModel userInfo = new LoginModel();
+            LoginReturnModel userInfo = new LoginReturnModel();
             try
             {
                 
@@ -97,19 +97,20 @@ namespace eFMS.API.System.DL.Services
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                //user.Token = tokenHandler.WriteToken(token);
+                var token = tokenHandler.CreateToken(tokenDescriptor);                
                 
                 userInfo.userName = user.Username;
+                userInfo.email = employee == null ? ((eFMSDataContext)DataContext.DC).SysEmployee.First(x => x.Id == user.EmployeeId).Email : ((eFMSDataContext)DataContext.DC).SysEmployee.First(x => x.Id == employee.Id).Email;
                 userInfo.token = tokenHandler.WriteToken(token);
-                userInfo.success = true;
-                
+                userInfo.status = true;
+                userInfo.message = "Login successfull !";
+
                 return userInfo;     
             }
             catch(Exception ex)
             {
-                userInfo.success = false;
-                userInfo.error = ex.Message;
+                userInfo.status = false;
+                userInfo.message = ex.Message;
                 return userInfo;
             }
         }

@@ -63,10 +63,10 @@ namespace eFMS.API.System.Controllers
         }
         [HttpPost]
         [Route("login")]
-        public IActionResult Login(string username,string password)
+        public IActionResult Login(LoginModel loginModel)
         {
-            var result = sysUserService.Login(username, password);
-            if (!result.success)
+            var result = sysUserService.Login(loginModel.username, loginModel.password);
+            if (!result.status)
             {
                 return BadRequest(result);
             }

@@ -1,4 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild,ElementRef } from '@angular/core';
+import * as lodash from 'lodash';
+import { BaseService } from 'src/services-base/base.service';
+import { ToastrService } from 'ngx-toastr';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { NgForm } from '@angular/forms';
+import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import * as dataHelper from 'src/helper/data.helper';
+import { from } from 'rxjs';
+import { SystemConstants } from 'src/constants/system.const';
+import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
+import { reserveSlots } from '@angular/core/src/render3/instructions';
+import { Router } from '@angular/router';
+// import {DataHelper} from 'src/helper/data.helper';
+declare var $: any;
 
 @Component({
   selector: 'app-login',
@@ -7,9 +25,29 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private baseServices: BaseService,
+    private toastr: ToastrService,
+    private spinnerService: Ng4LoadingSpinnerService,
+    private api_menu: API_MENU,
+    private el:ElementRef,
+    private router:Router) { }
+
+  username:string = "";
+  password:string = "";
+  remember_me:boolean = false;
 
   ngOnInit() {
+    
+  }
+
+  async Login(){
+    const response = await this.baseServices.postAsync(this.api_menu.System.User_Management.login,{username:this.username,password:this.password},true,true);
+    if(response.status){
+      localStorage.setItem(SystemConstants.LOGIN_STATUS,SystemConstants.LOGGED_IN);
+      this.router.navigateByUrl('/home');
+      
+    }
   }
 
   /**

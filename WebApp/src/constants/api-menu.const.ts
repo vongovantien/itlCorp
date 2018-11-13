@@ -145,7 +145,8 @@ export class API_MENU {
     */
     public System = {
         User_Management: {
-            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser"
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser",
+            login : this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/login",
         },
         Group: {
 
