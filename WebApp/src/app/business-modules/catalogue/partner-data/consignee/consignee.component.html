@@ -136,7 +136,7 @@
       </div> -->
       <!--end: Datatable of table-simple -->
       <app-table-layout [records]="consignees" [settings]="partnerDataSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
-            (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+            (edit)="showDetail($event)" (delete)="showConfirmDelete($event)"  [keySort]="keySortDefault">
         </app-table-layout>
       <!--begin::pagination-->
       <!-- <div class="pagination-nav">

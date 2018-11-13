@@ -1,3 +1,3 @@
 <app-table-layout [records]="partners" [settings]="partnerDataSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
-(edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+(edit)="showDetail($event)" (delete)="showConfirmDelete($event)" [keySort]="keySortDefault">
 </app-table-layout>

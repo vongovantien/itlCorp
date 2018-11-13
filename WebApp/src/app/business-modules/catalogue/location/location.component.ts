@@ -13,6 +13,7 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import * as dataHelper from 'src/helper/data.helper';
 import { from } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
+import { SortService } from 'src/app/shared/services/sort.service';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -118,7 +119,8 @@ export class LocationComponent implements OnInit {
     private baseServices: BaseService,
     private toastr: ToastrService,
     private spinnerService: Ng4LoadingSpinnerService,
-    private api_menu: API_MENU) { }
+    private api_menu: API_MENU,
+    private sortService: SortService) { }
 
   resetNg2SelectCountry = true;
   resetNg2SelectProvince = true;
@@ -943,4 +945,22 @@ export class LocationComponent implements OnInit {
     this.value = value;
   }
 
+  isDesc = true;
+  sortKey: string = "code";
+  sort(property){
+    this.isDesc = !this.isDesc;
+    this.sortKey = property;
+    if(this.activeTab==="country"){
+      this.ListCountries = this.sortService.sort(this.ListCountries, property, this.isDesc);
+    }
+    if(this.activeTab==="province"){
+      this.ListProvinceCities = this.sortService.sort(this.ListProvinceCities, property, this.isDesc);
+    }
+    if(this.activeTab==="district"){
+      this.ListDistricts = this.sortService.sort(this.ListDistricts, property, this.isDesc);
+    }
+    if(this.activeTab==="ward"){
+      this.ListWards = this.sortService.sort(this.ListWards, property, this.isDesc);
+    }
+  }
 }

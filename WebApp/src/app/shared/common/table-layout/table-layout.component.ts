@@ -13,11 +13,13 @@ export class TableLayoutComponent implements OnInit, OnChanges {
   @Input() caption: string;
   @Input() settings: ColumnSetting[];
   @Input() nameEditModal: string;
+  @Input() keySort: string = "";
   @Output() sortChange: EventEmitter<number> = new EventEmitter<number>();
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() save = new EventEmitter<any>();
   columnMaps: ColumnSetting[]; 
+  isDesc: boolean = true;
   
   editButtonSetting: ButtonModalSetting = {
     // buttonAttribute: {
@@ -62,8 +64,10 @@ export class TableLayoutComponent implements OnInit, OnChanges {
         console.log(this.columnMaps);
     }
   }
-  
   sort(column){
+    
+    this.keySort = column.primaryKey;
+    this.isDesc = !this.isDesc;
     this.sortChange.emit(column);
   }
   editClick(item) {

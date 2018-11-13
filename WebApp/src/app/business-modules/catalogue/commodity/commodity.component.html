@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     <!--end:: Search-form-->
-                    <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)" 
+                    <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)" [keySort]="keyCommoditySortDefault"
                         [nameEditModal]="nameCommodityModal"
                         (edit)="showDetail($event, tabName.commodity)" (delete)="showConfirmDelete($event, tabName.commodity)">
                     </app-table-layout>
@@ -89,7 +89,7 @@
                     </div>
                     <!--end:: Search-form-->
                     <!--begin: Datatable-->
-                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameGroupModal"
+                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameGroupModal" [keySort]="keygroupSortDefault"
                         (edit)="showDetail($event, tabName.commodityGroup)" (delete)="showConfirmDelete($event, tabName.commodityGroup)">
                     </app-table-layout>
                     <!--end: Datatable-->

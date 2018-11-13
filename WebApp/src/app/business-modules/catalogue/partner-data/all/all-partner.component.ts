@@ -24,6 +24,8 @@ export class AllPartnerComponent implements OnInit {
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.ALL };
   isDesc: boolean = false;
+  keySortDefault: string = "id";
+  
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<Partner>();
