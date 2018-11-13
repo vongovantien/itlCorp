@@ -72,11 +72,11 @@ $m-config-aside: (
 			// minimize mode
 			minimize: (
 				width: $m-aside-left-width-minimize,
-				transition:	none
+				transition:	width 0.2s ease
 			),					
 			// hidden mode
 			hide: (
-				transition:	none
+				transition:	width 0.2s ease
 			)					
 		)
 	),
