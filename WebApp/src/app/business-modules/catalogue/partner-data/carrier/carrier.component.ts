@@ -24,6 +24,8 @@ export class CarrierComponent implements OnInit {
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CARRIER };
   isDesc: boolean = false;
+  keySortDefault: string = "id";
+  
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();

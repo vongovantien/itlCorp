@@ -67,7 +67,7 @@
         <div class="m-portlet__body">
             <!--begin::Content-->
             <!--begin: Datatable of port-index-list-table -->
-            <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameEditModal"
+            <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [keySort]="keySortDefault" [nameEditModal]="nameEditModal"
             (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->

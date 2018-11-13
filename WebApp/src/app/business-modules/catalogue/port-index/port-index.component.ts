@@ -30,6 +30,7 @@ export class PortIndexComponent implements OnInit {
   portIndex: PortIndex= new PortIndex();
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: 8 };
+  keySortDefault: string = "code";
   nameModal = "edit-port-index-modal";
   titleAddModal = "Add Port Index";
   titleEditModal = "Edit Port Index";
