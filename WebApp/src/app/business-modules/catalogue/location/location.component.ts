@@ -14,6 +14,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { from } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -56,12 +57,7 @@ export class LocationComponent implements OnInit {
   WardToUpdate = new CatPlaceModel();
 
 
-  pager: PagerSetting = {
-    currentPage: 1,
-    pageSize: 30,
-    numberToShow: [3, 5, 10, 15, 30, 50],
-    totalPageBtn: 7
-  }
+  pager: PagerSetting = PAGINGSETTING;
 
   searchKey: string = "";
 

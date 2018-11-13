@@ -109,30 +109,36 @@
         <div class="m-portlet__body">
             <!--begin: Datatable of stage-management-list-table -->
             <div class="table-wrapper" id="">
-                <table class="table table-striped table-brand">
+                <table class="table table-striped table-brand dataTable">
                     <thead>
                         <tr>
-                            <th></th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                            <th>Actions</th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'id'), 'sorting_desc': (!isDesc && sortKey == 'id') }"
                                 (click)="sort('id')">
                                 <span>Stage ID</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'deptName'), 'sorting_desc': (!isDesc && sortKey == 'deptName') }"
+                                (click)="sort('deptName')">
                                 <span>Department</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                (click)="sort('code')">
                                 <span>Code</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameVn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameVn') }"
+                                (click)="sort('stageNameVn')">
                                 <span>Name (Local)</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameEn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameEn') }"
+                                (click)="sort('stageNameEn')">
                                 <span>Name (EN)</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'descriptionVn'), 'sorting_desc': (!isDesc && sortKey == 'descriptionVn') }"
+                                (click)="sort('descriptionVn')">
                                 <span>Description (Local)</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'descriptionEn'), 'sorting_desc': (!isDesc && sortKey == 'descriptionEn') }"
+                                (click)="sort('descriptionEn')">
                                 <span>Description (EN)</span>
                             </th>
                         </tr>

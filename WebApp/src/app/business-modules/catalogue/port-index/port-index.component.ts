@@ -76,11 +76,12 @@ export class PortIndexComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
-    this.setPage(this.pager);
+    this.getPortIndexs(this.pager);
     this.getDataCombobox();
   }
   setPage(pager: PagerSetting): any {
-    this.getPortIndexs(pager);
+    this.pager = pager;
+    this.getPortIndexs(this.pager);
   }
   getPortIndexs(pager: PagerSetting): any {
     this.spinnerService.show();

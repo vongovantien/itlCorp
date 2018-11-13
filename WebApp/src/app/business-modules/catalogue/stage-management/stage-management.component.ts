@@ -9,6 +9,7 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as lodash from 'lodash';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 declare var jquery: any;
 declare var $: any;
 
@@ -31,12 +32,7 @@ export class StageManagementComponent implements OnInit {
     StageToAdd = new StageModel();
     StageToUpdate = new StageModel();
     ListDepartment: any = [];
-    pager: PagerSetting = {
-        currentPage: 1,
-        pageSize: 15,
-        numberToShow: [10, 15, 30, 50],
-        totalPageBtn: 7
-    };
+    pager: PagerSetting = PAGINGSETTING;
 
     @ViewChild(PaginationComponent) child;
 
@@ -268,13 +264,19 @@ export class StageManagementComponent implements OnInit {
     }
 
     isDesc = true;
-    sortKey: string = "code";
+    sortKey: string = "id";
     sort(property){
+        this.sortKey = property;
         this.isDesc = !this.isDesc;  
-        const temp = this.ListStages.map(x=>Object.assign({},x));
-        this.ListStages = this.sortService.sort(this.ListStages.map(x=>Object.assign({},x.stage)), property, this.isDesc);
-        var getDept = this.getDepartmentname;
-        this.ListStages = this.ListStages.map(x=>({stage:x,deptName:getDept(x.id,temp)}));              
+        if(property === 'deptName'){
+            this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
+        }
+        else{
+            const temp = this.ListStages.map(x=>Object.assign({},x));
+            this.ListStages = this.sortService.sort(this.ListStages.map(x=>Object.assign({},x.stage)), property, this.isDesc);
+            var getDept = this.getDepartmentname;
+            this.ListStages = this.ListStages.map(x=>({stage:x,deptName:getDept(x.id,temp)}));     
+        }         
     }
 
     getDepartmentname(stageId,ListStages:any[]){

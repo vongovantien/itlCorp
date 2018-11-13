@@ -15,6 +15,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { reserveSlots } from '@angular/core/src/render3/instructions';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -28,12 +29,7 @@ export class UnitComponent implements OnInit {
     { filter: "All", field: "all" }, { filter: "Code", field: "code" },
     { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
   selectedUnitFilter = this.listUnitFilter[0].filter;
-  pager: PagerSetting = {
-    currentPage: 1,
-    pageSize: 30,
-    numberToShow: [3, 5, 10, 15, 30, 50],
-    totalPageBtn: 7
-  }
+  pager: PagerSetting = PAGINGSETTING;
   searchKey:string = "";
   ListUnits:any=[];
   UnitToAdd:CatUnitModel = new CatUnitModel();

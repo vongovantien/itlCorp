@@ -100,7 +100,7 @@ export class WarehouseComponent implements OnInit {
 
   ngOnInit() {
     this.warehouse.placeType = 12;
-    this.setPage(this.pager);
+    this.getWarehouses(this.pager);
     this.getDataCombobox();
   }
   getDataCombobox(){
@@ -194,7 +194,8 @@ export class WarehouseComponent implements OnInit {
   }
 
   setPage(pager) {
-    this.getWarehouses(pager);
+    this.pager = pager;
+    this.getWarehouses(this.pager);
   }
   onSubmit(){
     if(this.form.valid){

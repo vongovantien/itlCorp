@@ -100,7 +100,7 @@ export class CommodityComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
-    this.setPage(this.pager);
+    this.getCommodities(this.pager);
     this.getGroups();
   }
   async getGroups(){

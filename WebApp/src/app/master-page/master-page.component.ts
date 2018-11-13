@@ -25,11 +25,11 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   constructor(private baseService: BaseService,private router: Router,private cdRef:ChangeDetectorRef) { }
 
    ngOnInit() {
-     console.log(localStorage.getItem(SystemConstants.LOGIN_STATUS));
-     const login_status = localStorage.getItem(SystemConstants.LOGIN_STATUS);
-     if(((login_status!=null) && login_status!=SystemConstants.LOGGED_IN) || login_status==null){
-       this.router.navigateByUrl("/login");
-     }
+    //  console.log(localStorage.getItem(SystemConstants.LOGIN_STATUS));
+    //  const login_status = localStorage.getItem(SystemConstants.LOGIN_STATUS);
+    //  if(((login_status!=null) && login_status!=SystemConstants.LOGGED_IN) || login_status==null){
+    //    this.router.navigateByUrl("/login");
+    //  }
     this.cdRef.detectChanges();
   }
 

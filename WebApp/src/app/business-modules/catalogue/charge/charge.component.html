@@ -89,17 +89,21 @@
                 <table class="table table-striped table-brand dataTable">
                     <thead>
                         <tr>
-                            <th class="table-actions-col no-sorting"></th>
-                            <th class="sorting">
+                            <th class="table-actions-col no-sorting">Actions</th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                (click)="sort('code')">
                                 <span>Code</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameEn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameEn') }"
+                                (click)="sort('chargeNameEn')">
                                 <span>Name EN</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameVn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameVn') }"
+                                (click)="sort('chargeNameVn')">
                                 <span>Name Local</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                                (click)="sort('type')">
                                 <span>Type</span>
                             </th>
                             <th class="no-sorting">
