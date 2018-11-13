@@ -113,7 +113,8 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                (click)="sort('id')">
                                 <span>Stage ID</span>
                             </th>
                             <th>

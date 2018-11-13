@@ -7,6 +7,8 @@ import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
+import { SortService } from 'src/app/shared/services/sort.service';
+import * as lodash from 'lodash';
 declare var jquery: any;
 declare var $: any;
 
@@ -38,7 +40,7 @@ export class StageManagementComponent implements OnInit {
 
     @ViewChild(PaginationComponent) child;
 
-    constructor(private baseServices: BaseService, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService, private api_menu: API_MENU) {
+    constructor(private baseServices: BaseService, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService, private api_menu: API_MENU,private sortService: SortService) {
 
     }
 
@@ -265,5 +267,26 @@ export class StageManagementComponent implements OnInit {
         this.value = value;
     }
 
-
+    isDesc = true;
+    sortKey: string = "code";
+    sort(property){
+        this.isDesc = !this.isDesc;
+        //this.sortKey = property;
+        const temp = this.ListStages.map(x=>Object.assign({},x));
+        this.ListStages = this.sortService.sort(this.ListStages.map(x=>Object.assign({},x.stage)), property, this.isDesc);
+        this.ListStages = this.ListStages.map(x=>({stage:x}));
+        console.log(this.ListStages);
+        var temp2 = this.ListStages.map(x=>Object.assign({},x));
+        this.ListStages = lodash.map(temp2,function(o){
+            var index = lodash.findIndex(temp,function(k){return k.stage.id===o.id});
+            if(index!=-1){
+                return  {
+                    stage:o,
+                    deptName: temp[index].deptName
+                }
+            }
+                      
+        });
+        console.log({stages:this.ListStages});
+    }
 }
