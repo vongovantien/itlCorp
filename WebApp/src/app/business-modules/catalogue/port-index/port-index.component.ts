@@ -30,6 +30,7 @@ export class PortIndexComponent implements OnInit {
   portIndex: PortIndex= new PortIndex();
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: 8 };
+  keySortDefault: string = "code";
   nameModal = "edit-port-index-modal";
   titleAddModal = "Add Port Index";
   titleEditModal = "Edit Port Index";
@@ -75,11 +76,12 @@ export class PortIndexComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
-    this.setPage(this.pager);
+    this.getPortIndexs(this.pager);
     this.getDataCombobox();
   }
   setPage(pager: PagerSetting): any {
-    this.getPortIndexs(pager);
+    this.pager = pager;
+    this.getPortIndexs(this.pager);
   }
   getPortIndexs(pager: PagerSetting): any {
     this.spinnerService.show();

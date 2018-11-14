@@ -53,7 +53,7 @@ import { ChargeDetailsComponent } from './charge-details/charge-details.componen
       ConsigneeComponent,
       AirShipSupComponent,
       ShipperComponent,
- 	  CurrencyComponent,
+ 	    CurrencyComponent,
       AllPartnerComponent,
       ChargeDetailsComponent
     ],

@@ -31,7 +31,7 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin: Datatable of port-index-list-table -->
-            <app-table-layout [records]="portIndexs" [settings]="portIndexSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
+            <app-table-layout [records]="portIndexs" [settings]="portIndexSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal" [keySort]="keySortDefault"
                 (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->

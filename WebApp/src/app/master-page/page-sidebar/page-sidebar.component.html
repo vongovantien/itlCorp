@@ -6,8 +6,19 @@
     <!-- BEGIN: Aside Menu -->
     <div id="m_ver_menu" class="m-aside-menu  m-aside-menu--skin-dark m-aside-menu--submenu-skin-dark " m-menu-vertical="1" m-menu-scrollable="0" m-menu-dropdown-timeout="500">
         <perfect-scrollbar style="position: absolute; top: 0; bottom: 0" [config]="config">
+            <!-- <ul class="m-menu__nav" style="padding: 30px 30px 0">
+                <li class="m-menu__item">
+                    <a class="btn btn-danger m-btn--icon m-btn--uppercase btn-block" data-toggle="modal" href="#create-job-modal" (click)="gotoJobManagement()">
+                        <span>
+                            <i class="la la-plus"></i>
+                            <span>Create Job</span>
+                        </span>
+                    </a>
+                </li>
+            </ul> -->
+        
             <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" m-menu-submenu-toggle="hover" *ngFor="let item of Menu;let i = index;" #parrent [id]="i">
+                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" *ngFor="let item of Menu;let i = index;" #parrent [id]="i">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(i)">
                         <i [class]="'m-menu__link-icon '+item.icon"></i>
                         <span class="m-menu__link-text">

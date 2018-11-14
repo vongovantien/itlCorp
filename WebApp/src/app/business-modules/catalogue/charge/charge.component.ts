@@ -17,6 +17,8 @@ import { SystemConstants } from 'src/constants/system.const';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { reserveSlots } from '@angular/core/src/render3/instructions';
 import { Router } from '@angular/router';
+import { SortService } from 'src/app/shared/services/sort.service';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -33,19 +35,15 @@ export class ChargeComponent implements OnInit {
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private el:ElementRef,
-    private router:Router) { }
+    private router:Router,
+    private sortService: SortService) { }
 
     listFilter = [
       { filter: "All", field: "all" }, { filter: "Code", field: "code" },
       { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
     selectedFilter = this.listFilter[0].filter;
 
-    pager: PagerSetting = {
-      currentPage: 1,
-      pageSize: 3,
-      numberToShow: [3, 5, 10, 15, 30, 50],
-      totalPageBtn: 7
-    }
+    pager: PagerSetting = PAGINGSETTING;
     // ChargeToUpdate : CatChargeToAddOrUpdate ;
     // ChargeToAdd : CatChargeToAddOrUpdate ;
     ListCharges:any=[];
@@ -121,6 +119,23 @@ export class ChargeComponent implements OnInit {
     this.router.navigate(["/home/catalogue/charge-edit",{id:id}]);
   }
 
+  isDesc = true;
+  sortKey: string = "code";
+  sort(property){
+      this.sortKey = property;
+      this.isDesc = !this.isDesc;
+      const temp = this.ListCharges.map(x=>Object.assign({},x));
+      this.ListCharges = this.sortService.sort(this.ListCharges.map(x=>Object.assign({},x.charge)), property, this.isDesc);
+      // var getDept = this.getDepartmentname;
+      // this.ListCharges = this.ListCharges.map(x=>({stage:x,deptName:getDept(x.id,temp)})); 
+      this.ListCharges = this.ListCharges.map(x => ({ charge: x }));     
+  }
+  getDepartmentname(stageId,ListCharges:any[]){
+    var inx = lodash.findIndex(ListCharges,function(o){return o.charge.id===stageId});      
+    if(inx!=-1){                    
+        return ListCharges[inx].deptName;
+    }
+}
 
 
 

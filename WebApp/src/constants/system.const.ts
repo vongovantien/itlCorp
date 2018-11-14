@@ -7,6 +7,9 @@ export class SystemConstants {
     public static readonly LSL_CACHE_REMEMBER: string = 'CACHE_REMEMBER';
     public static readonly CURRENT_LANGUAGE:string = "CURRENT_LANGUAGE";
     public static readonly CURRENT_VERSION:string = "CURRENT_VERSION";
+    public static readonly LOGIN_STATUS:string = "LOGIN_STATUS";
+    public static readonly LOGGED_IN : string = "LOGGED_IN";
+    public static readonly LOGGED_OUT : string = "LOGGED_OUT";
 
     //Security
     public static readonly PATH_RSA_PUBLIC_KEY = './auth/z_rsa_public.key';

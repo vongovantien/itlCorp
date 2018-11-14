@@ -57,7 +57,7 @@
     <div class="m-portlet__body">
         <!--begin::Content-->
         <!--begin: Datatable of port-index-list-table -->
-        <app-table-layout [records]="currencies" [settings]="currenciesSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal"
+        <app-table-layout [records]="currencies" [settings]="currenciesSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameModal" [keySort]="keySortDefault"
         (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
         </app-table-layout>
         <!--end: Datatable of port-index-list-table -->

@@ -121,7 +121,8 @@
 				}
 			}
 
-			&.m-aside-left--minimize {
+			&.m-aside-left--minimize,
+			&.m-aside-left--minimize-hover {
 				.m-body {
 					@include transition(array-get($layout, self, minimize, transition));
 					padding-left: array-get($layout, self, minimize, width);

@@ -31,6 +31,7 @@ export class WarehouseComponent implements OnInit {
   provinceActive: {};
   districts: any[];
   districtActive: {};
+  keySortDefault: string = "code";
   warehouse: Warehouse = new Warehouse();
   showModal: boolean = false;
   countryLookup: any = { 
@@ -85,7 +86,7 @@ export class WarehouseComponent implements OnInit {
   selectedFilter = "All";
   titleConfirmDelete = "You want to delete this warehouse";
   warehouseSettings: ColumnSetting[] = WAREHOUSECOLUMNSETTING;
-  isDesc: boolean = false;
+  isDesc: boolean = true;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
     settingFields: this.warehouseSettings,
@@ -99,7 +100,7 @@ export class WarehouseComponent implements OnInit {
 
   ngOnInit() {
     this.warehouse.placeType = 12;
-    this.setPage(this.pager);
+    this.getWarehouses(this.pager);
     this.getDataCombobox();
   }
   getDataCombobox(){
@@ -157,9 +158,12 @@ export class WarehouseComponent implements OnInit {
       this.pager.totalItems = response.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
+    }
   }
   showDetail(item) {
     this.warehouse = item;
@@ -190,7 +194,8 @@ export class WarehouseComponent implements OnInit {
   }
 
   setPage(pager) {
-    this.getWarehouses(pager);
+    this.pager = pager;
+    this.getWarehouses(this.pager);
   }
   onSubmit(){
     if(this.form.valid){
