@@ -376,7 +376,7 @@ table.dataTable thead .sorting_desc {
     position: relative;
     color: #747474;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: inherit;
     &.job-success {
         color: #fff;
         background-color: #34bfa3;
@@ -481,7 +481,7 @@ table.dataTable thead .sorting_desc {
     }
     .asignment-job-checkbox {
         position: absolute;
-        bottom: -2px;
+        bottom: 8px;
         right: -4px;
     }  
 }
