@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.Catalogue.Service.Models
+namespace eFMS.API.System.DL.ViewModels
 {
-    public partial class SysUser
+    public class SysUserViewModel
     {
         public string Id { get; set; }
         public string Username { get; set; }
-        public string Password { get; set; }
         public short UserGroupId { get; set; }
         public string EmployeeId { get; set; }
         public Guid WorkPlaceId { get; set; }
@@ -19,7 +19,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public CatBranch WorkPlace { get; set; }
     }
 }

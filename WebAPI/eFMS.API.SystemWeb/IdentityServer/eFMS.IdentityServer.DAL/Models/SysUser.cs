@@ -1,10 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Catalogue.Service.Models
+namespace eFMS.API.System.Service.Models
 {
     public partial class SysUser
     {
+        public SysUser()
+        {
+            SysAuthorizationAssignToNavigation = new HashSet<SysAuthorization>();
+            SysAuthorizationUser = new HashSet<SysAuthorization>();
+            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
+            SysUserRole = new HashSet<SysUserRole>();
+        }
+
         public string Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
@@ -20,6 +28,11 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
+        public SysUserGroup UserGroup { get; set; }
         public CatBranch WorkPlace { get; set; }
+        public ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
+        public ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
+        public ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
+        public ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

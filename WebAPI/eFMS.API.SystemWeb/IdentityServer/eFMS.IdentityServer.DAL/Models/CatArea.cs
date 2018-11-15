@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Catalogue.Service.Models
+namespace eFMS.API.System.Service.Models
 {
-    public partial class CatSaleResource
+    public partial class CatArea
     {
         public string Id { get; set; }
-        public string ResourceName { get; set; }
+        public string NameVn { get; set; }
+        public string NameEn { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
