@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.IdentityServer.Service.Models
 {
     public partial class eFMSDataContext : DbContext
     {
@@ -23,6 +23,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
+        public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
         public virtual DbSet<CatCustomerPlace> CatCustomerPlace { get; set; }
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
@@ -67,11 +68,7 @@ namespace eFMS.API.System.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
-                    options =>
-                    {
-                        options.UseRowNumberForPaging();
-                    });
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
             }
         }
 
@@ -394,6 +391,45 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatCurrencyExchange>(entity =>
+            {
+                entity.ToTable("catCurrencyExchange");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.CurrencyFromId)
+                    .IsRequired()
+                    .HasColumnName("CurrencyFromID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CurrencyToId)
+                    .IsRequired()
+                    .HasColumnName("CurrencyToID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("smalldatetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.EffectiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Rate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

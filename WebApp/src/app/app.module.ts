@@ -25,6 +25,8 @@ import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLL
 import { SelectModule } from 'ng2-select';
 import { SharedModule } from './shared/shared.module';
 
+import { OAuthModule } from 'angular-oauth2-oidc';
+
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -52,7 +54,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     Ng4LoadingSpinnerModule.forRoot(),
     Daterangepicker,
     PerfectScrollbarModule,
-    SelectModule // Scrollbar
+    SelectModule, // Scrollbar
+    OAuthModule.forRoot()
   ],
   providers: [
     BaseService,

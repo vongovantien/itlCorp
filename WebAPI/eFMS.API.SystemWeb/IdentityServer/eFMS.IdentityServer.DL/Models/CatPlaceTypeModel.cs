@@ -1,6 +1,4 @@
-﻿using eFMS.API.System.Service.Models;
-using System;
-using System.Collections.Generic;
+﻿using eFMS.IdentityServer.Service.Models;
 using System.Text;
 
 namespace eFMS.API.System.DL.Models

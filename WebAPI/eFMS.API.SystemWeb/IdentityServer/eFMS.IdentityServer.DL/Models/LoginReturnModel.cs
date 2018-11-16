@@ -8,6 +8,8 @@ namespace eFMS.API.System.DL.Models
     public class LoginReturnModel
     {
         public string userName { get; set; }
+        public string idUser { get; set; }
+        public string workplaceId { get; set; }
         public string email { get; set; }
         public string token { get; set; }
         public bool status { get; set; }
