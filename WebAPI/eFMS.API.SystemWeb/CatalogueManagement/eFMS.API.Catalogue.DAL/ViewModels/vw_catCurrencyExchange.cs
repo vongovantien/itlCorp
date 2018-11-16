@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.API.Catalogue.DL.ViewModels
+namespace eFMS.API.Catalogue.Service.ViewModels
 {
-    public class CatCurrencyExchangeViewModel
+    public partial class vw_catCurrencyExchange
     {
         public int Id { get; set; }
         public string CurrencyFromId { get; set; }
