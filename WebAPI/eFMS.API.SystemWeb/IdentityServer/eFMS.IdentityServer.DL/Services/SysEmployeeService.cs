@@ -2,7 +2,7 @@
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.ViewModels;
-using eFMS.API.System.Service.Models;
+using eFMS.IdentityServer.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;

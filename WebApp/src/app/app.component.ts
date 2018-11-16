@@ -4,6 +4,9 @@ import { SystemConstants } from '../constants/system.const';
 import { Router, RouteConfigLoadStart, RouteConfigLoadEnd } from '@angular/router';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 
+import { OAuthService } from 'angular-oauth2-oidc';
+import { JwksValidationHandler } from 'angular-oauth2-oidc';
+import { authConfig } from './shared/authenticate/authConfig';
 
 @Component({
   selector: 'app-root',
@@ -29,8 +32,13 @@ export class AppComponent implements OnInit{
   });
     
   }
-  constructor(private api_menu:API_MENU,private router: Router,private spinnerService: Ng4LoadingSpinnerService){
-
+  constructor(private api_menu:API_MENU,private router: Router,private spinnerService: Ng4LoadingSpinnerService,private oauthService: OAuthService){
+    this.configureWithNewConfigApi();
+  }
+  private configureWithNewConfigApi() {
+    this.oauthService.configure(authConfig);
+    this.oauthService.tokenValidationHandler = new JwksValidationHandler();
+    this.oauthService.loadDiscoveryDocumentAndTryLogin();
   }
 
   title = 'app';

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.IdentityServer.Service.Models
 {
     public partial class SysUserNotification
     {

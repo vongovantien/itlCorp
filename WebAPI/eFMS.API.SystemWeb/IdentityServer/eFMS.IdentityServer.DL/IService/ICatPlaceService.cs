@@ -1,6 +1,6 @@
 ﻿using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
-using eFMS.API.System.Service.Models;
+using eFMS.IdentityServer.Service.Models;
 using eFMS.API.System.Service.ViewModels;
 using ITL.NetCore.Connection.BL;
 using System.Collections.Generic;
