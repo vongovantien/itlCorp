@@ -564,3 +564,32 @@ table.dataTable thead .sorting_desc {
         font-weight: normal;
     }
 }
+//assignment job
+.staffview-row {
+    position: relative;
+    .staffview-block {
+        min-height: 100px;
+        padding: 15px; 
+        background-color: #ecf3fa;
+        color: #5a5a5a;
+        font-size: 13px;
+    }
+    .btn-danger {
+        position: absolute;
+        top: -14px;
+        left: 0;
+        z-index: 2;
+        &.collapsed {
+            .la-minus {
+                &:before {
+                    content: "\f2c2"; 
+                }
+            }
+        }
+    }
+    .block-title {
+        color: #3f4858;
+        font-size: 14px;
+        font-weight: 500;
+    }
+}
