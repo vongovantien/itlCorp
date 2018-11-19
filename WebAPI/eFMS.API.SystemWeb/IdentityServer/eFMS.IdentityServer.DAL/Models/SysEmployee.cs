@@ -31,7 +31,5 @@ namespace eFMS.IdentityServer.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Signature { get; set; }
-
-        public CatSaleResource SaleResourceNavigation { get; set; }
     }
 }

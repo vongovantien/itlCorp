@@ -39,7 +39,7 @@ namespace AuthServer
                 list_Claim.Add(new Claim("userName", modelReturn.userName));
                 list_Claim.Add(new Claim("email", modelReturn.email));
                 context.Result = new GrantValidationResult(
-                    subject: modelReturn.userName,
+                    subject: modelReturn.idUser,
                       authenticationMethod: "custom",
                       claims: list_Claim
                     );
@@ -47,7 +47,7 @@ namespace AuthServer
 
      
 
-            return Task.FromResult(0);
+            return Task.FromResult(context.Result);
         }
 
       

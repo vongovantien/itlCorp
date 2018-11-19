@@ -1,19 +1,11 @@
 ﻿using AutoMapper;
-using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
-using eFMS.API.System.DL.ViewModels;
 using eFMS.IdentityServer.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using eFMS.API.System.Service.ViewModels;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using eFMS.IdentityServer.DL.IService;
+using eFMS.API.System.DL.ViewModels;
 
 namespace eFMS.IdentityServer.DL.Services
 {
@@ -21,6 +13,36 @@ namespace eFMS.IdentityServer.DL.Services
     {
         public AuthenticateService(IContextBase<SysUser> repository, IMapper mapper) : base(repository, mapper)
         {
+        }
+
+        public SysUserViewModel GetUserById(string id)
+        {
+            var data = ((eFMSDataContext)DataContext.DC).SysEmployee.Join(((eFMSDataContext)DataContext.DC).SysUser, x => x.Id, y => y.EmployeeId,
+                (x, y) => new { x, y }).FirstOrDefault(x => x.y.Id == id);
+            if (data == null) return null;
+            var result = new SysUserViewModel();
+            result.Id = data.y.Id;
+            result.Username = data.y.Username;
+            result.UserGroupId = data.y.UserGroupId;
+            result.EmployeeId = data.y.EmployeeId;
+            result.WorkPlaceId = data.y.WorkPlaceId;
+            result.RefuseEmail = data.y.RefuseEmail;
+            result.LdapObjectGuid = data.y.LdapObjectGuid;
+            result.DepartmentId = data.x.DepartmentId;
+            result.EmployeeNameVn = data.x.EmployeeNameVn;
+            result.EmployeeNameEn = data.x.EmployeeNameEn;
+            result.Position = data.x.Position;
+            result.Birthday = data.x.Birthday;
+            result.ExtNo = data.x.ExtNo;
+            result.Tel = data.x.Tel;
+            result.HomePhone = data.x.HomePhone;
+            result.HomeAddress = data.x.HomeAddress;
+            result.Email = data.x.Email;
+            result.Photo = data.x.Photo;
+            result.EmpPhotoSize = data.x.EmpPhotoSize;
+            var inActive = (data.y.Inactive == null || data.y.Inactive == true ) ? true : false;
+            result.InActive = inActive;
+            return result;
         }
 
         public int Login(string username, string password,out LoginReturnModel modelReturn)

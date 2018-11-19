@@ -16,6 +16,8 @@ import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { reserveSlots } from '@angular/core/src/render3/instructions';
 import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { async } from 'rxjs/internal/scheduler/async';
+import { CookieService } from 'ngx-cookie-service';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -51,19 +53,16 @@ export class LoginComponent implements OnInit {
 
   //   }
   // }
-   Login() {
+   async Login() {
     this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
-      console.log(resp)
-      
-      // Loading data about the user
+      console.log(window.location.origin);    
+      console.log(this.oauthService.getAccessToken());
       return this.oauthService.loadUserProfile();
-
-    }).then(() => {
-
-      // Using the loaded user data
-      let claims = this.oauthService.getIdentityClaims();
+    }).then(()  => {
+      let claims =  this.oauthService.getIdentityClaims();
       if (claims) console.log(claims);
-
+      
+      this.router.navigateByUrl('/home');
     })
   }
 

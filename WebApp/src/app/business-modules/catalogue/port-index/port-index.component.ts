@@ -80,8 +80,10 @@ export class PortIndexComponent implements OnInit {
     this.getDataCombobox();
   }
   setPage(pager: PagerSetting): any {
-    this.pager = pager;
-    this.getPortIndexs(this.pager);
+    this.pager.currentPage = pager.currentPage; 
+    this.pager.totalPages = pager.totalPages;
+    this.pager.pageSize = pager.pageSize
+    this.getPortIndexs(pager);
   }
   getPortIndexs(pager: PagerSetting): any {
     this.spinnerService.show();
