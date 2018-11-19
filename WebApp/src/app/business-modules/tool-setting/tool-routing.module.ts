@@ -5,6 +5,7 @@ import { IDDefinitionComponent } from './id-definition/id-definition.component';
 import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
 import { TariffComponent } from './tariff/tariff.component';
+import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
   {
     path:'tariff',
     component:TariffComponent
+  },
+  {
+    path:'exchange-rate',
+    component: ExchangeRateComponent
   }
 ];
 

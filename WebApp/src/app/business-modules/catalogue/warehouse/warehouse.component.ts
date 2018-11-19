@@ -177,14 +177,21 @@ export class WarehouseComponent implements OnInit {
       this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {
         if (response.status == true) {
           this.toastr.success(response.message);
-          this.pager.totalItems = this.pager.totalItems -1;
-          this.child.setPage(this.pager.currentPage);
+          this.setPageAfterDelete();
         }
         if (response.status == false) {
           this.toastr.error(response.message);
         }
       }, error => this.baseService.handleError(error));
     }
+  }
+  setPageAfterDelete(){
+    this.pager.totalItems = this.pager.totalItems -1;
+    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    if (totalPages < this.pager.totalPages) {
+      this.pager.currentPage = totalPages;
+    }
+    this.child.setPage(this.pager.currentPage);
   }
   showConfirmDelete(item) {
     this.warehouse = item;
@@ -223,11 +230,10 @@ export class WarehouseComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
       if (response.status == true){
         this.toastr.success(response.message);
-        this.getWarehouses(this.pager);
-        setTimeout(() => {
-          this.pager.currentPage = 1;
-          this.child.setPage(this.pager.currentPage);
-        }, 500);
+        //this.getWarehouses(this.pager);
+        this.pager.totalItems = this.pager.totalItems + 1;
+        this.pager.currentPage = 1;
+        this.child.setPage(this.pager.currentPage);
         this.resetWarehouse();
         this.form.onReset();
         $('#' + this.addButtonSetting.dataTarget).modal('hide');
