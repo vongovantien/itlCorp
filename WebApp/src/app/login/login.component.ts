@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
       console.log(resp)
       
       // Loading data about the user
-      return this.oauthService.loadUserProfile();
+      //return this.oauthService.loadUserProfile();
 
     }).then(() => {
 

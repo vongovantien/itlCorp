@@ -29,6 +29,9 @@ namespace AuthServer
                     RefreshTokenExpiration = TokenExpiration.Absolute,
                     SlidingRefreshTokenLifetime = slientRefreshToken,
                     //RedirectUris = redirectUris,
+                    RedirectUris = new List<string> {"http://localhost:4200/auth-callback", "http://localhost:4200/silent-refresh.html"},
+                    PostLogoutRedirectUris = new List<string> {"http://localhost:4200/"},
+                    AllowedCorsOrigins = new List<string> {"http://localhost:4200"},
                     AlwaysIncludeUserClaimsInIdToken = true,
                     AllowedScopes =
                     {

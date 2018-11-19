@@ -53,6 +53,7 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
+    <Folder Include="Models\Criteria\" />
     <Folder Include="Models\Views\" />
   </ItemGroup>
 </Project>

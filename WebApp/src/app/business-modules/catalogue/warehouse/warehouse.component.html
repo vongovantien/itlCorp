@@ -7,33 +7,9 @@
         </div>
         <div class="c-button-actions">
             <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
-            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                data-target="#add-ware-house-modal">
-                <span>
-                    <i class="icon-plus7"></i>
-                    <span>
-                        add new
-                    </span>
-                </span>
-            </button> -->
             <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
-            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-download"></i>
-                    <span>
-                        import
-                    </span>
-                </span>
-            </button> -->
             <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
-            <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
-                </span>
-            </button> -->
+            
         </div>
     </div>
 </div>
@@ -66,11 +42,9 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Content-->
-            <!--begin: Datatable of port-index-list-table -->
             <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [keySort]="keySortDefault" [nameEditModal]="nameEditModal"
             (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
-            <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
             <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->

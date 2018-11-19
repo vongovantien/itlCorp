@@ -15,6 +15,7 @@ using eFMS.IdentityServer.DL.Services;
 using AutoMapper;
 using ITL.NetCore.Connection.EF;
 using eFMS.API.System.Service.Contexts;
+using eFMS.IdentityServer;
 
 namespace AuthServer
 {
@@ -35,6 +36,7 @@ namespace AuthServer
             //.AddTestUsers(Config.GetUsers());
 
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+            services.AddTransient<IProfileService, ProfileService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
