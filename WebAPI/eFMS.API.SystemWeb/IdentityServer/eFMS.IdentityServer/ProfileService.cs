@@ -18,20 +18,22 @@ namespace eFMS.IdentityServer
         {
             authenUserService = service;
         }
-        public Task GetProfileDataAsync(ProfileDataRequestContext context)
+        public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
 
             var claims = new List<Claim>
                 {
-                    new Claim(JwtClaimTypes.Subject, user.Id.ToString()),
-                    new Claim(JwtClaimTypes.Email, user.Email),
-                    new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean)
+                    new Claim(JwtClaimTypes.Id, user.Id.ToString()),
+                    new Claim(JwtClaimTypes.Email, user.Email),                   
+                    new Claim(JwtClaimTypes.PreferredUserName,user.Username),
+                    new Claim(JwtClaimTypes.PhoneNumber,user.Tel??""),
+                    new Claim("workplaceId",user.WorkPlaceId.ToString()??"")
                 };
 
             context.IssuedClaims = claims;
-            return Task.FromResult(0);
+           // return Task.FromResult(context.IssuedClaims);
         }
 
         public Task IsActiveAsync(IsActiveContext context)

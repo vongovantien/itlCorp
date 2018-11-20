@@ -22,6 +22,7 @@ namespace AuthServer
                     RequireClientSecret = false,
                     RequireConsent = false,
                     AlwaysSendClientClaims = true,
+                   
                     AllowAccessTokensViaBrowser = true,
                     AccessTokenType = AccessTokenType.Jwt,
                     AllowOfflineAccess = true,
@@ -31,8 +32,10 @@ namespace AuthServer
                     //RedirectUris = redirectUris,
                     RedirectUris = new List<string> {"http://localhost:4200/auth-callback", "http://localhost:4200/silent-refresh.html"},
                     PostLogoutRedirectUris = new List<string> {"http://localhost:4200/"},
-                    AllowedCorsOrigins = new List<string> {"http://localhost:4200"},
+                    AllowedCorsOrigins = new List<string> {"http://localhost:4200","http://test.efms.itlvn.com/","http://localhost:44361"},
                     AlwaysIncludeUserClaimsInIdToken = true,
+                    
+                    
                     AllowedScopes =
                     {
                         "openid", "profile", "offline_access", "efms_scope", "dnt_api"
@@ -67,8 +70,7 @@ namespace AuthServer
                     DisplayName = "eFMS D&T API",
                     UserClaims =
                     {
-                        "user_id", "username", "name_vn", "name_en",
-                        "main_workplace_id", "work_places", "employee_id", "current_workplace_id"
+                        "userId","workplaceId","userName","email"
                     }
                 }
             };

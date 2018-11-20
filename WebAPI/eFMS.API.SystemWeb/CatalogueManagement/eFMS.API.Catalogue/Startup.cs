@@ -49,6 +49,22 @@ namespace SystemManagementAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                       .AddIdentityServerAuthentication(options =>
+                       {
+                           options.Authority = "https://localhost:44369/";
+                           options.RequireHttpsMetadata = false;
+                           options.ApiName = "dnt_api";
+                           options.ApiSecret = "secret";
+                       });
+            // services.AddAuthorization(options => options.AddPolicy("Founder", policy => policy.RequireClaim("Employee", "Mosalla")));
+
             services.AddAutoMapper();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
@@ -179,7 +195,7 @@ namespace SystemManagementAPI
             app.UseCors("AllowAllOrigins");
             //app.UseCors("CorsPolicy");
             //ConfigureAuth(app);
-
+            app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
         }

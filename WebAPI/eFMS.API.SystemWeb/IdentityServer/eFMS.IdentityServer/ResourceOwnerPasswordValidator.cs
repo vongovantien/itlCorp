@@ -47,7 +47,7 @@ namespace AuthServer
 
      
 
-            return Task.FromResult(0);
+            return Task.FromResult(context.Result);
         }
 
       

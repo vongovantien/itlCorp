@@ -16,20 +16,29 @@ using AutoMapper;
 using ITL.NetCore.Connection.EF;
 using eFMS.API.System.Service.Contexts;
 using eFMS.IdentityServer;
+using Microsoft.IdentityModel.Logging;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AuthServer
 {
     public class Startup
     {
+
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+
         public void ConfigureServices(IServiceCollection services)
         {
+          
             services.AddAutoMapper();
             services.AddIdentityServer()
                 .AddDeveloperSigningCredential()
                 .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients(null, 14400, 12600));
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryClients(Config.GetClients(null, 14400, 12600))
+                .AddInMemoryPersistedGrants();
+                 
 
             services.AddTransient<IAuthenUserService, AuthenticateService>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
@@ -37,6 +46,8 @@ namespace AuthServer
 
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
             services.AddTransient<IProfileService, ProfileService>();
+
+            IdentityModelEventSource.ShowPII = true;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
