@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Helpers
 {
-    public static class MongoDbHelper
+    public class MongoDbHelper
     {
         private static MongoClient mogoClient;
         private static IMongoDatabase mongodb;

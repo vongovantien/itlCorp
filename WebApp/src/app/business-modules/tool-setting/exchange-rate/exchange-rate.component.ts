@@ -11,5 +11,9 @@ export class ExchangeRateComponent implements OnInit {
 
   ngOnInit() {
   }
+   /**
+   * ng2-select
+   */
+  public items: Array<string> = ['USD', 'JPY', 'SGD', 'EUR', 'GBP', 'HKD'];
 
 }

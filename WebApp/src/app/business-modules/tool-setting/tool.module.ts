@@ -9,12 +9,14 @@ import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
 import { SharedModule } from '../../shared/shared.module';
 import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
+import { SelectModule } from 'ng2-select';
 
 @NgModule({
   imports: [
     CommonModule,
     ToolRoutingModule,
-    SharedModule
+    SharedModule,
+    SelectModule
   ],
   declarations: [IDDefinitionComponent, TariffComponent, EcusConnectionComponent, KPIComponent, SupplierComponent, ExchangeRateComponent]
 })

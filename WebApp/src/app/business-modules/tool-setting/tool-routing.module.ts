@@ -35,7 +35,7 @@ const routes: Routes = [
   },
   {
     path:'exchange-rate',
-    component: ExchangeRateComponent
+    component:ExchangeRateComponent
   }
 ];
 

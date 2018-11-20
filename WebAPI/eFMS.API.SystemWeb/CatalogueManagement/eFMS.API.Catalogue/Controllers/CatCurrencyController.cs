@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Claims;
 using System.Threading;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
@@ -11,10 +13,12 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
+using System.Linq;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -27,12 +31,16 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCurrencyService catCurrencyService;
         private readonly IMapper mapper;
+        private IHttpContextAccessor httpContext;
+        private IEnumerable<Claim> currentUser;
 
-        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service, IMapper imapper)
+        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service, IMapper imapper,
+            IHttpContextAccessor contextAccessor)
         {
             stringLocalizer = localizer;
             catCurrencyService = service;
             mapper = imapper;
+            httpContext = contextAccessor;
         }
 
         [HttpGet]
@@ -56,6 +64,8 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Get(CatCurrrencyCriteria criteria, int page, int size)
         {
+            currentUser = httpContext.HttpContext.User.Claims;
+            var userId = currentUser.FirstOrDefault(x => x.Type == "id").Value;
             var data = catCurrencyService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
