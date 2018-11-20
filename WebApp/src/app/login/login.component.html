@@ -73,7 +73,7 @@
                             <div class="row m-login__form-sub">
                                 <div class="col">
                                     <label class="m-checkbox m-checkbox--solid">
-                                        <input type="checkbox" name="remember" [checked]="remember_me" (click)="remember_me=!remember_me">
+                                        <input type="checkbox" name="remember" [(ngModel)]="remember_me">
                                         Remember my ID & Password?
                                         <span></span>
                                     </label>

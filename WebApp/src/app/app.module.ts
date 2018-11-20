@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { SelectModule } from 'ng2-select';
 import { SharedModule } from './shared/shared.module';
-
+import { CookieService } from 'ngx-cookie-service';
 import { OAuthModule } from 'angular-oauth2-oidc';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -59,6 +59,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   ],
   providers: [
     BaseService,
+    CookieService ,
     PagingService,
     { 
       provide: PERFECT_SCROLLBAR_CONFIG, // Scrollbar
