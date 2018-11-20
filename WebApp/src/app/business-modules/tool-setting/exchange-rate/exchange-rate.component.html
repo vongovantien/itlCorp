@@ -160,7 +160,11 @@
                                 Select range date
                             </label>
                             <div class="m-input-icon m-input-icon--right">
-                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                <input type="text" class="form-control m-input m-input--square"
+                                ngxDaterangepickerMd
+                                [(ngModel)]="selected"
+                                [singleDatePicker]="true"
+                                name="singledater"/>
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -224,7 +228,10 @@
                         <div class="form-group">
                             <div class="input-group">
                             <div class="custom-file  m-input-icon m-input-icon--right">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="From date - to date">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                    ngxDaterangepickerMd
+                                    [(ngModel)]="selectedrange"
+                                    name="daterange" placeholder="From date - to date"/>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -263,6 +270,54 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 40px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Detail" data-toggle="modal" data-target="">
+                                        <i class="la la-list"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>November 11. 2018</span>
+                            </td>
+                            <td>
+                                <span>VND</span>
+                            </td>
+                            <td>
+                                <span>System</span>
+                            </td>
+                            <td>
+                                <span>November 11. 2018</span> &nbsp;
+                                <span>-</span> &nbsp;
+                                <span>23:59:59 UTC + 7G</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 40px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Detail" data-toggle="modal" data-target="">
+                                        <i class="la la-list"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>November 11. 2018</span>
+                            </td>
+                            <td>
+                                <span>VND</span>
+                            </td>
+                            <td>
+                                <span>System</span>
+                            </td>
+                            <td>
+                                <span>November 11. 2018</span> &nbsp;
+                                <span>-</span> &nbsp;
+                                <span>23:59:59 UTC + 7G</span>
+                            </td>
+                        </tr>
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 40px">
