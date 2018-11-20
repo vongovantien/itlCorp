@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Helpers;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +19,22 @@ namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCurrencyService : RepositoryBase<CatCurrency, CatCurrencyModel>, ICatCurrencyService
     {
+        IMongoDatabase mongodb;
         public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper) : base(repository, mapper)
         {
+            mongodb = MongoDbHelper.GetDatabase();
             SetChildren<CatCharge>("Id", "CurrencyId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyToId");
+        }
+        public HandleState AddNew(CatCurrencyModel model)
+        {
+            var result = Add(model);
+            if (result.Success)
+            {
+                mongodb.GetCollection<object>("catCurrency").InsertOne(new { id = Guid.NewGuid(), currency = model, actionType = Crud.Insert, DatetimeModified = DateTime.Now });
+            }
+            return result;
         }
 
         public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount)

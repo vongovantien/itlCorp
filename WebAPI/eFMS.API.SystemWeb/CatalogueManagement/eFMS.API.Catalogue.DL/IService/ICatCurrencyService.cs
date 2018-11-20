@@ -13,5 +13,6 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
         HandleState Update(CatCurrencyModel model);
+        HandleState AddNew(CatCurrencyModel model);
     }
 }

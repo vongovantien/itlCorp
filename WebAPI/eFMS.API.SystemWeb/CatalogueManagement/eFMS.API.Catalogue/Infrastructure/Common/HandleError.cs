@@ -1,4 +1,5 @@
-﻿using ITL.NetCore.Common;
+﻿using eFMS.API.Common.Globals;
+using ITL.NetCore.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +8,6 @@ using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Catalogue.Infrastructure.Common
 {
-    public enum Crud
-    {
-        Get,
-        Insert,
-        Update,
-        Delete
-    }
     public static class HandleError
     {
         public static string GetMessage(HandleState hs, Crud crud)
