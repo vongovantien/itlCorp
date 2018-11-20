@@ -1,0 +1,129 @@
+﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.IService;
+using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Catalogue.DL.ViewModels;
+using eFMS.API.Catalogue.Service.Models;
+using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.EF;
+using System;
+using System.Collections.Generic;
+using eFMS.API.Catalogue.Service.ViewModels;
+using ITL.NetCore.Connection;
+using System.Linq;
+using ITL.NetCore.Common;
+using System.Globalization;
+
+namespace eFMS.API.Catalogue.DL.Services
+{
+    public class CatCurrencyExchangeService : RepositoryBase<CatCurrencyExchange, CatCurrencyExchangeModel>, ICatCurrencyExchangeService
+    {
+        public CatCurrencyExchangeService(IContextBase<CatCurrencyExchange> repository, IMapper mapper) : base(repository, mapper)
+        {
+        }
+
+        public List<vw_catCurrencyExchangeNewest> GetCurrencyExchangeNewest()
+        {
+            List<vw_catCurrencyExchangeNewest> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
+            return lvCatPlace;
+        }
+
+        public CurrencyExchangeNewestViewModel GetExchangeRates(DateTime date, string localCurrency, string createdBy)
+        {
+            var result = new CurrencyExchangeNewestViewModel();
+            var data = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.DatetimeCreated == date && x.CurrencyToId == localCurrency && x.UserCreated == createdBy);
+            if (data.Count() == 0) return result;
+            result.ExchangeRate = new List<vw_catCurrencyExchangeNewest>();
+            result.UserCreated = createdBy;
+            result.LocalCurrency = localCurrency;
+            foreach(var item in data)
+            {
+                var rate = new vw_catCurrencyExchangeNewest();
+                rate.CurrencyFromId = item.CurrencyFromId;
+                rate.Rate = item.Rate;
+                result.ExchangeRate.Add(rate);
+            }
+            return result;
+        }
+
+        public List<CatCurrencyExchangeHistory> Paging(CatCurrencyExchangeCriteria criteria, int page, int size, out int rowsCount)
+        {
+            var list = Query(criteria).OrderByDescending(x => x.DatetimeCreated)
+                .Select(x => new {
+                    DatetimeCreated = x.DatetimeCreated,
+                    LocalCurrency = x.CurrencyToId,
+                    x.UserCreated,
+                    DatetimeUpdated = x.DatetimeModified
+                }).GroupBy(x => x);
+            rowsCount = list.Count();
+            if (size > 1)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                list = list.Skip((page - 1) * size).Take(size);
+            }
+            return list.Select(x => new CatCurrencyExchangeHistory {
+                DatetimeCreated = x.Key.DatetimeCreated,
+                LocalCurrency = x.Key.LocalCurrency,
+                UserCreated = x.Key.UserCreated,
+                DatetimeUpdated = x.Key.DatetimeUpdated
+            }).ToList();
+        }
+
+        public List<vw_catCurrencyExchange> Query(CatCurrencyExchangeCriteria criteria)
+        {
+            var list = GetView();
+            list = list.Where(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
+                                && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate ==  null)
+                ).ToList();
+            return list;
+        }
+
+        public HandleState UpdateRate(CatCurrencyExchangeEditModel model)
+        {
+            var rates = model.CatCurrencyExchangeRates;
+            try
+            {
+                foreach (var item in rates)
+                {
+                    var rate = new CatCurrencyExchange();
+                    rate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.FirstOrDefault(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == item.CurrencyFromId && x.CurrencyToId == model.CurrencyToId);
+                    if (rate != null)
+                    {
+                        rate.Rate = item.Rate;
+                        rate.UserModified = "01";
+                        rate.DatetimeModified = DateTime.Now;
+                        ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Update(rate);
+                    }
+                    else
+                    {
+                        rate = new CatCurrencyExchange
+                        {
+                            CurrencyFromId = item.CurrencyFromId,
+                            CurrencyToId = model.CurrencyToId,
+                            Rate = item.Rate,
+                            UserCreated = "01",
+                            DatetimeCreated = DateTime.Now
+                        };
+                        ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Add(rate);
+                    }
+                }
+                DataContext.DC.SaveChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        private List<vw_catCurrencyExchange> GetView()
+        {
+            List<vw_catCurrencyExchange> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchange>();
+            return lvCatPlace;
+        }
+    }
+}

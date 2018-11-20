@@ -28,128 +28,6 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace SystemManagementAPI
 {
-    //public class Startup
-    //{
-    //    public Startup(IConfiguration configuration)
-    //    {
-    //        Configuration = configuration;
-    //    }
-
-    //    public Startup(IHostingEnvironment env)
-    //    {
-    //        var builder = new ConfigurationBuilder().SetBasePath(env.ContentRootPath)
-    //            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    //            .AddEnvironmentVariables();
-
-    //        Configuration = builder.Build();
-    //    }
-
-    //    public IConfiguration Configuration { get; }
-
-    //    // This method gets called by the runtime. Use this method to add services to the container.
-    //    public void ConfigureServices(IServiceCollection services)
-    //    {
-    //        services.AddAutoMapper();
-    //        services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-    //        services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
-    //        services.AddMemoryCache();
-    //        ServiceRegister.Register(services);
-    //        services.AddCors(options =>
-    //        {
-    //            options.AddPolicy("AllowAllOrigins",
-    //                builder =>
-    //                {
-    //                    builder
-    //                        .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-    //                        .AllowAnyOrigin()
-    //                        .AllowAnyHeader()
-    //                        .AllowAnyMethod();
-    //                });
-    //        });
-    //        services.AddApiVersioning(config =>
-    //        {
-    //            config.ReportApiVersions = true;
-    //            config.AssumeDefaultVersionWhenUnspecified = true;
-    //            config.DefaultApiVersion = new ApiVersion(1, 0);
-    //            config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-    //        });
-
-    //        services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-    //        services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
-    //        //Multiple language setting
-    //        var supportedCultures = new[]
-    //        {
-    //            new CultureInfo("en-US"),
-    //            new CultureInfo("vi-VN")
-    //        };
-
-    //        var localizationOptions = new RequestLocalizationOptions()
-    //        {
-    //            DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
-    //            SupportedCultures = supportedCultures,
-    //            SupportedUICultures = supportedCultures
-    //        };
-
-    //        localizationOptions.RequestCultureProviders = new[]
-    //        {
-    //             new RouteDataRequestCultureProvider()
-    //             {
-    //                 RouteDataStringKey = "lang",
-    //                 Options = localizationOptions
-    //             }
-    //        };
-
-    //        services.AddSingleton(localizationOptions);
-    //        services.AddSwaggerGen(
-    //            options =>
-    //            {
-    //                var provider = services.BuildServiceProvider()
-    //                .GetRequiredService<IApiVersionDescriptionProvider>();
-
-    //                foreach (var description in provider.ApiVersionDescriptions)
-    //                {
-    //                    options.SwaggerDoc(
-    //                        description.GroupName,
-    //                        new Info()
-    //                        {
-    //                            Title = $"Catalogue Management API {description.ApiVersion}",
-    //                            Version = description.ApiVersion.ToString(),
-    //                            Description = "Catalogue Management API Document"
-    //                        });
-    //                }
-    //                //options.DocumentFilter<SwaggerAddEnumDescriptions>();
-    //            });
-    //    }
-
-    //    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    //    public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApiVersionDescriptionProvider provider)
-    //    {
-    //        if (env.IsDevelopment())
-    //        {
-    //            app.UseDeveloperExceptionPage();
-    //        }
-    //        else
-    //        {
-    //            app.UseHsts();
-    //        }
-    //        app.UseSwagger();
-    //        app.UseSwaggerUI(
-    //            options =>
-    //            {
-    //                string swaggerJsonBasePath = string.IsNullOrWhiteSpace(options.RoutePrefix) ? "." : "..";
-    //                foreach (var description in provider.ApiVersionDescriptions)
-    //                {
-    //                    options.SwaggerEndpoint(
-    //                        $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json",
-    //                        description.GroupName.ToUpperInvariant());
-    //                }
-    //            });
-    //        app.UseCors("AllowAllOrigins");
-    //        app.UseHttpsRedirection();
-    //        app.UseMvc();
-    //        app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-    //    }
-    //}
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -171,82 +49,22 @@ namespace SystemManagementAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
-            ////services.AddCustomMvc()
-            ////     .AddCustomDbContext(Configuration)
-            ////     .AddCustomSwagger(Configuration)
-            ////     .AddCustomIntegrations(Configuration)
-            ////     .AddCustomAuthentication(Configuration);
-            //services.AddAutoMapper();
-            //services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            //services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
-            //services.AddMemoryCache();
-            //ServiceRegister.Register(services);
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowAllOrigins",
-            //        builder =>
-            //        {
-            //            builder
-            //                .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-            //                .AllowAnyOrigin()
-            //                .AllowAnyHeader()
-            //                .AllowAnyMethod();
-            //        });
-            //});
-            ////services.AddCustomAuthentication(Configuration);
-            //services.AddApiVersioning(config =>
-            //{
-            //    config.ReportApiVersions = true;
-            //    config.AssumeDefaultVersionWhenUnspecified = true;
-            //    config.DefaultApiVersion = new ApiVersion(1, 0);
-            //    config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            //});
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                       .AddIdentityServerAuthentication(options =>
+                       {
+                           options.Authority = "https://localhost:44369/";
+                           options.RequireHttpsMetadata = false;
+                           options.ApiName = "dnt_api";
+                           options.ApiSecret = "secret";
+                       });
+            // services.AddAuthorization(options => options.AddPolicy("Founder", policy => policy.RequireClaim("Employee", "Mosalla")));
 
-            //services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            //services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
-            ////Multiple language setting
-            //var supportedCultures = new[]
-            //{
-            //    new CultureInfo("en-US"),
-            //    new CultureInfo("vi-VN")
-            //};
-
-            //var localizationOptions = new RequestLocalizationOptions()
-            //{
-            //    DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
-            //    SupportedCultures = supportedCultures,
-            //    SupportedUICultures = supportedCultures
-            //};
-
-            //localizationOptions.RequestCultureProviders = new[]
-            //{
-            //     new RouteDataRequestCultureProvider()
-            //     {
-            //         RouteDataStringKey = "lang",
-            //         Options = localizationOptions
-            //     }
-            //};
-
-            //services.AddSingleton(localizationOptions);
-
-            //services.AddSwaggerGen(
-            //    options =>
-            //    {
-            //        var provider = services.BuildServiceProvider()
-            //        .GetRequiredService<IApiVersionDescriptionProvider>();
-
-            //        foreach (var description in provider.ApiVersionDescriptions)
-            //        {
-            //            options.SwaggerDoc(
-            //                description.GroupName,
-            //                new Info()
-            //                {
-            //                    Title = $"eFMS System API {description.ApiVersion}",
-            //                    Version = description.ApiVersion.ToString(),
-            //                    Description = "eFMS Mobile API Document"
-            //                });
-            //        }
-            //    });
             services.AddAutoMapper();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
@@ -312,9 +130,9 @@ namespace SystemManagementAPI
                             description.GroupName,
                             new Info()
                             {
-                                Title = $"eFMS Mobile API {description.ApiVersion}",
+                                Title = $"eFMS Catalogue API {description.ApiVersion}",
                                 Version = description.ApiVersion.ToString(),
-                                Description = "eFMS Mobile API Document"
+                                Description = "eFMS Catalogue API Document"
                             });
                     }
                     //options.DocumentFilter<SwaggerAddEnumDescriptions>();
@@ -323,7 +141,7 @@ namespace SystemManagementAPI
                     {
                         Flow = "implicit", // just get token via browser (suitable for swagger SPA)
                         AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
+                        Scopes = new Dictionary<string, string> { { "apimobile", "Catalogue API" } }
                     });
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
@@ -377,162 +195,142 @@ namespace SystemManagementAPI
             app.UseCors("AllowAllOrigins");
             //app.UseCors("CorsPolicy");
             //ConfigureAuth(app);
-
+            app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
         }
-        protected virtual void ConfigureAuth(IApplicationBuilder app)
-        {
-            if (Configuration.GetValue<bool>("UseLoadTest"))
-            {
-                app.UseMiddleware<ByPassAuthMiddleware>();
-            }
+        //protected virtual void ConfigureAuth(IApplicationBuilder app)
+        //{
+        //    if (Configuration.GetValue<bool>("UseLoadTest"))
+        //    {
+        //        app.UseMiddleware<ByPassAuthMiddleware>();
+        //    }
 
-            app.UseAuthentication();
-        }
+        //    app.UseAuthentication();
+        //}
     }
-    static class CustomExtensionsMethods
-    {
-        public static IServiceCollection AddCustomMvc(this IServiceCollection services)
-        {
-            // Add framework services.
-            //services.AddMvc(options =>
-            //{
-            //    options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-            //}).AddControllersAsServices();  //Injecting Controllers themselves thru DI
-            //                                //For further info see: http://docs.autofac.org/en/latest/integration/aspnetcore.html#controllers-as-services
+    //static class CustomExtensionsMethods
+    //{
+    //    public static IServiceCollection AddCustomMvc(this IServiceCollection services)
+    //    {
+    //        services.AddCors(options =>
+    //        {
+    //            options.AddPolicy("CorsPolicy",
+    //                builder => builder.AllowAnyOrigin()
+    //                .AllowAnyMethod()
+    //                .AllowAnyHeader()
+    //                .AllowCredentials());
+    //        });
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
-            });
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowAllOrigins",
-            //        builder =>
-            //        {
-            //            builder
-            //                .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-            //                .AllowAnyOrigin()
-            //                .AllowAnyHeader()
-            //                .AllowAnyMethod();
-            //        });
-            //});
+    //        services.AddRouting(options => options.LowercaseUrls = true);
+    //        services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+    //        services.AddScoped<IUrlHelper>(implementationFactory =>
+    //        {
+    //            var actionContext = implementationFactory.GetService<IActionContextAccessor>().ActionContext;
+    //            return new UrlHelper(actionContext);
+    //        });
+    //        // Lỗi không hiển thị hết data vì có quan hệ các bảng khác
+    //        services.AddMvc().AddJsonOptions(options =>
+    //        {
+    //            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    //        });
 
+    //        services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
+    //        services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+    //        services.AddApiVersioning(config =>
+    //        {
+    //            config.ReportApiVersions = true;
+    //            config.AssumeDefaultVersionWhenUnspecified = true;
+    //            config.DefaultApiVersion = new ApiVersion(1, 0);
+    //            config.ApiVersionReader = new HeaderApiVersionReader("api-version");
+    //        });
+    //        return services;
+    //    }
 
-            services.AddRouting(options => options.LowercaseUrls = true);
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddScoped<IUrlHelper>(implementationFactory =>
-            {
-                var actionContext = implementationFactory.GetService<IActionContextAccessor>().ActionContext;
-                return new UrlHelper(actionContext);
-            });
-            // Lỗi không hiển thị hết data vì có quan hệ các bảng khác
-            services.AddMvc().AddJsonOptions(options =>
-            {
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            });
+    //    public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
+    //    {
+    //        //services.AddDbContext<DNTDataContext>(options => options.UseSqlServer(configuration["ConnectStrings:Default"]));
+    //        services.AddEntityFrameworkSqlServer()
+    //            .AddDbContext<eFMSDataContext>(options =>
+    //            {
+    //                options.UseSqlServer(configuration["ConnectionString"],
+    //                    sqlServerOptionsAction: sqlOptions =>
+    //                    {
+    //                        //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+    //                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+    //                    });
+    //            },
+    //            ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
+    //            );
 
-            services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddApiVersioning(config =>
-            {
-                config.ReportApiVersions = true;
-                config.AssumeDefaultVersionWhenUnspecified = true;
-                config.DefaultApiVersion = new ApiVersion(1, 0);
-                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
-            return services;
-        }
+    //        return services;
+    //    }
 
-        public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
-        {
-            //services.AddDbContext<DNTDataContext>(options => options.UseSqlServer(configuration["ConnectStrings:Default"]));
-            services.AddEntityFrameworkSqlServer()
-                .AddDbContext<eFMSDataContext>(options =>
-                {
-                    options.UseSqlServer(configuration["ConnectionString"],
-                        sqlServerOptionsAction: sqlOptions =>
-                        {
-                            //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-                            sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
-                        });
-                },
-                ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
-                );
+    //    public static IServiceCollection AddCustomSwagger(this IServiceCollection services, IConfiguration configuration)
+    //    {
+    //        services.AddSwaggerGen(options =>
+    //            {
+    //                options.DescribeAllEnumsAsStrings();
 
-            return services;
-        }
+    //                var provider = services.BuildServiceProvider()
+    //                .GetRequiredService<IApiVersionDescriptionProvider>();
 
-        public static IServiceCollection AddCustomSwagger(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddSwaggerGen(options =>
-                {
-                    options.DescribeAllEnumsAsStrings();
+    //                foreach (var description in provider.ApiVersionDescriptions)
+    //                {
+    //                    options.SwaggerDoc(
+    //                        description.GroupName,
+    //                        new Info()
+    //                        {
+    //                            Title = $"System Managemet API {description.ApiVersion}",
+    //                            Version = description.ApiVersion.ToString(),
+    //                            Description = "System Managemet API Document"
+    //                        });
 
-                    var provider = services.BuildServiceProvider()
-                    .GetRequiredService<IApiVersionDescriptionProvider>();
+    //                }
+    //                //Add authentication
+    //                options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+    //                {
+    //                    Type = "oauth2",
+    //                    Flow = "implicit",
+    //                    AuthorizationUrl = $"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize",
+    //                    TokenUrl = $"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/token",
+    //                    Scopes = new Dictionary<string, string>()
+    //                        {
+    //                            { "systemmanagementapi", "Managemet API" }
+    //                        }
+    //                });
+    //                options.OperationFilter<AuthorizeCheckOperationFilter>();
+    //            });
+    //        return services;
+    //    }
 
-                    foreach (var description in provider.ApiVersionDescriptions)
-                    {
-                        options.SwaggerDoc(
-                            description.GroupName,
-                            new Info()
-                            {
-                                Title = $"System Managemet API {description.ApiVersion}",
-                                Version = description.ApiVersion.ToString(),
-                                Description = "System Managemet API Document"
-                            });
+    //    public static IServiceCollection AddCustomIntegrations(this IServiceCollection services, IConfiguration configuration)
+    //    {
+    //        services.AddAutoMapper();
+    //        ServiceRegister.Register(services);
+    //        services.AddOptions();
+    //        return services;
+    //    }
+    //    public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
+    //    {
+    //        // prevent from mapping "sub" claim to nameidentifier.
+    //        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
 
-                    }
-                    //Add authentication
-                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
-                    {
-                        Type = "oauth2",
-                        Flow = "implicit",
-                        AuthorizationUrl = $"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize",
-                        TokenUrl = $"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/token",
-                        Scopes = new Dictionary<string, string>()
-                            {
-                                { "systemmanagementapi", "Managemet API" }
-                            }
-                    });
-                    options.OperationFilter<AuthorizeCheckOperationFilter>();
-                });
-            return services;
-        }
+    //        var identityUrl = configuration.GetValue<string>("IdentityUrl");
 
-        public static IServiceCollection AddCustomIntegrations(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddAutoMapper();
-            ServiceRegister.Register(services);
-            services.AddOptions();
-            return services;
-        }
-        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
-        {
-            // prevent from mapping "sub" claim to nameidentifier.
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
+    //        services.AddAuthentication(options =>
+    //        {
+    //            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    //            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-            var identityUrl = configuration.GetValue<string>("IdentityUrl");
+    //        }).AddJwtBearer(options =>
+    //        {
+    //            options.Authority = identityUrl;
+    //            options.RequireHttpsMetadata = false;
+    //            options.Audience = "systemmanagementapi";
+    //        });
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-            }).AddJwtBearer(options =>
-            {
-                options.Authority = identityUrl;
-                options.RequireHttpsMetadata = false;
-                options.Audience = "systemmanagementapi";
-            });
-
-            return services;
-        }
-    }
+    //        return services;
+    //    }
+    //}
 }

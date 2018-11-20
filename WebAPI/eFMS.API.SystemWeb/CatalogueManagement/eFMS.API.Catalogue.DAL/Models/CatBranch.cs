@@ -8,8 +8,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public CatBranch()
         {
             SysUser = new HashSet<SysUser>();
-            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
-            SysUserRole = new HashSet<SysUserRole>();
         }
 
         public Guid Id { get; set; }
@@ -34,7 +32,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public string DatetimeCreated { get; set; }
 
         public ICollection<SysUser> SysUser { get; set; }
-        public ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
-        public ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

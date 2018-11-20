@@ -9,6 +9,7 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -51,6 +52,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("paging")]
+        [Authorize]
         public IActionResult Get(CatCurrrencyCriteria criteria, int page, int size)
         {
             var data = catCurrencyService.Paging(criteria, page, size, out int rowCount);

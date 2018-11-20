@@ -177,11 +177,8 @@ export class WarehouseComponent implements OnInit {
       this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {
         if (response.status == true) {
           this.toastr.success(response.message);
-          this.pager.currentPage = 1;
-          this.getWarehouses(this.pager);
-           setTimeout(() => {
-            this.child.setPage(this.pager.currentPage);
-          }, 500);
+          this.pager.totalItems = this.pager.totalItems -1;
+          this.child.setPage(this.pager.currentPage);
         }
         if (response.status == false) {
           this.toastr.error(response.message);
@@ -193,9 +190,11 @@ export class WarehouseComponent implements OnInit {
     this.warehouse = item;
   }
 
-  setPage(pager) {
-    this.pager = pager;
-    this.getWarehouses(this.pager);
+  setPage(pager) { 
+    this.pager.currentPage = pager.currentPage; 
+    this.pager.totalPages = pager.totalPages;
+    this.pager.pageSize = pager.pageSize
+    this.getWarehouses(pager);
   }
   onSubmit(){
     if(this.form.valid){

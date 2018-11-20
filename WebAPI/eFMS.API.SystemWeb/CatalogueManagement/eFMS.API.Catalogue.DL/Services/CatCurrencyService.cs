@@ -18,6 +18,8 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper) : base(repository, mapper)
         {
             SetChildren<CatCharge>("Id", "CurrencyId");
+            SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
+            SetChildren<CatCurrencyExchange>("Id", "CurrencyToId");
         }
 
         public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount)

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild,ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import * as lodash from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
@@ -15,6 +15,9 @@ import { SystemConstants } from 'src/constants/system.const';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { reserveSlots } from '@angular/core/src/render3/instructions';
 import { Router } from '@angular/router';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { async } from 'rxjs/internal/scheduler/async';
+import { CookieService } from 'ngx-cookie-service';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -30,24 +33,49 @@ export class LoginComponent implements OnInit {
     private toastr: ToastrService,
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
-    private el:ElementRef,
-    private router:Router) { }
+    private el: ElementRef,
+    private router: Router,
+    private oauthService: OAuthService,
+    private cookieService: CookieService ) { }
 
-  username:string = "";
-  password:string = "";
-  remember_me:boolean = false;
+  username: string = "";
+  password: string = "";
+  remember_me: boolean = false;
 
   ngOnInit() {
-    
+    this.getLoginData();
+  }
+ 
+   async Login() {
+    this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
+      console.log({response:resp});
+      return this.oauthService.loadUserProfile();
+    }).then(()  => {
+      let claims =  this.oauthService.getIdentityClaims();
+      if (claims) console.log(claims);
+      this.rememberMe();
+      this.toastr.success("Login successful !");      
+      this.router.navigateByUrl('/home');
+    }).catch((err)=>{
+      console.log(err);
+      this.toastr.error(err.error.error_description)
+    })
   }
 
-  async Login(){
-    const response = await this.baseServices.postAsync(this.api_menu.System.User_Management.login,{username:this.username,password:this.password},true,true);
-    if(response.status){
-      localStorage.setItem(SystemConstants.LOGIN_STATUS,SystemConstants.LOGGED_IN);
-      this.router.navigateByUrl('/home');
-      
+
+  rememberMe(){
+    if(this.remember_me){
+       this.cookieService.set('uSnGTX23NJKLX=',this.username);
+       this.cookieService.set('pWNEAExy2HBXS=',this.password);     
+    }else{
+      this.cookieService.deleteAll();
     }
+  }
+
+  private getLoginData(){
+    this.username = this.cookieService.get('uSnGTX23NJKLX=');
+    this.password = this.cookieService.get('pWNEAExy2HBXS=');
+    this.remember_me = (this.username!=''||this.password!='');
   }
 
   /**

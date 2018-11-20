@@ -10,6 +10,7 @@ import { promise } from 'protractor';
 import { error } from 'util';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { OAuthService } from 'angular-oauth2-oidc';
 
 
 
@@ -23,9 +24,10 @@ export class BaseService implements ErrorHandler {
   protected baseUrl: string;
   protected showError: boolean;
 
-  constructor(public _http: HttpClient, public _router: Router, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) {
+  constructor(public _http: HttpClient, public _router: Router, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService,private oauthService: OAuthService) {
     this.headers = new HttpHeaders({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.oauthService.getAccessToken()
     });
     this.baseUrl = "";
     this.showError = true;
