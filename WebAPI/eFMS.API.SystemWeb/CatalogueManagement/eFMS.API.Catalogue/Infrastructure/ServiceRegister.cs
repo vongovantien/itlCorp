@@ -7,6 +7,7 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -21,6 +22,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
+            services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
             services.AddTransient<ICatCountryService, CatCountryService>();

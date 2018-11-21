@@ -39,7 +39,7 @@ namespace AuthServer
             services.AddAutoMapper();
             var cert = new X509Certificate2(Path.Combine(_environment.ContentRootPath, "certs", "IdentityServer4Auth.pfx"));
             services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
+                //.AddDeveloperSigningCredential()
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryClients(Config.GetClients(null, 14400, 12600))
@@ -50,6 +50,7 @@ namespace AuthServer
 
             services.AddTransient<IAuthenUserService, AuthenticateService>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
+
             //.AddTestUsers(Config.GetUsers());
 
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();

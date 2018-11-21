@@ -11,6 +11,7 @@ using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -28,11 +29,13 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
-        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper)
+        private readonly ICurrentUser currentUser;
+        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catPartnerService = service;
             mapper = iMapper;
+            currentUser = user;
         }
 
         [HttpPost]
@@ -79,7 +82,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var partner = mapper.Map<CatPartnerModel>(model);
-            partner.UserCreated = "01";
+            partner.UserCreated = currentUser.UserID;
             partner.DatetimeCreated = DateTime.Now;
             partner.Inactive = false;
             //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
@@ -103,7 +106,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var partner = mapper.Map<CatPartnerModel>(model);
-            partner.UserModified = "01";
+            partner.UserModified = currentUser.UserID;
             partner.DatetimeModified = DateTime.Now;
             partner.Id = id;
             //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);

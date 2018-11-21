@@ -49,6 +49,9 @@
     <Reference Include="eFMS.API.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.1\eFMS.API.Common.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\..\IdentityServer\bin\netcoreapp2.1\eFMS.IdentityServer.DL.dll</HintPath>
+    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
     </Reference>
