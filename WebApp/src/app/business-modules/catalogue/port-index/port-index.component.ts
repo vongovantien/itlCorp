@@ -82,7 +82,7 @@ export class PortIndexComponent implements OnInit {
   setPage(pager: PagerSetting): any {
     this.pager.currentPage = pager.currentPage; 
     this.pager.totalPages = pager.totalPages;
-    this.pager.pageSize = pager.pageSize
+    this.pager.pageSize = pager.pageSize;
     this.getPortIndexs(pager);
   }
   getPortIndexs(pager: PagerSetting): any {
@@ -171,14 +171,13 @@ export class PortIndexComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.portIndex).subscribe((response: any) => {
       if (response.status == true){
         this.toastr.success(response.message);
-        this.getPortIndexs(this.pager);
+        //this.getPortIndexs(this.pager);
         this.form.onReset();
         this.initPortIndex();
         $('#' + this.nameModal).modal('hide');
-        setTimeout(() => {
-          this.pager.currentPage = 1;
-          this.child.setPage(this.pager.currentPage);
-        }, 500);
+        this.pager.totalItems = this.pager.totalItems + 1;
+        this.pager.currentPage = 1;
+        this.child.setPage(this.pager.currentPage);
       }
       else{
         this.toastr.error(response.message);
@@ -260,18 +259,21 @@ export class PortIndexComponent implements OnInit {
       this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.portIndex.id).subscribe((response: any) => {
         if (response.status == true) {
           this.toastr.success(response.message);
-          this.pager.currentPage = 1;
-          this.getPortIndexs(this.pager);
-          setTimeout(() => {
-            this.child.setPage(this.pager.currentPage);
-          }, 300);
-         
+          this.setPageAfterDelete();
         }
         if (response.status == false) {
           this.toastr.error(response.message);
         }
       }, error => this.baseService.handleError(error));
     }
+  }
+  setPageAfterDelete(){
+    this.pager.totalItems = this.pager.totalItems -1;
+    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    if (totalPages < this.pager.totalPages) {
+      this.pager.currentPage = totalPages;
+    }
+    this.child.setPage(this.pager.currentPage);
   }
   onSortChange(column) {
     if(column.dataType != 'boolean'){

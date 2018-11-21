@@ -36,4 +36,11 @@
         CARRIER = 10,
         AIRSHIPSUP = 11
     }
+    public enum Crud
+    {
+        Get,
+        Insert,
+        Update,
+        Delete
+    }
 }

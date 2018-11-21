@@ -231,23 +231,24 @@ export class CommodityComponent implements OnInit {
   }
   async deleteCommodity() {
     await this.baseService.deleteAsync(this.api_menu.Catalogue.Commodity.delete + this.commodity.id, true, false);
-    await this.getCommodities(this.pager);
+    //await this.getCommodities(this.pager);
     this.setPageAfterDelete();
   }
   async deleteGroupCommodity(){
     var response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
     if(response.status){
       this.getGroups();
-      await this.getGroupCommodities(this.pager);
+      //await this.getGroupCommodities(this.pager);
       this.setPageAfterDelete();
     }
   }
   setPageAfterDelete(){
-    this.child.setPage(this.pager.currentPage);
-    if (this.pager.currentPage > this.pager.totalPages) {
-      this.pager.currentPage = this.pager.totalPages;
-      this.child.setPage(this.pager.currentPage);
+    this.pager.totalItems = this.pager.totalItems -1;
+    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    if (totalPages < this.pager.totalPages) {
+      this.pager.currentPage = totalPages;
     }
+    this.child.setPage(this.pager.currentPage);
   }
   setPageAfterAdd() {
     this.child.setPage(this.pager.currentPage);
@@ -322,12 +323,15 @@ export class CommodityComponent implements OnInit {
     var response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
     if (response.status == true){
       this.getGroups();
-      await this.getGroupCommodities(this.pager);
+      //await this.getGroupCommodities(this.pager);
+      this.pager.totalItems = this.pager.totalItems + 1;
+      this.pager.currentPage = 1;
+      this.child.setPage(this.pager.currentPage);
       this.formGroupCommodity.onReset();
       this.commodityGroup = new CommodityGroup();
       $('#' + this.nameGroupModal).modal('hide');
-      this.child.setPage(this.pager.currentPage);
-      this.setPageAfterAdd();
+      // this.child.setPage(this.pager.currentPage);
+      // this.setPageAfterAdd();
     }
   }
   showConfirmDelete(item, tabName) {

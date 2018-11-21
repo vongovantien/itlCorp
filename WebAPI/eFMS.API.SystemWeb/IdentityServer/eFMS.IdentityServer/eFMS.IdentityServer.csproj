@@ -41,4 +41,16 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="certs\IdentityServer4Auth.cer">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="certs\IdentityServer4Auth.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="certs\IdentityServer4Auth.pvk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
