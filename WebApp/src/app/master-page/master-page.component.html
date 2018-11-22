@@ -15,3 +15,41 @@
 </div>
 <!-- end::Body -->
 <!-- <app-footer class="m-grid__item m-footer ng-star-inserted"></app-footer> -->
+
+<!--begin::logout-modal-->
+<div class="modal fade" id="logout-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Logout</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure you want to logout?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-check"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::logout-modal-->
