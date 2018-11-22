@@ -19,6 +19,7 @@ import { PagingService } from './paging-client/paging-client-service';
 import { SearchOptionsComponent } from './common/search-options/search-options.component';
 import { ModifiedModalComponent } from './common/modified-modal/modified-modal.component';
 import { InputFormComponent } from './common/input-form/input-form.component';
+import { TableDetailComponent } from './common/table-detail/table-detail.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ModalModule,SelectModule],
@@ -33,7 +34,8 @@ import { InputFormComponent } from './common/input-form/input-form.component';
     DeleteConfirmModalComponent, 
     SearchOptionsComponent, 
     ModifiedModalComponent, 
-    InputFormComponent
+    InputFormComponent, 
+    TableDetailComponent
     
   ],
   exports: [
@@ -47,7 +49,8 @@ import { InputFormComponent } from './common/input-form/input-form.component';
     DeleteConfirmModalComponent,
     SearchOptionsComponent,
     ModifiedModalComponent,
-    InputFormComponent
+    InputFormComponent,
+    TableDetailComponent
   ],
   providers: [
     SortService,

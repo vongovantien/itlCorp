@@ -19,7 +19,7 @@ namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCurrencyService : RepositoryBase<CatCurrency, CatCurrencyModel>, ICatCurrencyService
     {
-        IMongoDatabase mongodb;
+        private readonly IMongoDatabase mongodb;
         public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper) : base(repository, mapper)
         {
             mongodb = MongoDbHelper.GetDatabase();
@@ -27,12 +27,13 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyToId");
         }
+
         public HandleState AddNew(CatCurrencyModel model)
         {
             var result = Add(model);
             if (result.Success)
             {
-                mongodb.GetCollection<object>("catCurrency").InsertOne(new { id = Guid.NewGuid(), currency = model, actionType = Crud.Insert, DatetimeModified = DateTime.Now });
+                MongoDbHelper.Insert("catCurrency", new { id = Guid.NewGuid(), currency = model, actionType = Crud.Insert, DatetimeModified = DateTime.Now });
             }
             return result;
         }
@@ -73,6 +74,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Update(CatCurrencyModel model)
         {
             var result = Update(model, x => x.Id == model.Id);
+            MongoDbHelper.Insert("catCurrency", new { id = Guid.NewGuid(), currency = model, actionType = Crud.Update, DatetimeModified = DateTime.Now });
             if (result.Success)
             {
                 if (model.IsDefault)
@@ -82,10 +84,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         item.IsDefault = false;
                         DataContext.DC.Update(item);
+                        MongoDbHelper.Insert("catCurrency", new { id = Guid.NewGuid(), currency = item, actionType = Crud.Update, DatetimeModified = DateTime.Now });
                     }
+                    ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
             }
-            ((eFMSDataContext)DataContext.DC).SaveChanges();
             return result;
         }
     }

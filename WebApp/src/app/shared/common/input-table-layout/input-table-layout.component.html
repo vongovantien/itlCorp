@@ -22,7 +22,17 @@
   <!-- Date -->
   <ng-container *ngIf="column.dataType == 'Date'">
     <!-- <span>15:25</span> &nbsp; -->
-    <span>{{ item[column.primaryKey] | date: 'h:mm'}}</span> &nbsp;
-    <span>{{ item[column.primaryKey] | date: 'dd/MM/yyyy'}}</span>
+    <ng-container *ngIf="column.format == 'date-time' && item[column.primaryKey]">
+        <span>{{ item[column.primaryKey] | date: 'MMMM dd. yyyy'}}</span> &nbsp;
+        <span>-</span> &nbsp;
+        <span>{{ item[column.primaryKey] | date: 'h:mm'}} UTC + 7G</span>
+    </ng-container>
+    <ng-container *ngIf="column.format == 'EnglishDate'">
+        <span>{{ item[column.primaryKey] | date: 'MMMM dd. yyyy'}}</span>
+    </ng-container>
+    <ng-container *ngIf="column.format == ''">
+        <span>{{ item[column.primaryKey] | date: 'h:mm'}}</span> &nbsp;
+        <span>{{ item[column.primaryKey] | date: 'dd/MM/yyyy'}}</span>
+    </ng-container>
   </ng-container>
 </ng-container>

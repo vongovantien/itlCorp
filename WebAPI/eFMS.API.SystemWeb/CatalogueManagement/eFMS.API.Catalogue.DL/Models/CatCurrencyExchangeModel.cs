@@ -12,6 +12,7 @@ namespace eFMS.API.Catalogue.DL.Models
     {
         public string CurrencyToId { get; set; }
         public List<CatCurrencyExchangeRate> CatCurrencyExchangeRates { get; set; }
+        public string UserModified { get; set; }
 
     }
     public class CatCurrencyExchangeRate

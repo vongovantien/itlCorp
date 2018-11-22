@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ButtonModalSetting, ButtonAttributeSetting } from '../../models/layout/button-modal-setting.model';
 import { ButtonType } from '../../enums/type-button.enum';
 import { SelectModule } from 'ng2-select';
-import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton } from '../../enums/default-button-enum';
+import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton, DetailDefaultButton } from '../../enums/default-button-enum';
 
 @Component({
   selector: 'app-default-button',
@@ -19,6 +19,7 @@ export class DefaultButtonComponent implements OnInit {
   isExport: boolean= false;
   isSave: boolean = false;
   isCancel: boolean = false;
+  isDetail: boolean = false;
   buttonAttribute: ButtonAttributeSetting;
 
   constructor() { }
@@ -60,6 +61,10 @@ export class DefaultButtonComponent implements OnInit {
     if(typeButton == ButtonType.reset){
       this.isCancel = true;
       this.setSyleButton(ResetDefaultButton);
+    }
+    if(typeButton == ButtonType.detail){
+      this.isDetail = true;
+      this.setSyleButton(DetailDefaultButton);
     }
   }
   setSyleButton(DefaultButton: ButtonAttributeSetting): any {

@@ -18,5 +18,10 @@ namespace eFMS.API.Catalogue.DL.Helpers
             mongodb = mogoClient.GetDatabase("efms");
             return mongodb;
         }
+
+        public static void Insert(string collectionName, object model)
+        {
+            mongodb.GetCollection<object>(collectionName).InsertOne(model);
+        }
     }
 }
