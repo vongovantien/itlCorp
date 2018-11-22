@@ -40,43 +40,4 @@
             }
         }
     }
-
-    //ngx-daterangepicker-material
-    .daterange-rtl {
-        .md-drppicker {
-            top: 100% !important;
-            left: auto !important;
-            right: 0 !important;
-        }
-    }
-    .down {
-        .md-drppicker {
-            margin-top: 0; 
-        }
-    }
-    .md-drppicker{
-        margin-top: 0;
-        &.double {
-            min-width: 500px;
-        }
-        table {
-            th {
-                font-family: inherit;
-                color: inherit !important;
-                font-weight: 500;
-            }
-        }
-        .buttons {
-            width: 100%;
-            float: left;
-            .btn {
-                padding-left: 10px;
-                padding-right: 10px;
-                border-radius: 0;
-                line-height: 30px;
-                text-transform: capitalize;
-                margin-left: 5px;
-            }
-        }
-    }
 }
