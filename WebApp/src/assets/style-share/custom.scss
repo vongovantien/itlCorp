@@ -200,6 +200,17 @@ label {
             }
         }
     }
+    .no-data {
+        padding: 20px;
+        text-align: center;
+        font-size: 16px;
+        i {
+            font-size: 2rem;
+            line-height: 0;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+    }
 }
 .table-actions-col {
     .table-actions {
