@@ -12,7 +12,6 @@ import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
 import { SelectModule } from 'ng2-select';
 import { FormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-// import { Daterangepicker } from 'ng2-daterangepicker';
 
 @NgModule({
   imports: [

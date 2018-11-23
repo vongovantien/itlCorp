@@ -16,6 +16,7 @@ import { flatten } from '@angular/core/src/render3/util';
 })
 export class ExchangeRateComponent implements OnInit {
   exchangeRates: any[];
+  exchangeRatesOfDay: any[];
   exchangeRateNewest: any[];
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { localCurrencyId : "VND" };
@@ -23,8 +24,9 @@ export class ExchangeRateComponent implements OnInit {
   currencies: any[];
   rateNewest: any[];
   isDesc: boolean = false;
-  //keySortDefault: string = "datetimeCreated";
+  nameDetailModal = "detail-history-modal";
   selectedrange: any;
+
 
   constructor(private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
@@ -41,6 +43,26 @@ export class ExchangeRateComponent implements OnInit {
     this.pager.totalPages = pager.totalPages;
     this.pager.pageSize = pager.pageSize
     this.getExchangeRates(pager);
+  }
+  
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.exchangeRates = this.sortService.sort(this.exchangeRates, property, this.isDesc);
+    }
+  }
+  searchHistory(){
+    console.log(this.selectedrange);
+    if(this.selectedrange != null){
+      this.criteria.fromDate = this.selectedrange.startDate.toDate;
+      this.criteria.toDate = this.selectedrange.endDate.toDate;
+      this.pager.currentPage = 1;
+      this.getExchangeRates(this.pager);
+    }
+  }
+  showDetail(item){
+    this.getChargeRateBy(item.datetimeCreated, item.localCurrency);
   }
   async getExchangeRates(pager: PagerSetting) {
     this.spinnerService.show();
@@ -64,21 +86,11 @@ export class ExchangeRateComponent implements OnInit {
       }
     });
   }
-  onSortChange(column) {
-    if(column.dataType != 'boolean'){
-      let property = column.primaryKey;
-      this.isDesc = !this.isDesc;
-      this.exchangeRates = this.sortService.sort(this.exchangeRates, property, this.isDesc);
-    }
-  }
-  searchHistory(){
-    console.log(this.selectedrange);
-    if(this.selectedrange != null){
-      this.criteria.fromDate = this.selectedrange.startDate.toDate;
-      this.criteria.toDate = this.selectedrange.endDate.toDate;
-      this.pager.currentPage = 1;
-      this.getExchangeRates(this.pager);
-    }
+  getChargeRateBy(datetimeCreated, localCurrency){
+    this.baseService.get(this.api_menu.ToolSetting.ExchangeRate.getBy + '?date=' + datetimeCreated + '&localCurrency=' + localCurrency).subscribe((response: any) => {
+      this.exchangeRatesOfDay = response;
+      console.log(this.exchangeRatesOfDay);
+    })
   }
    /**
    * ng2-select

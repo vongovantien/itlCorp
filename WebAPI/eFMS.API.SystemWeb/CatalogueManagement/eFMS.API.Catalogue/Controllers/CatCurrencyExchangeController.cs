@@ -51,10 +51,10 @@ namespace eFMS.API.Catalogue.Controllers
             var result = catCurrencyExchangeService.GetCurrencyExchangeNewest();
             return Ok(result);
         }
-        [HttpGet("GetExchangeRates")]
-        public IActionResult GetExchangeRates(DateTime date, string localCurrency, string createdBy)
+        [HttpGet("GetExchangeRatesBy")]
+        public IActionResult GetExchangeRates(DateTime date, string localCurrency)
         {
-            var result = catCurrencyExchangeService.GetExchangeRates(date, localCurrency, createdBy);
+            var result = catCurrencyExchangeService.GetExchangeRates(date, localCurrency);
             return Ok(result);
         }
 

@@ -6,14 +6,16 @@ import { FormComponent } from './form/form.component';
 import { TableComponent } from './table/table.component';
 import { SharedModule } from '../shared/shared.module';
 import { SelectModule } from 'ng2-select';
-import { Daterangepicker } from 'ng2-daterangepicker';
+import { FormsModule } from '@angular/forms';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 @NgModule({
   imports: [
     CommonModule,
     DesignModulesRoutingModule,
     SharedModule,
-    Daterangepicker,
+    NgxDaterangepickerMd,
+    FormsModule,
     SelectModule
   ],
   declarations: [FormComponent, TableComponent]

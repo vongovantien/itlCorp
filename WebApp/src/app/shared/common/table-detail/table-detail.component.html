@@ -27,7 +27,7 @@
           <tr *ngFor="let record of records; let i = index">
               <td class="table-actions-col">
                   <div class="table-actions" style="width: 40px">
-                      <app-default-button [buttonSetting]="detailButtonSetting" [dataTarget]="detailButtonSetting.dataTarget" (click)="editClick(record)"></app-default-button>
+                      <app-default-button [buttonSetting]="detailButtonSetting" [dataTarget]="detailButtonSetting.dataTarget" (click)="detailClick(record)"></app-default-button>
                   </div>
               </td>
               <!-- <td>
