@@ -15,7 +15,7 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         List<CatCurrencyExchangeHistory> Paging(CatCurrencyExchangeCriteria criteria, int page, int size, out int rowsCount);
         List<vw_catCurrencyExchange> Query(CatCurrencyExchangeCriteria criteria);
-        List<vw_catCurrencyExchangeNewest> GetCurrencyExchangeNewest();
+        CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest();
         CurrencyExchangeNewestViewModel GetExchangeRates(DateTime date, string localCurrency);
         HandleState UpdateRate(CatCurrencyExchangeEditModel model);
     }

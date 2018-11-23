@@ -1,4 +1,4 @@
-export class CatCharge{
+export class CatCurrencyExchange{
     constructor(){}
     id: number;
     currencyFromId: String;

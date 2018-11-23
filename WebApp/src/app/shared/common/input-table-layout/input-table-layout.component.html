@@ -25,7 +25,7 @@
     <ng-container *ngIf="column.format == 'date-time' && item[column.primaryKey]">
         <span>{{ item[column.primaryKey] | date: 'MMMM dd. yyyy'}}</span> &nbsp;
         <span>-</span> &nbsp;
-        <span>{{ item[column.primaryKey] | date: 'h:mm'}} UTC + 7G</span>
+        <span>{{ item[column.primaryKey] | date: 'h:mm'}}</span>
     </ng-container>
     <ng-container *ngIf="column.format == 'EnglishDate'">
         <span>{{ item[column.primaryKey] | date: 'MMMM dd. yyyy'}}</span>

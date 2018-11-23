@@ -22,10 +22,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="m-portlet__body">
+                <div class="m-portlet__body" *ngIf="exchangeRateNewest">
                     <div class="h6 m--margin-bottom-10">
                         <span>Update date:</span>&nbsp;
-                        <span class="m--font-primary">November 11. 2018 - 23:59:59 UTC + 7G</span>
+                        <!-- <span class="m--font-primary">November 11. 2018 - 23:59:59 UTC + 7G</span> -->
+                        <span class="m--font-primary">{{ exchangeRateNewest.datetimeModified | date: 'MMMM dd. yyyy' }} - {{ exchangeRateNewest.datetimeModified | date: 'h:mm'}}</span>
                     </div>
                     <!--begin: table -->
                     <div class="table-wrapper" id="">
@@ -44,7 +45,7 @@
                                 </tr>
                             </thead>
                             <tbody *ngIf="exchangeRateNewest">
-                                <tr *ngFor="let item of exchangeRateNewest; let i = index">
+                                <tr *ngFor="let item of exchangeRateNewest.exchangeRates; let i = index">
                                     <td style="width: 30%">
                                         <span>{{ item.currencyFromId }}</span>
                                     </td>
@@ -253,93 +254,96 @@
 <div class="modal fade" id="setting-exchange-rate-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Setting</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="m-form m--margin-bottom-10">
-                    <div class="m--align-right">
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+            <form name="formAddCurrencyRate" #formAddCurrencyRate="ngForm" novalidate (ngSubmit)="formAddCurrencyRate.form.valid">
+
+                <div class="modal-header">
+                        <h5 class="modal-title">Setting</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="m-form m--margin-bottom-10">
+                            <div class="m--align-right">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="addNewRate()">
+                                    <span>
+                                        <i class="icon-plus7"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <!--begin: table -->
+                        <div class="table-wrapper" id="">
+                            <table class="table table-striped table-secondary table-editable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 70px"></th>
+                                        <th>
+                                            <span>Currency list</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="exchangeRateNewest">
+                                    <ng-container *ngFor="let item of exchangeRateNewest.exchangeRates; let j = index">
+                                        <tr>
+                                            <td class="table-actions-col">
+                                                <div class="table-actions" style="width: 70px">
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>{{ item.currencyFromId }}</span>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <tr>
+                                        <td class="table-actions-col">
+                                            <div class="table-actions" style="width: 70px">
+                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <ng-select [allowClear]="true" [items]="currencies" [disabled]="disabled" (data)="refreshValue($event)"
+                                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                    placeholder="Select currency">
+                                                </ng-select>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!--end: table -->
+                    </div>
+                    <div class="modal-footer m--align-center c-button-actions">
+                        <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                             <span>
-                                <i class="icon-plus7"></i>
+                                <i class="la la-save"></i>
                                 <span>
-                                    add new
+                                    save
+                                </span>
+                            </span>
+                        </button>
+                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                            <span>
+                                <i class="la la-ban"></i>
+                                <span>
+                                    No
                                 </span>
                             </span>
                         </button>
                     </div>
-                </div>
-                <!--begin: table -->
-                <div class="table-wrapper" id="">
-                    <table class="table table-striped table-secondary table-editable">
-                        <thead>
-                            <tr>
-                                <th style="width: 70px"></th>
-                                <th>
-                                    <span>Currency list</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ng-container *ngFor="let item of exchangeRateNewest; let j = index">
-                                <tr>
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="" data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>{{ item.currencyFromId }}</span>
-                                    </td>
-                                </tr>
-                            </ng-container>
-                            <tr>
-                                <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 70px">
-                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="" data-toggle="modal" data-target="#confirm-delete-modal">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        <ng-select [allowClear]="true" [items]="currencies" [disabled]="disabled" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                            placeholder="Select currency">
-                                        </ng-select>
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--end: table -->
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            No
-                        </span>
-                    </span>
-                </button>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -350,7 +354,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" *ngIf="exchangeRatesOfDay">
             <div class="modal-header">
-                <h5 class="modal-title">Exchange Rate Date: {{ exchangeRatesOfDay.datetimeCreated }}</h5>
+                <h5 class="modal-title">Exchange Rate Date: {{ exchangeRatesOfDay.datetimeCreated | date: 'MMMM dd. yyyy' }}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -359,7 +363,7 @@
                 <div class="row m--margin-bottom-15">
                     <div class="col-lg-4">
                         <span class="m--font-bolder">Update at:</span>&nbsp;
-                        <span>November 11. 2018</span>
+                        <span>{{ exchangeRatesOfDay.datetimeModified | date: 'MMMM dd. yyyy' }}</span>
                     </div>
                     <div class="col-lg-4">
                         <span class="m--font-bolder">Update by:</span>&nbsp;
@@ -383,53 +387,13 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody *ngIf="exchangeRatesOfDay.exchangeRate">
-                            <tr *ngFor="let item of exchangeRatesOfDay.exchangeRate; let i = index">
+                        <tbody *ngIf="exchangeRatesOfDay.exchangeRates">
+                            <tr *ngFor="let item of exchangeRatesOfDay.exchangeRates; let i = index">
                                 <td style="width: 50%">
-                                    <span>USD</span>
+                                    <span>{{ item.currencyFromId }}</span>
                                 </td>
                                 <td style="width: 50%">
-                                    <span>23.280,000</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%">
-                                    <span>USD</span>
-                                </td>
-                                <td style="width: 50%">
-                                    <span>23.280,000</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%">
-                                    <span>USD</span>
-                                </td>
-                                <td style="width: 50%">
-                                    <span>23.280,000</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%">
-                                    <span>USD</span>
-                                </td>
-                                <td style="width: 50%">
-                                    <span>23.280,000</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%">
-                                    <span>USD</span>
-                                </td>
-                                <td style="width: 50%">
-                                    <span>23.280,000</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%">
-                                    <span>USD</span>
-                                </td>
-                                <td style="width: 50%">
-                                    <span>23.280,000</span>
+                                    <span>{{ item.rate | currency : "" : '' }}</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -438,7 +402,7 @@
                 <!--end: table -->
             </div>
             <div class="modal-footer m--align-right c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" aria-label="Close">
                     close
                 </button>
             </div>

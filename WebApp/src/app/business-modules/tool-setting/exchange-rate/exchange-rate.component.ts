@@ -8,6 +8,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { EXCHANGERATECOLUMNSETTING } from './exchange-rate.columns';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { flatten } from '@angular/core/src/render3/util';
+import { CatCurrencyExchange } from 'src/app/shared/models/tool-setting/exchange-rate';
 
 @Component({
   selector: 'app-exchange-rate',
@@ -16,10 +17,13 @@ import { flatten } from '@angular/core/src/render3/util';
 })
 export class ExchangeRateComponent implements OnInit {
   exchangeRates: any[];
+  exchangeRate: CatCurrencyExchange;
+  exchangeRateToAdd: Array<CatCurrencyExchange>;
   exchangeRatesOfDay: any[];
   exchangeRateNewest: any[];
   pager: PagerSetting = PAGINGSETTING;
-  criteria: any = { localCurrencyId : "VND" };
+  localCurrency = "VND";
+  criteria: any = { localCurrencyId : this.localCurrency };
   ExchangeRateSettings: ColumnSetting[] = EXCHANGERATECOLUMNSETTING;
   currencies: any[];
   rateNewest: any[];
@@ -64,6 +68,9 @@ export class ExchangeRateComponent implements OnInit {
   showDetail(item){
     this.getChargeRateBy(item.datetimeCreated, item.localCurrency);
   }
+  addNewRate(){
+    this.exchangeRateToAdd = new Array<CatCurrencyExchange>();
+  }
   async getExchangeRates(pager: PagerSetting) {
     this.spinnerService.show();
     this.baseService.post(this.api_menu.ToolSetting.ExchangeRate.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
@@ -75,6 +82,7 @@ export class ExchangeRateComponent implements OnInit {
   async getExchangeNewest(){
     var responses = await this.baseService.getAsync(this.api_menu.ToolSetting.ExchangeRate.getNewest);
     this.exchangeRateNewest = responses;
+    console.log(this.exchangeRateNewest);
   }
   getcurrencies(){
     this.baseService.get(this.api_menu.Catalogue.Currency.getAll).subscribe((response: any) => {

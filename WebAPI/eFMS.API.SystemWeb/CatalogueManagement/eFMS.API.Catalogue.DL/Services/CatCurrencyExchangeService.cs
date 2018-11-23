@@ -22,24 +22,36 @@ namespace eFMS.API.Catalogue.DL.Services
         {
         }
 
-        public List<vw_catCurrencyExchangeNewest> GetCurrencyExchangeNewest()
+        public CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest()
         {
+            var lastRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.OrderByDescending(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).FirstOrDefault();
+            if (lastRate == null) return null;
             List<vw_catCurrencyExchangeNewest> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
-            return lvCatPlace;
+
+            var result = new CurrencyExchangeNewestViewModel
+            {
+                DatetimeModified = lastRate.DatetimeModified ?? lastRate.DatetimeCreated,
+                ExchangeRates = lvCatPlace
+            };
+            return result;
         }
 
         public CurrencyExchangeNewestViewModel GetExchangeRates(DateTime date, string localCurrency)
         {
-            var result = new CurrencyExchangeNewestViewModel();
+            var users = ((eFMSDataContext)DataContext.DC).GetViewData<vw_sysUser>();
             var data = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.DatetimeCreated.Value.Date == date.Date
                 && x.CurrencyToId == localCurrency);
+
+            var result = new CurrencyExchangeNewestViewModel();
             if (data.Count() == 0) return result;
-            result.ExchangeRate = new List<vw_catCurrencyExchangeNewest>();
             var lastRate = data.OrderBy(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).FirstOrDefault();
             result.LocalCurrency = localCurrency;
-            result.DatetimeCreated = date.Date;
-            result.UserModifield = lastRate != null ? (lastRate.UserModified != null ? lastRate.UserModified : lastRate.UserCreated) : null;
-            foreach(var item in data)
+            result.DatetimeCreated = lastRate.DatetimeCreated;
+            result.DatetimeModified = lastRate.DatetimeModified?? lastRate.DatetimeCreated;
+            result.UserModifield = lastRate != null ? (lastRate.UserModified!= null ?(users.FirstOrDefault(x => x.ID == lastRate.UserModified).Username): null) ?? (users.FirstOrDefault(x => x.ID == lastRate.UserCreated).Username) : null;
+
+            result.ExchangeRates = new List<vw_catCurrencyExchangeNewest>();
+            foreach (var item in data)
             {
                 var rate = new vw_catCurrencyExchangeNewest
                 {
@@ -47,7 +59,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     Rate = item.Rate,
                     //DatetimeModifield = item.DatetimeModified ==null?item.DatetimeCreated : item.DatetimeModified,
                 };
-                result.ExchangeRate.Add(rate);
+                result.ExchangeRates.Add(rate);
             }
             return result;
         }
