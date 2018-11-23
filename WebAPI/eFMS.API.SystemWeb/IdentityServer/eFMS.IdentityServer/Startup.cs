@@ -55,6 +55,7 @@ namespace AuthServer
 
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
             services.AddTransient<IProfileService, ProfileService>();
+            services.AddTransient<ISysUserLogService, SysUserLogService>();
 
             IdentityModelEventSource.ShowPII = true;
         }
