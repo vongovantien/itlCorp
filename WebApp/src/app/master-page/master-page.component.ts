@@ -26,9 +26,8 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   constructor(private baseService: BaseService,private router: Router,private cdRef:ChangeDetectorRef,private cookieService: CookieService,private oauthService: OAuthService, ) { }
 
    ngOnInit() {
-    console.log({ahahah:this.oauthService.getAccessToken()});
-    if(this.oauthService.getAccessToken()==null){
-      this.router.navigateByUrl('/login');
+    if(this.cookieService.get("login_status")!="LOGGED_IN"){
+      this.router.navigateByUrl('/home');
     }
     this.cdRef.detectChanges();
   }

@@ -1,5 +1,5 @@
 import { SystemConstants } from "./system.const";
-
+import {environment} from 'src/environments/environment';
 
 export class API_MENU {
     private HOST = {
@@ -21,7 +21,7 @@ export class API_MENU {
      * Use HOST.Test to run on test environment
      * Use HOST.Staging to run on staging environment 
      */
-    private CURRENT_HOST: String = this.HOST.Local;
+    private CURRENT_HOST: String =  environment.HOST.WEB_URL;  //this.HOST.Local;
 
     private getCurrentLanguage() {
         return localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);

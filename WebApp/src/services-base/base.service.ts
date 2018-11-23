@@ -27,7 +27,7 @@ export class BaseService implements ErrorHandler {
   constructor(public _http: HttpClient, public _router: Router, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService,private oauthService: OAuthService) {
     this.headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.oauthService.getAccessToken()
+      'Authorization': 'Bearer ' + sessionStorage.getItem("access_token") //this.oauthService.getAccessToken()
     });
     this.baseUrl = "";
     this.showError = true;
