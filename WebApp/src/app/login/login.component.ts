@@ -52,6 +52,7 @@ export class LoginComponent implements OnInit {
   checkLogin() {
     console.log({ TOKEN: this.oauthService.getAccessToken() })
     if (this.oauthService.getAccessToken() != null) {
+     
       this.router.navigateByUrl('/home');
     } else {
       return;

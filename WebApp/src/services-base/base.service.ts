@@ -120,6 +120,8 @@ export class BaseService implements ErrorHandler {
    * @param data 
    */
   public put(url: string, data?: any) {
+    var tk = 'Bearer ' + sessionStorage.getItem("access_token");
+    
     return this._http.put(url, data, { headers: this.headers });
   }
 
@@ -132,6 +134,9 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async putAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    // this.headers = this.headers.append("Authorization",token);
+    this.headers.set("Authorization",token);
     if (display_spinner)
       this.spinnerService.show();
     try {
