@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-exchange-rate',
@@ -7,12 +8,32 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ExchangeRateComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+   }
 
   ngOnInit() {
   }
   
-   /**
+  /**
+   * Daterange picker
+   */
+  ranges: any = {
+    Today: [moment(), moment()],
+    Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+    'This Month': [moment().startOf('month'), moment().endOf('month')],
+    'Last Month': [
+      moment()
+        .subtract(1, 'month')
+        .startOf('month'),
+      moment()
+        .subtract(1, 'month')
+        .endOf('month')
+    ]
+  };
+
+  /**
    * ng2-select
    */
   public items: Array<string> = ['USD', 'JPY', 'SGD', 'EUR', 'GBP', 'HKD',];
@@ -44,4 +65,5 @@ export class ExchangeRateComponent implements OnInit {
   public refreshValue(value:any):void {
     this.value = value;
   }
+
 }
