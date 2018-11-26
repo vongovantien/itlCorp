@@ -9,7 +9,9 @@ import * as moment from 'moment';
 export class ExchangeRateComponent implements OnInit {
 
   constructor() {
-   }
+    this.keepCalendarOpeningWithRange = true;
+    this.selectedrange = {startDate: moment().startOf('month'), endDate: moment().endOf('month')};
+  }
 
   ngOnInit() {
   }
@@ -17,6 +19,8 @@ export class ExchangeRateComponent implements OnInit {
   /**
    * Daterange picker
    */
+  selectedrange: any;
+  keepCalendarOpeningWithRange: true;
   ranges: any = {
     Today: [moment(), moment()],
     Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
