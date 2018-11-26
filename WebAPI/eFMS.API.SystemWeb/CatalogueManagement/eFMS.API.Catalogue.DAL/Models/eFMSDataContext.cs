@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Linq;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -46,7 +47,28 @@ namespace eFMS.API.Catalogue.Service.Models
                 optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
             }
         }
+        public override int SaveChanges()
+        {
+            var modifiedEntities = ChangeTracker.Entries()
+                .Where(p => p.State == EntityState.Modified).ToList();
+            var now = DateTime.UtcNow;
 
+            foreach (var change in modifiedEntities)
+            {
+                var entityName = change.Entity.GetType().Name;
+                var properties = change.OriginalValues.Properties;
+                var primaryKey = properties.Where(x => x.IsKey());
+                foreach (var prop in properties)
+                {
+                    var originalValue = change.OriginalValues[prop].ToString();
+                    var currentValue = change.CurrentValues[prop].ToString();
+                    if (originalValue != currentValue)
+                    {
+                    }
+                }
+            }
+            return base.SaveChanges();
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CatArea>(entity =>

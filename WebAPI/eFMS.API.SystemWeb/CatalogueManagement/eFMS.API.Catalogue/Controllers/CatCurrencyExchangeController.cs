@@ -10,6 +10,7 @@ using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -44,7 +45,12 @@ namespace eFMS.API.Catalogue.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
-
+        [HttpGet("GetCurrencies")]
+        public IActionResult GetCurrencies()
+        {
+            var result = catCurrencyExchangeService.GetCurrency();
+            return Ok(result);
+        }
         [HttpGet("GetNewest")]
         public IActionResult GetNewest()
         {
@@ -52,9 +58,16 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         [HttpGet("GetExchangeRatesBy")]
-        public IActionResult GetExchangeRates(DateTime date, string localCurrency)
+        public IActionResult GetExchangeRates(DateTime date, string localCurrency, string fromCurrency)
         {
-            var result = catCurrencyExchangeService.GetExchangeRates(date, localCurrency);
+            var result = catCurrencyExchangeService.GetExchangeRates(date, localCurrency, fromCurrency);
+            return Ok(result);
+        }
+
+        [HttpGet("ConvertRate")]
+        public IActionResult ConvertRate(DateTime date, string localCurrency, string fromCurrency)
+        {
+            var result = catCurrencyExchangeService.ConvertRate(date, localCurrency, fromCurrency);
             return Ok(result);
         }
 
@@ -82,6 +95,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("UpdateRate")]
+        [Authorize]
         public IActionResult Put(CatCurrencyExchangeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

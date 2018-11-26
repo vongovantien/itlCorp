@@ -81,9 +81,10 @@
                 <div class="modal-header">
                     <h5 class="modal-title" *ngIf="currency.id == null">{{ titleAddModal }}</h5>
                     <h5 class="modal-title" *ngIf="currency.id">{{ titleEditModal }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
-                    </button>
+                    </button> -->
+                    <app-close-modal-button></app-close-modal-button>
                 </div>
                 <div class="modal-body">
                     <!--begin::add-stage-management-form-->
@@ -94,7 +95,7 @@
                                 Currency Code
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="currency.id" (change)="currency.id=currency.id.trim()" class="form-control m-input m-input--square"
+                                <input type="text" [(ngModel)]="currency.id" (change)="currency.id=currency.id.trim()" class="form-control m-input m-input--square" [disabled]="!isAddnew"
                                     #currencyCode="ngModel" name="currencyCode" required placeholder="Please enter currency code" name="currencyCode" autocomplete="nope">
                                 <div class="form-control-feedback" *ngIf="formAddEdit.submitted && currencyCode.invalid">
                                     Currency Code is required

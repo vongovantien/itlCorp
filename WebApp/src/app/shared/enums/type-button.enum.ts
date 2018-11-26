@@ -7,5 +7,6 @@ export enum ButtonType{
     save="save",
     cancel="cancel",
     reset="reset",
-    detail="detail"
+    detail="detail",
+    closeModal="closeModal"
 }

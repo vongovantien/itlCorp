@@ -20,6 +20,7 @@ import { SearchOptionsComponent } from './common/search-options/search-options.c
 import { ModifiedModalComponent } from './common/modified-modal/modified-modal.component';
 import { InputFormComponent } from './common/input-form/input-form.component';
 import { TableDetailComponent } from './common/table-detail/table-detail.component';
+import { CloseModalButtonComponent } from './common/close-modal-button/close-modal-button.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ModalModule,SelectModule],
@@ -35,7 +36,8 @@ import { TableDetailComponent } from './common/table-detail/table-detail.compone
     SearchOptionsComponent, 
     ModifiedModalComponent, 
     InputFormComponent, 
-    TableDetailComponent
+    TableDetailComponent, 
+    CloseModalButtonComponent
     
   ],
   exports: [
@@ -50,7 +52,8 @@ import { TableDetailComponent } from './common/table-detail/table-detail.compone
     SearchOptionsComponent,
     ModifiedModalComponent,
     InputFormComponent,
-    TableDetailComponent
+    TableDetailComponent,
+    CloseModalButtonComponent
   ],
   providers: [
     SortService,

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -7,8 +7,13 @@ import { BaseService } from 'src/services-base/base.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { EXCHANGERATECOLUMNSETTING } from './exchange-rate.columns';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { flatten } from '@angular/core/src/render3/util';
 import { CatCurrencyExchange } from 'src/app/shared/models/tool-setting/exchange-rate';
+import { ToastrService } from 'ngx-toastr';
+import { SelectComponent } from 'ng2-select';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+import { moment } from 'ngx-bootstrap/chronos/test/chain';
+declare var $:any;
 
 @Component({
   selector: 'app-exchange-rate',
@@ -17,25 +22,62 @@ import { CatCurrencyExchange } from 'src/app/shared/models/tool-setting/exchange
 })
 export class ExchangeRateComponent implements OnInit {
   exchangeRates: any[];
-  exchangeRate: CatCurrencyExchange;
-  exchangeRateToAdd: Array<CatCurrencyExchange>;
   exchangeRatesOfDay: any[];
-  exchangeRateNewest: any[];
+  exchangeRateNewest: any = {};
   pager: PagerSetting = PAGINGSETTING;
   localCurrency = "VND";
+  rate: any;
   criteria: any = { localCurrencyId : this.localCurrency };
+  exchangeRateToAdd: any ={
+    currencyToId: this.localCurrency,
+    CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
+    userModified: ''
+  };
+  cancelButtonSetting: ButtonModalSetting = {
+    buttonAttribute: {titleButton: "no",
+    classStyle: "btn m-btn--square m-btn--icon m-btn--uppercase",
+    icon: "la la-ban"},
+    typeButton: ButtonType.cancel,
+  };
+  addButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.add
+  };
+  saveButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.save
+  };
   ExchangeRateSettings: ColumnSetting[] = EXCHANGERATECOLUMNSETTING;
-  currencies: any[];
+  fromCurrencies: any[];
+  toCurrencies: any[];
+  catCurrencies: any[];
   rateNewest: any[];
   isDesc: boolean = false;
   nameDetailModal = "detail-history-modal";
+  nameSettingExchangeRateModal = "setting-exchange-rate-modal";
+  nameUpdateRateModal = "update-exchange-rate-modal";
   selectedrange: any;
-
+  selectTypeName = {
+    rateSetting: 'rateSetting',
+    fromCurrency: 'fromCurrency',
+    toCurrency: 'toCurrency'
+  }
+  deleteButtonSetting: ButtonModalSetting = {
+    dataTarget: "confirm-delete-modal",
+    typeButton: ButtonType.delete
+  };
+  convertDate: any;
+  convert: any = {
+    selectedRangeDate: null,
+    fromCurrency: null,
+    toCurrency: null
+  }
+  isAllowUpdateRate: boolean = false;
+  @ViewChild('currencyRateSelect') public ngSelectCurrencyRate: SelectComponent;
 
   constructor(private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService, 
-    private baseService: BaseService) { }
+    private baseService: BaseService,
+    private toastr: ToastrService) { }
 
   async ngOnInit() {
     this.getExchangeRates(this.pager);
@@ -59,17 +101,142 @@ export class ExchangeRateComponent implements OnInit {
   searchHistory(){
     console.log(this.selectedrange);
     if(this.selectedrange != null){
-      this.criteria.fromDate = this.selectedrange.startDate.toDate;
-      this.criteria.toDate = this.selectedrange.endDate.toDate;
+      this.criteria.fromDate = this.selectedrange.startDate;
+      this.criteria.toDate = this.selectedrange.endDate;
       this.pager.currentPage = 1;
       this.getExchangeRates(this.pager);
     }
   }
   showDetail(item){
-    this.getChargeRateBy(item.datetimeCreated, item.localCurrency);
+    this.getChargeRateBy(item.datetimeCreated, item.localCurrency, '');
+  }
+  showSetting(){
+    this.exchangeRateToAdd = {
+      currencyToId: this.localCurrency,
+      CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
+      userModified: ''
+    };
+    this.getCatCurrencies();
   }
   addNewRate(){
-    this.exchangeRateToAdd = new Array<CatCurrencyExchange>();
+    if(this.catCurrencies.length == 0){
+      this.toastr.warning("All currencies have added.");
+    }
+    else{
+      if(this.exchangeRateToAdd.CatCurrencyExchangeRates.length > 0){
+        if(this.exchangeRateToAdd.CatCurrencyExchangeRates[this.exchangeRateToAdd.CatCurrencyExchangeRates.length-1].currencyFromId == null){
+  
+          this.toastr.warning("Please select currency to add new Rate");
+        }
+        else{
+          this.exchangeRateToAdd.CatCurrencyExchangeRates.push({ currencyFromId: null, rate: 0 });
+        }
+      }
+      else{
+        this.exchangeRateToAdd.CatCurrencyExchangeRates.push({ currencyFromId: null, rate: 0 });
+      }
+    }
+  }
+  async saveNewRate(){
+    if(this.exchangeRateToAdd.CatCurrencyExchangeRates.length > 0){
+      await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
+      $('#setting-exchange-rate-modal').modal('hide');
+      this.ngSelectCurrencyRate.active = [];
+      this.getExchangeNewest();
+      this.exchangeRateToAdd = {
+        currencyToId: this.localCurrency,
+        CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
+        userModified: ''
+      };
+    }
+    else{
+      this.toastr.warning("Please select currency to add new Rate");
+    }
+  }
+  async updateRate(){
+    this.exchangeRateToAdd = {
+      currencyToId: this.localCurrency,
+      CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
+      userModified: ''
+    };
+    this.exchangeRateNewest.exchangeRates.forEach(element => {
+      if(element.newRate != undefined){
+        this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.newRate, isUpdate : true });
+      }
+      else{
+        
+        this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.rate });
+      }
+    });
+    await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
+    this.getExchangeNewest();
+    $('#update-exchange-rate-modal').modal('hide');
+    
+    console.log(this.exchangeRateToAdd);
+  }
+  valueChange(value){
+    if(value != null){
+      this.isAllowUpdateRate = true;
+    }
+    else{
+      this.isAllowUpdateRate = false;
+      for(let element of this.exchangeRateNewest.exchangeRates){
+        if(element.newRate != null){
+          this.isAllowUpdateRate = true;
+          break;
+        }
+      }
+    }
+  }
+  
+  resetForm(form){
+    this.exchangeRateToAdd = {
+      currencyToId: this.localCurrency,
+      CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
+      userModified: ''
+    };
+    form.onReset();
+  }
+  confirmDeleteRate(item){
+
+  }
+  removeNewRate(index){
+    const currency = this.exchangeRateToAdd.CatCurrencyExchangeRates[index];
+    this.exchangeRateToAdd.CatCurrencyExchangeRates.splice(index, 1);
+    this.catCurrencies.push({"text": currency.currencyFromId,"id": currency.currencyFromId});
+  }
+  convertRate(form){
+    if(form.valid && this.convert.fromCurrency != null && this.convert.toCurrency != null){
+
+      console.log(this.convert);
+
+      this.baseService.get(this.api_menu.ToolSetting.ExchangeRate.convertRate + '?date=' + new Date(this.convert.selectedRangeDate.startDate).toISOString()
+       + '&localCurrency=' + this.convert.toCurrency + "&fromCurrency=" + this.convert.fromCurrency)
+      .subscribe((response: any) => {
+        this.rate = response;
+        console.log(this.exchangeRatesOfDay);
+      })
+    }
+  }
+  cancelAddRate(){
+    this.getCatCurrencies();
+  }
+  getCatCurrencies(){
+    
+    this.baseService.get(this.api_menu.Catalogue.Currency.getAll).subscribe((response: any) =>{
+      if(response != null){
+        this.catCurrencies = response.map(x=>({"text":x.id,"id":x.id}));
+        if(this.catCurrencies.length > 0){
+          this.catCurrencies.splice(this.catCurrencies.indexOf({"text":this.localCurrency,"id": this.localCurrency}), 1 );
+        }
+        this.exchangeRateNewest.exchangeRates.forEach(element => {
+          let index = this.catCurrencies.findIndex(x => x.id == element.currencyFromId);
+          this.catCurrencies.splice(index, 1 );
+        });
+      }else{
+        this.catCurrencies = [];
+      }
+    });
   }
   async getExchangeRates(pager: PagerSetting) {
     this.spinnerService.show();
@@ -85,17 +252,20 @@ export class ExchangeRateComponent implements OnInit {
     console.log(this.exchangeRateNewest);
   }
   getcurrencies(){
-    this.baseService.get(this.api_menu.Catalogue.Currency.getAll).subscribe((response: any) => {
+    this.baseService.get(this.api_menu.ToolSetting.ExchangeRate.getCurrencies).subscribe((response: any) => {
       if(response != null){
-        this.currencies = response.map(x=>({"text":x.id,"id":x.id}));
+        this.fromCurrencies = response.fromCurrencies;
+        this.toCurrencies = response.toCurrencies;
       }
       else{
-        this.currencies = [];
+        this.fromCurrencies = [];
+        this.toCurrencies = [];
       }
     });
   }
-  getChargeRateBy(datetimeCreated, localCurrency){
-    this.baseService.get(this.api_menu.ToolSetting.ExchangeRate.getBy + '?date=' + datetimeCreated + '&localCurrency=' + localCurrency).subscribe((response: any) => {
+  getChargeRateBy(datetimeCreated, localCurrency, fromCurrency?){
+    this.baseService.get(this.api_menu.ToolSetting.ExchangeRate.getBy + '?date=' + datetimeCreated + '&localCurrency=' + localCurrency + "&fromCurrency=" + fromCurrency)
+    .subscribe((response: any) => {
       this.exchangeRatesOfDay = response;
       console.log(this.exchangeRatesOfDay);
     })
@@ -117,12 +287,39 @@ export class ExchangeRateComponent implements OnInit {
     this.disabled = this._disabledV === '1';
   }
  
-  public selected(value:any):void {
+  public selected(value:any, selectTypeName):void {
+    if(selectTypeName == this.selectTypeName.rateSetting){
+      const checkCurrencyFrom = obj => obj.currencyFromId === value.id;
+      const isExist = this.exchangeRateNewest.exchangeRates.some(checkCurrencyFrom);
+      if(!isExist){
+        this.exchangeRateToAdd.CatCurrencyExchangeRates[this.exchangeRateToAdd.CatCurrencyExchangeRates.length -1].currencyFromId = value.id;
+        this.catCurrencies.splice(this.catCurrencies.findIndex(x => x.id == value.id),1);
+      }
+      console.log(this.exchangeRateToAdd);
+    }
+    if(selectTypeName == this.selectTypeName.fromCurrency){
+      this.convert.fromCurrency = value.id;
+    }
+    if(selectTypeName == this.selectTypeName.toCurrency){
+      this.convert.toCurrency = value.id;
+    }
     console.log('Selected value is: ', value);
   }
  
-  public removed(value:any):void {
-    console.log('Removed value is: ', value);
+  public removed(value: any, selectTypeName):void {
+    if(selectTypeName == this.selectTypeName.rateSetting){
+      let index = this.exchangeRateToAdd.CatCurrencyExchangeRates.findIndex(x => x.currencyFromId == value.id);
+      this.exchangeRateToAdd.CatCurrencyExchangeRates.splice(index, 1);
+      this.getCatCurrencies();
+    }
+    if(selectTypeName == this.selectTypeName.fromCurrency){
+      this.convert.fromCurrency = null;
+      this.rate = null;
+    }
+    if(selectTypeName == this.selectTypeName.toCurrency){
+      this.convert.toCurrency = null;
+      this.rate = null;
+    }
   }
  
   public typed(value:any):void {

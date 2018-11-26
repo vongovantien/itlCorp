@@ -19,5 +19,6 @@ namespace eFMS.API.Catalogue.DL.Models
     {
         public string CurrencyFromId { get; set; }
         public decimal Rate { get; set; }
+        public bool? IsUpdate { get; set; }
     }
 }
