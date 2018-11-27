@@ -10,7 +10,8 @@ export class ExchangeRateComponent implements OnInit {
 
   constructor() {
     this.keepCalendarOpeningWithRange = true;
-    this.selectedrange = {startDate: moment().startOf('month'), endDate: moment().endOf('month')};
+    this.selectedDate = Date.now();
+    this.selectedRange = {startDate: moment().startOf('month'), endDate: moment().endOf('month')};
   }
 
   ngOnInit() {
@@ -19,8 +20,10 @@ export class ExchangeRateComponent implements OnInit {
   /**
    * Daterange picker
    */
-  selectedrange: any;
+  selectedRange: any;
+  selectedDate:any;
   keepCalendarOpeningWithRange: true;
+  maxDate: moment.Moment = moment();
   ranges: any = {
     Today: [moment(), moment()],
     Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -36,6 +39,13 @@ export class ExchangeRateComponent implements OnInit {
         .endOf('month')
     ]
   };
+
+  dateRangeChanged(e) {
+    $('.reset-date').show();
+  }
+  defaultHistory() {
+    this.selectedRange = {startDate: moment().startOf('month'), endDate: moment().endOf('month')};
+  }
 
   /**
    * ng2-select
