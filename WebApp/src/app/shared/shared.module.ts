@@ -17,7 +17,6 @@ import { DeleteConfirmModalComponent } from './common/delete-confirm-modal/delet
 import { API_MENU } from '../../constants/api-menu.const';
 import { PagingService } from './paging-client/paging-client-service';
 import { SearchOptionsComponent } from './common/search-options/search-options.component';
-import { ModifiedModalComponent } from './common/modified-modal/modified-modal.component';
 import { InputFormComponent } from './common/input-form/input-form.component';
 
 @NgModule({
@@ -32,7 +31,6 @@ import { InputFormComponent } from './common/input-form/input-form.component';
     PaginationComponent, 
     DeleteConfirmModalComponent, 
     SearchOptionsComponent, 
-    ModifiedModalComponent, 
     InputFormComponent
     
   ],
@@ -46,7 +44,6 @@ import { InputFormComponent } from './common/input-form/input-form.component';
     PaginationComponent,
     DeleteConfirmModalComponent,
     SearchOptionsComponent,
-    ModifiedModalComponent,
     InputFormComponent
   ],
   providers: [

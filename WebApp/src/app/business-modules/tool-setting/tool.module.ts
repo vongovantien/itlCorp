@@ -10,13 +10,17 @@ import { SupplierComponent } from './supplier/supplier.component';
 import { SharedModule } from '../../shared/shared.module';
 import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
 import { SelectModule } from 'ng2-select';
+import { FormsModule } from '@angular/forms';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 @NgModule({
   imports: [
     CommonModule,
     ToolRoutingModule,
     SharedModule,
-    SelectModule
+    SelectModule,
+    FormsModule, 
+    NgxDaterangepickerMd
   ],
   declarations: [IDDefinitionComponent, TariffComponent, EcusConnectionComponent, KPIComponent, SupplierComponent, ExchangeRateComponent]
 })

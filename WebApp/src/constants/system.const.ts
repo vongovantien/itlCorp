@@ -18,6 +18,7 @@ export class SystemConstants {
     public static readonly AUTH_ISSUER = 'http://localhost:5000';
     public static readonly AUTH_CLIENT_ID = 'eTMS' ;
     public static readonly AUTH_SCOPE = 'openid profile offline_access etms_scope dnt_api';
+    public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
 
     public static CURRENT_USER;
 

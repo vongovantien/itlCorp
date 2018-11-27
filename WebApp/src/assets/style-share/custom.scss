@@ -200,6 +200,17 @@ label {
             }
         }
     }
+    .no-data {
+        padding: 20px;
+        text-align: center;
+        font-size: 16px;
+        i {
+            font-size: 2rem;
+            line-height: 0;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+    }
 }
 .table-actions-col {
     .table-actions {
@@ -591,5 +602,46 @@ table.dataTable thead .sorting_desc {
         color: #3f4858;
         font-size: 14px;
         font-weight: 500;
+    }
+}
+
+//ngx-daterangepicker-material
+.md-drppicker {
+    top: 100% !important;
+    margin-top: 0 !important;
+    &.double {
+        min-width: 500px;
+    }
+    table {
+        th {
+            font-family: inherit;
+            color: inherit !important;
+            font-weight: 500;
+        }
+    }
+    .buttons {
+        width: 100%;
+        float: left;
+        .btn {
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 0;
+            line-height: 30px;
+            text-transform: capitalize;
+            margin-left: 5px;
+        }
+    }
+}
+.daterange-rtl {
+    .md-drppicker {
+        left: auto !important;
+        right: 0 !important;
+        margin-top: 0;
+    }
+}
+.up {
+    .md-drppicker {
+        top: auto !important;
+        bottom: 100%;
     }
 }

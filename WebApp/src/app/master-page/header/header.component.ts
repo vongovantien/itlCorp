@@ -17,7 +17,7 @@ export class HeaderComponent implements OnInit {
 
   
   //minimize sidebar
-  minimize_page_sidebar(index) {
+  minimize_page_sidebar() {
     var bodyElement = document.getElementById('bodyElement');
     var leftMinimizeToggle = document.getElementById('m_aside_left_minimize_toggle');
     if (leftMinimizeToggle.classList.contains('m-brand__toggler--active')) {
