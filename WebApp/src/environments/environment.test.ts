@@ -6,7 +6,7 @@ export const environment = {
     test:true,
     local:false,
     HOST:{
-        WEB_URL:"test.api-efms.itlvn.com/vi",
+        WEB_URL:"test.api-efms.itlvn.com",
         INDENTITY_SERVER_URL:"http://test.api-efms.itlvn.com/indentityserver"
     }
   };   

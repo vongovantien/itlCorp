@@ -67,6 +67,20 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.test.ts"
+                },
+                {
+                  "replace": "src/languages/language.en.ts",
+                  "with": "src/languages/language.vi.ts"
+                }
+              ]
+            },
+            "en":{
+              "aot": true,
+              "outputPath": "dist/eFMS-en/",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.test.ts"
                 }
               ]
             }
@@ -86,6 +100,9 @@
             },
             "vi": {
               "browserTarget": "eFMS-Web:build:vi"
+            },
+            "en": {
+              "browserTarget": "eFMS-Web:build:en"
             }        
           }
         },

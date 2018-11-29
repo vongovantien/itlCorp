@@ -2,6 +2,8 @@ import { Component, OnInit, Output, EventEmitter, AfterViewInit, AfterContentChe
 import * as $ from 'jquery';
 import * as lodash from 'lodash';
 import { Router } from '@angular/router';
+import { BaseService } from 'src/services-base/base.service';
+import {language} from 'src/languages/language.en';
 @Component({
   selector: 'app-page-sidebar',
   templateUrl: './page-sidebar.component.html',
@@ -53,11 +55,17 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }
 
   }
-  constructor(private router: Router) { }
+  constructor(private router: Router,private baseServices:BaseService) { }
 
 
-  ngOnInit() {
-
+  async ngOnInit() {
+    // if(localStorage.getItem("CURRENT_CLIENT_LANGUAGE")==="en"){
+    //   this.Menu = await this.baseServices.getAsync('src/languages/en.json', true, true);
+    // }
+    // if(localStorage.getItem("CURRENT_CLIENT_LANGUAGE")==="vi"){
+    //   this.Menu = await this.baseServices.getAsync('src/languages/vi.json', true, true);
+    // }
+    this.Menu = language.Menu;
   }
 
 

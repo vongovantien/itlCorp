@@ -2,7 +2,7 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template">
     <body>
-      <trans-unit id="dee3a6e83997e54077c1b01b95bad17ce9ba7d92" datatype="html">
+      <trans-unit id="Welcome" datatype="html">
         <source>
                                 <x id="START_HEADING_LEVEL3" ctype="x-h3" equiv-text="&lt;h3&gt;"/>Welcome To Our Site<x id="CLOSE_HEADING_LEVEL3" ctype="x-h3" equiv-text="&lt;/h3&gt;"/>
                             </source>
@@ -10,9 +10,8 @@
           <context context-type="sourcefile">app/login/login.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <note priority="1" from="description">Welcome</note>
       </trans-unit>
-      <trans-unit id="611697b99ab607da4e36db0ebd5cf8b06386a118" datatype="html">
+      <trans-unit id="message" datatype="html">
         <source>
                                 Login your account by filling the <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/>right side  form
                             </source>
@@ -20,7 +19,6 @@
           <context context-type="sourcefile">app/login/login.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <note priority="1" from="description">message</note>
       </trans-unit>
       <trans-unit id="h31" datatype="html">
         <source>Welcome To Our Site</source>

@@ -39,6 +39,7 @@ export class LoginComponent implements OnInit {
     private api_menu: API_MENU,
     private el: ElementRef,
     private router: Router,
+    private route:ActivatedRoute,
     private oauthService: OAuthService,
     private cookieService: CookieService) { }
 
@@ -72,7 +73,7 @@ export class LoginComponent implements OnInit {
       this.rememberMe();
       this.toastr.success("Login successful !");
       this.router.navigateByUrl('/home');
-      this.cookieService.set('login_status', "LOGGED_IN");
+      this.cookieService.set('login_status', "LOGGED_IN",null,"/",window.location.hostname);
     }).catch((err) => {
       console.log(err);
       this.toastr.error(err.error.error_description)
@@ -83,10 +84,10 @@ export class LoginComponent implements OnInit {
   rememberMe() {
     if (this.remember_me) {  
       const userInfo = this.encryptUserInfo(this.username,this.password);
-      this.cookieService.set("_u", userInfo.username_encrypt);
-      this.cookieService.set("_p",userInfo.password_encrypt);
+      this.cookieService.set("_u", userInfo.username_encrypt,null,"/",window.location.hostname);
+      this.cookieService.set("_p",userInfo.password_encrypt,null,"/",location.hostname);
     } else {
-      this.cookieService.deleteAll();
+      this.cookieService.deleteAll("/",window.location.hostname);
     }
   }
 
@@ -159,8 +160,15 @@ public refreshValue(value:any):void {
 }
 
 changeLanguage(lang){
-  console.log(window.location.host);
-  window.location.href= "http://test.efms.itlvn.com/"+lang;
+  
+  console.log(this.route.url);
+  localStorage.setItem("CURRENT_CLIENT_LANGUAGE", lang);
+  if(localStorage.getItem("CURRENT_CLIENT_LANGUAGE")==="en"){
+    window.location.href= window.location.protocol + "//"+ window.location.hostname;
+  }else{
+    window.location.href= window.location.protocol +"//"+ window.location.hostname + "/"+lang +"/";
+  } 
 }
+
  
 }

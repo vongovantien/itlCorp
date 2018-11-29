@@ -27,6 +27,7 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   constructor(private baseService: BaseService,private router: Router,private cdRef:ChangeDetectorRef,private cookieService: CookieService,private oauthService: OAuthService, ) { }
 
    ngOnInit() {
+     console.log(this.cookieService.get("login_status"));
     if(this.cookieService.get("login_status")!=="LOGGED_IN"){
       this.router.navigateByUrl('/login');
     }
@@ -41,7 +42,8 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
 
   logout(){
     this.oauthService.logOut(false);
-    this.cookieService.delete("login_status");
+    // this.cookieService.deleteAll("/",window.location.hostname);
+    this.cookieService.delete("login_status","/",window.location.hostname);
     this.router.navigateByUrl("/login");
   }
 
