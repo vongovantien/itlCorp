@@ -166,16 +166,16 @@
                         </li>
                         <li class="m-nav__item topbar__lang">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)"  data-toggle="dropdown">
-                                <span class="m-topbar__userpic">
-                                    <img alt="" class="m--img-rounded m--marginless m--img-centered" src="assets/app/media/img/lang/en.png" />
+                                <span class="m-topbar__userpic" *ngIf="active_flag">
+                                    <img alt="" class="m--img-rounded m--marginless m--img-centered" [src]="active_flag" />
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
                                     <li class="m-nav__item">
-                                        <a class="m-nav__link active" href="javascript:void(0)" >
-                                            <span class="m-nav__link-icon">  
-                                                <img alt="" class="m--img-rounded m--marginless m--img-centered" src="assets/app/media/img/lang/en.png" />
+                                        <a class="m-nav__link active" href="javascript:void(0)" (click)="changeLanguage('en')">
+                                            <span class="m-nav__link-icon" *ngIf="english_flag">  
+                                                <img alt="" class="m--img-rounded m--marginless m--img-centered" [src]="english_flag" />
                                             </span>
                                             <span class="m-nav__link-text">
                                                 English
@@ -183,9 +183,9 @@
                                         </a>
                                     </li>
                                     <li class="m-nav__item">
-                                        <a class="m-nav__link" href="javascript:void(0)" >
-                                            <span class="m-nav__link-icon">  
-                                                <img alt="" class="m--img-rounded m--marginless m--img-centered" src="assets/app/media/img/lang/vi.png" />
+                                        <a class="m-nav__link" href="javascript:void(0)" (click)="changeLanguage('vi')" >
+                                            <span class="m-nav__link-icon" *ngIf="vietnam_flag">  
+                                                <img alt="" class="m--img-rounded m--marginless m--img-centered" [src]="vietnam_flag" />
                                             </span>
                                             <span class="m-nav__link-text">
                                                 Vietnamese

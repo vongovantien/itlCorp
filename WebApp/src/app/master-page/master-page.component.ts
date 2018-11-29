@@ -6,6 +6,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { CookieService } from 'ngx-cookie-service';
 import { OAuthService } from 'angular-oauth2-oidc';
 
+
 @Component({
   selector: 'app-master-page',
   templateUrl: './master-page.component.html',
@@ -26,8 +27,9 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   constructor(private baseService: BaseService,private router: Router,private cdRef:ChangeDetectorRef,private cookieService: CookieService,private oauthService: OAuthService, ) { }
 
    ngOnInit() {
-    if(this.cookieService.get("login_status")!="LOGGED_IN"){
-      this.router.navigateByUrl('/home');
+     console.log(this.cookieService.get("login_status"));
+    if(this.cookieService.get("login_status")!=="LOGGED_IN"){
+      this.router.navigateByUrl('/login');
     }
     this.cdRef.detectChanges();
   }
@@ -36,6 +38,13 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   MenuChanged(event){
     this.Page_Info = event;      
     this.Component_name = event.children; 
+  }
+
+  logout(){
+    this.oauthService.logOut(false);
+    // this.cookieService.deleteAll("/",window.location.hostname);
+    this.cookieService.delete("login_status","/",window.location.hostname);
+    this.router.navigateByUrl("/login");
   }
 
 

@@ -3,11 +3,11 @@
     <div class="m-login-wrap">
         <div class="lang-nav">
             <span>Language:</span>
-            <a class="btn-link lang-item active" href="javascript:void(0)">
+            <a class="btn-link lang-item active" href="javascript:void(0)" (click)="changeLanguage('vi')">
                 <img alt="" class="m--img-rounded m--marginless m--img-centered" src="assets/app/media/img/lang/vi-login.png">
             </a>
             <a class="btn-link lang-item" href="javascript:void(0)">
-                <img alt="" class="m--img-rounded m--marginless m--img-centered" src="assets/app/media/img/lang/en-login.png">
+                <img alt="" class="m--img-rounded m--marginless m--img-centered" (click)="changeLanguage('en')" src="assets/app/media/img/lang/en-login.png">
             </a>
         </div>
         <div class="m-login m-login--signin" id="m_login">
@@ -18,10 +18,10 @@
                             <div class="m-login__logo">
                                 <img src="assets/app/media/img/logo/logo-login-1.png">
                             </div>
-                            <div class="m-login__title">
+                            <div class="m-login__title" i18n="@@Welcome">
                                 <h3>Welcome To Our Site</h3>
                             </div>
-                            <div class="m-login__desc">
+                            <div class="m-login__desc" i18n="@@message">
                                 Login your account by filling the <br>right side  form
                             </div>
                         </div>
@@ -35,9 +35,9 @@
                             <img src="assets/app/media/img/logo/logo-login.png">
                         </div>
                         <div class="m-login__title">
-                            <h3>Welcome To Our Site</h3>
+                            <h3 i18n="@@h31">Welcome To Our Site</h3>
                         </div>
-                        <div class="m-login__desc">
+                        <div class="m-login__desc" i18n="@@h32">
                             Login your account by filling the form below
                         </div>
                     </div>
@@ -85,20 +85,20 @@
                                 <label class="form-control-label" for="">
                                     Server Name
                                 </label>
-                                <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                <!-- <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                     (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                     placeholder="">
-                                </ng-select>
+                                </ng-select> -->
                                 
                             </div>
                             <div class="form-group">
                                 <label class="form-control-label" for="">
                                     DBMS
                                 </label>
-                                <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                <!-- <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                     (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                     placeholder="">
-                                </ng-select>
+                                </ng-select> -->
                                 
                             </div>
                             <div class="form-group">

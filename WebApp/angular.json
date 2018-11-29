@@ -56,6 +56,33 @@
                   "with": "src/environments/environment.test.ts"
                 }
               ]
+            },
+            "vi":{
+              "aot": true,
+              "outputPath": "dist/eFMS-vi/",
+              "i18nFile": "src/src/locale/messages.vi.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "vi",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.test.ts"
+                },
+                {
+                  "replace": "src/languages/language.en.ts",
+                  "with": "src/languages/language.vi.ts"
+                }
+              ]
+            },
+            "en":{
+              "aot": true,
+              "outputPath": "dist/eFMS-en/",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.test.ts"
+                }
+              ]
             }
           }
         },
@@ -70,7 +97,13 @@
             },
             "test": {
               "browserTarget": "eFMS-Web:build:test"
-            }
+            },
+            "vi": {
+              "browserTarget": "eFMS-Web:build:vi"
+            },
+            "en": {
+              "browserTarget": "eFMS-Web:build:en"
+            }        
           }
         },
         "extract-i18n": {
@@ -84,7 +117,7 @@
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
+            "tsConfig": "src/tsconfig.spec.json",   
             "karmaConfig": "src/karma.conf.js",
             "styles": [
               "src/styles.sass"
