@@ -21,7 +21,8 @@ export const DeleteDefaultButton: ButtonAttributeSetting = {
     titleButton: "Remove",
     classStyle: "btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only",
     //targetModal: "confirm-delete-modal",
-    icon: "la la-trash"
+    icon: "la la-trash",
+    type: "button"
   };
 
 export const ImportDefaultButton: ButtonAttributeSetting = {

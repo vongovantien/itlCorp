@@ -2,6 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Linq;
+using eFMS.API.Catalogue.Service.ViewModels;
+using System.Collections.Generic;
+using eFMS.API.Log.DL.Helpers;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -49,26 +54,21 @@ namespace eFMS.API.Catalogue.Service.Models
         }
         public override int SaveChanges()
         {
-            var modifiedEntities = ChangeTracker.Entries()
-                .Where(p => p.State == EntityState.Modified).ToList();
-            var now = DateTime.UtcNow;
-
-            foreach (var change in modifiedEntities)
+            var entities = ChangeTracker.Entries();
+            var mongoDb = Helpers.MongoDbHelper.GetDatabase();
+            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+            var addedList = ChangeTrackerHelper.GetAdded(entities);
+            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
+            var result = base.SaveChanges();
+            if (result == 1)
             {
-                var entityName = change.Entity.GetType().Name;
-                var properties = change.OriginalValues.Properties;
-                var primaryKey = properties.Where(x => x.IsKey());
-                foreach (var prop in properties)
-                {
-                    var originalValue = change.OriginalValues[prop].ToString();
-                    var currentValue = change.CurrentValues[prop].ToString();
-                    if (originalValue != currentValue)
-                    {
-                    }
-                }
+                ChangeTrackerHelper.InsertToMongoDb(addedList, EntityState.Added);
+                ChangeTrackerHelper.InsertToMongoDb(modifiedList, EntityState.Modified);
+                ChangeTrackerHelper.InsertToMongoDb(deletedList, EntityState.Deleted);
             }
-            return base.SaveChanges();
+            return result;
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CatArea>(entity =>

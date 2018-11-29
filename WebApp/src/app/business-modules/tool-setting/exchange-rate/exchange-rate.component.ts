@@ -12,8 +12,9 @@ import { ToastrService } from 'ngx-toastr';
 import { SelectComponent } from 'ng2-select';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { moment } from 'ngx-bootstrap/chronos/test/chain';
+//import { moment } from 'ngx-bootstrap/chronos/test/chain';
 declare var $:any;
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-exchange-rate',
@@ -59,11 +60,8 @@ export class ExchangeRateComponent implements OnInit {
     rateSetting: 'rateSetting',
     fromCurrency: 'fromCurrency',
     toCurrency: 'toCurrency'
-  }
-  deleteButtonSetting: ButtonModalSetting = {
-    dataTarget: "confirm-delete-modal",
-    typeButton: ButtonType.delete
   };
+  titleConfirmDelete = "You want to delete this currency?";
   convertDate: any;
   convert: any = {
     selectedRangeDate: null,
@@ -71,6 +69,26 @@ export class ExchangeRateComponent implements OnInit {
     toCurrency: null
   }
   isAllowUpdateRate: boolean = false;
+   /**
+  /**
+   * Daterange picker
+   */
+  ranges: any = {
+    Today: [moment(), moment()],
+    Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+    'This Month': [moment().startOf('month'), moment().endOf('month')],
+    'Last Month': [
+      moment()
+        .subtract(1, 'month')
+        .startOf('month'),
+      moment()
+        .subtract(1, 'month')
+        .endOf('month')
+    ]
+  };
+
   @ViewChild('currencyRateSelect') public ngSelectCurrencyRate: SelectComponent;
 
   constructor(private spinnerService: Ng4LoadingSpinnerService,
@@ -138,16 +156,23 @@ export class ExchangeRateComponent implements OnInit {
     }
   }
   async saveNewRate(){
-    if(this.exchangeRateToAdd.CatCurrencyExchangeRates.length > 0){
-      await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
-      $('#setting-exchange-rate-modal').modal('hide');
-      this.ngSelectCurrencyRate.active = [];
-      this.getExchangeNewest();
-      this.exchangeRateToAdd = {
-        currencyToId: this.localCurrency,
-        CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
-        userModified: ''
-      };
+    let index = this.exchangeRateToAdd.CatCurrencyExchangeRates.findIndex(x => x.currencyFromId == null);
+    if(index < 0){
+      if(this.exchangeRateToAdd.CatCurrencyExchangeRates.length > 0){
+        this.exchangeRateNewest.exchangeRates.forEach(element => {
+          this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.rate, isUpdate : false });
+        });
+        await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
+        $('#setting-exchange-rate-modal').modal('hide');
+        this.ngSelectCurrencyRate.active = [];
+        this.getExchangeNewest();
+        this.getExchangeRates(this.pager);
+        this.exchangeRateToAdd = {
+          currencyToId: this.localCurrency,
+          CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
+          userModified: ''
+        };
+      }
     }
     else{
       this.toastr.warning("Please select currency to add new Rate");
@@ -329,4 +354,5 @@ export class ExchangeRateComponent implements OnInit {
   public refreshValue(value:any):void {
     this.value = value;
   }
+
 }

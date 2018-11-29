@@ -161,21 +161,27 @@
                                     </button>
                                 </div>
                             </div>
-                        </form>
-                        <hr>
-                        <div class="form-group" *ngIf="rate">
-                            <label class="form-control-label" for="">
-                                Date: <span class="m--font-primary">{{ convert.selectedRangeDate.startDate | date: 'MMMM dd. yyyy'}}</span>
-                            </label>
-                            <div class="border m--padding-10 bg-secondary" *ngIf="convert.fromCurrency && convert.toCurrency">
-                                <ng-container>
-                                    <span>({{ convert.fromCurrency }})</span>&nbsp;
-                                    <span>=</span>&nbsp;
-                                    <span *ngIf="rate">{{ rate.rate  | currency : "" : '' }}</span>&nbsp;
-                                    <span>({{ convert.toCurrency }})</span>
-                                </ng-container>
+                        
+                            <hr>
+                            <div class="form-group" *ngIf="rate">
+                                <label class="form-control-label" for="">
+                                    Date: <span class="m--font-primary">{{ convert.selectedRangeDate.startDate | date: 'MMMM dd. yyyy'}}</span>
+                                </label>
+                                <div class="border m--padding-10 bg-secondary" *ngIf="convert.fromCurrency && convert.toCurrency">
+                                    <ng-container>
+                                        <span>({{ convert.fromCurrency }})</span>&nbsp;
+                                        <span>=</span>&nbsp;
+                                        <span *ngIf="rate">{{ rate.rate  | currency : "" : '' }}</span>&nbsp;
+                                        <span>({{ convert.toCurrency }})</span>
+                                    </ng-container>
+                                </div>
                             </div>
-                        </div>
+                            <div class="form-group" *ngIf="rate == null && formConvertRate.submitted ">
+                                <label class="form-control-label" for="">
+                                    <span class="m--font-primary">No rates found</span>
+                                </label>
+                            </div>
+                        </form>
                     </div>
                     <!--end::Form-->
                 </div>
@@ -204,6 +210,8 @@
                                 <input type="text" class="form-control m-input m-input--square"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                 [(ngModel)]="selectedrange"
+                                [ranges]="ranges"
+                                [alwaysShowCalendars]="true"
                                 name="daterange" placeholder="From date - to date" readonly/>
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
@@ -314,11 +322,10 @@
                                 <tr>
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
-                                            <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDeleteRate()">
                                                 <i class="la la-trash"></i>
-                                            </button> -->
-                                            <app-default-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="confirmDeleteRate(record)"></app-default-button>
+                                            </button>
                                         </div>
                                     </td>
                                     <td>
@@ -329,11 +336,10 @@
                             <tr *ngFor="let item of exchangeRateToAdd.CatCurrencyExchangeRates; let j = index">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="" data-toggle="modal" (click)="removeNewRate(j)">
                                             <i class="la la-trash"></i>
-                                        </button> -->
-                                        <app-default-button [buttonSetting]="deleteButtonSetting" (click)="confirmDeleteRate(record)"></app-default-button>
+                                        </button>
                                     </div>
                                 </td>
                                 <td>
@@ -374,6 +380,11 @@
     </div>
 </div>
 <!--end::setting-exchange-rate-modal-->
+
+<!--begin::confirm-delete-modal-->
+
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
+<!--end::confirm-delete-modal-->
 
 <!--begin::detail-history-modal-->
 <div class="modal fade" id="detail-history-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
@@ -437,4 +448,3 @@
     </div>
 </div>
 <!--end::detail-history-modal-->
-<!-- <app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal> -->

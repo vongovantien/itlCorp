@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalogue.DL.Helpers;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
@@ -13,29 +13,29 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCurrencyService : RepositoryBase<CatCurrency, CatCurrencyModel>, ICatCurrencyService
     {
-        private readonly IMongoDatabase mongodb;
         public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper) : base(repository, mapper)
         {
-            mongodb = MongoDbHelper.GetDatabase();
             SetChildren<CatCharge>("Id", "CurrencyId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyToId");
         }
 
-        public HandleState AddNew(CatCurrencyModel model)
+        public override HandleState Add(CatCurrencyModel model)
         {
-            var result = Add(model);
-            if (result.Success)
-            {
-                MongoDbHelper.Insert("catCurrency", new { id = Guid.NewGuid(), currency = model, actionType = Crud.Insert, DatetimeModified = DateTime.Now });
-            }
+            var entity = mapper.Map<CatCurrency>(model);
+            var result = DataContext.Add(entity, true);
             return result;
+        }
+        public HandleState Delete(string id, string currentUser)
+        {
+            ChangeTrackerHelper.currentUser = currentUser;
+            return DataContext.Delete(x => x.Id == id);
         }
 
         public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
@@ -74,7 +74,6 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Update(CatCurrencyModel model)
         {
             var result = Update(model, x => x.Id == model.Id);
-            MongoDbHelper.Insert("catCurrency", new { id = Guid.NewGuid(), currency = model, actionType = Crud.Update, DatetimeModified = DateTime.Now });
             if (result.Success)
             {
                 if (model.IsDefault)
@@ -84,7 +83,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         item.IsDefault = false;
                         DataContext.DC.Update(item);
-                        MongoDbHelper.Insert("catCurrency", new { id = Guid.NewGuid(), currency = item, actionType = Crud.Update, DatetimeModified = DateTime.Now });
                     }
                     ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }

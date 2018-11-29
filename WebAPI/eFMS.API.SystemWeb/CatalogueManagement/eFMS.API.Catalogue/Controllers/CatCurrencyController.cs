@@ -70,7 +70,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Post(CatCurrencyModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -80,7 +80,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserCreated = "01";//currentUser.UserID;
+            catCurrencyModel.UserCreated = currentUser.UserID;
             catCurrencyModel.DatetimeCreated = DateTime.Now;
             catCurrencyModel.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -96,7 +96,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Put(CatCurrencyModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -106,7 +106,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserModified = "01";//currentUser.UserID;
+            catCurrencyModel.UserModified = currentUser.UserID;
             catCurrencyModel.DatetimeModified = DateTime.Now;         
             if(catCurrencyModel.Inactive == true)
             {
@@ -127,7 +127,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(string id)
         {
-            var hs = catCurrencyService.Delete(x => x.Id == id);
+            var hs = catCurrencyService.Delete(id, currentUser.UserID);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
