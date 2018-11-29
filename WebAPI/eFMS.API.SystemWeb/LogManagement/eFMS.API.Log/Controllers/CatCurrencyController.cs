@@ -28,12 +28,11 @@ namespace eFMS.API.Log.Controllers
         //    return Ok(results);
         //}
         [HttpGet]
-        public IEnumerable<CatCurrency> GetAllNotes()
+        public async Task<IEnumerable<CatCurrency>> Get()
         {
             try
             {
-                var result = catCurrencyService.Get();
-                return result;
+                return await catCurrencyService.GetAll();
             }
             catch (Exception ex)
             {
