@@ -73,7 +73,7 @@ export class CurrencyComponent implements OnInit {
     this.spinnerService.show();
     this.baseService.post(this.api_menu.Catalogue.Currency.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.spinnerService.hide();
-      this.currencies = response.data.map(x=>Object.assign({},x));
+      this.currencies = response.data;
       this.pager.totalItems = response.totalItems;
     });
   }

@@ -8,7 +8,7 @@ namespace eFMS.API.Catalogue.DL.ViewModels
     {
         public DateTime? DatetimeCreated { get; set; }
         public string LocalCurrency { get; set; }
-        public string UserCreated { get; set; }
+        public string UserModifield { get; set; }
         public DateTime? DatetimeUpdated{ get; set; }
     }
 }

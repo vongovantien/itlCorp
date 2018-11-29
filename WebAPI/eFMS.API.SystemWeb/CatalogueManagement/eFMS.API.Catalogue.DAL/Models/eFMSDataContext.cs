@@ -1,6 +1,12 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Linq;
+using eFMS.API.Catalogue.Service.ViewModels;
+using System.Collections.Generic;
+using eFMS.API.Log.DL.Helpers;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -45,6 +51,22 @@ namespace eFMS.API.Catalogue.Service.Models
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
             }
+        }
+        public override int SaveChanges()
+        {
+            var entities = ChangeTracker.Entries();
+            var mongoDb = Helpers.MongoDbHelper.GetDatabase();
+            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+            var addedList = ChangeTrackerHelper.GetAdded(entities);
+            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
+            var result = base.SaveChanges();
+            if (result == 1)
+            {
+                ChangeTrackerHelper.InsertToMongoDb(addedList, EntityState.Added);
+                ChangeTrackerHelper.InsertToMongoDb(modifiedList, EntityState.Modified);
+                ChangeTrackerHelper.InsertToMongoDb(deletedList, EntityState.Deleted);
+            }
+            return result;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

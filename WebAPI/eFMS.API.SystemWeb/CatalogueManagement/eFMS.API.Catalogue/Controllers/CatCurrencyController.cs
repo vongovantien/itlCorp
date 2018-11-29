@@ -47,7 +47,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAll")]
         public IActionResult Get()
         {
-            var data = catCurrencyService.Get();
+            var data = catCurrencyService.Get().OrderBy(x => x.CurrencyName);
             return Ok(data);
         }
 
@@ -127,7 +127,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(string id)
         {
-            var hs = catCurrencyService.Delete(x => x.Id == id);
+            var hs = catCurrencyService.Delete(id, currentUser.UserID);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
