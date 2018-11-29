@@ -355,4 +355,8 @@ export class ExchangeRateComponent implements OnInit {
     this.value = value;
   }
 
+  onDelete(event){
+    
+  }
+
 }
