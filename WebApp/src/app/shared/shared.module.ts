@@ -17,7 +17,6 @@ import { DeleteConfirmModalComponent } from './common/delete-confirm-modal/delet
 import { API_MENU } from '../../constants/api-menu.const';
 import { PagingService } from './paging-client/paging-client-service';
 import { SearchOptionsComponent } from './common/search-options/search-options.component';
-import { ModifiedModalComponent } from './common/modified-modal/modified-modal.component';
 import { InputFormComponent } from './common/input-form/input-form.component';
 import { TableDetailComponent } from './common/table-detail/table-detail.component';
 import { CloseModalButtonComponent } from './common/close-modal-button/close-modal-button.component';
@@ -34,7 +33,6 @@ import { CloseModalButtonComponent } from './common/close-modal-button/close-mod
     PaginationComponent, 
     DeleteConfirmModalComponent, 
     SearchOptionsComponent, 
-    ModifiedModalComponent, 
     InputFormComponent, 
     TableDetailComponent, 
     CloseModalButtonComponent
@@ -50,7 +48,6 @@ import { CloseModalButtonComponent } from './common/close-modal-button/close-mod
     PaginationComponent,
     DeleteConfirmModalComponent,
     SearchOptionsComponent,
-    ModifiedModalComponent,
     InputFormComponent,
     TableDetailComponent,
     CloseModalButtonComponent
