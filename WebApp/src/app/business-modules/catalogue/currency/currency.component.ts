@@ -10,7 +10,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { SystemConstants } from 'src/constants/system.const';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';

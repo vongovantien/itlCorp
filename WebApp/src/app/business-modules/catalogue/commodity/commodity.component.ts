@@ -4,7 +4,6 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { CommodityGroup } from 'src/app/shared/models/catalogue/commonity-group.model';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { COMMODITYGROUPCOLUMNSETTING } from './commonity-group.column';
@@ -12,7 +11,6 @@ import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
@@ -95,7 +93,6 @@ export class CommodityComponent implements OnInit {
 
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 

@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import * as lodash from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
@@ -11,7 +9,6 @@ import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import * as dataHelper from 'src/helper/data.helper';
-import { from } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -113,8 +110,6 @@ export class LocationComponent implements OnInit {
 
   constructor(
     private baseServices: BaseService,
-    private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using System.Linq;
 using eFMS.API.Catalogue.Service.ViewModels;
 using System.Collections.Generic;
-using eFMS.API.Log.DL.Helpers;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using eFMS.API.Catalogue.Service.Helpers;
 

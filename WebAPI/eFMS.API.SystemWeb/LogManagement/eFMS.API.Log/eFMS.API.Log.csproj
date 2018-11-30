@@ -51,12 +51,6 @@
     <Reference Include="eFMS.API.Log.Service">
       <HintPath>..\bin\netcoreapp2.1\eFMS.API.Log.Service.dll</HintPath>
     </Reference>
-    <Reference Include="eFMS.API.System.DL">
-      <HintPath>..\bin\netcoreapp2.1\eFMS.API.System.DL.dll</HintPath>
-    </Reference>
-    <Reference Include="eFMS.API.System.Service">
-      <HintPath>..\bin\netcoreapp2.1\eFMS.API.System.Service.dll</HintPath>
-    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
     </Reference>

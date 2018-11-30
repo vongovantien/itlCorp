@@ -7,7 +7,6 @@ import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
@@ -29,8 +28,7 @@ export class AllPartnerComponent implements OnInit {
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<Partner>();
-  constructor(private baseService: BaseService,
-    private toastr: ToastrService, 
+  constructor(private baseService: BaseService, 
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }

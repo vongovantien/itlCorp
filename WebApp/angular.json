@@ -58,7 +58,15 @@
               ]
             },
             "vi":{
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
               "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
               "outputPath": "dist/eFMS-vi/",
               "i18nFile": "src/src/locale/messages.vi.xlf",
               "i18nFormat": "xlf",
@@ -75,7 +83,15 @@
               ]
             },
             "en":{
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
               "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
               "outputPath": "dist/eFMS-en/",
               "fileReplacements": [
                 {

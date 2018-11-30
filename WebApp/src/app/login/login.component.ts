@@ -1,30 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import * as lodash from 'lodash';
-import { BaseService } from 'src/services-base/base.service';
+import { Component, OnInit} from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
-import { API_MENU } from 'src/constants/api-menu.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from '@angular/forms';
-import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import * as dataHelper from 'src/helper/data.helper';
-import { from } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
-import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
-import { reserveSlots } from '@angular/core/src/render3/instructions';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { async } from 'rxjs/internal/scheduler/async';
 import { CookieService } from 'ngx-cookie-service';
-import { toBase64String } from '@angular/compiler/src/output/source_map';
 import * as crypto_js from 'crypto-js';
 import * as CryptoJS from 'crypto-js';
-import { environment } from 'src/environments/environment';
-import { url } from 'inspector';
-// import {DataHelper} from 'src/helper/data.helper';
-declare var $: any;
+
 
 @Component({
   selector: 'app-login',
@@ -33,13 +15,8 @@ declare var $: any;
 })
 export class LoginComponent implements OnInit {
   constructor(
-    private baseServices: BaseService,
     private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
-    private api_menu: API_MENU,
-    private el: ElementRef,
     private router: Router,
-    private route:ActivatedRoute,
     private oauthService: OAuthService,
     private cookieService: CookieService) { }
 
@@ -55,8 +32,7 @@ export class LoginComponent implements OnInit {
     this.getLoginData();
   }
 
-  checkLogin() {
-    console.log({ TOKEN: this.oauthService.getAccessToken() })
+  checkLogin() {    
     if (this.oauthService.getAccessToken() != null) {     
       this.router.navigateByUrl('/home');
     } else {
@@ -69,13 +45,12 @@ export class LoginComponent implements OnInit {
       return this.oauthService.loadUserProfile();
     }).then(() => {
       let claims = this.oauthService.getIdentityClaims();
-      if (claims) console.log(claims);      
+      if (claims)   
       this.rememberMe();
       this.toastr.success("Login successful !");
       this.router.navigateByUrl('/home');
       this.cookieService.set('login_status', "LOGGED_IN",null,"/",window.location.hostname);
-    }).catch((err) => {
-      console.log(err);
+    }).catch((err) => {  
       this.toastr.error(err.error.error_description)
     })
   }
@@ -159,11 +134,9 @@ public refreshValue(value:any):void {
   this.value = value;
 }
 
-changeLanguage(lang){
-  
-  console.log(this.route.url);
-  localStorage.setItem("CURRENT_CLIENT_LANGUAGE", lang);
-  if(localStorage.getItem("CURRENT_CLIENT_LANGUAGE")==="en"){
+changeLanguage(lang){  
+  localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, lang);
+  if(localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE)==="en"){
     window.location.href= window.location.protocol + "//"+ window.location.hostname;
   }else{
     window.location.href= window.location.protocol +"//"+ window.location.hostname + "/"+lang +"/";

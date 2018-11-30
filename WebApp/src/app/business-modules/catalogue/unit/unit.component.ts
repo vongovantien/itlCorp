@@ -1,19 +1,10 @@
-import { Component, OnInit, ViewChild,ElementRef } from '@angular/core';
-import * as lodash from 'lodash';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
-import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import * as dataHelper from 'src/helper/data.helper';
-import { from } from 'rxjs';
-import { SystemConstants } from 'src/constants/system.const';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
-import { reserveSlots } from '@angular/core/src/render3/instructions';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 // import {DataHelper} from 'src/helper/data.helper';
@@ -42,10 +33,7 @@ export class UnitComponent implements OnInit {
 
   constructor(
     private baseServices: BaseService,
-    private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
-    private el:ElementRef,
     private sortService: SortService) { }
 
   async ngOnInit() {

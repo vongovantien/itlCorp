@@ -1,12 +1,6 @@
-﻿using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.DependencyInjection;
-using eFMS.API.System.Service.Contexts;
-using Microsoft.Extensions.Localization;
-using LocalizationCultureCore.StringLocalizer;
-using eFMS.API.System.DL.IService;
-using eFMS.API.System.DL.Services;
+﻿using eFMS.API.Log.DL.IService;
 using eFMS.API.Log.DL.Services;
-using eFMS.API.Log.DL.IService;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace eFMS.API.System.Infrastructure
 {

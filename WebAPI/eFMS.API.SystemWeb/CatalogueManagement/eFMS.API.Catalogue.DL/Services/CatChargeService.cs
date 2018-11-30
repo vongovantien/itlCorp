@@ -109,7 +109,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var unit = ((eFMSDataContext)DataContext.DC).CatUnit.Where(x => x.Id == charge.UnitId).FirstOrDefault();
                 //var listServices = charge.ServiceTypeId.Split(";");
                 var chargeDefaultAccounts = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == charge.Id).ToList();
-                var obj = new { currency = currency.Id, unit = unit.Code, charge, chargeDefaultAccounts };
+                var obj = new { currency = currency?.Id, unit = unit?.Code, charge, chargeDefaultAccounts };
                 listReturn.Add(obj);
             }
             
