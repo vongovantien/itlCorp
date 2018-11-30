@@ -12,6 +12,7 @@ import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
 import { SelectModule } from 'ng2-select';
 import { FormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { LogViewerComponent } from './log-viewer/log-viewer.component';
 
 @NgModule({
   imports: [
@@ -22,6 +23,6 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
     FormsModule, 
     NgxDaterangepickerMd
   ],
-  declarations: [IDDefinitionComponent, TariffComponent, EcusConnectionComponent, KPIComponent, SupplierComponent, ExchangeRateComponent]
+  declarations: [IDDefinitionComponent, TariffComponent, EcusConnectionComponent, KPIComponent, SupplierComponent, ExchangeRateComponent, LogViewerComponent]
 })
 export class ToolModule { }

@@ -154,7 +154,7 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
         { name: "Ecus Connection", route_child: "ecus-connection" },
         { name: "KPI", route_child: "kpi" },
         { name: "Supplier", route_child: "supplier" },
-
+        { name: "Log Viewer", route_child: "log-viewer" }
       ]
     },
     //Report Module

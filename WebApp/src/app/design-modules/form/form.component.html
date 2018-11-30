@@ -194,10 +194,14 @@
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square"
+                                    (ngModelChange)="dateRangeChanged($event)"
                                     ngxDaterangepickerMd
-                                    [(ngModel)]="selectedrange"
-                                    [opens]="center"
-                                    name="daterange" placeholder="From date - to date" readonly/>
+                                    [(ngModel)]="selectedRange"
+                                    [ranges]="ranges"
+                                    [maxDate]="maxDate"
+                                    [alwaysShowCalendars]="true"
+                                    name="daterange" 
+                                    placeholder="From date - to date" readonly/>
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
