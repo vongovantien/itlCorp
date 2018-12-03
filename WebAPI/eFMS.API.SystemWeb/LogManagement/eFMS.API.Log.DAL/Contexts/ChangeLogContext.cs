@@ -24,5 +24,61 @@ namespace eFMS.API.Log.Service.Contexts
                 return _database.GetCollection<CatCurrency>("CatCurrency");
             }
         }
+        public IMongoCollection<CatCurrencyExchange> CatCurrencyExchanges
+        {
+            get
+            {
+                return _database.GetCollection<CatCurrencyExchange>("CatCurrencyExchange");
+            }
+        }
+        public IMongoCollection<CatCharge> CatCatCharges
+        {
+            get
+            {
+                return _database.GetCollection<CatCharge>("CatCharge");
+            }
+        }
+        public IMongoCollection<CatChargeDefaultAccount> CatChargeDefaultAccounts
+        {
+            get
+            {
+                return _database.GetCollection<CatChargeDefaultAccount>("CatChargeDefaultAccount");
+            }
+        }
+        public IMongoCollection<CatCommodityGroup> CatCommodityGroups
+        {
+            get
+            {
+                return _database.GetCollection<CatCommodityGroup>("CatCommodityGroup");
+            }
+        }
+        public IMongoCollection<CatCommodity> CatCommodities
+        {
+            get
+            {
+                return _database.GetCollection<CatCommodity>("CatCommodity");
+            }
+        }
+        public IMongoCollection<CatCountry> CatCountries
+        {
+            get
+            {
+                return _database.GetCollection<CatCountry>("CatCountry");
+            }
+        }
+        public IMongoCollection<CatPartner> CatPartners
+        {
+            get
+            {
+                return _database.GetCollection<CatPartner>("CatPartner");
+            }
+        }
+        public IMongoCollection<CatPlace> CatPlaces
+        {
+            get
+            {
+                return _database.GetCollection<CatPlace>("CatPlace");
+            }
+        }
     }
 }
