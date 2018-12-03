@@ -5,10 +5,8 @@ import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import * as crypto_js from 'crypto-js';
-import * as CryptoJS from 'crypto-js';
+// import * as CryptoJS from 'crypto-js';
 import { NgForm } from '@angular/forms';
-import { formArrayNameProvider } from '@angular/forms/src/directives/reactive_directives/form_group_name';
-
 
 @Component({
   selector: 'app-login',
@@ -85,14 +83,14 @@ export class LoginComponent implements OnInit {
   getUserName(){
     const username_encypt = this.cookieService.get("_u");
     const bytes = crypto_js.AES.decrypt(username_encypt,SystemConstants.SECRET_KEY);
-    const username = bytes.toString(CryptoJS.enc.Utf8);
+    const username = bytes.toString(crypto_js.enc.Utf8);
     return username;
   }
 
   getUserPassword(){
     const pass_encypt = this.cookieService.get("_p");
     const bytes = crypto_js.AES.decrypt(pass_encypt,SystemConstants.SECRET_KEY);
-    const password = bytes.toString(CryptoJS.enc.Utf8);
+    const password = bytes.toString(crypto_js.enc.Utf8);
     return password;
   }
 
