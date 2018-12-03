@@ -78,6 +78,23 @@ namespace eFMS.API.Log.DL.Services
             return result;
         }
 
+        public List<CategoryCollectionModel> GetCollectionName()
+        {
+            List<CategoryCollectionModel> collections = new List<CategoryCollectionModel>
+            {
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatCharge, Name = "CatCharge" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatChargeDefaultAccount, Name = "CatChargeDefaultAccount" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatCommonityGroup, Name = "CatCommonityGroup" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatCommodity, Name = "CatCommodity"},
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatCountry, Name = "CatCountry" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatCurrency, Name = "CatCurrency" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatPartner, Name = "CatPartner" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatPlace, Name = "CatPlace" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatStage, Name = "CatStage" },
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatUnit, Name = "CatUnit" }
+            };
+            return collections;
+        }
         private IEnumerable<LogModel> PagingCatCommonityGroup(string query, int page, int size, out long rowsCount)
         {
             Expression<Func<CatCommodityGroup, bool>> groupCommodityEx = x => x.NewObject.GroupNameEn.Contains(query ?? "");
@@ -271,5 +288,6 @@ namespace eFMS.API.Log.DL.Services
             });
             return data;
         }
+
     }
 }

@@ -19,6 +19,7 @@ namespace eFMS.API.Log.Controllers
         {
             catLogService = service;
         }
+
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(CategoryCriteria categoryCriteria, int page, int size)
@@ -34,6 +35,14 @@ namespace eFMS.API.Log.Controllers
                 // log or manage the exception
                 throw ex;
             }
+        }
+
+        [HttpGet]
+        [Route("GetCategory")]
+        public IActionResult GetCategory()
+        {
+            var data = catLogService.GetCollectionName();
+            return Ok(data);
         }
     }
 }
