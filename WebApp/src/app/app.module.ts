@@ -51,8 +51,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ToastrModule.forRoot(), // ToastrModule added
     Ng4LoadingSpinnerModule.forRoot(),
     Daterangepicker,
-    PerfectScrollbarModule,
-    SelectModule // Scrollbar
+    PerfectScrollbarModule, // Scrollbar
+    SelectModule 
   ],
   providers: [
     BaseService,
