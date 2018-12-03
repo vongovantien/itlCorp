@@ -6,6 +6,8 @@ import { OAuthService } from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import * as crypto_js from 'crypto-js';
 import * as CryptoJS from 'crypto-js';
+import { NgForm } from '@angular/forms';
+import { formArrayNameProvider } from '@angular/forms/src/directives/reactive_directives/form_group_name';
 
 
 @Component({
@@ -40,19 +42,21 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  Login() {
-    this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
-      return this.oauthService.loadUserProfile();
-    }).then(() => {
-      let claims = this.oauthService.getIdentityClaims();
-      if (claims)   
-      this.rememberMe();
-      this.toastr.success("Login successful !");
-      this.router.navigateByUrl('/home');
-      this.cookieService.set('login_status', "LOGGED_IN",null,"/",window.location.hostname);
-    }).catch((err) => {  
-      this.toastr.error(err.error.error_description)
-    })
+  Login(form:NgForm) {
+    if(form.form.status!=="INVALID"){
+      this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
+        return this.oauthService.loadUserProfile();
+      }).then(() => {
+        let claims = this.oauthService.getIdentityClaims();
+        if (claims)   
+        this.rememberMe();
+        // this.toastr.success("Login successful !");
+        this.router.navigateByUrl('/home');
+        this.cookieService.set('login_status', "LOGGED_IN",null,"/",window.location.hostname);
+      }).catch((err) => {  
+        this.toastr.error(err.error.error_description)
+      })
+    } 
   }
 
 

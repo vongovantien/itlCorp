@@ -22,7 +22,7 @@ export class UnitComponent implements OnInit {
   selectedUnitFilter = this.listUnitFilter[0].filter;
   pager: PagerSetting = PAGINGSETTING;
   searchKey:string = "";
-  ListUnits:any=[];
+  ListUnits:any=[]; 
   UnitToAdd:CatUnitModel = new CatUnitModel();
   UnitToUpdate:CatUnitModel = new CatUnitModel();
   idUnitToUpdate:any= "";
