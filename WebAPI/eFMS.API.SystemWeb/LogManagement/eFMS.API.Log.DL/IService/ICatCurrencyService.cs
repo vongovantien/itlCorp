@@ -1,4 +1,5 @@
-﻿using eFMS.API.Log.Service.Models;
+﻿using eFMS.API.Log.DL.Models;
+using eFMS.API.Log.Service.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,11 +9,9 @@ namespace eFMS.API.Log.DL.IService
 {
     public interface ICatCurrencyService
     {
-        Task<IEnumerable<CatCurrency>> GetAll();
         IEnumerable<CatCurrency> Get();
-        Task<CatCurrency> GetAsync(Guid id);
-        Task Add(CatCurrency item);
-        Task<bool> Remove(Guid id);
-        Task<bool> Update(CatCurrency item);
+        List<LogModel> Paging(string query, int page, int size, out long rowsCount);
+        CatCurrency Get(Guid id);
+        bool Remove(Guid id);
     }
 }

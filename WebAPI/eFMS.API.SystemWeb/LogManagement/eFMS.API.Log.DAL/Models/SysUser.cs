@@ -1,21 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Log.Service.Models
 {
-    public class CatCurrency
-    {
-        public Guid Id { get; set; }
-        public PropertyCommon PropertyCommon { get; set; }
-        public CatCurrencyEntity NewObject { get; set; }
-    }
-    public class CatCurrencyEntity
+    public partial class SysUser
     {
         public string Id { get; set; }
-        public string CurrencyName { get; set; }
-        public bool IsDefault { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public short UserGroupId { get; set; }
+        public string EmployeeId { get; set; }
+        public Guid WorkPlaceId { get; set; }
+        public bool? RefuseEmail { get; set; }
+        public Guid? LdapObjectGuid { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

@@ -16,12 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\CatCurrencyController.cs" />
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 

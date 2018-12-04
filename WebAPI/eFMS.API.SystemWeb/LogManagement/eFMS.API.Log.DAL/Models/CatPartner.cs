@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.Catalogue.Service.Models
+namespace eFMS.API.Log.Service.Models
 {
-    public partial class CatPartner
+    public class CatPartner
     {
-        public CatPartner()
-        {
-            //CatPartnerContact = new HashSet<CatPartnerContact>();
-        }
-
+        public Guid Id { get; set; }
+        public PropertyCommon PropertyCommon { get; set; }
+        public CatPartnerEntity NewObject { get; set; }
+    }
+    public class CatPartnerEntity
+    {
         public string Id { get; set; }
         public string PartnerGroup { get; set; }
         public string PartnerNameVn { get; set; }
@@ -63,7 +65,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
         public Guid? WorkPlaceId { get; set; }
-
-        //public ICollection<CatPartnerContact> CatPartnerContact { get; set; }
     }
 }

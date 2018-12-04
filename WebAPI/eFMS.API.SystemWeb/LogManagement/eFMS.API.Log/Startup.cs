@@ -123,13 +123,13 @@ namespace SystemManagementAPI
                                 Description = "eFMS System API Document"
                             });
                     }
-                    //options.DocumentFilter<SwaggerAddEnumDescriptions>();
+                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
 
                     options.AddSecurityDefinition("oauth2", new OAuth2Scheme
                     {
                         Flow = "implicit", // just get token via browser (suitable for swagger SPA)
                         AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Mobile API" } }
+                        Scopes = new Dictionary<string, string> { { "apilog", "Log API" } }
                     });
 
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
