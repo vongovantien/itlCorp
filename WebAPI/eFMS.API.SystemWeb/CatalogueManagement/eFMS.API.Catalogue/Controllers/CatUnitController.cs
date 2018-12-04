@@ -9,6 +9,7 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -86,7 +87,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
-            return Ok(result);
+            return Ok(result);  
         }
 
         [HttpPut]

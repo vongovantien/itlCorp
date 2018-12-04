@@ -11,6 +11,8 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -29,13 +31,15 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeService catChargeService;
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
 
-        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, ICatChargeDefaultAccountService catChargeDefaultAccount, IMapper imapper)
+        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, ICatChargeDefaultAccountService catChargeDefaultAccount, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catChargeService = service;
             catChargeDefaultAccountService = catChargeDefaultAccount;
             mapper = imapper;
+            currentUser = user;
         }
 
         [HttpPost]

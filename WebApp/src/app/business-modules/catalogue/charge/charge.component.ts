@@ -1,22 +1,12 @@
-import { Component, OnInit, ViewChild,ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import * as lodash from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from '@angular/forms';
-import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
-import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
-import {CatCharge} from 'src/app/shared/models/catalogue/catCharge.model';
-import {CatChargeDefaultAccount} from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
-import * as dataHelper from 'src/helper/data.helper';
-import { from } from 'rxjs';
-import { SystemConstants } from 'src/constants/system.const';
-import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
-import { reserveSlots } from '@angular/core/src/render3/instructions';
 import { Router } from '@angular/router';
+import { SortService } from 'src/app/shared/services/sort.service';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -29,23 +19,16 @@ export class ChargeComponent implements OnInit {
 
   constructor(
     private baseServices: BaseService,
-    private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
-    private el:ElementRef,
-    private router:Router) { }
+    private router:Router,
+    private sortService: SortService) { }
 
     listFilter = [
       { filter: "All", field: "all" }, { filter: "Code", field: "code" },
       { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
     selectedFilter = this.listFilter[0].filter;
 
-    pager: PagerSetting = {
-      currentPage: 1,
-      pageSize: 3,
-      numberToShow: [3, 5, 10, 15, 30, 50],
-      totalPageBtn: 7
-    }
+    pager: PagerSetting = PAGINGSETTING;
     // ChargeToUpdate : CatChargeToAddOrUpdate ;
     // ChargeToAdd : CatChargeToAddOrUpdate ;
     ListCharges:any=[];
@@ -121,6 +104,23 @@ export class ChargeComponent implements OnInit {
     this.router.navigate(["/home/catalogue/charge-edit",{id:id}]);
   }
 
+  isDesc = true;
+  sortKey: string = "code";
+  sort(property){
+      this.sortKey = property;
+      this.isDesc = !this.isDesc;
+      const temp = this.ListCharges.map(x=>Object.assign({},x));
+      this.ListCharges = this.sortService.sort(this.ListCharges.map(x=>Object.assign({},x.charge)), property, this.isDesc);
+      // var getDept = this.getDepartmentname;
+      // this.ListCharges = this.ListCharges.map(x=>({stage:x,deptName:getDept(x.id,temp)})); 
+      this.ListCharges = this.ListCharges.map(x => ({ charge: x }));     
+  }
+  getDepartmentname(stageId,ListCharges:any[]){
+    var inx = lodash.findIndex(ListCharges,function(o){return o.charge.id===stageId});      
+    if(inx!=-1){                    
+        return ListCharges[inx].deptName;
+    }
+}
 
 
 
@@ -145,13 +145,13 @@ export class ChargeComponent implements OnInit {
  
   private value:any = ['Athens'];
   private _disabledV:string = '0';
-  private disabled:boolean = false;
+  public disabled:boolean = false;
  
-  private get disabledV():string {
+  public get disabledV():string {
     return this._disabledV;
   }
  
-  private set disabledV(value:string) {
+  public set disabledV(value:string) {
     this._disabledV = value;
     this.disabled = this._disabledV === '1';
   }

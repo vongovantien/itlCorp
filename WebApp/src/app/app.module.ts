@@ -7,7 +7,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormsModule} from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpModule } from '@angular/http';
 import { LoginComponent } from './login/login.component';
@@ -18,12 +18,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 import { Daterangepicker } from 'ng2-daterangepicker';
-import { PagingClientComponent } from './shared/paging-client/paging-client.component';
 import {PagingService} from './shared/common/pagination/paging-service';
 import { CommonModule } from '@angular/common';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { SelectModule } from 'ng2-select';
 import { SharedModule } from './shared/shared.module';
+import { CookieService } from 'ngx-cookie-service';
+import { OAuthModule } from 'angular-oauth2-oidc';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
@@ -51,11 +52,13 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ToastrModule.forRoot(), // ToastrModule added
     Ng4LoadingSpinnerModule.forRoot(),
     Daterangepicker,
-    PerfectScrollbarModule, // Scrollbar
-    SelectModule 
+    PerfectScrollbarModule,
+    SelectModule, // Scrollbar
+    OAuthModule.forRoot()
   ],
   providers: [
     BaseService,
+    CookieService ,
     PagingService,
     { 
       provide: PERFECT_SCROLLBAR_CONFIG, // Scrollbar

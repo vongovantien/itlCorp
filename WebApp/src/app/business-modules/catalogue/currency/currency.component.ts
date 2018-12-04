@@ -10,7 +10,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { SystemConstants } from 'src/constants/system.const';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';
@@ -34,7 +33,8 @@ export class CurrencyComponent implements OnInit {
     settingFields: this.currenciesSettings,
     typeSearch: TypeSearch.outtab
   };
-  isDesc: boolean = false;
+  keySortDefault = "id";
+  isDesc: boolean = true;
   nameModal: string = 'edit-currency-modal';
   titleAddModal: string = 'Add currency';
   titleEditModal: string = 'Edit currency';
@@ -72,11 +72,14 @@ export class CurrencyComponent implements OnInit {
     this.spinnerService.show();
     this.baseService.post(this.api_menu.Catalogue.Currency.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.spinnerService.hide();
-      this.currencies = response.data.map(x=>Object.assign({},x));
+      this.currencies = response.data;
       this.pager.totalItems = response.totalItems;
     });
   }
   setPage(pager) {
+    this.pager.currentPage = pager.currentPage; 
+    this.pager.totalPages = pager.totalPages;
+    this.pager.pageSize = pager.pageSize;
     this.getCurrencies(pager);
   }
   onSearch(event){
@@ -140,14 +143,12 @@ export class CurrencyComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.Currency.addNew, this.currency).subscribe((response: any) => {
       if (response.status == true){
         this.toastr.success(response.message);
-        this.getCurrencies(this.pager);
-        this.form.onReset();
+        //this.getCurrencies(this.pager);
         this.form.onReset();
         $('#' + this.nameModal).modal('hide');
-        setTimeout(() => {
-          this.pager.currentPage = 1;
-          this.child.setPage(this.pager.currentPage);
-        }, 500);
+        this.pager.totalItems = this.pager.totalItems + 1;
+        this.pager.currentPage = 1;
+        this.child.setPage(this.pager.currentPage);
       }
       else{
         this.toastr.error(response.message);
@@ -167,13 +168,22 @@ export class CurrencyComponent implements OnInit {
       this.baseService.delete(this.api_menu.Catalogue.Currency.delete + this.currency.id).subscribe((response: any) => {
         if (response.status == true) {
           this.toastr.success(response.message);
-          this.pager.currentPage = 1;
-          this.getCurrencies(this.pager);
+          // this.pager.currentPage = 1;
+          // this.getCurrencies(this.pager);
+          this.setPageAfterDelete();
         }
         if (response.status == false) {
           this.toastr.error(response.message);
         }
       }, error => this.baseService.handleError(error));
     }
+  }
+  setPageAfterDelete(){
+    this.pager.totalItems = this.pager.totalItems -1;
+    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    if (totalPages < this.pager.totalPages) {
+      this.pager.currentPage = totalPages;
+    }
+    this.child.setPage(this.pager.currentPage);
   }
 }

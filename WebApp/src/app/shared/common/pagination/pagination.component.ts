@@ -23,19 +23,26 @@ export class PaginationComponent implements OnInit {
   // pager object
   pager: any = {};
   ngOnInit() {   
-    this.setPage(this.config.currentPage);
-    
+    //this.setPage(this.config.currentPage);
+    this.getPages(this.config.currentPage);
   }
 
   sendBackData() {
     this.count += 1;
   }
-
-  setPage(page: number) {
+  
+  getPages(page: number){
     if (page < 1 || page > this.pager.totalPages) {
       return;
     }
     this.pager = this.pagerService.getPager(this.config.totalItems, page, this.config.pageSize,this.config.totalPageBtn);    
+  }
+  setPage(page: number) {
+    // if (page < 1 || page > this.pager.totalPages) {
+    //   return;
+    // }
+    // this.pager = this.pagerService.getPager(this.config.totalItems, page, this.config.pageSize,this.config.totalPageBtn);
+    this.getPages(page);    
     this.pagerObject.emit(this.pager);
   }
 }

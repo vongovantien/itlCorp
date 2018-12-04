@@ -2,14 +2,18 @@
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -18,6 +22,20 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper) : base(repository, mapper)
         {
             SetChildren<CatCharge>("Id", "CurrencyId");
+            SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
+            SetChildren<CatCurrencyExchange>("Id", "CurrencyToId");
+        }
+
+        public override HandleState Add(CatCurrencyModel model)
+        {
+            var entity = mapper.Map<CatCurrency>(model);
+            var result = DataContext.Add(entity, true);
+            return result;
+        }
+        public HandleState Delete(string id, string currentUser)
+        {
+            ChangeTrackerHelper.currentUser = currentUser;
+            return DataContext.Delete(x => x.Id == id);
         }
 
         public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
@@ -66,9 +84,9 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsDefault = false;
                         DataContext.DC.Update(item);
                     }
+                    ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
             }
-            ((eFMSDataContext)DataContext.DC).SaveChanges();
             return result;
         }
     }

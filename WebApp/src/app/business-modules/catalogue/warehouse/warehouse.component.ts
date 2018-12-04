@@ -31,6 +31,7 @@ export class WarehouseComponent implements OnInit {
   provinceActive: {};
   districts: any[];
   districtActive: {};
+  keySortDefault: string = "code";
   warehouse: Warehouse = new Warehouse();
   showModal: boolean = false;
   countryLookup: any = { 
@@ -85,7 +86,7 @@ export class WarehouseComponent implements OnInit {
   selectedFilter = "All";
   titleConfirmDelete = "You want to delete this warehouse";
   warehouseSettings: ColumnSetting[] = WAREHOUSECOLUMNSETTING;
-  isDesc: boolean = false;
+  isDesc: boolean = true;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
     settingFields: this.warehouseSettings,
@@ -99,7 +100,7 @@ export class WarehouseComponent implements OnInit {
 
   ngOnInit() {
     this.warehouse.placeType = 12;
-    this.setPage(this.pager);
+    this.getWarehouses(this.pager);
     this.getDataCombobox();
   }
   getDataCombobox(){
@@ -157,9 +158,12 @@ export class WarehouseComponent implements OnInit {
       this.pager.totalItems = response.totalItems;
     });
   }
-  onSortChange(property) {
-    this.isDesc = !this.isDesc;
-    this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
+  onSortChange(column) {
+    if(column.dataType != 'boolean'){
+      let property = column.primaryKey;
+      this.isDesc = !this.isDesc;
+      this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
+    }
   }
   showDetail(item) {
     this.warehouse = item;
@@ -173,11 +177,7 @@ export class WarehouseComponent implements OnInit {
       this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {
         if (response.status == true) {
           this.toastr.success(response.message);
-          this.pager.currentPage = 1;
-          this.getWarehouses(this.pager);
-           setTimeout(() => {
-            this.child.setPage(this.pager.currentPage);
-          }, 500);
+          this.setPageAfterDelete();
         }
         if (response.status == false) {
           this.toastr.error(response.message);
@@ -185,11 +185,22 @@ export class WarehouseComponent implements OnInit {
       }, error => this.baseService.handleError(error));
     }
   }
+  setPageAfterDelete(){
+    this.pager.totalItems = this.pager.totalItems -1;
+    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    if (totalPages < this.pager.totalPages) {
+      this.pager.currentPage = totalPages;
+    }
+    this.child.setPage(this.pager.currentPage);
+  }
   showConfirmDelete(item) {
     this.warehouse = item;
   }
 
-  setPage(pager) {
+  setPage(pager) { 
+    this.pager.currentPage = pager.currentPage; 
+    this.pager.totalPages = pager.totalPages;
+    this.pager.pageSize = pager.pageSize
     this.getWarehouses(pager);
   }
   onSubmit(){
@@ -219,11 +230,10 @@ export class WarehouseComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
       if (response.status == true){
         this.toastr.success(response.message);
-        this.getWarehouses(this.pager);
-        setTimeout(() => {
-          this.pager.currentPage = 1;
-          this.child.setPage(this.pager.currentPage);
-        }, 500);
+        //this.getWarehouses(this.pager);
+        this.pager.totalItems = this.pager.totalItems + 1;
+        this.pager.currentPage = 1;
+        this.child.setPage(this.pager.currentPage);
         this.resetWarehouse();
         this.form.onReset();
         $('#' + this.addButtonSetting.dataTarget).modal('hide');

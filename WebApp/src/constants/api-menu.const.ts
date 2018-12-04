@@ -1,5 +1,5 @@
 import { SystemConstants } from "./system.const";
-
+import {environment} from 'src/environments/environment';
 
 export class API_MENU {
     private HOST = {
@@ -21,7 +21,7 @@ export class API_MENU {
      * Use HOST.Test to run on test environment
      * Use HOST.Staging to run on staging environment 
      */
-    private CURRENT_HOST: String = this.HOST.Test;
+    private CURRENT_HOST: String =  environment.HOST.WEB_URL;  //this.HOST.Local;
 
     private getCurrentLanguage() {
         return localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
@@ -64,9 +64,6 @@ export class API_MENU {
             getProvinces: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetProvinces",
             getDistricts: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetDistricts",
             getModeOfTransport: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetModeOfTransport",
-        },
-        PortIndex: {
-
         },
         PartnerData: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Query",
@@ -145,7 +142,8 @@ export class API_MENU {
     */
     public System = {
         User_Management: {
-            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser"
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser",
+            login : this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/login",
         },
         Group: {
 
@@ -167,7 +165,19 @@ export class API_MENU {
         }
     }
 
+    /**
+    * TOOL-SETTING MODULE API URL DEFINITION 
+    */
 
-
+    public ToolSetting = {
+        ExchangeRate: {
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetExchangeRateHistory/Paging",
+            getNewest: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetNewest",
+            getBy: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetExchangeRatesBy",
+            updateRate: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/UpdateRate",
+            getCurrencies: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetCurrencies",
+            convertRate: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/ConvertRate"
+        }
+    }
 
 }

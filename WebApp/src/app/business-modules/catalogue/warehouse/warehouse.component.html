@@ -7,33 +7,9 @@
         </div>
         <div class="c-button-actions">
             <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
-            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                data-target="#add-ware-house-modal">
-                <span>
-                    <i class="icon-plus7"></i>
-                    <span>
-                        add new
-                    </span>
-                </span>
-            </button> -->
             <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
-            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-download"></i>
-                    <span>
-                        import
-                    </span>
-                </span>
-            </button> -->
             <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
-            <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
-                </span>
-            </button> -->
+            
         </div>
     </div>
 </div>
@@ -66,11 +42,9 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Content-->
-            <!--begin: Datatable of port-index-list-table -->
-            <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameEditModal"
+            <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [keySort]="keySortDefault" [nameEditModal]="nameEditModal"
             (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
-            <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
             <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
@@ -143,15 +117,6 @@
                                     <label class="form-control-label">
                                         Country
                                     </label>
-                                    <!-- <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && country.invalid }" required  (change)="onCountrychange(warehouse.countryID)">
-                                        <option value="">
-                                            Please select
-                                        </option>
-                                        <option *ngFor='let country of countries' [value]="country.id">
-                                            {{ country.nameEn }}
-                                        </option>
-                                    </select> -->
                                     <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)"
                                         (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
                                         placeholder="Select country">
@@ -160,23 +125,12 @@
                                         Country is required
                                     </div>
                                 </div>
-                                <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('countryID')" [form]="formAddEdit" [itemlookups]="countryLookup"></app-input-form> -->
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                     <label class="form-control-label">
                                         City/ Province
                                     </label>
-                                    <!-- <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
-                                        (change)="onProvincechange(warehouse.provinceID)"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && province.invalid }" required >
-                                        <option value="">
-                                            Please select
-                                        </option>
-                                        <option *ngFor='let province of provinces' [value]="province.id">
-                                                {{ province.name_VN }}
-                                        </option>
-                                    </select> -->
                                     <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshProvinceValue($event)"
                                         (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
                                         placeholder="Select province">
@@ -191,15 +145,6 @@
                                     <label class="form-control-label">
                                         District
                                     </label>
-                                    <!-- <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && district.invalid }" required >
-                                        <option value="">
-                                            Please select
-                                        </option>
-                                        <option *ngFor='let district of districts' [value]="district.id">
-                                                {{ district.name_VN }}
-                                        </option>
-                                    </select> -->
                                     <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshDistrictValue($event)"
                                         (removed)="removed($event)" (typed)="typed($event)" (selected)="onDistrictchange($event)" 
                                         placeholder="Select district">
@@ -212,7 +157,6 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('address')" [form]="formAddEdit"></app-input-form> -->
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
                                     <label  class="form-control-label">
                                         Address
@@ -230,14 +174,6 @@
                     <!--end:add-port-index-form -->
                 </div>
                 <div class="modal-footer m--align-center c-button-actions">
-                    <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span>
-                                save
-                            </span>
-                        </span>
-                    </button> -->
                     <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
                     <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
                     <!-- <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
@@ -272,10 +208,6 @@
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
-                                        <!-- <label>
-                                            Code
-                                        </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port code"> -->
                                         <label class="form-control-label">
                                             Code
                                         </label>
@@ -288,12 +220,6 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <!-- <div class="form-group">
-                                        <label>
-                                            Name
-                                        </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port name">
-                                    </div> -->
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouseNameEN.invalid }">
                                         <label class="form-control-label">
                                             Name(EN)
@@ -307,12 +233,6 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <!-- <div class="form-group">
-                                        <label>
-                                            Name
-                                        </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Port name">
-                                    </div> -->
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameVN.invalid }">
                                         <label class="form-control-label">
                                             Name(VN)
@@ -328,12 +248,6 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <!-- <div class="form-group">
-                                        <label>
-                                            Country
-                                        </label>
-                                        <input type="text" class="form-control m-input" placeholder="Please enter detail" value="Country">
-                                    </div> -->
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null}">
                                         <label class="form-control-label">
                                             Country
@@ -342,15 +256,6 @@
                                             (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
                                             placeholder="Select country">
                                         </ng-select>
-                                        <!-- <select class="form-control m-input m-input--square" #country="ngModel" name="country" [(ngModel)]="warehouse.countryID"
-                                            [ngClass]="{ 'm-input--square': formAddEdit.submitted && country.invalid }" required  (change)="onCountrychange(warehouse.countryID)">
-                                            <option value="">
-                                                Please select
-                                            </option>
-                                            <option *ngFor='let country of countries' [value]="country.id">
-                                                {{ country.nameEn }}
-                                            </option>
-                                        </select> -->
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.countryID == null" >
                                             Country is required
                                         </div>
@@ -361,16 +266,6 @@
                                         <label class="form-control-label">
                                             City/ Province
                                         </label>
-                                        <!-- <select class="form-control m-input m-input--square" #province="ngModel" name="province" [(ngModel)]="warehouse.provinceID"
-                                            (change)="onProvincechange(warehouse.provinceID)"
-                                            [ngClass]="{ 'm-input--square': formAddEdit.submitted && province.invalid }" required >
-                                            <option value="">
-                                                Please select
-                                            </option>
-                                            <option *ngFor='let province of provinces' [value]="province.id">
-                                                    {{ province.name_VN }}
-                                            </option>
-                                        </select> -->
                                         <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive==null?[]:[provinceActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
                                             (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
                                             placeholder="Select province">
@@ -389,15 +284,6 @@
                                             (selected)="onDistrictchange($event)" (removed)="removed($event)" (typed)="typed($event)"
                                             placeholder="Select district">
                                         </ng-select>
-                                        <!-- <select class="form-control m-input m-input--square" #district="ngModel" name="district" [(ngModel)]="warehouse.districtID"
-                                            [ngClass]="{ 'm-input--square': formAddEdit.submitted && district.invalid }" required >
-                                            <option value="">
-                                                Please select
-                                            </option>
-                                            <option *ngFor='let district of districts' [value]="district.id">
-                                                    {{ district.name_VN }}
-                                            </option>
-                                        </select> -->
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.districtID == null" >
                                             District is required
                                         </div>
@@ -436,22 +322,6 @@
                         <!--end:add-port-index-form -->
                     </div>
                     <div class="modal-footer m--align-center c-button-actions">
-                        <!-- <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    Edit
-                                </span>
-                            </span>
-                        </button>
-                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                            <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
-                            </span>
-                        </button> -->
                         <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
                         <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
                     </div>

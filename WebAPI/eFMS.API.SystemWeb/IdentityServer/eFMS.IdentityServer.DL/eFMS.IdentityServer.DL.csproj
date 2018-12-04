@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\bin\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\bin\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Dtos\**" />
+    <Compile Remove="Repositories\**" />
+    <EmbeddedResource Remove="Dtos\**" />
+    <EmbeddedResource Remove="Repositories\**" />
+    <None Remove="Dtos\**" />
+    <None Remove="Repositories\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="BCrypt.Net-Core" Version="1.5.0" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="1.1.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.2" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="eFMS.API.Common">
+      <HintPath>..\..\..\..\bin\netcoreapp2.1\eFMS.API.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.Service">
+      <HintPath>..\bin\netcoreapp2.1\eFMS.IdentityServer.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="ITL.NetCore.Common">
+      <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ITL.NetCore.Connection">
+      <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Connection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.abstractions\2.1.1\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlClient">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\system.data.sqlclient\4.5.1\ref\netcoreapp2.1\System.Data.SqlClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+    <Folder Include="Models\Criteria\" />
+    <Folder Include="Models\Views\" />
+  </ItemGroup>
+</Project>

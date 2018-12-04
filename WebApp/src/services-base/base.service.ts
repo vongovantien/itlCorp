@@ -10,6 +10,7 @@ import { promise } from 'protractor';
 import { error } from 'util';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { OAuthService } from 'angular-oauth2-oidc';
 
 
 
@@ -23,9 +24,10 @@ export class BaseService implements ErrorHandler {
   protected baseUrl: string;
   protected showError: boolean;
 
-  constructor(public _http: HttpClient, public _router: Router, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) {
+  constructor(public _http: HttpClient, public _router: Router, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService,private oauthService: OAuthService) {
     this.headers = new HttpHeaders({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+    //  'Authorization': 'Bearer ' + sessionStorage.getItem("access_token") //this.oauthService.getAccessToken()
     });
     this.baseUrl = "";
     this.showError = true;
@@ -84,6 +86,8 @@ export class BaseService implements ErrorHandler {
    * @param data 
    */
   public post(url: string, data?: any) {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
     return this._http.post(url, data, { headers: this.headers });
   }
 
@@ -96,6 +100,8 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async postAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
     if (display_spinner)
       this.spinnerService.show();
     try {
@@ -118,6 +124,9 @@ export class BaseService implements ErrorHandler {
    * @param data 
    */
   public put(url: string, data?: any) {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
+    // this.headers = this.headers.append("Authorization", token);
     return this._http.put(url, data, { headers: this.headers });
   }
 
@@ -130,6 +139,9 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async putAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
+    // this.headers = this.headers.append("Authorization",token);
     if (display_spinner)
       this.spinnerService.show();
     try {
@@ -150,6 +162,8 @@ export class BaseService implements ErrorHandler {
    * @param url 
    */
   public delete(url: string) {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
     return this._http.delete(url, { headers: this.headers });
   }
 
@@ -161,6 +175,8 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async deleteAsync(url: string, display_notify = true, display_spinner = true): Promise<any> {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
     if (display_spinner)
       this.spinnerService.show();
     try {

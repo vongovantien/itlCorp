@@ -61,9 +61,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     || ((x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >=0)
                     || ((x.stage.Code ?? "").IndexOf(criteria.Code ?? "")>=0)
                     || (x.stage.Id == criteria.Id))
-                    .Select(x => x.stage).ToList();
-
-              
+                    .Select(x => x.stage).ToList();              
             }
 
             rowsCount = result.Count;
@@ -71,7 +69,7 @@ namespace eFMS.API.Catalogue.DL.Services
             foreach(var stage in result)
             {
                 var department = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => x.Id == stage.DepartmentId).FirstOrDefault();
-                var returnStage = new { stage, department.DeptName,department.Code };
+                var returnStage = new { stage, department?.DeptName,department?.Code };
                 returnList.Add(returnStage);               
             }
 

@@ -49,7 +49,7 @@ export class LogViewerComponent implements OnInit {
   public items: Array<string> = ['Partner Data', 'Exchange Rate', 'Commidity'];
   private value: any = {};
   private _disabledV: string = '0';
-  private disabled: boolean = false;
+  public disabled: boolean = false;
   
   private get disabledV():string {
     return this._disabledV;

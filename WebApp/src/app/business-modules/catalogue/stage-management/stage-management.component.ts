@@ -1,13 +1,14 @@
-import { Component, OnInit, Output, ViewChild, AfterViewChecked, AfterContentInit, EventEmitter } from '@angular/core';
+import { Component, OnInit,ViewChild} from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
-declare var jquery: any;
+import { SortService } from 'src/app/shared/services/sort.service';
+import * as lodash from 'lodash';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+// declare var jquery: any;
 declare var $: any;
 
 @Component({
@@ -17,28 +18,17 @@ declare var $: any;
 })
 export class StageManagementComponent implements OnInit {
 
-
-    // Stages_List: any;
-    // Const_Stage_List:any;
-    // StageNew:StageModel;
-
     selected_filter = "All";
-
     ListStages: any = [];
     ConstStageList: any = [];
     StageToAdd = new StageModel();
     StageToUpdate = new StageModel();
     ListDepartment: any = [];
-    pager: PagerSetting = {
-        currentPage: 1,
-        pageSize: 15,
-        numberToShow: [10, 15, 30, 50],
-        totalPageBtn: 7
-    };
+    pager: PagerSetting = PAGINGSETTING;
 
     @ViewChild(PaginationComponent) child;
 
-    constructor(private baseServices: BaseService, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService, private api_menu: API_MENU) {
+    constructor(private baseServices: BaseService,private api_menu: API_MENU,private sortService: SortService) {
 
     }
 
@@ -265,5 +255,26 @@ export class StageManagementComponent implements OnInit {
         this.value = value;
     }
 
+    isDesc = true;
+    sortKey: string = "id";
+    sort(property){
+        this.sortKey = property;
+        this.isDesc = !this.isDesc;  
+        if(property === 'deptName'){
+            this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
+        }
+        else{
+            const temp = this.ListStages.map(x=>Object.assign({},x));
+            this.ListStages = this.sortService.sort(this.ListStages.map(x=>Object.assign({},x.stage)), property, this.isDesc);
+            var getDept = this.getDepartmentname;
+            this.ListStages = this.ListStages.map(x=>({stage:x,deptName:getDept(x.id,temp)}));     
+        }         
+    }
 
+    getDepartmentname(stageId,ListStages:any[]){
+        var inx = lodash.findIndex(ListStages,function(o){return o.stage.id===stageId});      
+        if(inx!=-1){                    
+            return ListStages[inx].deptName;
+        }
+    }
 }

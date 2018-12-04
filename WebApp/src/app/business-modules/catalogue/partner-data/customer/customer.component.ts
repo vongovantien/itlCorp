@@ -22,13 +22,13 @@ export class CustomerComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
-  isDesc: boolean = false;
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
     private spinnerService: Ng4LoadingSpinnerService,
-    private api_menu: API_MENU) { }
+    private api_menu: API_MENU,
+    private sortService: SortService) { }
 
   ngOnInit() {
   }
@@ -50,5 +50,15 @@ export class CustomerComponent implements OnInit {
   }
   showDetail(item){
     this.detail.emit(item);
+  }
+
+  isDesc = true;
+  sortKey: string = "id";
+  sort(property){
+    this.isDesc = !this.isDesc;
+    this.sortKey = property;
+    this.customers.forEach(element => {
+      element.catPartnerModels = this.sortService.sort(element.catPartnerModels, property, this.isDesc)
+    });
   }
 }

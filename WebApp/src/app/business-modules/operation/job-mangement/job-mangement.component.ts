@@ -240,7 +240,8 @@ export class JobMangementComponent implements OnInit {
     customer: "",
     stage_list: null,
     house_bill_list: null,
-    container_list: null
+    container_list: null,
+    service:""
   }
 
 
@@ -284,7 +285,7 @@ export class JobMangementComponent implements OnInit {
 
   private value: any = {};
   private _disabledV: string = '0';
-  private disabled: boolean = false;
+  public disabled: boolean = false;
 
   private get disabledV(): string {
     return this._disabledV;
@@ -383,6 +384,10 @@ export class JobMangementComponent implements OnInit {
 
   async setPage(pager) {
     this.Jobs_List = await this.getJobs(pager);
+  }
+
+  selectedDate(event){
+    
   }
 
 

@@ -56,7 +56,7 @@
                             <label class="form-control-label" for="">
                                 Partner Name EN Full
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Name EN Full" name="nameENFull" autocomplete="nope" minlength="3" maxlength="100"
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Name EN Full" name="nameENFull" autofocus autocomplete="nope" minlength="3" maxlength="100"
                                 [(ngModel)]="partner.partnerNameEn" #nameENFull="ngModel" (change)="partner.partnerNameEn = partner.partnerNameEn.trim()" 
                                 [ngClass]="{ 'm-input--square': formAddEdit.submitted && nameENFull.invalid }" required>
                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && nameENFull.invalid" >
@@ -375,7 +375,7 @@
                                 Website
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
-                            name="partnerWebsite"  [(ngModel)]="partner.website">
+                            name="partnerWebsite"  [(ngModel)]="partner.website" (change)="partner.website = partner.website.trim()">
                         </div>
                     </div>
                 </div>
@@ -386,7 +386,7 @@
                                 Partners Bank Account
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerbankAccountNo" autocomplete="nope"
-                                [(ngModel)]="partner.bankAccountNo">
+                                [(ngModel)]="partner.bankAccountNo" (change)="partner.bankAccountNo = partner.bankAccountNo.trim()">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -395,7 +395,7 @@
                                 Bank Name
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerBankAccountName" autocomplete="nope"
-                                [(ngModel)]="partner.bankAccountName">
+                                [(ngModel)]="partner.bankAccountName" (change)="partner.bankAccountName = partner.bankAccountName.trim()">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -418,7 +418,7 @@
                                         Swift Code
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerSwiftCode"
-                                        [(ngModel)]="partner.swiftCode">
+                                        [(ngModel)]="partner.swiftCode" (change)="partner.swiftCode = partner.swiftCode.trim()">
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -427,7 +427,7 @@
                                         Bank Address
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square" placeholder="" name="partnerBankAccountAddress" autocomplete="nope"
-                                        [(ngModel)]="partner.bankAccountAddress">
+                                        [(ngModel)]="partner.bankAccountAddress" (change)="partner.bankAccountAddress = partner.bankAccountAddress.trim()">
                                 </div>
                             </div>
                         </div>
@@ -471,7 +471,8 @@
                             <label class="form-control-label" for="">
                                 Note
                             </label>
-                            <textarea  class="form-control m-input m-input--square" id=""  name="partnerNote" [(ngModel)]="partner.note" autocomplete="nope" rows="6"></textarea>
+                            <textarea  class="form-control m-input m-input--square" id=""  name="partnerNote" [(ngModel)]="partner.note" autocomplete="nope" rows="6"
+                                (change)="partner.note = partner.note.trim()"></textarea>
                         </div>
                     </div>
                 </div>

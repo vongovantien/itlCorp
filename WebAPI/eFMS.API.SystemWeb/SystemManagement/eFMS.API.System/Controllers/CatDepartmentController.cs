@@ -10,6 +10,7 @@ using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
+
 namespace eFMS.API.System.Controllers
 {
     [ApiController]
@@ -30,6 +31,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult Get()
         {
             return Ok(catDepartmentService.Get());
+           
         }
 
     }

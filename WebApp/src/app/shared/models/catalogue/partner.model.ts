@@ -43,6 +43,7 @@ export class Partner {
     bookingOverdueDay: number;
     fixRevenueByProject: boolean;
     zipCode: string;
+    zipCodeShipping:string;
     swiftCode: string;
     userCreated: string;
     datetimeCreated: Date;

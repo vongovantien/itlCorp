@@ -6,7 +6,6 @@ import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PaginationComponent } from 'ngx-bootstrap';
-import { ToastrService } from 'ngx-toastr';
 import { BaseService } from 'src/services-base/base.service';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -24,10 +23,10 @@ export class ShipperComponent implements OnInit {
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.SHIPPER };
   isDesc: boolean = false;
+  keySortDefault: string = "id";
   @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
-  constructor(private baseService: BaseService,
-    private toastr: ToastrService, 
+  constructor(private baseService: BaseService, 
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }

@@ -4,9 +4,13 @@ export class SystemConstants {
     public static readonly LSK_CURRENT_USER: string = 'CURRENT_USER';
     public static readonly LSK_CURRENT_WORKPLACE_ID: string = 'CURRENT_WORKPLACE_ID';
     public static readonly LSK_CURRENT_LANG: string = 'CURRENT_LANG';
+    public static readonly CURRENT_CLIENT_LANGUAGE:string = 'CURRENT_CLIENT_LANGUAGE';
     public static readonly LSL_CACHE_REMEMBER: string = 'CACHE_REMEMBER';
     public static readonly CURRENT_LANGUAGE:string = "CURRENT_LANGUAGE";
     public static readonly CURRENT_VERSION:string = "CURRENT_VERSION";
+    public static readonly LOGIN_STATUS:string = "LOGIN_STATUS";
+    public static readonly LOGGED_IN : string = "LOGGED_IN";
+    public static readonly LOGGED_OUT : string = "LOGGED_OUT";
 
     //Security
     public static readonly PATH_RSA_PUBLIC_KEY = './auth/z_rsa_public.key';
@@ -15,6 +19,7 @@ export class SystemConstants {
     public static readonly AUTH_ISSUER = 'http://localhost:5000';
     public static readonly AUTH_CLIENT_ID = 'eTMS' ;
     public static readonly AUTH_SCOPE = 'openid profile offline_access etms_scope dnt_api';
+    public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
 
     public static CURRENT_USER;
 

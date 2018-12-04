@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     <!--end:: Search-form-->
-                    <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)" 
+                    <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)" [keySort]="keyCommoditySortDefault"
                         [nameEditModal]="nameCommodityModal"
                         (edit)="showDetail($event, tabName.commodity)" (delete)="showConfirmDelete($event, tabName.commodity)">
                     </app-table-layout>
@@ -89,7 +89,7 @@
                     </div>
                     <!--end:: Search-form-->
                     <!--begin: Datatable-->
-                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameGroupModal"
+                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameGroupModal" [keySort]="keygroupSortDefault"
                         (edit)="showDetail($event, tabName.commodityGroup)" (delete)="showConfirmDelete($event, tabName.commodityGroup)">
                     </app-table-layout>
                     <!--end: Datatable-->
@@ -115,9 +115,10 @@
                 <div class="modal-header">
                     <h5 class="modal-title" *ngIf="commodity.id == null">{{ titleAddCommodityModal }}</h5>
                     <h5 class="modal-title" *ngIf="commodity.id">{{ titleEditCommodityModal }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel(tabName.commodity)">
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel(tabName.commodity)">
                         <span aria-hidden="true">&times;</span>
-                    </button>
+                    </button> -->
+                    <app-close-modal-button (click)="onCancel(tabName.commodity)"></app-close-modal-button>
                 </div>
                 <div class="modal-body">
                     <!--begin::add-commodity-form-->
@@ -192,9 +193,10 @@
                 <div class="modal-header">
                     <h5 class="modal-title" *ngIf="commodityGroup.id == null">{{titleAddGroupModal}}</h5>
                     <h5 class="modal-title" *ngIf="commodityGroup.id">{{titleEditGroupModal}}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel(tabName.commodityGroup)">
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel(tabName.commodityGroup)">
                         <span aria-hidden="true">&times;</span>
-                    </button>
+                    </button> -->
+                    <app-close-modal-button (click)="onCancel(tabName.commodityGroup)"></app-close-modal-button>
                 </div>
                 <div class="modal-body">
                     <!--begin::add-commodity-group-form-->

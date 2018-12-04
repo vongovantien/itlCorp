@@ -117,17 +117,20 @@
                     <!--end::search-form-->
                     <!--begin: Datatable of table-simple -->
                     <div class="table-wrapper" id="">
-                        <table class="table table-striped table-brand">
+                        <table class="table table-striped table-brand dataTable">
                             <thead>
                                 <tr>
                                     <th class="table-actions-col">Actions</th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                        (click)="sort('code')">
                                         <span>Country Code</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                                        (click)="sort('nameEn')">
                                         <span>English Name</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
+                                        (click)="sort('nameVn')">
                                         <span>Local Name</span>
                                     </th>
                                     <th>
@@ -230,20 +233,24 @@
                     <!--end::search-form-->
                     <!--begin: Datatable of table-simple -->
                     <div class="table-wrapper" id="">
-                        <table class="table table-striped table-brand">
+                        <table class="table table-striped table-brand dataTable">
                             <thead>
                                 <tr>
                                     <th class="table-actions-col">Actions</th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                        (click)="sort('code')">
                                         <span>City-Province Code</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEN'), 'sorting_desc': (!isDesc && sortKey == 'nameEN') }"
+                                        (click)="sort('nameEN')">
                                         <span>English Name</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVN'), 'sorting_desc': (!isDesc && sortKey == 'nameVN') }"
+                                        (click)="sort('nameVN')">
                                         <span>Local Name</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
+                                        (click)="sort('countryName')">
                                         <span>Country</span>
                                     </th>
                                     <th>
@@ -349,23 +356,28 @@
                     <!--end::search-form-->
                     <!--begin: Datatable of table-simple -->
                     <div class="table-wrapper" id="">
-                        <table class="table table-striped table-brand">
+                        <table class="table table-striped table-brand dataTable">
                             <thead>
                                 <tr>
                                     <th class="table-actions-col">Actions</th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                        (click)="sort('code')">
                                         <span>District Code</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEN'), 'sorting_desc': (!isDesc && sortKey == 'nameEN') }"
+                                        (click)="sort('nameEN')">
                                         <span>English Name</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVN'), 'sorting_desc': (!isDesc && sortKey == 'nameVN') }"
+                                        (click)="sort('nameVN')">
                                         <span>Local Name</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
+                                        (click)="sort('provinceName')">
                                         <span>City-Province</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
+                                     (click)="sort('countryName')">
                                         <span>Country</span>
                                     </th>
                                     <th>
@@ -476,26 +488,32 @@
                     <!--end::search-form-->
                     <!--begin: Datatable of table-simple -->
                     <div class="table-wrapper" id="">
-                        <table class="table table-striped table-brand">
+                        <table class="table table-striped table-brand dataTable">
                             <thead>
                                 <tr>
                                     <th class="table-actions-col">Actions</th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                        (click)="sort('code')">
                                         <span>Town-Ward Code</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEN'), 'sorting_desc': (!isDesc && sortKey == 'nameEN') }"
+                                        (click)="sort('nameEN')">
                                         <span>English Name</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVN'), 'sorting_desc': (!isDesc && sortKey == 'nameVN') }"
+                                        (click)="sort('nameVN')">
                                         <span>Local Name</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
+                                        (click)="sort('districtName')">
                                         <span>District</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
+                                        (click)="sort('provinceName')">
                                         <span>City-Province</span>
                                     </th>
-                                    <th>
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
+                                        (click)="sort('countryName')">
                                         <span>Country</span>
                                     </th>
                                     <th>
