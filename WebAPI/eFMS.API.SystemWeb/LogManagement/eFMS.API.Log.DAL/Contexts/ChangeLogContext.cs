@@ -80,5 +80,19 @@ namespace eFMS.API.Log.Service.Contexts
                 return _database.GetCollection<CatPlace>("CatPlace");
             }
         }
+        public IMongoCollection<CatStage> CatStages
+        {
+            get
+            {
+                return _database.GetCollection<CatStage>("CatStage");
+            }
+        }
+        public IMongoCollection<CatUnit> CatUnits
+        {
+            get
+            {
+                return _database.GetCollection<CatUnit>("CatUnit");
+            }
+        }
     }
 }

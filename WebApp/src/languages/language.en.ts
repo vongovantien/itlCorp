@@ -91,7 +91,8 @@ export const language = {
         { "name": "Exchange Rate", "route_child": "exchange-rate" },
         { "name": "Ecus Connection", "route_child": "ecus-connection" },
         { "name": "KPI", "route_child": "kpi" },
-        { "name": "Supplier", "route_child": "supplier" }
+        { "name": "Supplier", "route_child": "supplier" },
+        { "name": "Catalog Log Viewer", "route_child": "log-viewer" }
 
       ]
     },

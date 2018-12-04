@@ -11,6 +11,14 @@ namespace eFMS.API.Log.DL.Common
         public const string Delete = "Delete";
         public const string Active = "Active";
     }
+    public class CatPlaceConstant
+    {
+        public const string Warehouse = "Warehouse";
+        public const string Port = "Port";
+        public const string Province = "Province"; 
+        public const string District = "District";
+        public const string Ward = "Ward";
+    }
     public enum CategoryTable
     {
         CatCharge = 1,
@@ -23,6 +31,11 @@ namespace eFMS.API.Log.DL.Common
         CatPartner = 8,
         CatPlace = 9,
         CatStage = 10,
-        CatUnit = 11
+        CatUnit = 11,
+        Warehouse = 12,
+        PortIndex = 13,
+        Province = 14,
+        District = 15,
+        Ward = 16
     }
 }

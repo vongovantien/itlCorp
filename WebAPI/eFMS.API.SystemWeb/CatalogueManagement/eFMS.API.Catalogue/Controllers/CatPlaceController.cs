@@ -8,6 +8,7 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
@@ -153,6 +154,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catPlaceService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

@@ -11,8 +11,6 @@ import {language} from 'src/languages/language.en';
 })
 export class PageSidebarComponent implements OnInit, AfterViewInit {
 
-
-
   index_parrent_menu = 0;
   index_sub_menu = 0;
   previous_menu_id = null;
@@ -165,7 +163,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         { name: "Ecus Connection", route_child: "ecus-connection" },
         { name: "KPI", route_child: "kpi" },
         { name: "Supplier", route_child: "supplier" },
-
+        { name: "Log Viewer", route_child: "log-viewer" }
       ]
     },
     //Report Module

@@ -17,6 +17,7 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
+import { SelectComponent } from 'ng2-select';
 declare var $:any;
 
 @Component({
@@ -32,6 +33,7 @@ export class CommodityComponent implements OnInit {
   @ViewChild(PaginationComponent) child; 
   @ViewChild('formCommodity') formCommodity: NgForm;
   @ViewChild('formGroupCommodity') formGroupCommodity: NgForm;
+  @ViewChild('chooseGroup') public groupSelect: SelectComponent;
   commodities: Array<Commodity>;
   commodity: Commodity;
   commodityGroups: Array<CommodityGroup>;
@@ -296,6 +298,8 @@ export class CommodityComponent implements OnInit {
   updateCommodity(): any {
     this.baseService.put(this.api_menu.Catalogue.Commodity.update + this.commodity.id, this.commodity).subscribe((response: any) => {
       if (response.status == true){
+        this.groupSelect.active = [];
+        this.formCommodity.onReset();
         $('#' + this.nameCommodityModal).modal('hide');
         this.toastr.success(response.message);
         this.setPage(this.pager);

@@ -9,8 +9,11 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -27,10 +30,12 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
-        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service)
+        private readonly ICurrentUser currentUser;
+        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catCountryService = service;
+            currentUser = user;
         }
 
         [HttpPost]
@@ -60,6 +65,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("addNew")]
+        [Authorize]
         public IActionResult Add(CatCountryModel catCountry)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -69,7 +75,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             catCountry.DatetimeCreated = DateTime.Now;
-            catCountry.UserCreated = "Thor";
+            catCountry.UserCreated = currentUser.UserID;
             catCountry.Inactive = false;
             var hs = catCountryService.Add(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -83,6 +89,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("update")]
+        [Authorize]
         public IActionResult Upadte(CatCountryModel catCountry)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -92,7 +99,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             catCountry.DatetimeModified = DateTime.Now;
-            catCountry.UserModified = "Thor";
+            catCountry.UserModified = currentUser.UserID;
             var hs = catCountryService.Update(catCountry,x=>x.Id==catCountry.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -105,8 +112,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpDelete]
         [Route("delete/{id}")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catCountryService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

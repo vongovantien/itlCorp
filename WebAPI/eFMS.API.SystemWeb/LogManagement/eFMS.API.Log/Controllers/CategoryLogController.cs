@@ -7,11 +7,14 @@ using eFMS.API.Log.DL.IService;
 using eFMS.API.Log.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Log.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [MiddlewareFilter(typeof(LocalizationMiddleware))]
+    [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class CategoryLogController : ControllerBase
     {
         private readonly ICategoryLogService catLogService;
@@ -26,7 +29,7 @@ namespace eFMS.API.Log.Controllers
         {
             try
             {
-                var data = catLogService.Paging(categoryCriteria.TableType, categoryCriteria.Query, page, size, out long rowCount);
+                var data = catLogService.Paging(categoryCriteria, page, size, out long rowCount);
                 var result = new { data, totalItems = rowCount, page, size };
                 return Ok(result);
             }

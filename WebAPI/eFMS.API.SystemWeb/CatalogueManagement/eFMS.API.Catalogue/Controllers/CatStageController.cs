@@ -8,7 +8,9 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -25,11 +27,13 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatStageService catStageService;
+        private readonly ICurrentUser currentUser;
 
-        public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service)
+        public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catStageService = service;
+            currentUser = user;
         }
 
 
@@ -52,10 +56,11 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("addNew")]
+        [Authorize]
         public IActionResult AddStage(CatStageModel catStageModel)
         {
             catStageModel.DatetimeCreated = DateTime.Now;
-            catStageModel.UserCreated = "Thor";
+            catStageModel.UserCreated = currentUser.UserID;
             var hs = catStageService.Add(catStageModel);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -68,9 +73,11 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("update")]
+        [Authorize]
         public IActionResult UpdateStage(CatStageModel catStageModel)
         {
             catStageModel.DatetimeModified = DateTime.Now;
+            catStageModel.UserModified = currentUser.UserID;
             var hs = catStageService.Update(catStageModel,x=>x.Id==catStageModel.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -83,6 +90,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpDelete]
         [Route("delete/{id}")]
+        [Authorize]
         public IActionResult DeleteStage(int id)
         {
             var hs = catStageService.Delete(x => x.Id == id);
