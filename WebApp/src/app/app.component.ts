@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { SystemConstants } from '../constants/system.const';
-import { OAuthService } from 'angular-oauth2-oidc';
-import { JwksValidationHandler } from 'angular-oauth2-oidc';
-import { authConfig } from './shared/authenticate/authConfig';
 
 @Component({
   selector: 'app-root',
@@ -21,19 +18,14 @@ export class AppComponent implements OnInit {
     }
     const current_client_lang = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
     this.default_current_client_lang = current_client_lang;
-    if(current_client_lang===null){
+    if (current_client_lang === null) {
       localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");
     }
   }
 
-  constructor(private oauthService: OAuthService) {
-    this.configureWithNewConfigApi();
+  constructor() {
   }
 
-  private configureWithNewConfigApi() {
-    this.oauthService.configure(authConfig);
-    this.oauthService.tokenValidationHandler = new JwksValidationHandler();
-    this.oauthService.loadDiscoveryDocumentAndTryLogin();
-  }
+
   title = 'app';
 }

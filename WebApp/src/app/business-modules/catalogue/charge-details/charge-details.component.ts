@@ -83,8 +83,8 @@ export class ChargeDetailsComponent implements OnInit {
         const idCurrency = this.Charge.charge.currencyId;
         const type = this.Charge.charge.type;
 
-        var indexCurrentUnit = lodash.findIndex(this.ngDataUnit,function(o){return o.id===idUnit});
-        var indexCurrentCurrency = lodash.findIndex(this.ngDataCurrency,function(o){return o.id===idCurrency});
+        var indexCurrentUnit = lodash.findIndex(this.ngDataUnit,function(o){return o['id']===idUnit});
+        var indexCurrentCurrency = lodash.findIndex(this.ngDataCurrency,function(o){return o['id']===idCurrency});
         var indexType = lodash.findIndex(this.ngDataType,function(o){return o.id===type});
 
         this.activeUnit = [this.ngDataUnit[indexCurrentUnit]];

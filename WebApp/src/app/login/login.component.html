@@ -42,19 +42,7 @@
                             <div class="m-login__desc" i18n="@@h32">
                                 Login your account by filling the form below
                             </div>
-                        </div>
-                        <ul class="nav nav-pills" role="tablist">
-                            <li class="nav-item ">
-                                <a class="nav-link active" data-toggle="tab" href="#login-form">
-                                    <i class="icon-user12"></i> sign in
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#setting-form">
-                                    <i class="la la-gear"></i> setting
-                                </a>
-                            </li>
-                        </ul>
+                        </div>                      
                         <div class="tab-content">
                             <div class="tab-pane m-login__form m-form active" id="login-form">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': loginForm.submitted && u_name.invalid }">
@@ -77,7 +65,7 @@
                                     <div class="form-control-feedback" *ngIf="loginForm.submitted && u_password.invalid">
                                                 Enter password please !
                                     </div>
-                                </div>
+                                </div>                       
                                 <div class="m-login__form-action">
                                     <button type="submit" class="btn btn-danger btn-block m-btn--uppercase m-btn--square"
                                         (click)="Login(loginForm)"> Login </button>
@@ -92,53 +80,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane m-setting__form m-form" id="setting-form">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Server Name
-                                    </label>
-                                    <!-- <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                    placeholder="">
-                                </ng-select> -->
-
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        DBMS
-                                    </label>
-                                    <!-- <ng-select [allowClear]="fasle" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                    placeholder="">
-                                </ng-select> -->
-
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        User Name
-                                    </label>
-                                    <input class="form-control m-input m-input--square" type="text" placeholder="" name=""
-                                        autocomplete="off">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        DB Name
-                                    </label>
-                                    <input class="form-control m-input m-input--square" type="text" placeholder="" name=""
-                                        autocomplete="off">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Password
-                                    </label>
-                                    <input class="form-control m-input m-input--square" type="password" placeholder=""
-                                        name="password" autocomplete="off">
-                                </div>
-                                <div class="m-login__form-action">
-                                    <button type="button" class="btn btn-danger btn-block m-btn--uppercase m-btn--square">
-                                        Save </button>
-                                </div>
-                            </div>
+                          
                         </div>
                     </div>
                 </form>
