@@ -4,8 +4,6 @@ import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
-import { TrustedHtmlString } from '@angular/core/src/sanitization/bypass';
 import { NgForm } from '@angular/forms';
 import { SelectComponent } from 'ng2-select';
 
@@ -48,7 +46,6 @@ export class PartnerDataDetailComponent implements OnInit {
     private router:Router,
     private baseService: BaseService,
     private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU) { }
 
   async ngOnInit() {

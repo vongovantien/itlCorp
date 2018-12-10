@@ -1,43 +1,17 @@
-import * as SearchHelper from 'src/helper/SearchHelper';
+
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
-import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
-import { async } from 'rxjs/internal/scheduler/async';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-
-// export class DataHelper {
-//     constructor(private baseService : BaseService , private api_menu: API_MENU) {
-//     }
-//     // baseService: BaseService;
-//     // api_menu: API_MENU;
-//     searchObj = {
-//         countryId: null,
-//         provinceId: null,
-//         districtId: null,
-//         placeType: null,
-//     }
-
-//     public async getProvinces(countryId: any, pager: PagerSetting) {
-//         this.searchObj.countryId = countryId;
-//         var provinces = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.searchObj, false, false);
-//         return provinces;
-//     }
-// }
-
+import * as XLSX from 'xlsx';
 
 /**
  * Return list provinces that belong to country has countryId
  * @param countryId 
  * @param pager 
  */
-export async function getProvinces(countryId: any,baseService:BaseService,api_menu:API_MENU) {
-   
+export async function getProvinces(countryId: any, baseService: BaseService, api_menu: API_MENU) {
+
     // var baseService: BaseService;
     // var api_menu: API_MENU;
     var searchObj = {
@@ -54,7 +28,7 @@ export async function getProvinces(countryId: any,baseService:BaseService,api_me
  * @param provinceId 
  * @param pager 
  */
-export async function getDistricts(countryId: any, provinceId: any,baseService:BaseService,api_menu:API_MENU) {
+export async function getDistricts(countryId: any, provinceId: any, baseService: BaseService, api_menu: API_MENU) {
     var baseService: BaseService;
     var api_menu: API_MENU;
     var searchObj = {
@@ -73,7 +47,7 @@ export async function getDistricts(countryId: any, provinceId: any,baseService:B
  * @param districtId 
  * @param pager 
  */
-export async function getTownWards(countryId: any, provinceId: any, districtId, pager: PagerSetting,baseService:BaseService,api_menu:API_MENU) {
+export async function getTownWards(countryId: any, provinceId: any, districtId, pager: PagerSetting, baseService: BaseService, api_menu: API_MENU) {
     var baseService: BaseService;
     var api_menu: API_MENU;
     var searchObj = {
@@ -84,5 +58,26 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
     }
     var townWards = await baseService.postAsync(api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, searchObj, false, false);
     return townWards;
+}
+
+/**
+ * Export excel file with single sheet from JSON data 
+ * https://www.npmjs.com/package/xlsx
+ * @param data 
+ * @param fileName 
+ * @param sheetName 
+ */
+export function exportExcelFileWithSingleSheet(data: any, fileName: string, sheetName: string) {
+    try {
+        /* generate worksheet */
+        const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+        /* generate workbook and add the worksheet */
+        const wb: XLSX.WorkBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        /* save to file */
+        XLSX.writeFile(wb, fileName, { bookType: 'xlsx' });
+    } catch (error) {
+        throw error;
+    }
 }
 

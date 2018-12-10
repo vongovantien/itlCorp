@@ -12,7 +12,7 @@ import { StageManagementComponent } from './stage-management/stage-management.co
 import { PartnerComponent } from './partner-data/partner.component';
 import { ModalModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
-import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormsModule} from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
 import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
 import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';

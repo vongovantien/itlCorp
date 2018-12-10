@@ -1,9 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { RouterLinkActive, ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
-import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
 import { BaseService } from 'src/services-base/base.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';

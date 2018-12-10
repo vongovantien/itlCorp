@@ -163,6 +163,7 @@ label {
 //table
 .table {
     font-size: 13px;
+    margin-bottom: 0;
     thead {
         th {
             padding-left: 8px;
@@ -214,6 +215,14 @@ label {
             margin-right: 10px;
         }
     }
+    .loading-wrapper {
+        text-align: center;
+        .m-loader {
+            &:before {
+                margin-top: -1rem;
+            }
+        }
+    }
 }
 .table-actions-col {
     .table-actions {
@@ -240,6 +249,9 @@ table.dataTable thead .sorting_asc {
 table.dataTable thead .sorting_desc {
     padding-right: 16px;
     background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+}
+.pagination-nav {
+    margin-top: 1rem;
 }
 //modal
 .modal {

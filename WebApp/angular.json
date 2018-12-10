@@ -27,9 +27,12 @@
               "src/assets"
             ],
             "styles": [
-              "src/assets/style-share/style.scss"
-            ],
-            "scripts": []
+              "src/assets/style-share/style.scss"            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "src/assets/external-libraries/js/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -47,7 +50,7 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true
+              "buildOptimizer": true                
             },
             "test":{
               "fileReplacements": [
@@ -58,7 +61,24 @@
               ]
             },
             "vi":{
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
               "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,                                          
+              "lazyModules": 
+              ["src/app/business-modules/catalogue/catalogue.module.ts",
+                "src/app/business-modules/accounting/accounting.module.ts",
+                "src/app/business-modules/documentation/documentation.module.ts",
+                "src/app/business-modules/operation/operation.module.ts",
+                "src/app/business-modules/report/report.module.ts",
+                "src/app/business-modules/tool-setting/tool.module.ts",
+                "src/app/business-modules/support/support.module.ts"               
+              ],
               "outputPath": "dist/eFMS-vi/",
               "i18nFile": "src/src/locale/messages.vi.xlf",
               "i18nFormat": "xlf",
@@ -75,7 +95,25 @@
               ]
             },
             "en":{
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
               "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "progress": true,
+              "lazyModules": 
+              ["src/app/business-modules/catalogue/catalogue.module.ts",
+                "src/app/business-modules/accounting/accounting.module.ts",
+                "src/app/business-modules/documentation/documentation.module.ts",
+                "src/app/business-modules/operation/operation.module.ts",
+                "src/app/business-modules/report/report.module.ts",
+                "src/app/business-modules/tool-setting/tool.module.ts",
+                "src/app/business-modules/support/support.module.ts"               
+              ],
               "outputPath": "dist/eFMS-en/",
               "fileReplacements": [
                 {

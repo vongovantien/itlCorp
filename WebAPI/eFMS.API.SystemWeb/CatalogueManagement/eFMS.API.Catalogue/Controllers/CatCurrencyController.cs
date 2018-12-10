@@ -64,9 +64,17 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("paging")]
         public IActionResult Get(CatCurrrencyCriteria criteria, int page, int size)
         {
-            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount);
-            var result = new { data, totalItems = rowCount, page, size };
+            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount, out int totalPages);
+            var result = new { data, totalItems = rowCount, totalPages, page, size };
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("getAllByQuery")]
+        public IActionResult Get(CatCurrrencyCriteria criteria)
+        {
+            var data = catCurrencyService.Query(criteria);
+            return Ok(data);
         }
 
         [HttpPost]

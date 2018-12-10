@@ -37,10 +37,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return DataContext.Delete(x => x.Id == id);
         }
 
-        public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
+        public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages)
         {
             var list = Query(criteria);
             rowsCount = list.Count;
+            totalPages = (rowsCount % pageSize == 0) ? rowsCount / pageSize : (rowsCount / pageSize) + 1;
             if (pageSize > 1)
             {
                 if (pageNumber < 1)
