@@ -72,6 +72,7 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
       childs: [
 
         { name: "Warehouse", route_child: "ware-house" },
+        { name: "Warehouse-import", route_child: "ware-house-import" },
         { name: "Port Index", route_child: "port-index" },
         { name: "Partner Data", route_child: "partner-data" },
         { name: "Commodity", route_child: "commodity" },

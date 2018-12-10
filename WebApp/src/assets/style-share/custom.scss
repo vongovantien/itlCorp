@@ -54,6 +54,12 @@ label {
         }
     }
 }
+.btn-link {
+    text-decoration: underline;
+    &:hover {
+        text-decoration: none;
+    }
+}
 .btn-danger {
     background-color: #fb4b58;
     border-color: #fb4b58;
@@ -193,6 +199,9 @@ label {
                 &:first-child {
                     padding-left: 10px
                 }
+            }
+            &.invalid-row {
+                background-color: #ffe3e4;
             }
         }
     }

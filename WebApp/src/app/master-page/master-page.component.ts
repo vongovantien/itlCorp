@@ -27,7 +27,7 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
    ngOnInit() {
      console.log(this.cookieService.get("login_status"));
     if(this.cookieService.get("login_status")!=="LOGGED_IN"){
-      this.router.navigateByUrl('/login');
+     // this.router.navigateByUrl('/login');
     }
     this.cdRef.detectChanges();
   }

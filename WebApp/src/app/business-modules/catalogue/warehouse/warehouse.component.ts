@@ -64,10 +64,10 @@ export class WarehouseComponent implements OnInit {
     };
   }
   importButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.export
+    typeButton: ButtonType.import
   };
   exportButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.import
+    typeButton: ButtonType.export
   };
   saveButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.save
