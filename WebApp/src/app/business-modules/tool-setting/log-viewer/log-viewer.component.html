@@ -93,19 +93,23 @@
                             <th class="sorting_asc">
                                 <span>No</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'name'), 'sorting_desc': (!isDesc && sortKey == 'name') }"
+                                (click)="sort('name')">
                                 <span>Name/Code</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'action'), 'sorting_desc': (!isDesc && sortKey == 'action') }"
+                                (click)="sort('action')">
                                 <span>Action</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'userUpdated'), 'sorting_desc': (!isDesc && sortKey == 'userUpdated') }"
+                                (click)="sort('userUpdated')">
                                 <span>User Update</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeUpdated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeUpdated') }"
+                                (click)="sort('datetimeUpdated')">
                                 <span>Update Time</span>
                             </th>
-                            <th class="sorting">
+                            <th>
                                 <span>Log Content</span>
                             </th>
                         </tr>

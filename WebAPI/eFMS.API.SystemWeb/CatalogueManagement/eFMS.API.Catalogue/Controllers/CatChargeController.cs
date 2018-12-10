@@ -10,9 +10,11 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -70,8 +72,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("addNew")]
+        [Authorize]
         public IActionResult Add(CatChargeAddOrUpdateModel model)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
@@ -91,8 +95,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("update")]
+        [Authorize]
         public IActionResult Update(CatChargeAddOrUpdateModel model)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model.Charge.Id, model);
             if (checkExistMessage.Length > 0)
@@ -112,8 +118,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpDelete]
         [Route("delete/{id}")]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catChargeService.DeleteCharge(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
