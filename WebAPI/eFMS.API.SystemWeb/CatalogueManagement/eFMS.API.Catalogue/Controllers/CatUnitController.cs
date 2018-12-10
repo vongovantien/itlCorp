@@ -8,7 +8,11 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -25,12 +29,14 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatUnitService catUnitService;
         private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
 
-        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper)
+        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catUnitService = service;
             mapper = imapper;
+            currentUser = user;
         }
 
         [HttpGet]
@@ -66,6 +72,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Post(CatUnitModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -75,7 +82,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
-            catUnit.UserCreated = "01";
+            catUnit.UserCreated = currentUser.UserID;
             catUnit.DatetimeCreated = DateTime.Now;
             catUnit.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -91,6 +98,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("Update")]
+        [Authorize]
         public IActionResult Put(CatUnitModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -100,7 +108,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
-            catUnit.UserModified = "01";
+            catUnit.UserModified = currentUser.UserID;
             catUnit.DatetimeModified = DateTime.Now;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catUnitService.Update(catUnit,x=>x.Id==model.Id);
@@ -119,6 +127,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(int id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catUnitService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

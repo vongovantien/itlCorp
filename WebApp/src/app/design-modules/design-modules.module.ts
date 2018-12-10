@@ -6,16 +6,32 @@ import { FormComponent } from './form/form.component';
 import { TableComponent } from './table/table.component';
 import { SharedModule } from '../shared/shared.module';
 import { SelectModule } from 'ng2-select';
-import { Daterangepicker } from 'ng2-daterangepicker';
+import { FormsModule } from '@angular/forms';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 
+const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+  // wheelPropagation: true
+};
 @NgModule({
   imports: [
     CommonModule,
     DesignModulesRoutingModule,
     SharedModule,
-    Daterangepicker,
-    SelectModule
+    NgxDaterangepickerMd,
+    FormsModule,
+    SelectModule,
+    PerfectScrollbarModule, // Scrollbar
   ],
-  declarations: [FormComponent, TableComponent]
+  declarations: [
+    FormComponent, 
+    TableComponent
+  ],
+  providers: [
+    { 
+      provide: PERFECT_SCROLLBAR_CONFIG, // Scrollbar
+      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG // Scrollbar
+    }
+  ],
 })
 export class DesignModulesModule { }

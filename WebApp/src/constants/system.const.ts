@@ -4,6 +4,7 @@ export class SystemConstants {
     public static readonly LSK_CURRENT_USER: string = 'CURRENT_USER';
     public static readonly LSK_CURRENT_WORKPLACE_ID: string = 'CURRENT_WORKPLACE_ID';
     public static readonly LSK_CURRENT_LANG: string = 'CURRENT_LANG';
+    public static readonly CURRENT_CLIENT_LANGUAGE:string = 'CURRENT_CLIENT_LANGUAGE';
     public static readonly LSL_CACHE_REMEMBER: string = 'CACHE_REMEMBER';
     public static readonly CURRENT_LANGUAGE:string = "CURRENT_LANGUAGE";
     public static readonly CURRENT_VERSION:string = "CURRENT_VERSION";
@@ -18,6 +19,7 @@ export class SystemConstants {
     public static readonly AUTH_ISSUER = 'http://localhost:5000';
     public static readonly AUTH_CLIENT_ID = 'eTMS' ;
     public static readonly AUTH_SCOPE = 'openid profile offline_access etms_scope dnt_api';
+    public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
 
     public static CURRENT_USER;
 
@@ -36,7 +38,8 @@ export class SystemConstants {
     
     public static readonly MODULE_NAME = {
         CATALOUGE: "Catalogue",
-        SYSTEM: "System"
+        SYSTEM: "System",
+        LOG: "Log"
     }
     public static readonly LANGUAGES = {
         ENGLISH: SystemConstants.DEFAULT_LANGUAGE,

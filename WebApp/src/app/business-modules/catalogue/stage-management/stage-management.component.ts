@@ -1,7 +1,5 @@
-import { Component, OnInit, Output, ViewChild, AfterViewChecked, AfterContentInit, EventEmitter } from '@angular/core';
+import { Component, OnInit,ViewChild} from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
@@ -10,7 +8,7 @@ import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as lodash from 'lodash';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-declare var jquery: any;
+// declare var jquery: any;
 declare var $: any;
 
 @Component({
@@ -20,13 +18,7 @@ declare var $: any;
 })
 export class StageManagementComponent implements OnInit {
 
-
-    // Stages_List: any;
-    // Const_Stage_List:any;
-    // StageNew:StageModel;
-
     selected_filter = "All";
-
     ListStages: any = [];
     ConstStageList: any = [];
     StageToAdd = new StageModel();
@@ -36,7 +28,7 @@ export class StageManagementComponent implements OnInit {
 
     @ViewChild(PaginationComponent) child;
 
-    constructor(private baseServices: BaseService, private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService, private api_menu: API_MENU,private sortService: SortService) {
+    constructor(private baseServices: BaseService,private api_menu: API_MENU,private sortService: SortService) {
 
     }
 

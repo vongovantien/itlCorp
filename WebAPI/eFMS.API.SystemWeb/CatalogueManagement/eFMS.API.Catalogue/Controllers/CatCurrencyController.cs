@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Claims;
 using System.Threading;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
@@ -9,11 +11,16 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
+using System.Linq;
+using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -26,19 +33,22 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCurrencyService catCurrencyService;
         private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
 
-        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service, IMapper imapper)
+        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service, IMapper imapper,
+            ICurrentUser user)
         {
             stringLocalizer = localizer;
             catCurrencyService = service;
             mapper = imapper;
+            currentUser = user;
         }
 
         [HttpGet]
         [Route("getAll")]
         public IActionResult Get()
         {
-            var data = catCurrencyService.Get();
+            var data = catCurrencyService.Get().OrderBy(x => x.CurrencyName);
             return Ok(data);
         }
 
@@ -52,16 +62,24 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("paging")]
-        [Authorize]
         public IActionResult Get(CatCurrrencyCriteria criteria, int page, int size)
         {
-            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount);
-            var result = new { data, totalItems = rowCount, page, size };
+            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount, out int totalPages);
+            var result = new { data, totalItems = rowCount, totalPages, page, size };
             return Ok(result);
         }
 
         [HttpPost]
+        [Route("getAllByQuery")]
+        public IActionResult Get(CatCurrrencyCriteria criteria)
+        {
+            var data = catCurrencyService.Query(criteria);
+            return Ok(data);
+        }
+
+        [HttpPost]
         [Route("add")]
+        [Authorize]
         public IActionResult Post(CatCurrencyModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -71,7 +89,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserCreated = "01";
+            catCurrencyModel.UserCreated = currentUser.UserID;
             catCurrencyModel.DatetimeCreated = DateTime.Now;
             catCurrencyModel.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -87,6 +105,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("update")]
+        [Authorize]
         public IActionResult Put(CatCurrencyModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -96,7 +115,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserModified = "01";
+            catCurrencyModel.UserModified = currentUser.UserID;
             catCurrencyModel.DatetimeModified = DateTime.Now;         
             if(catCurrencyModel.Inactive == true)
             {
@@ -114,9 +133,11 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(string id)
         {
-            var hs = catCurrencyService.Delete(x => x.Id == id);
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = catCurrencyService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

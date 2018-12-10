@@ -8,6 +8,9 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -25,32 +28,46 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCurrencyExchangeService catCurrencyExchangeService;
         private readonly IMapper mapper;
-        public CatCurrencyExchangeController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyExchangeService service, IMapper imapper)
+        private readonly ICurrentUser currentUser;
+        public CatCurrencyExchangeController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyExchangeService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catCurrencyExchangeService = service;
             mapper = imapper;
+            currentUser = user;
         }
 
         [HttpPost]
         [Route("GetExchangeRateHistory/Paging")]
-        public IActionResult GetExchangeRateHistory(CatCurrencyExchangeCriteria criteria, int pageNumber, int pageSize)
+        public IActionResult GetExchangeRateHistory(CatCurrencyExchangeCriteria criteria, int page, int size)
         {
-            var data = catCurrencyExchangeService.Paging(criteria, pageNumber, pageSize, out int rowCount);
-            var result = new { data, totalItems = rowCount, pageNumber, pageSize };
+            var data = catCurrencyExchangeService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
-
+        [HttpGet("GetCurrencies")]
+        public IActionResult GetCurrencies()
+        {
+            var result = catCurrencyExchangeService.GetCurrency();
+            return Ok(result);
+        }
         [HttpGet("GetNewest")]
         public IActionResult GetNewest()
         {
             var result = catCurrencyExchangeService.GetCurrencyExchangeNewest();
             return Ok(result);
         }
-        [HttpGet("GetExchangeRates")]
-        public IActionResult GetExchangeRates(DateTime date, string localCurrency, string createdBy)
+        [HttpGet("GetExchangeRatesBy")]
+        public IActionResult GetExchangeRates(DateTime date, string localCurrency, string fromCurrency)
         {
-            var result = catCurrencyExchangeService.GetExchangeRates(date, localCurrency, createdBy);
+            var result = catCurrencyExchangeService.GetExchangeRates(date, localCurrency, fromCurrency);
+            return Ok(result);
+        }
+
+        [HttpGet("ConvertRate")]
+        public IActionResult ConvertRate(DateTime date, string localCurrency, string fromCurrency)
+        {
+            var result = catCurrencyExchangeService.ConvertRate(date, localCurrency, fromCurrency);
             return Ok(result);
         }
 
@@ -78,9 +95,11 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("UpdateRate")]
+        [Authorize]
         public IActionResult Put(CatCurrencyExchangeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            model.UserModified = currentUser.UserID;
             var hs = catCurrencyExchangeService.UpdateRate(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -95,6 +114,8 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Put(int id, CatCurrencyExchangeModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            model.UserModified = currentUser.UserID;
+            model.DatetimeModified = DateTime.Now;
             var hs = catCurrencyExchangeService.Update(model, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

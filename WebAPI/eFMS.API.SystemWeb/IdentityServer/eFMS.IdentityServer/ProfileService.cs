@@ -1,4 +1,6 @@
 ﻿using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.Models;
+using eFMS.IdentityServer.Service.Models;
 using IdentityModel;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
@@ -14,14 +16,20 @@ namespace eFMS.IdentityServer
     public class ProfileService : IProfileService
     {
         private IAuthenUserService authenUserService;
-        public ProfileService(IAuthenUserService service)
+        private ISysUserLogService userLogService;
+        public ProfileService(IAuthenUserService service,ISysUserLogService _userLogService)
         {
             authenUserService = service;
+            userLogService = _userLogService;
         }
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
+            var userInfo = new SysUserLogModel();
+            userInfo.LoggedInOn = DateTime.Now;
+            userInfo.UserId = user.Id;
+            userLogService.Add(userInfo);
 
             var claims = new List<Claim>
                 {
@@ -33,7 +41,8 @@ namespace eFMS.IdentityServer
                 };
 
             context.IssuedClaims = claims;
-           // return Task.FromResult(context.IssuedClaims);
+
+     
         }
 
         public Task IsActiveAsync(IsActiveContext context)

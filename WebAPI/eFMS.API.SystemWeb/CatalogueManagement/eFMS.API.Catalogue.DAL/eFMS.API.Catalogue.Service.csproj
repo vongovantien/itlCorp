@@ -20,12 +20,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <Compile Remove="Contexts\DBHelper.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <PackageReference Include="mongocsharpdriver" Version="2.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="eFMS.API.Log.DL">
+      <HintPath>..\..\LogManagement\bin\netcoreapp2.1\eFMS.API.Log.DL.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\..\IdentityServer\bin\netcoreapp2.1\eFMS.IdentityServer.DL.dll</HintPath>
+    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
     </Reference>

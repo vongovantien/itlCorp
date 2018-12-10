@@ -13,7 +13,6 @@ import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { SortService } from 'src/app/shared/services/sort.service';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { Router } from '@angular/router';
 import { AirShipSupComponent } from './air-ship-sup/air-ship-sup.component';
@@ -177,11 +176,12 @@ export class PartnerComponent implements OnInit {
     }
   }
   setPageAfterDelete() {
-    this.child.setPage(this.pager.currentPage);
-    if (this.pager.currentPage > this.pager.totalPages) {
-      this.pager.currentPage = this.pager.totalPages;
-      this.child.setPage(this.pager.currentPage);
+    this.pager.totalItems = this.pager.totalItems -1;
+    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    if (totalPages < this.pager.totalPages) {
+      this.pager.currentPage = totalPages;
     }
+    this.child.setPage(this.pager.currentPage);
   }
   
   RefreshData(): any {
@@ -219,6 +219,9 @@ export class PartnerComponent implements OnInit {
    this.router.navigate(["/home/catalogue/partner-data-addnew",{ partnerType: this.criteria.partnerGroup }]);
   }
   setPage(pager:PagerSetting){
+    this.pager.currentPage = pager.currentPage;
+    this.pager.pageSize = pager.pageSize;
+    this.pager.totalPages = pager.totalPages;
     if(this.activeTab == this.tabName.customerTab){
       this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
       this.customerComponent.getPartnerData(pager, this.criteria);

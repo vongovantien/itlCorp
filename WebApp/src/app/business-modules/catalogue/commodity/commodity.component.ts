@@ -4,7 +4,6 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { CommodityGroup } from 'src/app/shared/models/catalogue/commonity-group.model';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { COMMODITYGROUPCOLUMNSETTING } from './commonity-group.column';
@@ -12,11 +11,11 @@ import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
+import { SelectComponent } from 'ng2-select';
 declare var $:any;
 
 @Component({
@@ -32,6 +31,7 @@ export class CommodityComponent implements OnInit {
   @ViewChild(PaginationComponent) child; 
   @ViewChild('formCommodity') formCommodity: NgForm;
   @ViewChild('formGroupCommodity') formGroupCommodity: NgForm;
+  @ViewChild('chooseGroup') public groupSelect: SelectComponent;
   commodities: Array<Commodity>;
   commodity: Commodity;
   commodityGroups: Array<CommodityGroup>;
@@ -64,10 +64,10 @@ export class CommodityComponent implements OnInit {
     typeButton: ButtonType.add
   };
   importButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.export
+    typeButton: ButtonType.import
   };
   exportButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.import
+    typeButton: ButtonType.export
   };
   saveButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.save
@@ -95,7 +95,6 @@ export class CommodityComponent implements OnInit {
 
   constructor(private baseService: BaseService,
     private toastr: ToastrService, 
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 
@@ -231,23 +230,24 @@ export class CommodityComponent implements OnInit {
   }
   async deleteCommodity() {
     await this.baseService.deleteAsync(this.api_menu.Catalogue.Commodity.delete + this.commodity.id, true, false);
-    await this.getCommodities(this.pager);
+    //await this.getCommodities(this.pager);
     this.setPageAfterDelete();
   }
   async deleteGroupCommodity(){
     var response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
     if(response.status){
       this.getGroups();
-      await this.getGroupCommodities(this.pager);
+      //await this.getGroupCommodities(this.pager);
       this.setPageAfterDelete();
     }
   }
   setPageAfterDelete(){
-    this.child.setPage(this.pager.currentPage);
-    if (this.pager.currentPage > this.pager.totalPages) {
-      this.pager.currentPage = this.pager.totalPages;
-      this.child.setPage(this.pager.currentPage);
+    this.pager.totalItems = this.pager.totalItems -1;
+    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    if (totalPages < this.pager.totalPages) {
+      this.pager.currentPage = totalPages;
     }
+    this.child.setPage(this.pager.currentPage);
   }
   setPageAfterAdd() {
     this.child.setPage(this.pager.currentPage);
@@ -295,6 +295,8 @@ export class CommodityComponent implements OnInit {
   updateCommodity(): any {
     this.baseService.put(this.api_menu.Catalogue.Commodity.update + this.commodity.id, this.commodity).subscribe((response: any) => {
       if (response.status == true){
+        this.groupSelect.active = [];
+        this.formCommodity.onReset();
         $('#' + this.nameCommodityModal).modal('hide');
         this.toastr.success(response.message);
         this.setPage(this.pager);
@@ -322,12 +324,15 @@ export class CommodityComponent implements OnInit {
     var response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
     if (response.status == true){
       this.getGroups();
-      await this.getGroupCommodities(this.pager);
+      //await this.getGroupCommodities(this.pager);
+      this.pager.totalItems = this.pager.totalItems + 1;
+      this.pager.currentPage = 1;
+      this.child.setPage(this.pager.currentPage);
       this.formGroupCommodity.onReset();
       this.commodityGroup = new CommodityGroup();
       $('#' + this.nameGroupModal).modal('hide');
-      this.child.setPage(this.pager.currentPage);
-      this.setPageAfterAdd();
+      // this.child.setPage(this.pager.currentPage);
+      // this.setPageAfterAdd();
     }
   }
   showConfirmDelete(item, tabName) {

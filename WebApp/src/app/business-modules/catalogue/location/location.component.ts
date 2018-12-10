@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import * as lodash from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
@@ -11,7 +9,6 @@ import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import * as dataHelper from 'src/helper/data.helper';
-import { from } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -113,8 +110,6 @@ export class LocationComponent implements OnInit {
 
   constructor(
     private baseServices: BaseService,
-    private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 
@@ -458,7 +453,7 @@ export class LocationComponent implements OnInit {
     var countryId = this.ProvinceCityToUpdate.countryId;
 
     var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-      return o.id == countryId
+      return o['id'] == countryId
     });
     this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
   }
@@ -564,7 +559,7 @@ export class LocationComponent implements OnInit {
     var provinceId = this.DistrictToUpdate.provinceId;
 
     var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-      return o.id == countryId
+      return o['id'] == countryId
     });
 
     var provinces = await dataHelper.getProvinces(countryId, this.baseServices, this.api_menu);
@@ -572,7 +567,7 @@ export class LocationComponent implements OnInit {
     this.resetNgSelect("province");
 
     var indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
-      return o.id == provinceId;
+      return o['id'] == provinceId;
     });
 
     this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
@@ -699,15 +694,15 @@ export class LocationComponent implements OnInit {
     console.log({ provinces: this.ngSelectDataProvinces }, { districts: this.ngSelectDataDistricts });
 
     var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-      return o.id == countryId
+      return o['id'] == countryId
     });
 
     var indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
-      return o.id == provinceId;
+      return o['id'] == provinceId;
     });
 
     var indexCurrentDistrict = lodash.findIndex(this.ngSelectDataDistricts, function (o) {
-      return o.id == districtId;
+      return o['id'] == districtId;
     });
     this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
     this.currentActiveProvince = [this.ngSelectDataProvinces[indexCurrentProvince]];

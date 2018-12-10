@@ -8,7 +8,11 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -25,11 +29,13 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
-        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper)
+        private readonly ICurrentUser currentUser;
+        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catPlaceService = service;
             mapper = iMapper;
+            currentUser = user;
         }
 
         [HttpGet]
@@ -88,6 +94,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Post(CatPlaceEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -100,7 +107,7 @@ namespace eFMS.API.Catalogue.Controllers
             model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
             catPlace.Id = Guid.NewGuid();
-            catPlace.UserCreated = "01";
+            catPlace.UserCreated = currentUser.UserID;
             catPlace.DatetimeCreated = DateTime.Now;
             catPlace.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -115,6 +122,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Put(Guid id, CatPlaceEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -124,7 +132,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.UserModified = "01";
+            catPlace.UserModified = currentUser.UserID;
             catPlace.DatetimeModified = DateTime.Now;
             catPlace.Id = id;
             if(catPlace.Inactive == true)
@@ -143,8 +151,10 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catPlaceService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

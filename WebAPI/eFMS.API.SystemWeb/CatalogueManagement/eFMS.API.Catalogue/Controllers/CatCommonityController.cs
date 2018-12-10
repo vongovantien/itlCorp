@@ -8,7 +8,11 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -26,11 +30,13 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCommodityService catComonityService;
         private readonly IMapper mapper;
-        public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper)
+        private readonly ICurrentUser currentUser;
+        public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catComonityService = service;
             mapper = iMapper;
+            currentUser = user;
         }
 
         [HttpPost]
@@ -59,6 +65,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Post(CatCommodityEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -69,7 +76,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var commonity = mapper.Map<CatCommodityModel>(model);
-            commonity.UserCreated = "01";
+            commonity.UserCreated = currentUser.UserID;
             commonity.DatetimeCreated = DateTime.Now;
             commonity.Inactive = false;
             var hs = catComonityService.Add(commonity);
@@ -82,6 +89,7 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Put(short id, CatCommodityEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -91,7 +99,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var commonity = mapper.Map<CatCommodityModel>(model);
-            commonity.UserModified = "01";
+            commonity.UserModified = currentUser.UserID;
             commonity.DatetimeModified = DateTime.Now;
             commonity.Id = id;
             if (commonity.Inactive == true)
@@ -108,8 +116,10 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(short id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catComonityService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

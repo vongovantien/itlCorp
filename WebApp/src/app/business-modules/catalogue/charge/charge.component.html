@@ -60,7 +60,7 @@
                                 class="form-control" aria-label="Text input with dropdown button">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="button" title="Search" (click)="searchCharge()">
-                                    <i class="icon-search"></i>
+                                    <i class="la la-search"></i>
                                 </button>
                             </div>
                         </div>
@@ -203,7 +203,7 @@
                         <label class="col-lg-4 col-form-label form-control-label">Type</label>
                         <div class="col-lg-8">
                             <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" 
                                 placeholder="Select type">
                             </ng-select>
                         </div>
@@ -275,7 +275,7 @@
                         <label class="col-lg-4 col-form-label form-control-label">Type</label>
                         <div class="col-lg-8">
                             <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                (selected)="selected($event)" (removed)="removed($event)"
                                 placeholder="Select type">
                             </ng-select>
                         </div>

@@ -18,13 +18,18 @@ using eFMS.API.System.Service.Contexts;
 using eFMS.IdentityServer;
 using Microsoft.IdentityModel.Logging;
 using System.Security.Cryptography.X509Certificates;
+using System.IO;
 
 namespace AuthServer
 {
     public class Startup
     {
 
-        
+        IHostingEnvironment _environment;
+        public Startup(IHostingEnvironment environment)
+        {
+            _environment = environment;
+        }
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 
@@ -32,20 +37,25 @@ namespace AuthServer
         {
           
             services.AddAutoMapper();
+            var cert = new X509Certificate2(Path.Combine(_environment.ContentRootPath, "certs", "IdentityServer4Auth.pfx"));
             services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
+                //.AddDeveloperSigningCredential()
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryClients(Config.GetClients(null, 14400, 12600))
-                .AddInMemoryPersistedGrants();
-                 
+                .AddInMemoryPersistedGrants()
+            .AddSigningCredential(cert)
+                .AddValidationKey(cert);
+
 
             services.AddTransient<IAuthenUserService, AuthenticateService>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
+
             //.AddTestUsers(Config.GetUsers());
 
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
             services.AddTransient<IProfileService, ProfileService>();
+            services.AddTransient<ISysUserLogService, SysUserLogService>();
 
             IdentityModelEventSource.ShowPII = true;
         }

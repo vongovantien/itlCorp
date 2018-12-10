@@ -44,3 +44,7 @@ bin
 /WebAPI/eFMS.API.SystemWeb/IdentityServer/eFMS.IdentityServer/bin
 /WebAPI/eFMS.API.SystemWeb/IdentityServer/.vs
 /WebAPI/eFMS.API.SystemWeb/CatalogueManagement/.vs
+/WebAPI/eFMS.API.SystemWeb/LogManagement/eFMS.API.Log/obj
+/WebAPI/eFMS.API.SystemWeb/LogManagement/eFMS.API.Log.DAL/obj
+/WebAPI/eFMS.API.SystemWeb/LogManagement/eFMS.API.Log.DL/obj
+/WebAPI/eFMS.API.SystemWeb/LogManagement/.vs

@@ -4,22 +4,15 @@ import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+
 import { NgForm } from '@angular/forms';
-import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
+
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
-import {CatCharge} from 'src/app/shared/models/catalogue/catCharge.model';
+
 import {CatChargeDefaultAccount} from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
-import * as dataHelper from 'src/helper/data.helper';
-import { from } from 'rxjs';
-import { SystemConstants } from 'src/constants/system.const';
-import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
-import { reserveSlots } from '@angular/core/src/render3/instructions';
+
 import { Router, ActivatedRoute } from '@angular/router';
-import { async } from 'q';
-// import {DataHelper} from 'src/helper/data.helper';
-declare var $: any;
+// declare var $: any;
 
 
 @Component({
@@ -31,10 +24,7 @@ export class ChargeDetailsComponent implements OnInit {
   constructor(
     private baseServices: BaseService,
     private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
-    private api_menu: API_MENU,
-    private el:ElementRef,
-    private router:Router,
+    private api_menu: API_MENU,  
     private route:ActivatedRoute) { }
     //Charge : CatChargeOrUpdate = new CatChargeOrUpdate();
     isAddNewLine:boolean = false;
@@ -93,8 +83,8 @@ export class ChargeDetailsComponent implements OnInit {
         const idCurrency = this.Charge.charge.currencyId;
         const type = this.Charge.charge.type;
 
-        var indexCurrentUnit = lodash.findIndex(this.ngDataUnit,function(o){return o.id===idUnit});
-        var indexCurrentCurrency = lodash.findIndex(this.ngDataCurrency,function(o){return o.id===idCurrency});
+        var indexCurrentUnit = lodash.findIndex(this.ngDataUnit,function(o){return o['id']===idUnit});
+        var indexCurrentCurrency = lodash.findIndex(this.ngDataCurrency,function(o){return o['id']===idCurrency});
         var indexType = lodash.findIndex(this.ngDataType,function(o){return o.id===type});
 
         this.activeUnit = [this.ngDataUnit[indexCurrentUnit]];
