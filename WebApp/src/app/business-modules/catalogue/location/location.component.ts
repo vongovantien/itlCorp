@@ -12,7 +12,6 @@ import * as dataHelper from 'src/helper/data.helper';
 import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-// import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
 @Component({

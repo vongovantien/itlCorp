@@ -73,6 +73,7 @@ export class CurrencyComponent implements OnInit {
 
   async getCurrencies(pager: PagerSetting) {
     this.spinnerService.show();
+    console.log(this.criteria);
     this.baseService.post(this.api_menu.Catalogue.Currency.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.spinnerService.hide();
       this.currencies = response.data;
@@ -138,29 +139,30 @@ export class CurrencyComponent implements OnInit {
   update(): any {
     this.spinnerService.show();
     this.baseService.put(this.api_menu.Catalogue.Currency.update, this.currency).subscribe((response: any) => {
-      if (response.status == true) {
+      
         $('#' + this.nameModal).modal('hide');
-        this.toastr.success(response.message);
+        this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
         this.getCurrencies(this.pager);
         this.spinnerService.hide();
-      }
-    }, error => this.baseService.handleError(error));
+      
+    },err=>{
+      this.toastr.error(err.error.message,"",{positionClass:'toast-bottom-right'});
+    });
   }
   addNew(): any {
     this.baseService.post(this.api_menu.Catalogue.Currency.addNew, this.currency).subscribe((response: any) => {
-      if (response.status == true) {
-        this.toastr.success(response.message);
+  
+        this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
         //this.getCurrencies(this.pager);
         this.form.onReset();
         $('#' + this.nameModal).modal('hide');
         this.pager.totalItems = this.pager.totalItems + 1;
         this.pager.currentPage = 1;
         this.child.setPage(this.pager.currentPage);
-      }
-      else {
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+  
+    },err=>{       
+       this.toastr.error(err.error.message,"",{positionClass:'toast-bottom-right'});
+    });
   }
   showDetail(item) {
     this.isAddnew = false;
@@ -174,7 +176,7 @@ export class CurrencyComponent implements OnInit {
     if (event) {
       this.baseService.delete(this.api_menu.Catalogue.Currency.delete + this.currency.id).subscribe((response: any) => {
         if (response.status == true) {
-          this.toastr.success(response.message);
+          this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
           // this.pager.currentPage = 1;
           // this.getCurrencies(this.pager);
           this.setPageAfterDelete();
@@ -197,7 +199,7 @@ export class CurrencyComponent implements OnInit {
 
   async export() {
     console.log(this.criteria)
-    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery,this.criteria,true,true);
+    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery,this.criteria);
     console.log(currenciesList);    
     currenciesList = lodash.map(currenciesList, function (currency) {
       return {
