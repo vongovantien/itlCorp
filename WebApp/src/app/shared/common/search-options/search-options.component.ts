@@ -10,6 +10,7 @@ declare var $: any;
 export class SearchOptionsComponent implements OnInit {
   @Input() configSearch : any;
   @Output() search = new EventEmitter<any>();
+  @Output() reset_search = new EventEmitter<any>();
   defaultSetting: any = { header: 'All', primaryKey: 'All'};
   settingFields: any [] = [this.defaultSetting];
   searchObject: any = {
@@ -67,6 +68,6 @@ export class SearchOptionsComponent implements OnInit {
       searchString: ""
     };
     //this.searchObject.fieldDisplayName = this.defaultSetting.header;
-    this.search.emit(this.searchObject);
+    this.reset_search.emit(this.searchObject);
   }
 }
