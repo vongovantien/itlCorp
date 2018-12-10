@@ -64,10 +64,10 @@ export class CommodityComponent implements OnInit {
     typeButton: ButtonType.add
   };
   importButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.export
+    typeButton: ButtonType.import
   };
   exportButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.import
+    typeButton: ButtonType.export
   };
   saveButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.save

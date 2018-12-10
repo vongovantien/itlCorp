@@ -70,6 +70,14 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPost]
+        [Route("getAllByQuery")]
+        public IActionResult Get(CatCurrrencyCriteria criteria)
+        {
+            var data = catCurrencyService.Query(criteria);
+            return Ok(data);
+        }
+
+        [HttpPost]
         [Route("add")]
         [Authorize]
         public IActionResult Post(CatCurrencyModel model)

@@ -64,10 +64,10 @@ export class WarehouseComponent implements OnInit {
     };
   }
   importButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.export
+    typeButton: ButtonType.import
   };
   exportButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.import
+    typeButton: ButtonType.export
   };
   saveButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.save
@@ -351,5 +351,16 @@ export class WarehouseComponent implements OnInit {
   }
   onDistrictchange(district){
     this.warehouse.districtID = district.id;
+  }
+
+  /**
+   * EXPORT - IMPORT DATA 
+   */
+  async export(){
+    
+  }
+
+  async import(){
+
   }
 }

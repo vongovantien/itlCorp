@@ -35,6 +35,7 @@ export class LoginComponent implements OnInit,AfterViewInit {
     this.oauthService.configure(authConfig);
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    this.oauthService.setupAutomaticSilentRefresh();
   }
 
   username: string = "";
@@ -61,6 +62,7 @@ export class LoginComponent implements OnInit,AfterViewInit {
         this.spinnerService.hide();
       }).catch((err) => {
         this.toastr.error(err.error.error_description)
+        this.spinnerService.hide();
       })
     }
 
@@ -153,6 +155,5 @@ export class LoginComponent implements OnInit,AfterViewInit {
       window.location.href = window.location.protocol + "//" + window.location.hostname + "/" + lang + "/";
     }
   }
-
 
 }

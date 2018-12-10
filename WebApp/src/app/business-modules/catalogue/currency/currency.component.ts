@@ -14,9 +14,8 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import * as XLSX from 'xlsx';
+import * as DataHelper from 'src/helper/data.helper';
 import * as lodash from 'lodash';
-import * as Excel from 'exceljs';
 
 declare var $: any;
 
@@ -137,12 +136,13 @@ export class CurrencyComponent implements OnInit {
     }
   }
   update(): any {
+    this.spinnerService.show();
     this.baseService.put(this.api_menu.Catalogue.Currency.update, this.currency).subscribe((response: any) => {
       if (response.status == true) {
         $('#' + this.nameModal).modal('hide');
         this.toastr.success(response.message);
         this.getCurrencies(this.pager);
-
+        this.spinnerService.hide();
       }
     }, error => this.baseService.handleError(error));
   }
@@ -196,8 +196,8 @@ export class CurrencyComponent implements OnInit {
 
 
   async export() {
-    console.log(this.currencies)
-    var currenciesList = await this.baseService.getAsync(this.api_menu.Catalogue.Currency.getAll,true,true);
+    console.log(this.criteria)
+    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery,this.criteria,true,true);
     console.log(currenciesList);    
     currenciesList = lodash.map(currenciesList, function (currency) {
       return {
@@ -207,25 +207,16 @@ export class CurrencyComponent implements OnInit {
         "Inactive": currency.inactive,
       }
     });
-    /* generate worksheet */
-   
-      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(currenciesList);
-      /* generate workbook and add the worksheet */
-      const wb: XLSX.WorkBook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Currency Report');
-  
-      /* save to file */
-      XLSX.writeFile(wb, "Currency-" + new Date().toISOString() + ".xlsx");
+    DataHelper.exportExcelFileWithSingleSheet(currenciesList,"currency_report","Currency List");
   }
 
-  total = 0;
   async import() {
-    for (var i = 0; i <= 6000; i++) {
-      var currency: catCurrency = new catCurrency();
-      currency.id = "CRCC-" + new Date().toISOString();
-      currency.currencyName = "CRCC-name-" + new Date().toISOString();
-      await this.baseService.postAsync(this.api_menu.Catalogue.Currency.addNew, currency,false,false);
-      this.total += 1;
-    }
+    // for (var i = 0; i <= 6000; i++) {
+    //   var currency: catCurrency = new catCurrency();
+    //   currency.id = "CRCC-" + new Date().toISOString();
+    //   currency.currencyName = "CRCC-name-" + new Date().toISOString();
+    //   await this.baseService.postAsync(this.api_menu.Catalogue.Currency.addNew, currency,false,false);
+    //   this.total += 1;
+    //}
   }
 }
