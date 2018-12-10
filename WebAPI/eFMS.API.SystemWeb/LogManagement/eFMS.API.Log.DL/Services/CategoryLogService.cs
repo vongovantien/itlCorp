@@ -69,7 +69,18 @@ namespace eFMS.API.Log.DL.Services
                 case CategoryTable.Warehouse:
                     data = PagingCatPlace(criteria, page, size, out rowsCount);
                     break;
-
+                case CategoryTable.PortIndex:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
+                case CategoryTable.Province:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
+                case CategoryTable.District:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
+                case CategoryTable.Ward:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
             }
             if (data == null) return null;
             var result = (from s in data
@@ -257,7 +268,7 @@ namespace eFMS.API.Log.DL.Services
                 PropertyChange = x.PropertyCommon.PropertyChange,
                 ObjectId = x.NewObject.Id.ToString(),
                 Name = x.NewObject.Code??x.NewObject.NameEn,
-                Code = x.NewObject?.Id.ToString()
+                Code = int.TryParse(x.NewObject?.Id.ToString(), out int n) == true ? null : x.NewObject?.Id.ToString()
             });
             return data;
         }
@@ -279,7 +290,7 @@ namespace eFMS.API.Log.DL.Services
                 PropertyChange = x.PropertyCommon.PropertyChange,
                 ObjectId = x.NewObject.Id.ToString(),
                 Name = x.NewObject?.CommodityNameEn,
-                Code = x.NewObject?.Id.ToString()
+                Code = int.TryParse(x.NewObject?.Id.ToString(), out int n) == true?null: x.NewObject?.Id.ToString()
             });
             return data;
         }

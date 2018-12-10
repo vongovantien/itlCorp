@@ -132,6 +132,8 @@ export class LogViewerComponent implements OnInit {
  
   public removed(value:any):void {
     this.logs = [];
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     console.log('Removed value is: ', value);
   }
  

@@ -118,7 +118,7 @@
                             <td>
                                 <span *ngIf="log.code == null">{{ log.name }}</span>
                                 <span *ngIf="log.name == null">{{ log.code }}</span>
-                                <span *ngIf="log.name && log.name">{{ log.code }} / {{ log.name }}</span>
+                                <span *ngIf="log.code && log.name">{{ log.code }} / {{ log.name }}</span>
                             </td>
                             <td>
                                 <span>{{ log.action }}</span>
@@ -131,9 +131,9 @@
                                 <span>{{ log.datetimeUpdated | date: 'hh:mm:ss' }}</span>
                             </td>
                             <td>
-                                <span *ngIf="log.propertyChange == null">{{ log.action }} </span>
-                                <span *ngIf="log.propertyChange == null && log.action=='Update'">{{ log.action }}: nochange </span>
-                                <span *ngIf="log.propertyChange">{{ log.action }} {{ log.propertyChange.propertyName }} : {{ log.propertyChange.newValue }} </span>
+                                <span>{{ log.action }}</span>
+                                <span *ngIf="log.propertyChange == null && log.action=='Update'">: nochange </span>
+                                <span *ngIf="log.propertyChange"> {{ log.propertyChange.propertyName }} : {{ log.propertyChange.newValue }} </span>
                             </td>
                         </tr>
                         <!-- <tr>
