@@ -1,4 +1,3 @@
-
 export const language = {
   Menu : [  
     {
@@ -89,7 +88,8 @@ export const language = {
         { name: "Tỉ Giá", "route_child": "exchange-rate" },
         { name: "Ecus Connection", "route_child": "ecus-connection" },
         { name: "KPI", "route_child": "kpi" },
-        { name: "Nhà Cung Cấp", "route_child": "supplier" }
+        { name: "Nhà Cung Cấp", "route_child": "supplier" },
+        { "name": "Truy Xuất Lịch Sử", "route_child": "log-viewer" }
 
       ]
     },
@@ -118,4 +118,3 @@ export const language = {
     }
   ]
 }
-

@@ -176,13 +176,13 @@ export class WarehouseComponent implements OnInit {
     if (event) {
       this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {
         if (response.status == true) {
-          this.toastr.success(response.message);
+          this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
           this.setPageAfterDelete();
         }
         if (response.status == false) {
-          this.toastr.error(response.message);
+          this.toastr.error(response.message,"",{positionClass:'toast-bottom-right'});
         }
-      }, error => this.baseService.handleError(error));
+      });
     }
   }
   setPageAfterDelete(){
@@ -224,12 +224,12 @@ export class WarehouseComponent implements OnInit {
         this.getWarehouses(this.pager);
         
       }
-    }, error => this.baseService.handleError(error));
+    });
   }
   addNew(){
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
       if (response.status == true){
-        this.toastr.success(response.message);
+        this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
         //this.getWarehouses(this.pager);
         this.pager.totalItems = this.pager.totalItems + 1;
         this.pager.currentPage = 1;
@@ -239,9 +239,9 @@ export class WarehouseComponent implements OnInit {
         $('#' + this.addButtonSetting.dataTarget).modal('hide');
       }
       else{
-        this.toastr.error(response.message);
+        this.toastr.error(response.message,"",{positionClass:'toast-bottom-right'});
       }
-    }, error => this.baseService.handleError(error));
+    });
   }
   resetSearch(event){
     this.criteria = {
@@ -351,5 +351,16 @@ export class WarehouseComponent implements OnInit {
   }
   onDistrictchange(district){
     this.warehouse.districtID = district.id;
+  }
+
+  /**
+   * EXPORT - IMPORT DATA 
+   */
+  async export(){
+    
+  }
+
+  async import(){
+
   }
 }

@@ -28,12 +28,27 @@ namespace eFMS.API.Log.Controllers
         //    return Ok(results);
         //}
         [HttpGet]
-        public IEnumerable<CatCurrency> GetAllNotes()
+        public IEnumerable<CatCurrency> Get()
         {
             try
             {
-                var result = catCurrencyService.Get();
-                return result;
+                return catCurrencyService.Get();
+            }
+            catch (Exception ex)
+            {
+                // log or manage the exception
+                throw ex;
+            }
+        }
+        [HttpGet]
+        [Route("Paging")]
+        public IActionResult Paging(string query, int page, int size)
+        {
+            try
+            {
+                var data = catCurrencyService.Paging(query, page, size, out long rowCount);
+                var result = new { data, totalItems = rowCount, page, size };
+                return Ok(result);
             }
             catch (Exception ex)
             {

@@ -20,7 +20,7 @@
                             <label class="form-control-label" for="">
                                 Select single with search
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                            <ng-select #categorySelect [allowClear]="true" [items]="categories" [disabled]="disabled" (data)="refreshValue($event)"
                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                 placeholder="Select filter">
                             </ng-select>
@@ -39,6 +39,7 @@
                                     [maxDate]="maxDate"
                                     [alwaysShowCalendars]="true"
                                     name="daterange" 
+                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                     placeholder="From date - to date" readonly/>
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
@@ -53,12 +54,13 @@
                             <label class="form-control-label" for="">
                                 Name/Code
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="" aria-autocomplete="nope">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" aria-autocomplete="nope"
+                                [(ngModel)]="criteria.query" (change)="criteria.query=criteria.query.trim()">
                         </div>
                     </div>
                 </div>
                 <div class="form-actions m--align-right">
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="search()">
                         <span>
                             <i class="la la-search"></i>
                             <span>
@@ -66,7 +68,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
                         <span>
                             <i class="la la-refresh"></i>
                             <span>
@@ -108,8 +110,33 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
+                    <tbody *ngIf="logs">
+                        <tr *ngFor="let log of logs;let i = index;">
+                            <td>
+                                <span>{{(i+1)}}</span>
+                            </td>
+                            <td>
+                                <span *ngIf="log.code == null">{{ log.name }}</span>
+                                <span *ngIf="log.name == null">{{ log.code }}</span>
+                                <span *ngIf="log.name && log.name">{{ log.code }} / {{ log.name }}</span>
+                            </td>
+                            <td>
+                                <span>{{ log.action }}</span>
+                            </td>
+                            <td>
+                                <span>{{ log.userUpdated }}</span>
+                            </td>
+                            <td>
+                                <span>{{ log.datetimeUpdated | date: 'dd/MM/yyyy' }}</span>&nbsp;
+                                <span>{{ log.datetimeUpdated | date: 'hh:mm:ss' }}</span>
+                            </td>
+                            <td>
+                                <span *ngIf="log.propertyChange == null">{{ log.action }} </span>
+                                <span *ngIf="log.propertyChange == null && log.action=='Update'">{{ log.action }}: nochange </span>
+                                <span *ngIf="log.propertyChange">{{ log.action }} {{ log.propertyChange.propertyName }} : {{ log.propertyChange.newValue }} </span>
+                            </td>
+                        </tr>
+                        <!-- <tr>
                             <td>
                                 <span>1</span>
                             </td>
@@ -129,9 +156,10 @@
                             <td>
                                 <span>Update Currency list</span>
                             </td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
+                <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
             </div>
             <!--end: Datatable -->
         </div>

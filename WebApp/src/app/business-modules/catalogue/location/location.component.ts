@@ -12,7 +12,6 @@ import * as dataHelper from 'src/helper/data.helper';
 import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-// import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
 @Component({
@@ -453,7 +452,7 @@ export class LocationComponent implements OnInit {
     var countryId = this.ProvinceCityToUpdate.countryId;
 
     var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-      return o.id == countryId
+      return o['id'] == countryId
     });
     this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
   }
@@ -559,7 +558,7 @@ export class LocationComponent implements OnInit {
     var provinceId = this.DistrictToUpdate.provinceId;
 
     var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-      return o.id == countryId
+      return o['id'] == countryId
     });
 
     var provinces = await dataHelper.getProvinces(countryId, this.baseServices, this.api_menu);
@@ -567,7 +566,7 @@ export class LocationComponent implements OnInit {
     this.resetNgSelect("province");
 
     var indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
-      return o.id == provinceId;
+      return o['id'] == provinceId;
     });
 
     this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
@@ -694,15 +693,15 @@ export class LocationComponent implements OnInit {
     console.log({ provinces: this.ngSelectDataProvinces }, { districts: this.ngSelectDataDistricts });
 
     var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-      return o.id == countryId
+      return o['id'] == countryId
     });
 
     var indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
-      return o.id == provinceId;
+      return o['id'] == provinceId;
     });
 
     var indexCurrentDistrict = lodash.findIndex(this.ngSelectDataDistricts, function (o) {
-      return o.id == districtId;
+      return o['id'] == districtId;
     });
     this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
     this.currentActiveProvince = [this.ngSelectDataProvinces[indexCurrentProvince]];

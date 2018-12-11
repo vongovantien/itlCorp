@@ -11,7 +11,8 @@ export class API_MENU {
     private PORT = {
         System: 44360,
         Catalogue: 44361,
-        Department: 44242
+        Department: 44242,
+        Log: 44363
     }
 
     private PROTOCOL = "http://";
@@ -129,6 +130,7 @@ export class API_MENU {
         },
         Currency:{
             getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getAll",
+            getAllByQuery:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getAllByQuery",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getById/",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/paging",
             addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/add",
@@ -177,6 +179,10 @@ export class API_MENU {
             updateRate: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/UpdateRate",
             getCurrencies: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetCurrencies",
             convertRate: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/ConvertRate"
+        },
+        CatalogueLogViewer: {
+            getCategory: this.getUrlMainPath(SystemConstants.MODULE_NAME.LOG) + "CategoryLog/GetCategory",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.LOG) + "CategoryLog/Paging"
         }
     }
 

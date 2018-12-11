@@ -62,7 +62,7 @@
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <app-search-options [configSearch]="configSearchCommonity" (search)="onSearch($event, tabName.commodity)" (search)=resetSearch($event)></app-search-options>
+                            <app-search-options [configSearch]="configSearchCommonity" (search)="onSearch($event, tabName.commodity)" (reset_search)=resetSearch($event)></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
@@ -84,7 +84,7 @@
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <app-search-options [configSearch]="configSearchGroup" (search)="onSearch($event, tabName.commodityGroup)" (search)=resetSearch($event)></app-search-options>
+                            <app-search-options [configSearch]="configSearchGroup" (search)="onSearch($event, tabName.commodityGroup)" (reset_search)=resetSearch($event)></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->

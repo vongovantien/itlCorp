@@ -20,6 +20,7 @@ using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 using System.Linq;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -63,9 +64,17 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("paging")]
         public IActionResult Get(CatCurrrencyCriteria criteria, int page, int size)
         {
-            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount);
-            var result = new { data, totalItems = rowCount, page, size };
+            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount, out int totalPages);
+            var result = new { data, totalItems = rowCount, totalPages, page, size };
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("getAllByQuery")]
+        public IActionResult Get(CatCurrrencyCriteria criteria)
+        {
+            var data = catCurrencyService.Query(criteria);
+            return Ok(data);
         }
 
         [HttpPost]
@@ -127,7 +136,8 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(string id)
         {
-            var hs = catCurrencyService.Delete(id, currentUser.UserID);
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = catCurrencyService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

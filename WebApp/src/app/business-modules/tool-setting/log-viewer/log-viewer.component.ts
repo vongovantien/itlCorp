@@ -1,5 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import * as moment from 'moment';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { CatLogViewer } from 'src/app/shared/models/tool-setting/catalogue';
+import { SelectComponent } from 'ng2-select';
+import { ToastrService } from 'ngx-toastr';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 
 @Component({
   selector: 'app-log-viewer',
@@ -7,20 +14,75 @@ import * as moment from 'moment';
   styleUrls: ['./log-viewer.component.scss']
 })
 export class LogViewerComponent implements OnInit {
+  categories: any[];
+  logs: CatLogViewer[];
+  criteria: any = {
+    tableType: null,
+    query: null
+  };
+  pager: PagerSetting = PAGINGSETTING;
+  @ViewChild('categorySelect') public categorySelect: SelectComponent;
 
-  constructor() {
+  constructor( private api_menu: API_MENU,
+    private toastr: ToastrService,
+    private baseService: BaseService) {
     this.keepCalendarOpeningWithRange = true;
     this.selectedRange = {startDate: moment().startOf('month'), endDate: moment().endOf('month')};
   }
 
   ngOnInit() {
+    this.getCategories();
+    this.selectedRange.endDate = this.maxDate;
+    console.log(this.selectedRange);
   }
-  
+  getCategories(){
+    
+    this.baseService.get(this.api_menu.ToolSetting.CatalogueLogViewer.getCategory).subscribe((responses: any) =>{
+      if(responses != null){
+        this.categories = responses.map(x=>({"text":x.name,"id":x.id}));
+        console.log(this.categories);
+      }else{
+        this.categories = [];
+      }
+    });
+  }
+  resetSearch(){
+    this.criteria = {
+      tableType: null,
+      query: null,
+      fromDate: this.selectedRange.startDate,
+      toDate: this.selectedRange.toDate
+    };
+    this.categorySelect.active = [];
+    this.logs = [];
+  }
+  search(){
+    console.log(this.criteria);
+    this.criteria.fromDate = this.selectedRange.startDate;
+    this.criteria.toDate = this.selectedRange.endDate;
+    if(this.criteria.tableType != null){
+      this.getLogViewers();
+    }
+    else{
+      this.toastr.warning("Please choose a table type to search");
+    }
+  }
+  setPage(pager) { 
+    this.pager.currentPage = pager.currentPage; 
+    this.pager.totalPages = pager.totalPages;
+    this.pager.pageSize = pager.pageSize
+    this.getLogViewers();
+  }
+ async getLogViewers(){
+    let responses = await this.baseService.postAsync(this.api_menu.ToolSetting.CatalogueLogViewer.paging+ "?page=" + (this.pager.currentPage -1) + "&size=" + this.pager.pageSize, this.criteria, false, true);
+    this.logs = responses.data;
+    this.pager.totalItems = responses.totalItems;
+    console.log(this.logs);
+  }
   /**
    * Daterange picker
    */
   selectedRange: any;
-  selectedDate:any;
   keepCalendarOpeningWithRange: true;
   maxDate: moment.Moment = moment();
   ranges: any = {
@@ -41,6 +103,8 @@ export class LogViewerComponent implements OnInit {
 
   defaultHistory() {
     this.selectedRange = {startDate: moment().startOf('month'), endDate: moment().endOf('month')};
+    this.criteria.fromDate = this.selectedRange.startDate;
+    this.criteria.toDate = this.selectedRange.endDate;
   }
 
   /**
@@ -61,10 +125,13 @@ export class LogViewerComponent implements OnInit {
   }
  
   public selected(value:any):void {
+    this.criteria.tableType = value.id;
     console.log('Selected value is: ', value);
+    console.log(this.criteria.tableType);
   }
  
   public removed(value:any):void {
+    this.logs = [];
     console.log('Removed value is: ', value);
   }
  

@@ -29,15 +29,15 @@ namespace eFMS.API.Catalogue.Service.Helpers
                     else
                     {
                         var primaryKey = properties.FirstOrDefault(x => x.IsKey());
-                        var log = new ChangeLog
-                        {
-                            Id = Guid.NewGuid(),
+                        var log = new ChangeLog { Id = Guid.NewGuid() };
+                        log.PropertyCommon = new PropertyCommon {
                             PrimaryKeyValue = change.OriginalValues[primaryKey.Name].ToString(),
                             ActionType = EntityState.Modified,
                             DatetimeModified = DateTime.Now,
-                            UserModified = change.CurrentValues["UserModified"]?.ToString(),
+                            UserModified = change.CurrentValues["UserModified"]?.ToString()
                         };
-                        log.PropertyChanges = new List<PropertyChange>();
+                        log.NewObject = change.Entity;
+                        //log.PropertyChange = new List<PropertyChange>();
                         foreach (var prop in properties)
                         {
                             if (prop.Name == "UserModified" || prop.Name == "DatetimeModified"
@@ -53,7 +53,7 @@ namespace eFMS.API.Catalogue.Service.Helpers
                                     OldValue = originalValue,
                                     NewValue = currentValue
                                 };
-                                log.PropertyChanges.Add(addObject);
+                                log.PropertyCommon.PropertyChange = addObject;
                             }
                         }
                         var objectLog = new EntityChangeLog { EntityName = entityName, ChangeLog = log };
@@ -79,9 +79,9 @@ namespace eFMS.API.Catalogue.Service.Helpers
                     var entityName = add.Entity.GetType().Name;
                     var properties = add.OriginalValues.Properties;
                     var primaryKey = properties.FirstOrDefault(x => x.IsKey());
-                    var log = new ChangeLog
+                    var log = new ChangeLog { Id = Guid.NewGuid() };
+                    log.PropertyCommon = new PropertyCommon
                     {
-                        Id = Guid.NewGuid(),
                         PrimaryKeyValue = add.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Added,
                         DatetimeModified = DateTime.Now,
@@ -103,19 +103,23 @@ namespace eFMS.API.Catalogue.Service.Helpers
             if (addedEntities.Count > 0)
             {
                 listLog = new List<EntityChangeLog>();
-                foreach (var add in addedEntities)
+                foreach (var delete in addedEntities)
                 {
-                    var entityName = add.Entity.GetType().Name;
-                    var properties = add.OriginalValues.Properties;
+                    var entityName = delete.Entity.GetType().Name;
+                    var properties = delete.OriginalValues.Properties;
                     var primaryKey = properties.FirstOrDefault(x => x.IsKey());
                     var log = new ChangeLog
                     {
                         Id = Guid.NewGuid(),
-                        PrimaryKeyValue = add.OriginalValues[primaryKey.Name].ToString(),
+                    };
+                    log.PropertyCommon = new PropertyCommon
+                    {
+                        PrimaryKeyValue = delete.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Deleted,
                         DatetimeModified = DateTime.Now,
                         UserModified = currentUser ?? string.Empty
                     };
+                    log.NewObject = delete.Entity;
                     var objectLog = new EntityChangeLog { EntityName = entityName, ChangeLog = log };
                     listLog.Add(objectLog);
                 }
@@ -124,33 +128,38 @@ namespace eFMS.API.Catalogue.Service.Helpers
         }
         public static void InsertToMongoDb(List<EntityChangeLog> list, EntityState state)
         {
-            switch (state)
+            if (list == null) return;
+            var s = list.GroupBy(x => x.EntityName);
+            foreach(var log in s)
             {
-                case EntityState.Added:
-                    if (list == null) break;
-                    foreach (var item in list)
-                    {
-                        Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
-                    }
-                    break;
-                case EntityState.Modified:
-                    if (list == null) break;
-                    foreach (var item in list)
-                    {
-                        if(item.ChangeLog.PropertyChanges != null)
-                        {
-                            Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
-                        }
-                    }
-                    break;
-                case EntityState.Deleted:
-                    if (list == null) break;
-                    foreach (var item in list)
-                    {
-                        Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
-                    }
-                    break;
+                var k = log.Select(x => x.ChangeLog).ToList<object>();
+                MongoDbHelper.InsertMany(log.Key, k);
             }
+            //switch (state)
+            //{
+            //    case EntityState.Added:
+            //        if (list == null) break;
+            //        foreach (var item in list)
+            //        {
+            //            Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
+            //        }
+            //        break;
+            //    case EntityState.Modified:
+            //        foreach (var item in list)
+            //        {
+            //            if(item.ChangeLog.PropertyChanges != null)
+            //            {
+            //                Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
+            //            }
+            //        }
+            //        break;
+            //    case EntityState.Deleted:
+            //        foreach (var item in list)
+            //        {
+            //            Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
+            //        }
+            //        break;
+            //}
         }
     }
 }

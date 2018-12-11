@@ -32,16 +32,16 @@ namespace eFMS.API.Catalogue.DL.Services
             var result = DataContext.Add(entity, true);
             return result;
         }
-        public HandleState Delete(string id, string currentUser)
+        public HandleState Delete(string id)
         {
-            ChangeTrackerHelper.currentUser = currentUser;
             return DataContext.Delete(x => x.Id == id);
         }
 
-        public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
+        public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages)
         {
             var list = Query(criteria);
             rowsCount = list.Count;
+            totalPages = (rowsCount % pageSize == 0) ? rowsCount / pageSize : (rowsCount / pageSize) + 1;
             if (pageSize > 1)
             {
                 if (pageNumber < 1)

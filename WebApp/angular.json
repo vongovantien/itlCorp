@@ -27,9 +27,12 @@
               "src/assets"
             ],
             "styles": [
-              "src/assets/style-share/style.scss"
-            ],
-            "scripts": []
+              "src/assets/style-share/style.scss"            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "src/assets/external-libraries/js/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
           },
           "configurations": {
             "design":{
