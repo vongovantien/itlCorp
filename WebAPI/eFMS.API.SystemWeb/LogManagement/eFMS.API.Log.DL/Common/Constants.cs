@@ -36,6 +36,7 @@ namespace eFMS.API.Log.DL.Common
         PortIndex = 13,
         Province = 14,
         District = 15,
-        Ward = 16
+        Ward = 16,
+        ExchangeRate = 17
     }
 }

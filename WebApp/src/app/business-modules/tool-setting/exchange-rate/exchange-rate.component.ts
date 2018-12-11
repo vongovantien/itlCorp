@@ -195,6 +195,8 @@ export class ExchangeRateComponent implements OnInit {
     });
     await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
     this.getExchangeNewest();
+    this.pager.currentPage = 1;
+    this.getExchangeRates(this.pager);
     $('#update-exchange-rate-modal').modal('hide');
     
     console.log(this.exchangeRateToAdd);

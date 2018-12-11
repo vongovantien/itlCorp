@@ -81,6 +81,9 @@ namespace eFMS.API.Log.DL.Services
                 case CategoryTable.Ward:
                     data = PagingCatPlace(criteria, page, size, out rowsCount);
                     break;
+                case CategoryTable.ExchangeRate:
+                    data = PagingCatCurrencyExchange(criteria, page, size, out rowsCount);
+                    break;
             }
             if (data == null) return null;
             var result = (from s in data
@@ -116,7 +119,8 @@ namespace eFMS.API.Log.DL.Services
                 new CategoryCollectionModel { Id = (int)CategoryTable.District, Name = "District" },
                 new CategoryCollectionModel { Id = (int)CategoryTable.Ward, Name = "Ward" },
                 new CategoryCollectionModel { Id = (int)CategoryTable.CatStage, Name = "Stage" },
-                new CategoryCollectionModel { Id = (int)CategoryTable.CatUnit, Name = "Unit" }
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatUnit, Name = "Unit" },
+                //new CategoryCollectionModel { Id = (int)CategoryTable.ExchangeRate, Name = "Exchange Rate" }
             };
             return collections.OrderBy(x => x.Name).ToList();
         }
@@ -247,7 +251,7 @@ namespace eFMS.API.Log.DL.Services
                 DatetimeUpdated = x.PropertyCommon.DatetimeModified,
                 PropertyChange = x.PropertyCommon.PropertyChange,
                 ObjectId = x.NewObject.Id.ToString(),
-                Name = ""
+                Name = x.NewObject.CurrencyFromId
             });
             return data;
         }
