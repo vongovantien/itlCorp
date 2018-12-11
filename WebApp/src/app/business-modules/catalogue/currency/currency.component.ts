@@ -137,31 +137,34 @@ export class CurrencyComponent implements OnInit {
     }
   }
   update(): any {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.Currency.update, this.currency).subscribe((response: any) => {
       
         $('#' + this.nameModal).modal('hide');
-        this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
+        this.baseService.successToast(response.message);
         this.getCurrencies(this.pager);
-        this.spinnerService.hide();
+        this.baseService.spinnerShow();
       
     },err=>{
-      this.toastr.error(err.error.message,"",{positionClass:'toast-bottom-right'});
+      this.baseService.errorToast(err.error.message);
+      this.baseService.spinnerHide();
     });
   }
   addNew(): any {
+    this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.Currency.addNew, this.currency).subscribe((response: any) => {
-  
-        this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
-        //this.getCurrencies(this.pager);
+
+        this.baseService.successToast(response.message);
         this.form.onReset();
         $('#' + this.nameModal).modal('hide');
         this.pager.totalItems = this.pager.totalItems + 1;
         this.pager.currentPage = 1;
         this.child.setPage(this.pager.currentPage);
+        this.baseService.spinnerHide();
   
     },err=>{       
-       this.toastr.error(err.error.message,"",{positionClass:'toast-bottom-right'});
+       this.baseService.errorToast(err.error.message);
+       this.baseService.spinnerHide();
     });
   }
   showDetail(item) {
@@ -174,17 +177,17 @@ export class CurrencyComponent implements OnInit {
   async onDelete(event) {
     console.log(event);
     if (event) {
+      this.baseService.spinnerShow();
       this.baseService.delete(this.api_menu.Catalogue.Currency.delete + this.currency.id).subscribe((response: any) => {
-        if (response.status == true) {
-          this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
-          // this.pager.currentPage = 1;
-          // this.getCurrencies(this.pager);
+     
+          this.baseService.successToast(response.message);         
           this.setPageAfterDelete();
-        }
-        if (response.status == false) {
-          this.toastr.error(response.message);
-        }
-      }, error => this.baseService.handleError(error));
+          this.baseService.spinnerHide();
+       
+      }, err => {
+        this.baseService.errorToast(err.error.message);
+        this.baseService.spinnerHide();
+      });
     }
   }
   setPageAfterDelete() {

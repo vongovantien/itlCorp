@@ -11,6 +11,7 @@ import { error } from 'util';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { resolve } from 'path';
 
 
 
@@ -113,11 +114,11 @@ export class BaseService implements ErrorHandler {
       this.spinnerService.hide();
       return res;      
     }
-    catch (error) {
+    catch (error) {      
       this.spinnerService.hide();
       this.handleError(error);
+      return error;
     }
-
   }
 
   /**
@@ -154,6 +155,7 @@ export class BaseService implements ErrorHandler {
     catch (error) {
       this.spinnerService.hide();
       this.handleError(error);
+      return error;
     }
   }
 
@@ -189,6 +191,7 @@ export class BaseService implements ErrorHandler {
     catch (error) {
       this.spinnerService.hide();
       this.handleError(error);
+      return error;
     }
   }
 
@@ -200,10 +203,10 @@ export class BaseService implements ErrorHandler {
    */
   public handleState(response, display_notify = false) {
     if (response.status == true && display_notify == true) {
-      this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
+      this.toastr.success(response.message,"",{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
     }
     if (response.status == false && display_notify == true) {
-      this.toastr.error(response.message,"",{positionClass:'toast-bottom-right'});
+      this.toastr.error(response.message,"",{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
     }
   }
 
@@ -212,11 +215,42 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
-    console.log(error);
-    if(error.ok==false){
-      this.toastr.error(error.statusText,"",{positionClass:'toast-bottom-right'});
-    }
-    this.toastr.error(error.error.message.toString(),"",{positionClass:'toast-bottom-right'});
+    this.toastr.error(error.error.message.toString(), "", { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 3000 });
+  }
+
+  /**
+   * Emit success toast notification at bottom-right conner
+   * @param message 
+   * @param title 
+   */
+  successToast(message:string,title=""){
+    this.toastr.success(message,title,{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
+  }
+
+  /**
+   * Emit error toast notification at bottom-right conner
+   * @param message 
+   * @param title 
+   */
+  errorToast(message:string,title=""){
+    this.toastr.error(message,title,{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
+  }
+
+  /**
+   * Emit warning toast notification at bottom-right conner
+   * @param message 
+   * @param title 
+   */
+  warningToast(message:string,title=""){
+    this.toastr.warning(message,title,{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
+  }
+
+  spinnerShow(){
+    this.spinnerService.show();
+  }
+
+  spinnerHide(){
+    this.spinnerService.hide();
   }
 
 

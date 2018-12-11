@@ -10,7 +10,6 @@ import { AllPartnerComponent } from './all/all-partner.component';
 import { ConsigneeComponent } from './consignee/consignee.component';
 import { CustomerComponent } from './customer/customer.component';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
@@ -59,8 +58,7 @@ export class PartnerComponent implements OnInit {
   @ViewChild(CarrierComponent) carrierComponent; 
   @ViewChild(ShipperComponent) shipperComponent; 
 
-  constructor(private baseService: BaseService,
-    private toastr: ToastrService, 
+  constructor(private baseService: BaseService, 
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private router:Router) { }
@@ -165,14 +163,13 @@ export class PartnerComponent implements OnInit {
   async onDelete(event) {
     if (event) {
       this.baseService.delete(this.api_menu.Catalogue.PartnerData.delete + this.partner.id).subscribe((response: any) => {
-        if (response.status == true) {
-          this.toastr.success(response.message);
+       
+          this.baseService.successToast(response.message);
           this.RefreshData();
-        }
-        if (response.status == false) {
-          this.toastr.error(response.message);
-        }
-      }, error => this.baseService.handleError(error));
+     
+      }, err => {
+          this.baseService.errorToast(err.error.message);
+      });
     }
   }
   setPageAfterDelete() {

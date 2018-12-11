@@ -71,7 +71,7 @@ namespace AuthServer
             app.UseIdentityServer();
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("Hello World!");
+                await context.Response.WriteAsync("Identity Server is running ...");
             });
             app.UseCors(builder => builder
             .AllowAnyOrigin()
