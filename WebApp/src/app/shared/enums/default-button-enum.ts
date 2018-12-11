@@ -4,7 +4,7 @@ export const AddDefaultButton: ButtonAttributeSetting = {
     titleButton: "add new",
     classStyle: "btn btn-success m-btn--square m-btn--icon m-btn--uppercase",
     //targetModal: "add-ware-house-modal",
-    icon: "icon-plus7"
+    icon: "la la-plus"
   };
 export const EditDefaultButton: ButtonAttributeSetting = {
     titleButton: "Edit",
@@ -32,7 +32,7 @@ export const ImportDefaultButton: ButtonAttributeSetting = {
   };
 
 export const ExportDefaultButton: ButtonAttributeSetting = {
-    titleButton: "export",
+    titleButton: "export", 
     classStyle: "btn btn-danger m-btn--square m-btn--icon m-btn--uppercase",
     icon: "la la-upload"
   };

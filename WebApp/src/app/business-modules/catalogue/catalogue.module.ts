@@ -25,6 +25,7 @@ import { ShipperComponent } from './partner-data/shipper/shipper.component';
 import { AllPartnerComponent } from './partner-data/all/all-partner.component';
 import { CurrencyComponent } from './currency/currency.component';
 import { ChargeDetailsComponent } from './charge-details/charge-details.component';
+import { WarehouseImportComponent } from './warehouse-import/warehouse-import.component';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { ChargeDetailsComponent } from './charge-details/charge-details.componen
       ShipperComponent,
  	    CurrencyComponent,
       AllPartnerComponent,
-      ChargeDetailsComponent
+      ChargeDetailsComponent,
+      WarehouseImportComponent
     ],
 })
 export class CatalogueModule { }
