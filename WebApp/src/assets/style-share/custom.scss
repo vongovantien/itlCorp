@@ -28,6 +28,9 @@ body {
 label {
     font-weight: 500;
 }
+ul {
+    margin-bottom: 0;
+}
 .form-control {
     &[readonly] {
         cursor: pointer;
@@ -692,5 +695,25 @@ table.dataTable thead .sorting_desc {
                 opacity: 1;
             }
         }
+    }
+}
+.progress--block-ui {
+    width: 100%;
+    position: absolute;
+    top: -20px;
+    left: 0;
+    .progress--block-inner {
+        width: 100%;
+        max-width: 500px;
+        margin: auto;
+    }
+    .progress-text {
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .progress {
+        height: 5px;
+        margin-top: 8px;
+        background-color: #d9dadb;
     }
 }
