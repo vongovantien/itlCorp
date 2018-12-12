@@ -134,7 +134,7 @@ namespace eFMS.API.Log.DL.Services
             var filterStage = Builders<CatStage>.Filter.Where(stageEx);
             var queryCurrencyResult = mongoContext.CatStages.Find(filterStage);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -156,7 +156,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCommodityGroup = Builders<CatCommodityGroup>.Filter.Where(groupCommodityEx);
             var queryCurrencyResult = mongoContext.CatCommodityGroups.Find(filterCommodityGroup);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -199,7 +199,7 @@ namespace eFMS.API.Log.DL.Services
             var filterPlace = Builders<CatPlace>.Filter.Where(placeEx);
             var queryCurrencyResult = mongoContext.CatPlaces.Find(filterPlace);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -224,7 +224,7 @@ namespace eFMS.API.Log.DL.Services
             var filterPartner = Builders<CatPartner>.Filter.Where(partnerEx);
             var queryCurrencyResult = mongoContext.CatPartners.Find(filterPartner);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -243,7 +243,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCurrencyExchange = Builders<CatCurrencyExchange>.Filter.Where(_ => true);
             var queryCurrencyResult = mongoContext.CatCurrencyExchanges.Find(filterCurrencyExchange);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -267,7 +267,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCountry = Builders<CatCountry>.Filter.Where(countryEx);
             var queryCurrencyResult = mongoContext.CatCountries.Find(filterCountry);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -290,7 +290,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCommodity = Builders<CatCommodity>.Filter.Where(commodityEx);
             var queryCurrencyResult = mongoContext.CatCommodities.Find(filterCommodity);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -315,7 +315,7 @@ namespace eFMS.API.Log.DL.Services
             var filterChargeDefaultAccount = Builders<CatChargeDefaultAccount>.Filter.Where(changeDefaultEx);
             var queryCurrencyResult = mongoContext.CatChargeDefaultAccounts.Find(filterChargeDefaultAccount);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -337,7 +337,7 @@ namespace eFMS.API.Log.DL.Services
             var filterUnit = Builders<CatUnit>.Filter.Where(unitEx);
             var queryUnitResult = mongoContext.CatUnits.Find(filterUnit);
             rowsCount = queryUnitResult.CountDocuments();
-            var data = queryUnitResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryUnitResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -362,7 +362,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCurrency = Builders<CatCurrency>.Filter.Where(currencyEx);
             var queryCurrencyResult = mongoContext.CatCurrencies.Find(filterCurrency).SortByDescending(x => x.PropertyCommon.DatetimeModified);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList();
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList();
             return data.Select(x => new LogModel
             {
                 Id = x.Id,
@@ -387,7 +387,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCharge = Builders<CatCharge>.Filter.Where(chargeEx);
             var queryResult = mongoContext.CatCatCharges.Find(filterCharge);
             rowsCount = queryResult.CountDocuments();
-            var data = queryResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
