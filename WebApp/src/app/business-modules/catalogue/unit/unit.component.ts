@@ -7,6 +7,9 @@ import { NgForm } from '@angular/forms';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import * as DataHelper from 'src/helper/xlsx.helper';
+import * as lodash from 'lodash';
+import { ExcelService } from 'src/app/shared/services/excel.service';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -32,6 +35,7 @@ export class UnitComponent implements OnInit {
   @ViewChild(PaginationComponent) child;
 
   constructor(
+    private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
@@ -149,6 +153,31 @@ export class UnitComponent implements OnInit {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.ListUnits = this.sortService.sort(this.ListUnits, property, this.isDesc);
+  }
+
+  async export(){
+    // var units = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery,this.searchObject);
+    // console.log(units);
+    // units = lodash.map(units,function(unit){
+    //   return {
+    //     "Code": unit.code,
+    //     "Name_Vn": unit.unitNameVn,
+    //     "Name_En": unit.unitNameEn,
+    //     "Description_En":unit.descriptionEn,
+    //     "Description_Vn":unit.descriptionVn,
+    //     "Inactive": unit.inactive
+    //   }
+    // });
+
+    // var object = [
+    //   {"header":"Report Units"},
+    //   {"data":units},
+    //   {"reporter":"Thor"}
+    // ]
+    // console.log(object);
+
+    // DataHelper.exportExcelFileWithSingleSheet(units,"unit report");
+    this.excelService.generateExcel();
   }
 
 
