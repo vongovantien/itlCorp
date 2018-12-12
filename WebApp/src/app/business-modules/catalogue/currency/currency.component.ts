@@ -14,7 +14,7 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import * as DataHelper from 'src/helper/data.helper';
+import * as DataHelper from 'src/helper/xlsx.helper';
 import * as lodash from 'lodash';
 
 declare var $: any;
