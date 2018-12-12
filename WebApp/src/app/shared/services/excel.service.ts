@@ -3,18 +3,20 @@ import { Workbook } from 'exceljs';
 // import * as Excel from 'exceljs';
 import * as fs from 'file-saver';
 import { WorkBook } from 'xlsx/types';
+import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
 @Injectable({
   providedIn: 'root'
 })
 export class ExcelService {
   constructor() {
   }
-  generateExcel() {
+  generateExcel(exportModel:ExportExcel) {
     
     //Excel Title, Header, Data
-    const title = 'Car Sell Report';
-    const header = ["Year", "Month", "Make", "Model", "Quantity", "Pct"]
-    const data = [
+    const title =  exportModel.title;  //'Car Sell Report';
+    const header = exportModel.header;  //["Year", "Month", "Make", "Model", "Quantity", "Pct"]
+    const data = exportModel.data;
+    const data1 = [
       [2007, 1, "Volkswagen ", "Volkswagen Passat", 1267, 10],
       [2007, 1, "Toyota ", "Toyota Rav4", 819, 6.5],
       [2007, 1, "Toyota ", "Toyota Avensis", 787, 6.2],
@@ -73,6 +75,7 @@ export class ExcelService {
         bgColor: { argb: 'FF0000FF' }
       }
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      cell.font = {family: 4, size: 16, bold: true }
     })
     // worksheet.addRows(data);
     // Add Data and Conditional Formatting
