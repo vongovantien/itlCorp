@@ -11,6 +11,7 @@ import * as DataHelper from 'src/helper/xlsx.helper';
 import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
+import { SystemConstants } from 'src/constants/system.const';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -188,24 +189,26 @@ export class UnitComponent implements OnInit {
 
     /**Set up stylesheet */
     var exportModel:ExportExcel = new ExportExcel();
-    exportModel.title = "Unit Report !";
-    exportModel.author = "Thor The";
+    exportModel.fileName = "Unit Report";    
+    const currrently_user = sessionStorage.getItem('currently_userName');
+    exportModel.title = "Unit Report ";
+    exportModel.author = currrently_user;
     exportModel.header = ["Code","Name_Vn","Name_En","Description_En","Description_Vn","Inactive"];
     exportModel.data = units;
-    // exportModel.cellStyle.fontSize = 16;
-    // exportModel.cellStyle.isBold = true;
 
+    exportModel.titleStyle.fontFamily = 'Century Gothic';
+    exportModel.titleStyle.isBold = true;
+    exportModel.titleStyle.fontSize = 20;
 
-
-    // var object = [
-    //   {"header":"Report Units"},
-    //   {"data":units},
-    //   {"reporter":"Thor"}
-    // ]
-    // console.log(object);
-
-    // DataHelper.exportExcelFileWithSingleSheet(units,"unit report");
+    exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
+    exportModel.cellStyle.fontSize = 11;
+    exportModel.cellStyle.isBold = false;
+ 
     this.excelService.generateExcel(exportModel);
+  }
+
+  import(){
+    
   }
 
 

@@ -397,8 +397,8 @@ export class WarehouseComponent implements OnInit {
     }
     const exportModel: ExportExcel = new ExportExcel();
     exportModel.title = "Warehouse list";
-    let claim = this.oauthService.getIdentityClaims();
-    exportModel.author = claim['preferred_username'];
+    const currrently_user = sessionStorage.getItem('currently_userName');
+    exportModel.author = currrently_user;
     exportModel.header = ["Stt", "Code", "Name EN", "Name VN", "Address", "District", "City/ Province", "Country", "Status"];
     exportModel.data = warehouseData;
     exportModel.fileName = "Warehouse";

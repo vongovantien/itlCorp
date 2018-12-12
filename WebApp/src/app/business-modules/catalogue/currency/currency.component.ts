@@ -6,7 +6,6 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
@@ -14,8 +13,9 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import * as DataHelper from 'src/helper/xlsx.helper';
 import * as lodash from 'lodash';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
 
 declare var $: any;
 
@@ -63,7 +63,7 @@ export class CurrencyComponent implements OnInit {
   @ViewChild('formAddEdit') form: NgForm;
   totalPages: number;
   constructor(private sortService: SortService, private baseService: BaseService,
-    private toastr: ToastrService,
+    private excelService: ExcelService,
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU) { }
 
@@ -139,13 +139,13 @@ export class CurrencyComponent implements OnInit {
   update(): any {
     this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.Currency.update, this.currency).subscribe((response: any) => {
-      
-        $('#' + this.nameModal).modal('hide');
-        this.baseService.successToast(response.message);
-        this.getCurrencies(this.pager);
-        this.baseService.spinnerShow();
-      
-    },err=>{
+
+      $('#' + this.nameModal).modal('hide');
+      this.baseService.successToast(response.message);
+      this.getCurrencies(this.pager);
+      this.baseService.spinnerShow();
+
+    }, err => {
       this.baseService.errorToast(err.error.message);
       this.baseService.spinnerHide();
     });
@@ -154,17 +154,17 @@ export class CurrencyComponent implements OnInit {
     this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.Currency.addNew, this.currency).subscribe((response: any) => {
 
-        this.baseService.successToast(response.message);
-        this.form.onReset();
-        $('#' + this.nameModal).modal('hide');
-        this.pager.totalItems = this.pager.totalItems + 1;
-        this.pager.currentPage = 1;
-        this.child.setPage(this.pager.currentPage);
-        this.baseService.spinnerHide();
-  
-    },err=>{       
-       this.baseService.errorToast(err.error.message);
-       this.baseService.spinnerHide();
+      this.baseService.successToast(response.message);
+      this.form.onReset();
+      $('#' + this.nameModal).modal('hide');
+      this.pager.totalItems = this.pager.totalItems + 1;
+      this.pager.currentPage = 1;
+      this.child.setPage(this.pager.currentPage);
+      this.baseService.spinnerHide();
+
+    }, err => {
+      this.baseService.errorToast(err.error.message);
+      this.baseService.spinnerHide();
     });
   }
   showDetail(item) {
@@ -179,11 +179,11 @@ export class CurrencyComponent implements OnInit {
     if (event) {
       this.baseService.spinnerShow();
       this.baseService.delete(this.api_menu.Catalogue.Currency.delete + this.currency.id).subscribe((response: any) => {
-     
-          this.baseService.successToast(response.message);         
-          this.setPageAfterDelete();
-          this.baseService.spinnerHide();
-       
+
+        this.baseService.successToast(response.message);
+        this.setPageAfterDelete();
+        this.baseService.spinnerHide();
+
       }, err => {
         this.baseService.errorToast(err.error.message);
         this.baseService.spinnerHide();
@@ -200,19 +200,36 @@ export class CurrencyComponent implements OnInit {
   }
 
 
-  async export() {
-    console.log(this.criteria)
-    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery,this.criteria);
-    console.log(currenciesList);    
+  async export() {    
+    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);   
     currenciesList = lodash.map(currenciesList, function (currency) {
-      return {
-        "Code": currency.id,
-        "Name": currency.currencyName,
-        "Is Default": currency.isDefault,
-        "Inactive": currency.inactive,
-      }
+      return [
+        currency.id,
+        currency.currencyName,
+        currency.isDefault,
+        currency.inactive,
+      ]
     });
-    DataHelper.exportExcelFileWithSingleSheet(currenciesList,"currency_report","Currency List");
+
+     /**Set up stylesheet */
+     var exportModel:ExportExcel = new ExportExcel();
+     exportModel.fileName = "Currency Report";    
+     const currrently_user = sessionStorage.getItem('currently_userName');
+     exportModel.title = "Currency Report ";
+     exportModel.author = currrently_user;
+     exportModel.header = ["Code","Currency Name","Is Default","Inactive"];
+     exportModel.data = currenciesList;
+ 
+     exportModel.titleStyle.fontFamily = 'Century Gothic';
+     exportModel.titleStyle.isBold = true;
+     exportModel.titleStyle.fontSize = 20;
+ 
+     exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
+     exportModel.cellStyle.fontSize = 11;
+     exportModel.cellStyle.isBold = false;
+  
+     this.excelService.generateExcel(exportModel);
+    
   }
 
   async import() {
