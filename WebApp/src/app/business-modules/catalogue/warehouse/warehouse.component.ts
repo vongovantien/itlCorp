@@ -6,7 +6,6 @@ import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-s
 import { ButtonType } from '../../../shared/enums/type-button.enum';
 import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
@@ -94,7 +93,6 @@ export class WarehouseComponent implements OnInit {
   };
   
   constructor(private sortService: SortService, private baseService: BaseService,
-    private toastr: ToastrService, 
     private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU) { }
 
@@ -176,13 +174,13 @@ export class WarehouseComponent implements OnInit {
     if (event) {
       this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {
         if (response.status == true) {
-          this.toastr.success(response.message);
+          this.baseService.successToast(response.message);
           this.setPageAfterDelete();
         }
         if (response.status == false) {
-          this.toastr.error(response.message);
+          this.baseService.errorToast(response.message);
         }
-      }, error => this.baseService.handleError(error));
+      });
     }
   }
   setPageAfterDelete(){
@@ -217,32 +215,28 @@ export class WarehouseComponent implements OnInit {
     }
   }
   update(){
-    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => {
-      if (response.status == true){
-        $('#edit-ware-house-modal').modal('hide');
-        this.toastr.success(response.message);
-        this.getWarehouses(this.pager);
-        
-      }
-    }, error => this.baseService.handleError(error));
+    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => { 
+        $('#edit-ware-house-modal').modal('hide');     
+        this.baseService.successToast(response.message);
+        this.getWarehouses(this.pager);       
+    },err=>{
+      this.baseService.errorToast(err.error.message);
+    });
   }
   addNew(){
-    this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
-      if (response.status == true){
-        this.toastr.success(response.message);
-        //this.getWarehouses(this.pager);
+    this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {     
+        this.baseService.successToast(response.message);
         this.pager.totalItems = this.pager.totalItems + 1;
         this.pager.currentPage = 1;
         this.child.setPage(this.pager.currentPage);
         this.resetWarehouse();
         this.form.onReset();
-        $('#' + this.addButtonSetting.dataTarget).modal('hide');
-      }
-      else{
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+        $('#' + this.addButtonSetting.dataTarget).modal('hide');     
+    },err=>{
+      this.baseService.errorToast(err.error.message);
+    });
   }
+
   resetSearch(event){
     this.criteria = {
       placeType: 12

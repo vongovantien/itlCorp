@@ -7,6 +7,7 @@ import { SelectComponent } from 'ng2-select';
 import { ToastrService } from 'ngx-toastr';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
   selector: 'app-log-viewer',
@@ -25,7 +26,8 @@ export class LogViewerComponent implements OnInit {
 
   constructor( private api_menu: API_MENU,
     private toastr: ToastrService,
-    private baseService: BaseService) {
+    private baseService: BaseService,
+    private sortService: SortService) {
     this.keepCalendarOpeningWithRange = true;
     this.selectedRange = {startDate: moment().startOf('month'), endDate: moment().endOf('month')};
   }
@@ -55,6 +57,8 @@ export class LogViewerComponent implements OnInit {
     };
     this.categorySelect.active = [];
     this.logs = [];
+    this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
   }
   search(){
     console.log(this.criteria);
@@ -78,6 +82,14 @@ export class LogViewerComponent implements OnInit {
     this.logs = responses.data;
     this.pager.totalItems = responses.totalItems;
     console.log(this.logs);
+  }
+  isDesc = true;
+  sortKey: string = "code";
+  sort(property){
+    this.isDesc = !this.isDesc;
+    console.log(this.logs);
+    this.sortKey = property;
+    this.logs = this.sortService.sort(this.logs, property, this.isDesc);
   }
   /**
    * Daterange picker
@@ -132,6 +144,8 @@ export class LogViewerComponent implements OnInit {
  
   public removed(value:any):void {
     this.logs = [];
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     console.log('Removed value is: ', value);
   }
  

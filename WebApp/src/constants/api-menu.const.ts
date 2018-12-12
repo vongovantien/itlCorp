@@ -12,7 +12,7 @@ export class API_MENU {
         System: 44360,
         Catalogue: 44361,
         Department: 44242,
-        Log: 44363
+        auditlog: 44363
     }
 
     private PROTOCOL = "http://";

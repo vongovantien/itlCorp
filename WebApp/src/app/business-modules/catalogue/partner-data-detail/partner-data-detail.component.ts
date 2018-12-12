@@ -181,26 +181,27 @@ export class PartnerDataDetailComponent implements OnInit {
     }
   }
   update(): any {
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.PartnerData.update + this.partner.id, this.partner).subscribe((response: any) => {
-      if (response.status == true){
-        this.toastr.success(response.message);
-      }
-      else{
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+        this.baseService.spinnerHide();
+        this.baseService.successToast(response.message);
+ 
+    }, err=>{
+      this.baseService.errorToast(err.error.message);
+      this.baseService.spinnerHide();
+    });
   }
   onDelete(event){
     if(event){
+      this.baseService.spinnerShow();
       this.baseService.delete(this.api_menu.Catalogue.PartnerData.delete + this.partner.id).subscribe((response: any) => {
-        if (response.status == true) {
-          this.toastr.success(response.message);
-          this.router.navigate(["/home/catalogue/partner-data",{ id: this.partner.id }]);
-        }
-        if (response.status == false) {
-          this.toastr.error(response.message);
-        }
-      }, error => this.baseService.handleError(error));
+          this.baseService.spinnerHide();
+          this.baseService.successToast(response.message);
+          this.router.navigate(["/home/catalogue/partner-data",{ id: this.partner.id }]);        
+      }, err=>{
+          this.baseService.spinnerHide();
+          this.baseService.errorToast(err.error.message);
+      });
     }
   }
   /**

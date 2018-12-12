@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { LocationComponent } from './location/location.component';
 import { PartnerComponent } from './partner-data/partner.component';
 import { WarehouseComponent } from './warehouse/warehouse.component';
+import { WarehouseImportComponent } from './warehouse-import/warehouse-import.component';
 import { ChargeComponent } from './charge/charge.component';
 import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
 import { CommodityComponent } from './commodity/commodity.component';
@@ -28,6 +29,10 @@ const routes: Routes = [
   {
     path:'ware-house',
     component:WarehouseComponent
+  },
+  {
+    path:'ware-house-import',
+    component:WarehouseImportComponent
   },
   {
     path:'charge',

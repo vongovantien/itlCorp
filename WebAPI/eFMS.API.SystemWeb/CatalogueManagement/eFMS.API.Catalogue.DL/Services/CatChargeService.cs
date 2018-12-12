@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Text;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Common.Globals;
+using eFMS.API.Catalogue.Service.Helpers;
+
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatChargeService  :RepositoryBase<CatCharge,CatChargeModel>,ICatChargeService
@@ -25,7 +27,7 @@ namespace eFMS.API.Catalogue.DL.Services
             Guid chargeId = Guid.NewGuid();
             model.Charge.Id = chargeId;
             model.Charge.Inactive = false;
-            model.Charge.UserCreated = "Thor.The";
+            model.Charge.UserCreated = ChangeTrackerHelper.currentUser;
             model.Charge.DatetimeCreated = DateTime.Now;
 
             try
@@ -36,7 +38,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     x.ChargeId = chargeId;
                     x.Inactive = false;
-                    x.UserCreated = "Thor.The";
+                    x.UserCreated = ChangeTrackerHelper.currentUser;
                     x.DatetimeCreated = DateTime.Now;
                     ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Add(x);
                     ((eFMSDataContext)DataContext.DC).SaveChanges();
@@ -54,14 +56,14 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState UpdateCharge(CatChargeAddOrUpdateModel model)
         {
-            model.Charge.UserModified = "Thor.The";
+            model.Charge.UserModified = ChangeTrackerHelper.currentUser;
             model.Charge.DatetimeModified = DateTime.Now;
             try
             {
                 DataContext.Update(model.Charge, x => x.Id == model.Charge.Id);
                 foreach(var x in model.ListChargeDefaultAccount)
                 {
-                    x.UserModified = "Thor.The";
+                    x.UserModified = ChangeTrackerHelper.currentUser;
                     x.DatetimeModified = DateTime.Now;
                     ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Update(x);
                     ((eFMSDataContext)DataContext.DC).SaveChanges();

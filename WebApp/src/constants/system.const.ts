@@ -39,7 +39,7 @@ export class SystemConstants {
     public static readonly MODULE_NAME = {
         CATALOUGE: "Catalogue",
         SYSTEM: "System",
-        LOG: "Log"
+        LOG: "auditlog"
     }
     public static readonly LANGUAGES = {
         ENGLISH: SystemConstants.DEFAULT_LANGUAGE,

@@ -75,7 +75,7 @@ export function exportExcelFileWithSingleSheet(data: any, fileName: string, shee
         const wb: XLSX.WorkBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, sheetName);
         /* save to file */
-        XLSX.writeFile(wb, fileName, { bookType: 'xlsx' });
+        XLSX.writeFile(wb, fileName+".xlsx");
     } catch (error) {
         throw error;
     }

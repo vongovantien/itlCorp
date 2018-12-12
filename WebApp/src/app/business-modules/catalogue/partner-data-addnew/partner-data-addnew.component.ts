@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { ToastrService } from 'ngx-toastr';
 import { BaseService } from 'src/services-base/base.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { NgForm } from '@angular/forms';
@@ -42,7 +41,6 @@ export class PartnerDataAddnewComponent implements OnInit {
 
   constructor(private route:ActivatedRoute,
     private baseService: BaseService,
-    private toastr: ToastrService, 
     private api_menu: API_MENU) { }
 
   ngOnInit() {
@@ -186,16 +184,17 @@ export class PartnerDataAddnewComponent implements OnInit {
     }
   }
   addNew(): any {
-    this.baseService.post(this.api_menu.Catalogue.PartnerData.add, this.partner).subscribe((response: any) => {
-      if (response.status == true){
-        this.toastr.success(response.message);
-        this.resetForm();
-      }
-      else{
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+    this.baseService.spinnerShow();
+    this.baseService.post(this.api_menu.Catalogue.PartnerData.add, this.partner).subscribe((response: any) => {   
+        this.baseService.spinnerHide();
+        this.baseService.successToast(response.message);
+        this.resetForm();     
+    }, err=>{
+      this.baseService.spinnerHide();
+      this.baseService.errorToast(err.error.message);
+    });
   }
+
   resetForm(): any {
     this.form.onReset();
     this.partner.parentId = null;

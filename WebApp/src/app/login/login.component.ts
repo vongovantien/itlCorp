@@ -14,12 +14,12 @@ import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit,AfterViewInit {
+export class LoginComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     if (this.cookieService.get("login_status") === "LOGGED_IN") {
       this.router.navigateByUrl('/home');
     }
-    this.getLoginData();  
+    this.getLoginData();
   }
 
   constructor(
@@ -54,14 +54,17 @@ export class LoginComponent implements OnInit,AfterViewInit {
         return this.oauthService.loadUserProfile();
       }).then(() => {
         let claims = this.oauthService.getIdentityClaims();
-        if (claims)
+        if (claims) {
+        
+          console.log(claims);
           this.rememberMe();
-        // this.toastr.success("Login successful !");
-        this.router.navigateByUrl('/home');
-        this.cookieService.set('login_status', "LOGGED_IN", null, "/", window.location.hostname);
-        this.spinnerService.hide();
+          this.toastr.success("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "", { positionClass: 'toast-bottom-right' });
+          this.router.navigateByUrl('/home');
+          this.cookieService.set('login_status', "LOGGED_IN", null, "/", window.location.hostname);
+          this.spinnerService.hide();
+        }
       }).catch((err) => {
-        this.toastr.error(err.error.error_description)
+        this.toastr.error(err.error.error_description, "", { positionClass: 'toast-bottom-right' })
         this.spinnerService.hide();
       })
     }

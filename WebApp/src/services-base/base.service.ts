@@ -11,6 +11,7 @@ import { error } from 'util';
 import { ToastrService } from 'ngx-toastr';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { resolve } from 'path';
 
 
 
@@ -50,6 +51,8 @@ export class BaseService implements ErrorHandler {
    * @param url 
    */
   public get(url: string) {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
     return this._http.get(url, { headers: this.headers });
   }
 
@@ -61,7 +64,8 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async getAsync(url: string, display_error = false, display_spinner = false): Promise<any> {
-
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
     if (display_spinner)
       this.spinnerService.show();
 
@@ -105,16 +109,16 @@ export class BaseService implements ErrorHandler {
     if (display_spinner)
       this.spinnerService.show();
     try {
-      const res = await this._http.post(url, data, { headers: this.headers }).toPromise();
-      this.spinnerService.hide();
+      const res = await this._http.post(url, data, { headers: this.headers }).toPromise();     
       this.handleState(res, display_notify);
-      return res;
+      this.spinnerService.hide();
+      return res;      
     }
-    catch (error) {
+    catch (error) {      
       this.spinnerService.hide();
       this.handleError(error);
+      return error;
     }
-
   }
 
   /**
@@ -125,8 +129,7 @@ export class BaseService implements ErrorHandler {
    */
   public put(url: string, data?: any) {
     var token = 'Bearer ' + sessionStorage.getItem("access_token");
-    this.headers = this.headers.set("Authorization",token);
-    // this.headers = this.headers.append("Authorization", token);
+    this.headers = this.headers.set("Authorization",token);  
     return this._http.put(url, data, { headers: this.headers });
   }
 
@@ -140,8 +143,7 @@ export class BaseService implements ErrorHandler {
    */
   public async putAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
     var token = 'Bearer ' + sessionStorage.getItem("access_token");
-    this.headers = this.headers.set("Authorization",token);
-    // this.headers = this.headers.append("Authorization",token);
+    this.headers = this.headers.set("Authorization",token);   
     if (display_spinner)
       this.spinnerService.show();
     try {
@@ -153,6 +155,7 @@ export class BaseService implements ErrorHandler {
     catch (error) {
       this.spinnerService.hide();
       this.handleError(error);
+      return error;
     }
   }
 
@@ -188,6 +191,7 @@ export class BaseService implements ErrorHandler {
     catch (error) {
       this.spinnerService.hide();
       this.handleError(error);
+      return error;
     }
   }
 
@@ -199,10 +203,10 @@ export class BaseService implements ErrorHandler {
    */
   public handleState(response, display_notify = false) {
     if (response.status == true && display_notify == true) {
-      this.toastr.success(response.message);
+      this.toastr.success(response.message,"",{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
     }
     if (response.status == false && display_notify == true) {
-      this.toastr.error(response.message);
+      this.toastr.error(response.message,"",{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
     }
   }
 
@@ -211,11 +215,42 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
-    console.log(error);
-    if(error.ok==false){
-      this.toastr.error(error.statusText);
-    }
-    this.toastr.error(error.error.message.toString());
+    this.toastr.error(error.error.message.toString(), "", { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 3000 });
+  }
+
+  /**
+   * Emit success toast notification at bottom-right conner
+   * @param message 
+   * @param title 
+   */
+  successToast(message:string,title=""){
+    this.toastr.success(message,title,{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
+  }
+
+  /**
+   * Emit error toast notification at bottom-right conner
+   * @param message 
+   * @param title 
+   */
+  errorToast(message:string,title=""){
+    this.toastr.error(message,title,{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
+  }
+
+  /**
+   * Emit warning toast notification at bottom-right conner
+   * @param message 
+   * @param title 
+   */
+  warningToast(message:string,title=""){
+    this.toastr.warning(message,title,{positionClass:'toast-bottom-right',closeButton:true,timeOut:3000});
+  }
+
+  spinnerShow(){
+    this.spinnerService.show();
+  }
+
+  spinnerHide(){
+    this.spinnerService.hide();
   }
 
 

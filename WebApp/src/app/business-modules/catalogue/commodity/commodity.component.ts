@@ -3,7 +3,6 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { CommodityGroup } from 'src/app/shared/models/catalogue/commonity-group.model';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { COMMODITYGROUPCOLUMNSETTING } from './commonity-group.column';
@@ -94,7 +93,6 @@ export class CommodityComponent implements OnInit {
   */
 
   constructor(private baseService: BaseService,
-    private toastr: ToastrService, 
     private api_menu: API_MENU,
     private sortService: SortService) { }
 
@@ -293,32 +291,42 @@ export class CommodityComponent implements OnInit {
     }
   }
   updateCommodity(): any {
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.Commodity.update + this.commodity.id, this.commodity).subscribe((response: any) => {
-      if (response.status == true){
-        this.groupSelect.active = [];
-        this.formCommodity.onReset();
-        $('#' + this.nameCommodityModal).modal('hide');
-        this.toastr.success(response.message);
-        this.setPage(this.pager);
-      }
-    }, error => this.baseService.handleError(error));
+      this.groupSelect.active = [];
+      this.formCommodity.onReset();
+      $('#' + this.nameCommodityModal).modal('hide');
+      this.setPage(this.pager);
+      this.baseService.successToast(response.message);
+      this.baseService.spinnerHide();
+    }, err => {
+      this.baseService.spinnerHide();
+      this.baseService.errorToast(err.error.message);
+    });
   }
   async addNewCommodity() {
-    var response = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity, true, false);
-      this.formCommodity.onReset();
-      this.commodity = new Commodity();
-      $('#' + this.nameCommodityModal).modal('hide');
-      await this.getCommodities(this.pager);
-      this.setPageAfterAdd();
+      var res = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity);
+      if(res.status===true){
+        this.formCommodity.onReset();
+        this.commodity = new Commodity();
+        $('#' + this.nameCommodityModal).modal('hide');
+        await this.getCommodities(this.pager);
+        this.setPageAfterAdd();
+      }
   }
   updateGroup(): any {
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.CommodityGroup.update + this.commodityGroup.id, this.commodityGroup).subscribe((response: any) => {
     if (response.status == true){
       $('#' + this.nameGroupModal).modal('hide');
-      this.toastr.success(response.message);
+      this.baseService.successToast(response.message);
+      this.baseService.spinnerHide();
       this.setPage(this.pager);
     }
-  }, error => this.baseService.handleError(error));
+  }, err=>{
+     this.baseService.spinnerHide();
+     this.baseService.errorToast(err.error.message);
+  });
   }
   async addNewGroup() {
     var response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
