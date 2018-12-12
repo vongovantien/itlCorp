@@ -17,7 +17,6 @@ import { BaseService } from 'src/services-base/base.service';
 import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
-import { Daterangepicker } from 'ng2-daterangepicker';
 import {PagingService} from './shared/common/pagination/paging-service';
 import { CommonModule } from '@angular/common';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
@@ -51,7 +50,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     BrowserAnimationsModule, // required animations module
     ToastrModule.forRoot(), // ToastrModule added
     Ng4LoadingSpinnerModule.forRoot(),
-    Daterangepicker,
     PerfectScrollbarModule,
     SelectModule, // Scrollbar
     OAuthModule.forRoot()
