@@ -3,7 +3,6 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import * as XLSX from 'xlsx';
 
 /**
  * Return list provinces that belong to country has countryId
@@ -58,26 +57,5 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
     }
     var townWards = await baseService.postAsync(api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, searchObj, false, false);
     return townWards;
-}
-
-/**
- * Export excel file with single sheet from JSON data 
- * https://www.npmjs.com/package/xlsx
- * @param data 
- * @param fileName 
- * @param sheetName 
- */
-export function exportExcelFileWithSingleSheet(data: any, fileName: string, sheetName: string) {
-    try {
-        /* generate worksheet */
-        const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
-        /* generate workbook and add the worksheet */
-        const wb: XLSX.WorkBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
-        /* save to file */
-        XLSX.writeFile(wb, fileName+".xlsx");
-    } catch (error) {
-        throw error;
-    }
 }
 
