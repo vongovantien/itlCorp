@@ -1,3 +1,5 @@
+import { WAREHOUSEENCOLUMNSETTING } from "../app/business-modules/catalogue/warehouse/warehouse.columns";
+
 export const language = {
   Menu :[  
     {
@@ -117,5 +119,6 @@ export const language = {
         { name: "Table", route_child: "table" }
       ]
     }
-  ]
+  ],
+  Warehouse: WAREHOUSEENCOLUMNSETTING
 }

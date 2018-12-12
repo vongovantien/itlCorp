@@ -43,6 +43,14 @@
                 }
               ]
             },
+            "vi-dev":{
+              "fileReplacements": [
+                {
+                  "replace": "src/languages/language.en.ts",
+                  "with": "src/languages/language.vi.ts"
+                }
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -146,6 +154,9 @@
             },
             "vi": {
               "browserTarget": "eFMS-Web:build:vi"
+            },
+            "vi-dev": {
+              "browserTarget": "eFMS-Web:build:vi-dev"
             },
             "en": {
               "browserTarget": "eFMS-Web:build:en"

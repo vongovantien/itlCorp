@@ -8,7 +8,7 @@ export class ExportExcel  {
     logoPath?:string;
     company?:string;
     data:any[];
-    cellStyle?:CellStyle
+    cellStyle?:CellStyle = new CellStyle();
 
 }
 
