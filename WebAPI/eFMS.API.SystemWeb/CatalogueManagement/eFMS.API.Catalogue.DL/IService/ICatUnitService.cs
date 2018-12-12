@@ -14,5 +14,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatUnit> Query(CatUnitCriteria criteria);
         List<CatUnit> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
 
+
     }
 }
