@@ -9,7 +9,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
-import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
@@ -25,13 +25,13 @@ export class UnitComponent implements OnInit {
     { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
   selectedUnitFilter = this.listUnitFilter[0].filter;
   pager: PagerSetting = PAGINGSETTING;
-  searchKey:string = "";
-  ListUnits:any=[]; 
-  UnitToAdd:CatUnitModel = new CatUnitModel();
-  UnitToUpdate:CatUnitModel = new CatUnitModel();
-  idUnitToUpdate:any= "";
-  idUnitToDelete:any= "";
-  searchObject:any ={};
+  searchKey: string = "";
+  ListUnits: any = [];
+  UnitToAdd: CatUnitModel = new CatUnitModel();
+  UnitToUpdate: CatUnitModel = new CatUnitModel();
+  idUnitToUpdate: any = "";
+  idUnitToDelete: any = "";
+  searchObject: any = {};
 
   @ViewChild(PaginationComponent) child;
 
@@ -45,8 +45,8 @@ export class UnitComponent implements OnInit {
     await this.getUnits();
   }
 
-  async searchUnit(){
-    
+  async searchUnit() {
+
     this.searchObject = {};
     if (this.selectedUnitFilter == "All") {
       this.searchObject.All = this.searchKey;
@@ -64,14 +64,14 @@ export class UnitComponent implements OnInit {
     await this.getUnits();
   }
 
-  async resetSearch(){
+  async resetSearch() {
     this.searchKey = "";
     this.searchObject = {};
     this.selectedUnitFilter = this.listUnitFilter[0].filter;
     await this.getUnits();
   }
 
-  async setPage(pager:PagerSetting){
+  async setPage(pager: PagerSetting) {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
@@ -93,22 +93,22 @@ export class UnitComponent implements OnInit {
     }
   }
 
-  async getUnits(){
+  async getUnits() {
     var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject, false, true);
     this.ListUnits = response.data;
     this.pager.totalItems = response.totalItems;
   }
 
-  async showUpdateUnit(id){
+  async showUpdateUnit(id) {
     this.UnitToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getById + id, true, true);
   }
 
-  async updateUnit(form:NgForm,action){
+  async updateUnit(form: NgForm, action) {
     if (action == "yes") {
       if (form.form.status != "INVALID") {
         await this.baseServices.putAsync(this.api_menu.Catalogue.Unit.update, this.UnitToUpdate);
         await this.getUnits();
-        form.onReset();        
+        form.onReset();
         $('#update-unit-modal').modal('hide');
       }
     } else {
@@ -118,17 +118,17 @@ export class UnitComponent implements OnInit {
   }
 
 
-  async addNewUnit(form:NgForm,action){
+  async addNewUnit(form: NgForm, action) {
     if (action == "yes") {
       delete this.UnitToAdd.id;
       if (form.form.status != "INVALID") {
-        var respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.addNew, this.UnitToAdd, true, true);  
-        await this.getUnits();     
-        if(respone!=undefined && respone.status){
+        var respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.addNew, this.UnitToAdd, true, true);
+        await this.getUnits();
+        if (respone != undefined && respone.status) {
           this.setPageAfterAdd();
           form.onReset();
           $('#add-unit-modal').modal('hide');
-         
+
         }
       }
     } else {
@@ -138,26 +138,26 @@ export class UnitComponent implements OnInit {
     }
   }
 
-  prepareDeleteUnit(id){
+  prepareDeleteUnit(id) {
     this.idUnitToDelete = id;
   }
 
-  async delete(){
-    await this.baseServices.deleteAsync(this.api_menu.Catalogue.Unit.delete+this.idUnitToDelete,true,true);    
+  async delete() {
+    await this.baseServices.deleteAsync(this.api_menu.Catalogue.Unit.delete + this.idUnitToDelete, true, true);
     await this.getUnits();
     this.setPageAfterDelete();
-    
+
   }
   isDesc = true;
   sortKey: string = "code";
-  sort(property){
+  sort(property) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.ListUnits = this.sortService.sort(this.ListUnits, property, this.isDesc);
   }
 
-  
-  async export(){
+
+  async export() {
     // var units = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, this.searchObject);
     // console.log(units);
     // units = lodash.map(units, function (unit) {
@@ -187,27 +187,35 @@ export class UnitComponent implements OnInit {
     });
 
     /**Set up stylesheet */
-    var exportModel:ExportExcel = new ExportExcel();
-    exportModel.fileName = "Unit Report";    
-    const currrently_user = sessionStorage.getItem('currently_userName');
+    var exportModel: ExportExcel = new ExportExcel();
+    exportModel.fileName = "Unit Report";
+    const currrently_user = localStorage.getItem('currently_userName');
     exportModel.title = "Unit Report ";
     exportModel.author = currrently_user;
-    exportModel.header = ["Code","Name_Vn","Name_En","Description_En","Description_Vn","Inactive"];
+    exportModel.header = [
+      { name: "Code", width: 10 },
+      { name: "Name_Vn", width: 25 },
+      { name: "Name_En", width: 25 },
+      { name: "Description_En", width: 25 },
+      { name: "Description_Vn", width: 25 },
+      { name: "Inactive", width: 25 }];   
+
     exportModel.data = units;
 
-    exportModel.titleStyle.fontFamily = 'Century Gothic';
-    exportModel.titleStyle.isBold = true;
-    exportModel.titleStyle.fontSize = 20;
+    // exportModel.authorFontSyle.fontFamily = 'Times New Roman';
+    // exportModel.authorFontSyle.isBold = true;
+    // exportModel.authorFontSyle.isItalic = true;
+    // exportModel.authorFontSyle.fontSize = 20;
 
-    exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
-    exportModel.cellStyle.fontSize = 11;
-    exportModel.cellStyle.isBold = false;
- 
+    // exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
+    // exportModel.cellStyle.fontSize = 11;
+    // exportModel.cellStyle.isBold = false;
+
     this.excelService.generateExcel(exportModel);
   }
 
-  import(){
-    
+  import() {
+
   }
 
 

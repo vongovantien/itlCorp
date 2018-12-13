@@ -397,15 +397,15 @@ export class WarehouseComponent implements OnInit {
     }
     const exportModel: ExportExcel = new ExportExcel();
     exportModel.title = "Warehouse list";
-    const currrently_user = sessionStorage.getItem('currently_userName');
+    const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
-    exportModel.header = ["Stt", "Code", "Name EN", "Name VN", "Address", "District", "City/ Province", "Country", "Status"];
+   // exportModel.header = ["Stt", "Code", "Name EN", "Name VN", "Address", "District", "City/ Province", "Country", "Status"];
     exportModel.data = warehouseData;
     exportModel.fileName = "Warehouse";
 
-    exportModel.titleStyle.fontFamily = 'Century Gothic';
-    exportModel.titleStyle.isBold = true;
-    exportModel.titleStyle.fontSize = 20;
+    exportModel.titleFontStyle.fontFamily = 'Century Gothic';
+    exportModel.titleFontStyle.isBold = true;
+    exportModel.titleFontStyle.fontSize = 20;
 
     exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
     exportModel.cellStyle.fontSize = 11;

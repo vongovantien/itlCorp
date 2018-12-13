@@ -214,19 +214,19 @@ export class CurrencyComponent implements OnInit {
      /**Set up stylesheet */
      var exportModel:ExportExcel = new ExportExcel();
      exportModel.fileName = "Currency Report";    
-     const currrently_user = sessionStorage.getItem('currently_userName');
+     const currrently_user = localStorage.getItem('currently_userName');
      exportModel.title = "Currency Report ";
      exportModel.author = currrently_user;
-     exportModel.header = ["Code","Currency Name","Is Default","Inactive"];
+    //  exportModel.header = ["Code","Currency Name","Is Default","Inactive"];
      exportModel.data = currenciesList;
  
-     exportModel.titleStyle.fontFamily = 'Century Gothic';
-     exportModel.titleStyle.isBold = true;
-     exportModel.titleStyle.fontSize = 20;
+    //  exportModel.titleStyle.fontFamily = 'Century Gothic';
+    //  exportModel.titleStyle.isBold = true;
+    //  exportModel.titleStyle.fontSize = 20;
  
-     exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
-     exportModel.cellStyle.fontSize = 11;
-     exportModel.cellStyle.isBold = false;
+    //  exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
+    //  exportModel.cellStyle.fontSize = 11;
+    //  exportModel.cellStyle.isBold = false;
   
      this.excelService.generateExcel(exportModel);
     

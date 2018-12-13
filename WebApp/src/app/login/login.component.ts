@@ -55,8 +55,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
       }).then(() => {
         let claims = this.oauthService.getIdentityClaims();
         if (claims) {
-          sessionStorage.setItem("currently_userName",claims['preferred_username']);
-          sessionStorage.setItem("currently_userEmail",claims['email']);
+          localStorage.setItem("currently_userName",claims['preferred_username']);
+          localStorage.setItem("currently_userEmail",claims['email']);
           console.log(claims);
           this.rememberMe();
           this.toastr.success("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "", { positionClass: 'toast-bottom-right' });
