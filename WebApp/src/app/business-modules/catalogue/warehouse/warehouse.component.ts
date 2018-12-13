@@ -399,17 +399,19 @@ export class WarehouseComponent implements OnInit {
     exportModel.title = "Warehouse list";
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
-   // exportModel.header = ["Stt", "Code", "Name EN", "Name VN", "Address", "District", "City/ Province", "Country", "Status"];
+    exportModel.header = [
+      {name:"STT",width:10},
+      {name:"Code",width:20},
+      {name:"Name EN",width:20},
+      {name:"Name VN",width:20},
+      {name:"Address",width:30},
+      {name:"Disctric",width:20},
+      {name:"City/Province",width:20},
+      {name:"Country",width:20},
+      {name:"Status",width:20}
+    ]
     exportModel.data = warehouseData;
     exportModel.fileName = "Warehouse";
-
-    exportModel.titleFontStyle.fontFamily = 'Century Gothic';
-    exportModel.titleFontStyle.isBold = true;
-    exportModel.titleFontStyle.fontSize = 20;
-
-    exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
-    exportModel.cellStyle.fontSize = 11;
-    exportModel.cellStyle.isBold = false;
     
     this.excelService.generateExcel(exportModel);
   }

@@ -217,7 +217,13 @@ export class CurrencyComponent implements OnInit {
      const currrently_user = localStorage.getItem('currently_userName');
      exportModel.title = "Currency Report ";
      exportModel.author = currrently_user;
-    //  exportModel.header = ["Code","Currency Name","Is Default","Inactive"];
+     exportModel.sheetName = "Sheet 1";
+     exportModel.header = [
+       {name:"Code",width:10},
+       {name:"Currency Name",width:20},
+       {name:"Is Default",width:20},
+       {name:"Inactive",width:20}
+     ]
      exportModel.data = currenciesList;
  
     //  exportModel.titleStyle.fontFamily = 'Century Gothic';
