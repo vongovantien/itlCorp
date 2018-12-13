@@ -402,6 +402,15 @@ export class WarehouseComponent implements OnInit {
     exportModel.header = ["Stt", "Code", "Name EN", "Name VN", "Address", "District", "City/ Province", "Country", "Status"];
     exportModel.data = warehouseData;
     exportModel.fileName = "Warehouse";
+
+    exportModel.titleStyle.fontFamily = 'Century Gothic';
+    exportModel.titleStyle.isBold = true;
+    exportModel.titleStyle.fontSize = 20;
+
+    exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
+    exportModel.cellStyle.fontSize = 11;
+    exportModel.cellStyle.isBold = false;
+    
     this.excelService.generateExcel(exportModel);
   }
 

@@ -7,7 +7,6 @@ import { NgForm } from '@angular/forms';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import * as DataHelper from 'src/helper/xlsx.helper';
 import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';

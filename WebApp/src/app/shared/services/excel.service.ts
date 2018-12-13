@@ -67,8 +67,12 @@ export class ExcelService {
       // }
     }
     );
-    worksheet.getColumn(3).width = 30;
-    worksheet.getColumn(4).width = 30;
+    for(var i = 1; i<=header.length;i++){
+      worksheet.getColumn(i).width = 25;
+    }
+    // worksheet.getColumn(3).width = 30;
+    // worksheet.getColumn(4).width = 30;
+
     worksheet.addRow([]);
     // //Footer Row
     // let footerRow = worksheet.addRow(['This is system generated excel sheet.']);
