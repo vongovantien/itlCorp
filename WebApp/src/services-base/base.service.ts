@@ -55,7 +55,7 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async getAsync(url: string, display_error = false, display_spinner = false): Promise<any> {
-    this.checkLoginSession();   
+    this.checkLoginSession();
     var token = 'Bearer ' + sessionStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
@@ -251,13 +251,22 @@ export class BaseService implements ErrorHandler {
     this.spinnerService.hide();
   }
 
-  checkLoginSession(){
+  checkLoginSession():boolean{
     if(this.oauthService.getAccessToken()==null){
-      if(this.cookieService.get("login_status")==="LOGGED_IN"){
-        this.warningToast("Login again to continue !");
+      if(this.cookieService.get("login_status")==="LOGGED_IN"){               
+        if(window.location.hostname==='localhost'){
+          window.location.href = window.location.protocol + "//" + window.location.hostname+":"+window.location.port;
+        }else{
+          window.location.href = window.location.protocol + "//" + window.location.hostname;
+        }
+        this.warningToast("Login again to continue !"); 
+        
       }
       this.cookieService.delete("login_status","/",window.location.hostname);
       this.router.navigateByUrl('/login');      
+      return false;
+    }else{
+      return true;
     }
   }
 
