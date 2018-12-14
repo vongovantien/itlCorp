@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
@@ -8,6 +8,9 @@ import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as lodash from 'lodash';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import { SystemConstants } from 'src/constants/system.const';
 // declare var jquery: any;
 declare var $: any;
 
@@ -28,7 +31,11 @@ export class StageManagementComponent implements OnInit {
 
     @ViewChild(PaginationComponent) child;
 
-    constructor(private baseServices: BaseService,private api_menu: API_MENU,private sortService: SortService) {
+    constructor(
+        private excelService: ExcelService,
+        private baseServices: BaseService,
+        private api_menu: API_MENU,
+        private sortService: SortService) {
 
     }
 
@@ -44,7 +51,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async getStages(pager: PagerSetting) {
-        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.getAll + "/" + pager.currentPage + "/" + pager.pageSize, this.searchObject, false, true);
+        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.paging + "/" + pager.currentPage + "/" + pager.pageSize, this.searchObject, false, true);
         this.ConstStageList = response.data.map(x => Object.assign({}, x));
         console.log(response);
         pager.totalItems = response.totalItems;
@@ -109,7 +116,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async add_stage(form: NgForm, action) {
-      console.log(this.StageToAdd);
+        console.log(this.StageToAdd);
         if (action == "yes") {
             console.log(this.StageToAdd);
             delete this.StageToAdd.id;
@@ -165,7 +172,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async search_stage() {
-     
+
         if (this.selected_filter == "All") {
             this.searchObject.code = this.search_key.trim() == "" ? "" : this.search_key.trim();
             this.searchObject.condition = "OR";
@@ -257,24 +264,83 @@ export class StageManagementComponent implements OnInit {
 
     isDesc = true;
     sortKey: string = "id";
-    sort(property){
+    sort(property) {
         this.sortKey = property;
-        this.isDesc = !this.isDesc;  
-        if(property === 'deptName'){
+        this.isDesc = !this.isDesc;
+        if (property === 'deptName') {
             this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
         }
-        else{
-            const temp = this.ListStages.map(x=>Object.assign({},x));
-            this.ListStages = this.sortService.sort(this.ListStages.map(x=>Object.assign({},x.stage)), property, this.isDesc);
+        else {
+            const temp = this.ListStages.map(x => Object.assign({}, x));
+            this.ListStages = this.sortService.sort(this.ListStages.map(x => Object.assign({}, x.stage)), property, this.isDesc);
             var getDept = this.getDepartmentname;
-            this.ListStages = this.ListStages.map(x=>({stage:x,deptName:getDept(x.id,temp)}));     
-        }         
+            this.ListStages = this.ListStages.map(x => ({ stage: x, deptName: getDept(x.id, temp) }));
+        }
     }
 
-    getDepartmentname(stageId,ListStages:any[]){
-        var inx = lodash.findIndex(ListStages,function(o){return o.stage.id===stageId});      
-        if(inx!=-1){                    
+    getDepartmentname(stageId, ListStages: any[]) {
+        var inx = lodash.findIndex(ListStages, function (o) { return o.stage.id === stageId });
+        if (inx != -1) {
             return ListStages[inx].deptName;
         }
+    }
+
+    async import() {
+
+    }
+
+    async export() {
+        var stages = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.query, this.searchObject);
+        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+            stages = lodash.map(stages, function (stg, index) {
+                return [
+                    index + 1,
+                    stg['stage']['id'],
+                    stg['deptName'],
+                    stg['stage']['code'],
+                    stg['stage']['stageNameVn'],
+                    stg['stage']['stageNameEn'],
+                    stg['stage']['descriptionVn'],
+                    stg['stage']['descriptionEn'],
+                    (stg['stage']['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+                ]
+            });
+        }
+
+        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+            stages = lodash.map(stages, function (stg, index) {
+                return [
+                    index + 1,
+                    stg['stage']['id'],
+                    stg['deptName'],
+                    stg['stage']['code'],
+                    stg['stage']['stageNameVn'],
+                    stg['stage']['stageNameEn'],
+                    stg['stage']['descriptionVn'],
+                    stg['stage']['descriptionEn'],
+                    (stg['stage']['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+                ]
+            });
+        }
+
+        const exportModel: ExportExcel = new ExportExcel();
+        exportModel.title = "Stage List";
+        const currrently_user = localStorage.getItem('currently_userName');
+        exportModel.author = currrently_user;
+        exportModel.header = [
+            { name: "No.", width: 10 },
+            { name: "Stage ID", width: 10 },
+            { name: "Department Name", width: 30 },
+            { name: "Code", width: 30 },
+            { name: "Name VN", width: 30 },
+            { name: "Name EN", width: 30 },
+            { name: "Description VN", width: 30 },
+            { name: "Description EN", width: 30 },
+            { name: "Inactive", width: 30 }
+        ]
+        exportModel.data = stages;
+        exportModel.fileName = "Stage - "+new Date().toISOString();
+
+        this.excelService.generateExcel(exportModel);
     }
 }

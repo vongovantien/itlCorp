@@ -17,17 +17,17 @@ namespace AuthServer
                 {
                     ClientId = "eFMS",
                     ClientName = "eFMS Services",
-                    AccessTokenLifetime = tokenLifetime,
+                    AccessTokenLifetime =  tokenLifetime,
                     AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                     RequireClientSecret = false,
                     RequireConsent = false,
                     AlwaysSendClientClaims = true,
-                   
+
                     AllowAccessTokensViaBrowser = true,
                     AccessTokenType = AccessTokenType.Jwt,
                     AllowOfflineAccess = true,
                     UpdateAccessTokenClaimsOnRefresh = true,
-                    RefreshTokenExpiration = TokenExpiration.Absolute,
+                    RefreshTokenExpiration = TokenExpiration.Sliding,
                     SlidingRefreshTokenLifetime = slientRefreshToken,
                     //RedirectUris = redirectUris,
                     RedirectUris = new List<string> {"http://localhost:4200/auth-callback", "http://localhost:4200/silent-refresh.html"},

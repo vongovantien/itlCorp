@@ -7,7 +7,6 @@ import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
 
@@ -29,7 +28,6 @@ export class AllPartnerComponent implements OnInit {
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<Partner>();
   constructor(private baseService: BaseService, 
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 
@@ -40,12 +38,12 @@ export class AllPartnerComponent implements OnInit {
     this.getPartnerData(pager, this.criteria);
   }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     if(criteria != undefined){
       this.criteria = criteria;
     }
     this.baseService.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.partners = response.data.map(x=>Object.assign({},x));
       console.log(this.partners);
       this.pager.totalItems = response.totalItems;

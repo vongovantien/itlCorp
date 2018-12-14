@@ -6,16 +6,16 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import * as DataHelper from 'src/helper/data.helper';
 import * as lodash from 'lodash';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
+import { SystemConstants } from 'src/constants/system.const';
 
 declare var $: any;
 
@@ -63,8 +63,7 @@ export class CurrencyComponent implements OnInit {
   @ViewChild('formAddEdit') form: NgForm;
   totalPages: number;
   constructor(private sortService: SortService, private baseService: BaseService,
-    private toastr: ToastrService,
-    private spinnerService: Ng4LoadingSpinnerService,
+    private excelService: ExcelService,
     private api_menu: API_MENU) { }
 
   ngOnInit() {
@@ -72,10 +71,10 @@ export class CurrencyComponent implements OnInit {
   }
 
   async getCurrencies(pager: PagerSetting) {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     console.log(this.criteria);
     this.baseService.post(this.api_menu.Catalogue.Currency.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.currencies = response.data;
       this.pager.totalItems = response.totalItems;
       console.log(response.totalPages);
@@ -139,13 +138,13 @@ export class CurrencyComponent implements OnInit {
   update(): any {
     this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.Currency.update, this.currency).subscribe((response: any) => {
-      
-        $('#' + this.nameModal).modal('hide');
-        this.baseService.successToast(response.message);
-        this.getCurrencies(this.pager);
-        this.baseService.spinnerShow();
-      
-    },err=>{
+
+      $('#' + this.nameModal).modal('hide');
+      this.baseService.successToast(response.message);
+      this.getCurrencies(this.pager);
+      this.baseService.spinnerShow();
+
+    }, err => {
       this.baseService.errorToast(err.error.message);
       this.baseService.spinnerHide();
     });
@@ -154,17 +153,17 @@ export class CurrencyComponent implements OnInit {
     this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.Currency.addNew, this.currency).subscribe((response: any) => {
 
-        this.baseService.successToast(response.message);
-        this.form.onReset();
-        $('#' + this.nameModal).modal('hide');
-        this.pager.totalItems = this.pager.totalItems + 1;
-        this.pager.currentPage = 1;
-        this.child.setPage(this.pager.currentPage);
-        this.baseService.spinnerHide();
-  
-    },err=>{       
-       this.baseService.errorToast(err.error.message);
-       this.baseService.spinnerHide();
+      this.baseService.successToast(response.message);
+      this.form.onReset();
+      $('#' + this.nameModal).modal('hide');
+      this.pager.totalItems = this.pager.totalItems + 1;
+      this.pager.currentPage = 1;
+      this.child.setPage(this.pager.currentPage);
+      this.baseService.spinnerHide();
+
+    }, err => {
+      this.baseService.errorToast(err.error.message);
+      this.baseService.spinnerHide();
     });
   }
   showDetail(item) {
@@ -179,11 +178,11 @@ export class CurrencyComponent implements OnInit {
     if (event) {
       this.baseService.spinnerShow();
       this.baseService.delete(this.api_menu.Catalogue.Currency.delete + this.currency.id).subscribe((response: any) => {
-     
-          this.baseService.successToast(response.message);         
-          this.setPageAfterDelete();
-          this.baseService.spinnerHide();
-       
+
+        this.baseService.successToast(response.message);
+        this.setPageAfterDelete();
+        this.baseService.spinnerHide();
+
       }, err => {
         this.baseService.errorToast(err.error.message);
         this.baseService.spinnerHide();
@@ -200,28 +199,53 @@ export class CurrencyComponent implements OnInit {
   }
 
 
-  async export() {
-    console.log(this.criteria)
-    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery,this.criteria);
-    console.log(currenciesList);    
-    currenciesList = lodash.map(currenciesList, function (currency) {
-      return {
-        "Code": currency.id,
-        "Name": currency.currencyName,
-        "Is Default": currency.isDefault,
-        "Inactive": currency.inactive,
-      }
-    });
-    DataHelper.exportExcelFileWithSingleSheet(currenciesList,"currency_report","Currency List");
+  async export() {    
+    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);      
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      currenciesList = lodash.map(currenciesList, function (currency,index) {
+        return [
+          index+1,
+          currency['id'],
+          currency['currencyName'],
+          currency['isDefault'],
+          (currency['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      });
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      currenciesList = lodash.map(currenciesList, function (currency,index) {
+        return [
+          index+1,
+          currency['id'],
+          currency['currencyName'],
+          currency['isDefault'],
+          (currency['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+    
+
+     /**Set up stylesheet */
+     var exportModel:ExportExcel = new ExportExcel();
+     exportModel.fileName = "Currency Report";    
+     const currrently_user = localStorage.getItem('currently_userName');
+     exportModel.title = "Currency Report ";
+     exportModel.author = currrently_user;
+     exportModel.sheetName = "Sheet 1";
+     exportModel.header = [
+       {name:"No.",width:10},
+       {name:"Code",width:10},
+       {name:"Currency Name",width:20},
+       {name:"Is Default",width:20},
+       {name:"Inactive",width:20}
+     ]
+     exportModel.data = currenciesList;
+     this.excelService.generateExcel(exportModel);
+    
   }
 
   async import() {
-    // for (var i = 0; i <= 6000; i++) {
-    //   var currency: catCurrency = new catCurrency();
-    //   currency.id = "CRCC-" + new Date().toISOString();
-    //   currency.currencyName = "CRCC-name-" + new Date().toISOString();
-    //   await this.baseService.postAsync(this.api_menu.Catalogue.Currency.addNew, currency,false,false);
-    //   this.total += 1;
-    //}
+
   }
 }

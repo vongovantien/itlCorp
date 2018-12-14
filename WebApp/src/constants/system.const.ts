@@ -1,11 +1,7 @@
 export class SystemConstants {
 
     //Local Storage Key
-    public static readonly LSK_CURRENT_USER: string = 'CURRENT_USER';
-    public static readonly LSK_CURRENT_WORKPLACE_ID: string = 'CURRENT_WORKPLACE_ID';
-    public static readonly LSK_CURRENT_LANG: string = 'CURRENT_LANG';
     public static readonly CURRENT_CLIENT_LANGUAGE:string = 'CURRENT_CLIENT_LANGUAGE';
-    public static readonly LSL_CACHE_REMEMBER: string = 'CACHE_REMEMBER';
     public static readonly CURRENT_LANGUAGE:string = "CURRENT_LANGUAGE";
     public static readonly CURRENT_VERSION:string = "CURRENT_VERSION";
     public static readonly LOGIN_STATUS:string = "LOGIN_STATUS";
@@ -13,15 +9,8 @@ export class SystemConstants {
     public static readonly LOGGED_OUT : string = "LOGGED_OUT";
 
     //Security
-    public static readonly PATH_RSA_PUBLIC_KEY = './auth/z_rsa_public.key';
-    public static readonly PATH_HOME_PAGE = '/app/main/home';
-    public static readonly PATH_LOGIN_PAGE = '/login';
-    public static readonly AUTH_ISSUER = 'http://localhost:5000';
-    public static readonly AUTH_CLIENT_ID = 'eTMS' ;
-    public static readonly AUTH_SCOPE = 'openid profile offline_access etms_scope dnt_api';
     public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
-
-    public static CURRENT_USER;
+    public static readonly USER_CLAIMS = 'id_token_claims_obj';
 
     //Language
     // public static CURRENT_LANGUAGE: string = localStorage.getItem(SystemConstants.LSK_CURRENT_LANG);
@@ -42,7 +31,20 @@ export class SystemConstants {
         LOG: "auditlog"
     }
     public static readonly LANGUAGES = {
-        ENGLISH: SystemConstants.DEFAULT_LANGUAGE,
-        VIETNAM: "vi-VN"
+        ENGLISH_API:  "en-US",  //SystemConstants.DEFAULT_LANGUAGE,
+        VIETNAM_API: "vi-VN",
+        ENGLISH: "en",
+        VIETNAM:"vi"
+    }
+
+    public static readonly STATUS_BY_LANG ={
+        INACTIVE:{
+            ENGLISH:"Inactive",
+            VIETNAM:"Ngưng Hoạt Động"
+        },
+        ACTIVE:{
+            ENGLISH:"Active",
+            VIETNAM:"Đang Hoạt Động"
+        }
     }
 }

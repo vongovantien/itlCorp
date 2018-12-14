@@ -7,7 +7,6 @@ import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { BaseService } from 'src/services-base/base.service';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 
@@ -28,7 +27,6 @@ export class AirShipSupComponent implements OnInit {
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 
@@ -38,12 +36,12 @@ export class AirShipSupComponent implements OnInit {
     this.getPartnerData(pager, this.criteria);
   }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     if(criteria != undefined){
       this.criteria = criteria;
     }
     this.baseService.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.airShips = response.data.map(x=>Object.assign({},x));
       console.log(this.airShips);
       this.pager.totalItems = response.totalItems;
