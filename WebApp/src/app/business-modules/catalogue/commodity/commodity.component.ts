@@ -444,7 +444,7 @@ export class CommodityComponent implements OnInit {
           index+1,         
           com_group['groupNameEn'],
           com_group['groupNameVn'],         
-          (com_group['inactive']===true)?"Inactive":"Active"
+          (com_group['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       }); 
     }
@@ -455,7 +455,7 @@ export class CommodityComponent implements OnInit {
           index+1,         
           com_group['groupNameEn'],
           com_group['groupNameVn'],        
-          (com_group['inactive']===true)?"Ngưng Hoạt Động":"Đang Hoạt Động"
+          (com_group['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
@@ -465,7 +465,7 @@ export class CommodityComponent implements OnInit {
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
     exportModel.header = [
-      {name:"STT",width:10},      
+      {name:"No.",width:10},      
       {name:"Name EN",width:20},
       {name:"Name Local",width:20},   
       {name:"Inactive",width:20}

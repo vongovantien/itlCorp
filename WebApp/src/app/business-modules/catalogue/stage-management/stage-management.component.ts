@@ -302,7 +302,7 @@ export class StageManagementComponent implements OnInit {
                     stg['stage']['stageNameEn'],
                     stg['stage']['descriptionVn'],
                     stg['stage']['descriptionEn'],
-                    (stg['stage']['inactive'] === true) ? "Inactive" : "Active",
+                    (stg['stage']['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
                 ]
             });
         }
@@ -318,7 +318,7 @@ export class StageManagementComponent implements OnInit {
                     stg['stage']['stageNameEn'],
                     stg['stage']['descriptionVn'],
                     stg['stage']['descriptionEn'],
-                    (stg['stage']['inactive'] === true) ? "Ngưng Hoạt Động" : "Đang Hoạt Động",
+                    (stg['stage']['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
                 ]
             });
         }
@@ -328,7 +328,7 @@ export class StageManagementComponent implements OnInit {
         const currrently_user = localStorage.getItem('currently_userName');
         exportModel.author = currrently_user;
         exportModel.header = [
-            { name: "STT", width: 10 },
+            { name: "No.", width: 10 },
             { name: "Stage ID", width: 10 },
             { name: "Department Name", width: 30 },
             { name: "Code", width: 30 },

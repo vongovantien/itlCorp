@@ -11,7 +11,6 @@ import { BaseService } from 'src/services-base/base.service';
 })
 export class AppComponent implements OnInit {
 
-  default_current_client_lang = "en";
   ngOnInit(): void {
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == null) {
       localStorage.setItem("CURRENT_LANGUAGE", SystemConstants.DEFAULT_LANGUAGE);
@@ -19,8 +18,8 @@ export class AppComponent implements OnInit {
     if (localStorage.getItem(SystemConstants.CURRENT_VERSION) == null) {
       localStorage.setItem("CURRENT_VERSION", "1");
     }
-    const current_client_lang = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
-    this.default_current_client_lang = current_client_lang;
+    var current_client_lang = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
+ 
     if (current_client_lang === null) {
       localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");
     }
@@ -50,6 +49,4 @@ export class AppComponent implements OnInit {
     }
   }
 
-
-  title = 'app';
 }

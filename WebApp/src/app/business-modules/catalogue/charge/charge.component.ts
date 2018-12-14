@@ -181,7 +181,7 @@ export class ChargeComponent implements OnInit {
           chrg['chargeNameEn'],
           chrg['chargeNameVn'],
           chrg['type'],
-          (chrg['inactive'] === true) ? "Inactive" : "Active"
+          (chrg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
@@ -194,16 +194,16 @@ export class ChargeComponent implements OnInit {
           chrg['chargeNameEn'],
           chrg['chargeNameVn'],
           chrg['type'],
-          (chrg['inactive'] === true) ? "Ngưng Hoạt Động" : "Đang Hoạt Động"
+          (chrg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
     const exportModel: ExportExcel = new ExportExcel();
-    exportModel.title = "PortIndex List";
+    exportModel.title = "Charge List";
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
     exportModel.header = [
-      { name: "STT", width: 10 },
+      { name: "No.", width: 10 },
       { name: "Code", width: 20 },
       { name: "English Name", width: 20 },
       { name: "Local Name", width: 20 },
@@ -211,7 +211,7 @@ export class ChargeComponent implements OnInit {
       { name: "Inactive", width: 20 }
     ]
     exportModel.data = charges;
-    exportModel.fileName = "PortIndex";
+    exportModel.fileName = "Charges";
 
     this.excelService.generateExcel(exportModel);
 

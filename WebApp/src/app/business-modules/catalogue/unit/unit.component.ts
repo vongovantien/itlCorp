@@ -163,26 +163,28 @@ export class UnitComponent implements OnInit {
     
     if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
 
-      units = lodash.map(units, function (unit) {
+      units = lodash.map(units, function (unit,index) {
         return [
+          index+1,
           unit.code,
           unit.unitNameVn,
           unit.unitNameEn,
           unit.descriptionEn,
           unit.descriptionVn,
-          (unit.inactive===true)?"Inactive":"Active"
+          (unit.inactive===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
     if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      units = lodash.map(units, function (unit) {
+      units = lodash.map(units, function (unit,index) {
         return [
+          index+1,
           unit.code,
           unit.unitNameVn,
           unit.unitNameEn,
           unit.descriptionEn,
           unit.descriptionVn,
-          (unit.inactive===true)?"Ngưng Hoạt Động":"Đang Hoạt Động"
+          (unit.inactive===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
@@ -195,6 +197,7 @@ export class UnitComponent implements OnInit {
     exportModel.title = "Unit Report ";
     exportModel.author = currrently_user;
     exportModel.header = [
+      { name: "No.", width: 10 },
       { name: "Code", width: 10 },
       { name: "Name Vn", width: 25 },
       { name: "Name En", width: 25 },

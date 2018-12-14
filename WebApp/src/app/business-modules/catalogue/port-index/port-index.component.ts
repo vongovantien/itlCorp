@@ -300,7 +300,7 @@ export class PortIndexComponent implements OnInit {
           pi['countryNameEN'],
           pi['areaNameEN'],
           pi['modeOfTransport'],
-          (pi['inactive']===true)?"Inactive":"Active"
+          (pi['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       }); 
     }
@@ -315,7 +315,7 @@ export class PortIndexComponent implements OnInit {
           pi['countryNameVN'],
           pi['areaNameVN'],
           pi['modeOfTransport'],
-          (pi['inactive']===true)?"Ngưng Hoạt Động":"Đang Hoạt Động"
+          (pi['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
@@ -325,7 +325,7 @@ export class PortIndexComponent implements OnInit {
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
     exportModel.header = [
-      {name:"STT",width:10},
+      {name:"No.",width:10},
       {name:"Code",width:20},
       {name:"Name EN",width:20},
       {name:"Name VN",width:20},

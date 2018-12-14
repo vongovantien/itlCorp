@@ -370,7 +370,7 @@ export class WarehouseComponent implements OnInit {
           item['districtNameEN'],
           item['provinceNameEN'],
           item['countryNameEN'],
-          (item['inactive'] == true)?"inactive": "active"
+          (item['inactive'] == true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
@@ -385,7 +385,7 @@ export class WarehouseComponent implements OnInit {
           item['districtNameVN'],
           item['provinceNameVN'],
           item['countryNameVN'],
-          (item['inactive'] == true)?"Ngưng Hoạt Động": "Đang Hoạt Động"
+          (item['inactive'] == true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
@@ -394,7 +394,7 @@ export class WarehouseComponent implements OnInit {
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
     exportModel.header = [
-      {name:"STT",width:10},
+      {name:"No.",width:10},
       {name:"Code",width:20},
       {name:"Name EN",width:20},
       {name:"Name VN",width:20},

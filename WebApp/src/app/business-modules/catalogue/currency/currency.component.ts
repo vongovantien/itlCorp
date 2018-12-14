@@ -202,23 +202,25 @@ export class CurrencyComponent implements OnInit {
   async export() {    
     var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);      
     if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
-      currenciesList = lodash.map(currenciesList, function (currency) {
+      currenciesList = lodash.map(currenciesList, function (currency,index) {
         return [
+          index+1,
           currency['id'],
           currency['currencyName'],
           currency['isDefault'],
-          (currency['inactive']===true)?"Inactive":"Active",
+          (currency['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
 
     if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      currenciesList = lodash.map(currenciesList, function (currency) {
+      currenciesList = lodash.map(currenciesList, function (currency,index) {
         return [
+          index+1,
           currency['id'],
           currency['currencyName'],
           currency['isDefault'],
-          (currency['inactive']===true)?"Ngưng Hoạt Động":"Đang Hoạt Động",
+          (currency['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
@@ -232,6 +234,7 @@ export class CurrencyComponent implements OnInit {
      exportModel.author = currrently_user;
      exportModel.sheetName = "Sheet 1";
      exportModel.header = [
+       {name:"No.",width:10},
        {name:"Code",width:10},
        {name:"Currency Name",width:20},
        {name:"Is Default",width:20},

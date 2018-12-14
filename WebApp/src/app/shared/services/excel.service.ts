@@ -1,14 +1,16 @@
 import { Injectable, } from '@angular/core';
 import { Workbook } from 'exceljs';
-import {Font} from 'exceljs';
 import * as fs from 'file-saver';
-import * as lodash from 'lodash';
-
-// import { WorkBook } from 'xlsx/types';
 import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
 @Injectable({
   providedIn: 'root'
 })
+
+
+/**
+ * author: Thor-The
+ * More informations about this services, please reference to the link https://www.ngdevelop.tech/export-to-excel-in-angular-6/
+ */
 export class ExcelService {
   constructor() {
   }
@@ -77,10 +79,10 @@ export class ExcelService {
     let worksheet = workbook.addWorksheet(exportModel.sheetName);
     //Add Row and formatting
     let titleRow = worksheet.addRow([title]);
-    titleRow.font = titleFontStyle //{ name: exportModel.titleFontStyle.fontFamily, family: 4, size: exportModel.titleFontStyle.fontSize,bold: exportModel.titleFontStyle.isBold }
+    titleRow.font = titleFontStyle 
     worksheet.addRow([]);
     let exportedBy = worksheet.addRow(['Exported By : ' + author.toUpperCase()]);
-    exportedBy.font = authorFontStyle//   {name:'Century Gothic',size:14,bold:true}
+    exportedBy.font = authorFontStyle
     //Add Image
     // let logo = workbook.addImage({
     //   base64: logoFile.logoBase64,
@@ -103,7 +105,7 @@ export class ExcelService {
       // }
       cell.fill;
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      cell.font =  cellStyle  //{name: exportModel.cellStyle.fontFamily, size: exportModel.cellStyle.fontSize, bold: exportModel.cellStyle.isBold }
+      cell.font =  cellStyle  
     })
 
     // Add Data and Conditional Formatting
