@@ -43,7 +43,9 @@ export class SystemConstants {
         LOG: "auditlog"
     }
     public static readonly LANGUAGES = {
-        ENGLISH: SystemConstants.DEFAULT_LANGUAGE,
-        VIETNAM: "vi-VN"
+        ENGLISH_API:  "en-US",  //SystemConstants.DEFAULT_LANGUAGE,
+        VIETNAM_API: "vi-VN",
+        ENGLISH: "en",
+        VIETNAM:"vi"
     }
 }

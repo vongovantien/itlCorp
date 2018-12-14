@@ -2,8 +2,6 @@ import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/co
 import * as lodash from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
-import { Observer, Observable } from 'rxjs';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 declare var jquery: any;
@@ -54,7 +52,7 @@ export class JobMangementComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private router: Router,
     private baseServices: BaseService, private cdRef: ChangeDetectorRef,
-    private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) { }
+    private toastr: ToastrService) { }
 
   async ngOnInit() {
     this.toastr.success("mess","title", {
@@ -345,17 +343,17 @@ export class JobMangementComponent implements OnInit {
   reason_cancel_job = "";
 
   submit_cancel_job() {
-    this.spinnerService.show();
+    this.baseServices.spinnerShow();
     setTimeout(() => {
-      this.spinnerService.hide();
+      this.baseServices.spinnerHide();
       this.toastr.success("Request submited successful !");
     }, 3000);
   }
 
   save_change_job() {
-    this.spinnerService.show();
+    this.baseServices.spinnerShow();
     setTimeout(() => {
-      this.spinnerService.hide();
+      this.baseServices.spinnerHide();
       this.toastr.success("All changes have been saved !");
     }, 3000);
   }
@@ -369,9 +367,9 @@ export class JobMangementComponent implements OnInit {
       this.stage_index = index_stage;
       console.log(this.Jobs_List[this.job_index].stage_list[this.stage_index]);
     } else {
-      this.spinnerService.show();
+      this.baseServices.spinnerShow();
       setTimeout(() => {
-        this.spinnerService.hide();
+        this.baseServices.spinnerHide();
         this.toastr.success("Edit stage success !");
       }, 1500);
     }

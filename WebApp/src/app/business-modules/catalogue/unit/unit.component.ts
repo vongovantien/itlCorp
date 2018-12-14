@@ -158,33 +158,35 @@ export class UnitComponent implements OnInit {
 
 
   async export() {
-    // var units = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, this.searchObject);
-    // console.log(units);
-    // units = lodash.map(units, function (unit) {
-    //   return {
-    //     "Code": unit.code,
-    //     "Name_Vn": unit.unitNameVn,
-    //     "Name_En": unit.unitNameEn,
-    //     "Description_En": unit.descriptionEn,
-    //     "Description_Vn": unit.descriptionVn,
-    //     "Inactive": unit.inactive
-    //   }
-    // });
-
-
     /**Prepare data */
     var units = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, this.searchObject);
-    console.log(units);
-    units = lodash.map(units, function (unit) {
-      return [
-        unit.code,
-        unit.unitNameVn,
-        unit.unitNameEn,
-        unit.descriptionEn,
-        unit.descriptionVn,
-        unit.inactive
-      ]
-    });
+    
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+
+      units = lodash.map(units, function (unit) {
+        return [
+          unit.code,
+          unit.unitNameVn,
+          unit.unitNameEn,
+          unit.descriptionEn,
+          unit.descriptionVn,
+          (unit.inactive===true)?"Inactive":"Active"
+        ]
+      });
+    }
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      units = lodash.map(units, function (unit) {
+        return [
+          unit.code,
+          unit.unitNameVn,
+          unit.unitNameEn,
+          unit.descriptionEn,
+          unit.descriptionVn,
+          (unit.inactive===true)?"Ngưng Hoạt Động":"Đang Hoạt Động"
+        ]
+      });
+    }
+
 
     /**Set up stylesheet */
     var exportModel: ExportExcel = new ExportExcel();
@@ -194,23 +196,13 @@ export class UnitComponent implements OnInit {
     exportModel.author = currrently_user;
     exportModel.header = [
       { name: "Code", width: 10 },
-      { name: "Name_Vn", width: 25 },
-      { name: "Name_En", width: 25 },
-      { name: "Description_En", width: 25 },
-      { name: "Description_Vn", width: 25 },
+      { name: "Name Vn", width: 25 },
+      { name: "Name En", width: 25 },
+      { name: "Description En", width: 25 },
+      { name: "Description Vn", width: 25 },
       { name: "Inactive", width: 25 }];   
 
     exportModel.data = units;
-
-    // exportModel.authorFontSyle.fontFamily = 'Times New Roman';
-    // exportModel.authorFontSyle.isBold = true;
-    // exportModel.authorFontSyle.isItalic = true;
-    // exportModel.authorFontSyle.fontSize = 20;
-
-    // exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
-    // exportModel.cellStyle.fontSize = 11;
-    // exportModel.cellStyle.isBold = false;
-
     this.excelService.generateExcel(exportModel);
   }
 

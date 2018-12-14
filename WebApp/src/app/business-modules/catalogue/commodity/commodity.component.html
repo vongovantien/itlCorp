@@ -43,7 +43,7 @@
                                     </span>
                                 </button> -->
                                 <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget" (click)="showAdd(tabName.commodity)"></app-default-button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="importCom()">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -51,7 +51,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="exportCom()">
                                     <span>
                                         <i class="la la-upload"></i>
                                         <span>
@@ -79,8 +79,8 @@
                         <div class="clearfix m--margin-bottom-15">
                             <div class="c-button-actions m--align-right">
                                 <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget" (click)="showAdd(tabName.commodityGroup)"></app-default-button>
-                                <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
-                                <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
+                                <app-default-button [buttonSetting]="importButtonSetting" (click)="importComGroup()"></app-default-button>
+                                <app-default-button [buttonSetting]="exportButtonSetting" (click)="exportComGroup()"></app-default-button>
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">

@@ -6,7 +6,6 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { BaseService } from 'src/services-base/base.service';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
@@ -16,6 +15,7 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
+import { SystemConstants } from 'src/constants/system.const';
 
 declare var $: any;
 
@@ -64,7 +64,6 @@ export class CurrencyComponent implements OnInit {
   totalPages: number;
   constructor(private sortService: SortService, private baseService: BaseService,
     private excelService: ExcelService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU) { }
 
   ngOnInit() {
@@ -72,10 +71,10 @@ export class CurrencyComponent implements OnInit {
   }
 
   async getCurrencies(pager: PagerSetting) {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     console.log(this.criteria);
     this.baseService.post(this.api_menu.Catalogue.Currency.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.currencies = response.data;
       this.pager.totalItems = response.totalItems;
       console.log(response.totalPages);
@@ -201,15 +200,29 @@ export class CurrencyComponent implements OnInit {
 
 
   async export() {    
-    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);   
-    currenciesList = lodash.map(currenciesList, function (currency) {
-      return [
-        currency.id,
-        currency.currencyName,
-        currency.isDefault,
-        currency.inactive,
-      ]
-    });
+    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);      
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      currenciesList = lodash.map(currenciesList, function (currency) {
+        return [
+          currency['id'],
+          currency['currencyName'],
+          currency['isDefault'],
+          (currency['inactive']===true)?"Inactive":"Active",
+        ]
+      });
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      currenciesList = lodash.map(currenciesList, function (currency) {
+        return [
+          currency['id'],
+          currency['currencyName'],
+          currency['isDefault'],
+          (currency['inactive']===true)?"Ngưng Hoạt Động":"Đang Hoạt Động",
+        ]
+      });
+    }
+    
 
      /**Set up stylesheet */
      var exportModel:ExportExcel = new ExportExcel();
@@ -225,26 +238,11 @@ export class CurrencyComponent implements OnInit {
        {name:"Inactive",width:20}
      ]
      exportModel.data = currenciesList;
- 
-    //  exportModel.titleStyle.fontFamily = 'Century Gothic';
-    //  exportModel.titleStyle.isBold = true;
-    //  exportModel.titleStyle.fontSize = 20;
- 
-    //  exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
-    //  exportModel.cellStyle.fontSize = 11;
-    //  exportModel.cellStyle.isBold = false;
-  
      this.excelService.generateExcel(exportModel);
     
   }
 
   async import() {
-    // for (var i = 0; i <= 6000; i++) {
-    //   var currency: catCurrency = new catCurrency();
-    //   currency.id = "CRCC-" + new Date().toISOString();
-    //   currency.currencyName = "CRCC-name-" + new Date().toISOString();
-    //   await this.baseService.postAsync(this.api_menu.Catalogue.Currency.addNew, currency,false,false);
-    //   this.total += 1;
-    //}
+
   }
 }

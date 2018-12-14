@@ -8,8 +8,8 @@
         </div>
         <div class="c-button-actions">
             <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
-            <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
-            <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" (click)="import()"></app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
         </div>
     </div>
 </div>

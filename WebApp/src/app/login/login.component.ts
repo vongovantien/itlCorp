@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
 import { Router } from '@angular/router';
@@ -7,14 +7,14 @@ import { CookieService } from 'ngx-cookie-service';
 import * as crypto_js from 'crypto-js';
 import { NgForm } from '@angular/forms';
 import { authConfig } from '../shared/authenticate/authConfig';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { BaseService } from 'src/services-base/base.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   ngAfterViewInit(): void {
     if (this.cookieService.get("login_status") === "LOGGED_IN") {
       this.router.navigateByUrl('/home');
@@ -24,18 +24,22 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   constructor(
     private toastr: ToastrService,
+    private baseService:BaseService,
     private router: Router,
     private oauthService: OAuthService,
     private cookieService: CookieService,
-    private spinnerService: Ng4LoadingSpinnerService) {
+    private changeDetector : ChangeDetectorRef ) {    
 
+  }
+  ngAfterViewChecked(){
+    this.changeDetector.detectChanges();
   }
 
   private async configureWithNewConfigApi() {
     this.oauthService.configure(authConfig);
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-    this.oauthService.setupAutomaticSilentRefresh();
+    this.oauthService.setupAutomaticSilentRefresh();   
   }
 
   username: string = "";
@@ -47,7 +51,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   async Login(form: NgForm) {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     await this.configureWithNewConfigApi();
     if (form.form.status !== "INVALID") {
       this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
@@ -62,11 +66,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
           this.toastr.success("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "", { positionClass: 'toast-bottom-right' });
           this.router.navigateByUrl('/home');
           this.cookieService.set('login_status', "LOGGED_IN", null, "/", window.location.hostname);
-          this.spinnerService.hide();
+          this.baseService.spinnerHide();
         }
       }).catch((err) => {
         this.toastr.error(err.error.error_description, "", { positionClass: 'toast-bottom-right' })
-        this.spinnerService.hide();
+        this.baseService.spinnerHide();
       })
     }
 
@@ -154,8 +158,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
   changeLanguage(lang) {
     localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, lang);
     if (localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE) === "en") {
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"en-US");
       window.location.href = window.location.protocol + "//" + window.location.hostname;
     } else {
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"vi-VN");
       window.location.href = window.location.protocol + "//" + window.location.hostname + "/" + lang + "/";
     }
   }

@@ -72,7 +72,6 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }
     this.previous_menu_index = index;
 
-
     this.index_parrent_menu = index;
     var parentMenu = document.getElementById(index.toString());   
     if (parentMenu.classList.contains('m-menu__item--open')) {

@@ -10,7 +10,6 @@ import { AllPartnerComponent } from './all/all-partner.component';
 import { ConsigneeComponent } from './consignee/consignee.component';
 import { CustomerComponent } from './customer/customer.component';
 import { BaseService } from 'src/services-base/base.service';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { Router } from '@angular/router';
@@ -59,12 +58,11 @@ export class PartnerComponent implements OnInit {
   @ViewChild(ShipperComponent) shipperComponent; 
 
   constructor(private baseService: BaseService, 
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private router:Router) { }
 
   ngOnInit() {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
   }
   onSearch(event){
@@ -150,7 +148,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
       this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
     }
-    this.spinnerService.hide();
+    this.baseService.spinnerHide();
   }
 
   showConfirmDelete(event){

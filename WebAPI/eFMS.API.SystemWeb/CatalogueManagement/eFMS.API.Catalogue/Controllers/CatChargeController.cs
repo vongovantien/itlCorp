@@ -53,6 +53,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("Query")]
+        public IActionResult Get(CatChargeCriteria criteria)
+        {
+            var data = catChargeService.Query(criteria);        
+            return Ok(data);
+        }
+
 
         [HttpGet]
         [Route("getById/{id}")]

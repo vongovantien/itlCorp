@@ -85,6 +85,48 @@ namespace eFMS.API.Catalogue.DL.Services
             return returnList;
         }
 
+        public List<object> Query(CatStageCriteria criteria)
+        {
+
+            List<Object> returnList = new List<Object>();
+            var result = new List<CatStage>();
+            var departmentList = new List<CatDepartment>();
+            if (criteria.condition == SearchCondition.AND)
+            {
+                var s = DataContext.Get(stage => (stage.Id == criteria.Id || criteria.Id == 0)
+                                    && ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
+                                    && ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
+                                    && ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0));
+
+                var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
+                result = (from i in s
+
+                          join department in t on i.DepartmentId equals department.Id
+                          select i).ToList();
+
+            }
+            else
+            {
+                var s = DataContext.Get();
+                var t = ((eFMSDataContext)DataContext.DC).CatDepartment;
+
+                result = s.Join(t, stage => stage.DepartmentId, department => department.Id, (stage, department) => new { stage, department }).Where(x => ((x.department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0)
+                   || ((x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
+                   || ((x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
+                   || ((x.stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
+                   || (x.stage.Id == criteria.Id))
+                   .Select(x => x.stage).ToList();
+            }         
+
+            foreach (var stage in result)
+            {
+                var department = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => x.Id == stage.DepartmentId).FirstOrDefault();
+                var returnStage = new { stage, department?.DeptName, department?.Code };
+                returnList.Add(returnStage);
+            }
+
+            return returnList;
+        }
 
         public HandleState UpdateStage(CatStageModel catStage)
         {
