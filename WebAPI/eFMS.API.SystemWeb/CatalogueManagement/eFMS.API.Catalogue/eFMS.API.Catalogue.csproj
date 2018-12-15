@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="1.1.15" />
     <PackageReference Include="LocalizationCultureCore" Version="1.1.2" />
@@ -66,5 +67,10 @@
     <Content Update="Resources\vi-VN.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Resources\Files\WarehouseImportTeamplate.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

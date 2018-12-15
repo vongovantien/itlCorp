@@ -89,7 +89,7 @@ export class WarehouseComponent implements OnInit {
   nameEditModal = "edit-ware-house-modal";
   selectedFilter = "All";
   titleConfirmDelete = "You want to delete this warehouse";
-  warehouseSettings: ColumnSetting[] ;//= WAREHOUSECOLUMNSETTING;
+  warehouseSettings: ColumnSetting[] = language.Warehouse;//= WAREHOUSECOLUMNSETTING;
   isDesc: boolean = true;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
@@ -105,7 +105,6 @@ export class WarehouseComponent implements OnInit {
     private api_menu: API_MENU) { }
 
   ngOnInit() {
-    this.warehouseSettings = language.Warehouse;
     this.warehouse.placeType = 12;
     this.getWarehouses(this.pager);
     this.getDataCombobox();
@@ -174,6 +173,7 @@ export class WarehouseComponent implements OnInit {
   }
   showDetail(item) {
     this.warehouse = item;
+    console.log(this.warehouse);
     this.countryActive = this.countries.find(x => x.id == this.warehouse.countryID);
     this.provinceActive = this.provinces.find(x => x.id == this.warehouse.provinceID);
     this.districtActive = this.districts.find(x => x.id == this.warehouse.districtID);
@@ -412,9 +412,5 @@ export class WarehouseComponent implements OnInit {
     exportModel.cellStyle.isBold = false;
     
     this.excelService.generateExcel(exportModel);
-  }
-
-  async import(){
-
   }
 }

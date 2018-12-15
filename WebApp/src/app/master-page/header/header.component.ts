@@ -48,12 +48,14 @@ export class HeaderComponent implements OnInit,AfterViewInit {
     } else {
       if (lang === "en") {
         localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");       
+        localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "en-US"); 
         const url = window.location.protocol + "//" + window.location.hostname + "/" + lang +"/#" + this.router.url + "/";
         this.active_flag = this.english_flag;
         window.location.href = url;
       }
       if (lang === "vi") {
         localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "vi");
+        localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "vi-VN"); 
         const url = window.location.protocol + "//" + window.location.hostname + "/" + lang +"/#" + this.router.url + "/";
         this.active_flag = this.vietnam_flag;
         window.location.href = url;

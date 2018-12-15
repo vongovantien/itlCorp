@@ -65,6 +65,9 @@ export class API_MENU {
             getProvinces: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetProvinces",
             getDistricts: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetDistricts",
             getModeOfTransport: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetModeOfTransport",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/DownloadExcel",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/UpLoadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/Import"
         },
         PartnerData: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Query",

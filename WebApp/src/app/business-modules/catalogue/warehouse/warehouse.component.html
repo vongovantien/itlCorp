@@ -76,7 +76,8 @@
                                         Code
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="nope" minlength="3"
-                                        [(ngModel)]="warehouse.code" #code="ngModel" (change)="warehouse.code = warehouse.code.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required >
+                                        [(ngModel)]="warehouse.code" #code="ngModel" (change)="warehouse.code = warehouse.code.trim()" 
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required >
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
                                         Code is required least 3 characters
                                     </div>
@@ -211,7 +212,7 @@
                                             Code
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="nope" minlength="3"
-                                            (change)="warehouse.code = warehouse.code.trim()"
+                                            (change)="warehouse.code = warehouse.code.trim()" disabled
                                             [(ngModel)]="warehouse.code" #code="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required >
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
                                             Code is required least 3 characters

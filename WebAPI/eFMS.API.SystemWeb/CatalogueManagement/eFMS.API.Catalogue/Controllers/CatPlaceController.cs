@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
@@ -11,12 +14,17 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
+using System.Linq;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -30,6 +38,8 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+        private string templateName = "ImportTeamplate.xlsx";
+
         public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -163,6 +173,73 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        {
+            templateName = GetFileName(type);
+            var result = await new FileHelper().ExportExcel(templateName);
+            if (result != null)
+                return result;
+            return BadRequest();
+        }
+
+        [HttpPost]
+        [Route("UpLoadFile")]
+        public IActionResult UpLoadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if(file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int ColCount = worksheet.Dimension.Columns;
+                List<WarehouseImportModel> list = new List<WarehouseImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var warehouse = new WarehouseImportModel();
+                    warehouse.Code = worksheet.Cells[row, 1].Value?.ToString();
+                    warehouse.NameEn = worksheet.Cells[row, 2].Value?.ToString();
+                    warehouse.NameVn = worksheet.Cells[row, 3].Value?.ToString();
+                    warehouse.Address = worksheet.Cells[row, 4].Value?.ToString();
+                    warehouse.CountryName = worksheet.Cells[row, 5].Value?.ToString();
+                    warehouse.ProvinceName = worksheet.Cells[row, 6].Value?.ToString();
+                    warehouse.DistrictName = worksheet.Cells[row, 7].Value?.ToString();
+                    warehouse.Status = worksheet.Cells[row, 8].Value?.ToString();
+                    list.Add(warehouse);
+                }
+
+                var data = catPlaceService.CheckValidImport(list, CatPlaceTypeEnum.Warehouse);
+                var validRows = data.Count(x => x.InvalidMessage == null);
+                var results = new { data, validRows };
+                return Ok(results);
+            }
+            return BadRequest(file);
+        }
+
+        [HttpPost]
+        [Route("Import")]
+        [Authorize]
+        public IActionResult Import(List<WarehouseImportModel> data)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var result = catPlaceService.Import(data);
+            return Ok(result);
+        }
+
+        private string GetFileName(CatPlaceTypeEnum type)
+        {
+            switch (type)
+            {
+                case CatPlaceTypeEnum.Port:
+                    templateName = "PortIndex" + templateName;
+                    break;
+                default:
+                    templateName = "Warehouse" + templateName;
+                    break;
+            }
+            return templateName;
         }
 
         private string CheckExist(Guid id, CatPlaceEditModel model)

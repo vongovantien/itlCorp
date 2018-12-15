@@ -17,6 +17,8 @@ using System.Linq.Expressions;
 using eFMS.API.Catalogue.DL.ViewModels;
 using System.Threading;
 using System.Globalization;
+using ITL.NetCore.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -188,6 +190,87 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<ModeOfTransport> GetModeOfTransport()
         {
             return DataEnums.ModeOfTransportData;
+        }
+
+        public List<WarehouseImportModel> CheckValidImport(List<WarehouseImportModel> list, CatPlaceTypeEnum placeType)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var countries = dc.CatCountry;
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
+            var districts = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District));
+            var warehouses = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Warehouse));
+            list.ForEach(x => {
+                var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(x.CountryName) >= 0);
+                //var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(x.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
+                //var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(x.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
+                var warehouse = warehouses.FirstOrDefault(i => i.Code.IndexOf(x.Code) >= 0);
+                if(warehouse != null)
+                {
+                    x.InvalidMessage = string.Format("Code '{0}' is existed!", x.Code);
+                }
+                else
+                {
+                    if (country == null)
+                    {
+                        x.InvalidMessage = string.Format("Country '{0}' is not found!", x.CountryName);
+                    }
+                    else
+                    {
+                        x.CountryId = country.Id;
+                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(x.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
+                        if (province == null)
+                        {
+                            x.InvalidMessage = string.Format("Province '{0}' is not found!", x.ProvinceName);
+                        }
+                        else
+                        {
+                            x.ProvinceId = province.Id;
+                            var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(x.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
+                            if (district == null)
+                            {
+                                x.InvalidMessage = string.Format("District '{0}' is not found!", x.DistrictName);
+                            }
+                            else
+                            {
+                                x.DistrictId = district.Id;
+                            }
+                        }
+                    }
+                    x.PlaceTypeId = PlaceTypeEx.GetPlaceType(placeType);
+                    x.Status = x.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
+                }
+            });
+            return list;
+        }
+
+        public HandleState Import(List<WarehouseImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach (var item in data)
+                {
+                    var catPlace = new CatPlace
+                    {
+                        Code = item.Code,
+                        NameEn = item.NameEn,
+                        NameVn = item.NameVn,
+                        CountryId = item.CountryId,
+                        ProvinceId = item.ProvinceId,
+                        DistrictId = item.DistrictId,
+                        Address = item.Address,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = ChangeTrackerHelper.currentUser
+                    };
+                    dc.CatPlace.Add(catPlace);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
     }
 }

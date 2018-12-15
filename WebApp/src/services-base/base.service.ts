@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, ErrorHandler, ViewContainerRef } from '@angular/core';
 import { Http, Response, Headers } from '@angular/http';
 import { Router } from '@angular/router';
@@ -194,8 +194,34 @@ export class BaseService implements ErrorHandler {
       return error;
     }
   }
+  
+  downloadfile(url: string) {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization",token);
+    return this._http.get(url, {responseType: 'blob'});
+  }
 
+  uploadfile( url: any,files: any, name:string=null) {
+    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+    if (files.length === 0)
 
+    return;
+    var formData = new FormData();
+    for (let file of files)
+      formData.append(name||file.name,file);
+    let params = new HttpParams();
+    const options = {
+      params: params,
+      reportProgress: true,
+      headers:new HttpHeaders({
+        'Authorization': token,
+        'accept':'application/json'
+      })
+    };
+    return this._http.post(url, formData, options);
+
+   
+  }
   /**
    * Handle state return from server and display toast notification 
    * @param response 

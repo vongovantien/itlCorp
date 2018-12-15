@@ -7,6 +7,10 @@ namespace eFMS.API.Catalogue.DL.Common
 {
     public static class DataEnums
     {
+        public static readonly string EnActive = "Active";
+        public static readonly string EnInActive = "In Active";
+        public static readonly string VnActive = "Hoạt động";
+        public static readonly string VnInActive = "Ngưng hoạt động";
         public static List<ModeOfTransport> ModeOfTransportData = new List<ModeOfTransport>
         {
             new ModeOfTransport { Id = "AIR", Name = "AIR"},
