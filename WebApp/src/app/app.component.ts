@@ -44,8 +44,6 @@ export class AppComponent implements OnInit {
       }
       this.cookieService.delete("login_status","/",window.location.hostname);
       this.router.navigateByUrl('/login');      
-    }else{
-      this.router.navigateByUrl('/home');
     }
   }
 

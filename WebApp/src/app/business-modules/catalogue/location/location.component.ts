@@ -953,4 +953,14 @@ export class LocationComponent implements OnInit {
       this.ListWards = this.sortService.sort(this.ListWards, property, this.isDesc);
     }
   }
+
+
+
+  async import(){
+
+  }
+
+  async export(){
+    
+  }
 }
