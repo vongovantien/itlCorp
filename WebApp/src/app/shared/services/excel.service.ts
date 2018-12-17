@@ -104,26 +104,21 @@ export class ExcelService {
       //   bgColor: { argb: 'FF0000FF' }
       // }
       cell.fill;
-      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-      cell.font =  cellStyle  
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+      cell.alignment = {horizontal:'center',vertical:'middle'}
+      cell.font =  cellStyle;  
     })
 
     // Add Data and Conditional Formatting
     data.forEach(d => {
       let row = worksheet.addRow(d);
-      let qty = row.getCell(5);
-      qty.fill;
-     // let color = 'FF99FF99';      
-      // qty.fill = {
-      //   type: 'pattern',
-      //   pattern: 'solid',
-      //   fgColor: { argb: color }
-      // }
+      row.eachCell((cell,number)=>{
+        cell.alignment = {horizontal:'center',vertical:'middle'} ;
+      });
     }
     );
 
-    for(var i = 0; i<HeaderName.length;i++){
-      
+    for(var i = 0; i<HeaderName.length;i++){      
       for(var j=0;j<HeaderWidth.length;j++){
         if(i===j){
           worksheet.getColumn(i+1).width = HeaderWidth[j];

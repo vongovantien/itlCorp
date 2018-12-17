@@ -125,6 +125,7 @@ export class API_MENU {
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/update",
         },
         Country:{            
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/query",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getAll",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getById/",

@@ -58,6 +58,27 @@ namespace eFMS.API.Catalogue.DL.Services
             return returnList;        
         }
 
+        public List<CatCountry> Query(CatCountryCriteria criteria)
+        {
+            var returnList = new List<CatCountry>();
+            if (criteria.condition == SearchCondition.AND)
+            {
+                var s = DataContext.Get(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
+                && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "") >= 0
+                && (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "") >= 0).ToList();
+                returnList = s;
+            }
+            else
+            {
+                var s = DataContext.Get(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
+                || ((x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null") >= 0)
+                || ((x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null") >= 0)).ToList();
+                returnList = s;
+            }
+           
+            return returnList;
+        }
+
         private List<CatCountryViewModel> GetDataByLanguage(IQueryable<CatCountry> data)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
