@@ -247,4 +247,8 @@ export class PartnerComponent implements OnInit {
     }
     this.pager.currentPage = pager.currentPage;
   }
+
+  async export(){
+    
+  }
 }
