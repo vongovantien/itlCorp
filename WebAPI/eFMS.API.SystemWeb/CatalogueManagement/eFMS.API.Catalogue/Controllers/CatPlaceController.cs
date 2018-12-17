@@ -176,6 +176,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("DownloadExcel")]
+        [Authorize]
         public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
         {
             templateName = GetFileName(type);
@@ -187,6 +188,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("UpLoadFile")]
+        [Authorize]
         public IActionResult UpLoadFile(IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);

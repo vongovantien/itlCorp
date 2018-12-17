@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -91,7 +90,7 @@ export class ExchangeRateComponent implements OnInit {
 
   @ViewChild('currencyRateSelect') public ngSelectCurrencyRate: SelectComponent;
 
-  constructor(private spinnerService: Ng4LoadingSpinnerService,
+  constructor(
     private api_menu: API_MENU,
     private sortService: SortService, 
     private baseService: BaseService,
@@ -266,9 +265,9 @@ export class ExchangeRateComponent implements OnInit {
     });
   }
   async getExchangeRates(pager: PagerSetting) {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.ToolSetting.ExchangeRate.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.exchangeRates = response.data;
       this.pager.totalItems = response.totalItems;
     });

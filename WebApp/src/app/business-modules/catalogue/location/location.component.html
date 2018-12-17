@@ -5,7 +5,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -13,7 +13,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()" >
                 <span>
                     <i class="la la-upload"></i>
                     <span>

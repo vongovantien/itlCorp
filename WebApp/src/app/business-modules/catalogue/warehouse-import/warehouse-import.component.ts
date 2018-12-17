@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { saveAs } from 'file-saver';
@@ -11,6 +10,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
+declare var $:any;
 
 @Component({
   selector: 'app-warehouse-import',
@@ -26,9 +26,12 @@ export class WarehouseImportComponent implements OnInit {
   totalRows: number = 0;
   WarehouseImportSettings: ColumnSetting[] = WAREHOUSEIMPORTENCOLUMNSETTING;
   pager: PagerSetting = PAGINGSETTING;
+  inProgress: boolean = false;
+  inValidItems: any[] = [];
+  @ViewChild('form') form;
   @ViewChild(PaginationComponent) child;
 
-  constructor(private spinnerService: Ng4LoadingSpinnerService,
+  constructor(
     private pagingService: PagingService,
     private baseService: BaseService,
     private api_menu: API_MENU,
@@ -50,10 +53,10 @@ export class WarehouseImportComponent implements OnInit {
       });
   }
   pagingData(){
-    this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage);
     this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
-    this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
+    this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
+    this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
   downloadSample(){
@@ -64,8 +67,22 @@ export class WarehouseImportComponent implements OnInit {
       }
     )
   }
+  hideInvalid(){
+    this.data.forEach(function(item){
+      this.inValidItems.push(item);
+    });
+    console.log(this.inValidItems);
+  }
   async import(){
-    await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, this.data, false, true);
+    if(this.inValidRows > 0){
+
+    }
+    else{
+      this.inProgress = true;
+      await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, this.data, false, false);
+      this.inProgress = false;
+      this.reset();
+    }
   }
   isDesc = true;
   sortKey: string;
@@ -79,5 +96,12 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
     this.pagingData();
+  }
+  reset(){
+    this.data = null;
+    this.pagedItems = null;
+    $("#inputFile").val('');
+    this.form.onReset();
+    this.pager.totalItems = 0;
   }
 }

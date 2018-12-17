@@ -6,7 +6,6 @@ import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-s
 import { ButtonType } from '../../../shared/enums/type-button.enum';
 import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
 import { BaseService } from 'src/services-base/base.service';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
@@ -16,10 +15,10 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ExcelService } from 'src/app/shared/services/excel.service';
+import {PlaceTypeEnum} from 'src/app/shared/enums/placeType-enum';
 declare var $:any;
 import * as lodash from 'lodash';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
-import { OAuthService } from 'angular-oauth2-oidc';
 import {language} from 'src/languages/language.en';
 
 @Component({
@@ -45,7 +44,7 @@ export class WarehouseComponent implements OnInit {
   };
   provinceLookup: any;
   districtLookup: any;
-  criteria: any = { placeType: 12 };
+  criteria: any = { placeType: PlaceTypeEnum.Warehouse };
   // @ViewChild('formAddEdit') form: NgForm;
   pager: PagerSetting = PAGINGSETTING;
   addButtonSetting: ButtonModalSetting = {
@@ -98,10 +97,8 @@ export class WarehouseComponent implements OnInit {
   };
   
   constructor(private sortService: SortService, 
-    private oauthService: OAuthService,
     private excelService: ExcelService,
     private baseService: BaseService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU) { }
 
   ngOnInit() {
@@ -157,9 +154,9 @@ export class WarehouseComponent implements OnInit {
     });
   }
   async getWarehouses(pager: PagerSetting) {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.warehouses = response.data.map(x=>Object.assign({},x));
       this.pager.totalItems = response.totalItems;
     });
@@ -361,55 +358,54 @@ export class WarehouseComponent implements OnInit {
    */
   async export(){
     var warehouseData = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);
-    console.log(warehouseData);
-    let i = 0;
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == 'en-US') {
-      warehouseData = lodash.map(warehouseData, function (item) {
-        i =  i + 1;
+    console.log(warehouseData);    
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == SystemConstants.LANGUAGES.ENGLISH_API) {
+      warehouseData = lodash.map(warehouseData, function (item,index) {        
         return [
-          i,
-          item.code,
-          item.name_EN,
-          item.name_VN,
-          item.address,
-          item.districtNameEN,
-          item.provinceNameEN,
-          item.countryNameEN,
-          (item.inactive == true)?"inactive": "active"
+          index+1,
+          item['code'],
+          item['name_EN'],
+          item['name_VN'],
+          item['address'],
+          item['districtNameEN'],
+          item['provinceNameEN'],
+          item['countryNameEN'],
+          (item['inactive'] == true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
-    else{
-      warehouseData = lodash.map(warehouseData, function (item) {
-        i =  i + 1;
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == SystemConstants.LANGUAGES.VIETNAM_API){
+      warehouseData = lodash.map(warehouseData, function (item,index) {       
         return [
-          i,
-          item.code,
-          item.name_EN,
-          item.name_VN,
-          item.address,
-          item.districtNameVN,
-          item.provinceNameVN,
-          item.countryNameVN,
-          (item.inactive == true)?"Ngưng hoạt động": "Đang hoạt động"
+          index+1,
+          item['code'],
+          item['name_EN'],
+          item['name_VN'],
+          item['address'],
+          item['districtNameVN'],
+          item['provinceNameVN'],
+          item['countryNameVN'],
+          (item['inactive'] == true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
     const exportModel: ExportExcel = new ExportExcel();
     exportModel.title = "Warehouse list";
-    const currrently_user = sessionStorage.getItem('currently_userName');
+    const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
-    exportModel.header = ["Stt", "Code", "Name EN", "Name VN", "Address", "District", "City/ Province", "Country", "Status"];
+    exportModel.header = [
+      {name:"No.",width:10},
+      {name:"Code",width:20},
+      {name:"Name EN",width:20},
+      {name:"Name VN",width:20},
+      {name:"Address",width:30},
+      {name:"Disctric",width:20},
+      {name:"City/Province",width:20},
+      {name:"Country",width:20},
+      {name:"Status",width:20}
+    ]
     exportModel.data = warehouseData;
     exportModel.fileName = "Warehouse";
-
-    exportModel.titleStyle.fontFamily = 'Century Gothic';
-    exportModel.titleStyle.isBold = true;
-    exportModel.titleStyle.fontSize = 20;
-
-    exportModel.cellStyle.fontFamily = 'Kodchasan SemiBold';
-    exportModel.cellStyle.fontSize = 11;
-    exportModel.cellStyle.isBold = false;
     
     this.excelService.generateExcel(exportModel);
   }

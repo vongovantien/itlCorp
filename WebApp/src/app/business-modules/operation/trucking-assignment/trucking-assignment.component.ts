@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -9,25 +8,25 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class TruckingAssignmentComponent implements OnInit {
 
-  constructor(private toastr: ToastrService, private spinnerService: Ng4LoadingSpinnerService) { }
+  constructor(private toastr: ToastrService) { }
 
   ngOnInit() {
   }
 
   unlock_assign(){
-    this.spinnerService.show();
-    setTimeout(() => {
-      this.spinnerService.hide();
-      this.toastr.success("Unlock assignment success !");
-    }, 1500);
+    // this.spinnerService.show();
+    // setTimeout(() => {
+    //   this.spinnerService.hide();
+    //   this.toastr.success("Unlock assignment success !");
+    // }, 1500);
   }
 
   assign_supplier(){
-    this.spinnerService.show();
-    setTimeout(() => {
-      this.spinnerService.hide();
-      this.toastr.success("Assign success !");
-    }, 1500);
+    // this.spinnerService.show();
+    // setTimeout(() => {
+    //   this.spinnerService.hide();
+    //   this.toastr.success("Assign success !");
+    // }, 1500);
   }
 
   

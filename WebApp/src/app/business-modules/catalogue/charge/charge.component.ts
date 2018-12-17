@@ -7,6 +7,9 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { Router } from '@angular/router';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
+import { SystemConstants } from 'src/constants/system.const';
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
 
@@ -19,33 +22,34 @@ export class ChargeComponent implements OnInit {
 
   constructor(
     private baseServices: BaseService,
+    private excelService: ExcelService,
     private api_menu: API_MENU,
-    private router:Router,
+    private router: Router,
     private sortService: SortService) { }
 
-    listFilter = [
-      { filter: "All", field: "all" }, { filter: "Code", field: "code" },
-      { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
-    selectedFilter = this.listFilter[0].filter;
+  listFilter = [
+    { filter: "All", field: "all" }, { filter: "Code", field: "code" },
+    { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
+  selectedFilter = this.listFilter[0].filter;
 
-    pager: PagerSetting = PAGINGSETTING;
-    // ChargeToUpdate : CatChargeToAddOrUpdate ;
-    // ChargeToAdd : CatChargeToAddOrUpdate ;
-    ListCharges:any=[];
-    idChargeToUpdate:any="";   
-    idChargeToDelete:any=""
-    idChargeToAdd:any="";
-    searchKey:string="";
-    searchObject:any={};
-    
-  
-    @ViewChild(PaginationComponent) child;
+  pager: PagerSetting = PAGINGSETTING;
+  // ChargeToUpdate : CatChargeToAddOrUpdate ;
+  // ChargeToAdd : CatChargeToAddOrUpdate ;
+  ListCharges: any = [];
+  idChargeToUpdate: any = "";
+  idChargeToDelete: any = ""
+  idChargeToAdd: any = "";
+  searchKey: string = "";
+  searchObject: any = {};
+
+
+  @ViewChild(PaginationComponent) child;
 
   async ngOnInit() {
     await this.getCharges();
   }
 
-  async searchCharge(){
+  async searchCharge() {
     this.searchObject = {};
     if (this.selectedFilter == "All") {
       this.searchObject.All = this.searchKey;
@@ -61,14 +65,14 @@ export class ChargeComponent implements OnInit {
     await this.getCharges();
   }
 
-  async resetSearch(){
+  async resetSearch() {
     this.searchKey = "";
     this.searchObject = {};
     this.selectedFilter = this.listFilter[0].filter;
     await this.getCharges();
   }
 
-  async setPage(pager:PagerSetting){
+  async setPage(pager: PagerSetting) {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
@@ -83,95 +87,134 @@ export class ChargeComponent implements OnInit {
     }
   }
 
-  async getCharges(){
-    var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging+"?pageNumber="+this.pager.currentPage+"&pageSize="+this.pager.pageSize,this.searchObject,false,true);
+  async getCharges() {
+    var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, false, true);
     this.ListCharges = response.data;
     console.log(this.ListCharges);
     this.pager.totalItems = response.totalItems;
   }
 
-  prepareDeleteCharge(id){
+  prepareDeleteCharge(id) {
     this.idChargeToDelete = id;
   }
 
-  async deleteCharge(){
-    await this.baseServices.deleteAsync(this.api_menu.Catalogue.Charge.delete+this.idChargeToDelete,true,true);
+  async deleteCharge() {
+    await this.baseServices.deleteAsync(this.api_menu.Catalogue.Charge.delete + this.idChargeToDelete, true, true);
     await this.getCharges();
     this.setPageAfterDelete();
   }
 
-  gotoEditPage(id){
-    this.router.navigate(["/home/catalogue/charge-edit",{id:id}]);
+  gotoEditPage(id) {
+    this.router.navigate(["/home/catalogue/charge-edit", { id: id }]);
   }
 
   isDesc = true;
   sortKey: string = "code";
-  sort(property){
-      this.sortKey = property;
-      this.isDesc = !this.isDesc;
-      const temp = this.ListCharges.map(x=>Object.assign({},x));
-      this.ListCharges = this.sortService.sort(this.ListCharges.map(x=>Object.assign({},x.charge)), property, this.isDesc);
-      // var getDept = this.getDepartmentname;
-      // this.ListCharges = this.ListCharges.map(x=>({stage:x,deptName:getDept(x.id,temp)})); 
-      this.ListCharges = this.ListCharges.map(x => ({ charge: x }));     
+  sort(property) {
+    this.sortKey = property;
+    this.isDesc = !this.isDesc;
+    const temp = this.ListCharges.map(x => Object.assign({}, x));
+    this.ListCharges = this.sortService.sort(this.ListCharges.map(x => Object.assign({}, x.charge)), property, this.isDesc);
+    // var getDept = this.getDepartmentname;
+    // this.ListCharges = this.ListCharges.map(x=>({stage:x,deptName:getDept(x.id,temp)})); 
+    this.ListCharges = this.ListCharges.map(x => ({ charge: x }));
   }
-  getDepartmentname(stageId,ListCharges:any[]){
-    var inx = lodash.findIndex(ListCharges,function(o){return o.charge.id===stageId});      
-    if(inx!=-1){                    
-        return ListCharges[inx].deptName;
+  getDepartmentname(stageId, ListCharges: any[]) {
+    var inx = lodash.findIndex(ListCharges, function (o) { return o.charge.id === stageId });
+    if (inx != -1) {
+      return ListCharges[inx].deptName;
     }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+  }
 
 
 
   /**
    * ng2-select multi
    */
-  public items:Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
+  public items: Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
     'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels'];
- 
-  private value:any = ['Athens'];
-  private _disabledV:string = '0';
-  public disabled:boolean = false;
- 
-  public get disabledV():string {
+
+  private value: any = ['Athens'];
+  private _disabledV: string = '0';
+  public disabled: boolean = false;
+
+  public get disabledV(): string {
     return this._disabledV;
   }
- 
-  public set disabledV(value:string) {
+
+  public set disabledV(value: string) {
     this._disabledV = value;
     this.disabled = this._disabledV === '1';
   }
- 
-  public selected(value:any):void {
+
+  public selected(value: any): void {
     console.log('Selected value is: ', value);
   }
- 
-  public removed(value:any):void {
+
+  public removed(value: any): void {
     console.log('Removed value is: ', value);
   }
- 
-  public refreshValue(value:any):void {
+
+  public refreshValue(value: any): void {
     this.value = value;
   }
- 
-  public itemsToString(value:Array<any> = []):string {
+
+  public itemsToString(value: Array<any> = []): string {
     return value
-      .map((item:any) => {
+      .map((item: any) => {
         return item.text;
       }).join(',');
   }
+
+
+  async import() {
+
+  }
+
+  async export() {
+    var charges = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.query, this.searchObject);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      charges = lodash.map(charges, function (chrg, index) {
+        return [
+          index + 1,
+          chrg['code'],
+          chrg['chargeNameEn'],
+          chrg['chargeNameVn'],
+          chrg['type'],
+          (chrg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      });
+    }
+
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      charges = lodash.map(charges, function (chrg, index) {
+        return [
+          index + 1,
+          chrg['code'],
+          chrg['chargeNameEn'],
+          chrg['chargeNameVn'],
+          chrg['type'],
+          (chrg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+    const exportModel: ExportExcel = new ExportExcel();
+    exportModel.title = "Charge List";
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.author = currrently_user;
+    exportModel.header = [
+      { name: "No.", width: 10 },
+      { name: "Code", width: 20 },
+      { name: "English Name", width: 20 },
+      { name: "Local Name", width: 20 },
+      { name: "Type", width: 20 },
+      { name: "Inactive", width: 20 }
+    ]
+    exportModel.data = charges;
+    exportModel.fileName = "Charges";
+
+    this.excelService.generateExcel(exportModel);
+
+  }
+
 }

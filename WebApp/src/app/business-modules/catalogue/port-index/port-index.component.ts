@@ -4,7 +4,6 @@ import { PORTINDEXCOLUMNSETTING } from './port-index.columns';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
@@ -15,6 +14,10 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
+import * as lodash from 'lodash';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import {PlaceTypeEnum} from 'src/app/shared/enums/placeType-enum';
 declare var $: any;
 
 @Component({
@@ -28,7 +31,7 @@ export class PortIndexComponent implements OnInit {
   portIndexs: Array<PortIndex>;
   portIndex: PortIndex = new PortIndex();
   pager: PagerSetting = PAGINGSETTING;
-  criteria: any = { placeType: 8 };
+  criteria: any = { placeType: PlaceTypeEnum.Port };
   keySortDefault: string = "code";
   nameModal = "edit-port-index-modal";
   titleAddModal = "Add Port Index";
@@ -39,10 +42,10 @@ export class PortIndexComponent implements OnInit {
   };
   selectedFilter = "All";
   importButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.export
+    typeButton: ButtonType.import
   };
   exportButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.import
+    typeButton: ButtonType.export
   };
   saveButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.save
@@ -69,9 +72,9 @@ export class PortIndexComponent implements OnInit {
   titleConfirmDelete = "You want to delete this port index";
 
   constructor(private baseService: BaseService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private sortService: SortService,
+    private excelService: ExcelService,) { }
 
   ngOnInit() {
     this.getPortIndexs(this.pager);
@@ -84,9 +87,9 @@ export class PortIndexComponent implements OnInit {
     this.getPortIndexs(pager);
   }
   getPortIndexs(pager: PagerSetting): any {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.portIndexs = response.data.map(x => Object.assign({}, x));
       this.pager.totalItems = response.totalItems;
     });
@@ -279,4 +282,64 @@ export class PortIndexComponent implements OnInit {
       this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
     }
   }
+
+  async import(){
+
+  }
+
+  async export(){
+    var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query,this.criteria);
+    console.log(portIndexes);
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      portIndexes = lodash.map(portIndexes,function(pi,index){
+        return [
+          index+1,
+          pi['code'],
+          pi['name_EN'],
+          pi['name_VN'],
+          pi['countryNameEN'],
+          pi['areaNameEN'],
+          pi['modeOfTransport'],
+          (pi['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      }); 
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      portIndexes = lodash.map(portIndexes,function(pi,index){
+        return [
+          index+1,
+          pi['code'],
+          pi['name_EN'],
+          pi['name_VN'],
+          pi['countryNameVN'],
+          pi['areaNameVN'],
+          pi['modeOfTransport'],
+          (pi['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+
+    const exportModel: ExportExcel = new ExportExcel();
+    exportModel.title = "PortIndex List";
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.author = currrently_user;
+    exportModel.header = [
+      {name:"No.",width:10},
+      {name:"Code",width:20},
+      {name:"Name EN",width:20},
+      {name:"Name VN",width:20},
+      {name:"Country",width:20},
+      {name:"Zone",width:20},
+      {name:"Mode",width:20},
+      {name:"Inactive",width:20}
+    ]
+    exportModel.data = portIndexes;
+    exportModel.fileName = "PortIndex";
+    
+    this.excelService.generateExcel(exportModel);
+   
+    
+  }
+
 }

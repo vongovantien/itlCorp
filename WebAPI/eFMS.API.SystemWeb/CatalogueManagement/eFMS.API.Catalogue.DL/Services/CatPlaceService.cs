@@ -251,7 +251,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach (var item in data)
                 {
                     var catPlace = new CatPlace
-                    {
+                    {   Id = Guid.NewGuid(),
                         Code = item.Code,
                         NameEn = item.NameEn,
                         NameVn = item.NameVn,
@@ -260,7 +260,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DistrictId = item.DistrictId,
                         Address = item.Address,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser
+                        UserCreated = ChangeTrackerHelper.currentUser,
+                        PlaceTypeId = item.PlaceTypeId
                     };
                     dc.CatPlace.Add(catPlace);
                 }

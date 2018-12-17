@@ -18,7 +18,9 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <input type="file" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" accept=".xlsx">
+                        <form #form>
+                                <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" accept=".xlsx">
+                        </form>
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
                         </span>
@@ -44,15 +46,14 @@
                     </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
                         <span>
                             <span> 
                                 Show/hide invalid rows
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" [disabled]="inValidRows > 0"
-                        (click)="import()">
+                    <button type="button" #fileInput class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span> 
@@ -76,7 +77,7 @@
     <!--end::m-portlet-->
     <!--begin:: m-portlet-->
     <div class="m-portlet" style="position: relative">  
-        <div class="progress--block-ui">
+        <div class="progress--block-ui" *ngIf="inProgress">
             <div class="progress--block-inner">
                 <div class="row">
                     <div class="col-auto">

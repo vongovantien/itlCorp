@@ -7,8 +7,6 @@ import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 
@@ -26,19 +24,18 @@ export class CustomerComponent implements OnInit {
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
-    private spinnerService: Ng4LoadingSpinnerService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 
   ngOnInit() {
   }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     if(criteria != undefined){
       this.criteria = criteria;
     }
     this.baseService.post(this.api_menu.Catalogue.PartnerData.customerPaging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.customers = response.data;
       console.log(this.customers);
       this.pager.totalItems = response.totalItems;

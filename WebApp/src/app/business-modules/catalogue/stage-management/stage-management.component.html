@@ -16,7 +16,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -24,7 +24,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
                 <span>
                     <i class="la la-upload"></i>
                     <span>
@@ -141,6 +141,10 @@
                                 (click)="sort('descriptionEn')">
                                 <span>Description (EN)</span>
                             </th>
+
+                            <th>
+                                <span>Inactive</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody *ngIf="ListStages">
@@ -179,6 +183,9 @@
                             </td>
                             <td>
                                 <span>{{stage.stage.descriptionEn}}</span>
+                            </td>
+                            <td>
+                                <span>{{stage.stage.inactive}}</span>
                             </td>
 
                     </tbody>
@@ -273,7 +280,7 @@
                                     <!-- <input type="number" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.departmentId" name="role" placeholder="Please enter detail"> -->
 
                                 </div>
-                             
+
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
@@ -352,11 +359,12 @@
                                     <label>
                                         Code
                                     </label>
-                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.code" required name="code_edit" #code_edt="ngModel" class="form-control m-input m-input--square"
+                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.code" required
+                                        name="code_edit" #code_edt="ngModel" class="form-control m-input m-input--square"
                                         placeholder="Please enter detail" value=" Code">
-                                        <div class="form-control-feedback" *ngIf="editStageForm.submitted && code_edt.invalid">
-                                                Code is required
-                                         </div>
+                                    <div class="form-control-feedback" *ngIf="editStageForm.submitted && code_edt.invalid">
+                                        Code is required
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -364,11 +372,11 @@
                                     <label>
                                         Name (Local)
                                     </label>
-                                    <input type="text" required minlength="6" #name_local_edt="ngModel" name="name_local_edt" [(ngModel)]="ListStages[index_stage_edit].stage.stageNameVn"
-                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                        value="Name (VN)">
+                                    <input type="text" required minlength="6" #name_local_edt="ngModel" name="name_local_edt"
+                                        [(ngModel)]="ListStages[index_stage_edit].stage.stageNameVn" class="form-control m-input m-input--square"
+                                        placeholder="Please enter detail" value="Name (VN)">
                                     <div class="form-control-feedback" *ngIf="editStageForm.submitted && name_local_edt.invalid">
-                                            Name (Local) is required at least 6 characters
+                                        Name (Local) is required at least 6 characters
                                     </div>
                                 </div>
                             </div>
@@ -377,12 +385,12 @@
                                     <label>
                                         Name (EN)
                                     </label>
-                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.stageNameEn" required minlength="6" name="name_en_edt" #name_en_edt="ngModel"
-                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                        value="Name (EN)">
-                                        <div class="form-control-feedback" *ngIf="editStageForm.submitted && name_en_edt.invalid">
-                                                Name (EN) is required at least 6 characters
-                                            </div>
+                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stage.stageNameEn"
+                                        required minlength="6" name="name_en_edt" #name_en_edt="ngModel" class="form-control m-input m-input--square"
+                                        placeholder="Please enter detail" value="Name (EN)">
+                                    <div class="form-control-feedback" *ngIf="editStageForm.submitted && name_en_edt.invalid">
+                                        Name (EN) is required at least 6 characters
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -398,20 +406,21 @@
                                         placeholder="Select department">
                                     </ng-select>
                                     <div class="form-control-feedback" *ngIf="editStageForm.submitted && this.ListStages[this.index_stage_edit].stage.departmentId==null">
-                                            Department is required
-                                        </div>
+                                        Department is required
+                                    </div>
                                     <!-- <input type="number" [(ngModel)]="ListStages[index_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Role"> -->
                                 </div>
-                         
+
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>
                                         Description (Local)
                                     </label>
-                                    <textarea name="des_local_edt" [(ngModel)]="ListStages[index_stage_edit].stage.descriptionVn" class="form-control m-input m-input--square"
-                                        placeholder="Please enter detail" rows="6">This is Description (VN)</textarea>
+                                    <textarea name="des_local_edt" [(ngModel)]="ListStages[index_stage_edit].stage.descriptionVn"
+                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                        rows="6">This is Description (VN)</textarea>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -419,34 +428,36 @@
                                     <label>
                                         Description (EN)
                                     </label>
-                                    <textarea name="des_en_edt" [(ngModel)]="ListStages[index_stage_edit].stage.descriptionEn" class="form-control m-input m-input--square"
-                                        placeholder="Please enter detail" rows="6">This is Description (EN)</textarea>
+                                    <textarea name="des_en_edt" [(ngModel)]="ListStages[index_stage_edit].stage.descriptionEn"
+                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                        rows="6">This is Description (EN)</textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer m--align-center c-button-actions">
-                                <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="edit_stage(-1,'yes',editStageForm)">
+                            <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="edit_stage(-1,'yes',editStageForm)">
+                                <span>
+                                    <i class="la la-save"></i>
                                     <span>
-                                        <i class="la la-save"></i>
-                                        <span>
-                                            Save Change
-                                        </span>
+                                        Save Change
                                     </span>
-                                </button>
-                                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                                </span>
+                            </button>
+                            <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                                <span>
+                                    <i class="la la-ban"></i>
                                     <span>
-                                        <i class="la la-ban"></i>
-                                        <span>
-                                            Cancel
-                                        </span>
+                                        Cancel
                                     </span>
-                                </button>
-                            </div>
+                                </span>
+                            </button>
+                        </div>
                     </form>
                 </div>
                 <!--end:add-stage-management-form -->
             </div>
-      
+
         </div>
     </div>
 </div>
