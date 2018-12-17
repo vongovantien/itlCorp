@@ -14,7 +14,9 @@ perfect-scrollbar > .ps.ps--scrolling-y > .ps__rail-y, perfect-scrollbar > .ps.p
 html,
 body {
     color: #5a5a5a;
+    font-size: 13px;
     font-weight: normal;
+    line-height: 1.25;
 }
 body {
     overflow-y: scroll;
@@ -88,6 +90,9 @@ ul {
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
     }
+}
+.form-actions {
+    padding-top: 0.5rem;
 }
 .c-button-actions,
 .form-actions {
@@ -349,11 +354,11 @@ table.dataTable thead .sorting_desc {
 }
 .div-inside {
     width: 100%;
-    padding: 20px;
-    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem 0;
 }
 .advance-search-form {
-    padding: 20px; 
+    padding: 0.5rem; 
     margin-bottom: 20px;
 }
 //

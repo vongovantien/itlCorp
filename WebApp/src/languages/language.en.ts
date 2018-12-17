@@ -10,9 +10,10 @@ export const language = {
       "display_child": false,
       "childs": [
 
-        { name: "Warehouse", route_child: "ware-house" },
+        { name: "Warehouse", route_child: "ware-house"},
         { name: "Warehouse-import", route_child: "ware-house-import" },
         { name: "Port Index", route_child: "port-index" },
+        { name: "Port Index Import", route_child: "port-index-import" },
         { name: "Partner Data", route_child: "partner-data" },
         { name: "Commodity", route_child: "commodity" },
         { name: "Stage Management", route_child: "stage-management" },
