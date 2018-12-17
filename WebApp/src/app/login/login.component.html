@@ -16,7 +16,7 @@
                     <div class="m-login__contanier">
                         <div class="m-login__content">
                             <div class="m-login__logo">
-                                <img src="assets/app/media/img/logo/logo-login-1.png">
+                                <img src="assets/app/media/img/logo/logo-login-1.png" alt="">
                             </div>
                             <div class="m-login__title" i18n="@@Welcome">
                                 <h3>Welcome To Our Site</h3>
@@ -34,7 +34,7 @@
                     <div class="m-login__contanier">
                         <div class="m-login__content">
                             <div class="m-login__logo">
-                                <img src="assets/app/media/img/logo/logo-login.png">
+                                <img src="assets/app/media/img/logo/logo-login.png" alt="">
                             </div>
                             <div class="m-login__title">
                                 <h3 i18n="@@h31">Welcome To Our Site</h3>
@@ -51,7 +51,7 @@
                                     </label>
                                     <input [(ngModel)]="username" name="u_name" #u_name="ngModel" autofocus (change)="username = username.trim()"
                                         required class="form-control m-input m-input--square" type="text" placeholder=""
-                                        autocomplete="off"> 
+                                        autocomplete="nope"> 
                                         <div class="form-control-feedback" *ngIf="loginForm.submitted && u_name.invalid">
                                                Enter username please !
                                         </div>
@@ -61,7 +61,7 @@
                                         Password
                                     </label>
                                     <input [(ngModel)]="password" name="u_password" #u_password="ngModel" required class="form-control m-input m-input--square"
-                                        type="password" placeholder="" required autocomplete="off">
+                                        type="password" placeholder="" required autocomplete="nope">
                                     <div class="form-control-feedback" *ngIf="loginForm.submitted && u_password.invalid">
                                                 Enter password please !
                                     </div>
