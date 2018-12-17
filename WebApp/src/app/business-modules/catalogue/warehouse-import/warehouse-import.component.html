@@ -61,7 +61,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/ware-house">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -128,7 +128,7 @@
                                 (click)="sort('countryName')">
                                 <span>Country</span>
                             </th>
-                            <th (click)="sort('status')">
+                            <th (click)="sort('status')" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }">
                                 <span>Status</span>
                             </th>
                         </tr>

@@ -20,14 +20,15 @@ declare var $:any;
 export class WarehouseImportComponent implements OnInit {
   file: File;
   data: any[];
-  pagedItems: any[];
+  pagedItems: any[] = [];
+  validItems: any[] = [];
   validRows: number = 0;
   inValidRows: number = 0;
   totalRows: number = 0;
+  isShowInvalid: boolean = true;
   WarehouseImportSettings: ColumnSetting[] = WAREHOUSEIMPORTENCOLUMNSETTING;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  inValidItems: any[] = [];
   @ViewChild('form') form;
   @ViewChild(PaginationComponent) child;
 
@@ -38,9 +39,11 @@ export class WarehouseImportComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
     this.file = file.target['files'];
+    this.baseService.spinnerShow();
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel, this.file, "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
@@ -48,16 +51,19 @@ export class WarehouseImportComponent implements OnInit {
         this.validRows = response.validRows;
         this.totalRows = this.data.length;
         this.inValidRows = this.totalRows - this.validRows;
-        this.pagingData();
+        this.pagingData(this.data);
+        this.baseService.spinnerHide();
         console.log(this.data);
       });
   }
-  pagingData(){
-    this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
+  pagingData(data: any[]){
+    //this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
     this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
-    this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
+    //this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-    this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    
+    //this.pager.totalItems = responses.totalItems;
   }
   downloadSample(){
     this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12")
@@ -68,20 +74,32 @@ export class WarehouseImportComponent implements OnInit {
     )
   }
   hideInvalid(){
-    this.data.forEach(function(item){
-      this.inValidItems.push(item);
-    });
-    console.log(this.inValidItems);
+    if(this.data == null) return;
+    this.isShowInvalid = !this.isShowInvalid;
+    this.sortKey = '';
+    if(this.isShowInvalid){
+      this.pagingData(this.data);
+    }
+    else{
+      this.validItems = this.data.filter(x => x.invalidMessage == null);
+      this.pagingData(this.validItems);
+    }
   }
   async import(){
+    if(this.data == null) return;
     if(this.inValidRows > 0){
-
+      $('#upload-alert-modal').modal('show');
     }
     else{
       this.inProgress = true;
-      await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, this.data, false, false);
-      this.inProgress = false;
-      this.reset();
+      this.validItems = this.data.filter(x => x.invalidMessage == null);
+      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, this.validItems, true, false);
+      if(response.success){
+        this.inProgress = false;
+        this.pager.totalItems = 0;
+        this.reset();
+      }
+      console.log(response);
     }
   }
   isDesc = true;
@@ -95,7 +113,9 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
-    this.pagingData();
+    this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
+    this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
+    this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
   reset(){
     this.data = null;
