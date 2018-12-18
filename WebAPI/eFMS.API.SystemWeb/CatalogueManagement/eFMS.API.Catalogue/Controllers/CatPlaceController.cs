@@ -38,7 +38,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "WarehouseImportTeamplate.xlsx";
+        private string templateName = "ImportTeamplate.xlsx";
 
         public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
         {

@@ -207,32 +207,32 @@ namespace eFMS.API.Catalogue.DL.Services
                 var warehouse = warehouses.FirstOrDefault(i => i.Code.IndexOf(item.Code) >= 0);
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    result.Code = string.Format("Code is not allow empty!");
+                    result.Code = string.Format("Code is not allow empty!|wrong");
                     result.IsValid = false;
                 }
                 if(results.Any(x => x.Code == item.Code))
                 {
-                    result.Code = string.Format("Code {0} is existed!", item.Code);
+                    result.Code = string.Format("Code {0} is existed!|wrong", item.Code);
                     result.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    result.NameEn = string.Format("NameEn is not allow empty!");
+                    result.NameEn = string.Format("NameEn is not allow empty!|wrong");
                     result.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    result.NameVn = string.Format("NameVn is not allow empty!");
+                    result.NameVn = string.Format("NameVn is not allow empty!|wrong");
                     result.IsValid = false;
                 }
                 if (warehouse != null)
                 {
-                    result.Code = string.Format("Code '{0}' has been existed!", item.Code);
+                    result.Code = string.Format("Code '{0}' has been existed!|wrong", item.Code);
                     result.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    result.CountryName = string.Format("Country name is not allow empty!");
+                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
                     result.IsValid = false;
                 }
                 else
@@ -240,7 +240,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
                     if (country == null)
                     {
-                        result.CountryName = string.Format("Country '{0}' is not found!", item.CountryName);
+                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
                         result.IsValid = false;
                     }
                     else
@@ -249,12 +249,12 @@ namespace eFMS.API.Catalogue.DL.Services
                         var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(item.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
                         if (string.IsNullOrEmpty(item.ProvinceName))
                         {
-                            result.ProvinceName = string.Format("Province name is not allow empty!");
+                            result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
                             result.IsValid = false;
                         }
                         else if (province == null)
                         {
-                            result.ProvinceName = string.Format("Province name '{0}' is not found!", item.ProvinceName);
+                            result.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
                             result.IsValid = false;
                         }
                         else
@@ -263,12 +263,12 @@ namespace eFMS.API.Catalogue.DL.Services
                             var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(item.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
                             if (string.IsNullOrEmpty(item.DistrictName))
                             {
-                                result.DistrictName = string.Format("District name is not allow empty!");
+                                result.DistrictName = string.Format("District name is not allow empty!|wrong");
                                 result.IsValid = false;
                             }
                             else if (district == null)
                             {
-                                result.DistrictName = string.Format("District '{0}' is not found!", item.DistrictName);
+                                result.DistrictName = string.Format("District '{0}' is not found!|wrong", item.DistrictName);
                                 result.IsValid = false;
                             }
                             else
@@ -281,7 +281,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 result.PlaceTypeId = placeTypeName;
                 result.Status = DataEnums.EnActive;
-                //x.Status = x.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
+                result.Status = item.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
                 results.Add(result);
             }
             return results;
