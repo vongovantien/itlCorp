@@ -26,7 +26,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string Note { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public string InvalidMessage { get; set; }
+        public bool IsValid { get; set; }
         public string Status { get; set; }
     }
 }

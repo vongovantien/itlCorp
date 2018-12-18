@@ -19,7 +19,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <form #form>
-                                <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" accept=".xlsx">
+                                <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         </form>
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
@@ -135,7 +135,7 @@
                     </thead>
                     <tbody *ngIf="data">
                         <ng-container *ngFor="let item of pagedItems; let i = index">
-                            <tr [ngClass]="{ 'invalid-row': item.invalidMessage != null }">
+                            <tr [ngClass]="{ 'invalid-row': !item.isValid }">
                                 <td>
                                     <span>{{ (i+1) }}</span>
                                 </td>

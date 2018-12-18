@@ -38,7 +38,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTeamplate.xlsx";
+        private string templateName = "WarehouseImportTeamplate.xlsx";
 
         public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
         {
@@ -176,7 +176,6 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("DownloadExcel")]
-        [Authorize]
         public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
         {
             templateName = GetFileName(type);
@@ -197,10 +196,12 @@ namespace eFMS.API.Catalogue.Controllers
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
                 List<WarehouseImportModel> list = new List<WarehouseImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
                     var warehouse = new WarehouseImportModel();
+                    warehouse.IsValid = true;
                     warehouse.Code = worksheet.Cells[row, 1].Value?.ToString();
                     warehouse.NameEn = worksheet.Cells[row, 2].Value?.ToString();
                     warehouse.NameVn = worksheet.Cells[row, 3].Value?.ToString();
@@ -213,7 +214,7 @@ namespace eFMS.API.Catalogue.Controllers
                 }
 
                 var data = catPlaceService.CheckValidImport(list, CatPlaceTypeEnum.Warehouse);
-                var validRows = data.Count(x => x.InvalidMessage == null);
+                var validRows = data.Count(x => x.IsValid == true);
                 var results = new { data, validRows };
                 return Ok(results);
             }

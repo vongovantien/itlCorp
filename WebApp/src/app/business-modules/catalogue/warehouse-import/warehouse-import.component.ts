@@ -21,7 +21,7 @@ export class WarehouseImportComponent implements OnInit {
   file: File;
   data: any[];
   pagedItems: any[] = [];
-  validItems: any[] = [];
+  inValidItems: any[] = [];
   validRows: number = 0;
   inValidRows: number = 0;
   totalRows: number = 0;
@@ -59,7 +59,7 @@ export class WarehouseImportComponent implements OnInit {
   pagingData(data: any[]){
     //this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
     this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
-    //this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
+    this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     
@@ -81,8 +81,8 @@ export class WarehouseImportComponent implements OnInit {
       this.pagingData(this.data);
     }
     else{
-      this.validItems = this.data.filter(x => x.invalidMessage == null);
-      this.pagingData(this.validItems);
+      this.inValidItems = this.data.filter(x => !x.isValid);
+      this.pagingData(this.inValidItems);
     }
   }
   async import(){
@@ -92,8 +92,8 @@ export class WarehouseImportComponent implements OnInit {
     }
     else{
       this.inProgress = true;
-      this.validItems = this.data.filter(x => x.invalidMessage == null);
-      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, this.validItems, true, false);
+      let validItems = this.data.filter(x => x.isValid);
+      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
       if(response.success){
         this.inProgress = false;
         this.pager.totalItems = 0;
