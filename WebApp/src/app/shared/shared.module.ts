@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalModule } from 'ngx-bootstrap';
+// import { ModalModule } from 'ngx-bootstrap';
 
 import { TableLayoutComponent } from './common/table-layout/table-layout.component';
 import { StyleCellDirective } from './directives/style-cell.directive';
@@ -22,7 +22,7 @@ import { TableDetailComponent } from './common/table-detail/table-detail.compone
 import { CloseModalButtonComponent } from './common/close-modal-button/close-modal-button.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ModalModule,SelectModule],
+  imports: [CommonModule, FormsModule,SelectModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 
@@ -40,7 +40,7 @@ import { CloseModalButtonComponent } from './common/close-modal-button/close-mod
   ],
   exports: [
     CommonModule,
-    ModalModule,
+    // ModalModule,
     TableLayoutComponent,
     BreadcrumbComponent,
     DefaultButtonComponent,

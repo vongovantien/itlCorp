@@ -122,21 +122,6 @@ export class ChargeComponent implements OnInit {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   /**
    * ng2-select multi
    */
