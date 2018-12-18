@@ -47,6 +47,7 @@ export class WarehouseImportComponent implements OnInit {
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel, this.file, "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
+        this.pager.currentPage = 1;
         this.pager.totalItems = this.data.length;
         this.validRows = response.validRows;
         this.totalRows = this.data.length;
@@ -62,7 +63,6 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    
     //this.pager.totalItems = responses.totalItems;
   }
   downloadSample(){
@@ -82,6 +82,7 @@ export class WarehouseImportComponent implements OnInit {
     }
     else{
       this.inValidItems = this.data.filter(x => !x.isValid);
+      this.pager.totalItems = this.inValidItems.length;
       this.pagingData(this.inValidItems);
     }
   }

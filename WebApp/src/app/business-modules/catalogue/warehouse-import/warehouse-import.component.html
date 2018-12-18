@@ -140,25 +140,32 @@
                                     <span>{{ (i+1) }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.code }}</span>
+                                    <span *ngIf="item.code.split('|').length == 1">{{ item.code }}</span>
+                                    <span class="m--font-danger" *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.nameEn }}</span>
+                                    <span *ngIf="item.nameEn.split('|').length == 1">{{ item.nameEn }}</span>
+                                    <span class="m--font-danger" *ngIf="item.nameEn.split('|').length > 1">{{ item.nameEn.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.nameVn }}</span>
+                                    <span *ngIf="item.nameVn.split('|').length == 1">{{ item.nameVn }}</span>
+                                    <span class="m--font-danger" *ngIf="item.nameVn.split('|').length > 1">{{ item.nameVn.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.address }}</span>
+                                    <span *ngIf="item.address.split('|').length == 1">{{ item.address }}</span>
+                                    <span class="m--font-danger" *ngIf="item.address.split('|').length > 1">{{ item.address.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.districtName }}</span>
+                                    <span *ngIf="item.districtName.split('|').length == 1">{{ item.districtName }}</span>
+                                    <span class="m--font-danger" *ngIf="item.districtName.split('|').length > 1">{{ item.districtName.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.provinceName }}</span>
+                                    <span *ngIf="item.provinceName.split('|').length == 1">{{ item.provinceName }}</span>
+                                    <span class="m--font-danger" *ngIf="item.provinceName.split('|').length > 1">{{ item.provinceName.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.countryName }}</span>
+                                    <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
+                                    <span class="m--font-danger" *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>
