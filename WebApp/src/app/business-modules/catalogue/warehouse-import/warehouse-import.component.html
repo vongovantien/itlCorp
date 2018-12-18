@@ -19,7 +19,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <form #form>
-                                <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" accept=".xlsx">
+                                <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         </form>
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
@@ -61,7 +61,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/ware-house">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -128,14 +128,14 @@
                                 (click)="sort('countryName')">
                                 <span>Country</span>
                             </th>
-                            <th (click)="sort('status')">
+                            <th (click)="sort('status')" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }">
                                 <span>Status</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody *ngIf="data">
                         <ng-container *ngFor="let item of pagedItems; let i = index">
-                            <tr [ngClass]="{ 'invalid-row': item.invalidMessage != null }">
+                            <tr [ngClass]="{ 'invalid-row': !item.isValid }">
                                 <td>
                                     <span>{{ (i+1) }}</span>
                                 </td>

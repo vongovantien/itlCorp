@@ -58,7 +58,7 @@ namespace SystemManagementAPI
             })
                        .AddIdentityServerAuthentication(options =>
                        {
-                          // options.Authority = "http://test.api-efms.itlvn.com/indentityserver/";
+                           //options.Authority = "http://test.api-efms.itlvn.com/indentityserver/";
                            options.Authority = "https://localhost:44369/";
                            options.RequireHttpsMetadata = false;
                            options.ApiName = "dnt_api";

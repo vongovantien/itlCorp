@@ -199,48 +199,92 @@ namespace eFMS.API.Catalogue.DL.Services
             var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
             var districts = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District));
             var warehouses = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Warehouse));
-            list.ForEach(x => {
-                var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(x.CountryName) >= 0);
-                //var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(x.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
-                //var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(x.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
-                var warehouse = warehouses.FirstOrDefault(i => i.Code.IndexOf(x.Code) >= 0);
-                if(warehouse != null)
+            string placeTypeName = PlaceTypeEx.GetPlaceType(placeType);
+            var results = new List<WarehouseImportModel>();
+            foreach(var item in list)
+            {
+                var result = item;
+                var warehouse = warehouses.FirstOrDefault(i => i.Code.IndexOf(item.Code) >= 0);
+                if (string.IsNullOrEmpty(item.Code))
                 {
-                    x.InvalidMessage = string.Format("Code '{0}' is existed!", x.Code);
+                    result.Code = string.Format("Code is not allow empty!");
+                    result.IsValid = false;
+                }
+                if(results.Any(x => x.Code == item.Code))
+                {
+                    result.Code = string.Format("Code {0} is existed!", item.Code);
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.NameEn))
+                {
+                    result.NameEn = string.Format("NameEn is not allow empty!");
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.NameVn))
+                {
+                    result.NameVn = string.Format("NameVn is not allow empty!");
+                    result.IsValid = false;
+                }
+                if (warehouse != null)
+                {
+                    result.Code = string.Format("Code '{0}' has been existed!", item.Code);
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CountryName))
+                {
+                    result.CountryName = string.Format("Country name is not allow empty!");
+                    result.IsValid = false;
                 }
                 else
                 {
+                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
                     if (country == null)
                     {
-                        x.InvalidMessage = string.Format("Country '{0}' is not found!", x.CountryName);
+                        result.CountryName = string.Format("Country '{0}' is not found!", item.CountryName);
+                        result.IsValid = false;
                     }
                     else
                     {
-                        x.CountryId = country.Id;
-                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(x.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
-                        if (province == null)
+                        result.CountryId = country.Id;
+                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(item.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
+                        if (string.IsNullOrEmpty(item.ProvinceName))
                         {
-                            x.InvalidMessage = string.Format("Province '{0}' is not found!", x.ProvinceName);
+                            result.ProvinceName = string.Format("Province name is not allow empty!");
+                            result.IsValid = false;
+                        }
+                        else if (province == null)
+                        {
+                            result.ProvinceName = string.Format("Province name '{0}' is not found!", item.ProvinceName);
+                            result.IsValid = false;
                         }
                         else
                         {
-                            x.ProvinceId = province.Id;
-                            var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(x.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
-                            if (district == null)
+                            result.ProvinceId = province.Id;
+                            var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(item.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
+                            if (string.IsNullOrEmpty(item.DistrictName))
                             {
-                                x.InvalidMessage = string.Format("District '{0}' is not found!", x.DistrictName);
+                                result.DistrictName = string.Format("District name is not allow empty!");
+                                result.IsValid = false;
+                            }
+                            else if (district == null)
+                            {
+                                result.DistrictName = string.Format("District '{0}' is not found!", item.DistrictName);
+                                result.IsValid = false;
                             }
                             else
                             {
-                                x.DistrictId = district.Id;
+                                result.DistrictId = district.Id;
                             }
                         }
                     }
-                    x.PlaceTypeId = PlaceTypeEx.GetPlaceType(placeType);
-                    x.Status = x.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
                 }
-            });
-            return list;
+
+                result.PlaceTypeId = placeTypeName;
+                result.Status = DataEnums.EnActive;
+                //x.Status = x.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
+                results.Add(result);
+            }
+            return results;
         }
 
         public HandleState Import(List<WarehouseImportModel> data)
