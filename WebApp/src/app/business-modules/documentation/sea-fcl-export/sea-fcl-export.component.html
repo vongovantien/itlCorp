@@ -1,3 +1,563 @@
-<p>
-  sea-fcl-export works!
-</p>
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <app-breadcrumb></app-breadcrumb>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#add-port-index-modal">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        create new job
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<!--begin::m-content-->
+<div class="m-content">
+    <!--begin:: m-portlet-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form m-form--state">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Search text
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Select filter
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Create date: From - To
+                            </label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                    [(ngModel)]="selectedRange"
+                                    [ranges]="ranges"
+                                    [maxDate]="maxDate"
+                                    [alwaysShowCalendars]="true"
+                                    name="daterange" 
+                                    placeholder="From date - to date" readonly/>
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--begin::Advance-search-->
+                <div class="collapse" id="advance-search-of-job">
+                    <div class="div-inside bg-secondary">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        HBL No.
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Cont No.
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Seal No.
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Shipper
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Supplier (Co-Loader)
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Saleman
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Advance-search-->
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
+                                role="button" aria-expanded="false" aria-controls="advance-search-of-job">
+                                <span>
+                                    <i class="la la-angle-up"></i>
+                                    <span>Advance search</span>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="col-lg-6 m--align-right">
+                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                style="margin-left: 10px;">
+                                <span>
+                                    <i class="la la-search"></i>
+                                    <span>
+                                        Search
+                                    </span>
+                                </span>
+                            </button>
+                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                style="margin-left: 10px;">
+                                <span>
+                                    <i class="la la-refresh"></i>
+                                    <span>
+                                        Reset
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet-->
+    <!--begin:: m-portlet-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin: Datatable -->
+            <div class="table-wrapper" id="sea-fcl-export-table">
+                <table class="table table-striped table-brand dataTable">
+                    <thead>
+                        <tr>
+                            <th class="table-actions-col no-sorting"></th>
+                            <th class="sorting_asc">
+                                <span>Port Code</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Name(EN)</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Name(VI)</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Country</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Zone</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Mode</span>
+                            </th>
+                            <th>
+                                <span>Status</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbody-group">
+                        <!-- begin collapse-toggle-row -->
+                        <tr class="collapse-toggle-row">
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-001"
+                                        title="Collapse">
+                                        <i class="la la-angle-up"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>Active</span>
+                            </td>
+                        </tr>
+                        <!-- end of collapse-toggle-row -->
+                        <!-- begin collapse-panel-row -->
+                        <tr class="collapse-panel-row">
+                            <td colspan="8">
+                                <div class="detail-panel-block collapse" id="id-001" data-parent="#sea-fcl-export-table">
+                                    <div class="table-inside-block">
+                                        <table class="table table-secondary dataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="sorting_asc">
+                                                        <span>Stage ID</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Role</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Stage ABBR</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name (VN)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name (EN)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Description (VN</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Description (EN)</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <span>LH001</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Customer services</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>ABBR</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Ký kết hợp đồng ngoại thương</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Shipping Schedule</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Đây là mô tả bằng tiếng Việt</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>This is description by EN</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <!--end of collapse-panel-row -->
+                    </tbody>
+                    <tbody class="tbody-group">
+                        <!-- begin collapse-toggle-row -->
+                        <tr class="collapse-toggle-row">
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-002"
+                                        title="Collapse">
+                                        <i class="la la-angle-up"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>Active</span>
+                            </td>
+                        </tr>
+                        <!-- end of collapse-toggle-row -->
+                        <!-- begin collapse-panel-row -->
+                        <tr class="collapse-panel-row">
+                            <td colspan="8">
+                                <div class="detail-panel-block collapse" id="id-002" data-parent="#sea-fcl-export-table">
+                                    <div class="table-inside-block">
+                                        <table class="table table-secondary dataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="sorting_asc">
+                                                        <span>Stage ID</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Role</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Stage ABBR</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name (VN)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name (EN)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Description (VN</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Description (EN)</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <span>LH001</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Customer services</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>ABBR</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Ký kết hợp đồng ngoại thương</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Shipping Schedule</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Đây là mô tả bằng tiếng Việt</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>This is description by EN</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <!--end of collapse-panel-row -->
+                    </tbody>
+                    <tbody>
+                        <!-- begin collapse-toggle-row -->
+                        <tr class="collapse-toggle-row">
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-003"
+                                        title="Collapse">
+                                        <i class="la la-angle-up"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>Active</span>
+                            </td>
+                        </tr>
+                        <!-- end of collapse-toggle-row -->
+                        <!-- begin collapse-panel-row -->
+                        <tr class="collapse-panel-row">
+                            <td colspan="8">
+                                <div class="detail-panel-block collapse" id="id-003" data-parent="#sea-fcl-export-table">
+                                    <div class="table-inside-block">
+                                        <table class="table table-secondary dataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="sorting_asc">
+                                                        <span>Stage ID</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Role</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Stage ABBR</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name (VN)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name (EN)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Description (VN</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Description (EN)</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <span>LH001</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Customer services</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>ABBR</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Ký kết hợp đồng ngoại thương</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Shipping Schedule</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Đây là mô tả bằng tiếng Việt</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>This is description by EN</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <!--end of collapse-panel-row -->
+                    </tbody>
+                </table>
+            </div>
+            <!--end: Datatable -->
+
+            <!--begin::pagination-->
+            <div class="pagination-nav">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="tatable__pager-size" style="max-width: 190px">
+                            <div class="select-box">
+                                <select class="form-control m-input m-input--square" id="" aria-label="">
+                                    <option value="1">15 line/screen</option>
+                                    <option value="2">30 line/screen</option>
+                                    <option value="3">50 line/screen</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <nav aria-label="">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <!--end::pagination-->
+        </div>
+    </div>
+    <!--end:: m-portlet-->
+</div>
+<!--end::m-content-->
