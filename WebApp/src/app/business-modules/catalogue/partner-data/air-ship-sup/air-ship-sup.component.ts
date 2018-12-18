@@ -51,6 +51,9 @@ export class AirShipSupComponent implements OnInit {
       this.airShips = response.data.map(x=>Object.assign({},x));
       console.log(this.airShips);
       this.pager.totalItems = response.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   onSortChange(column) {

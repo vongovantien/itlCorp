@@ -3,10 +3,6 @@ import { Injectable, ErrorHandler } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { OAuthService } from 'angular-oauth2-oidc';
-import { CookieService } from 'ngx-cookie-service';
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -20,15 +16,13 @@ export class BaseService implements ErrorHandler {
   constructor(private _http: HttpClient,
     private spinnerService: NgxSpinnerService,
     private toastr: ToastrService,
-    private oauthService: OAuthService,
-    private router: Router,
-    private cookieService: CookieService,){
+    private router: Router,) {
 
     this.headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
     this.baseUrl = "";
-    this.showError = true; 
+    this.showError = true;
   }
 
   public setBaseUrl(url) {
@@ -40,9 +34,9 @@ export class BaseService implements ErrorHandler {
    * you must handle error or state by yourself
    * @param url 
    */
-  public get(url: string) {    
-    this.checkLoginSession(); 
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+  public get(url: string) {
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.get(url, { headers: this.headers });
   }
@@ -55,8 +49,8 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async getAsync(url: string, display_error = false, display_spinner = false): Promise<any> {
-    this.checkLoginSession();
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+   // this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
       this.spinnerShow()
@@ -82,8 +76,8 @@ export class BaseService implements ErrorHandler {
    * @param data 
    */
   public post(url: string, data?: any) {
-    this.checkLoginSession();   
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.post(url, data, { headers: this.headers });
   }
@@ -97,8 +91,8 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async postAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
-    this.checkLoginSession();       
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
       this.spinnerShow();
@@ -122,8 +116,8 @@ export class BaseService implements ErrorHandler {
    * @param data 
    */
   public put(url: string, data?: any) {
-    this.checkLoginSession();   
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+   // this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.put(url, data, { headers: this.headers });
   }
@@ -137,12 +131,12 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async putAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
-    this.checkLoginSession();   
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
       this.spinnerShow();
-    try {     
+    try {
       const res = await this._http.put(url, data, { headers: this.headers }).toPromise();
       console.log(res)
       this.spinnerHide();
@@ -162,8 +156,8 @@ export class BaseService implements ErrorHandler {
    * @param url 
    */
   public delete(url: string) {
-    this.checkLoginSession();   
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.delete(url, { headers: this.headers });
   }
@@ -176,8 +170,8 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async deleteAsync(url: string, display_notify = true, display_spinner = true): Promise<any> {
-    this.checkLoginSession();   
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
       this.spinnerShow();
@@ -193,35 +187,35 @@ export class BaseService implements ErrorHandler {
       return error;
     }
   }
-  
+
   downloadfile(url: string) {
-    this.checkLoginSession();
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
-    this.headers = this.headers.set("Authorization",token);
-    return this._http.get(url, {responseType: 'blob'});
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization", token);
+    return this._http.get(url, { responseType: 'blob' });
   }
 
-  uploadfile( url: any,files: any, name:string=null) {
-    this.checkLoginSession();
-    var token = 'Bearer ' + sessionStorage.getItem("access_token");
+  uploadfile(url: any, files: any, name: string = null) {
+  //  this.checkLoginSession();
+    var token = 'Bearer ' + localStorage.getItem("access_token");
     if (files.length === 0)
 
-    return;
+      return;
     var formData = new FormData();
     for (let file of files)
-      formData.append(name||file.name,file);
+      formData.append(name || file.name, file);
     let params = new HttpParams();
     const options = {
       params: params,
       reportProgress: true,
-      headers:new HttpHeaders({
+      headers: new HttpHeaders({
         'Authorization': token,
-        'accept':'application/json'
+        'accept': 'application/json'
       })
     };
     return this._http.post(url, formData, options);
 
-   
+
   }
   /**
    * Handle state return from server and display toast notification 
@@ -241,15 +235,25 @@ export class BaseService implements ErrorHandler {
    * Handle and display toast notificaton to show error returned from request 
    * @param error 
    */
-  handleError(error: HttpErrorResponse ) {
+  handleError(error: HttpErrorResponse) {
     console.log(error)
-    if(error.status===400){
-      this.errorToast(error.error.message);
+    if (error.status === 400) {
+      this.errorToast(error.error.message,"Invalid Request");
     }
-    if(error.status===500){
-      this.errorToast(error.error.error.Message);
+    if (error.status === 500) {
+      this.errorToast(error.error.error.Message,"Server Error");
     }
-    
+    if(error.status===0){
+      this.errorToast("Check your connection","Unknow Error");
+    }
+    if(error.status===401){
+      this.warningToast("Please login to continue !","Expired Session");
+      this.router.navigateByUrl('/login');      
+      setTimeout(() => {
+        this.reloadPage();
+      }, 300);    
+    }
+
   }
 
   /**
@@ -258,7 +262,7 @@ export class BaseService implements ErrorHandler {
    * @param title 
    */
   successToast(message: string, title = "") {
-    this.toastr.success(message, title, { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 4000 });
+    this.toastr.success(message, title, { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
   }
 
   /**
@@ -267,7 +271,7 @@ export class BaseService implements ErrorHandler {
    * @param title 
    */
   errorToast(message: string, title = "") {
-    this.toastr.error(message, title, { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 4000 });
+    this.toastr.error(message, title, { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
   }
 
   /**
@@ -276,7 +280,7 @@ export class BaseService implements ErrorHandler {
    * @param title 
    */
   warningToast(message: string, title = "") {
-    this.toastr.warning(message, title, { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 4000 });
+    this.toastr.warning(message, title, { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
   }
 
   spinnerShow() {
@@ -287,22 +291,24 @@ export class BaseService implements ErrorHandler {
     this.spinnerService.hide();
   }
 
-  checkLoginSession():boolean{
-    if(this.oauthService.getAccessToken()==null){
-      if(this.cookieService.get("login_status")==="LOGGED_IN"){               
-        if(window.location.hostname==='localhost'){
-          window.location.href = window.location.protocol + "//" + window.location.hostname+":"+window.location.port;
-        }else{
-          window.location.href = window.location.protocol + "//" + window.location.hostname;
-        }
-        this.warningToast("Please login to continue !"); 
-        
+  checkLoginSession(display_warning=true): boolean {
+    if (localStorage.getItem("access_token") == null) {
+      if(display_warning){             
+        this.warningToast("Please login to continue !","Expired Session");       
       }
-      this.cookieService.delete("login_status","/",window.location.hostname);
-      this.router.navigateByUrl('/login');      
+      this.router.navigateByUrl('/login');           
       return false;
-    }else{
+    } else {
       return true;
+    }
+
+  }
+
+  reloadPage(){
+    if(window.location.hostname==='localhost'){
+      window.location.href = window.location.protocol + "//" + window.location.hostname+":"+window.location.port;
+    }else{
+      window.location.href = window.location.protocol + "//" + window.location.hostname;
     }
   }
 

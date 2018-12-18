@@ -112,13 +112,18 @@ export class WarehouseComponent implements OnInit {
     this.getDistricts();
   }
   getCountries(){
+    this.baseService.spinnerShow();
     this.baseService.get(this.api_menu.Catalogue.Country.getAllByLanguage).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if(response != null){
         this.countries = response.map(x=>({"text":x.name,"id":x.id}));
       }
       else{
         this.countries = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err)
     });
   }
   getProvinces(id?: number){
@@ -126,7 +131,9 @@ export class WarehouseComponent implements OnInit {
     if(id != undefined){
       url = url + "?countryId=" + id; 
     }
+    this.baseService.spinnerShow();
     this.baseService.get(url).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if(response != null){
         this.provinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
       }
@@ -137,6 +144,9 @@ export class WarehouseComponent implements OnInit {
       this.countryLookup.value = "id";
       this.countryLookup.displayName = "nameEn";
       console.log(this.provinces);
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   getDistricts(id?: number){
@@ -144,13 +154,18 @@ export class WarehouseComponent implements OnInit {
     if(id != undefined){
       url = url + "?provinceId=" + id; 
     }
+    this.baseService.spinnerShow();
     this.baseService.get(url).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if(response != null){
         this.districts = response.map(x=>({"text":x.name_VN,"id":x.id}));
       }
       else{
         this.districts = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   async getWarehouses(pager: PagerSetting) {
@@ -159,6 +174,9 @@ export class WarehouseComponent implements OnInit {
       this.baseService.spinnerHide();
       this.warehouses = response.data.map(x=>Object.assign({},x));
       this.pager.totalItems = response.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   onSortChange(column) {
@@ -178,14 +196,14 @@ export class WarehouseComponent implements OnInit {
   async onDelete(event) {
     console.log(event);
     if (event) {
-      this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {
-        if (response.status == true) {
+      this.baseService.spinnerShow();
+      this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {       
           this.baseService.successToast(response.message);
-          this.setPageAfterDelete();
-        }
-        if (response.status == false) {
-          this.baseService.errorToast(response.message);
-        }
+          this.baseService.spinnerHide();
+          this.setPageAfterDelete();        
+      },err=>{
+        this.baseService.spinnerHide();
+        this.baseService.handleError(err);
       });
     }
   }
@@ -221,16 +239,21 @@ export class WarehouseComponent implements OnInit {
     }
   }
   update(){
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => { 
         $('#edit-ware-house-modal').modal('hide');     
         this.baseService.successToast(response.message);
         this.getWarehouses(this.pager);       
-    },err=>{
-      this.baseService.errorToast(err.error.message);
+        this.baseService.spinnerHide();
+    },err=>{     
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   addNew(){
+    this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {     
+        this.baseService.spinnerHide();
         this.baseService.successToast(response.message);
         this.pager.totalItems = this.pager.totalItems + 1;
         this.pager.currentPage = 1;
@@ -239,7 +262,8 @@ export class WarehouseComponent implements OnInit {
         this.form.onReset();
         $('#' + this.addButtonSetting.dataTarget).modal('hide');     
     },err=>{
-      this.baseService.errorToast(err.error.message);
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
 

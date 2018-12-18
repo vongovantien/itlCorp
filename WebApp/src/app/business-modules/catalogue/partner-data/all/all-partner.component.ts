@@ -54,6 +54,9 @@ export class AllPartnerComponent implements OnInit {
       console.log(this.partners);
       this.pager.totalItems = response.totalItems;
       return this.pager.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   onSortChange(column) {

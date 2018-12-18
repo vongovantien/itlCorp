@@ -18,17 +18,12 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
 
 
   ngAfterViewInit(): void {
-   this.Page_Info = this.Page_side_bar.Page_Info;
-  // console.log(this.Page_Info);
+   this.Page_Info = this.Page_side_bar.Page_Info;  
   }
 
   constructor(private router: Router,private cdRef:ChangeDetectorRef,private cookieService: CookieService,private oauthService: OAuthService, ) { }
 
    ngOnInit() {
-     console.log(this.cookieService.get("login_status"));
-    if(this.cookieService.get("login_status")!=="LOGGED_IN"){
-      this.router.navigateByUrl('/login');
-    }
     this.cdRef.detectChanges();
   }
 
@@ -37,12 +32,11 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
     this.Page_Info = event;      
     this.Component_name = event.children; 
   }
-
+ 
   logout(){
-    this.oauthService.logOut(false);
-    // this.cookieService.deleteAll("/",window.location.hostname);
-    this.cookieService.delete("login_status","/",window.location.hostname);
+    this.oauthService.logOut(false);  
     this.router.navigateByUrl("/login");
+    localStorage.clear()   
   }
 
 

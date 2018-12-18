@@ -45,6 +45,9 @@ export class CustomerComponent implements OnInit {
       console.log(this.customers);
       this.pager.totalItems = response.totalItems;
       return this.pager.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   showConfirmDelete(item) {

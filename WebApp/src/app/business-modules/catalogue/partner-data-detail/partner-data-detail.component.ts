@@ -166,6 +166,8 @@ export class PartnerDataDetailComponent implements OnInit {
         this.billingProvinces = [];
         this.shippingProvinces = [];
       }
+    },err=>{
+      this.baseService.handleError(err);
     });
   }
   onSubmit(){
@@ -187,7 +189,7 @@ export class PartnerDataDetailComponent implements OnInit {
         this.baseService.successToast(response.message);
  
     }, err=>{
-      this.baseService.errorToast(err.error.message);
+      this.baseService.handleError(err);
       this.baseService.spinnerHide();
     });
   }
@@ -200,7 +202,7 @@ export class PartnerDataDetailComponent implements OnInit {
           this.router.navigate(["/home/catalogue/partner-data",{ id: this.partner.id }]);        
       }, err=>{
           this.baseService.spinnerHide();
-          this.baseService.errorToast(err.error.message);
+          this.baseService.handleError(err);
       });
     }
   }
@@ -286,6 +288,8 @@ export class PartnerDataDetailComponent implements OnInit {
         this.employee = {};
       }
       console.log(this.employee);
+    },err=>{
+      this.baseService.handleError(err);
     });
   }
   public removed(value: any, selectName?: string): void {

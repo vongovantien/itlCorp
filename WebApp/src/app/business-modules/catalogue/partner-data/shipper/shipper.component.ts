@@ -48,6 +48,9 @@ export class ShipperComponent implements OnInit {
       console.log(this.shippers);
       this.pager.totalItems = response.totalItems;
       return this.pager.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   onSortChange(column) {

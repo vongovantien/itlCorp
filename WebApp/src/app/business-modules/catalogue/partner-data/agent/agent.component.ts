@@ -51,8 +51,10 @@ export class AgentComponent implements OnInit {
       this.baseService.spinnerHide();
       this.agents = response.data.map(x=>Object.assign({},x));
       console.log(this.agents);
-      this.pager.totalItems = response.totalItems;
-      // this.child.setPage(this.pager.currentPage);
+      this.pager.totalItems = response.totalItems;    
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   onSortChange(column) {

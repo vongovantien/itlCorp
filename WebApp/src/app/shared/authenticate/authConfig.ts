@@ -13,7 +13,8 @@ export const authConfig: AuthConfig = {
   clientId: 'eFMS',
   requireHttps:false,
   oidc:false,
-  logoutUrl:'/#/login',
+  logoutUrl:'/login',
+  sessionCheckIntervall:2000,
   // set the scope for the permissions the client should request
   // The first three are defined by OIDC. The 4th is a usecase-specific one
   scope: 'dnt_api profile efms_scope openid offline_access',

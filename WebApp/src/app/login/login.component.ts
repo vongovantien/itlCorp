@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, ChangeDetectorRef, AfterViewChecked }
 import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
 import { Router } from '@angular/router';
-import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
+import { OAuthService, JwksValidationHandler} from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import * as crypto_js from 'crypto-js';
 import { NgForm } from '@angular/forms';
@@ -28,8 +28,9 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
     private router: Router,
     private oauthService: OAuthService,
     private cookieService: CookieService,
-    private changeDetector : ChangeDetectorRef ) {    
-
+    private changeDetector : ChangeDetectorRef ) {       
+      this.oauthService.setStorage(localStorage);
+      this.oauthService.setupAutomaticSilentRefresh();
   }
   ngAfterViewChecked(){
     this.changeDetector.detectChanges();
@@ -38,8 +39,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   private async configureWithNewConfigApi() {
     this.oauthService.configure(authConfig);
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
-    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-    this.oauthService.setupAutomaticSilentRefresh();   
+    await this.oauthService.loadDiscoveryDocumentAndTryLogin();     
   }
 
   username: string = "";
@@ -47,10 +47,10 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   remember_me: boolean = false;
 
   ngOnInit() {
-
+    this.setupLocalInfo();
   }
 
-  async Login(form: NgForm) {
+  async Login(form: NgForm) {    
     this.baseService.spinnerShow();
     await this.configureWithNewConfigApi();
     if (form.form.status !== "INVALID") {
@@ -61,11 +61,10 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
         if (claims) {
           localStorage.setItem("currently_userName",claims['preferred_username']);
           localStorage.setItem("currently_userEmail",claims['email']);
-          console.log(claims);
+          
           this.rememberMe();
           this.toastr.success("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "", { positionClass: 'toast-bottom-right' });
-          this.router.navigateByUrl('/home');
-          this.cookieService.set('login_status', "LOGGED_IN", null, "/", window.location.hostname);
+          this.router.navigateByUrl('/home');       
           this.baseService.spinnerHide();
         }
       }).catch((err) => {
@@ -73,7 +72,6 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
         this.baseService.spinnerHide();
       })
     }
-
   }
 
 
@@ -117,43 +115,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
     this.username = this.getUserName();
     this.password = this.getUserPassword();
     this.remember_me = (this.username != '' || this.password != '');
-  }
-
-  /**
-   * ng2-select
-   */
-  public items: Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
-    'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',
-    'Budapest', 'Cologne', 'Copenhagen'];
-
-  private value: any = {};
-  private _disabledV: string = '0';
-  private disabled: boolean = false;
-
-  private get disabledV(): string {
-    return this._disabledV;
-  }
-
-  private set disabledV(value: string) {
-    this._disabledV = value;
-    this.disabled = this._disabledV === '1';
-  }
-
-  public selected(value: any): void {
-    console.log('Selected value is: ', value);
-  }
-
-  public removed(value: any): void {
-    console.log('Removed value is: ', value);
-  }
-
-  public typed(value: any): void {
-    console.log('New search input: ', value);
-  }
-
-  public refreshValue(value: any): void {
-    this.value = value;
-  }
+  }  
 
   changeLanguage(lang) {
     localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, lang);
@@ -165,5 +127,22 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
       window.location.href = window.location.protocol + "//" + window.location.hostname + "/" + lang + "/";
     }
   }
+
+
+  setupLocalInfo(){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == null) {
+      localStorage.setItem("CURRENT_LANGUAGE", SystemConstants.DEFAULT_LANGUAGE);
+    }
+    if (localStorage.getItem(SystemConstants.CURRENT_VERSION) == null) {
+      localStorage.setItem("CURRENT_VERSION", "1");
+    }
+    var current_client_lang = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
+ 
+    if (current_client_lang === null) {
+      localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");
+    }
+  }
+
+
 
 }
