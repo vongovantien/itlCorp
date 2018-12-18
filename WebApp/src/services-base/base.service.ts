@@ -142,8 +142,9 @@ export class BaseService implements ErrorHandler {
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
       this.spinnerShow();
-    try {
+    try {     
       const res = await this._http.put(url, data, { headers: this.headers }).toPromise();
+      console.log(res)
       this.spinnerHide();
       this.handleState(res, display_notify);
       return res;
@@ -240,8 +241,15 @@ export class BaseService implements ErrorHandler {
    * Handle and display toast notificaton to show error returned from request 
    * @param error 
    */
-  handleError(error: HttpErrorResponse) {
-    this.errorToast(error.error.message.toString());
+  handleError(error: HttpErrorResponse ) {
+    console.log(error)
+    if(error.status===400){
+      this.errorToast(error.error.message);
+    }
+    if(error.status===500){
+      this.errorToast(error.error.error.Message);
+    }
+    
   }
 
   /**
@@ -287,7 +295,7 @@ export class BaseService implements ErrorHandler {
         }else{
           window.location.href = window.location.protocol + "//" + window.location.hostname;
         }
-        this.warningToast("Login again to continue !"); 
+        this.warningToast("Please login to continue !"); 
         
       }
       this.cookieService.delete("login_status","/",window.location.hostname);
