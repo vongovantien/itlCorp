@@ -10,7 +10,6 @@ import { ChargeComponent } from './charge/charge.component';
 import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
-import { ModalModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { FormsModule} from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
@@ -35,8 +34,7 @@ import { PortIndexImportComponent } from './port-index-import/port-index-import.
     CatalogueRoutingModule,
     SharedModule,
     FormsModule,
-    SelectModule,
-    ModalModule.forRoot()  ],
+    SelectModule],
   declarations:
     [LocationComponent,
       WarehouseComponent,

@@ -211,6 +211,29 @@ ul {
             &.invalid-row {
                 background-color: #ffe3e4;
             }
+            .collapsed .la-angle-up:before {
+                content: "\f110";
+            }
+            &.collapse-panel-row {
+                > td {
+                    padding: 0;
+                }
+                .detail-panel-block {
+                    box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);
+                    -webkit-box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);   
+                     border: 1px solid #d0312c;
+                }
+            }
+        }
+        & + tbody {
+            border-top: 0;
+        }
+        &.tbody-group {
+            &:nth-child(2n+1) {
+                > .collapse-toggle-row {
+                    background-color: #fff;
+                }
+            }
         }
     }
     &.table-brand {
@@ -218,6 +241,14 @@ ul {
             th {
                 color: #fff;
                 background-color: #3966b6;
+            }
+        }
+    }
+    &.table-secondary {
+        thead {
+            th {
+                color: inherit;
+                background-color: #f2dedf;
             }
         }
     }
@@ -255,17 +286,39 @@ ul {
         }
     }
 }
-table.dataTable thead .sorting {
-    padding-right: 16px;
-    background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
-}
-table.dataTable thead .sorting_asc {
-    padding-right: 16px;
-    background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
-}
-table.dataTable thead .sorting_desc {
-    padding-right: 16px;
-    background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+table.dataTable {
+    &.table-brand {
+        thead {
+            .sorting {
+                padding-right: 16px;
+                background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+            }
+            .sorting_asc {
+                padding-right: 16px;
+                background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+            }
+            .sorting_desc {
+                padding-right: 16px;
+                background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+            }
+        }
+    }
+    &.table-secondary {
+        thead {
+            .sorting {
+                padding-right: 16px;
+                background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+            }
+            .sorting_asc {
+                padding-right: 16px;
+                background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+            }
+            .sorting_desc {
+                padding-right: 16px;
+                background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+            }
+        }
+    }
 }
 .pagination-nav {
     margin-top: 1rem;
@@ -337,6 +390,10 @@ table.dataTable thead .sorting_desc {
             font-size: 16px;
             margin: 0;
         }
+    }
+    .m-portlet__body {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
 } 
 // job management

@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalModule } from 'ngx-bootstrap';
+// import { ModalModule } from 'ngx-bootstrap';
+
 import { TableLayoutComponent } from './common/table-layout/table-layout.component';
 import { StyleCellDirective } from './directives/style-cell.directive';
 import { InputTableLayoutComponent } from './common/input-table-layout/input-table-layout.component';
@@ -19,7 +20,7 @@ import { CloseModalButtonComponent } from './common/close-modal-button/close-mod
 import { ExcelService } from './services/excel.service';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ModalModule,SelectModule],
+  imports: [CommonModule, FormsModule,SelectModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 
@@ -36,7 +37,7 @@ import { ExcelService } from './services/excel.service';
   ],
   exports: [
     CommonModule,
-    ModalModule,
+    // ModalModule,
     TableLayoutComponent,
     BreadcrumbComponent,
     DefaultButtonComponent,
