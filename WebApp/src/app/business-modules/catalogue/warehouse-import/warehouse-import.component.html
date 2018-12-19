@@ -48,8 +48,11 @@
                 <div class="form-actions m--margin-top-5 m--align-right">
                     <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
                         <span>
-                            <span> 
-                                Show/hide invalid rows
+                            <span *ngIf="isShowInvalid"> 
+                                Show invalid rows
+                            </span>
+                            <span *ngIf="isShowInvalid == false"> 
+                                Show All
                             </span>
                         </span>
                     </button>

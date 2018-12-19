@@ -3,6 +3,7 @@ import { Injectable, ErrorHandler } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { language } from 'src/languages/language.en';
 @Injectable({
   providedIn: 'root'
 })
@@ -12,6 +13,8 @@ export class BaseService implements ErrorHandler {
   private headers: HttpHeaders;
   protected baseUrl: string;
   protected showError: boolean;
+
+  public LANG = language;
 
   constructor(private _http: HttpClient,
     private spinnerService: NgxSpinnerService,
@@ -65,7 +68,7 @@ export class BaseService implements ErrorHandler {
       if (display_error) {
         this.handleError(error);
       }
-      return error;
+      return false;
     }
   }
 
@@ -105,7 +108,7 @@ export class BaseService implements ErrorHandler {
     catch (error) {
       this.spinnerHide();
       this.handleError(error);
-      return error;
+      return false;
     }
   }
 
@@ -146,7 +149,7 @@ export class BaseService implements ErrorHandler {
     catch (error) {
       this.spinnerHide();
       this.handleError(error);
-      return error;
+      return false;
     }
   }
 
@@ -184,7 +187,7 @@ export class BaseService implements ErrorHandler {
     catch (error) {
       this.spinnerHide();
       this.handleError(error);
-      return error;
+      return false;
     }
   }
 
@@ -226,9 +229,6 @@ export class BaseService implements ErrorHandler {
     if (response.status == true && display_notify == true) {
       this.successToast(response.message);
     }
-    if (response.status == false && display_notify == true) {
-      this.errorToast(response.message);
-    }
   }
 
   /**
@@ -236,18 +236,19 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
+  
     console.log(error)
     if (error.status === 400) {
-      this.errorToast(error.error.message,"Invalid Request");
+      this.errorToast(error.error.message,this.LANG.NOTIFI_MESS.CLIENT_ERR_TITLE);
     }
     if (error.status === 500) {
-      this.errorToast(error.error.error.Message,"Server Error");
+      this.errorToast(error.error.error.Message,this.LANG.NOTIFI_MESS.SERVER_ERR_TITLE);
     }
     if(error.status===0){
-      this.errorToast("Check your connection","Unknow Error");
+      this.errorToast(this.LANG.NOTIFI_MESS.CHECK_CONNECT,this.LANG.NOTIFI_MESS.UNKNOW_ERR);
     }
     if(error.status===401){
-      this.warningToast("Please login to continue !","Expired Session");
+      this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS,this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
       this.router.navigateByUrl('/login');      
       setTimeout(() => {
         this.reloadPage();

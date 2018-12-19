@@ -48,6 +48,9 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
 
   ngOnInit() {
     this.setupLocalInfo();
+    if(this.baseService.checkLoginSession(false)){
+      this.router.navigateByUrl('/home');
+    };
   }
 
   async Login(form: NgForm) {    

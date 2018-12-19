@@ -10,6 +10,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
+import { language } from 'src/languages/language.en';
 declare var $:any;
 
 @Component({
@@ -79,13 +80,11 @@ export class WarehouseImportComponent implements OnInit {
     this.sortKey = '';
     if(this.isShowInvalid){
       this.pager.totalItems = this.data.length;
-      //this.setPage(this)
       this.pagingData(this.data);
     }
     else{
       this.inValidItems = this.data.filter(x => !x.isValid);
       this.pager.totalItems = this.inValidItems.length;
-      this.setPage(this.pager);
       this.pagingData(this.inValidItems);
     }
   }
@@ -98,8 +97,8 @@ export class WarehouseImportComponent implements OnInit {
       this.inProgress = true;
       let validItems = this.data.filter(x => x.isValid);
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
-      if(response.success){
-        this.baseService.successToast("Import successful!");
+      if(response){
+        this.baseService.successToast(language.NOTIFI_MESS.EXPORT_SUCCES);
         this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();

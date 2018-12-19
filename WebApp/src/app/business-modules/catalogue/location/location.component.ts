@@ -295,7 +295,7 @@ export class LocationComponent implements OnInit {
   totalItemWards:number = null;
 
   async getCountries() {
-    var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.paging + "/" + this.pager.currentPage + "/" + this.pager.pageSize, this.searchObject, false, true);
+    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.paging + "/" + this.pager.currentPage + "/" + this.pager.pageSize, this.searchObject, false, true);
     this.ListCountries = response.data;
     this.totalItemCountries = response.totalItems;
     this.pager.totalItems = this.totalItemCountries;
@@ -307,9 +307,9 @@ export class LocationComponent implements OnInit {
     if (action == "yes") {
       delete this.CountryToAdd.id;
       if (form.form.status != "INVALID") {
-        var respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
+        const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
         await this.getCountries();
-        if(respone!=undefined && respone.status){
+        if(response){
           this.setPageAfterAdd();
           form.onReset();
           $('#add-country-modal').modal('hide');
@@ -329,11 +329,13 @@ export class LocationComponent implements OnInit {
   async updateCountry(form: NgForm, action) {
     if (action == "yes") {
       if (form.form.status != "INVALID") {
-        await this.baseServices.putAsync(this.api_menu.Catalogue.Country.update, this.CountryToUpdate);
-        await this.getCountries();
-        await this.getProvinceCities();
-        form.onReset();
-        $('#update-country-modal').modal('hide');
+        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Country.update, this.CountryToUpdate);
+        if(res){
+          await this.getCountries();
+          await this.getProvinceCities();
+          form.onReset();
+          $('#update-country-modal').modal('hide');
+        }
       }
     } else {
       form.onReset();
@@ -415,7 +417,7 @@ export class LocationComponent implements OnInit {
 
   async getProvinceCities() {
     this.searchObject.placeType = PlaceTypeEnum.Province; //9;
-    var response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject);
+    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject);
     this.ListProvinceCities = response.data;
     this.ConstListProvinceCities = response.data;
     this.totalItemProvinces = response.totalItems;
@@ -427,10 +429,10 @@ export class LocationComponent implements OnInit {
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.ProvinceCityToAdd.countryId != null) {
         this.ProvinceCityToAdd.placeType = PlaceTypeEnum.Province;
-        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.ProvinceCityToAdd);
+        const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.ProvinceCityToAdd);
         await this.getProvinceCities();
         console.log(response);
-        if(response!=undefined && response.status){
+        if(response){
           this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
@@ -464,10 +466,12 @@ export class LocationComponent implements OnInit {
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.ProvinceCityToUpdate.countryId != null) {
         console.log(JSON.stringify(this.ProvinceCityToUpdate));
-        await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idProvinceCityToUpdate, this.ProvinceCityToUpdate);
-        await this.getProvinceCities();
-        form.onReset();
-        $('#update-city-province-modal').modal('hide');
+        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idProvinceCityToUpdate, this.ProvinceCityToUpdate);
+        if(res){
+          await this.getProvinceCities();
+          form.onReset();
+          $('#update-city-province-modal').modal('hide');
+        }
       }
     } else {
       form.onReset();
@@ -520,7 +524,7 @@ export class LocationComponent implements OnInit {
 
   public async getDistrict() {
     this.searchObject.placeType = PlaceTypeEnum.District;
-    var response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject);
+    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject);
     this.ListDistricts = response.data;
     this.totalItemDistricts = response.totalItems;
     this.pager.totalItems = this.totalItemDistricts;
@@ -532,9 +536,9 @@ export class LocationComponent implements OnInit {
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.DistrictToAdd.countryId != null && this.DistrictToAdd.provinceId != null) {
         this.DistrictToAdd.placeType = PlaceTypeEnum.District;
-        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.DistrictToAdd);
+        const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.DistrictToAdd);
         await this.getDistrict();
-        if(response!=undefined && response.status){
+        if(response){
           this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
@@ -580,10 +584,12 @@ export class LocationComponent implements OnInit {
   async updateDistrict(form: NgForm, action) {
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.DistrictToUpdate.countryId != null && this.DistrictToUpdate.provinceId != null) {
-        await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idDistrictToUpdate, this.DistrictToUpdate);
-        await this.getDistrict();
-        form.onReset();
-        $('#update-district-modal').modal('hide');
+        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idDistrictToUpdate, this.DistrictToUpdate);
+        if(res){
+          await this.getDistrict();
+          form.onReset();
+          $('#update-district-modal').modal('hide');
+        }
       }
     } else {
       form.onReset();
@@ -644,7 +650,7 @@ export class LocationComponent implements OnInit {
 
   public async getWards() {
     this.searchObject.placeType = PlaceTypeEnum.Ward;
-    var response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject);
+    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject);
     this.ListWards = response.data;
     this.ConstListWards = response.data;
     this.totalItemWards = response.totalItems;
@@ -659,9 +665,9 @@ export class LocationComponent implements OnInit {
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.WardToAdd.countryId != null && this.WardToAdd.provinceId != null && this.WardToAdd.districtId != null) {
         this.WardToAdd.placeType = PlaceTypeEnum.Ward;
-        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.WardToAdd);
+        const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.WardToAdd);
         await this.getWards();        
-        if(response!=undefined && response.status){
+        if(response){
           this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
@@ -715,9 +721,9 @@ export class LocationComponent implements OnInit {
     console.log(this.WardToUpdate);
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.WardToUpdate.countryId != null && this.WardToUpdate.provinceId != null && this.WardToUpdate.districtId) {
-        var respone = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idWardoUpdate, this.WardToUpdate);
-        await this.getWards();
-        if (respone!= undefined && respone.status) {
+        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idWardoUpdate, this.WardToUpdate);        
+        if (res) {
+          await this.getWards();
           form.onReset();
           $('#update-ward-modal').modal('hide');
         }
