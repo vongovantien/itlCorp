@@ -247,4 +247,29 @@ export class PartnerComponent implements OnInit {
     }
     this.pager.currentPage = pager.currentPage;
   }
+
+  async export(){
+    if(this.activeTab===this.tabName.customerTab){
+      await this.customerComponent.exportCustomers();
+    }
+    if(this.activeTab===this.tabName.agentTab){
+      await this.agentComponent.exportAgents();
+    }
+    if(this.activeTab===this.tabName.carrierTab){
+      await this.carrierComponent.exportCarriers();
+    }
+    if(this.activeTab===this.tabName.consigneeTab){
+      await this.consigneeComponent.exportConsignees();
+    }
+    if(this.activeTab===this.tabName.airshipsupTab){
+      await this.airShipSupComponent.exportAirShipSup();
+    }
+    if(this.activeTab===this.tabName.shipperTab){
+      await this.shipperComponent.exportShippers();
+    }
+    if(this.activeTab===this.tabName.allTab){
+      await this.allPartnerComponent.exportAll();
+    }
+
+  }
 }

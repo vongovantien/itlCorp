@@ -92,6 +92,9 @@ export class PortIndexComponent implements OnInit {
       this.baseService.spinnerHide();
       this.portIndexs = response.data.map(x => Object.assign({}, x));
       this.pager.totalItems = response.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   onSearch(event) {
@@ -161,17 +164,22 @@ export class PortIndexComponent implements OnInit {
   }
 
   update(): any {
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.portIndex.id, this.portIndex).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       $('#' + this.nameModal).modal('hide');
       this.baseService.successToast(response.message);
       this.setPage(this.pager);
     }, err => {
-      this.baseService.errorToast(err.error.message);
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
 
   addNew(): any {
+    this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.portIndex).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       this.baseService.successToast(response.message);
       this.form.onReset();
       this.initPortIndex();
@@ -180,7 +188,8 @@ export class PortIndexComponent implements OnInit {
       this.pager.currentPage = 1;
       this.child.setPage(this.pager.currentPage);
     }, err => {
-      this.baseService.errorToast(err.error.message);
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
 
@@ -197,33 +206,48 @@ export class PortIndexComponent implements OnInit {
     this.getModeOfTransport();
   }
   getModeOfTransport(): any {
+    this.baseService.spinnerShow();
     this.baseService.get(this.api_menu.Catalogue.CatPlace.getModeOfTransport).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if (response != null) {
         this.modes = response.map(x => ({ "text": x.name, "id": x.id }));
       }
       else {
         this.modes = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   getAreas(): any {
+    this.baseService.spinnerShow();
     this.baseService.get(this.api_menu.Catalogue.Area.getAllByLanguage).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if (response != null) {
         this.areas = response.map(x => ({ "text": x.name, "id": x.id }));
       }
       else {
         this.areas = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   getCountries() {
+    this.baseService.spinnerShow();
     this.baseService.get(this.api_menu.Catalogue.Country.getAllByLanguage).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if (response != null) {
         this.countries = response.map(x => ({ "text": x.name, "id": x.id }));
       }
       else {
         this.countries = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   valueCountry: any = {};
@@ -258,11 +282,14 @@ export class PortIndexComponent implements OnInit {
   async onDelete(event) {
     console.log(event);
     if (event) {
+      this.baseService.spinnerShow();
       this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.portIndex.id).subscribe((response: any) => {
+        this.baseService.spinnerHide();
         this.baseService.successToast(response.message);
         this.setPageAfterDelete();
       }, err => {
-        this.baseService.errorToast(err.error.message);
+        this.baseService.spinnerHide();
+        this.baseService.handleError(err);        
       });
     }
   }

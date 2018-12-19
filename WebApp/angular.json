@@ -50,24 +50,7 @@
                   "with": "src/languages/language.vi.ts"
                 }
               ]
-            },
-            "production": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true                
-            },
+            },       
             "test":{
               "fileReplacements": [
                 {
@@ -85,7 +68,8 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true,                                          
+              "buildOptimizer": true,         
+              "baseHref": "/vi/",                                 
               "lazyModules": 
               ["src/app/business-modules/catalogue/catalogue.module.ts",
                 "src/app/business-modules/accounting/accounting.module.ts",
@@ -115,12 +99,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "progress": true,
+              "baseHref": "/en/",
               "lazyModules": 
               ["src/app/business-modules/catalogue/catalogue.module.ts",
                 "src/app/business-modules/accounting/accounting.module.ts",
@@ -130,6 +109,12 @@
                 "src/app/business-modules/tool-setting/tool.module.ts",
                 "src/app/business-modules/support/support.module.ts"               
               ],
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "progress": true,           
               "outputPath": "dist/eFMS-en/",
               "fileReplacements": [
                 {
@@ -145,10 +130,7 @@
           "options": {
             "browserTarget": "eFMS-Web:build"
           },
-          "configurations": {
-            "production": {
-              "browserTarget": "eFMS-Web:build:production"
-            },
+          "configurations": {          
             "test": {
               "browserTarget": "eFMS-Web:build:test"
             },

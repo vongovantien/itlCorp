@@ -13,10 +13,12 @@ export class HeaderComponent implements OnInit,AfterViewInit {
     if (this.getCurrentLangFromUrl() === "en") {
       this.active_flag = this.english_flag;
       localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE,"en");
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"en-US");
     }
     if (this.getCurrentLangFromUrl() === "vi") {
       this.active_flag = this.vietnam_flag;
       localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE,"vi");
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"vi-VN");
     }
   }
 
@@ -47,13 +49,17 @@ export class HeaderComponent implements OnInit,AfterViewInit {
       return
     } else {
       if (lang === "en") {
-        localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");       
+        localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, SystemConstants.LANGUAGES.ENGLISH); 
+        localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, SystemConstants.LANGUAGES.ENGLISH_API);       
+        localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "en-US"); 
         const url = window.location.protocol + "//" + window.location.hostname + "/" + lang +"/#" + this.router.url + "/";
         this.active_flag = this.english_flag;
         window.location.href = url;
       }
       if (lang === "vi") {
-        localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "vi");
+        localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, SystemConstants.LANGUAGES.VIETNAM);
+        localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, SystemConstants.LANGUAGES.VIETNAM_API); 
+        localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "vi-VN"); 
         const url = window.location.protocol + "//" + window.location.hostname + "/" + lang +"/#" + this.router.url + "/";
         this.active_flag = this.vietnam_flag;
         window.location.href = url;

@@ -16,6 +16,8 @@ export class TableDetailComponent implements OnInit {
   @Input() records: any[];
   @Input() settings: ColumnSetting[];
   @Input() nameDetailModal: string;
+  @Input() hasAction: boolean = true;
+  @Input() hasOreder: boolean = false;
   @Input() keySort: string = "";
   @Output() sortChange: EventEmitter<number> = new EventEmitter<number>();
   @Output() detail = new EventEmitter<any>();

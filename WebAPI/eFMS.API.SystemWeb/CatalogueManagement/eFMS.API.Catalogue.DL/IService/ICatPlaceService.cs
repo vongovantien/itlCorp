@@ -3,6 +3,8 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Catalogue.Service.ViewModels;
+using eFMS.API.Common.Globals;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -18,5 +20,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<vw_catProvince> GetProvinces(short? countryId);
         List<vw_catDistrict> GetDistricts(Guid? provinceId);
         List<ModeOfTransport> GetModeOfTransport();
+        List<WarehouseImportModel> CheckValidImport(List<WarehouseImportModel> list, CatPlaceTypeEnum placeType);
+        HandleState Import(List<WarehouseImportModel> data);
     }
 }

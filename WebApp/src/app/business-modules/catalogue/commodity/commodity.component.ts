@@ -306,7 +306,7 @@ export class CommodityComponent implements OnInit {
       this.baseService.spinnerHide();
     }, err => {
       this.baseService.spinnerHide();
-      this.baseService.errorToast(err.error.message);
+      this.baseService.handleError(err);
     });
   }
   async addNewCommodity() {
@@ -330,7 +330,7 @@ export class CommodityComponent implements OnInit {
     }
   }, err=>{
      this.baseService.spinnerHide();
-     this.baseService.errorToast(err.error.message);
+     this.baseService.handleError(err);
   });
   }
   async addNewGroup() {

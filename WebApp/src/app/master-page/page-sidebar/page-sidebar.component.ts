@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit} from '@angular/core';
 import { Router } from '@angular/router';
 import {language} from 'src/languages/language.en';
+import { BaseService } from 'src/services-base/base.service';
+
 @Component({
   selector: 'app-page-sidebar',
   templateUrl: './page-sidebar.component.html',
@@ -49,7 +51,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }
 
   }
-  constructor(private router: Router) { }
+  constructor(private router: Router,private baseService:BaseService) { }
 
   async ngOnInit() {
     this.Menu = language.Menu;
@@ -85,31 +87,33 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
   }
 
   sub_menu_click(sub_menu_name, parrent_index, children_index) { 
-    var current_parent = document.getElementById(parrent_index.toString());
-    var current_children = document.getElementById(parrent_index.toString() + '-' + children_index.toString());
-
-    if (this.previous_children != null) {
-      this.previous_children.classList.remove('m-menu__item--active');
-      this.previous_parent.classList.remove('m-menu__item--open');
-      this.previous_parent.classList.remove('m-menu__item--active');
-    }
-
-    this.previous_children = current_children;
-    this.previous_parent = current_parent;
-
-
-    current_parent.classList.add('m-menu__item--open');
-    current_parent.classList.add('m-menu__item--active');
-    current_children.classList.add('m-menu__item--active');
-
-    
-    for (var i = 0; i < this.Menu.length; i++) {
-      for (var j = 0; j < this.Menu[i].childs.length; j++) {
-        if (this.Menu[i].childs[j].name == sub_menu_name) {
-          this.Page_Info.parent = this.Menu[i].parent_name;
-          this.Page_Info.children = this.Menu[i].childs[j].name;
-          this.Page_Information.emit(this.Page_Info);        
-          break;
+    if(this.baseService.checkLoginSession()){
+      var current_parent = document.getElementById(parrent_index.toString());
+      var current_children = document.getElementById(parrent_index.toString() + '-' + children_index.toString());
+  
+      if (this.previous_children != null) {
+        this.previous_children.classList.remove('m-menu__item--active');
+        this.previous_parent.classList.remove('m-menu__item--open');
+        this.previous_parent.classList.remove('m-menu__item--active');
+      }
+  
+      this.previous_children = current_children;
+      this.previous_parent = current_parent;
+  
+  
+      current_parent.classList.add('m-menu__item--open');
+      current_parent.classList.add('m-menu__item--active');
+      current_children.classList.add('m-menu__item--active');
+  
+      
+      for (var i = 0; i < this.Menu.length; i++) {
+        for (var j = 0; j < this.Menu[i].childs.length; j++) {
+          if (this.Menu[i].childs[j].name == sub_menu_name) {
+            this.Page_Info.parent = this.Menu[i].parent_name;
+            this.Page_Info.children = this.Menu[i].childs[j].name;
+            this.Page_Information.emit(this.Page_Info);        
+            break;
+          }
         }
       }
     }

@@ -1,4 +1,5 @@
 import { WAREHOUSEENCOLUMNSETTING } from "../app/business-modules/catalogue/warehouse/warehouse.columns";
+import { WAREHOUSEIMPORTENCOLUMNSETTING } from "src/app/business-modules/catalogue/warehouse-import/warehouse-import.columns";
 
 export const language = {
   Menu :[  
@@ -9,9 +10,10 @@ export const language = {
       "display_child": false,
       "childs": [
 
-        { name: "Warehouse", route_child: "ware-house" },
+        { name: "Warehouse", route_child: "ware-house"},
         { name: "Warehouse-import", route_child: "ware-house-import" },
         { name: "Port Index", route_child: "port-index" },
+        { name: "Port Index Import", route_child: "port-index-import" },
         { name: "Partner Data", route_child: "partner-data" },
         { name: "Commodity", route_child: "commodity" },
         { name: "Stage Management", route_child: "stage-management" },
@@ -120,5 +122,6 @@ export const language = {
       ]
     }
   ],
-  Warehouse: WAREHOUSEENCOLUMNSETTING
+  Warehouse: WAREHOUSEENCOLUMNSETTING,
+  WarehouseImport: WAREHOUSEIMPORTENCOLUMNSETTING
 }

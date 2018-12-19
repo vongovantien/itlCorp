@@ -15,7 +15,8 @@
               <th class="sorting">
                   <span>Update time</span>
               </th> -->
-              <th class="table-actions-col no-sorting"></th>
+              <th  class="sorting_asc" *ngIf="hasOreder">No</th>
+              <th class="table-actions-col no-sorting" *ngIf="hasAction"></th>
               <ng-container *ngFor="let map of columnMaps">
                 <ng-container *ngIf="map.isShow">
                     <th [ngClass]="{ 'no-sorting': map.dataType == 'boolean','sorting ': (map.dataType != 'boolean'), 'sorting_asc ': (map.dataType != 'boolean' && keySort == map.primaryKey && isDesc), 'sorting_desc ': (map.dataType != 'boolean' && keySort == map.primaryKey && !isDesc)}" id="hearder_{{map.primaryKey}}"  (click)="sort(map)"><span>{{ map.header }}</span></th>
@@ -25,7 +26,8 @@
       </thead>
       <tbody  *ngIf="records">
           <tr *ngFor="let record of records; let i = index">
-              <td class="table-actions-col">
+              <td *ngIf="hasOreder"><span> {{ (i+1) }} </span></td>
+              <td class="table-actions-col" *ngIf="hasAction">
                   <div class="table-actions" style="width: 40px">
                       <app-default-button [buttonSetting]="detailButtonSetting" [dataTarget]="detailButtonSetting.dataTarget" (click)="detailClick(record)"></app-default-button>
                   </div>

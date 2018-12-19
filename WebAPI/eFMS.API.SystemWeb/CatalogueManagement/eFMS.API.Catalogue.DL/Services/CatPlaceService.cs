@@ -17,6 +17,8 @@ using System.Linq.Expressions;
 using eFMS.API.Catalogue.DL.ViewModels;
 using System.Threading;
 using System.Globalization;
+using ITL.NetCore.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -188,6 +190,132 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<ModeOfTransport> GetModeOfTransport()
         {
             return DataEnums.ModeOfTransportData;
+        }
+
+        public List<WarehouseImportModel> CheckValidImport(List<WarehouseImportModel> list, CatPlaceTypeEnum placeType)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var countries = dc.CatCountry;
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
+            var districts = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District));
+            var warehouses = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Warehouse));
+            string placeTypeName = PlaceTypeEx.GetPlaceType(placeType);
+            var results = new List<WarehouseImportModel>();
+            foreach(var item in list)
+            {
+                var result = item;
+                var warehouse = warehouses.FirstOrDefault(i => i.Code.IndexOf(item.Code) >= 0);
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    result.Code = string.Format("Code is not allow empty!|wrong");
+                    result.IsValid = false;
+                }
+                if(results.Any(x => x.Code == item.Code))
+                {
+                    result.Code = string.Format("Code {0} is existed!|wrong", item.Code);
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.NameEn))
+                {
+                    result.NameEn = string.Format("NameEn is not allow empty!|wrong");
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.NameVn))
+                {
+                    result.NameVn = string.Format("NameVn is not allow empty!|wrong");
+                    result.IsValid = false;
+                }
+                if (warehouse != null)
+                {
+                    result.Code = string.Format("Code '{0}' has been existed!|wrong", item.Code);
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CountryName))
+                {
+                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
+                    result.IsValid = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    if (country == null)
+                    {
+                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.IsValid = false;
+                    }
+                    else
+                    {
+                        result.CountryId = country.Id;
+                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(item.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
+                        if (string.IsNullOrEmpty(item.ProvinceName))
+                        {
+                            result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
+                            result.IsValid = false;
+                        }
+                        else if (province == null)
+                        {
+                            result.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
+                            result.IsValid = false;
+                        }
+                        else
+                        {
+                            result.ProvinceId = province.Id;
+                            var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(item.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
+                            if (string.IsNullOrEmpty(item.DistrictName))
+                            {
+                                result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                result.IsValid = false;
+                            }
+                            else if (district == null)
+                            {
+                                result.DistrictName = string.Format("District '{0}' is not found!|wrong", item.DistrictName);
+                                result.IsValid = false;
+                            }
+                            else
+                            {
+                                result.DistrictId = district.Id;
+                            }
+                        }
+                    }
+                }
+
+                result.PlaceTypeId = placeTypeName;
+                result.Status = DataEnums.EnActive;
+                result.Status = item.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
+                results.Add(result);
+            }
+            return results;
+        }
+
+        public HandleState Import(List<WarehouseImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach (var item in data)
+                {
+                    var catPlace = new CatPlace
+                    {   Id = Guid.NewGuid(),
+                        Code = item.Code,
+                        NameEn = item.NameEn,
+                        NameVn = item.NameVn,
+                        CountryId = item.CountryId,
+                        ProvinceId = item.ProvinceId,
+                        DistrictId = item.DistrictId,
+                        Address = item.Address,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = ChangeTrackerHelper.currentUser,
+                        PlaceTypeId = item.PlaceTypeId
+                    };
+                    dc.CatPlace.Add(catPlace);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
     }
 }

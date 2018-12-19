@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { FormsModule} from '@angular/forms';
 import { DocumentationRoutingModule } from './documentation-routing.module';
 import { AirExportComponent } from './air-export/air-export.component';
 import { AirImportComponent } from './air-import/air-import.component';
@@ -12,12 +12,17 @@ import { SeaLCLImportComponent } from './sea-lcl-import/sea-lcl-import.component
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
 import { SharedModule } from '../../shared/shared.module';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { SelectModule } from 'ng2-select';
 
 @NgModule({
   imports: [
     CommonModule,
     DocumentationRoutingModule,
-    SharedModule
+    SharedModule,
+    NgxDaterangepickerMd,
+    SelectModule,
+    FormsModule
   ],
   declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent]
 })

@@ -10,7 +10,6 @@ import { ChargeComponent } from './charge/charge.component';
 import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
-import { ModalModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { FormsModule} from '@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
@@ -26,6 +25,7 @@ import { AllPartnerComponent } from './partner-data/all/all-partner.component';
 import { CurrencyComponent } from './currency/currency.component';
 import { ChargeDetailsComponent } from './charge-details/charge-details.component';
 import { WarehouseImportComponent } from './warehouse-import/warehouse-import.component';
+import { PortIndexImportComponent } from './port-index-import/port-index-import.component';
 
 
 @NgModule({
@@ -34,8 +34,7 @@ import { WarehouseImportComponent } from './warehouse-import/warehouse-import.co
     CatalogueRoutingModule,
     SharedModule,
     FormsModule,
-    SelectModule,
-    ModalModule.forRoot()  ],
+    SelectModule],
   declarations:
     [LocationComponent,
       WarehouseComponent,
@@ -57,7 +56,8 @@ import { WarehouseImportComponent } from './warehouse-import/warehouse-import.co
  	    CurrencyComponent,
       AllPartnerComponent,
       ChargeDetailsComponent,
-      WarehouseImportComponent
+      WarehouseImportComponent,
+      PortIndexImportComponent
     ],
 })
 export class CatalogueModule { }
