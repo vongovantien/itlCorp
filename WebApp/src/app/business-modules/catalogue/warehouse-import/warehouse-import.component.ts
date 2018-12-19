@@ -78,11 +78,14 @@ export class WarehouseImportComponent implements OnInit {
     this.isShowInvalid = !this.isShowInvalid;
     this.sortKey = '';
     if(this.isShowInvalid){
+      this.pager.totalItems = this.data.length;
+      //this.setPage(this)
       this.pagingData(this.data);
     }
     else{
       this.inValidItems = this.data.filter(x => !x.isValid);
       this.pager.totalItems = this.inValidItems.length;
+      this.setPage(this.pager);
       this.pagingData(this.inValidItems);
     }
   }
@@ -96,6 +99,7 @@ export class WarehouseImportComponent implements OnInit {
       let validItems = this.data.filter(x => x.isValid);
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
       if(response.success){
+        this.baseService.successToast("Import successful!");
         this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();

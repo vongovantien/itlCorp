@@ -5,5 +5,6 @@ export const PAGINGSETTING: PagerSetting = {
     currentPage: 1,
     pageSize: SystemConstants.OPTIONS_PAGE_SIZE,
     numberToShow: SystemConstants.ITEMS_PER_PAGE,
-    numberPageDisplay: SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY
+    numberPageDisplay: SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY,
+    totalItems: 0
   }
