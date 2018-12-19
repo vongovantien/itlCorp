@@ -98,15 +98,15 @@ namespace SystemManagementAPI
             //Multiple language setting
             var supportedCultures = new[]
             {
-                new CultureInfo("en-US"),
-                new CultureInfo("vi-VN")
+                new CultureInfo("en-US",true),
+                new CultureInfo("vi-VN",true)
             };
 
             var localizationOptions = new RequestLocalizationOptions()
             {
-                DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
+                //DefaultRequestCulture = new RequestCulture(culture: "en-US"),               
                 SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
+                //SupportedUICultures = supportedCultures
             };
 
             localizationOptions.RequestCultureProviders = new[]

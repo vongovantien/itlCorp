@@ -89,9 +89,11 @@ export class ChargeComponent implements OnInit {
 
   async getCharges() {
     var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, false, true);
-    this.ListCharges = response.data;
-    console.log(this.ListCharges);
-    this.pager.totalItems = response.totalItems;
+    if(response){
+      this.ListCharges = response.data;
+      console.log(this.ListCharges);
+      this.pager.totalItems = response.totalItems;
+    }
   }
 
   prepareDeleteCharge(id) {
