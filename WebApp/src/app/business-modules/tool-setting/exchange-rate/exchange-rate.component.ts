@@ -161,7 +161,8 @@ export class ExchangeRateComponent implements OnInit {
         this.exchangeRateNewest.exchangeRates.forEach(element => {
           this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.rate, isUpdate : false });
         });
-        await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
+       var res = await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
+       if(res){
         $('#setting-exchange-rate-modal').modal('hide');
         this.ngSelectCurrencyRate.active = [];
         this.getExchangeNewest();
@@ -171,6 +172,7 @@ export class ExchangeRateComponent implements OnInit {
           CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
           userModified: ''
         };
+       }    
       }
     }
     else{
@@ -192,13 +194,15 @@ export class ExchangeRateComponent implements OnInit {
         this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.rate });
       }
     });
-    await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
-    this.getExchangeNewest();
-    this.pager.currentPage = 1;
-    this.getExchangeRates(this.pager);
-    $('#update-exchange-rate-modal').modal('hide');
-    
-    console.log(this.exchangeRateToAdd);
+    var res = await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
+    if(res){
+      this.getExchangeNewest();
+      this.pager.currentPage = 1;
+      this.getExchangeRates(this.pager);
+      $('#update-exchange-rate-modal').modal('hide');
+      console.log(this.exchangeRateToAdd);
+    } 
+
   }
   valueChange(value){
     if(value != null){
@@ -270,6 +274,9 @@ export class ExchangeRateComponent implements OnInit {
       this.baseService.spinnerHide();
       this.exchangeRates = response.data;
       this.pager.totalItems = response.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   async getExchangeNewest(){
@@ -287,6 +294,9 @@ export class ExchangeRateComponent implements OnInit {
         this.fromCurrencies = [];
         this.toCurrencies = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   getChargeRateBy(datetimeCreated, localCurrency, fromCurrency?){
@@ -294,6 +304,8 @@ export class ExchangeRateComponent implements OnInit {
     .subscribe((response: any) => {
       this.exchangeRatesOfDay = response;
       console.log(this.exchangeRatesOfDay);
+    },err=>{
+      this.baseService.handleError(err);
     })
   }
    /**

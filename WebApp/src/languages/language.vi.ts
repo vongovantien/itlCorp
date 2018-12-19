@@ -214,5 +214,14 @@ export const language = {
       required: true,
       lookup: ''
     }
-  ]
+  ],
+  NOTIFI_MESS: {
+    UNKNOW_ERR:"Lỗi",
+    SERVER_ERR_TITLE: "Lỗi Máy Chủ",
+    CLIENT_ERR_TITLE: "Yêu Cầu Không Hợp Lệ",
+    EXPIRED_SESSION_TITLE: "Hết Phiên Đăng Nhập",
+    CHECK_CONNECT:"Vui Lòng Kiểm Tra Kết Nối !",
+    EXPIRED_SESSION_MESS: "Vui Lòng Đăng Nhập Để Tiếp Tục !",
+    EXPORT_SUCCES: "Xuất Tệp Thành Công !",
+  }
 }

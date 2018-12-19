@@ -95,7 +95,7 @@ export class WarehouseImportComponent implements OnInit {
       this.inProgress = true;
       let validItems = this.data.filter(x => x.isValid);
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
-      if(response.success){
+      if(response){
         this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();

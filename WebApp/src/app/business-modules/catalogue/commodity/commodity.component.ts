@@ -106,7 +106,7 @@ export class CommodityComponent implements OnInit {
     this.getGroups();
   }
   async getGroups(){
-    var response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage, false, false);
+    const response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage, false, false);
     if(response){
       this.groups = response.map(x=>({"text":x.groupName,"id":x.id}));
     }
@@ -134,7 +134,7 @@ export class CommodityComponent implements OnInit {
     }
   }
   async getCommodities(pager: PagerSetting) {
-    var responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
+    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
     if(responses){
       this.commodities = responses.data;
       this.pager.totalItems = responses.totalItems;
@@ -142,7 +142,7 @@ export class CommodityComponent implements OnInit {
   }
 
   async getGroupCommodities(pager: PagerSetting){
-    var responses = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
+    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
     if(responses){
       this.commodityGroups = responses.data;
       this.pager.totalItems = responses.totalItems;
@@ -211,12 +211,12 @@ export class CommodityComponent implements OnInit {
   async showDetail(item, tabName){
     if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = item;
-      var response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getById + item.id,false, false);
+      const response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getById + item.id,false, false);
       this.commodityGroup = response;
     }
     if(tabName == this.tabName.commodity){
       this.commodity = item;
-      var response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id,false, false);
+      const response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id,false, false);
       this.commodity = response;
       this.groupActive = this.groups.find(x => x.id == this.commodity.commodityGroupId);
     }
@@ -237,8 +237,8 @@ export class CommodityComponent implements OnInit {
     this.setPageAfterDelete();
   }
   async deleteGroupCommodity(){
-    var response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
-    if(response.status){
+    const response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
+    if(response){
       this.getGroups();
       //await this.getGroupCommodities(this.pager);
       this.setPageAfterDelete();
@@ -310,8 +310,8 @@ export class CommodityComponent implements OnInit {
     });
   }
   async addNewCommodity() {
-      var res = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity);
-      if(res.status===true){
+      const res = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity);
+      if(res){
         this.formCommodity.onReset();
         this.commodity = new Commodity();
         $('#' + this.nameCommodityModal).modal('hide');
@@ -334,8 +334,8 @@ export class CommodityComponent implements OnInit {
   });
   }
   async addNewGroup() {
-    var response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
-    if (response.status == true){
+    const response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
+    if (response){
       this.getGroups();
       //await this.getGroupCommodities(this.pager);
       this.pager.totalItems = this.pager.totalItems + 1;

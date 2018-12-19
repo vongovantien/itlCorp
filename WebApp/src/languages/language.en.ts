@@ -2,7 +2,7 @@ import { WAREHOUSEENCOLUMNSETTING } from "../app/business-modules/catalogue/ware
 import { WAREHOUSEIMPORTENCOLUMNSETTING } from "src/app/business-modules/catalogue/warehouse-import/warehouse-import.columns";
 
 export const language = {
-  Menu :[  
+  Menu: [
     {
       "parent_name": "Catalogue",
       "icon": "icon-books",
@@ -10,7 +10,7 @@ export const language = {
       "display_child": false,
       "childs": [
 
-        { name: "Warehouse", route_child: "ware-house"},
+        { name: "Warehouse", route_child: "ware-house" },
         // { name: "Warehouse-import", route_child: "ware-house-import" },
         { name: "Port Index", route_child: "port-index" },
         { name: "Port Index Import", route_child: "port-index-import" },
@@ -23,7 +23,7 @@ export const language = {
         { name: "Currency", route_child: "currency" }
       ]
     },
-   
+
     {
       "parent_name": "Operation",
       "icon": "icon-cogs",
@@ -35,7 +35,7 @@ export const language = {
         { name: "Trucking Assigment", route_child: "trucking-assigment" }
       ]
     },
-   
+
     {
       "parent_name": "Documentation",
       "icon": "icon-file-text2",
@@ -53,7 +53,7 @@ export const language = {
         { name: "Sea LCL Import", route_child: "sea-lcl-import" }
       ]
     },
-   
+
     {
       "parent_name": "Accounting",
       "icon": "icon-calculator",
@@ -66,7 +66,7 @@ export const language = {
         { name: "Statement of Account", route_child: "statement-of-account" }
       ]
     },
-    
+
     {
       "parent_name": "System",
       "icon": "icon-database",
@@ -81,7 +81,7 @@ export const language = {
         { name: "Company Informations", route_child: "company-info" }
       ]
     },
-   
+
     {
       "parent_name": "Tool - Setting",
       "icon": "icon-wrench",
@@ -98,7 +98,7 @@ export const language = {
 
       ]
     },
-    
+
     {
       "parent_name": "Report",
       "icon": "icon-stats-bars",
@@ -110,7 +110,7 @@ export const language = {
         { name: "Shipment Overview", route_child: "shipment-overview" }
       ]
     },
-    
+
     {
       "parent_name": "Designs Zone",
       "icon": "icon-format_paint",
@@ -123,5 +123,14 @@ export const language = {
     }
   ],
   Warehouse: WAREHOUSEENCOLUMNSETTING,
-  WarehouseImport: WAREHOUSEIMPORTENCOLUMNSETTING
+  WarehouseImport: WAREHOUSEIMPORTENCOLUMNSETTING,
+  NOTIFI_MESS: {
+    UNKNOW_ERR:"Unknow Error",
+    SERVER_ERR_TITLE: "Server Error",
+    CLIENT_ERR_TITLE: "Invalid Request",
+    EXPIRED_SESSION_TITLE: "Expired Session",
+    CHECK_CONNECT:"Check Your Connection !",
+    EXPIRED_SESSION_MESS: "Please Login Again To Continue !",
+    EXPORT_SUCCES: "Export File Successfully !",
+  }
 }
