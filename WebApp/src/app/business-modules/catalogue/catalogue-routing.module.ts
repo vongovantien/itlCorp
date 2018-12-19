@@ -8,6 +8,7 @@ import { ChargeComponent } from './charge/charge.component';
 import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
 import { CommodityComponent } from './commodity/commodity.component';
 import { PortIndexComponent } from './port-index/port-index.component';
+import { PortIndexImportComponent } from './port-index-import/port-index-import.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { UnitComponent } from './unit/unit.component';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
@@ -57,6 +58,10 @@ const routes: Routes = [
   {
     path:'port-index',
     component:PortIndexComponent
+  },
+  {
+    path:'port-index-import',
+    component:PortIndexImportComponent
   },
   {
     path:'stage-management',

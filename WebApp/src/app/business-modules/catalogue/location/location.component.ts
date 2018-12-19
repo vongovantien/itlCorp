@@ -12,6 +12,8 @@ import * as dataHelper from 'src/helper/data.helper';
 import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
+import { ExcelService } from 'src/app/shared/services/excel.service';
 declare var $: any;
 
 @Component({
@@ -108,6 +110,7 @@ export class LocationComponent implements OnInit {
    */
 
   constructor(
+    private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
@@ -179,10 +182,10 @@ export class LocationComponent implements OnInit {
 
   async ngOnInit() {
     await this.getCountries();
-    await this.getProvinceCities();
-    await this.getDistrict();
-    await this.getWards();
-    await this.getAllCountries();
+    this.getProvinceCities();
+    this.getDistrict();
+    this.getWards();
+    this.getAllCountries();
   }
   activeTab:string = "country";
   changeTab(activeTab){
@@ -956,11 +959,225 @@ export class LocationComponent implements OnInit {
 
 
 
-  async import(){
-
+   async import(){
+   
   }
 
   async export(){
-    
+    if(this.activeTab==='country'){
+      await this.exportCountry();
+    }
+    if(this.activeTab==='province'){
+      await this.exportProvince();
+    }
+    if(this.activeTab==='district'){
+      await this.exportDistrict();
+    }
+    if(this.activeTab==='ward'){
+      await this.exportTownWard()
+    }
   }
+
+  async exportCountry(){
+    var countries = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.query,this.searchObject);
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+        countries = lodash.map(countries,function(country,index){
+          return [
+            index+1,
+            country['code'],
+            country['nameEn'],
+            country['nameVn'],
+            (country['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          ]
+        });
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      countries = lodash.map(countries,function(country,index){
+        return [
+          index+1,
+          country['code'],
+          country['nameEn'],
+          country['nameVn'],
+          (country['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+
+    /**Set up stylesheet */
+    var exportModel:ExportExcel = new ExportExcel();
+    exportModel.fileName = "Countries List";    
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.title = "Countries List";
+    exportModel.author = currrently_user;
+    exportModel.sheetName = "Sheet 1";
+    exportModel.header = [
+      {name:"No.",width:10},
+      {name:"Country Code",width:10},
+      {name:"English Name",width:20},
+      {name:"Local Name",width:20},
+      {name:"Inactive",width:20}
+    ]
+    exportModel.data = countries;
+    this.excelService.generateExcel(exportModel);
+  }
+
+
+  async exportProvince(){
+    this.searchObject.placeType = PlaceTypeEnum.Province;
+    var provinces = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query,this.searchObject);
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      provinces = lodash.map(provinces,function(province,index){
+          return [
+            index+1,
+            province['code'],
+            province['name_EN'],
+            province['name_VN'],
+            province['countryNameEN'],
+            (province['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          ]
+        });
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      provinces = lodash.map(provinces,function(province,index){
+        return [
+          index+1,
+          province['code'],
+          province['name_EN'],
+          province['name_VN'],
+          province['countryNameVN'],
+          (province['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+
+    /**Set up stylesheet */
+    var exportModel:ExportExcel = new ExportExcel();
+    exportModel.fileName = "Provinces List";    
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.title = "Provinces List";
+    exportModel.author = currrently_user;
+    exportModel.sheetName = "Sheet 1";
+    exportModel.header = [
+      {name:"No.",width:10},
+      {name:"Province Code",width:20},
+      {name:"English Name",width:20},
+      {name:"Local Name",width:20},
+      {name:"Country",width:20},
+      {name:"Inactive",width:20}
+    ]
+    exportModel.data = provinces;
+    this.excelService.generateExcel(exportModel);
+
+  }
+
+  async exportDistrict(){
+    this.searchObject.placeType = PlaceTypeEnum.District;
+    var districts = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query,this.searchObject);
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      districts = lodash.map(districts,function(dist,index){
+          return [
+            index+1,
+            dist['code'],
+            dist['name_EN'],
+            dist['name_VN'],
+            dist['provinceNameEN'],
+            dist['countryNameEN'],
+            (dist['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          ]
+        });
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      districts = lodash.map(districts,function(dist,index){
+        return [
+          index+1,
+          dist['code'],
+          dist['name_EN'],
+          dist['name_VN'],
+          dist['provinceNameVN'],
+          dist['countryNameVN'],
+          (dist['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+
+    /**Set up stylesheet */
+    var exportModel:ExportExcel = new ExportExcel();
+    exportModel.fileName = "Districts List";    
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.title = "Districts List";
+    exportModel.author = currrently_user;
+    exportModel.sheetName = "Sheet 1";
+    exportModel.header = [
+      {name:"No.",width:10},
+      {name:"District Code",width:20},
+      {name:"English Name",width:20},
+      {name:"Local Name",width:20},
+      {name:"Province",width:20},
+      {name:"Country",width:20},
+      {name:"Inactive",width:20}
+    ]
+    exportModel.data = districts;
+    this.excelService.generateExcel(exportModel);
+
+  }
+
+
+  async exportTownWard(){
+    this.searchObject.placeType = PlaceTypeEnum.Ward;
+    var wards = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query,this.searchObject);
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      wards = lodash.map(wards,function(ward,index){
+          return [
+            index+1,
+            ward['code'],
+            ward['name_EN'],
+            ward['name_VN'],
+            ward['districtNameEN'],
+            ward['provinceNameEN'],
+            ward['countryNameEN'],
+            (ward['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          ]
+        });
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      wards = lodash.map(wards,function(ward,index){
+        return [
+          index+1,
+          ward['code'],
+          ward['name_EN'],
+          ward['name_VN'],
+          ward['districtNameVN'],
+          ward['provinceNameVN'],
+          ward['countryNameVN'],
+          (ward['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+
+    /**Set up stylesheet */
+    var exportModel:ExportExcel = new ExportExcel();
+    exportModel.fileName = "Town-Ward List";    
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.title = "Town-Ward List";
+    exportModel.author = currrently_user;
+    exportModel.sheetName = "Sheet 1";
+    exportModel.header = [
+      {name:"No.",width:10},
+      {name:"Town-Ward Code",width:20},
+      {name:"English Name",width:20},
+      {name:"Local Name",width:20},
+      {name:"District",width:20},
+      {name:"Province",width:20},
+      {name:"Country",width:20},
+      {name:"Inactive",width:20}
+    ]
+    exportModel.data = wards;
+    this.excelService.generateExcel(exportModel);
+
+  }
+
 }

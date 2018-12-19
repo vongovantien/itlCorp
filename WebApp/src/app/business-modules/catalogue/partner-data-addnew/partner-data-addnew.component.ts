@@ -63,26 +63,31 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.getparentCustomers();
     this.getDepartments();
   }
-  getDepartments(): any {
-    this.baseService.get(this.api_menu.Catalogue.PartnerData.getDepartments).subscribe((response: any) => {
+  getDepartments(): any { 
+    this.baseService.get(this.api_menu.Catalogue.PartnerData.getDepartments).subscribe((response: any) => {     
       if(response != null){
-        this.departments = response.map(x=>({"text":x.name,"id":x.id}));
-      }
+        this.departments = response.map(x=>({"text":x.name,"id":x.id}));      }
+     },err=>{     
+       this.baseService.handleError(err);
      });
   }
-  getparentCustomers(): any { 
+  getparentCustomers(): any {     
     this.baseService.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup : 3 }).subscribe((response: any) => {
-      if(response.length > 0){
+      if(response.length > 0){    
         this.parentCustomers = response.map(x=>({"text":x.partnerNameVn,"id":x.id}));
         console.log(this.parentCustomers);
       }
+    },err=>{    
+      this.baseService.handleError(err);
     });
   }
-  getWorkPlaces(): any {
+  getWorkPlaces(): any {  
     this.baseService.post(this.api_menu.Catalogue.CatPlace.query, { placeType: 2 }).subscribe((response: any) => {
       if(response != null){
         this.workPlaces = response.map(x=>({"text":x.code + ' - ' + x.name_VN ,"id":x.id}));
       }
+     },err=>{    
+       this.baseService.handleError(err);
      });
   }
   getSalemans(): any {
@@ -91,6 +96,8 @@ export class PartnerDataAddnewComponent implements OnInit {
         this.users = response;
         this.saleMans = response.map(x=>({"text":x.username,"id":x.id}));
       }
+     },err=>{
+       this.baseService.handleError(err);
      });
   }
   getProvinces(id: number, isBilling: boolean){
@@ -105,6 +112,8 @@ export class PartnerDataAddnewComponent implements OnInit {
       else{
         this.shippingProvinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
       }
+    },err=>{
+      this.baseService.handleError(err);
     });
   }
   getCountries(): any {
@@ -112,6 +121,8 @@ export class PartnerDataAddnewComponent implements OnInit {
     if(response != null){
       this.countries = response.map(x=>({"text":x.name,"id":x.id}));
     }
+   },err=>{
+     this.baseService.handleError(err);
    });
   }
   getPartnerGroups(): any {
@@ -120,6 +131,8 @@ export class PartnerDataAddnewComponent implements OnInit {
         this.partnerGroups = response.map(x=>({"text":x.id,"id":x.id}));
         this.getPartnerGroupActive(this.partnerType);
       }
+    },err=>{
+      this.baseService.handleError(err);
     });
   }
   getPartnerGroupActive(partnerGroup: any): any {
@@ -191,7 +204,7 @@ export class PartnerDataAddnewComponent implements OnInit {
         this.resetForm();     
     }, err=>{
       this.baseService.spinnerHide();
-      this.baseService.errorToast(err.error.message);
+      this.baseService.handleError(err);
     });
   }
 

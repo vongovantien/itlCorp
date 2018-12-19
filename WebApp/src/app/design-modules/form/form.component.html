@@ -19,7 +19,7 @@
                             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                                 data-target="#add-port-index-modal">
                                 <span>
-                                    <i class="icon-plus7"></i>
+                                    <i class="la la-plus"></i>
                                     <span>
                                         add new
                                     </span>
@@ -178,7 +178,13 @@
                                 Date picker
                             </label>
                             <div class="m-input-icon m-input-icon--right down">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly/>
+                                <input type="text" class="form-control m-input m-input--square" 
+                                    ngxDaterangepickerMd 
+                                    [autoApply]="true" 
+                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                    [(ngModel)]="selected" 
+                                    [singleDatePicker]="true" 
+                                    name="singledater" readonly/>
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -194,7 +200,7 @@
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square"
-                                    ngxDaterangepickerMd
+                                    ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                     [(ngModel)]="selectedRange"
                                     [ranges]="ranges"
                                     [maxDate]="maxDate"
