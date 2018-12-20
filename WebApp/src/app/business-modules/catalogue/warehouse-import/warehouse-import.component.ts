@@ -48,7 +48,6 @@ export class WarehouseImportComponent implements OnInit {
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel, this.file, "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
-        this.pager.currentPage = 1;
         this.pager.totalItems = this.data.length;
         this.validRows = response.validRows;
         this.totalRows = this.data.length;
@@ -59,12 +58,10 @@ export class WarehouseImportComponent implements OnInit {
       });
   }
   pagingData(data: any[]){
-    //this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
     this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    //this.pager.totalItems = responses.totalItems;
   }
   downloadSample(){
     this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12")
@@ -80,13 +77,12 @@ export class WarehouseImportComponent implements OnInit {
     this.sortKey = '';
     if(this.isShowInvalid){
       this.pager.totalItems = this.data.length;
-      this.pagingData(this.data);
     }
     else{
       this.inValidItems = this.data.filter(x => !x.isValid);
       this.pager.totalItems = this.inValidItems.length;
-      this.pagingData(this.inValidItems);
     }
+    this.child.setPage(this.pager.currentPage);
   }
   async import(){
     if(this.data == null) return;
@@ -117,9 +113,13 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
-    this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-    this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    if(this.isShowInvalid){
+      this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    }
+    else{
+      this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    }
   }
   reset(){
     this.data = null;
