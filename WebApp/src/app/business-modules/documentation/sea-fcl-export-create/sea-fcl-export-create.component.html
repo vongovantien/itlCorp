@@ -1,0 +1,848 @@
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <!-- <app-breadcrumb></app-breadcrumb> -->
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#search-job-detail-modal">
+                <span>
+                    <i class="la la-search"></i>
+                    <span>
+                        search job detail
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        save
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-ban"></i>
+                    <span>
+                        cancel
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<!--begin::m-content-->
+<div class="m-content">
+
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#customer-tabview-tab" role="tab">
+                        Master Bill
+                    </a>
+                </li>
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#agent-tabview-tab" role="tab">
+                        House Bill List
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content" id="partnerDataTabContent">
+        <div class="tab-pane fade show active" role="tabpanel" id="customer-tabview-tab">
+            <!--begin:: m-portlet-->
+            <div class="m-portlet">
+                <div class="m-portlet__body">
+                    <!--begin::Form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Search text
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Select filter
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Create date: From - To
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedRange"
+                                            [ranges]="ranges"
+                                            [maxDate]="maxDate"
+                                            [alwaysShowCalendars]="true"
+                                            name="daterange"
+                                            placeholder="From date - to date" readonly/>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Search text
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Select filter
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Create date: From - To
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedRange"
+                                            [ranges]="ranges"
+                                            [maxDate]="maxDate"
+                                            [alwaysShowCalendars]="true"
+                                            name="daterange"
+                                            placeholder="From date - to date" readonly/>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Search text
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Select filter
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Create date: From - To
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedRange"
+                                            [ranges]="ranges"
+                                            [maxDate]="maxDate"
+                                            [alwaysShowCalendars]="true"
+                                            name="daterange"
+                                            placeholder="From date - to date" readonly/>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Search text
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Select filter
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Create date: From - To
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedRange"
+                                            [ranges]="ranges"
+                                            [maxDate]="maxDate"
+                                            [alwaysShowCalendars]="true"
+                                            name="daterange"
+                                            placeholder="From date - to date" readonly/>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Search text
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Select filter
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Create date: From - To
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedRange"
+                                            [ranges]="ranges"
+                                            [maxDate]="maxDate"
+                                            [alwaysShowCalendars]="true"
+                                            name="daterange"
+                                            placeholder="From date - to date" readonly/>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Form-->
+                </div>
+            </div>
+            <!--end:: m-portlet-->  
+            <!--begin:: m-portlet-->
+            <div class="m-portlet">
+                <div class="m-portlet__head">
+                    <div class="m-portlet__head-caption">
+                        <div class="m-portlet__head-title">
+                            <h3 class="m-portlet__head-text">
+                                Goods Summary
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="m-portlet__head-tools">
+                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal">
+                            <span>
+                                <i class="la la-list"></i>
+                                <span>
+                                   container list
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="m--margin-bottom-10">
+                                        <span class="m--font-bolder">
+                                            Commodities:
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="m--margin-bottom-10">
+                                        <span class="m--font-bolder">
+                                            Detail container & packages:
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Description of good:
+                                </span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total gross weight:
+                                </span>
+                                <span></span>
+                            </div>
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total net weight:
+                                </span>
+                                <span></span>
+                            </div>
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total chargeable weight:
+                                </span>
+                                <span></span>
+                            </div>
+                            <hr>
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total:
+                                </span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end:: m-portlet--> 
+        </div>
+        <div class="tab-pane fade" id="agent-tabview-tab" role="tabpanel" aria-labelledby="">
+            <!--begin::Form-->
+            <div class="m-form m-form--state">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Search text
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Select filter
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Create date: From - To
+                            </label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                    [(ngModel)]="selectedRange"
+                                    [ranges]="ranges"
+                                    [maxDate]="maxDate"
+                                    [alwaysShowCalendars]="true"
+                                    name="daterange"
+                                    placeholder="From date - to date" readonly/>
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <div class="row">
+            <div class="col-lg-6">
+            </div>
+            <div class="col-lg-6 m--align-right">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::m-content-->
+
+<!--begin::container-list-of-job-modal-->
+<div class="modal fade" id="container-list-of-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Container List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-list-table">
+                    <!--begin: Search Form -->
+                    <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                        <div class="row align-items-center">
+                            <div class="col-xl-8 order-2 order-xl-1">
+                                <div class="form-group m-form__group row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="m-input-icon m-input-icon--left">
+                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                <span>
+                                                    <i class="la la-search"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end: Search Form -->
+                    <!--begin: Datatable of container-list-table -->
+                    <div class="table-wrapper" id="">
+                        <table class="table table-striped table-brand table--editable">
+                            <thead class="">
+                                <tr class="">
+                                    <th class=""></th>
+                                    <th class="">
+                                        Q'ty
+                                    </th>
+                                    <th class="">
+                                        Cont Type
+                                    </th>
+                                    <th class="">
+                                        Cont No
+                                    </th>
+                                    <th class="">
+                                        Seal No
+                                    </th>
+                                    <th class="">
+                                        Type
+                                    </th>
+                                    <th class="">
+                                        Unit
+                                    </th>
+                                    <th class="">
+                                        Description
+                                    </th>
+                                    <th class="">
+                                        N.W
+                                    </th>
+                                    <th class="">
+                                        G.W
+                                    </th>
+                                    <th class="">
+                                        CBM
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="">
+                                    <td class="">
+                                        <div class="table-actions">
+                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="">
+                                        Q'ty
+                                    </td>
+                                    <td class="">
+                                        Cont Type
+                                    </td>
+                                    <td class="">
+                                        Cont No
+                                    </td>
+                                    <td class="">
+                                        Seal No
+                                    </td>
+                                    <td class="">
+                                        Type
+                                    </td>
+                                    <td class="">
+                                        Unit
+                                    </td>
+                                    <td class="">
+                                        Description
+                                    </td>
+                                    <td class="">
+                                        N.W
+                                    </td>
+                                    <td class="">
+                                        G.W
+                                    </td>
+                                    <td class="">
+                                        CBM
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td class="">
+                                        <div class="table-actions">
+                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="">
+                                        Q'ty
+                                    </td>
+                                    <td class="">
+                                        Cont Type
+                                    </td>
+                                    <td class="">
+                                        Cont No
+                                    </td>
+                                    <td class="">
+                                        Seal No
+                                    </td>
+                                    <td class="">
+                                        Type
+                                    </td>
+                                    <td class="">
+                                        Unit
+                                    </td>
+                                    <td class="">
+                                        Description
+                                    </td>
+                                    <td class="">
+                                        N.W
+                                    </td>
+                                    <td class="">
+                                        G.W
+                                    </td>
+                                    <td class="">
+                                        CBM
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable of container-list-table -->
+                </div>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::container-list-of-job-modal-->
+
+
+<!--begin::container-list-of-job-modal-->
+<div class="modal fade" id="search-job-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Search job detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state m--margin-bottom-20">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Search text
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Select filter
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Create date: From - To
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                        [(ngModel)]="selectedRange"
+                                        [ranges]="ranges"
+                                        [maxDate]="maxDate"
+                                        [alwaysShowCalendars]="true"
+                                        name="daterange"
+                                        placeholder="From date - to date" readonly/>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-lg-6"></div>
+                            <div class="col-lg-6 m--align-right">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="la la-search"></i>
+                                        <span>
+                                            Search
+                                        </span>
+                                    </span>
+                                </button>
+                                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="la la-refresh"></i>
+                                        <span>
+                                            Reset
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+                <!--begin: Datatable of container-list-table -->
+                <div class="table-wrapper" id="">
+                    <table class="table table-striped table-brand table--editable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="">
+                                    Q'ty
+                                </th>
+                                <th class="">
+                                    Cont Type
+                                </th>
+                                <th class="">
+                                    Cont No
+                                </th>
+                                <th class="">
+                                    Seal No
+                                </th>
+                                <th class="">
+                                    Type
+                                </th>
+                                <th class="">
+                                    Unit
+                                </th>
+                                <th class="">
+                                    Description
+                                </th>
+                                <th class="">
+                                    N.W
+                                </th>
+                                <th class="">
+                                    G.W
+                                </th>
+                                <th class="">
+                                    CBM
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class=""></td>
+                                <td class="">
+                                    Q'ty
+                                </td>
+                                <td class="">
+                                    Cont Type
+                                </td>
+                                <td class="">
+                                    Cont No
+                                </td>
+                                <td class="">
+                                    Seal No
+                                </td>
+                                <td class="">
+                                    Type
+                                </td>
+                                <td class="">
+                                    Unit
+                                </td>
+                                <td class="">
+                                    Description
+                                </td>
+                                <td class="">
+                                    N.W
+                                </td>
+                                <td class="">
+                                    G.W
+                                </td>
+                                <td class="">
+                                    CBM
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class=""></td>
+                                <td class="">
+                                    Q'ty
+                                </td>
+                                <td class="">
+                                    Cont Type
+                                </td>
+                                <td class="">
+                                    Cont No
+                                </td>
+                                <td class="">
+                                    Seal No
+                                </td>
+                                <td class="">
+                                    Type
+                                </td>
+                                <td class="">
+                                    Unit
+                                </td>
+                                <td class="">
+                                    Description
+                                </td>
+                                <td class="">
+                                    N.W
+                                </td>
+                                <td class="">
+                                    G.W
+                                </td>
+                                <td class="">
+                                    CBM
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable of container-list-table -->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Apply
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::container-list-of-job-modal-->
