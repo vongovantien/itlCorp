@@ -214,8 +214,8 @@ namespace eFMS.API.Catalogue.Controllers
                 }
 
                 var data = catPlaceService.CheckValidImport(list, CatPlaceTypeEnum.Warehouse);
-                var validRows = data.Count(x => x.IsValid == true);
-                var results = new { data, validRows };
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
                 return Ok(results);
             }
             return BadRequest(file);

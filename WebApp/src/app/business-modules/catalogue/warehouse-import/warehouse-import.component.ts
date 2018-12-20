@@ -23,8 +23,8 @@ export class WarehouseImportComponent implements OnInit {
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
-  validRows: number = 0;
-  inValidRows: number = 0;
+  totalValidRows: number = 0;
+  totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   WarehouseImportSettings: ColumnSetting[] = WAREHOUSEIMPORTENCOLUMNSETTING;
@@ -49,9 +49,9 @@ export class WarehouseImportComponent implements OnInit {
       .subscribe((response: any) => {
         this.data = response.data;
         this.pager.totalItems = this.data.length;
-        this.validRows = response.validRows;
+        this.totalValidRows = response.totalValidRows;
         this.totalRows = this.data.length;
-        this.inValidRows = this.totalRows - this.validRows;
+        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.baseService.spinnerHide();
         console.log(this.data);
@@ -86,7 +86,7 @@ export class WarehouseImportComponent implements OnInit {
   }
   async import(){
     if(this.data == null) return;
-    if(this.inValidRows > 0){
+    if(this.totalInValidRows > 0){
       $('#upload-alert-modal').modal('show');
     }
     else{
