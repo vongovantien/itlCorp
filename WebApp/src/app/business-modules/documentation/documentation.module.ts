@@ -14,6 +14,7 @@ import { InlandTruckingComponent } from './inland-trucking/inland-trucking.compo
 import { SharedModule } from '../../shared/shared.module';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
+import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { SelectModule } from 'ng2-select';
     SharedModule,
     NgxDaterangepickerMd,
     SelectModule,
-    FormsModule
+    FormsModule,
+    PerfectScrollbarModule, // Scrollbar
   ],
   declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent]
 })

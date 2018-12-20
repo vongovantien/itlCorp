@@ -37,9 +37,11 @@ namespace SystemManagementAPI
 
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder().SetBasePath(env.ContentRootPath)
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
+            
 
             Configuration = builder.Build();
         }
@@ -58,8 +60,8 @@ namespace SystemManagementAPI
             })
                        .AddIdentityServerAuthentication(options =>
                        {
-                           //options.Authority = "http://test.api-efms.itlvn.com/indentityserver/";
-                           options.Authority = "https://localhost:44369/";
+                           options.Authority = "http://test.api-efms.itlvn.com/indentityserver/";
+                           //options.Authority = "https://localhost:44369/";
                            options.RequireHttpsMetadata = false;
                            options.ApiName = "dnt_api";
                            options.ApiSecret = "secret";
@@ -98,15 +100,15 @@ namespace SystemManagementAPI
             //Multiple language setting
             var supportedCultures = new[]
             {
-                new CultureInfo("en-US",true),
+                new CultureInfo("en-US",false),
                 new CultureInfo("vi-VN",true)
             };
 
             var localizationOptions = new RequestLocalizationOptions()
             {
-                //DefaultRequestCulture = new RequestCulture(culture: "en-US"),               
+                DefaultRequestCulture = new RequestCulture(culture: "en-US"),               
                 SupportedCultures = supportedCultures,
-                //SupportedUICultures = supportedCultures
+                 
             };
 
             localizationOptions.RequestCultureProviders = new[]
@@ -199,6 +201,7 @@ namespace SystemManagementAPI
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
+            app.UseRequestLocalization();
         }
         //protected virtual void ConfigureAuth(IApplicationBuilder app)
         //{
