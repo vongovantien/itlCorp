@@ -5,7 +5,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -20,7 +20,9 @@
                         export
                     </span>
                 </span>
-            </button>
+            </button> -->
+            <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/location-import']"></app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
         </div>
     </div>
 </div>

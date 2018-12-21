@@ -11,6 +11,7 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 declare var $:any;
 
 @Component({
@@ -19,15 +20,13 @@ declare var $:any;
   styleUrls: ['./warehouse-import.component.scss']
 })
 export class WarehouseImportComponent implements OnInit {
-  file: File;
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
-  validRows: number = 0;
-  inValidRows: number = 0;
+  totalValidRows: number = 0;
+  totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
-  WarehouseImportSettings: ColumnSetting[] = WAREHOUSEIMPORTENCOLUMNSETTING;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
   @ViewChild('form') form;
@@ -43,28 +42,28 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
-    this.file = file.target['files'];
+    if(!this.baseService.checkLoginSession()) return;
+    if(file.target['files'] == null) return;
     this.baseService.spinnerShow();
-    this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel, this.file, "uploadedFile")
+    this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Warehouse, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
-        this.pager.currentPage = 1;
         this.pager.totalItems = this.data.length;
-        this.validRows = response.validRows;
+        this.totalValidRows = response.totalValidRows;
         this.totalRows = this.data.length;
-        this.inValidRows = this.totalRows - this.validRows;
+        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.baseService.spinnerHide();
         console.log(this.data);
+      },err=>{
+        this.baseService.handleError(err);
       });
   }
   pagingData(data: any[]){
-    //this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
     this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    //this.pager.totalItems = responses.totalItems;
   }
   downloadSample(){
     this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12")
@@ -80,22 +79,22 @@ export class WarehouseImportComponent implements OnInit {
     this.sortKey = '';
     if(this.isShowInvalid){
       this.pager.totalItems = this.data.length;
-      this.pagingData(this.data);
     }
     else{
       this.inValidItems = this.data.filter(x => !x.isValid);
       this.pager.totalItems = this.inValidItems.length;
-      this.pagingData(this.inValidItems);
     }
+    this.child.setPage(this.pager.currentPage);
   }
   async import(){
     if(this.data == null) return;
-    if(this.inValidRows > 0){
+    if(this.totalInValidRows > 0){
       $('#upload-alert-modal').modal('show');
     }
     else{
       this.inProgress = true;
       let validItems = this.data.filter(x => x.isValid);
+      if(!this.baseService.checkLoginSession()) return;
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.EXPORT_SUCCES);
@@ -117,9 +116,16 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
-    this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
-    this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-    this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    if(this.isShowInvalid){
+      this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
+      this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
+      this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    }
+    else{
+      this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
+      this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
+      this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    }
   }
   reset(){
     this.data = null;

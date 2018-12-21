@@ -188,7 +188,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("UpLoadFile")]
         [Authorize]
-        public IActionResult UpLoadFile(IFormFile uploadedFile)
+        public IActionResult UpLoadFile(IFormFile uploadedFile, CatPlaceTypeEnum type)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
             if(file != null)
@@ -197,34 +197,48 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
-                List<WarehouseImportModel> list = new List<WarehouseImportModel>();
-                for (int row = 2; row <= rowCount; row++)
+                List<CatPlaceImportModel> list = null;
+                switch (type)
                 {
-                    var warehouse = new WarehouseImportModel();
-                    warehouse.IsValid = true;
-                    warehouse.Code = worksheet.Cells[row, 1].Value?.ToString();
-                    warehouse.NameEn = worksheet.Cells[row, 2].Value?.ToString();
-                    warehouse.NameVn = worksheet.Cells[row, 3].Value?.ToString();
-                    warehouse.Address = worksheet.Cells[row, 4].Value?.ToString();
-                    warehouse.CountryName = worksheet.Cells[row, 5].Value?.ToString();
-                    warehouse.ProvinceName = worksheet.Cells[row, 6].Value?.ToString();
-                    warehouse.DistrictName = worksheet.Cells[row, 7].Value?.ToString();
-                    warehouse.Status = worksheet.Cells[row, 8].Value?.ToString();
-                    list.Add(warehouse);
+                    case CatPlaceTypeEnum.Warehouse:
+                        list = ReadWarehouseFromExel(worksheet, rowCount);
+                        break;
                 }
 
-                var data = catPlaceService.CheckValidImport(list, CatPlaceTypeEnum.Warehouse);
-                var validRows = data.Count(x => x.IsValid == true);
-                var results = new { data, validRows };
+                var data = catPlaceService.CheckValidImport(list, type);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
                 return Ok(results);
             }
             return BadRequest(file);
         }
 
+        private List<CatPlaceImportModel> ReadWarehouseFromExel(ExcelWorksheet worksheet, int rowCount)
+        {
+            List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var warehouse = new CatPlaceImportModel
+                {
+                    IsValid = true,
+                    Code = worksheet.Cells[row, 1].Value?.ToString(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                    Address = worksheet.Cells[row, 4].Value?.ToString(),
+                    CountryName = worksheet.Cells[row, 5].Value?.ToString(),
+                    ProvinceName = worksheet.Cells[row, 6].Value?.ToString(),
+                    DistrictName = worksheet.Cells[row, 7].Value?.ToString(),
+                    Status = worksheet.Cells[row, 8].Value?.ToString()
+                };
+                list.Add(warehouse);
+            }
+            return list;
+        }
+
         [HttpPost]
         [Route("Import")]
         [Authorize]
-        public IActionResult Import(List<WarehouseImportModel> data)
+        public IActionResult Import(List<CatPlaceImportModel> data)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catPlaceService.Import(data);

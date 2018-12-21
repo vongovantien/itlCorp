@@ -34,12 +34,12 @@
                             </div>
                             <div class="col-sm-4 m--margin-top-10 text-right">
                                 <span class="m--font-success m--font-bolder">
-                                    Valid rows: {{ validRows }}
+                                    Valid rows: {{ totalValidRows }}
                                 </span>
                             </div>
                             <div class="col-sm-4 m--margin-top-10 text-right">
                                 <span class="m--font-danger  m--font-bolder">
-                                    Invalid rows: {{ inValidRows }}
+                                    Invalid rows: {{ totalInValidRows }}
                                 </span>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" #fileInput class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span> 

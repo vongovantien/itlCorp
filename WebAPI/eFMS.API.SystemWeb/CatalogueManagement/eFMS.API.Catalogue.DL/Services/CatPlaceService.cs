@@ -192,44 +192,275 @@ namespace eFMS.API.Catalogue.DL.Services
             return DataEnums.ModeOfTransportData;
         }
 
-        public List<WarehouseImportModel> CheckValidImport(List<WarehouseImportModel> list, CatPlaceTypeEnum placeType)
+        public List<CatPlaceImportModel> CheckValidImport(List<CatPlaceImportModel> list, CatPlaceTypeEnum placeType)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var countries = dc.CatCountry;
-            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
-            var districts = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District));
-            var warehouses = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Warehouse));
             string placeTypeName = PlaceTypeEx.GetPlaceType(placeType);
-            var results = new List<WarehouseImportModel>();
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            List<CatPlaceImportModel> results = null;
+            switch (placeType)
+            {
+                case CatPlaceTypeEnum.Warehouse:
+                    results = CheckWarehouseValidImport(list, dc, placeTypeName);
+                    break;
+                case CatPlaceTypeEnum.Port:
+                    results = CheckPortIndexValidImport(list, dc, placeTypeName);
+                    break;
+                case CatPlaceTypeEnum.Province:
+                    results = CheckProvinceValidImport(list, dc, placeTypeName);
+                    break;
+                case CatPlaceTypeEnum.District:
+                    results = CheckDistrictValidImport(list, dc, placeTypeName);
+                    break;
+                case CatPlaceTypeEnum.Ward:
+                    results = CheckWardValidImport(list, dc, placeTypeName);
+                    break;
+            }
+            return results;
+        }
+
+        private List<CatPlaceImportModel> CheckWardValidImport(List<CatPlaceImportModel> list, eFMSDataContext dc, string placeTypeName)
+        {
+            var countries = dc.CatCountry.ToList();
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
+            var districts = dc.CatPlace.Where(x => x.PlaceTypeId == placeTypeName).ToList();
+            var results = new List<CatPlaceImportModel>();
+            foreach (var item in list)
+            {
+                var result = CheckCatplaceValidImport(districts, results, item);
+                if (string.IsNullOrEmpty(item.CountryName))
+                {
+                    result.CountryName = string.Format("Country name is not allow empty", item.CountryName);
+                    result.IsValid = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    if (country == null)
+                    {
+                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.IsValid = false;
+                    }
+                    else
+                    {
+                        result.CountryId = country.Id;
+                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(item.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
+                        if (string.IsNullOrEmpty(item.ProvinceName))
+                        {
+                            result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
+                            result.IsValid = false;
+                        }
+                        else if (province == null)
+                        {
+                            result.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
+                            result.IsValid = false;
+                        }
+                        else
+                        {
+                            result.ProvinceId = province.Id;
+                            if (string.IsNullOrEmpty(item.DistrictName))
+                            {
+                                result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                result.IsValid = false;
+                            }
+                            else
+                            {
+                                var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(item.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
+                                if(district == null)
+                                {
+                                    result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                    result.IsValid = false;
+                                }
+                            }
+                        }
+                    }
+                }
+                results.Add(result);
+            }
+            return results;
+        }
+
+        private List<CatPlaceImportModel> CheckDistrictValidImport(List<CatPlaceImportModel> list, eFMSDataContext dc, string placeTypeName)
+        {
+            var countries = dc.CatCountry.ToList();
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
+            var districts = dc.CatPlace.Where(x => x.PlaceTypeId == placeTypeName).ToList();
+            var results = new List<CatPlaceImportModel>();
+            foreach (var item in list)
+            {
+                var result = CheckCatplaceValidImport(districts, results, item);
+                if (string.IsNullOrEmpty(item.CountryName))
+                {
+                    result.CountryName = string.Format("Country name is not allow empty", item.CountryName);
+                    result.IsValid = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    if (country == null)
+                    {
+                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.IsValid = false;
+                    }
+                    else
+                    {
+                        result.CountryId = country.Id;
+                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(item.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
+                        if (string.IsNullOrEmpty(item.ProvinceName))
+                        {
+                            result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
+                            result.IsValid = false;
+                        }
+                        else if (province == null)
+                        {
+                            result.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
+                            result.IsValid = false;
+                        }
+                        else
+                        {
+                            result.ProvinceId = province.Id;
+                            var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(item.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
+                            if (string.IsNullOrEmpty(item.DistrictName))
+                            {
+                                result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                result.IsValid = false;
+                            }
+                        }
+                    }
+                }
+                results.Add(result);
+            }
+            return results;
+        }
+
+        private List<CatPlaceImportModel> CheckProvinceValidImport(List<CatPlaceImportModel> list, eFMSDataContext dc, string placeTypeName)
+        {
+            var countries = dc.CatCountry;
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == placeTypeName).ToList();
+            var results = new List<CatPlaceImportModel>();
+            foreach (var item in list)
+            {
+                var result = CheckCatplaceValidImport(provinces, results, item);
+                if (string.IsNullOrEmpty(item.CountryName))
+                {
+                    result.CountryName = string.Format("Country name is not allow empty", item.CountryName);
+                    result.IsValid = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    if (country == null)
+                    {
+                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.IsValid = false;
+                    }
+                    else
+                    {
+                        result.CountryId = country.Id;
+                    }
+                }
+                results.Add(result);
+            }
+            return results;
+        }
+
+        private CatPlaceImportModel CheckCatplaceValidImport(List<CatPlace> places, List<CatPlaceImportModel> newList, CatPlaceImportModel item)
+        {
+            if (string.IsNullOrEmpty(item.Code))
+            {
+                item.Code = string.Format("Code is not allow empty!|wrong");
+                item.IsValid = false;
+            }
+            else if (newList.Any(x => x.Code == item.Code))
+            {
+                item.Code = string.Format("Code {0} is existed!|wrong", item.Code);
+                item.IsValid = false;
+            }
+            else
+            {
+                if(places.Any(i => i.Code.IndexOf(item.Code) >= 0))
+                {
+                    item.Code = string.Format("Code '{0}' has been existed!|wrong", item.Code);
+                    item.IsValid = false;
+                }
+            }
+            if (string.IsNullOrEmpty(item.NameEn))
+            {
+                item.NameEn = string.Format("NameEn is not allow empty!|wrong");
+                item.IsValid = false;
+            }
+            if (string.IsNullOrEmpty(item.NameVn))
+            {
+                item.NameVn = string.Format("NameVn is not allow empty!|wrong");
+                item.IsValid = false;
+            }
+            return item;
+        }
+
+        private List<CatPlaceImportModel> CheckPortIndexValidImport(List<CatPlaceImportModel> list, eFMSDataContext dc, string placeTypeName)
+        {
+            var countries = dc.CatCountry;
+            var areas = dc.CatArea.ToList();
+            var modes = DataEnums.ModeOfTransportData;
+            var portIndexs = dc.CatPlace.Where(x => x.PlaceTypeId == placeTypeName).ToList();
+            var results = new List<CatPlaceImportModel>();
             foreach(var item in list)
             {
-                var result = item;
-                var warehouse = warehouses.FirstOrDefault(i => i.Code.IndexOf(item.Code) >= 0);
-                if (string.IsNullOrEmpty(item.Code))
+                var result = CheckCatplaceValidImport(portIndexs, results, item);
+                if (string.IsNullOrEmpty(item.Address))
                 {
-                    result.Code = string.Format("Code is not allow empty!|wrong");
+                    result.Address = string.Format("Address is not allow empty!|wrong");
                     result.IsValid = false;
                 }
-                if(results.Any(x => x.Code == item.Code))
+                if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    result.Code = string.Format("Code {0} is existed!|wrong", item.Code);
+                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
                     result.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.NameEn))
+                else
                 {
-                    result.NameEn = string.Format("NameEn is not allow empty!|wrong");
-                    result.IsValid = false;
+                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    if (country == null)
+                    {
+                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.IsValid = false;
+                    }
+                    else
+                    {
+                        result.CountryId = country.Id;
+                    }
                 }
-                if (string.IsNullOrEmpty(item.NameVn))
+                if (string.IsNullOrEmpty(item.ModeOfTransport))
                 {
-                    result.NameVn = string.Format("NameVn is not allow empty!|wrong");
-                    result.IsValid = false;
+                    result.ModeOfTransport = string.Format("Mode of transport is not allow empty!|wrong");
                 }
-                if (warehouse != null)
+                if (!string.IsNullOrEmpty(item.AreaName))
                 {
-                    result.Code = string.Format("Code '{0}' has been existed!|wrong", item.Code);
-                    result.IsValid = false;
+                    var area = areas.FirstOrDefault(i => i.NameEn.IndexOf(item.AreaName) >= 0);
+                    if (area == null)
+                    {
+                        result.CountryName = string.Format("Area '{0}' is not found!|wrong", item.CountryName);
+                        result.IsValid = false;
+                    }
+                    else
+                    {
+                        result.AreaId = area.Id;
+                    }
                 }
+                results.Add(result);
+            }
+            return results;
+        }
+
+        private List<CatPlaceImportModel> CheckWarehouseValidImport(List<CatPlaceImportModel> list, eFMSDataContext dc, string placeTypeName)
+        {
+            var countries = dc.CatCountry.ToList();
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
+            var districts = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District)).ToList();
+            var warehouses = dc.CatPlace.Where(x => x.PlaceTypeId == placeTypeName).ToList();
+            var results = new List<CatPlaceImportModel>();
+            foreach (var item in list)
+            {
+                var result = CheckCatplaceValidImport(warehouses, results, item);
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
                     result.CountryName = string.Format("Country name is not allow empty!|wrong");
@@ -287,7 +518,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        public HandleState Import(List<WarehouseImportModel> data)
+        public HandleState Import(List<CatPlaceImportModel> data)
         {
             try
             {

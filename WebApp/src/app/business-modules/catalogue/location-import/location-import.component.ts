@@ -1,20 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { API_MENU } from 'src/constants/api-menu.const';
-import { PagingService } from 'src/app/shared/common/pagination/paging-service';
-import { SortService } from 'src/app/shared/services/sort.service';
-import { BaseService } from 'src/services-base/base.service';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { Component, OnInit } from '@angular/core';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { PagingService } from 'src/app/shared/common/pagination/paging-service';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 
 @Component({
-  selector: 'app-port-index-import',
-  templateUrl: './port-index-import.component.html',
-  styleUrls: ['./port-index-import.component.scss']
+  selector: 'app-location-import',
+  templateUrl: './location-import.component.html',
+  styleUrls: ['./location-import.component.scss']
 })
-export class PortIndexImportComponent implements OnInit {
+export class LocationImportComponent implements OnInit {
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
@@ -24,9 +22,6 @@ export class PortIndexImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild('form') form;
-  @ViewChild(PaginationComponent) child;
-  
   constructor(
     private pagingService: PagingService,
     private baseService: BaseService,
@@ -39,7 +34,7 @@ export class PortIndexImportComponent implements OnInit {
     if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
     this.baseService.spinnerShow();
-    this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Port, file.target['files'], "uploadedFile")
+    this.baseService.uploadfile(this.api_menu.Catalogue.Country.uploadExel, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
         this.pager.totalItems = this.data.length;
@@ -53,7 +48,6 @@ export class PortIndexImportComponent implements OnInit {
         this.baseService.handleError(err);
       });
   }
-  
   pagingData(data: any[]){
     this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;

@@ -20,7 +20,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<vw_catProvince> GetProvinces(short? countryId);
         List<vw_catDistrict> GetDistricts(Guid? provinceId);
         List<ModeOfTransport> GetModeOfTransport();
-        List<WarehouseImportModel> CheckValidImport(List<WarehouseImportModel> list, CatPlaceTypeEnum placeType);
-        HandleState Import(List<WarehouseImportModel> data);
+        List<CatPlaceImportModel> CheckValidImport(List<CatPlaceImportModel> list, CatPlaceTypeEnum placeType);
+        HandleState Import(List<CatPlaceImportModel> data);
     }
 }
