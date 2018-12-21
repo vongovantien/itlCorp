@@ -54,9 +54,10 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   }
 
   async Login(form: NgForm) {    
-    this.baseService.spinnerShow();
+    
     await this.configureWithNewConfigApi();
     if (form.form.status !== "INVALID") {
+      this.baseService.spinnerShow();
       this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
         return this.oauthService.loadUserProfile();
       }).then(() => {
