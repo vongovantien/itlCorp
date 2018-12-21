@@ -56,6 +56,7 @@ export class WarehouseImportComponent implements OnInit {
         this.baseService.spinnerHide();
         console.log(this.data);
       },err=>{
+        this.baseService.spinnerHide();
         this.baseService.handleError(err);
       });
   }

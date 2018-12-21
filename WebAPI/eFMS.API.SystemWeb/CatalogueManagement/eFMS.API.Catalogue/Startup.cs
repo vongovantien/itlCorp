@@ -37,9 +37,11 @@ namespace SystemManagementAPI
 
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder().SetBasePath(env.ContentRootPath)
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
+            
 
             Configuration = builder.Build();
         }
@@ -104,9 +106,9 @@ namespace SystemManagementAPI
 
             var localizationOptions = new RequestLocalizationOptions()
             {
-                DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
+                DefaultRequestCulture = new RequestCulture(culture: "en-US"),               
                 SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
+                 
             };
 
             localizationOptions.RequestCultureProviders = new[]
@@ -199,6 +201,7 @@ namespace SystemManagementAPI
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
+            app.UseRequestLocalization();
         }
         //protected virtual void ConfigureAuth(IApplicationBuilder app)
         //{

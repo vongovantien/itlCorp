@@ -7,7 +7,7 @@
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                 data-target="#add-port-index-modal">
                 <span>
                     <i class="la la-plus"></i>
@@ -59,7 +59,7 @@
                                     [ranges]="ranges"
                                     [maxDate]="maxDate"
                                     [alwaysShowCalendars]="true"
-                                    name="daterange" 
+                                    name="daterange"
                                     placeholder="From date - to date" readonly/>
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
@@ -185,25 +185,37 @@
                         <tr>
                             <th class="table-actions-col no-sorting"></th>
                             <th class="sorting_asc">
-                                <span>Port Code</span>
+                                <span>Job Id</span>
                             </th>
                             <th class="sorting">
-                                <span>Name(EN)</span>
+                                <span>M/B/L No.</span>
                             </th>
                             <th class="sorting">
-                                <span>Name(VI)</span>
+                                <span>ETD</span>
                             </th>
                             <th class="sorting">
-                                <span>Country</span>
+                                <span>ETA</span>
                             </th>
                             <th class="sorting">
-                                <span>Zone</span>
+                                <span>Shipping Line</span>
                             </th>
                             <th class="sorting">
-                                <span>Mode</span>
+                                <span>Agent</span>
                             </th>
-                            <th>
-                                <span>Status</span>
+                            <th class="sorting">
+                                <span>POL</span>
+                            </th>
+                            <th class="sorting">
+                                <span>POD</span>
+                            </th>
+                            <th class="no-sorting">
+                                <span>Gross Weight</span>
+                            </th>
+                            <th class="no-sorting">
+                                <span>CBM</span>
+                            </th>
+                            <th class="no-sorting">
+                                <span>Creator</span>
                             </th>
                         </tr>
                     </thead>
@@ -211,7 +223,7 @@
                         <!-- begin collapse-toggle-row -->
                         <tr class="collapse-toggle-row">
                             <td class="table-actions-col">
-                                <div class="table-actions">
+                                <div class="table-actions" style="width: 100px">
                                     <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-001"
                                         title="Collapse">
                                         <i class="la la-angle-up"></i>
@@ -245,67 +257,280 @@
                                 <span>text</span>
                             </td>
                             <td>
-                                <span>Active</span>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
                             </td>
                         </tr>
                         <!-- end of collapse-toggle-row -->
                         <!-- begin collapse-panel-row -->
                         <tr class="collapse-panel-row">
-                            <td colspan="8">
+                            <td colspan="12">
                                 <div class="detail-panel-block collapse" id="id-001" data-parent="#sea-fcl-export-table">
                                     <div class="table-inside-block">
-                                        <table class="table table-secondary dataTable">
-                                            <thead>
-                                                <tr>
-                                                    <th class="sorting_asc">
-                                                        <span>Stage ID</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Role</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Stage ABBR</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Name (VN)</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Name (EN)</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Description (VN</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Description (EN)</span>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span>LH001</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Customer services</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>ABBR</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Ký kết hợp đồng ngoại thương</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Shipping Schedule</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Đây là mô tả bằng tiếng Việt</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>This is description by EN</span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <perfect-scrollbar style="max-height: 180px">
+                                            <table class="table table-secondary dataTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="sorting_asc">
+                                                            <span>H-B/L No.</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Customer</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Sale Man</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Nomination Party</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Destination</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Containers</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Qty</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Unit</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>G.W</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>C.W</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>CBM</span>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </perfect-scrollbar>
                                     </div>
                                 </div>
                             </td>
@@ -316,7 +541,7 @@
                         <!-- begin collapse-toggle-row -->
                         <tr class="collapse-toggle-row">
                             <td class="table-actions-col">
-                                <div class="table-actions">
+                                <div class="table-actions" style="width: 100px">
                                     <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-002"
                                         title="Collapse">
                                         <i class="la la-angle-up"></i>
@@ -350,78 +575,291 @@
                                 <span>text</span>
                             </td>
                             <td>
-                                <span>Active</span>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
                             </td>
                         </tr>
                         <!-- end of collapse-toggle-row -->
                         <!-- begin collapse-panel-row -->
                         <tr class="collapse-panel-row">
-                            <td colspan="8">
+                            <td colspan="12">
                                 <div class="detail-panel-block collapse" id="id-002" data-parent="#sea-fcl-export-table">
                                     <div class="table-inside-block">
-                                        <table class="table table-secondary dataTable">
-                                            <thead>
-                                                <tr>
-                                                    <th class="sorting_asc">
-                                                        <span>Stage ID</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Role</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Stage ABBR</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Name (VN)</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Name (EN)</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Description (VN</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Description (EN)</span>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span>LH001</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Customer services</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>ABBR</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Ký kết hợp đồng ngoại thương</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Shipping Schedule</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Đây là mô tả bằng tiếng Việt</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>This is description by EN</span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <perfect-scrollbar style="max-height: 180px">
+                                            <table class="table table-secondary dataTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="sorting_asc">
+                                                            <span>H-B/L No.</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Customer</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Sale Man</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Nomination Party</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Destination</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Containers</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Qty</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Unit</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>G.W</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>C.W</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>CBM</span>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </perfect-scrollbar>
                                     </div>
                                 </div>
                             </td>
                         </tr>
                         <!--end of collapse-panel-row -->
                     </tbody>
-                    <tbody>
+                    <tbody class="tbody-group">
                         <!-- begin collapse-toggle-row -->
                         <tr class="collapse-toggle-row">
                             <td class="table-actions-col">
-                                <div class="table-actions">
+                                <div class="table-actions" style="width: 100px">
                                     <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-003"
                                         title="Collapse">
                                         <i class="la la-angle-up"></i>
@@ -455,67 +893,280 @@
                                 <span>text</span>
                             </td>
                             <td>
-                                <span>Active</span>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
+                            </td>
+                            <td>
+                                <span>text</span>
                             </td>
                         </tr>
                         <!-- end of collapse-toggle-row -->
                         <!-- begin collapse-panel-row -->
                         <tr class="collapse-panel-row">
-                            <td colspan="8">
+                            <td colspan="12">
                                 <div class="detail-panel-block collapse" id="id-003" data-parent="#sea-fcl-export-table">
                                     <div class="table-inside-block">
-                                        <table class="table table-secondary dataTable">
-                                            <thead>
-                                                <tr>
-                                                    <th class="sorting_asc">
-                                                        <span>Stage ID</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Role</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Stage ABBR</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Name (VN)</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Name (EN)</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Description (VN</span>
-                                                    </th>
-                                                    <th class="sorting">
-                                                        <span>Description (EN)</span>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span>LH001</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Customer services</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>ABBR</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Ký kết hợp đồng ngoại thương</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Shipping Schedule</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>Đây là mô tả bằng tiếng Việt</span>
-                                                    </td>
-                                                    <td>
-                                                        <span>This is description by EN</span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <perfect-scrollbar style="max-height: 180px">
+                                            <table class="table table-secondary dataTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="sorting_asc">
+                                                            <span>H-B/L No.</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Customer</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Sale Man</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Nomination Party</span>
+                                                        </th>
+                                                        <th class="sorting">
+                                                            <span>Destination</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Containers</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Qty</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>Unit</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>G.W</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>C.W</span>
+                                                        </th>
+                                                        <th class="no-sorting">
+                                                            <span>CBM</span>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>Text</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </perfect-scrollbar>
                                     </div>
                                 </div>
                             </td>
@@ -545,7 +1196,7 @@
                             <ul class="pagination justify-content-end">
                                 <li class="page-item"><a class="page-link" href="#">First</a></li>
                                 <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item text"><a class="page-link" href="#">1</a></li>
                                 <li class="page-item"><a class="page-link" href="#">2</a></li>
                                 <li class="page-item"><a class="page-link" href="#">3</a></li>
                                 <li class="page-item"><a class="page-link" href="#">Next</a></li>
