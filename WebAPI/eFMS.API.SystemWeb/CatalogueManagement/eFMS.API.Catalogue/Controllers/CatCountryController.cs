@@ -146,7 +146,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("DownloadExcel")]
-        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        public async Task<ActionResult> DownloadExcel()
         {
             templateName = "Country" + templateName;
             var result = await new FileHelper().ExportExcel(templateName);

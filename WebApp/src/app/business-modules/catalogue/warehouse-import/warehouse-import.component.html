@@ -140,7 +140,7 @@
                         <ng-container *ngFor="let item of pagedItems; let i = index">
                             <tr [ngClass]="{ 'invalid-row': !item.isValid }">
                                 <td>
-                                    <span>{{ (i+1) }}</span>
+                                    <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.code.split('|').length == 1">{{ item.code }}</span>
