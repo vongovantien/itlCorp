@@ -51,6 +51,10 @@ label {
 }
 ul {
     margin-bottom: 0;
+    padding-left: 15px;
+}
+.form-control-label {
+    text-transform: capitalize;
 }
 .form-control {
     &[readonly] {
@@ -76,12 +80,6 @@ ul {
                 color: #fff !important;
             }
         }
-    }
-}
-.btn-link {
-    text-decoration: underline;
-    &:hover {
-        text-decoration: none;
     }
 }
 .btn-danger {

@@ -42,38 +42,38 @@ export class SeaFCLExportComponent implements OnInit {
     /**
      * ng2-select
      */
-    public items:Array<string> = ['item 1', 'item 2', 'item 3', 'item 4', 'item 5'];
+    public items: Array<string> = ['item 1', 'item 2', 'item 3', 'item 4', 'item 5'];
 
-    private value:any = ['Athens'];
-    private _disabledV:string = '0';
-    public disabled:boolean = false;
+    private value: any = ['Athens'];
+    private _disabledV: string = '0';
+    public disabled: boolean = false;
 
-    public get disabledV():string {
-    return this._disabledV;
+    public get disabledV(): string {
+        return this._disabledV;
     }
 
-    public set disabledV(value:string) {
-    this._disabledV = value;
-    this.disabled = this._disabledV === '1';
+    public set disabledV(value: string) {
+        this._disabledV = value;
+        this.disabled = this._disabledV === '1';
     }
 
-    public selected(value:any):void {
-    console.log('Selected value is: ', value);
+    public selected(value: any): void {
+        console.log('Selected value is: ', value);
     }
 
-    public removed(value:any):void {
-    console.log('Removed value is: ', value);
+    public removed(value: any): void {
+        console.log('Removed value is: ', value);
     }
 
-    public refreshValue(value:any):void {
-    this.value = value;
+    public refreshValue(value: any): void {
+        this.value = value;
     }
 
-    public itemsToString(value:Array<any> = []):string {
-    return value
-        .map((item:any) => {
-        return item.text;
-        }).join(',');
+    public itemsToString(value: Array<any> = []): string {
+        return value
+            .map((item: any) => {
+                return item.text;
+            }).join(',');
     }
 
 }

@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <!-- <app-breadcrumb></app-breadcrumb> -->
+            <app-breadcrumb></app-breadcrumb>
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
@@ -66,26 +66,37 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Search text
+                                        Job ID
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Select filter
+                                        Estimated time of departure
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedRange"
+                                            [ranges]="ranges"
+                                            [maxDate]="maxDate"
+                                            [alwaysShowCalendars]="true"
+                                            name="daterange"
+                                            placeholder="From date - to date" readonly/>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Create date: From - To
+                                        Estimated time of Arrival
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
@@ -109,15 +120,15 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Search text
+                                        Master bill of landing no
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Select filter
+                                            Master bill of landing type
                                     </label>
                                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -127,23 +138,14 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Create date: From - To
-                                    </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedRange"
-                                            [ranges]="ranges"
-                                            [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true"
-                                            name="daterange"
-                                            placeholder="From date - to date" readonly/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                                Supplier/Vendor (co-loader)
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select filter">
+                                        </ng-select>
                                     </div>
                                 </div>
                             </div>
@@ -152,15 +154,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Search text
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Select filter
+                                        Booking no
                                     </label>
                                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -171,23 +165,23 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Create date: From - To
+                                        Services type
                                     </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedRange"
-                                            [ranges]="ranges"
-                                            [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true"
-                                            name="daterange"
-                                            placeholder="From date - to date" readonly/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Aggent
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
                                 </div>
                             </div>
                         </div>
@@ -195,15 +189,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Search text
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Select filter
+                                        Port of loading
                                     </label>
                                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -214,23 +200,23 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Create date: From - To
+                                        Port of destination
                                     </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedRange"
-                                            [ranges]="ranges"
-                                            [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true"
-                                            name="daterange"
-                                            placeholder="From date - to date" readonly/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Term
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
                                 </div>
                             </div>
                         </div>
@@ -238,15 +224,23 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Search text
+                                        Vessel name
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Select filter
+                                        Voy no
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Shipment type
                                     </label>
                                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -254,26 +248,31 @@
                                     </ng-select>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Create date: From - To
+                                        Puschase order(P/O) no 
                                     </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedRange"
-                                            [ranges]="ranges"
-                                            [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true"
-                                            name="daterange"
-                                            placeholder="From date - to date" readonly/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Person in charge
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <textarea class="form-control m-input--square" name="" id="" rows="5"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -328,7 +327,11 @@
                                 <span class="m--font-bolder">
                                     Description of good:
                                 </span>
-                                <span></span>
+                                <ul class="m--margin-top-5">
+                                    <li>Description of good 1</li>
+                                    <li>Description of good 2</li>
+                                    <li>Description of good 3</li>
+                                </ul>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -370,9 +373,9 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Search text
+                                Enter text
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                         </div>
                     </div>
                     <div class="col-lg-4">
