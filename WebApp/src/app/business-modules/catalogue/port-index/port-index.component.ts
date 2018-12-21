@@ -309,11 +309,6 @@ export class PortIndexComponent implements OnInit {
       this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
     }
   }
-
-  async import(){
-
-  }
-
   async export(){
     var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query,this.criteria);
     console.log(portIndexes);

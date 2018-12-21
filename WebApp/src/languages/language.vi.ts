@@ -9,7 +9,7 @@ export const language = {
 
         { name: "Kho", route_child: "ware-house" },
         { name: "Cửa Khẩu", route_child: "port-index" },
-        { name: "Port Index Import", route_child: "port-index-import" },
+        // { name: "Port Index Import", route_child: "port-index-import" },
         { name: "Dữ Liệu Đối Tác", route_child: "partner-data" },
         { name: "Hàng Hóa", route_child: "commodity" },
         { name: "Quản Lí Stage", route_child: "stage-management" },

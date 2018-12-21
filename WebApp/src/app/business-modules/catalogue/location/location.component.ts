@@ -14,6 +14,8 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 declare var $: any;
 
 @Component({
@@ -54,6 +56,12 @@ export class LocationComponent implements OnInit {
   WardToAdd = new CatPlaceModel();
   WardToUpdate = new CatPlaceModel();
 
+  importButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.import
+  };
+  exportButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.export
+  };
 
   pager: PagerSetting = PAGINGSETTING;
 

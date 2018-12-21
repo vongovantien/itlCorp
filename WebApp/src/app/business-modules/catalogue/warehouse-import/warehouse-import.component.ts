@@ -11,6 +11,7 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 declare var $:any;
 
 @Component({
@@ -19,7 +20,6 @@ declare var $:any;
   styleUrls: ['./warehouse-import.component.scss']
 })
 export class WarehouseImportComponent implements OnInit {
-  file: File;
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
@@ -27,7 +27,6 @@ export class WarehouseImportComponent implements OnInit {
   totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
-  WarehouseImportSettings: ColumnSetting[] = WAREHOUSEIMPORTENCOLUMNSETTING;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
   @ViewChild('form') form;
@@ -43,9 +42,10 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
-    this.file = file.target['files'];
+    if(!this.baseService.checkLoginSession()) return;
+    if(file.target['files'] == null) return;
     this.baseService.spinnerShow();
-    this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel, this.file, "uploadedFile")
+    this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Warehouse, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
         this.pager.totalItems = this.data.length;
@@ -55,6 +55,8 @@ export class WarehouseImportComponent implements OnInit {
         this.pagingData(this.data);
         this.baseService.spinnerHide();
         console.log(this.data);
+      },err=>{
+        this.baseService.handleError(err);
       });
   }
   pagingData(data: any[]){
@@ -92,6 +94,7 @@ export class WarehouseImportComponent implements OnInit {
     else{
       this.inProgress = true;
       let validItems = this.data.filter(x => x.isValid);
+      if(!this.baseService.checkLoginSession()) return;
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.EXPORT_SUCCES);
@@ -113,11 +116,14 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
-    this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     if(this.isShowInvalid){
+      this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
+      this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
     else{
+      this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
+      this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
   }

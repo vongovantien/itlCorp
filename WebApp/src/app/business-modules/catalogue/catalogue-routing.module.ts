@@ -15,6 +15,7 @@ import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-a
 import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
 import { ChargeDetailsComponent } from './charge-details/charge-details.component';
 import { CurrencyComponent } from './currency/currency.component';
+import { LocationImportComponent } from './location-import/location-import.component';
 
 const routes: Routes = [
 
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path:'location',
     component:LocationComponent
+  },
+  {
+    path:'location-import',
+    component:LocationImportComponent
   },
   {
     path:'ware-house',

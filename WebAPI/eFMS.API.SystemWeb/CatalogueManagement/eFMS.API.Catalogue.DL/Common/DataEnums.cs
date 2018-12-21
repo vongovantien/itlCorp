@@ -16,15 +16,10 @@ namespace eFMS.API.Catalogue.DL.Common
             new ModeOfTransport { Id = "AIR", Name = "AIR"},
             new ModeOfTransport { Id = "SEA", Name = "SEA"},
             new ModeOfTransport { Id = "INLAND", Name = "INLAND" },
-            new ModeOfTransport { Id = "SEA - AIR - EXPRESS", Name= "SEA - AIR - EXPRESS" },
-            new ModeOfTransport { Id = "SEA - INLAND - EXPRESS", Name = "SEA - INLAND - EXPRESS" },
-            new ModeOfTransport { Id = "AIR - INLAND - EXPRESS", Name = "AIR - INLAND - EXPRESS" },
-            new ModeOfTransport { Id = "DEPOT", Name = "DEPOT" },
-            new ModeOfTransport { Id = "SEA - DEPOT - EXPRESS", Name = "SEA - DEPOT - EXPRESS" },
-            new ModeOfTransport { Id = "INLAND - DEPOT - EXPRESS", Name = "INLAND - DEPOT - EXPRESS" },
-            new ModeOfTransport { Id = "SEA - AIR - INLAND - DEPOT - EXPRESS", Name = "SEA - AIR - INLAND - DEPOT - EXPRESS" },
-            new ModeOfTransport { Id = "EXPRESS", Name = "EXPRESS" },
-            new ModeOfTransport { Id = "AIR - EXPRESS", Name = "AIR - EXPRESS" }
+            new ModeOfTransport { Id = "AIR - SEA", Name= "AIR - SEA" },
+            new ModeOfTransport { Id = "INLAND - SEA", Name = "INLAND - SEA" },
+            new ModeOfTransport { Id = "AIR - INLAND", Name = "AIR - INLAND" },
+            new ModeOfTransport { Id = "INLAND - AIR - SEA", Name = "INLAND - AIR - SEA" }
         };
 
         public static List<DepartmentPartner> Departments = new List<DepartmentPartner> {
