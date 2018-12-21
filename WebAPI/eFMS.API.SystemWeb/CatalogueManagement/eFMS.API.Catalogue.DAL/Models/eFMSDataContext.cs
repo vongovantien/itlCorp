@@ -71,6 +71,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     options =>
                     {
                         options.UseRowNumberForPaging();
+                        options.EnableRetryOnFailure(3);
                     });            }
         }
 

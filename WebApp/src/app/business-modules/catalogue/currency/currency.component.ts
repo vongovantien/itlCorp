@@ -79,6 +79,9 @@ export class CurrencyComponent implements OnInit {
       this.pager.totalItems = response.totalItems;
       console.log(response.totalPages);
       this.totalPages = response.totalPages;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   setPage(pager) {

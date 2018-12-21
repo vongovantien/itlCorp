@@ -100,8 +100,8 @@ namespace SystemManagementAPI
             //Multiple language setting
             var supportedCultures = new[]
             {
-                new CultureInfo("en-US",false),
-                new CultureInfo("vi-VN",true)
+                new CultureInfo("en-US"),
+                new CultureInfo("vi-VN")
             };
 
             var localizationOptions = new RequestLocalizationOptions()
