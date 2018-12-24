@@ -105,7 +105,8 @@ export class API_MENU {
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/getById/",
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/addnew",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/update",
-            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/delete/"
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/delete/",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/uploadFile",
         },
         Unit: {
             getAllByQuery: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Query",

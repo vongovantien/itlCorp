@@ -6,14 +6,17 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
@@ -110,5 +113,55 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+                List<CatStageImportModel> list = new List<CatStageImportModel>();
+                for(int row = 2; row <= rowCount; row++)
+                {
+                    var stage = new CatStageImportModel
+                    {
+                        IsValid = true,
+                        DepartmentId = worksheet.Cells[row, 1].Value == null ? (int?)null : (int)Math.Ceiling((double)worksheet.Cells[row, 1].Value),
+                        Code = worksheet.Cells[row, 2].Value?.ToString(),
+                        StageNameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                        StageNameEn = worksheet.Cells[row, 4].Value?.ToString(),
+                        DescriptionVn = worksheet.Cells[row, 5].Value?.ToString(),
+                        DescriptionEn = worksheet.Cells[row, 6].Value?.ToString()
+                    };
+                    list.Add(stage);
+                }
+                var data = catStageService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(file);
+        }
+
+        [HttpPost]
+        [Route("Import")]
+      //  [Authorize]
+        public IActionResult Import([FromBody] List<CatStageImportModel> data)
+        {
+           // ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var result = catStageService.Import(data);
+            return Ok(result);
+        }
+
+
+
+
+
+
     }
 }

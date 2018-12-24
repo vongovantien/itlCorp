@@ -10,17 +10,17 @@ export const language = {
       "display_child": false,
       "childs": [
 
-        { name: "Warehouse", route_child: "ware-house" },
-        // { name: "Warehouse-import", route_child: "ware-house-import" },
-        { name: "Port Index", route_child: "port-index" },
-        // { name: "Port Index Import", route_child: "port-index-import" },
-        { name: "Partner Data", route_child: "partner-data" },
-        { name: "Commodity", route_child: "commodity" },
-        { name: "Stage Management", route_child: "stage-management" },
-        { name: "Unit", route_child: "unit" },
-        { name: "Location", route_child: "location" },
-        { name: "Charge", route_child: "charge" },
-        { name: "Currency", route_child: "currency" }
+        { name: "Warehouse", route_child: "ware-house", display:true },
+        { name: "Warehouse-import", route_child: "ware-house-import",display:false },
+        { name: "Port Index", route_child: "port-index",display:true },
+        { name: "Port Index Import", route_child: "port-index-import",display:false },
+        { name: "Partner Data", route_child: "partner-data",display:true },
+        { name: "Commodity", route_child: "commodity",display:true },
+        { name: "Stage Management", route_child: "stage-management",display:true },
+        { name: "Unit", route_child: "unit",display:true },
+        { name: "Location", route_child: "location",display:true },
+        { name: "Charge", route_child: "charge",display:true },
+        { name: "Currency", route_child: "currency",display:true }
       ]
     },
 
@@ -30,9 +30,9 @@ export const language = {
       "route_parent": "/home/operation/",
       "display_child": false,
       "childs": [
-        { name: "Job Management", route_child: "job-management" },
-        { name: "Assignment", route_child: "assigment" },
-        { name: "Trucking Assigment", route_child: "trucking-assigment" }
+        { name: "Job Management", route_child: "job-management",display:true },
+        { name: "Assignment", route_child: "assigment",display:true },
+        { name: "Trucking Assigment", route_child: "trucking-assigment",display:true }
       ]
     },
 
@@ -42,15 +42,15 @@ export const language = {
       "route_parent": "/home/documentation/",
       "display_child": false,
       "childs": [
-        { name: "Inland Trucking", route_child: "inland-trucking" },
-        { name: "Air Export", route_child: "air-export" },
-        { name: "Air Import", route_child: "air-import" },
-        { name: "Sea Consol Export", route_child: "sea-consol-export" },
-        { name: "Sea Consol Import", route_child: "sea-consol-import" },
-        { name: "Sea FCL Export", route_child: "sea-fcl-export" },
-        { name: "Sea FCL Import", route_child: "sea-fcl-import" },
-        { name: "Sea LCL Export", route_child: "sea-lcl-export" },
-        { name: "Sea LCL Import", route_child: "sea-lcl-import" }
+        { name: "Inland Trucking", route_child: "inland-trucking",display:true },
+        { name: "Air Export", route_child: "air-export",display:true },
+        { name: "Air Import", route_child: "air-import",display:true },
+        { name: "Sea Consol Export", route_child: "sea-consol-export",display:true },
+        { name: "Sea Consol Import", route_child: "sea-consol-import",display:true },
+        { name: "Sea FCL Export", route_child: "sea-fcl-export",display:true },
+        { name: "Sea FCL Import", route_child: "sea-fcl-import",display:true },
+        { name: "Sea LCL Export", route_child: "sea-lcl-export",display:true },
+        { name: "Sea LCL Import", route_child: "sea-lcl-import",display:true }
       ]
     },
 
@@ -60,10 +60,10 @@ export const language = {
       "route_parent": "/home/accounting/",
       "display_child": false,
       "childs": [
-        { name: "Account Receivable Payable", route_child: "account-receivable-payable" },
-        { name: "Advance Payment", route_child: "advance-payment" },
-        { name: "Settlement Payment", route_child: "settlement-payment" },
-        { name: "Statement of Account", route_child: "statement-of-account" }
+        { name: "Account Receivable Payable", route_child: "account-receivable-payable",display:true },
+        { name: "Advance Payment", route_child: "advance-payment",display:true },
+        { name: "Settlement Payment", route_child: "settlement-payment",display:true },
+        { name: "Statement of Account", route_child: "statement-of-account",display:true }
       ]
     },
 
@@ -73,12 +73,12 @@ export const language = {
       "route_parent": "/home/system/",
       "display_child": false,
       "childs": [
-        { name: "User Management", route_child: "user-management" },
-        { name: "Group", route_child: "group" },
-        { name: "Role", route_child: "role" },
-        { name: "Permission", route_child: "permission" },
-        { name: "Department", route_child: "department" },
-        { name: "Company Informations", route_child: "company-info" }
+        { name: "User Management", route_child: "user-management",display:true },
+        { name: "Group", route_child: "group",display:true },
+        { name: "Role", route_child: "role",display:true },
+        { name: "Permission", route_child: "permission",display:true },
+        { name: "Department", route_child: "department",display:true },
+        { name: "Company Informations", route_child: "company-info",display:true }
       ]
     },
 
@@ -88,13 +88,13 @@ export const language = {
       "route_parent": "/home/tool/",
       "display_child": false,
       "childs": [
-        { name: "ID Definition", route_child: "id-definition" },
-        { name: "Tariff", route_child: "tariff" },
-        { name: "Exchange Rate", route_child: "exchange-rate" },
-        { name: "Ecus Connection", route_child: "ecus-connection" },
-        { name: "KPI", route_child: "kpi" },
-        { name: "Supplier", route_child: "supplier" },
-        { name: "Catalog Log Viewer", route_child: "log-viewer" }
+        { name: "ID Definition", route_child: "id-definition",display:true },
+        { name: "Tariff", route_child: "tariff",display:true },
+        { name: "Exchange Rate", route_child: "exchange-rate",display:true },
+        { name: "Ecus Connection", route_child: "ecus-connection",display:true },
+        { name: "KPI", route_child: "kpi",display:true },
+        { name: "Supplier", route_child: "supplier",display:true },
+        { name: "Catalog Log Viewer", route_child: "log-viewer",display:true }
 
       ]
     },
@@ -105,9 +105,9 @@ export const language = {
       "route_parent": "/home/report/",
       "display_child": false,
       "childs": [
-        { name: "P/L Report", route_child: "pl-report" },
-        { name: "Performance Report", route_child: "performance-report" },
-        { name: "Shipment Overview", route_child: "shipment-overview" }
+        { name: "P/L Report", route_child: "pl-report",display:true },
+        { name: "Performance Report", route_child: "performance-report",display:true },
+        { name: "Shipment Overview", route_child: "shipment-overview",display:true }
       ]
     },
 
@@ -117,8 +117,8 @@ export const language = {
       "route_parent": "/home/designs-zone/",
       "display_child": false,
       "childs": [
-        { name: "Form", route_child: "form" },
-        { name: "Table", route_child: "table" }
+        { name: "Form", route_child: "form",display:true },
+        { name: "Table", route_child: "table",display:true }
       ]
     }
   ],
