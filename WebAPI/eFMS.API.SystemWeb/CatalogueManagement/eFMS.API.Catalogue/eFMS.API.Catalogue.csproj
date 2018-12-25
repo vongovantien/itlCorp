@@ -74,13 +74,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Resources\Files\CountryImportTeamplate.xlsx">
+    <None Update="Resources\Files\CountryImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Files\DistrictImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Files\PortIndexImportTeamplate.xlsx">
+    <None Update="Resources\Files\PortIndexImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Files\ProvinceImportTemplate.xlsx">
@@ -89,7 +89,7 @@
     <None Update="Resources\Files\WardImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Files\WarehouseImportTeamplate.xlsx">
+    <None Update="Resources\Files\WarehouseImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

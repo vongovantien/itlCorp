@@ -154,8 +154,14 @@
                               <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
                             <span class="m--font-danger" *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
                           </td>
-                          <td *ngIf="type != 'province' && type != 'country'">{{ provinceName }}</td>
-                          <td *ngIf="type != 'province' && type != 'country' && type != 'district'">{{ districtName }}</td>
+                          <td *ngIf="type != 'province' && type != 'country'">
+                            <span *ngIf="item.provinceName.split('|').length == 1">{{ item.provinceName }}</span>
+                            <span class="m--font-danger" *ngIf="item.provinceName.split('|').length > 1">{{ item.provinceName.split('|')[0] }}</span>
+                            </td>
+                          <td *ngIf="type != 'province' && type != 'country' && type != 'district'">
+                            <span *ngIf="item.districtName.split('|').length == 1">{{ item.districtName }}</span>
+                            <span class="m--font-danger" *ngIf="item.districtName.split('|').length > 1">{{ item.districtName.split('|')[0] }}</span>
+                          </td>
                           <td>
                               <span>{{ item.status }}</span>
                           </td>

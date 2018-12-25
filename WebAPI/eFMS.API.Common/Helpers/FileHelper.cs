@@ -21,7 +21,7 @@ namespace eFMS.API.Common.Helpers
                 FileInfo file = new FileInfo(path);
                 var memory = new MemoryStream();
 
-                if (!file.Exists)
+                if (file.Exists == false)
                 {
                     return null;
                 }

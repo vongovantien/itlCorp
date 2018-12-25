@@ -73,6 +73,7 @@ export class LocationImportComponent implements OnInit {
         this.totalRows = this.data.length;
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
+        // this.child.setPage(this.pager.currentPage);
         this.baseService.spinnerHide();
         console.log(this.data);
       },err=>{
@@ -147,17 +148,17 @@ export class LocationImportComponent implements OnInit {
       let data = this.data.filter(x => x.isValid);
       if(!this.baseService.checkLoginSession()) return;
       let url = '';
-    if(this.type != 'province'){
-      url = this.api_menu.Catalogue.Country.downloadExcel + "?type=" + PlaceTypeEnum.Province;
+    if(this.type == 'province'){
+      url = this.api_menu.Catalogue.CatPlace.import + "?type=" + PlaceTypeEnum.Province;
     }
-    if(this.type != 'district'){
-      url = this.api_menu.Catalogue.Country.downloadExcel + "?type=" + PlaceTypeEnum.District;
+    if(this.type == 'district'){
+      url = this.api_menu.Catalogue.CatPlace.import + "?type=" + PlaceTypeEnum.District;
     }
-    if(this.type != 'ward'){
-      url = this.api_menu.Catalogue.Country.downloadExcel + "?type=" + PlaceTypeEnum.Ward;
+    if(this.type == 'ward'){
+      url = this.api_menu.Catalogue.CatPlace.import + "?type=" + PlaceTypeEnum.Ward;
     }
-    if(this.type != 'country'){
-      url = this.api_menu.Catalogue.Country.downloadExcel;
+    if(this.type == 'country'){
+      url = this.api_menu.Catalogue.Country.import;
     }
       var response = await this.baseService.postAsync(url, data, true, false);
       if(response){
