@@ -18,7 +18,9 @@
           <div class="m-form m-form--state">
               <div class="row">
                   <div class="col-lg-4">
-                      <input type="file" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                    <form #form>
+                        <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                    </form>
                       <span class="m-form__help">
                           <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download simple</a>
                       </span>
@@ -114,6 +116,18 @@
                             (click)="sort('nameVn')">
                               <span>Name(Local)</span>
                           </th>
+                          <th *ngIf="type != 'country'" class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
+                            (click)="sort('countryName')">
+                              <span>Country</span>
+                          </th>
+                          <th *ngIf="type != 'province' && type != 'country'" class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
+                            (click)="sort('provinceName')">
+                              <span>Province</span>
+                          </th>
+                          <th *ngIf="type != 'province' && type != 'country' && type != 'district'" class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
+                            (click)="sort('districtName')">
+                              <span>District</span>
+                          </th>
                           <th>
                               <span>Status</span>
                           </th>
@@ -136,6 +150,12 @@
                               <span *ngIf="item.nameVn.split('|').length == 1">{{ item.nameVn }}</span>
                               <span class="m--font-danger" *ngIf="item.nameVn.split('|').length > 1">{{ item.nameVn.split('|')[0] }}</span>
                           </td>
+                          <td *ngIf="type != 'country'">
+                              <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
+                            <span class="m--font-danger" *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
+                          </td>
+                          <td *ngIf="type != 'province' && type != 'country'">{{ provinceName }}</td>
+                          <td *ngIf="type != 'province' && type != 'country' && type != 'district'">{{ districtName }}</td>
                           <td>
                               <span>{{ item.status }}</span>
                           </td>

@@ -234,7 +234,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    var country = countries.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.CountryName ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+
                     if (country == null)
                     {
                         result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
@@ -243,7 +244,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     else
                     {
                         result.CountryId = country.Id;
-                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(item.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
+                        var province = provinces.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.ProvinceName??"", StringComparison.OrdinalIgnoreCase) >= 0 && (i.CountryId == country.Id || country == null));
                         if (string.IsNullOrEmpty(item.ProvinceName))
                         {
                             result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
@@ -264,7 +265,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                             else
                             {
-                                var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(item.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
+                                var district = districts.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.DistrictName??"") >= 0 && (i.ProvinceId == province.Id || province == null));
                                 if(district == null)
                                 {
                                     result.DistrictName = string.Format("District name is not allow empty!|wrong");
@@ -370,14 +371,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 item.Code = string.Format("Code is not allow empty!|wrong");
                 item.IsValid = false;
             }
-            else if (newList.Any(x => x.Code == item.Code))
+            else if (newList.Any(x => (x.Code ?? "").IndexOf(item.Code ?? "", StringComparison.OrdinalIgnoreCase) >=0))
             {
                 item.Code = string.Format("Code {0} is existed!|wrong", item.Code);
                 item.IsValid = false;
             }
             else
             {
-                if(places.Any(i => i.Code.IndexOf(item.Code) >= 0))
+                if(places.Any(i => (i.Code ?? "").IndexOf(item.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
                 {
                     item.Code = string.Format("Code '{0}' has been existed!|wrong", item.Code);
                     item.IsValid = false;
@@ -418,7 +419,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName, StringComparison.OrdinalIgnoreCase) >= 0);
                     if (country == null)
                     {
                         result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
@@ -435,7 +436,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (!string.IsNullOrEmpty(item.AreaName))
                 {
-                    var area = areas.FirstOrDefault(i => i.NameEn.IndexOf(item.AreaName) >= 0);
+                    var area = areas.FirstOrDefault(i => i.NameEn.IndexOf(item.AreaName, StringComparison.OrdinalIgnoreCase) >= 0);
                     if (area == null)
                     {
                         result.CountryName = string.Format("Area '{0}' is not found!|wrong", item.CountryName);

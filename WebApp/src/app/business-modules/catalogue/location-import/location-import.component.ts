@@ -8,6 +8,8 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { language } from 'src/languages/language.en';
+import { ActivatedRoute } from '@angular/router';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 
 declare var $:any;
 @Component({
@@ -25,6 +27,7 @@ export class LocationImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
+  type: string;
 
   @ViewChild('form') form;
   @ViewChild(PaginationComponent) child;
@@ -32,15 +35,37 @@ export class LocationImportComponent implements OnInit {
     private pagingService: PagingService,
     private baseService: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private sortService: SortService,
+    private route:ActivatedRoute
+    ) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
+    this.route.queryParams.subscribe(prams => {
+      console.log(prams["type"]);
+      if(prams.type != undefined){
+        this.type = prams.type;
+      }
+    });
   }
   chooseFile(file: Event){
     if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
     this.baseService.spinnerShow();
-    this.baseService.uploadfile(this.api_menu.Catalogue.Country.uploadExel, file.target['files'], "uploadedFile")
+    let url = '';
+    if(this.type == 'province'){
+      url = this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Province;
+    }
+    if(this.type == 'district'){
+      url = this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.District;
+    }
+    if(this.type == 'ward'){
+      url = this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Ward;
+    }
+    if(this.type == 'country'){
+      url = this.api_menu.Catalogue.Country.uploadExel;
+    }
+    this.baseService.uploadfile(url, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
         this.pager.totalItems = this.data.length;
@@ -51,6 +76,7 @@ export class LocationImportComponent implements OnInit {
         this.baseService.spinnerHide();
         console.log(this.data);
       },err=>{
+        this.baseService.spinnerHide();
         this.baseService.handleError(err);
       });
   }
@@ -61,12 +87,27 @@ export class LocationImportComponent implements OnInit {
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
   downloadSample(){
-    this.baseService.downloadfile(this.api_menu.Catalogue.Country.downloadExcel)
+    let url = '';
+    if(this.type == 'province'){
+      url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Province;
+    }
+    if(this.type == 'district'){
+      url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.District;
+    }
+    if(this.type == 'ward'){
+      url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Ward;
+    }
+    if(this.type == 'country'){
+      url = this.api_menu.Catalogue.Country.downloadExcel;
+    }
+    this.baseService.downloadfile(url)
     .subscribe(
       response => {
-        saveAs(response, 'CountryImportTemplate.xlsx');
+        saveAs(response, this.type + 'ImportTemplate.xlsx');
       }
-    )
+    ),err=>{
+      this.baseService.handleError(err);
+    }
   }
   async setPage(pager:PagerSetting){
     this.pager.currentPage = pager.currentPage;
@@ -103,17 +144,38 @@ export class LocationImportComponent implements OnInit {
     }
     else{
       this.inProgress = true;
-      let validItems = this.data.filter(x => x.isValid);
+      let data = this.data.filter(x => x.isValid);
       if(!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
+      let url = '';
+    if(this.type != 'province'){
+      url = this.api_menu.Catalogue.Country.downloadExcel + "?type=" + PlaceTypeEnum.Province;
+    }
+    if(this.type != 'district'){
+      url = this.api_menu.Catalogue.Country.downloadExcel + "?type=" + PlaceTypeEnum.District;
+    }
+    if(this.type != 'ward'){
+      url = this.api_menu.Catalogue.Country.downloadExcel + "?type=" + PlaceTypeEnum.Ward;
+    }
+    if(this.type != 'country'){
+      url = this.api_menu.Catalogue.Country.downloadExcel;
+    }
+      var response = await this.baseService.postAsync(url, data, true, false);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.EXPORT_SUCCES);
         this.inProgress = false;
         this.pager.totalItems = 0;
-        this.form.reset();
+        this.reset();
       }
       console.log(response);
     }
+  }
+  
+  reset(){
+    this.data = null;
+    this.pagedItems = null;
+    $("#inputFile").val('');
+    //this.form.nativeElement.onReset();
+    this.pager.totalItems = 0;
   }
   isDesc = true;
   sortKey: string;

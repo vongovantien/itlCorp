@@ -200,25 +200,25 @@ export class LocationComponent implements OnInit {
     this.activeTab = activeTab;
     if(activeTab==="country"){
         this.pager.currentPage = 1;
-        this.pager.pageSize = 10;
+        //this.pager.pageSize = 10;
         this.pager.totalItems = this.totalItemCountries;
         this.child.setPage(this.pager.currentPage);
     }
     if(activeTab==="province"){
       this.pager.currentPage = 1;
-      this.pager.pageSize = 10;
+      //this.pager.pageSize = 10;
       this.pager.totalItems = this.totalItemProvinces;
       this.child.setPage(this.pager.currentPage);
     }
     if(activeTab==="district"){
       this.pager.currentPage = 1;
-      this.pager.pageSize = 10;
+      //this.pager.pageSize = 10;
       this.pager.totalItems = this.totalItemDistricts;
       this.child.setPage(this.pager.currentPage);
     }
     if(activeTab==="ward"){
        this.pager.currentPage = 1;
-        this.pager.pageSize = 10;
+       //this.pager.pageSize = 10;
        this.pager.totalItems = this.totalItemWards;
        this.child.setPage(this.pager.currentPage);
     }

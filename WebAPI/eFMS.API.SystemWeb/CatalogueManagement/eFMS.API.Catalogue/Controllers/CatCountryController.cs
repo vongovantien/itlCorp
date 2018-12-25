@@ -191,7 +191,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("Import")]
         [Authorize]
-        public IActionResult Import(List<CatCountryImportModel> data)
+        public IActionResult Import([FromBody]List<CatCountryImportModel> data)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catCountryService.Import(data);
