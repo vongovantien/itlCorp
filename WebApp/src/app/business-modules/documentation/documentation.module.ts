@@ -16,6 +16,7 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-export-create.component';
+import { MasterBillComponent } from './sea-fcl-export-create/master-bill/master-bill.component';
 
 @NgModule({
   imports: [
@@ -27,6 +28,6 @@ import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-exp
     FormsModule,
     PerfectScrollbarModule, // Scrollbar
   ],
-  declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent, SeaFclExportCreateComponent]
+  declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent]
 })
 export class DocumentationModule { }
