@@ -59,6 +59,7 @@ ul {
 .form-control {
     &[readonly] {
         cursor: pointer;
+        background-color: #fbfbfb;
     }
     background-color: #fbfbfb;
 }
@@ -223,6 +224,10 @@ ul {
                 vertical-align: middle;
                 &:first-child {
                     padding-left: 10px
+                }
+                .m-checkbox, 
+                .m-radio {
+                    margin-bottom: 0;
                 }
             }
             &.invalid-row {

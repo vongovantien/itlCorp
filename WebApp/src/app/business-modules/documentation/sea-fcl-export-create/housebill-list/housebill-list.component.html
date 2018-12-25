@@ -1,0 +1,47 @@
+<!--begin::Form-->
+<div class="m-form m-form--state">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-control-label" for="">
+                    Enter text
+                </label>
+                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-control-label" for="">
+                    Select filter
+                </label>
+                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                    placeholder="Select filter">
+                </ng-select>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-control-label" for="">
+                    Create date: From - To
+                </label>
+                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                    <input type="text" class="form-control m-input m-input--square"
+                        ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                        [(ngModel)]="selectedRange"
+                        [ranges]="ranges"
+                        [maxDate]="maxDate"
+                        [alwaysShowCalendars]="true"
+                        name="daterange"
+                        placeholder="From date - to date" readonly/>
+                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                        <span>
+                            <i class="la la-calendar"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Form-->
