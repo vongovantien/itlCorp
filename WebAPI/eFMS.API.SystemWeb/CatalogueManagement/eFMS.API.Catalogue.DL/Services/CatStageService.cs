@@ -193,7 +193,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         DescriptionEn = item.DescriptionEn,
                         DescriptionVn = item.DescriptionVn,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated ="thor", //ChangeTrackerHelper.currentUser,
+                        UserCreated =ChangeTrackerHelper.currentUser,
                         Inactive = item.Inactive
                     };
                     dc.CatStage.Add(stage);

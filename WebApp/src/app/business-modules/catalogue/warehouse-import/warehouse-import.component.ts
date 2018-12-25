@@ -98,7 +98,7 @@ export class WarehouseImportComponent implements OnInit {
       if(!this.baseService.checkLoginSession()) return;
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
       if(response){
-        this.baseService.successToast(language.NOTIFI_MESS.EXPORT_SUCCES);
+        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();

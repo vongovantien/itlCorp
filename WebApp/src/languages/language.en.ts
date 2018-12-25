@@ -17,6 +17,7 @@ export const language = {
         { name: "Partner Data", route_child: "partner-data",display:true },
         { name: "Commodity", route_child: "commodity",display:true },
         { name: "Stage Management", route_child: "stage-management",display:true },
+        { name: "Stage Import", route_child: "stage-import",display:false },
         { name: "Unit", route_child: "unit",display:true },
         { name: "Location", route_child: "location",display:true },
         { name: "Charge", route_child: "charge",display:true },
@@ -132,5 +133,6 @@ export const language = {
     CHECK_CONNECT:"Check Your Connection !",
     EXPIRED_SESSION_MESS: "Please Login Again To Continue !",
     EXPORT_SUCCES: "Export File Successfully !",
+    IMPORT_SUCCESS:"Import File Successfully !"
   }
 }

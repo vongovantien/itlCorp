@@ -7,16 +7,17 @@ export const language = {
       display_child: false,
       childs: [
 
-        { name: "Kho", route_child: "ware-house" },
-        { name: "Cửa Khẩu", route_child: "port-index" },
+        { name: "Kho", route_child: "ware-house",display:true },
+        { name: "Cửa Khẩu", route_child: "port-index",display:true },
         // { name: "Port Index Import", route_child: "port-index-import" },
-        { name: "Dữ Liệu Đối Tác", route_child: "partner-data" },
-        { name: "Hàng Hóa", route_child: "commodity" },
-        { name: "Quản Lí Stage", route_child: "stage-management" },
-        { name: "Đơn Vị", route_child: "unit" },
-        { name: "Địa Điểm", route_child: "location" },
-        { name: "Phí", route_child: "charge" },
-        { name: "Tiền Tệ", route_child: "currency" }
+        { name: "Dữ Liệu Đối Tác", route_child: "partner-data",display:true },
+        { name: "Hàng Hóa", route_child: "commodity",display:true },
+        { name: "Quản Lí Stage", route_child: "stage-management",display:true },
+        { name: "Import Stage", route_child: "stage-import" , display:false},
+        { name: "Đơn Vị", route_child: "unit" ,display:true},
+        { name: "Địa Điểm", route_child: "location",display:true },
+        { name: "Phí", route_child: "charge" ,display:true},
+        { name: "Tiền Tệ", route_child: "currency",display:true }
       ]
     },
    
@@ -26,9 +27,9 @@ export const language = {
       route_parent: "/home/operation/",
       display_child: false,
       childs: [
-        { name: "Quản Lý Job", route_child: "job-management" },
-        { name: "Điều Phối", route_child: "assigment" },
-        { name: "Điều Phối Xe", route_child: "trucking-assigment" }
+        { name: "Quản Lý Job", route_child: "job-management",display:true  },
+        { name: "Điều Phối", route_child: "assigment",display:true  },
+        { name: "Điều Phối Xe", route_child: "trucking-assigment",display:true  }
       ]
     },
    
@@ -38,15 +39,15 @@ export const language = {
       route_parent: "/home/documentation/",
       display_child: false,
       childs: [
-        { name: "Inland Trucking", route_child: "inland-trucking" },
-        { name: "Air Export", route_child: "air-export" },
-        { name: "Air Import", route_child: "air-import" },
-        { name: "Sea Consol Export", route_child: "sea-consol-export" },
-        { name: "Sea Consol Import", route_child: "sea-consol-import" },
-        { name: "Sea FCL Export", route_child: "sea-fcl-export" },
-        { name: "Sea FCL Import", route_child: "sea-fcl-import" },
-        { name: "Sea LCL Export", route_child: "sea-lcl-export" },
-        { name: "Sea LCL Import", route_child: "sea-lcl-import" }
+        { name: "Inland Trucking", route_child: "inland-trucking",display:true  },
+        { name: "Air Export", route_child: "air-export",display:true  },
+        { name: "Air Import", route_child: "air-import",display:true  },
+        { name: "Sea Consol Export", route_child: "sea-consol-export",display:true  },
+        { name: "Sea Consol Import", route_child: "sea-consol-import",display:true  },
+        { name: "Sea FCL Export", route_child: "sea-fcl-export",display:true  },
+        { name: "Sea FCL Import", route_child: "sea-fcl-import",display:true  },
+        { name: "Sea LCL Export", route_child: "sea-lcl-export",display:true  },
+        { name: "Sea LCL Import", route_child: "sea-lcl-import",display:true  }
       ]
     },
    
@@ -56,10 +57,10 @@ export const language = {
       route_parent: "/home/accounting/",
       display_child: false,
       childs: [
-        { name: "Account Receivable Payable", route_child: "account-receivable-payable" },
-        { name: "Advance Payment", route_child: "advance-payment" },
-        { name: "Settlement Payment", route_child: "settlement-payment" },
-        { name: "Statement of Account", route_child: "statement-of-account" }
+        { name: "Account Receivable Payable", route_child: "account-receivable-payable",display:true  },
+        { name: "Advance Payment", route_child: "advance-payment",display:true  },
+        { name: "Settlement Payment", route_child: "settlement-payment",display:true  },
+        { name: "Statement of Account", route_child: "statement-of-account",display:true  }
       ]
     },
     
@@ -69,12 +70,12 @@ export const language = {
       route_parent: "/home/system/",
       display_child: false,
       childs: [
-        { name: "Quản Lý Người Dùng", route_child: "user-management" },
-        { name: "Nhóm Người Dùng", route_child: "group" },
-        { name: "Vai Trò", route_child: "role" },
-        { name: "Quyền", route_child: "permission" },
-        { name: "Bộ Phận", route_child: "department" },
-        { name: "Thông Tin Công Ty", route_child: "company-info" }
+        { name: "Quản Lý Người Dùng", route_child: "user-management",display:true  },
+        { name: "Nhóm Người Dùng", route_child: "group",display:true  },
+        { name: "Vai Trò", route_child: "role",display:true  },
+        { name: "Quyền", route_child: "permission",display:true  },
+        { name: "Bộ Phận", route_child: "department",display:true  },
+        { name: "Thông Tin Công Ty", route_child: "company-info",display:true  }
       ]
     },
    
@@ -84,13 +85,13 @@ export const language = {
       route_parent: "/home/tool/",
       display_child: false,
       childs: [
-        { name: "Định Nghĩa ID", route_child: "id-definition" },
-        { name: "Thuế Quan", route_child: "tariff" },
-        { name: "Tỉ Giá", route_child: "exchange-rate" },
-        { name: "Ecus Connection", route_child: "ecus-connection" },
-        { name: "KPI", route_child: "kpi" },
-        { name: "Nhà Cung Cấp", route_child: "supplier" },
-        { name: "Truy Xuất Lịch Sử", route_child: "log-viewer" }
+        { name: "Định Nghĩa ID", route_child: "id-definition",display:true  },
+        { name: "Thuế Quan", route_child: "tariff",display:true  },
+        { name: "Tỉ Giá", route_child: "exchange-rate",display:true  },
+        { name: "Ecus Connection", route_child: "ecus-connection",display:true  },
+        { name: "KPI", route_child: "kpi",display:true  },
+        { name: "Nhà Cung Cấp", route_child: "supplier",display:true  },
+        { name: "Truy Xuất Lịch Sử", route_child: "log-viewer",display:true  }
 
       ]
     },
@@ -101,9 +102,9 @@ export const language = {
       route_parent: "/home/report/",
       display_child: false,
       childs: [
-        { name: "Báo Cáo P/L", route_child: "pl-report" },
-        { name: "Báo Cáo Hiệu Suất", route_child: "performance-report" },
-        { name: "Tổng Quan Lô Hàng", route_child: "shipment-overview" }
+        { name: "Báo Cáo P/L", route_child: "pl-report",display:true  },
+        { name: "Báo Cáo Hiệu Suất", route_child: "performance-report",display:true  },
+        { name: "Tổng Quan Lô Hàng", route_child: "shipment-overview",display:true  }
       ]
     },
     
@@ -113,8 +114,8 @@ export const language = {
       route_parent: "/home/designs-zone/",
       display_child: false,
       childs: [
-        { name: "Form", route_child: "form" },
-        { name: "Table", route_child: "table" }
+        { name: "Form", route_child: "form",display:true  },
+        { name: "Table", route_child: "table",display:true  }
       ]
     }
   ],
@@ -223,5 +224,6 @@ export const language = {
     CHECK_CONNECT:"Vui Lòng Kiểm Tra Kết Nối !",
     EXPIRED_SESSION_MESS: "Vui Lòng Đăng Nhập Để Tiếp Tục !",
     EXPORT_SUCCES: "Xuất Tệp Thành Công !",
+    IMPORT_SUCCESS:"Tải Tệp Lên Thành Công !"
   }
 }
