@@ -21,6 +21,10 @@ namespace eFMS.API.Common.Helpers
                 FileInfo file = new FileInfo(path);
                 var memory = new MemoryStream();
 
+                if (file.Exists == false)
+                {
+                    return null;
+                }
                 using (var stream = new FileStream(path, FileMode.Open))
                 {
                     await stream.CopyToAsync(memory);

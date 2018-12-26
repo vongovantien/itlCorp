@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Models
 {
-    public class WarehouseImportModel
+    public class CatPlaceImportModel
     {
         public Guid Id { get; set; }
         public string Code { get; set; }
@@ -20,6 +20,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public short? CountryId { get; set; }
         public string CountryName { get; set; }
         public string AreaId { get; set; }
+        public string AreaName { get; set; }
         public string LocalAreaId { get; set; }
         public string ModeOfTransport { get; set; }
         public string PlaceTypeId { get; set; }

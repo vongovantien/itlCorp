@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Common.Globals;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -26,7 +27,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             return DataContext.Add(catStage);
         }
-
+      
         public HandleState DeleteStage(int id)
         {
             return DataContext.Delete(x => x.Id == id);
@@ -84,6 +85,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return returnList;
         }
+       
 
         public List<object> Query(CatStageCriteria criteria)
         {
@@ -132,5 +134,82 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             return DataContext.Update(catStage, x => x.Id == catStage.Id);
         }
+
+        public List<CatStageImportModel> CheckValidImport(List<CatStageImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var stages = dc.CatStage.ToList();
+            list.ForEach(item =>
+            {
+               
+                if (string.IsNullOrEmpty(item.StageNameEn))
+                {
+                    item.StageNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (item.DepartmentId==null)
+                {
+                    item.DepartmentId = -1;
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Status))
+                {
+                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    item.Code = string.Format("Code is not allow empty!|wrong"); ;
+                    item.IsValid = false;
+                }
+                else
+                {
+                    var stage = stages.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
+                    if (stage != null)
+                    {
+                        item.Code = string.Format("Code {0} has been existed!|wrong",item.Code);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
+                    {
+                        item.Code = string.Format("Code {0} has been duplicated!|wrong", item.Code);
+                        item.IsValid = false;
+                    }
+                }
+
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CatStageImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach(var item in data)
+                {
+                    var stage = new CatStage
+                    {
+                        Code = item.Code,
+                        StageNameEn = item.StageNameEn,
+                        StageNameVn = item.StageNameVn,
+                        DepartmentId = item.DepartmentId,
+                        DescriptionEn = item.DescriptionEn,
+                        DescriptionVn = item.DescriptionVn,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = ChangeTrackerHelper.currentUser,
+                        Inactive = item.Status.ToString().ToLower()=="active"?false:true
+                    };
+                    dc.CatStage.Add(stage);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
     }
 }

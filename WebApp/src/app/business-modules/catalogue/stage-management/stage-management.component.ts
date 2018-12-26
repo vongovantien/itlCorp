@@ -97,9 +97,11 @@ export class StageManagementComponent implements OnInit {
         } else {
             if (form.form.status != "INVALID") {
                 this.StageToUpdate = this.ListStages[this.index_stage_edit].stage;
-                await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
-                this.StageToUpdate = new StageModel();
-                $('#edit-stage-management-modal').modal('hide');
+                var res = await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
+                if(res){
+                    this.StageToUpdate = new StageModel();
+                    $('#edit-stage-management-modal').modal('hide');
+                }
             }
 
 
@@ -121,7 +123,7 @@ export class StageManagementComponent implements OnInit {
             console.log(this.StageToAdd);
             delete this.StageToAdd.id;
             if (form.form.status != "INVALID") {
-                var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
+                await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
                 this.StageToAdd = new StageModel();
                 await this.getStages(this.pager);
                 this.child.setPage(this.pager.currentPage);
@@ -286,7 +288,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async import() {
-
+        
     }
 
     async export() {

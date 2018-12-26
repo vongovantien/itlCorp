@@ -2,9 +2,10 @@
 <button class="m-aside-left-close  m-aside-left-close--skin-dark " id="m_aside_left_close_btn">
     <i class="la la-close"></i>
 </button>
-<div id="m_aside_left" (mouseenter)="mouseenter()"  (mouseleave)="mouseleave()"  class="m-grid__item	m-aside-left  m-aside-left--skin-dark ">
+<div id="m_aside_left" (mouseenter)="mouseenter()" (mouseleave)="mouseleave()" class="m-grid__item	m-aside-left  m-aside-left--skin-dark ">
     <!-- BEGIN: Aside Menu -->
-    <div id="m_ver_menu" class="m-aside-menu  m-aside-menu--skin-dark m-aside-menu--submenu-skin-dark " m-menu-vertical="1" m-menu-scrollable="0" m-menu-dropdown-timeout="500">
+    <div id="m_ver_menu" class="m-aside-menu  m-aside-menu--skin-dark m-aside-menu--submenu-skin-dark " m-menu-vertical="1"
+        m-menu-scrollable="0" m-menu-dropdown-timeout="500">
         <perfect-scrollbar style="position: absolute; top: 0; bottom: 0">
             <!-- <ul class="m-menu__nav" style="padding: 30px 30px 0">
                 <li class="m-menu__item">
@@ -16,32 +17,36 @@
                     </a>
                 </li>
             </ul> -->
-        
+
             <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" *ngFor="let item of Menu;let i = index;" #parrent [id]="i">
+                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" *ngFor="let item of Menu;let i = index;"
+                    #parrent [id]="i">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(i)">
                         <i [class]="'m-menu__link-icon '+item.icon"></i>
                         <span class="m-menu__link-text">
-                          {{item.parent_name}}
+                            {{item.parent_name}}
                         </span>
                         <i class="m-menu__ver-arrow la la-angle-right"></i>
                     </a>
                     <div class="m-menu__submenu" *ngIf="item.display_child">
                         <span class="m-menu__arrow"></span>
                         <ul class="m-menu__subnav">
-                            <li class="m-menu__item m-menu__item" aria-haspopup="true" *ngFor="let sub_item of item.childs;let k = index;" [id]="i+'-'+k">
-                                <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link " (click)="sub_menu_click(sub_item.name,i,k)">
-                                    <i class="m-menu__link-bullet m-menu__link-bullet--dot">
-                                        <span></span>
-                                    </i>
-                                    <span class="m-menu__link-text">
-                                       {{sub_item.name}}
-                                    </span>
-                                </a>
+                            <li class="m-menu__item m-menu__item" aria-haspopup="true" *ngFor="let sub_item of item.childs;let k = index;"
+                                [id]="i+'-'+k">
+                              
+                                    <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link " *ngIf="sub_item.display"
+                                        (click)="sub_menu_click(sub_item.name,i,k)">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--dot">
+                                            <span></span>
+                                        </i>
+                                        <span class="m-menu__link-text">
+                                            {{sub_item.name}}
+                                        </span>
+                                    </a>
                             </li>
                         </ul>
                     </div>
-                </li>           
+                </li>
             </ul>
         </perfect-scrollbar>
     </div>

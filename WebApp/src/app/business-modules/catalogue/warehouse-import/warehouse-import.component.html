@@ -34,12 +34,12 @@
                             </div>
                             <div class="col-sm-4 m--margin-top-10 text-right">
                                 <span class="m--font-success m--font-bolder">
-                                    Valid rows: {{ validRows }}
+                                    Valid rows: {{ totalValidRows }}
                                 </span>
                             </div>
                             <div class="col-sm-4 m--margin-top-10 text-right">
                                 <span class="m--font-danger  m--font-bolder">
-                                    Invalid rows: {{ inValidRows }}
+                                    Invalid rows: {{ totalInValidRows }}
                                 </span>
                             </div>
                         </div>
@@ -48,12 +48,15 @@
                 <div class="form-actions m--margin-top-5 m--align-right">
                     <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
                         <span>
-                            <span> 
-                                Show/hide invalid rows
+                            <span *ngIf="isShowInvalid"> 
+                                Show invalid rows
+                            </span>
+                            <span *ngIf="isShowInvalid == false"> 
+                                Show All
                             </span>
                         </span>
                     </button>
-                    <button type="button" #fileInput class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span> 
@@ -137,7 +140,7 @@
                         <ng-container *ngFor="let item of pagedItems; let i = index">
                             <tr [ngClass]="{ 'invalid-row': !item.isValid }">
                                 <td>
-                                    <span>{{ (i+1) }}</span>
+                                    <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.code.split('|').length == 1">{{ item.code }}</span>

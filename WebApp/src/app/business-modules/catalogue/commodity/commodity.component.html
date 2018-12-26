@@ -43,7 +43,7 @@
                                     </span>
                                 </button> -->
                                 <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget" (click)="showAdd(tabName.commodity)"></app-default-button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="importCom()">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="importCom()" [routerLink]="['/home/catalogue/commodity-import']">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>

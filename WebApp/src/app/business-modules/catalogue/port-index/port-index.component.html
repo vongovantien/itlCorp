@@ -3,13 +3,13 @@
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <app-breadcrumb></app-breadcrumb>
+            <!-- <app-breadcrumb></app-breadcrumb> -->
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
             <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
-            <app-default-button [buttonSetting]="importButtonSetting" (click)="import()"></app-default-button>
             <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/port-index-import']"></app-default-button>
         </div>
     </div>
 </div>
@@ -67,7 +67,8 @@
                                         Port code
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter detail" name="code" autocomplete="nope" minlength="3"
-                                    [(ngModel)]="portIndex.code" #code="ngModel" (change)="portIndex.code = portIndex.code.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required>
+                                        [(ngModel)]="portIndex.code" #code="ngModel" (change)="portIndex.code = portIndex.code.trim()" [attr.disabled]="portIndex.id ? '' : null"
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required>
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
                                         Code is required least 3 characters
                                     </div>

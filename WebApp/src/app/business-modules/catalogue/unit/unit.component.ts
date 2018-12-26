@@ -94,7 +94,7 @@ export class UnitComponent implements OnInit {
   }
 
   async getUnits() {
-    var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject, false, true);
+    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject, false, true);
     this.ListUnits = response.data;
     this.pager.totalItems = response.totalItems;
   }
@@ -106,10 +106,12 @@ export class UnitComponent implements OnInit {
   async updateUnit(form: NgForm, action) {
     if (action == "yes") {
       if (form.form.status != "INVALID") {
-        await this.baseServices.putAsync(this.api_menu.Catalogue.Unit.update, this.UnitToUpdate);
-        await this.getUnits();
-        form.onReset();
-        $('#update-unit-modal').modal('hide');
+        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Unit.update, this.UnitToUpdate);
+        if(res){
+          await this.getUnits();
+          form.onReset();
+          $('#update-unit-modal').modal('hide');
+        }
       }
     } else {
       form.onReset();
@@ -122,9 +124,9 @@ export class UnitComponent implements OnInit {
     if (action == "yes") {
       delete this.UnitToAdd.id;
       if (form.form.status != "INVALID") {
-        var respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.addNew, this.UnitToAdd, true, true);
+        const respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.addNew, this.UnitToAdd, true, true);
         await this.getUnits();
-        if (respone != undefined && respone.status) {
+        if (respone) {
           this.setPageAfterAdd();
           form.onReset();
           $('#add-unit-modal').modal('hide');

@@ -48,12 +48,15 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
 
   ngOnInit() {
     this.setupLocalInfo();
+    if(this.baseService.checkLoginSession(false)){
+      this.router.navigateByUrl('/home');
+    };
   }
 
-  async Login(form: NgForm) {    
-    this.baseService.spinnerShow();
-    await this.configureWithNewConfigApi();
+  async Login(form: NgForm) {          
     if (form.form.status !== "INVALID") {
+      this.baseService.spinnerShow();
+      await this.configureWithNewConfigApi();
       this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
         return this.oauthService.loadUserProfile();
       }).then(() => {
@@ -63,7 +66,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
           localStorage.setItem("currently_userEmail",claims['email']);
           
           this.rememberMe();
-          this.toastr.success("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "", { positionClass: 'toast-bottom-right' });
+          this.toastr.info("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "Login Success", { positionClass: 'toast-bottom-right' });
           this.router.navigateByUrl('/home');       
           this.baseService.spinnerHide();
         }
@@ -142,7 +145,5 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
       localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");
     }
   }
-
-
 
 }

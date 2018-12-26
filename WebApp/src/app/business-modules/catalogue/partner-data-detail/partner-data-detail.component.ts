@@ -115,19 +115,19 @@ export class PartnerDataDetailComponent implements OnInit {
   }
   async getDepartments(){
     let respones = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getDepartments);
-    if(respones != null){
+    if(respones!=null){
       this.departments = respones.map(x=>({"text":x.name,"id":x.id}));
     }
   }
   async getParentCustomers(){
     let respones = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup : 3 });
-    if(respones != null){
+    if(respones!=null){
       this.parentCustomers = respones.map(x=>({"text":x.partnerNameVn,"id":x.id}));
     }
   }
   async getWorkPlaces(){
     let responses = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: 2 });
-    if(responses != null){
+    if(responses!=null){
       this.workPlaces = responses.map(x=>({"text":x.code + ' - ' + x.name_VN ,"id":x.id}));
     }
   }

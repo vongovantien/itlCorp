@@ -38,7 +38,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTeamplate.xlsx";
+        private string templateName = "ImportTemplate.xlsx";
 
         public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
         {
@@ -182,13 +182,13 @@ namespace eFMS.API.Catalogue.Controllers
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
                 return result;
-            return BadRequest();
+            else return BadRequest(result);
         }
 
         [HttpPost]
         [Route("UpLoadFile")]
         [Authorize]
-        public IActionResult UpLoadFile(IFormFile uploadedFile)
+        public IActionResult UpLoadFile(IFormFile uploadedFile, CatPlaceTypeEnum type)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
             if(file != null)
@@ -197,34 +197,138 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
-                List<WarehouseImportModel> list = new List<WarehouseImportModel>();
-                for (int row = 2; row <= rowCount; row++)
+                List<CatPlaceImportModel> list = null;
+                switch (type)
                 {
-                    var warehouse = new WarehouseImportModel();
-                    warehouse.IsValid = true;
-                    warehouse.Code = worksheet.Cells[row, 1].Value?.ToString();
-                    warehouse.NameEn = worksheet.Cells[row, 2].Value?.ToString();
-                    warehouse.NameVn = worksheet.Cells[row, 3].Value?.ToString();
-                    warehouse.Address = worksheet.Cells[row, 4].Value?.ToString();
-                    warehouse.CountryName = worksheet.Cells[row, 5].Value?.ToString();
-                    warehouse.ProvinceName = worksheet.Cells[row, 6].Value?.ToString();
-                    warehouse.DistrictName = worksheet.Cells[row, 7].Value?.ToString();
-                    warehouse.Status = worksheet.Cells[row, 8].Value?.ToString();
-                    list.Add(warehouse);
+                    case CatPlaceTypeEnum.Warehouse:
+                        list = ReadWarehouseFromExel(worksheet, rowCount);
+                        break;
+                    case CatPlaceTypeEnum.Port:
+                        list = ReadPortIndexFromExel(worksheet, rowCount);
+                        break;
+                    case CatPlaceTypeEnum.Province:
+                        list = ReadProvinceFromExel(worksheet, rowCount);
+                        break;
+                    case CatPlaceTypeEnum.District:
+                        list = ReadDistrictFromExel(worksheet, rowCount);
+                        break;
+                    case CatPlaceTypeEnum.Ward:
+                        list = ReadWardFromExel(worksheet, rowCount);
+                        break;
                 }
 
-                var data = catPlaceService.CheckValidImport(list, CatPlaceTypeEnum.Warehouse);
-                var validRows = data.Count(x => x.IsValid == true);
-                var results = new { data, validRows };
+                var data = catPlaceService.CheckValidImport(list, type);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
                 return Ok(results);
             }
             return BadRequest(file);
         }
 
+        private List<CatPlaceImportModel> ReadWarehouseFromExel(ExcelWorksheet worksheet, int rowCount)
+        {
+            List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var warehouse = new CatPlaceImportModel
+                {
+                    IsValid = true,
+                    Code = worksheet.Cells[row, 1].Value?.ToString(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                    Address = worksheet.Cells[row, 4].Value?.ToString(),
+                    CountryName = worksheet.Cells[row, 5].Value?.ToString(),
+                    ProvinceName = worksheet.Cells[row, 6].Value?.ToString(),
+                    DistrictName = worksheet.Cells[row, 7].Value?.ToString(),
+                    Status = worksheet.Cells[row, 8].Value?.ToString()
+                };
+                list.Add(warehouse);
+            }
+            return list;
+        }
+        private List<CatPlaceImportModel> ReadPortIndexFromExel(ExcelWorksheet worksheet, int rowCount)
+        {
+            List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var warehouse = new CatPlaceImportModel
+                {
+                    IsValid = true,
+                    Code = worksheet.Cells[row, 1].Value?.ToString(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
+                    AreaName = worksheet.Cells[row, 5].Value?.ToString(),
+                    ModeOfTransport = worksheet.Cells[row, 6].Value?.ToString(),
+                    Status = worksheet.Cells[row, 7].Value?.ToString()
+                };
+                list.Add(warehouse);
+            }
+            return list;
+        }
+        private List<CatPlaceImportModel> ReadProvinceFromExel(ExcelWorksheet worksheet, int rowCount)
+        {
+            List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var warehouse = new CatPlaceImportModel
+                {
+                    IsValid = true,
+                    Code = worksheet.Cells[row, 1].Value?.ToString(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
+                    Status = worksheet.Cells[row, 5].Value?.ToString()
+                };
+                list.Add(warehouse);
+            }
+            return list;
+        }
+        private List<CatPlaceImportModel> ReadDistrictFromExel(ExcelWorksheet worksheet, int rowCount)
+        {
+            List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var warehouse = new CatPlaceImportModel
+                {
+                    IsValid = true,
+                    Code = worksheet.Cells[row, 1].Value?.ToString(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
+                    ProvinceName = worksheet.Cells[row, 5].Value?.ToString(),
+                    Status = worksheet.Cells[row, 6].Value?.ToString()
+                };
+                list.Add(warehouse);
+            }
+            return list;
+        }
+
+        private List<CatPlaceImportModel> ReadWardFromExel(ExcelWorksheet worksheet, int rowCount)
+        {
+            List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var warehouse = new CatPlaceImportModel
+                {
+                    IsValid = true,
+                    Code = worksheet.Cells[row, 1].Value?.ToString(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
+                    ProvinceName = worksheet.Cells[row, 5].Value?.ToString(),
+                    DistrictName = worksheet.Cells[row, 6].Value?.ToString(),
+                    Status = worksheet.Cells[row, 7].Value?.ToString()
+                };
+                list.Add(warehouse);
+            }
+            return list;
+        }
+
         [HttpPost]
         [Route("Import")]
         [Authorize]
-        public IActionResult Import(List<WarehouseImportModel> data)
+        public IActionResult Import([FromBody]List<CatPlaceImportModel> data)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catPlaceService.Import(data);
@@ -237,6 +341,15 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 case CatPlaceTypeEnum.Port:
                     templateName = "PortIndex" + templateName;
+                    break;
+                case CatPlaceTypeEnum.Province:
+                    templateName = "Province" + templateName;
+                    break;
+                case CatPlaceTypeEnum.District:
+                    templateName = "District" + templateName;
+                    break;
+                case CatPlaceTypeEnum.Ward:
+                    templateName = "Ward" + templateName;
                     break;
                 default:
                     templateName = "Warehouse" + templateName;

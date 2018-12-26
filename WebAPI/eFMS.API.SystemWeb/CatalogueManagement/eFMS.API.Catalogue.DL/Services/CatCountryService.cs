@@ -3,8 +3,10 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -21,6 +23,45 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper) : base(repository, mapper)
         {
             SetChildren<CatPlace>("Id", "CountryId");
+        }
+
+        public List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var countries = dc.CatCountry.ToList();
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.NameEn))
+                {
+                    item.NameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.NameVn))
+                {
+                    item.NameVn = string.Format("Name Vn is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    item.Code = string.Format("Code is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(x => x.Code.ToLower()==item.Code.ToLower());
+                    if(country != null)
+                    {
+                        item.Code = string.Format("Code {0} has been existed!|wrong", item.Code);
+                        item.IsValid = false;
+                    }
+                    if(list.Count(x => (x.Code??"").IndexOf(item.Code ??"", StringComparison.OrdinalIgnoreCase) >=0) > 1)
+                    {
+                        item.Code = string.Format("Code {0} has been duplicated!|wrong", item.Code);
+                        item.IsValid = false;
+                    }
+                }
+            });
+            return list;
         }
 
         public List<CatCountryViewModel> GetByLanguage()
@@ -56,6 +97,35 @@ namespace eFMS.API.Catalogue.DL.Services
                 returnList = returnList.Skip((page - 1) * size).Take(size).ToList();
             }
             return returnList;        
+        }
+
+        public HandleState Import(List<CatCountryImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach (var item in data)
+                {
+                    DateTime? inactive = null;
+                    var country = new CatCountry
+                    {
+                        Code = item.Code,
+                        NameEn = item.NameEn,
+                        NameVn = item.NameVn,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = ChangeTrackerHelper.currentUser,
+                        Inactive = (item.Status ?? "").Contains("active"),
+                        InactiveOn = item.Status != null? DateTime.Now: inactive
+                    };
+                    dc.CatCountry.Add(country);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
 
         public List<CatCountry> Query(CatCountryCriteria criteria)

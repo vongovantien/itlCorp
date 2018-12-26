@@ -11,11 +11,13 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
@@ -31,6 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityService catComonityService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+        private string templateName = "ImportTeamplate.xlsx";
         public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -148,5 +151,94 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return message;
         }
+
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+                if (worksheet.Cells[1, 1].Value.ToString() != "English Name")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name'" });
+                }
+                if (worksheet.Cells[1, 2].Value.ToString() != "Local Name")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'Local Name'" });
+                }
+                if (worksheet.Cells[1, 3].Value.ToString() != "Commodity Group ID")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Commodity Group ID'" });
+                }
+                if (worksheet.Cells[1, 4].Value.ToString() != "Status")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Status'" });
+                }
+                List<CommodityImportModel> list = new List<CommodityImportModel>();
+                for(int row = 2; row <= rowCount; row++)
+                {
+                    var commodity = new CommodityImportModel
+                    {
+                        IsValid = true,
+                        CommodityNameEn = worksheet.Cells[row, 1].Value?.ToString(),
+                        CommodityNameVn = worksheet.Cells[row, 2].Value?.ToString(),
+                        CommodityGroupId = worksheet.Cells[row, 3].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 3].Value),
+                        Status = worksheet.Cells[row,4].Value?.ToString()
+                    };
+                    list.Add(commodity);
+                }
+                var data = catComonityService.CheckValidImport(list);
+                var totoalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totoalValidRows };
+                return Ok(results);
+
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = "Cannot upload, file not found !" });
+        }
+
+
+        [HttpPost]
+        [Route("import")]
+        //[Authorize]
+        public IActionResult Import([FromBody] List<CommodityImportModel> data)
+        {
+            ChangeTrackerHelper.currentUser = "1";  //currentUser.UserID;
+            var result = catComonityService.Import(data);
+            return Ok(result);
+        }
+
+
+
+        [HttpGet("downloadExcel")]
+        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        {
+
+            try
+            {
+                templateName = "Commodity" + templateName;
+                var result = await new FileHelper().ExportExcel(templateName);
+                if (result != null)
+                {
+                    return result;
+
+                }
+                else
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+            }
+
+
+        }
+
     }
 }
