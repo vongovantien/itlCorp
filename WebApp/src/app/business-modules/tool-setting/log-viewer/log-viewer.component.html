@@ -117,7 +117,7 @@
                     <tbody *ngIf="logs">
                         <tr *ngFor="let log of logs;let i = index;">
                             <td>
-                                <span>{{(i+1)}}</span>
+                                <span>{{ (i + this.pager.startIndex + 1) }}</span>
                             </td>
                             <td>
                                 <span *ngIf="log.code == null">{{ log.name }}</span>

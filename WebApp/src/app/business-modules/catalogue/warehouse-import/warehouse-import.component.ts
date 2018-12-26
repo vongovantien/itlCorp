@@ -65,12 +65,13 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    console.log(this.pager);
   }
   downloadSample(){
     this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12")
     .subscribe(
       response => {
-        saveAs(response, 'WarehouseTemplate.xlsx');
+        saveAs(response, 'WarehouseImportTemplate.xlsx');
       }
     )
   }
@@ -94,9 +95,9 @@ export class WarehouseImportComponent implements OnInit {
     }
     else{
       this.inProgress = true;
-      let validItems = this.data.filter(x => x.isValid);
+      let data = this.data.filter(x => x.isValid);
       if(!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, validItems, true, false);
+      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data, true, false);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.inProgress = false;

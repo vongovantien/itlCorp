@@ -54,7 +54,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.Code = string.Format("Code {0} has been existed!|wrong", item.Code);
                         item.IsValid = false;
                     }
-                    if(list.Count(x => x.Code.IndexOf(item.Code, StringComparison.OrdinalIgnoreCase) >=0) > 1)
+                    if(list.Count(x => (x.Code??"").IndexOf(item.Code ??"", StringComparison.OrdinalIgnoreCase) >=0) > 1)
                     {
                         item.Code = string.Format("Code {0} has been duplicated!|wrong", item.Code);
                         item.IsValid = false;
@@ -106,16 +106,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
-                    var catPlace = new CatPlace
+                    DateTime? inactive = null;
+                    var country = new CatCountry
                     {
-                        Id = Guid.NewGuid(),
                         Code = item.Code,
                         NameEn = item.NameEn,
                         NameVn = item.NameVn,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser
+                        UserCreated = ChangeTrackerHelper.currentUser,
+                        Inactive = (item.Status ?? "").Contains("active"),
+                        InactiveOn = item.Status != null? DateTime.Now: inactive
                     };
-                    dc.CatPlace.Add(catPlace);
+                    dc.CatCountry.Add(country);
                 }
                 dc.SaveChanges();
                 return new HandleState();
