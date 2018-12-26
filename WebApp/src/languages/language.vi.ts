@@ -12,6 +12,7 @@ export const language = {
         // { name: "Port Index Import", route_child: "port-index-import" },
         { name: "Dữ Liệu Đối Tác", route_child: "partner-data",display:true },
         { name: "Hàng Hóa", route_child: "commodity",display:true },
+        { name: "Commodity Import", route_child: "commodity-import",display:false },
         { name: "Quản Lí Stage", route_child: "stage-management",display:true },
         { name: "Import Stage", route_child: "stage-import" , display:false},
         { name: "Đơn Vị", route_child: "unit" ,display:true},

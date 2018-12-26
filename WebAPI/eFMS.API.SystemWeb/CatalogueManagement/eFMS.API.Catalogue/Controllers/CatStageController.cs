@@ -156,9 +156,9 @@ namespace eFMS.API.Catalogue.Controllers
                     var hs = new HandleState("Column 6 must have header is 'DescriptionEn'");
                     return BadRequest(hs);
                 }
-                if (worksheet.Cells[1, 7].Value.ToString() != "Inactive")
+                if (worksheet.Cells[1, 7].Value.ToString() != "Status")
                 {
-                    ResultHandle result = new ResultHandle { Status = false, Message = "Column 7 must have header is 'Inactive'" };
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Column 7 must have header is 'Status'" };
                     return BadRequest(result);
                 }
                 List<CatStageImportModel> list = new List<CatStageImportModel>();
@@ -172,7 +172,8 @@ namespace eFMS.API.Catalogue.Controllers
                         StageNameVn = worksheet.Cells[row, 3].Value?.ToString(),
                         StageNameEn = worksheet.Cells[row, 4].Value?.ToString(),
                         DescriptionVn = worksheet.Cells[row, 5].Value?.ToString(),
-                        DescriptionEn = worksheet.Cells[row, 6].Value?.ToString()
+                        DescriptionEn = worksheet.Cells[row, 6].Value?.ToString(),
+                        Status = worksheet.Cells[row,7].Value?.ToString()
                     };
                     list.Add(stage);
                 }
@@ -181,7 +182,7 @@ namespace eFMS.API.Catalogue.Controllers
                 var results = new { data, totalValidRows };
                 return Ok(results);
             }
-            return BadRequest(file);
+            return BadRequest(new ResultHandle { Status = false, Message = "Cannot upload, file not found !" });
         }
 
         [HttpPost]
@@ -198,18 +199,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("downloadExcel")]
         public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
         {
-            //templateName = "Stage" + templateName;
-            //var result = await new FileHelper().ExportExcel(templateName);
-            //if (result != null)
-            //{
-            //    return result;
-
-            //}
-            //else
-            //{               
-            //    return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
-            //}
-
+ 
             try
             {
                 templateName = "Stage" + templateName;
