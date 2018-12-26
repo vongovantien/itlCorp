@@ -257,11 +257,10 @@ namespace eFMS.API.Catalogue.Controllers
                     Code = worksheet.Cells[row, 1].Value?.ToString(),
                     NameEn = worksheet.Cells[row, 2].Value?.ToString(),
                     NameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                    Address = worksheet.Cells[row, 4].Value?.ToString(),
-                    CountryName = worksheet.Cells[row, 5].Value?.ToString(),
-                    ProvinceName = worksheet.Cells[row, 6].Value?.ToString(),
-                    DistrictName = worksheet.Cells[row, 7].Value?.ToString(),
-                    Status = worksheet.Cells[row, 8].Value?.ToString()
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
+                    AreaName = worksheet.Cells[row, 5].Value?.ToString(),
+                    ModeOfTransport = worksheet.Cells[row, 6].Value?.ToString(),
+                    Status = worksheet.Cells[row, 7].Value?.ToString()
                 };
                 list.Add(warehouse);
             }

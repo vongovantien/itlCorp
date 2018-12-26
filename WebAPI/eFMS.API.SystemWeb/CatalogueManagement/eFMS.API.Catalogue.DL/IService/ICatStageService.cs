@@ -16,6 +16,8 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState AddStage(CatStageModel catStage);
         HandleState UpdateStage(CatStageModel catStage);
         HandleState DeleteStage(int id);
+        List<CatStageImportModel> CheckValidImport(List<CatStageImportModel> list);
+        HandleState Import(List<CatStageImportModel> data);
     }
 
 

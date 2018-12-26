@@ -417,11 +417,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var result = CheckCatplaceValidImport(portIndexs, results, item);
                 result.PlaceTypeId = placeTypeName;
-                if (string.IsNullOrEmpty(item.Address))
-                {
-                    result.Address = string.Format("Address is not allow empty!|wrong");
-                    result.IsValid = false;
-                }
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
                     result.CountryName = string.Format("Country name is not allow empty!|wrong");
@@ -489,7 +484,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (string.IsNullOrEmpty(item.ProvinceName))
                     {
                         result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
-                        result.DistrictName = string.Format("Province name is not allow empty!|wrong|wrong");
+                        result.DistrictName = string.Format("Province name is not allow empty!|wrong");
                         result.IsValid = false;
                     }
                     else if (province == null)
@@ -545,7 +540,9 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserCreated = ChangeTrackerHelper.currentUser,
                         PlaceTypeId = item.PlaceTypeId,
                         Inactive = (item.Status ?? "").Contains("active"),
-                        InactiveOn = item.Status != null ? DateTime.Now : inactive
+                        InactiveOn = item.Status != null ? DateTime.Now : inactive,
+                        ModeOfTransport = item.ModeOfTransport,
+                        AreaId = item.AreaId
                     };
                     dc.CatPlace.Add(catPlace);
                 }

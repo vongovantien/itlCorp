@@ -16,6 +16,7 @@ import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-d
 import { ChargeDetailsComponent } from './charge-details/charge-details.component';
 import { CurrencyComponent } from './currency/currency.component';
 import { LocationImportComponent } from './location-import/location-import.component';
+import { StageImportComponent } from './stage-import/stage-import.component';
 
 const routes: Routes = [
 
@@ -71,6 +72,10 @@ const routes: Routes = [
   {
     path:'stage-management',
     component:StageManagementComponent
+  },
+  {
+    path:'stage-import',
+    component:StageImportComponent
   },
   {
     path:'unit',

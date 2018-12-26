@@ -48,7 +48,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(x => (x.Code ?? "").IndexOf(item.Code ??"", StringComparison.OrdinalIgnoreCase) >= 0);
+                    var country = countries.FirstOrDefault(x => x.Code.ToLower()==item.Code.ToLower());
                     if(country != null)
                     {
                         item.Code = string.Format("Code {0} has been existed!|wrong", item.Code);

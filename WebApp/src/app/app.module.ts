@@ -24,6 +24,8 @@ import { SharedModule } from './shared/shared.module';
 import { CookieService } from 'ngx-cookie-service';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { NgxSpinnerModule } from 'ngx-spinner';
+
+import { NgProgressModule } from '@ngx-progressbar/core';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -49,6 +51,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     BrowserAnimationsModule, // required animations module
     ToastrModule.forRoot(), // ToastrModule added
     NgxSpinnerModule,
+    NgProgressModule,
     PerfectScrollbarModule,
     SelectModule, // Scrollbar
     OAuthModule.forRoot()

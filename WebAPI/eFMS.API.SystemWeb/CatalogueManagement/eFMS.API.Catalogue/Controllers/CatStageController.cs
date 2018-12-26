@@ -6,14 +6,17 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
@@ -28,6 +31,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatStageService catStageService;
         private readonly ICurrentUser currentUser;
+        private string templateName = "ImportTeamplate.xlsx";
 
         public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user)
         {
@@ -110,5 +114,128 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+                if(worksheet.Cells[1,1].Value.ToString()!= "DepartmentId")
+                {
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Column 1 must have header is 'DepartmentId'" };
+                    return BadRequest(result);
+                }
+                if (worksheet.Cells[1, 2].Value.ToString() != "Code")
+                {
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Column 2 must have header is 'Code'" };
+                    return BadRequest(result);
+                }
+                if (worksheet.Cells[1, 3].Value.ToString() != "StageNameVn")
+                {
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Column 3 must have header is 'StageNameVn'" };
+                    return BadRequest(result);
+                }
+                if (worksheet.Cells[1, 4].Value.ToString() != "StageNameEn")
+                {
+                    var hs = new HandleState("Column 4 must have header is 'StageNameEn'");
+                    return BadRequest(hs);
+                }
+                if (worksheet.Cells[1, 5].Value.ToString() != "DescriptionVn")
+                {
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Column 5 must have header is 'DescriptionVn'" };
+                    return BadRequest(result);
+                }
+                if (worksheet.Cells[1, 6].Value.ToString() != "DescriptionEn")
+                {
+                    var hs = new HandleState("Column 6 must have header is 'DescriptionEn'");
+                    return BadRequest(hs);
+                }
+                if (worksheet.Cells[1, 7].Value.ToString() != "Inactive")
+                {
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Column 7 must have header is 'Inactive'" };
+                    return BadRequest(result);
+                }
+                List<CatStageImportModel> list = new List<CatStageImportModel>();
+                for(int row = 2; row <= rowCount; row++)
+                {
+                    var stage = new CatStageImportModel
+                    {
+                        IsValid = true,
+                        DepartmentId = worksheet.Cells[row, 1].Value == null ? (int?)null : (int)Math.Ceiling((double)worksheet.Cells[row, 1].Value),
+                        Code = worksheet.Cells[row, 2].Value?.ToString(),
+                        StageNameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                        StageNameEn = worksheet.Cells[row, 4].Value?.ToString(),
+                        DescriptionVn = worksheet.Cells[row, 5].Value?.ToString(),
+                        DescriptionEn = worksheet.Cells[row, 6].Value?.ToString()
+                    };
+                    list.Add(stage);
+                }
+                var data = catStageService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(file);
+        }
+
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<CatStageImportModel> data)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var result = catStageService.Import(data);
+            return Ok(result);
+        }
+
+
+        [HttpGet("downloadExcel")]
+        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        {
+            //templateName = "Stage" + templateName;
+            //var result = await new FileHelper().ExportExcel(templateName);
+            //if (result != null)
+            //{
+            //    return result;
+
+            //}
+            //else
+            //{               
+            //    return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+            //}
+
+            try
+            {
+                templateName = "Stage" + templateName;
+                var result = await new FileHelper().ExportExcel(templateName);
+                if (result != null)
+                {
+                    return result;
+
+                }
+                else
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+                }
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+            }
+                
+            
+        }
+
+
+
+
+
+
     }
 }
