@@ -29,8 +29,8 @@ export class WarehouseImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild('form') form;
-  @ViewChild(PaginationComponent) child;
+  @ViewChild('form') form:any;
+  @ViewChild(PaginationComponent) child:any;
 
   constructor(
     private pagingService: PagingService,

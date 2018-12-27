@@ -102,6 +102,7 @@ export class CommodityComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
     this.getCommodities(this.pager);
     this.getGroups();
   }

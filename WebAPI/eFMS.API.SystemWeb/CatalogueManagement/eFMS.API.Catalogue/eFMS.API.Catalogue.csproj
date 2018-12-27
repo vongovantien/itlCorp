@@ -67,10 +67,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.Development.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.Test.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="Resources\en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

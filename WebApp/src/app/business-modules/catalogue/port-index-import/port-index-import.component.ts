@@ -27,8 +27,8 @@ export class PortIndexImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild('form') form;
-  @ViewChild(PaginationComponent) child;
+  @ViewChild('form') form:any;
+  @ViewChild(PaginationComponent) child:any;
   @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   
   constructor(
@@ -52,8 +52,8 @@ export class PortIndexImportComponent implements OnInit {
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.baseService.spinnerHide();
-        console.log(this.data);
       },err=>{
+        this.baseService.spinnerHide();
         this.baseService.handleError(err);
       });
   }
@@ -80,10 +80,9 @@ export class PortIndexImportComponent implements OnInit {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.inProgress = false;
         this.pager.totalItems = 0;
-        this.reset();
-        this.progressBar.complete();
+        this.reset();        
       }
-      console.log(response);
+      this.progressBar.complete();      
     }
   }
   

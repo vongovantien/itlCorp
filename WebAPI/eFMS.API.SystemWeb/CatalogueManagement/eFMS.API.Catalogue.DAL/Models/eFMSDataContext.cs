@@ -740,11 +740,11 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Partner)
-                    .WithMany(p => p.CatPartnerContact)
-                    .HasForeignKey(d => d.PartnerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_catPartnerContact_catPartner");
+                //entity.HasOne(d => d.Partner)
+                //    .WithMany(p => p.CatPartnerContact)
+                //    .HasForeignKey(d => d.PartnerId)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("FK_catPartnerContact_catPartner");
             });
 
             modelBuilder.Entity<CatPartnerContract>(entity =>

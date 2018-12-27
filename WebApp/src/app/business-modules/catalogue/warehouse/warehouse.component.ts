@@ -102,6 +102,7 @@ export class WarehouseComponent implements OnInit {
     private api_menu: API_MENU) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
     this.warehouse.placeType = 12;
     this.getWarehouses(this.pager);
     this.getDataCombobox();

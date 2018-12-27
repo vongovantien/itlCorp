@@ -42,6 +42,7 @@ export class UnitComponent implements OnInit {
     private sortService: SortService) { }
 
   async ngOnInit() {
+    this.pager.totalItems = 0;
     await this.getUnits();
   }
 

@@ -29,6 +29,7 @@ import { PortIndexImportComponent } from './port-index-import/port-index-import.
 import { LocationImportComponent } from './location-import/location-import.component';
 import { StageImportComponent } from './stage-import/stage-import.component';
 import { CommodityImportComponent } from './commodity-import/commodity-import.component';
+import { CommodityGroupImportComponent } from './commodity-group-import/commodity-group-import.component';
 
 
 @NgModule({
@@ -63,7 +64,8 @@ import { CommodityImportComponent } from './commodity-import/commodity-import.co
       PortIndexImportComponent,
       LocationImportComponent,
       StageImportComponent,
-      CommodityImportComponent
+      CommodityImportComponent,
+      CommodityGroupImportComponent
     ],
 })
 export class CatalogueModule { }

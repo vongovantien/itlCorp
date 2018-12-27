@@ -67,6 +67,7 @@ export class CurrencyComponent implements OnInit {
     private api_menu: API_MENU) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
     this.getCurrencies(this.pager);
   }
 

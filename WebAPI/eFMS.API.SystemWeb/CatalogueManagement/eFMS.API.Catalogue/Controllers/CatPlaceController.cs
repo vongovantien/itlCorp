@@ -187,7 +187,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("UpLoadFile")]
-        [Authorize]
+        //[Authorize]
         public IActionResult UpLoadFile(IFormFile uploadedFile, CatPlaceTypeEnum type)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
@@ -197,6 +197,7 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
+
                 List<CatPlaceImportModel> list = null;
                 switch (type)
                 {

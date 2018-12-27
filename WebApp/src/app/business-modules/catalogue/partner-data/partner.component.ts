@@ -62,6 +62,7 @@ export class PartnerComponent implements OnInit {
     private router:Router) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
     this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
   }
