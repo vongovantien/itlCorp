@@ -40,6 +40,7 @@ export class CommodityGroupImportComponent implements OnInit {
   @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
 
   ngOnInit() {
+    this.pager.totalItems =0 ;
   }
 
   chooseFile(file:Event){
@@ -55,7 +56,6 @@ export class CommodityGroupImportComponent implements OnInit {
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.progressBar.complete();
-        console.log({DATA:this.data});
       },err=>{
         this.progressBar.complete();
         this.baseService.handleError(err);
@@ -67,7 +67,6 @@ export class CommodityGroupImportComponent implements OnInit {
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    console.log(this.pagedItems);
   }
 
   async setPage(pager: PagerSetting) {
@@ -88,7 +87,7 @@ export class CommodityGroupImportComponent implements OnInit {
 
   isDesc = true;
   sortKey: string;
-  sort(property) {
+  sort(property: string) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
@@ -113,16 +112,14 @@ export class CommodityGroupImportComponent implements OnInit {
     if (this.totalInValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
-    else {
-      this.baseService.spinnerShow();
+    else {      
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.CommodityGroup.import, validItems, true, false);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.CommodityGroup.import, validItems, true, true);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);       
         this.pager.totalItems = 0;
         this.reset();
-        this.baseService.spinnerHide();
       }     
     }
 
@@ -137,11 +134,14 @@ export class CommodityGroupImportComponent implements OnInit {
   }
 
   downloadSample(){
+    this.baseService.spinnerShow();
     this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel)
     .subscribe(
       response => {
+        this.baseService.spinnerHide();
         saveAs(response, 'CommodityTemplate.xlsx');
       },err=>{
+        this.baseService.spinnerHide();
         this.baseService.handleError(err);
       }
     )}

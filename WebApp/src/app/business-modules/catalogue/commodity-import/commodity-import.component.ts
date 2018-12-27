@@ -34,18 +34,18 @@ export class CommodityImportComponent implements OnInit {
     private sortService: SortService
   ) { }
 
-  @ViewChild(PaginationComponent) child:any;
+  @ViewChild(PaginationComponent) child: any;
   @ViewChild('form') form: any;
   @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   ngOnInit() {
-    
+
   }
-  chooseFile(file:Event){
+  chooseFile(file: Event) {
     if (!this.baseService.checkLoginSession()) return;
     if (file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.menu_api.Catalogue.Commodity.uploadFile, file.target['files'], "uploadedFile")
-      .subscribe(res=>{
+      .subscribe(res => {
         this.data = res['data'];
         this.pager.totalItems = this.data.length;
         this.totalValidRows = res['totalValidRows'];
@@ -53,10 +53,10 @@ export class CommodityImportComponent implements OnInit {
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.progressBar.complete();
-        console.log({DATA:this.data});
-      },err=>{
+        console.log({ DATA: this.data });
+      }, err => {
         this.progressBar.complete();
-          this.baseService.handleError(err);
+        this.baseService.handleError(err);
       });
   }
 
@@ -65,7 +65,6 @@ export class CommodityImportComponent implements OnInit {
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    console.log(this.pagedItems);
   }
 
   async setPage(pager: PagerSetting) {
@@ -86,7 +85,7 @@ export class CommodityImportComponent implements OnInit {
 
   isDesc = true;
   sortKey: string;
-  sort(property) {
+  sort(property: string) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
@@ -106,28 +105,26 @@ export class CommodityImportComponent implements OnInit {
     this.child.setPage(this.pager.currentPage);
   }
 
-  
+
   async import() {
     if (this.data == null) return;
     if (this.totalInValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
-    else {
-      this.baseService.spinnerShow();
+    else {     
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Commodity.import, validItems, true, false);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Commodity.import, validItems, true, true);
       if (response) {
-        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);       
+        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
         this.reset();
-        this.baseService.spinnerHide();
-      }     
+      }
     }
 
   }
 
-  
+
   reset() {
     this.data = null;
     this.pagedItems = null;
@@ -135,16 +132,20 @@ export class CommodityImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
 
-  
-  downloadSample(){
+
+  downloadSample() {
+    this.baseService.spinnerShow();
     this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel)
-    .subscribe(
-      response => {
-        saveAs(response, 'CommodityTemplate.xlsx');
-      },err=>{
-        this.baseService.handleError(err);
-      }
-    )}
+      .subscribe(
+        response => {
+          this.baseService.spinnerHide();
+          saveAs(response, 'CommodityTemplate.xlsx');        
+        }, err => {
+          this.baseService.spinnerHide();
+          this.baseService.handleError(err);
+        }
+      )
+  }
 
 
 }

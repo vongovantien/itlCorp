@@ -29,8 +29,8 @@ export class LocationImportComponent implements OnInit {
   inProgress: boolean = false;
   type: string;
 
-  @ViewChild('form') form;
-  @ViewChild(PaginationComponent) child;
+  @ViewChild('form') form:any;
+  @ViewChild(PaginationComponent) child:any;
   constructor(
     private pagingService: PagingService,
     private baseService: BaseService,
@@ -105,11 +105,10 @@ export class LocationImportComponent implements OnInit {
     .subscribe(
       response => {
         saveAs(response, this.type + 'ImportTemplate.xlsx');
-      }
-    ),err=>{
-      this.baseService.handleError(err);
+      },err=>{
+        this.baseService.handleError(err);
+      });  
     }
-  }
   async setPage(pager:PagerSetting){
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
@@ -167,7 +166,6 @@ export class LocationImportComponent implements OnInit {
         this.pager.totalItems = 0;
         this.reset();
       }
-      console.log(response);
     }
   }
   
@@ -180,7 +178,7 @@ export class LocationImportComponent implements OnInit {
   }
   isDesc = true;
   sortKey: string;
-  sort(property){
+  sort(property: string){
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
