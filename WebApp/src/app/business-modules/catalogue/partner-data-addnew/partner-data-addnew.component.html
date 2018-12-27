@@ -41,7 +41,7 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partnerAccountNo.invalid }">
                             <label class="form-control-label" for="">
-                                Account No 
+                                Account No <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" disabled name="partnerAccountNo" autocomplete="nope" minlength="3" maxlength="20"
                              [(ngModel)]="partner.accountNo" #partnerAccountNo="ngModel" (change)="partner.accountNo = partner.taxCode.trim()" 
@@ -54,7 +54,7 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && nameENFull.invalid }">
                             <label class="form-control-label" for="">
-                                Partner Name EN Full
+                                Partner Name EN Full <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" autofocus placeholder="Please enter Name EN Full" name="nameENFull" autocomplete="nope" minlength="3" maxlength="100"
                                 [(ngModel)]="partner.partnerNameEn" #nameENFull="ngModel" (change)="partner.partnerNameEn = partner.partnerNameEn.trim()" 
@@ -67,7 +67,7 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && nameLocalFull.invalid }">
                             <label class="form-control-label" for="">
-                                Partner Name Local Full
+                                Partner Name Local Full <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Name Local" name="nameLocalFull" autocomplete="nope" minlength="3" maxlength="100"
                                 [(ngModel)]="partner.partnerNameVn" #nameLocalFull="ngModel" (change)="partner.partnerNameVn = partner.partnerNameVn.trim()" 
@@ -82,7 +82,7 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && nameAbreviation.invalid }">
                             <label class="form-control-label" for="">
-                                Partner Name Abreviation
+                                Partner Name Abreviation <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="please enter Name Abreviation" name="nameAbreviation" autocomplete="nope" minlength="3" maxlength="10"
                                 [(ngModel)]="partner.shortName" #nameAbreviation="ngModel" (change)="partner.shortName = partner.shortName.trim()" 
@@ -95,7 +95,7 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partnerTaxCode.invalid }">
                             <label class="form-control-label" for="">
-                                Tax Code
+                                Tax Code <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Tax Code" autocomplete="nope" minlength="3" maxlength="100"
                                 name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" (change)="partner.taxCode = partner.taxCode.trim()" 
@@ -109,7 +109,7 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.partnerGroup == null }">
                             <label class="form-control-label" for="">
-                                Category
+                                Category <span class="m--font-danger">(*)</span>
                             </label>
                             <ng-select [multiple]="true" *ngIf="activeNg" [active]="partnerGroupActives" [items]="partnerGroups" [disabled]="disabled" (data)="refreshValue($event)"
                                 (selected)="selected($event, 'category')" (removed)="removed($event,'category')" placeholder="Select partner group">
@@ -288,7 +288,7 @@
                         <div class="form-group">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
                                 <label class="form-control-label">
-                                    Saleman
+                                    Saleman <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
                                     (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"

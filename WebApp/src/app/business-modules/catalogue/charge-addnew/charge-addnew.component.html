@@ -20,7 +20,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && code.invalid }">
                                 <label class="form-control-label" for="">
-                                    Code
+                                    Code <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" [(ngModel)]="ChargeToAdd.charge.code" (change)="ChargeToAdd.charge.code=ChargeToAdd.charge.code.trim()"
                                     required minlength="3" #code="ngModel" name="code" class="form-control m-input m-input--square"
@@ -33,7 +33,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && nameEn.invalid }">
                                 <label class="form-control-label" for="">
-                                    Name EN
+                                    Name EN <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" [(ngModel)]="ChargeToAdd.charge.chargeNameEn" required minlength="3"
                                     #nameEn="ngModel" name="nameEn" class="form-control m-input m-input--square"
@@ -46,7 +46,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && nameVn.invalid }">
                                 <label class="form-control-label">
-                                    Name Local
+                                    Name Local <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" [(ngModel)]="ChargeToAdd.charge.chargeNameVn" required minlength="3"
                                     #nameVn="ngModel" name="nameVn" class="form-control m-input m-input--square"
@@ -61,7 +61,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && ChargeToAdd.charge.unitId==null }">
                                 <label class="form-control-label">
-                                    Unit
+                                    Unit <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="ngDataUnit" [disabled]="disabled" (data)="refreshValue($event)"
                                     (selected)="selected($event,'unit')" (removed)="removed($event,'unit')" placeholder="Select Unit">
@@ -74,7 +74,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && unitPrice.invalid }">
                                 <label class="form-control-label">
-                                    Unit Price
+                                    Unit Price <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="number" [(ngModel)]="ChargeToAdd.charge.unitPrice" required min="0" name="unitPrice"
                                     #unitPrice="ngModel" class="form-control m-input m-input--square" placeholder="0000.00">
@@ -86,7 +86,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && ChargeToAdd.charge.currencyId==null }">
                                 <label class="form-control-label">
-                                    Currency
+                                    Currency <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="ngDataCurrency" [disabled]="disabled" (data)="refreshValue($event)"
                                     (selected)="selected($event,'currency')" (removed)="removed($event,'currency')"
@@ -102,7 +102,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && vat.invalid }">
                                 <label class="form-control-label">
-                                    VAT
+                                    VAT <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="number" [(ngModel)]="ChargeToAdd.charge.vat" required name="vat" #vat="ngModel"
                                     class="form-control m-input m-input--square" placeholder="VAT">
@@ -114,7 +114,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && ChargeToAdd.charge.type==null }">
                                 <label class="form-control-label">
-                                    Type
+                                    Type <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="ngDataType" [disabled]="disabled" (data)="refreshValue($event)"
                                     (selected)="selected($event,'type')" (removed)="removed($event,'type')" placeholder="Select Type">
@@ -127,7 +127,7 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && (ChargeToAdd.charge.serviceTypeId==null || ChargeToAdd.charge.serviceTypeId=='')}">
                                 <label class="form-control-label">
-                                    Service
+                                    Service <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [multiple]="true" [items]="ngDataService" [disabled]="disabled" (data)="refreshValue($event)"
                                     (selected)="selected($event,'service')" (removed)="removed($event,'service')"

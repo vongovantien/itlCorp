@@ -15,6 +15,9 @@ import { SharedModule } from '../../shared/shared.module';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-export-create.component';
+import { MasterBillComponent } from './sea-fcl-export-create/master-bill/master-bill.component';
+import { HousebillListComponent } from './sea-fcl-export-create/housebill-list/housebill-list.component';
 
 @NgModule({
   imports: [
@@ -26,6 +29,6 @@ import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLL
     FormsModule,
     PerfectScrollbarModule, // Scrollbar
   ],
-  declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent]
+  declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent]
 })
 export class DocumentationModule { }

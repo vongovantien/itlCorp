@@ -92,7 +92,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && currencyCode.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Currency Code
+                                Currency Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="currency.id" (change)="currency.id=currency.id.trim()"
@@ -108,7 +108,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && currencyName.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Currency Name
+                                Currency Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="currency.currencyName" (change)="currency.currencyName=currency.currencyName.trim()"

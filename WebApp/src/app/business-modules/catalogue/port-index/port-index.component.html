@@ -64,7 +64,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
                                     <label class="form-control-label">
-                                        Port code
+                                        Port code <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter detail" name="code" autocomplete="nope" minlength="3"
                                         [(ngModel)]="portIndex.code" #code="ngModel" (change)="portIndex.code = portIndex.code.trim()" [attr.disabled]="portIndex.id ? '' : null"
@@ -77,7 +77,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameEN.invalid }">
                                     <label class="form-control-label">
-                                        Name(EN)
+                                        Name(EN) <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter name" name="portIndexeNameEN" autocomplete="nope" minlength="3"
                                         [(ngModel)]="portIndex.nameEN" #portIndexeNameEN="ngModel" (change)="portIndex.nameEN = portIndex.nameEN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameEN.invalid }" required >
@@ -89,7 +89,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameLocal.invalid }">
                                     <label class="form-control-label">
-                                        Name(Local)
+                                        Name(Local) <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter name" name="portIndexeNameLocal" autocomplete="nope" minlength="3"
                                         [(ngModel)]="portIndex.nameVN" #portIndexeNameLocal="ngModel" (change)="portIndex.nameVN = portIndex.nameVN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameLocal.invalid }" required >
@@ -103,7 +103,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndex.countryID == null }">
                                     <label class="form-control-label">
-                                        Country
+                                        Country <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)" [active]="countryActive==null?[]:[countryActive]"
                                         (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -142,7 +142,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && modePort.invalid }">
                                     <label class="form-control-label">
-                                        Mode
+                                        Mode <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input list="modes" type="text" class="form-control m-input" placeholder="Please enter mode" name="modePort" autocomplete="nope" minlength="3"
                                     [(ngModel)]="portIndex.modeOfTransport" #modePort="ngModel" (change)="portIndex.modeOfTransport = portIndex.modeOfTransport.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && modePort.invalid }" required>

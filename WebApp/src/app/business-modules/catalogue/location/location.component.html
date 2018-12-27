@@ -600,7 +600,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addCountryForm.submitted && country_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country Code
+                                Country Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="CountryToAdd.code" (change)="CountryToAdd.code=CountryToAdd.code.trim()"
@@ -615,7 +615,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addCountryForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="CountryToAdd.nameEn" (change)="CountryToAdd.nameEn=CountryToAdd.nameEn.trim()"
@@ -630,7 +630,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addCountryForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
 
                             <div class="col-lg-8">
@@ -693,7 +693,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateCountryForm.submitted && country_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country Code
+                                Country Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="CountryToUpdate.code" (change)="CountryToUpdate.code=CountryToUpdate.code.trim()"
@@ -711,7 +711,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateCountryForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="CountryToUpdate.nameEn" (change)="CountryToUpdate.nameEn=CountryToUpdate.nameEn.trim()"
@@ -728,7 +728,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateCountryForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="CountryToUpdate.nameVn" (change)="CountryToUpdate.nameVn=CountryToUpdate.nameVn.trim()"
@@ -803,7 +803,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && province_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City Code
+                                Province - City Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="ProvinceCityToAdd.code" (change)="ProvinceCityToAdd.code=ProvinceCityToAdd.code.trim()"
@@ -819,7 +819,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="ProvinceCityToAdd.nameEn" (change)="ProvinceCityToAdd.nameEn=ProvinceCityToAdd.nameEn.trim()"
@@ -835,7 +835,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="ProvinceCityToAdd.nameVn" (change)="ProvinceCityToAdd.nameVn=ProvinceCityToAdd.nameVn.trim()"
@@ -850,7 +850,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && ProvinceCityToAdd.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country
+                                Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [disabled]="disabled"
@@ -914,7 +914,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && province_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City Code
+                                Province - City Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="ProvinceCityToUpdate.code" class="form-control m-input m-input--square"
@@ -928,7 +928,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="ProvinceCityToUpdate.nameEn" class="form-control m-input m-input--square"
@@ -943,7 +943,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="ProvinceCityToUpdate.nameVn" class="form-control m-input m-input--square"
@@ -958,7 +958,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && ProvinceCityToUpdate.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country
+                                Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [active]="currentActiveCountry"
@@ -1032,7 +1032,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addDistrictForm.submitted && district_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                District Code
+                                District Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="DistrictToAdd.code" (change)="DistrictToAdd.code=DistrictToAdd.code.trim()"
@@ -1048,7 +1048,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addDistrictForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="DistrictToAdd.nameEN" (change)="DistrictToAdd.nameEN=DistrictToAdd.nameEN.trim()"
@@ -1064,7 +1064,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addDistrictForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="DistrictToAdd.nameVN" (change)="DistrictToAdd.nameVN=DistrictToAdd.nameVN.trim()"
@@ -1079,7 +1079,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addDistrictForm.submitted && DistrictToAdd.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country
+                                Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [disabled]="disabled"
@@ -1095,7 +1095,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addDistrictForm.submitted && DistrictToAdd.provinceId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City
+                                Province - City <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [disabled]="disabled"
@@ -1160,7 +1160,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && district_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City Code
+                                Province - City Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="DistrictToUpdate.code" class="form-control m-input m-input--square"
@@ -1174,7 +1174,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="DistrictToUpdate.nameEn" (change)="DistrictToUpdate.nameEn=DistrictToUpdate.nameEn.trim()"
@@ -1190,7 +1190,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="DistrictToUpdate.nameVn" (change)="DistrictToUpdate.nameVn=DistrictToUpdate.nameVn.trim()"
@@ -1206,7 +1206,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && DistrictToUpdate.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country
+                                Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [active]="currentActiveCountry"
@@ -1223,7 +1223,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && DistrictToUpdate.provinceId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City
+                                Province - City <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [active]="currentActiveProvince"
@@ -1299,7 +1299,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addWardForm.submitted && ward_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Town - Ward Code
+                                Town - Ward Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="WardToAdd.code" (change)="WardToAdd.code=WardToAdd.code.trim()"
@@ -1331,7 +1331,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addWardForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="WardToAdd.nameVN" (change)="WardToAdd.nameVN=WardToAdd.nameVN.trim()"
@@ -1346,7 +1346,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addWardForm.submitted && WardToAdd.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country
+                                Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [disabled]="disabled"
@@ -1362,7 +1362,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addWardForm.submitted && WardToAdd.provinceId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City
+                                Province - City <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [disabled]="disabled"
@@ -1378,7 +1378,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addWardForm.submitted && WardToAdd.districtId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                District
+                                District <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataDistricts" [disabled]="disabled"
@@ -1442,7 +1442,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateWardForm.submitted && ward_code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Town - Ward Code
+                                Town - Ward Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="WardToUpdate.code" (change)="WardToUpdate.code=WardToUpdate.code.trim()"
@@ -1458,7 +1458,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateWardForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="WardToUpdate.nameEn" (change)="WardToUpdate.nameEn=WardToUpdate.nameEn.trim()"
@@ -1474,7 +1474,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateWardForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="WardToUpdate.nameVn" (change)="WardToUpdate.nameVn=WardToUpdate.nameVn.trim()"
@@ -1489,7 +1489,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateWardForm.submitted && WardToUpdate.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Country
+                                Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [active]="currentActiveCountry"
@@ -1505,7 +1505,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateWardForm.submitted && WardToUpdate.provinceId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City
+                                Province - City <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [disabled]="disabled"
@@ -1523,7 +1523,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateWardForm.submitted && WardToUpdate.districtId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                District
+                                District <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataDistricts" [disabled]="disabled"
