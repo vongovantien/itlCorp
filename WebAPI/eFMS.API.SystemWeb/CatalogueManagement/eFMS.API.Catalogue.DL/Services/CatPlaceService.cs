@@ -452,6 +452,10 @@ namespace eFMS.API.Catalogue.DL.Services
                         result.AreaId = area.Id;
                     }
                 }
+                else
+                {
+                    result.AreaName = string.Empty;
+                }
                 results.Add(result);
             }
             return results;
