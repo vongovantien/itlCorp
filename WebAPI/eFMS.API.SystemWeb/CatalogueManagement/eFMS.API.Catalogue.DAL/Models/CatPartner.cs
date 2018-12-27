@@ -5,10 +5,10 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CatPartner
     {
-        public CatPartner()
-        {
-            CatPartnerContact = new HashSet<CatPartnerContact>();
-        }
+        //public CatPartner()
+        //{
+        //    CatPartnerContact = new HashSet<CatPartnerContact>();
+        //}
 
         public string Id { get; set; }
         public string PartnerGroup { get; set; }
@@ -64,6 +64,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? InactiveOn { get; set; }
         public Guid? WorkPlaceId { get; set; }
 
-        public ICollection<CatPartnerContact> CatPartnerContact { get; set; }
+        //public ICollection<CatPartnerContact> CatPartnerContact { get; set; }
     }
 }

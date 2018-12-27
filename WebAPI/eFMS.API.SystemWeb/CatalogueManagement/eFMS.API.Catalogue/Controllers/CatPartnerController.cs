@@ -9,12 +9,16 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
@@ -30,6 +34,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+        private string templateName = "ImportTemplate.xlsx";
         public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -160,6 +165,82 @@ namespace eFMS.API.Catalogue.Controllers
                 }
             }
             return message;
+        }
+
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var result = catPartnerService.Import(data);
+            return Ok(result);
+        }
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            templateName = "Partner" + templateName;
+            var result = await new FileHelper().ExportExcel(templateName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+            }
+        }
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+                List<CatPartnerImportModel> list = new List<CatPartnerImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var stage = new CatPartnerImportModel
+                    {
+                        IsValid = true,
+                        PartnerGroup = worksheet.Cells[row, 1].Value?.ToString(),
+                        ContactPerson = worksheet.Cells[row, 2].Value?.ToString(),
+                        Tel = worksheet.Cells[row, 3].Value?.ToString(),
+                        Fax = worksheet.Cells[row, 4].Value?.ToString(),
+                        CountryBilling = worksheet.Cells[row, 5].Value?.ToString(),
+                        CityBilling = worksheet.Cells[row, 6].Value?.ToString(),
+                        ZipCode = worksheet.Cells[row, 7].Value?.ToString(),
+                        AddressEn = worksheet.Cells[row, 8].Value?.ToString(),
+                        AddressVn = worksheet.Cells[row, 9].Value?.ToString(),
+                        CountryShipping = worksheet.Cells[row, 10].Value?.ToString(),
+                        CityShipping = worksheet.Cells[row, 11].Value?.ToString(),
+                        ZipCodeShipping = worksheet.Cells[row, 12].Value?.ToString(),
+                        AddressShippingEn = worksheet.Cells[row, 13].Value?.ToString(),
+                        AddressShippingVn = worksheet.Cells[row, 14].Value?.ToString(),
+                        SaleManName = worksheet.Cells[row, 15].Value?.ToString(),
+                        DepartmentName = worksheet.Cells[row, 16].Value?.ToString(),
+                        ACReference = worksheet.Cells[row, 17].Value?.ToString(),
+                        Website = worksheet.Cells[row, 18].Value?.ToString(),
+                        BankAccountNo = worksheet.Cells[row, 19].Value?.ToString(),
+                        BankAccountName = worksheet.Cells[row, 20].Value?.ToString(),
+                        BankAccountAddress = worksheet.Cells[row, 21].Value?.ToString(),
+                        SwiftCode = worksheet.Cells[row, 22].Value?.ToString(),
+                        Profile = worksheet.Cells[row, 23].Value?.ToString(),
+                        Note = worksheet.Cells[row, 24].Value?.ToString(),
+                        Public = worksheet.Cells[row, 25].Value != null? (bool)worksheet.Cells[row, 25].Value: (bool?)null
+                    };
+                    list.Add(stage);
+                }
+                var data = catPartnerService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = "Cannot upload, file not found !" });
         }
     }
 }

@@ -31,7 +31,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatStageService catStageService;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTeamplate.xlsx";
+        private string templateName = "ImportTemplate.xlsx";
 
         public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user)
         {

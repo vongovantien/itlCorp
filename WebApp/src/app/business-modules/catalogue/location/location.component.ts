@@ -189,6 +189,7 @@ export class LocationComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.pager.totalItems = 0;
     await this.getCountries();
     this.getProvinceCities();
     this.getDistrict();

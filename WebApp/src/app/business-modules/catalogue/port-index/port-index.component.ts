@@ -77,6 +77,7 @@ export class PortIndexComponent implements OnInit {
     private excelService: ExcelService,) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
     this.getPortIndexs(this.pager);
     this.getDataCombobox();
   }
