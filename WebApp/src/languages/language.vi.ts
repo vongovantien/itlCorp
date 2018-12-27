@@ -48,6 +48,7 @@ export const language = {
         { name: "Sea FCL Import", route_child: "sea-fcl-import",display:true  },
         { name: "Sea LCL Export", route_child: "sea-lcl-export",display:true  },
         { name: "Sea LCL Import", route_child: "sea-lcl-import",display:true  }
+        { name: "Sea LCL Import", route_child: "sea-lcl-import" }
       ]
     },
    

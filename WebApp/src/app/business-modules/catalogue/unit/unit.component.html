@@ -188,7 +188,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addUnitForm.submitted && code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Unit Code
+                                Unit Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.code" (change)="UnitToAdd.code=UnitToAdd.code.trim()" class="form-control m-input m-input--square"
@@ -202,7 +202,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addUnitForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.unitNameEn" (change)="UnitToAdd.unitNameEn=UnitToAdd.unitNameEn.trim()" class="form-control m-input m-input--square"
@@ -217,7 +217,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addUnitForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.unitNameVn" (change)="UnitToAdd.unitNameVn=UnitToAdd.unitNameVn.trim()" class="form-control m-input m-input--square"
@@ -308,11 +308,11 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateUnitForm.submitted && code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Unit Code
+                                Unit Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.code" (change)="UnitToUpdate.code=UnitToUpdate.code.trim()" class="form-control m-input m-input--square"
-                                    #code="ngModel" name="code" required placeholder="Please enter unit code">
+                                    #code="ngModel" name="code" required placeholder="Please enter unit code" disabled>
                                 <div class="form-control-feedback" *ngIf="updateUnitForm.submitted && code.invalid">
                                     Unit code is required
                                 </div>
@@ -322,7 +322,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateUnitForm.submitted && english_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                English Name
+                                English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.unitNameEn" (change)="UnitToUpdate.unitNameEn=UnitToUpdate.unitNameEn.trim()" class="form-control m-input m-input--square"
@@ -337,7 +337,7 @@
 
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateUnitForm.submitted && local_name.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name
+                                Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.unitNameVn" (change)="UnitToUpdate.unitNameVn=UnitToUpdate.unitNameVn.trim()" class="form-control m-input m-input--square"

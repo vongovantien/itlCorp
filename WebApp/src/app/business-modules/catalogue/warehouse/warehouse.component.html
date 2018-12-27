@@ -73,7 +73,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
                                     <label class="form-control-label">
-                                        Code
+                                        Code <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="nope" minlength="3"
                                         [(ngModel)]="warehouse.code" #code="ngModel" (change)="warehouse.code = warehouse.code.trim()" 
@@ -87,7 +87,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameEN.invalid }">
                                     <label class="form-control-label">
-                                        Name(EN)
+                                        Name(EN) <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameEN" autocomplete="nope" minlength="3"
                                         [(ngModel)]="warehouse.nameEN" #warewhouseNameEN="ngModel" (change)="warehouse.nameEN = warehouse.nameEN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameEN.invalid }" required >
@@ -100,7 +100,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameLocal.invalid }">
                                     <label class="form-control-label">
-                                        Name(Local)
+                                        Name(Local) <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameLocal" autocomplete="nope" minlength="3"
                                         [(ngModel)]="warehouse.nameVN" #warewhouseNameLocal="ngModel" (change)="warehouse.nameVN = warehouse.nameVN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameLocal.invalid }" required >
@@ -115,7 +115,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null }">
                                     <label class="form-control-label">
-                                        Country
+                                        Country <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)"
                                         (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -129,7 +129,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                     <label class="form-control-label">
-                                        City/ Province
+                                        City/ Province <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshProvinceValue($event)"
                                         (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -143,7 +143,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
                                     <label class="form-control-label">
-                                        District
+                                        District <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshDistrictValue($event)"
                                         (removed)="removed($event)" (typed)="typed($event)" (selected)="onDistrictchange($event)" 
@@ -159,7 +159,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
                                     <label  class="form-control-label">
-                                        Address
+                                        Address <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter address"  name="address" autocomplete="nope"
                                         (change)="warehouse.address = warehouse.address.trim()"
@@ -209,7 +209,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
                                         <label class="form-control-label">
-                                            Code
+                                            Code <span class="m--font-danger">(*)</span>
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter code"  name="code" autocomplete="nope" minlength="3"
                                             (change)="warehouse.code = warehouse.code.trim()" disabled
@@ -222,7 +222,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouseNameEN.invalid }">
                                         <label class="form-control-label">
-                                            Name(EN)
+                                            Name(EN) <span class="m--font-danger">(*)</span>
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter name" name="warehouseNameEN" autocomplete="nope" minlength="3"
                                             (change)="warehouse.nameEN = warehouse.nameEN.trim()"
@@ -235,7 +235,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameVN.invalid }">
                                         <label class="form-control-label">
-                                            Name(VN)
+                                            Name(VN) <span class="m--font-danger">(*)</span>
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameVN" autocomplete="nope" minlength="3"
                                             (change)="warehouse.nameVN = warehouse.nameVN.trim()"
@@ -250,7 +250,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null}">
                                         <label class="form-control-label">
-                                            Country
+                                            Country <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive==null?[]:[countryActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
                                             (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -264,7 +264,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
                                         <label class="form-control-label">
-                                            City/ Province
+                                            City/ Province <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive==null?[]:[provinceActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
                                             (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -278,7 +278,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
                                         <label class="form-control-label">
-                                            District
+                                            District <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive==null?[]:[districtActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
                                             (selected)="onDistrictchange($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -294,7 +294,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
                                         <label  class="form-control-label">
-                                            Address
+                                            Address <span class="m--font-danger">(*)</span>
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter address"  name="address" autocomplete="nope"
                                             [(ngModel)]="warehouse.address" #address="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && address.invalid }" required

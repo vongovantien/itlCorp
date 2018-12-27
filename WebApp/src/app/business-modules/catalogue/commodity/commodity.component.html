@@ -125,7 +125,7 @@
                     <div class="m-form m-form--state">
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameEn.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Name (EN):
+                                Name (EN): <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="commodity.commodityNameEn" (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()" 
@@ -138,7 +138,7 @@
                         </div>
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameVn.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Name (Local):
+                                Name (Local): <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="commodity.commodityNameVn" (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()" 
@@ -151,7 +151,7 @@
                         </div>
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodity.commodityGroupId == null }">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Group:
+                                Group: <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select #chooseGroup [allowClear]="true" [items]="groups"  [disabled]="disabled" (data)="refreshGroupValue($event)"
@@ -204,7 +204,7 @@
                         <div class="m-form m-form--state">
                             <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameEN.invalid }">
                                 <label class="col-lg-4 col-form-label form-control-label">
-                                    Group Name(EN):
+                                    Group Name(EN): <span class="m--font-danger">(*)</span>
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" [(ngModel)]="commodityGroup.groupNameEn" (change)="commodityGroup.groupNameEn = commodityGroup.groupNameEn.trim()" 
@@ -216,7 +216,7 @@
                                 </div>
                             </div>
                             <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameVN.invalid }">
-                                <label class="col-lg-4 col-form-label form-control-label">Group Name(Local):</label>
+                                <label class="col-lg-4 col-form-label form-control-label">Group Name(Local): <span class="m--font-danger">(*)</span></label>
                                 <div class="col-lg-8">
                                     <input  type="input" class="form-control m-input m-input-group--square" placeholder="Enter group name (VN)" name="groupNameVN"
                                         [(ngModel)]="commodityGroup.groupNameVn" #groupNameVN="ngModel" (change)="commodityGroup.groupNameVn = commodityGroup.groupNameVn.trim()" 
