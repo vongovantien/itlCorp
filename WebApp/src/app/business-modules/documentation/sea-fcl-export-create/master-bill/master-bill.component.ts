@@ -13,7 +13,7 @@ export class MasterBillComponent implements OnInit {
   ngOnInit() {
   }
 
-  /**
+    /**
      * Daterange picker
      */
     selectedRange: any;

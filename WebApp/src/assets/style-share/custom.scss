@@ -201,7 +201,7 @@ ul {
     -webkit-overflow-scrolling: touch;
     -ms-overflow-style: -ms-autohiding-scrollbar;
     .table {   
-        min-width: 991px;
+        min-width: 100%;
     }
 }
 .table {
@@ -352,6 +352,9 @@ table.dataTable {
             }
         }
     }
+}
+.tatable__pager-size {
+    max-width: 190px; 
 }
 .pagination-nav {
     margin-top: 1rem;
