@@ -17,5 +17,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatCountry> Query(CatCountryCriteria criteria);
         List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list);
         HandleState Import(List<CatCountryImportModel> data);
+     
     }
 }

@@ -88,7 +88,10 @@ export class API_MENU {
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/",
             add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatCommonity/add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/",
-            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/"
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/",
+            uploadFile : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/uploadFile",
+            import : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/import",
+            downloadExcel : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/downloadExcel",
         },
         CommodityGroup: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/Query",

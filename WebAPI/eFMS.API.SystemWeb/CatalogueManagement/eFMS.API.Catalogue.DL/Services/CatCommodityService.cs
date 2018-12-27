@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using eFMS.API.Catalogue.DL.ViewModels;
+using ITL.NetCore.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -19,6 +21,63 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatCommodityService(IContextBase<CatCommodity> repository, IMapper mapper, IContextBase<CatCommodityGroup> catCommonityGroup) : base(repository, mapper)
         {
             catCommonityGroupRepo = catCommonityGroup;
+        }
+
+        public List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var commodities = dc.CatCommodity.ToList();
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.CommodityNameEn))
+                {
+                    item.CommodityNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CommodityNameVn))
+                {
+                    item.CommodityNameVn = string.Format("Name Local is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (item.CommodityGroupId == null)
+                {
+                    item.CommodityGroupId = -1;
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Status))
+                {
+                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CommodityImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach(var item in data)
+                {
+                    var commodity = new CatCommodity
+                    {
+                        CommodityNameEn = item.CommodityNameEn,
+                        CommodityNameVn = item.CommodityNameVn,
+                        CommodityGroupId = item.CommodityGroupId,
+                        Inactive = item.Status.ToString().ToLower()=="active"?false:true,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = ChangeTrackerHelper.currentUser
+                    };
+                    dc.CatCommodity.Add(commodity);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
 
         public List<CatCommodityViewModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount)

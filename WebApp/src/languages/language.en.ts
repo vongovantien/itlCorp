@@ -16,6 +16,7 @@ export const language = {
         { name: "Port Index Import", route_child: "port-index-import",display:false },
         { name: "Partner Data", route_child: "partner-data",display:true },
         { name: "Commodity", route_child: "commodity",display:true },
+        { name: "Commodity Import", route_child: "commodity-import",display:false },
         { name: "Stage Management", route_child: "stage-management",display:true },
         { name: "Stage Import", route_child: "stage-import",display:false },
         { name: "Unit", route_child: "unit",display:true },

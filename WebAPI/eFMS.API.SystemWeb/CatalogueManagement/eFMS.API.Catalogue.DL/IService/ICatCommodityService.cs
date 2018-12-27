@@ -2,6 +2,7 @@
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,7 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         List<CatCommodityViewModel> Query(CatCommodityCriteria criteria);
         List<CatCommodityViewModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount);
+        List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list);
+        HandleState Import(List<CommodityImportModel> data);
     }
 }

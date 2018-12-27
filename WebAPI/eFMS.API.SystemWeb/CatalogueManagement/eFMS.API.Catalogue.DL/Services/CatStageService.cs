@@ -152,7 +152,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.DepartmentId = -1;
                     item.IsValid = false;
                 }
-
+                if (string.IsNullOrEmpty(item.Status))
+                {
+                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
                 if (string.IsNullOrEmpty(item.Code))
                 {
                     item.Code = string.Format("Code is not allow empty!|wrong"); ;
@@ -193,8 +197,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DescriptionEn = item.DescriptionEn,
                         DescriptionVn = item.DescriptionVn,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated =ChangeTrackerHelper.currentUser,
-                        Inactive = item.Inactive
+                        UserCreated = ChangeTrackerHelper.currentUser,
+                        Inactive = item.Status.ToString().ToLower()=="active"?false:true
                     };
                     dc.CatStage.Add(stage);
                 }
