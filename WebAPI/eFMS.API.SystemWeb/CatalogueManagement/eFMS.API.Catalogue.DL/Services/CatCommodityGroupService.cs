@@ -12,6 +12,8 @@ using System.Linq;
 using eFMS.API.Catalogue.DL.ViewModels;
 using System.Globalization;
 using System.Threading;
+using ITL.NetCore.Common;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -102,6 +104,57 @@ namespace eFMS.API.Catalogue.DL.Services
                     ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn).ToList();
             }
             return results;
+        }
+
+        public List<CommodityGroupImportModel> CheckValidImport(List<CommodityGroupImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var commodityGroups = dc.CatCommodityGroup.ToList();
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.GroupNameEn))
+                {
+                    item.GroupNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.GroupNameVn))
+                {
+                    item.GroupNameVn = string.Format("Name Vn is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Status))
+                {
+                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CommodityGroupImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach(var item in data)
+                {
+                    var commodityGroup = new CatCommodityGroup
+                    {
+                        GroupNameEn = item.GroupNameEn,
+                        GroupNameVn = item.GroupNameVn,
+                        Inactive = item.Status.ToString().ToLower() == "active" ? false : true,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = ChangeTrackerHelper.currentUser
+                    };
+                    dc.CatCommodityGroup.Add(commodityGroup);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
     }
 }
