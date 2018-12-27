@@ -3,7 +3,6 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { CommodityGroup } from 'src/app/shared/models/catalogue/commonity-group.model';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { COMMODITYGROUPCOLUMNSETTING } from './commonity-group.column';
@@ -16,6 +15,10 @@ import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
 import { SelectComponent } from 'ng2-select';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import * as lodash from 'lodash';
+import { SystemConstants } from 'src/constants/system.const';
 declare var $:any;
 
 @Component({
@@ -94,16 +97,17 @@ export class CommodityComponent implements OnInit {
   */
 
   constructor(private baseService: BaseService,
-    private toastr: ToastrService, 
+    private excelService: ExcelService,
     private api_menu: API_MENU,
     private sortService: SortService) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
     this.getCommodities(this.pager);
     this.getGroups();
   }
   async getGroups(){
-    var response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage, false, false);
+    const response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage, false, false);
     if(response){
       this.groups = response.map(x=>({"text":x.groupName,"id":x.id}));
     }
@@ -131,7 +135,7 @@ export class CommodityComponent implements OnInit {
     }
   }
   async getCommodities(pager: PagerSetting) {
-    var responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
+    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
     if(responses){
       this.commodities = responses.data;
       this.pager.totalItems = responses.totalItems;
@@ -139,7 +143,7 @@ export class CommodityComponent implements OnInit {
   }
 
   async getGroupCommodities(pager: PagerSetting){
-    var responses = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
+    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
     if(responses){
       this.commodityGroups = responses.data;
       this.pager.totalItems = responses.totalItems;
@@ -149,7 +153,7 @@ export class CommodityComponent implements OnInit {
     if(tabName == this.tabName.commodityGroup){
       this.searchCommodityGroup(event);
     }
-    if(tabName == this.tabName.commodityGroup){
+    if(tabName == this.tabName.commodity){
       this.searchCommodity(event);
     }
   }
@@ -208,12 +212,12 @@ export class CommodityComponent implements OnInit {
   async showDetail(item, tabName){
     if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = item;
-      var response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getById + item.id,false, false);
+      const response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getById + item.id,false, false);
       this.commodityGroup = response;
     }
     if(tabName == this.tabName.commodity){
       this.commodity = item;
-      var response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id,false, false);
+      const response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id,false, false);
       this.commodity = response;
       this.groupActive = this.groups.find(x => x.id == this.commodity.commodityGroupId);
     }
@@ -234,8 +238,8 @@ export class CommodityComponent implements OnInit {
     this.setPageAfterDelete();
   }
   async deleteGroupCommodity(){
-    var response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
-    if(response.status){
+    const response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
+    if(response){
       this.getGroups();
       //await this.getGroupCommodities(this.pager);
       this.setPageAfterDelete();
@@ -293,36 +297,46 @@ export class CommodityComponent implements OnInit {
     }
   }
   updateCommodity(): any {
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.Commodity.update + this.commodity.id, this.commodity).subscribe((response: any) => {
-      if (response.status == true){
-        this.groupSelect.active = [];
-        this.formCommodity.onReset();
-        $('#' + this.nameCommodityModal).modal('hide');
-        this.toastr.success(response.message);
-        this.setPage(this.pager);
-      }
-    }, error => this.baseService.handleError(error));
+      this.groupSelect.active = [];
+      this.formCommodity.onReset();
+      $('#' + this.nameCommodityModal).modal('hide');
+      this.setPage(this.pager);
+      this.baseService.successToast(response.message);
+      this.baseService.spinnerHide();
+    }, err => {
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
+    });
   }
   async addNewCommodity() {
-    var response = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity, true, false);
-      this.formCommodity.onReset();
-      this.commodity = new Commodity();
-      $('#' + this.nameCommodityModal).modal('hide');
-      await this.getCommodities(this.pager);
-      this.setPageAfterAdd();
+      const res = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity);
+      if(res){
+        this.formCommodity.onReset();
+        this.commodity = new Commodity();
+        $('#' + this.nameCommodityModal).modal('hide');
+        await this.getCommodities(this.pager);
+        this.setPageAfterAdd();
+      }
   }
   updateGroup(): any {
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.CommodityGroup.update + this.commodityGroup.id, this.commodityGroup).subscribe((response: any) => {
     if (response.status == true){
       $('#' + this.nameGroupModal).modal('hide');
-      this.toastr.success(response.message);
+      this.baseService.successToast(response.message);
+      this.baseService.spinnerHide();
       this.setPage(this.pager);
     }
-  }, error => this.baseService.handleError(error));
+  }, err=>{
+     this.baseService.spinnerHide();
+     this.baseService.handleError(err);
+  });
   }
   async addNewGroup() {
-    var response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
-    if (response.status == true){
+    const response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
+    if (response){
       this.getGroups();
       //await this.getGroupCommodities(this.pager);
       this.pager.totalItems = this.pager.totalItems + 1;
@@ -369,4 +383,99 @@ export class CommodityComponent implements OnInit {
   refreshGroupValue(value:any){
     this.value = value;
   }
+
+  async importCom(){
+
+  }
+  async exportCom(){
+    var commodities = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.query,this.criteria);
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      commodities = lodash.map(commodities,function(com,index){
+        return [
+          index+1,
+          com['code'],
+          com['commodityNameEn'],
+          com['commodityNameVn'],
+          com['commonityGroupNameEn'],
+          (com['inactive']===true)?"Inactive":"Active"
+        ]
+      }); 
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
+      commodities = lodash.map(commodities,function(com,index){
+        return [
+          index+1,
+          com['code'],
+          com['commodityNameEn'],
+          com['commodityNameVn'],
+          com['commonityGroupNameVn'],
+          (com['inactive']===true)?"Ngưng Hoạt Động":"Đang Hoạt Động"
+        ]
+      });
+    }
+    const exportModel: ExportExcel = new ExportExcel();
+    exportModel.title = "Commodity List";
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.author = currrently_user;
+    exportModel.header = [
+      {name:"STT",width:10},
+      {name:"Code",width:20},
+      {name:"Name EN",width:20},
+      {name:"Name VN",width:20},
+      {name:"Commodity Group",width:30},
+      {name:"Inactive",width:20}
+    ]
+    exportModel.data = commodities;
+    exportModel.fileName = "Commodity";
+    
+    this.excelService.generateExcel(exportModel);
+
+  }
+
+  async importComGroup(){
+    
+  }
+
+  async exportComGroup(){
+    var commodities_group = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.query,this.criteria);
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
+      commodities_group = lodash.map(commodities_group,function(com_group,index){
+        return [
+          index+1,         
+          com_group['groupNameEn'],
+          com_group['groupNameVn'],         
+          (com_group['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      }); 
+    }
+
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){      
+      commodities_group = lodash.map(commodities_group,function(com_group,index){
+        return [
+          index+1,         
+          com_group['groupNameEn'],
+          com_group['groupNameVn'],        
+          (com_group['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+
+    const exportModel: ExportExcel = new ExportExcel();
+    exportModel.title = "Commodity Group List";
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.author = currrently_user;
+    exportModel.header = [
+      {name:"No.",width:10},      
+      {name:"Name EN",width:20},
+      {name:"Name Local",width:20},   
+      {name:"Inactive",width:20}
+    ]
+    exportModel.data = commodities_group;
+    exportModel.fileName = "Commodity Group";
+    
+    this.excelService.generateExcel(exportModel);
+
+  }
+
 }

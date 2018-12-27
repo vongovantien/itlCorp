@@ -5,6 +5,7 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -21,9 +22,40 @@ namespace eFMS.API.Catalogue.DL.Services
         {
         }
 
+        public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var partners = dc.CatPartner.ToList();
+            list.ForEach(item =>
+            {
+
+            });
+            return list;
+        }
+
         public List<DepartmentPartner> GetDepartments()
         {
             return DataEnums.Departments;
+        }
+
+        public HandleState Import(List<CatPartnerImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach (var item in data)
+                {
+                    var partner = mapper.Map<CatPartner>(item);
+                    partner.Inactive = item.Status.ToString().ToLower() == "active" ? false : true;
+                    dc.CatPartner.Add(partner);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
 
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)

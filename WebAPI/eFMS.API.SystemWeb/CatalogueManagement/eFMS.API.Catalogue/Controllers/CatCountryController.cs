@@ -12,11 +12,13 @@ using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
@@ -31,6 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
         private readonly ICurrentUser currentUser;
+        private string templateName = "ImportTeamplate.xlsx";
         public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -45,6 +48,14 @@ namespace eFMS.API.Catalogue.Controllers
             var data = catCountryService.GetCountries(criteria,pageNumber,pageSize, out int rowCount);
             var result = new { data, totalItems = rowCount, pageNumber, pageSize };
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("query")]
+        public IActionResult Get(CatCountryCriteria criteria)
+        {
+            var data = catCountryService.Query(criteria);
+            return Ok(data);
         }
 
         [HttpGet]
@@ -134,7 +145,58 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            templateName = "Country" + templateName;
+            var result = await new FileHelper().ExportExcel(templateName);
+            if (result != null)
+                return result;
+            return BadRequest();
+        }
 
+        [HttpPost]
+        [Route("UpLoadFile")]
+      //  [Authorize]
+        public IActionResult UpLoadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int ColCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+                List<CatCountryImportModel> list = new List<CatCountryImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var country = new CatCountryImportModel
+                    {
+                        IsValid = true,
+                        Code = worksheet.Cells[row, 1].Value?.ToString(),
+                        NameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                        NameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                        Status = worksheet.Cells[row, 4].Value?.ToString()
+                    };
+                    list.Add(country);
+                }
+
+                var data = catCountryService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(file);
+        }
+        [HttpPost]
+        [Route("Import")]
+        [Authorize]
+        public IActionResult Import([FromBody]List<CatCountryImportModel> data)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var result = catCountryService.Import(data);
+            return Ok(result);
+        }
         private string CheckExist(int id, CatCountryModel model)
         {
             string message = string.Empty;

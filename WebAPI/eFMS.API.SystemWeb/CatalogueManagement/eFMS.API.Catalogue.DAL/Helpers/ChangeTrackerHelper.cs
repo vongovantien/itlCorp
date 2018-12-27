@@ -133,33 +133,15 @@ namespace eFMS.API.Catalogue.Service.Helpers
             foreach(var log in s)
             {
                 var k = log.Select(x => x.ChangeLog).ToList<object>();
-                MongoDbHelper.InsertMany(log.Key, k);
+                try
+                {
+                    MongoDbHelper.InsertMany(log.Key, k);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
             }
-            //switch (state)
-            //{
-            //    case EntityState.Added:
-            //        if (list == null) break;
-            //        foreach (var item in list)
-            //        {
-            //            Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
-            //        }
-            //        break;
-            //    case EntityState.Modified:
-            //        foreach (var item in list)
-            //        {
-            //            if(item.ChangeLog.PropertyChanges != null)
-            //            {
-            //                Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
-            //            }
-            //        }
-            //        break;
-            //    case EntityState.Deleted:
-            //        foreach (var item in list)
-            //        {
-            //            Helpers.MongoDbHelper.Insert(item.EntityName, item.ChangeLog);
-            //        }
-            //        break;
-            //}
         }
     }
 }

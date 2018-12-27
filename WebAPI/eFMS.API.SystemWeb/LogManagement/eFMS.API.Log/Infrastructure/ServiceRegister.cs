@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using eFMS.API.Log.DL.Services;
 using eFMS.API.Log.DL.IService;
 using eFMS.API.Log.Service.Contexts;
+using eFMS.API.Catalogue.Service.Contexts;
 
 namespace eFMS.API.System.Infrastructure
 {

@@ -8,8 +8,11 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -26,12 +29,14 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
 
-        public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper)
+        public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catChargeDefaultAccountService = service;
             mapper = imapper;
+            currentUser = user;
         }
 
         [HttpGet]
@@ -44,6 +49,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("addNew")]
+        [Authorize]
         public IActionResult Add(CatChargeDefaultAccountModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -54,7 +60,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
 
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
-            catChargeDefaultAccount.UserCreated = "01";
+            catChargeDefaultAccount.UserCreated = currentUser.UserID;
             catChargeDefaultAccount.DatetimeCreated = DateTime.Now;
             catChargeDefaultAccount.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -70,6 +76,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut]
         [Route("update")]
+        [Authorize]
         public IActionResult Update(CatChargeDefaultAccountModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -80,7 +87,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
 
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
-            catChargeDefaultAccount.UserModified = "01";
+            catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeModified = DateTime.Now;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeDefaultAccountService.Update(catChargeDefaultAccount,x=>x.Id==model.Id);
@@ -96,8 +103,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpDelete]
         [Route("delete/{id}")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catChargeDefaultAccountService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

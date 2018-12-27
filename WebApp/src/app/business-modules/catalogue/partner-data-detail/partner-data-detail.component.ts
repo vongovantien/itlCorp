@@ -115,19 +115,19 @@ export class PartnerDataDetailComponent implements OnInit {
   }
   async getDepartments(){
     let respones = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getDepartments);
-    if(respones != null){
+    if(respones!=null){
       this.departments = respones.map(x=>({"text":x.name,"id":x.id}));
     }
   }
   async getParentCustomers(){
     let respones = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup : 3 });
-    if(respones != null){
+    if(respones!=null){
       this.parentCustomers = respones.map(x=>({"text":x.partnerNameVn,"id":x.id}));
     }
   }
   async getWorkPlaces(){
     let responses = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: 2 });
-    if(responses != null){
+    if(responses!=null){
       this.workPlaces = responses.map(x=>({"text":x.code + ' - ' + x.name_VN ,"id":x.id}));
     }
   }
@@ -166,6 +166,8 @@ export class PartnerDataDetailComponent implements OnInit {
         this.billingProvinces = [];
         this.shippingProvinces = [];
       }
+    },err=>{
+      this.baseService.handleError(err);
     });
   }
   onSubmit(){
@@ -181,26 +183,27 @@ export class PartnerDataDetailComponent implements OnInit {
     }
   }
   update(): any {
+    this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.PartnerData.update + this.partner.id, this.partner).subscribe((response: any) => {
-      if (response.status == true){
-        this.toastr.success(response.message);
-      }
-      else{
-        this.toastr.error(response.message);
-      }
-    }, error => this.baseService.handleError(error));
+        this.baseService.spinnerHide();
+        this.baseService.successToast(response.message);
+ 
+    }, err=>{
+      this.baseService.handleError(err);
+      this.baseService.spinnerHide();
+    });
   }
   onDelete(event){
     if(event){
+      this.baseService.spinnerShow();
       this.baseService.delete(this.api_menu.Catalogue.PartnerData.delete + this.partner.id).subscribe((response: any) => {
-        if (response.status == true) {
-          this.toastr.success(response.message);
-          this.router.navigate(["/home/catalogue/partner-data",{ id: this.partner.id }]);
-        }
-        if (response.status == false) {
-          this.toastr.error(response.message);
-        }
-      }, error => this.baseService.handleError(error));
+          this.baseService.spinnerHide();
+          this.baseService.successToast(response.message);
+          this.router.navigate(["/home/catalogue/partner-data",{ id: this.partner.id }]);        
+      }, err=>{
+          this.baseService.spinnerHide();
+          this.baseService.handleError(err);
+      });
     }
   }
   /**
@@ -285,6 +288,8 @@ export class PartnerDataDetailComponent implements OnInit {
         this.employee = {};
       }
       console.log(this.employee);
+    },err=>{
+      this.baseService.handleError(err);
     });
   }
   public removed(value: any, selectName?: string): void {

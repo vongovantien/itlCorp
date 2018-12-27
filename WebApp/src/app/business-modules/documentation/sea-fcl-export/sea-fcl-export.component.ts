@@ -69,11 +69,15 @@ export class SeaFCLExportComponent implements OnInit {
         this.value = value;
     }
 
-    public itemsToString(value: Array<any> = []): string {
-        return value
-            .map((item: any) => {
-                return item.text;
-            }).join(',');
+    public typed(e){
+
+    }
+
+    public itemsToString(value:Array<any> = []):string {
+    return value
+        .map((item:any) => {
+        return item.text;
+        }).join(',');
     }
 
 }

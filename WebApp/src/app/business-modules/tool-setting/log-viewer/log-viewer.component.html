@@ -93,19 +93,23 @@
                             <th class="sorting_asc">
                                 <span>No</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'name'), 'sorting_desc': (!isDesc && sortKey == 'name') }"
+                                (click)="sort('name')">
                                 <span>Name/Code</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'action'), 'sorting_desc': (!isDesc && sortKey == 'action') }"
+                                (click)="sort('action')">
                                 <span>Action</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'userUpdated'), 'sorting_desc': (!isDesc && sortKey == 'userUpdated') }"
+                                (click)="sort('userUpdated')">
                                 <span>User Update</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeUpdated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeUpdated') }"
+                                (click)="sort('datetimeUpdated')">
                                 <span>Update Time</span>
                             </th>
-                            <th class="sorting">
+                            <th>
                                 <span>Log Content</span>
                             </th>
                         </tr>
@@ -113,12 +117,12 @@
                     <tbody *ngIf="logs">
                         <tr *ngFor="let log of logs;let i = index;">
                             <td>
-                                <span>{{(i+1)}}</span>
+                                <span>{{ (i + this.pager.startIndex + 1) }}</span>
                             </td>
                             <td>
                                 <span *ngIf="log.code == null">{{ log.name }}</span>
                                 <span *ngIf="log.name == null">{{ log.code }}</span>
-                                <span *ngIf="log.name && log.name">{{ log.code }} / {{ log.name }}</span>
+                                <span *ngIf="log.code && log.name">{{ log.code }} / {{ log.name }}</span>
                             </td>
                             <td>
                                 <span>{{ log.action }}</span>
@@ -131,9 +135,9 @@
                                 <span>{{ log.datetimeUpdated | date: 'hh:mm:ss' }}</span>
                             </td>
                             <td>
-                                <span *ngIf="log.propertyChange == null">{{ log.action }} </span>
-                                <span *ngIf="log.propertyChange == null && log.action=='Update'">{{ log.action }}: nochange </span>
-                                <span *ngIf="log.propertyChange">{{ log.action }} {{ log.propertyChange.propertyName }} : {{ log.propertyChange.newValue }} </span>
+                                <span>{{ log.action }}</span>
+                                <span *ngIf="log.propertyChange == null && log.action=='Update'">: nochange </span>
+                                <span *ngIf="log.propertyChange"> {{ log.propertyChange.propertyName }} : {{ log.propertyChange.newValue }} </span>
                             </td>
                         </tr>
                         <!-- <tr>

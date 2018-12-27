@@ -16,8 +16,6 @@ import { NotfoundPageComponent } from './notfound-page/notfound-page.component';
 import { BaseService } from 'src/services-base/base.service';
 import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
-import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
-import { Daterangepicker } from 'ng2-daterangepicker';
 import {PagingService} from './shared/common/pagination/paging-service';
 import { CommonModule } from '@angular/common';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
@@ -25,7 +23,9 @@ import { SelectModule } from 'ng2-select';
 import { SharedModule } from './shared/shared.module';
 import { CookieService } from 'ngx-cookie-service';
 import { OAuthModule } from 'angular-oauth2-oidc';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
+import { NgProgressModule } from '@ngx-progressbar/core';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -50,8 +50,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     HttpClientModule,
     BrowserAnimationsModule, // required animations module
     ToastrModule.forRoot(), // ToastrModule added
-    Ng4LoadingSpinnerModule.forRoot(),
-    Daterangepicker,
+    NgxSpinnerModule,
+    NgProgressModule,
     PerfectScrollbarModule,
     SelectModule, // Scrollbar
     OAuthModule.forRoot()

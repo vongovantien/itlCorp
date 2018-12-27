@@ -10,8 +10,6 @@ import { AllPartnerComponent } from './all/all-partner.component';
 import { ConsigneeComponent } from './consignee/consignee.component';
 import { CustomerComponent } from './customer/customer.component';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { Router } from '@angular/router';
@@ -59,14 +57,13 @@ export class PartnerComponent implements OnInit {
   @ViewChild(CarrierComponent) carrierComponent; 
   @ViewChild(ShipperComponent) shipperComponent; 
 
-  constructor(private baseService: BaseService,
-    private toastr: ToastrService, 
-    private spinnerService: Ng4LoadingSpinnerService,
+  constructor(private baseService: BaseService, 
     private api_menu: API_MENU,
     private router:Router) { }
 
   ngOnInit() {
-    this.spinnerService.show();
+    this.pager.totalItems = 0;
+    this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
   }
   onSearch(event){
@@ -152,7 +149,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
       this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
     }
-    this.spinnerService.hide();
+    this.baseService.spinnerHide();
   }
 
   showConfirmDelete(event){
@@ -165,14 +162,13 @@ export class PartnerComponent implements OnInit {
   async onDelete(event) {
     if (event) {
       this.baseService.delete(this.api_menu.Catalogue.PartnerData.delete + this.partner.id).subscribe((response: any) => {
-        if (response.status == true) {
-          this.toastr.success(response.message);
+       
+          this.baseService.successToast(response.message);
           this.RefreshData();
-        }
-        if (response.status == false) {
-          this.toastr.error(response.message);
-        }
-      }, error => this.baseService.handleError(error));
+     
+      }, err => {
+          this.baseService.errorToast(err.error.message);
+      });
     }
   }
   setPageAfterDelete() {
@@ -251,5 +247,30 @@ export class PartnerComponent implements OnInit {
       this.allPartnerComponent.getPartnerData(pager, this.criteria);
     }
     this.pager.currentPage = pager.currentPage;
+  }
+
+  async export(){
+    if(this.activeTab===this.tabName.customerTab){
+      await this.customerComponent.exportCustomers();
+    }
+    if(this.activeTab===this.tabName.agentTab){
+      await this.agentComponent.exportAgents();
+    }
+    if(this.activeTab===this.tabName.carrierTab){
+      await this.carrierComponent.exportCarriers();
+    }
+    if(this.activeTab===this.tabName.consigneeTab){
+      await this.consigneeComponent.exportConsignees();
+    }
+    if(this.activeTab===this.tabName.airshipsupTab){
+      await this.airShipSupComponent.exportAirShipSup();
+    }
+    if(this.activeTab===this.tabName.shipperTab){
+      await this.shipperComponent.exportShippers();
+    }
+    if(this.activeTab===this.tabName.allTab){
+      await this.allPartnerComponent.exportAll();
+    }
+
   }
 }

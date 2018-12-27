@@ -69,7 +69,21 @@ namespace eFMS.API.Log.DL.Services
                 case CategoryTable.Warehouse:
                     data = PagingCatPlace(criteria, page, size, out rowsCount);
                     break;
-
+                case CategoryTable.PortIndex:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
+                case CategoryTable.Province:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
+                case CategoryTable.District:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
+                case CategoryTable.Ward:
+                    data = PagingCatPlace(criteria, page, size, out rowsCount);
+                    break;
+                case CategoryTable.ExchangeRate:
+                    data = PagingCatCurrencyExchange(criteria, page, size, out rowsCount);
+                    break;
             }
             if (data == null) return null;
             var result = (from s in data
@@ -105,9 +119,10 @@ namespace eFMS.API.Log.DL.Services
                 new CategoryCollectionModel { Id = (int)CategoryTable.District, Name = "District" },
                 new CategoryCollectionModel { Id = (int)CategoryTable.Ward, Name = "Ward" },
                 new CategoryCollectionModel { Id = (int)CategoryTable.CatStage, Name = "Stage" },
-                new CategoryCollectionModel { Id = (int)CategoryTable.CatUnit, Name = "Unit" }
+                new CategoryCollectionModel { Id = (int)CategoryTable.CatUnit, Name = "Unit" },
+                //new CategoryCollectionModel { Id = (int)CategoryTable.ExchangeRate, Name = "Exchange Rate" }
             };
-            return collections;
+            return collections.OrderBy(x => x.Name).ToList();
         }
 
         private IEnumerable<LogModel> PagingCatStage(CategoryCriteria criteria, int page, int size, out long rowsCount)
@@ -119,7 +134,7 @@ namespace eFMS.API.Log.DL.Services
             var filterStage = Builders<CatStage>.Filter.Where(stageEx);
             var queryCurrencyResult = mongoContext.CatStages.Find(filterStage);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -141,7 +156,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCommodityGroup = Builders<CatCommodityGroup>.Filter.Where(groupCommodityEx);
             var queryCurrencyResult = mongoContext.CatCommodityGroups.Find(filterCommodityGroup);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -184,7 +199,7 @@ namespace eFMS.API.Log.DL.Services
             var filterPlace = Builders<CatPlace>.Filter.Where(placeEx);
             var queryCurrencyResult = mongoContext.CatPlaces.Find(filterPlace);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -200,14 +215,16 @@ namespace eFMS.API.Log.DL.Services
 
         private IEnumerable<LogModel> PagingCatPartner(CategoryCriteria criteria, int page, int size, out long rowsCount)
         {
-            Expression<Func<CatPartner, bool>> partnerEx = x => x.NewObject.Id.Contains(criteria.Query ?? "") 
-                && x.NewObject.PartnerNameEn.Contains(criteria.Query ?? "")
+            string valueId, valueName;
+            valueId = valueName = criteria.Query != null ? criteria.Query.ToLower() : "";
+            Expression<Func<CatPartner, bool>> partnerEx = x => (x.NewObject.Id.ToLower().Contains(valueId) 
+                || x.NewObject.PartnerNameEn.ToLower().Contains(valueName))
                 && (x.PropertyCommon.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                 && (x.PropertyCommon.DatetimeModified <= criteria.ToDate || criteria.ToDate == null);
             var filterPartner = Builders<CatPartner>.Filter.Where(partnerEx);
             var queryCurrencyResult = mongoContext.CatPartners.Find(filterPartner);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -226,7 +243,7 @@ namespace eFMS.API.Log.DL.Services
             var filterCurrencyExchange = Builders<CatCurrencyExchange>.Filter.Where(_ => true);
             var queryCurrencyResult = mongoContext.CatCurrencyExchanges.Find(filterCurrencyExchange);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -234,21 +251,23 @@ namespace eFMS.API.Log.DL.Services
                 DatetimeUpdated = x.PropertyCommon.DatetimeModified,
                 PropertyChange = x.PropertyCommon.PropertyChange,
                 ObjectId = x.NewObject.Id.ToString(),
-                Name = ""
+                Name = x.NewObject.CurrencyFromId
             });
             return data;
         }
 
         private IEnumerable<LogModel> PagingCatCountry(CategoryCriteria criteria, int page, int size, out long rowsCount)
         {
-            Expression<Func<CatCountry, bool>> countryEx = x => x.NewObject.NameEn.Contains(criteria.Query ?? "") 
-                && x.NewObject.Code.Contains(criteria.Query ?? "")
+            string valueName, valueCode;
+            valueName = valueCode = criteria.Query != null ? criteria.Query.ToLower() : "";
+            Expression<Func<CatCountry, bool>> countryEx = x => (x.NewObject.NameEn.ToLower().Contains(valueName) 
+                || x.NewObject.Code.ToLower().Contains(valueCode))
                 && (x.PropertyCommon.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                 && (x.PropertyCommon.DatetimeModified <= criteria.ToDate || criteria.ToDate == null);
             var filterCountry = Builders<CatCountry>.Filter.Where(countryEx);
             var queryCurrencyResult = mongoContext.CatCountries.Find(filterCountry);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -257,20 +276,21 @@ namespace eFMS.API.Log.DL.Services
                 PropertyChange = x.PropertyCommon.PropertyChange,
                 ObjectId = x.NewObject.Id.ToString(),
                 Name = x.NewObject.Code??x.NewObject.NameEn,
-                Code = x.NewObject?.Id.ToString()
+                Code = int.TryParse(x.NewObject?.Id.ToString(), out int n) == true ? null : x.NewObject?.Id.ToString()
             });
             return data;
         }
 
         private IEnumerable<LogModel> PagingCatCommodity(CategoryCriteria criteria, int page, int size, out long rowsCount)
         {
-            Expression<Func<CatCommodity, bool>> commodityEx = x => x.NewObject.CommodityNameEn.Contains(criteria.Query ?? "")
+            var value = criteria.Query != null ? criteria.Query.ToLower() : "";
+            Expression<Func<CatCommodity, bool>> commodityEx = x => x.NewObject.CommodityNameEn.ToLower().Contains(value)
                 && (x.PropertyCommon.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                 && (x.PropertyCommon.DatetimeModified <= criteria.ToDate || criteria.ToDate == null);
             var filterCommodity = Builders<CatCommodity>.Filter.Where(commodityEx);
             var queryCurrencyResult = mongoContext.CatCommodities.Find(filterCommodity);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -279,21 +299,23 @@ namespace eFMS.API.Log.DL.Services
                 PropertyChange = x.PropertyCommon.PropertyChange,
                 ObjectId = x.NewObject.Id.ToString(),
                 Name = x.NewObject?.CommodityNameEn,
-                Code = x.NewObject?.Id.ToString()
+                Code = int.TryParse(x.NewObject?.Id.ToString(), out int n) == true?null: x.NewObject?.Id.ToString()
             });
             return data;
         }
 
         private IEnumerable<LogModel> PagingCatChargeDefaultAccount(CategoryCriteria criteria, int page, int size, out long rowsCount)
         {
-            Expression<Func<CatChargeDefaultAccount, bool>> changeDefaultEx = x => x.NewObject.DebitAccountNo.Contains(criteria.Query ?? "")
-                      && x.NewObject.CreditAccountNo.Contains(criteria.Query ?? "")
+            string valueDebit, valueCredit;
+            valueDebit = valueCredit = criteria.Query != null ? criteria.Query.ToLower() : "";
+            Expression<Func<CatChargeDefaultAccount, bool>> changeDefaultEx = x => (x.NewObject.DebitAccountNo.ToLower().Contains(valueDebit)
+                      || x.NewObject.CreditAccountNo.ToLower().Contains(valueCredit))
                 && (x.PropertyCommon.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                 && (x.PropertyCommon.DatetimeModified <= criteria.ToDate || criteria.ToDate == null);
             var filterChargeDefaultAccount = Builders<CatChargeDefaultAccount>.Filter.Where(changeDefaultEx);
             var queryCurrencyResult = mongoContext.CatChargeDefaultAccounts.Find(filterChargeDefaultAccount);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -308,13 +330,14 @@ namespace eFMS.API.Log.DL.Services
 
         private IEnumerable<LogModel> PagingCatUnit(CategoryCriteria criteria, int page, int size, out long rowsCount)
         {
-            Expression<Func<CatUnit, bool>> unitEx = x => x.NewObject.UnitNameEn.Contains(criteria.Query ?? "")
+            string value = criteria.Query != null ? criteria.Query.ToLower() : "";
+            Expression<Func<CatUnit, bool>> unitEx = x => x.NewObject.UnitNameEn.ToLower().Contains(value)
                 && (x.PropertyCommon.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                 && (x.PropertyCommon.DatetimeModified <= criteria.ToDate || criteria.ToDate == null);
             var filterUnit = Builders<CatUnit>.Filter.Where(unitEx);
             var queryUnitResult = mongoContext.CatUnits.Find(filterUnit);
             rowsCount = queryUnitResult.CountDocuments();
-            var data = queryUnitResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryUnitResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,
@@ -330,14 +353,16 @@ namespace eFMS.API.Log.DL.Services
 
         private IEnumerable<LogModel> PagingCatCurrency(CategoryCriteria criteria, int page, int size, out long rowsCount)
         {
-            Expression<Func<CatCurrency, bool>> currencyEx = x => x.NewObject.CurrencyName.Contains(criteria.Query ?? "")
-                && x.NewObject.Id.Contains(criteria.Query ?? "")
+            string valueName, valueId;
+            valueName = valueId = criteria.Query != null ? criteria.Query.ToLower() : "";
+            Expression<Func<CatCurrency, bool>> currencyEx = x => (x.NewObject.CurrencyName.ToLower().Contains(valueName)
+                || x.NewObject.Id.ToLower().Contains(valueId))
                 && (x.PropertyCommon.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                 && (x.PropertyCommon.DatetimeModified <= criteria.ToDate || criteria.ToDate == null);
             var filterCurrency = Builders<CatCurrency>.Filter.Where(currencyEx);
             var queryCurrencyResult = mongoContext.CatCurrencies.Find(filterCurrency).SortByDescending(x => x.PropertyCommon.DatetimeModified);
             rowsCount = queryCurrencyResult.CountDocuments();
-            var data = queryCurrencyResult.Skip(page).Limit(size).ToList();
+            var data = queryCurrencyResult.Skip(page*size).Limit(size).ToList();
             return data.Select(x => new LogModel
             {
                 Id = x.Id,
@@ -353,14 +378,16 @@ namespace eFMS.API.Log.DL.Services
 
         private IEnumerable<LogModel> PagingCatCharge(CategoryCriteria criteria, int page, int size, out long rowsCount)
         {
-            Expression<Func<CatCharge, bool>> chargeEx = x => x.NewObject.ChargeNameEn.Contains(criteria.Query ?? "")
-                && x.NewObject.Code.Contains(criteria.Query ?? "")
+            string valueName, valueCode;
+           valueName = valueCode = criteria.Query != null ? criteria.Query.ToLower() : "";
+            Expression<Func<CatCharge, bool>> chargeEx = x => (x.NewObject.ChargeNameEn.ToLower().Contains(valueName)
+                || x.NewObject.Code.ToLower().Contains(valueCode))
                 && (x.PropertyCommon.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                 && (x.PropertyCommon.DatetimeModified <= criteria.ToDate || criteria.ToDate == null);
             var filterCharge = Builders<CatCharge>.Filter.Where(chargeEx);
             var queryResult = mongoContext.CatCatCharges.Find(filterCharge);
             rowsCount = queryResult.CountDocuments();
-            var data = queryResult.Skip(page).Limit(size).ToList().Select(x => new LogModel
+            var data = queryResult.Skip(page*size).Limit(size).ToList().Select(x => new LogModel
             {
                 Id = x.Id,
                 UserUpdated = x.PropertyCommon.UserModified,

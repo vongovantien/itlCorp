@@ -1,6 +1,6 @@
 import { ColumnSetting } from "src/app/shared/models/layout/column-setting.model";
 
-export const WAREHOUSECOLUMNSETTING: ColumnSetting[] =
+export const WAREHOUSEENCOLUMNSETTING: ColumnSetting[] =
 [
   {
     primaryKey: 'id',

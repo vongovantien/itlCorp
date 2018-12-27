@@ -6,17 +6,20 @@ import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-s
 import { ButtonType } from '../../../shared/enums/type-button.enum';
 import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
 import { BaseService } from 'src/services-base/base.service';
-import { ToastrService } from 'ngx-toastr';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
 import { SelectComponent } from 'ng2-select';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { WAREHOUSECOLUMNSETTING } from 'src/app/business-modules/catalogue/warehouse/warehouse.columns';
+//import { WAREHOUSECOLUMNSETTING } from 'src/app/business-modules/catalogue/warehouse/warehouse.columns';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import {PlaceTypeEnum} from 'src/app/shared/enums/placeType-enum';
 declare var $:any;
+import * as lodash from 'lodash';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
+import {language} from 'src/languages/language.en';
 
 @Component({
   selector: 'app-warehouse',
@@ -41,7 +44,7 @@ export class WarehouseComponent implements OnInit {
   };
   provinceLookup: any;
   districtLookup: any;
-  criteria: any = { placeType: 12 };
+  criteria: any = { placeType: PlaceTypeEnum.Warehouse };
   // @ViewChild('formAddEdit') form: NgForm;
   pager: PagerSetting = PAGINGSETTING;
   addButtonSetting: ButtonModalSetting = {
@@ -85,7 +88,7 @@ export class WarehouseComponent implements OnInit {
   nameEditModal = "edit-ware-house-modal";
   selectedFilter = "All";
   titleConfirmDelete = "You want to delete this warehouse";
-  warehouseSettings: ColumnSetting[] = WAREHOUSECOLUMNSETTING;
+  warehouseSettings: ColumnSetting[] = language.Warehouse;//= WAREHOUSECOLUMNSETTING;
   isDesc: boolean = true;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
@@ -93,12 +96,13 @@ export class WarehouseComponent implements OnInit {
     typeSearch: TypeSearch.outtab
   };
   
-  constructor(private sortService: SortService, private baseService: BaseService,
-    private toastr: ToastrService, 
-    private spinnerService: Ng4LoadingSpinnerService,
+  constructor(private sortService: SortService, 
+    private excelService: ExcelService,
+    private baseService: BaseService,
     private api_menu: API_MENU) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
     this.warehouse.placeType = 12;
     this.getWarehouses(this.pager);
     this.getDataCombobox();
@@ -109,13 +113,18 @@ export class WarehouseComponent implements OnInit {
     this.getDistricts();
   }
   getCountries(){
+    this.baseService.spinnerShow();
     this.baseService.get(this.api_menu.Catalogue.Country.getAllByLanguage).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if(response != null){
         this.countries = response.map(x=>({"text":x.name,"id":x.id}));
       }
       else{
         this.countries = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err)
     });
   }
   getProvinces(id?: number){
@@ -123,7 +132,9 @@ export class WarehouseComponent implements OnInit {
     if(id != undefined){
       url = url + "?countryId=" + id; 
     }
+    this.baseService.spinnerShow();
     this.baseService.get(url).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if(response != null){
         this.provinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
       }
@@ -134,6 +145,9 @@ export class WarehouseComponent implements OnInit {
       this.countryLookup.value = "id";
       this.countryLookup.displayName = "nameEn";
       console.log(this.provinces);
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   getDistricts(id?: number){
@@ -141,21 +155,29 @@ export class WarehouseComponent implements OnInit {
     if(id != undefined){
       url = url + "?provinceId=" + id; 
     }
+    this.baseService.spinnerShow();
     this.baseService.get(url).subscribe((response: any) => {
+      this.baseService.spinnerHide();
       if(response != null){
         this.districts = response.map(x=>({"text":x.name_VN,"id":x.id}));
       }
       else{
         this.districts = [];
       }
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   async getWarehouses(pager: PagerSetting) {
-    this.spinnerService.show();
+    this.baseService.spinnerShow();
     this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.spinnerService.hide();
+      this.baseService.spinnerHide();
       this.warehouses = response.data.map(x=>Object.assign({},x));
       this.pager.totalItems = response.totalItems;
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   onSortChange(column) {
@@ -167,6 +189,7 @@ export class WarehouseComponent implements OnInit {
   }
   showDetail(item) {
     this.warehouse = item;
+    console.log(this.warehouse);
     this.countryActive = this.countries.find(x => x.id == this.warehouse.countryID);
     this.provinceActive = this.provinces.find(x => x.id == this.warehouse.provinceID);
     this.districtActive = this.districts.find(x => x.id == this.warehouse.districtID);
@@ -174,14 +197,14 @@ export class WarehouseComponent implements OnInit {
   async onDelete(event) {
     console.log(event);
     if (event) {
-      this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {
-        if (response.status == true) {
-          this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
-          this.setPageAfterDelete();
-        }
-        if (response.status == false) {
-          this.toastr.error(response.message,"",{positionClass:'toast-bottom-right'});
-        }
+      this.baseService.spinnerShow();
+      this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.warehouse.id).subscribe((response: any) => {       
+          this.baseService.successToast(response.message);
+          this.baseService.spinnerHide();
+          this.setPageAfterDelete();        
+      },err=>{
+        this.baseService.spinnerHide();
+        this.baseService.handleError(err);
       });
     }
   }
@@ -217,32 +240,34 @@ export class WarehouseComponent implements OnInit {
     }
   }
   update(){
-    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => {
-      if (response.status == true){
-        $('#edit-ware-house-modal').modal('hide');
-        this.toastr.success(response.message);
-        this.getWarehouses(this.pager);
-        
-      }
+    this.baseService.spinnerShow();
+    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => { 
+        $('#edit-ware-house-modal').modal('hide');     
+        this.baseService.successToast(response.message);
+        this.getWarehouses(this.pager);       
+        this.baseService.spinnerHide();
+    },err=>{     
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
   addNew(){
-    this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {
-      if (response.status == true){
-        this.toastr.success(response.message,"",{positionClass:'toast-bottom-right'});
-        //this.getWarehouses(this.pager);
+    this.baseService.spinnerShow();
+    this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {     
+        this.baseService.spinnerHide();
+        this.baseService.successToast(response.message);
         this.pager.totalItems = this.pager.totalItems + 1;
         this.pager.currentPage = 1;
         this.child.setPage(this.pager.currentPage);
         this.resetWarehouse();
         this.form.onReset();
-        $('#' + this.addButtonSetting.dataTarget).modal('hide');
-      }
-      else{
-        this.toastr.error(response.message,"",{positionClass:'toast-bottom-right'});
-      }
+        $('#' + this.addButtonSetting.dataTarget).modal('hide');     
+    },err=>{
+      this.baseService.spinnerHide();
+      this.baseService.handleError(err);
     });
   }
+
   resetSearch(event){
     this.criteria = {
       placeType: 12
@@ -357,10 +382,56 @@ export class WarehouseComponent implements OnInit {
    * EXPORT - IMPORT DATA 
    */
   async export(){
+    var warehouseData = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);
+    console.log(warehouseData);    
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == SystemConstants.LANGUAGES.ENGLISH_API) {
+      warehouseData = lodash.map(warehouseData, function (item,index) {        
+        return [
+          index+1,
+          item['code'],
+          item['name_EN'],
+          item['name_VN'],
+          item['address'],
+          item['districtNameEN'],
+          item['provinceNameEN'],
+          item['countryNameEN'],
+          (item['inactive'] == true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      });
+    }
+    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == SystemConstants.LANGUAGES.VIETNAM_API){
+      warehouseData = lodash.map(warehouseData, function (item,index) {       
+        return [
+          index+1,
+          item['code'],
+          item['name_EN'],
+          item['name_VN'],
+          item['address'],
+          item['districtNameVN'],
+          item['provinceNameVN'],
+          item['countryNameVN'],
+          (item['inactive'] == true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        ]
+      });
+    }
+    const exportModel: ExportExcel = new ExportExcel();
+    exportModel.title = "Warehouse list";
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.author = currrently_user;
+    exportModel.header = [
+      {name:"No.",width:10},
+      {name:"Code",width:20},
+      {name:"Name EN",width:20},
+      {name:"Name VN",width:20},
+      {name:"Address",width:30},
+      {name:"Disctric",width:20},
+      {name:"City/Province",width:20},
+      {name:"Country",width:20},
+      {name:"Status",width:20}
+    ]
+    exportModel.data = warehouseData;
+    exportModel.fileName = "Warehouse";
     
-  }
-
-  async import(){
-
+    this.excelService.generateExcel(exportModel);
   }
 }

@@ -1,20 +1,20 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
 import { Router } from '@angular/router';
-import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
+import { OAuthService, JwksValidationHandler} from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import * as crypto_js from 'crypto-js';
 import { NgForm } from '@angular/forms';
 import { authConfig } from '../shared/authenticate/authConfig';
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { BaseService } from 'src/services-base/base.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   ngAfterViewInit(): void {
     if (this.cookieService.get("login_status") === "LOGGED_IN") {
       this.router.navigateByUrl('/home');
@@ -24,18 +24,22 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   constructor(
     private toastr: ToastrService,
+    private baseService:BaseService,
     private router: Router,
     private oauthService: OAuthService,
     private cookieService: CookieService,
-    private spinnerService: Ng4LoadingSpinnerService) {
-
+    private changeDetector : ChangeDetectorRef ) {       
+      this.oauthService.setStorage(localStorage);
+      this.oauthService.setupAutomaticSilentRefresh();
+  }
+  ngAfterViewChecked(){
+    this.changeDetector.detectChanges();
   }
 
   private async configureWithNewConfigApi() {
     this.oauthService.configure(authConfig);
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
-    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-    this.oauthService.setupAutomaticSilentRefresh();
+    await this.oauthService.loadDiscoveryDocumentAndTryLogin();     
   }
 
   username: string = "";
@@ -43,32 +47,34 @@ export class LoginComponent implements OnInit, AfterViewInit {
   remember_me: boolean = false;
 
   ngOnInit() {
-
+    this.setupLocalInfo();
+    if(this.baseService.checkLoginSession(false)){
+      this.router.navigateByUrl('/home');
+    };
   }
 
-  async Login(form: NgForm) {
-    this.spinnerService.show();
-    await this.configureWithNewConfigApi();
+  async Login(form: NgForm) {          
     if (form.form.status !== "INVALID") {
+      this.baseService.spinnerShow();
+      await this.configureWithNewConfigApi();
       this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
         return this.oauthService.loadUserProfile();
       }).then(() => {
         let claims = this.oauthService.getIdentityClaims();
         if (claims) {
-        
-          console.log(claims);
+          localStorage.setItem("currently_userName",claims['preferred_username']);
+          localStorage.setItem("currently_userEmail",claims['email']);
+          
           this.rememberMe();
-          this.toastr.success("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "", { positionClass: 'toast-bottom-right' });
-          this.router.navigateByUrl('/home');
-          this.cookieService.set('login_status', "LOGGED_IN", null, "/", window.location.hostname);
-          this.spinnerService.hide();
+          this.toastr.info("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "Login Success", { positionClass: 'toast-bottom-right' });
+          this.router.navigateByUrl('/home');       
+          this.baseService.spinnerHide();
         }
       }).catch((err) => {
         this.toastr.error(err.error.error_description, "", { positionClass: 'toast-bottom-right' })
-        this.spinnerService.hide();
+        this.baseService.spinnerHide();
       })
     }
-
   }
 
 
@@ -112,50 +118,31 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.username = this.getUserName();
     this.password = this.getUserPassword();
     this.remember_me = (this.username != '' || this.password != '');
-  }
-
-  /**
-   * ng2-select
-   */
-  public items: Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
-    'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',
-    'Budapest', 'Cologne', 'Copenhagen'];
-
-  private value: any = {};
-  private _disabledV: string = '0';
-  private disabled: boolean = false;
-
-  private get disabledV(): string {
-    return this._disabledV;
-  }
-
-  private set disabledV(value: string) {
-    this._disabledV = value;
-    this.disabled = this._disabledV === '1';
-  }
-
-  public selected(value: any): void {
-    console.log('Selected value is: ', value);
-  }
-
-  public removed(value: any): void {
-    console.log('Removed value is: ', value);
-  }
-
-  public typed(value: any): void {
-    console.log('New search input: ', value);
-  }
-
-  public refreshValue(value: any): void {
-    this.value = value;
-  }
+  }  
 
   changeLanguage(lang) {
     localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, lang);
     if (localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE) === "en") {
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"en-US");
       window.location.href = window.location.protocol + "//" + window.location.hostname;
     } else {
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"vi-VN");
       window.location.href = window.location.protocol + "//" + window.location.hostname + "/" + lang + "/";
+    }
+  }
+
+
+  setupLocalInfo(){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == null) {
+      localStorage.setItem("CURRENT_LANGUAGE", SystemConstants.DEFAULT_LANGUAGE);
+    }
+    if (localStorage.getItem(SystemConstants.CURRENT_VERSION) == null) {
+      localStorage.setItem("CURRENT_VERSION", "1");
+    }
+    var current_client_lang = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
+ 
+    if (current_client_lang === null) {
+      localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");
     }
   }
 
