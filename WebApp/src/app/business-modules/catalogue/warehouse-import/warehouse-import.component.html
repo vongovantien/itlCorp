@@ -80,20 +80,7 @@
     <!--end::m-portlet-->
     <!--begin:: m-portlet-->
     <div class="m-portlet" style="position: relative">  
-        <div class="progress--block-ui" *ngIf="inProgress">
-            <div class="progress--block-inner">
-                <div class="row">
-                    <div class="col-auto">
-                        <span class="progress-text">Processing...</span>
-                    </div>
-                    <div class="col">
-                        <div class="progress">
-                            <div class="progress-bar m--bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
         <div class="m-portlet__body">
             <!--begin: Datatable -->
             <div class="table-wrapper" id="">

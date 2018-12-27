@@ -25,7 +25,6 @@ export class StageImportComponent implements OnInit {
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-  inProgress: boolean = false;
 
   constructor(
     public ngProgress: NgProgress,
@@ -36,10 +35,11 @@ export class StageImportComponent implements OnInit {
   ) { }
   @ViewChild(PaginationComponent) child:any;
   @ViewChild('form') form:any;
+  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   ngOnInit() {
     this.pager.totalItems = 0;
   }
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+
   chooseFile(file: Event) {
     if (!this.baseService.checkLoginSession()) return;
     if (file.target['files'] == null) return;
@@ -111,15 +111,13 @@ export class StageImportComponent implements OnInit {
       $('#upload-alert-modal').modal('show');
     }
     else {
-      this.inProgress = true;
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()){
         return;
       } 
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems, true, true);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-        this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();
       }
@@ -127,11 +125,14 @@ export class StageImportComponent implements OnInit {
   }
 
   downloadSample(){
+    this.baseService.spinnerShow();
     this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel)
     .subscribe(
       response => {
+        this.baseService.spinnerHide();
         saveAs(response, 'StageTemplate.xlsx');
       },err=>{
+        this.baseService.spinnerHide();
         this.baseService.handleError(err);
       }
     )}

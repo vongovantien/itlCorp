@@ -2,8 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { saveAs } from 'file-saver';
-import { WAREHOUSEIMPORTENCOLUMNSETTING } from './warehouse-import.columns';
-import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -12,6 +10,7 @@ import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { NgProgressComponent } from '@ngx-progressbar/core';
 declare var $:any;
 
 @Component({
@@ -31,7 +30,7 @@ export class WarehouseImportComponent implements OnInit {
   inProgress: boolean = false;
   @ViewChild('form') form:any;
   @ViewChild(PaginationComponent) child:any;
-
+  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   constructor(
     private pagingService: PagingService,
     private baseService: BaseService,
@@ -44,7 +43,7 @@ export class WarehouseImportComponent implements OnInit {
   chooseFile(file: Event){
     if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
-    this.baseService.spinnerShow();
+    this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Warehouse, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
@@ -53,10 +52,9 @@ export class WarehouseImportComponent implements OnInit {
         this.totalRows = this.data.length;
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
-        this.baseService.spinnerHide();
-        console.log(this.data);
+        this.progressBar.complete();
       },err=>{
-        this.baseService.spinnerHide();
+        this.progressBar.complete();
         this.baseService.handleError(err);
       });
   }
@@ -68,10 +66,15 @@ export class WarehouseImportComponent implements OnInit {
     console.log(this.pager);
   }
   downloadSample(){
+    this.baseService.spinnerShow();
     this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12")
     .subscribe(
       response => {
+        this.baseService.spinnerHide();
         saveAs(response, 'WarehouseImportTemplate.xlsx');
+      },err=>{
+        this.baseService.spinnerHide();
+        this.baseService.handleError(err);
       }
     )
   }
@@ -93,23 +96,20 @@ export class WarehouseImportComponent implements OnInit {
     if(this.totalInValidRows > 0){
       $('#upload-alert-modal').modal('show');
     }
-    else{
-      this.inProgress = true;
+    else{     
       let data = this.data.filter(x => x.isValid);
       if(!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data, true, false);
+      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data);
       if(response){
-        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-        this.inProgress = false;
+        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);        
         this.pager.totalItems = 0;
         this.reset();
       }
-      console.log(response);
     }
   }
   isDesc = true;
   sortKey: string;
-  sort(property){
+  sort(property: string){
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);

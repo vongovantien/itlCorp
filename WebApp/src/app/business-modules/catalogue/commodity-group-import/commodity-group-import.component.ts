@@ -26,7 +26,6 @@ export class CommodityGroupImportComponent implements OnInit {
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-  inProgress: boolean = false;
   constructor(
     public ngProgress: NgProgress,
     private pagingService: PagingService,
@@ -115,7 +114,7 @@ export class CommodityGroupImportComponent implements OnInit {
     else {      
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.CommodityGroup.import, validItems, true, true);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.CommodityGroup.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);       
         this.pager.totalItems = 0;
@@ -139,7 +138,7 @@ export class CommodityGroupImportComponent implements OnInit {
     .subscribe(
       response => {
         this.baseService.spinnerHide();
-        saveAs(response, 'CommodityTemplate.xlsx');
+        saveAs(response, 'CommodityGroupTemplate.xlsx');
       },err=>{
         this.baseService.spinnerHide();
         this.baseService.handleError(err);

@@ -25,7 +25,6 @@ export class CommodityImportComponent implements OnInit {
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-  inProgress: boolean = false;
   constructor(
     public ngProgress: NgProgress,
     private pagingService: PagingService,
@@ -53,7 +52,6 @@ export class CommodityImportComponent implements OnInit {
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.progressBar.complete();
-        console.log({ DATA: this.data });
       }, err => {
         this.progressBar.complete();
         this.baseService.handleError(err);
@@ -114,7 +112,7 @@ export class CommodityImportComponent implements OnInit {
     else {     
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Commodity.import, validItems, true, true);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Commodity.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
