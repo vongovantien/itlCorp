@@ -209,8 +209,8 @@ ul {
     margin-bottom: 0;
     thead {
         th {
-            padding-left: 8px;
-            padding-right: 8px;
+            padding-left: 4px;
+            padding-right: 4px;
             font-weight: 500;
             vertical-align: middle;
             background-color: #f2dedf;
@@ -305,6 +305,16 @@ ul {
         }
     }
 }
+.table-editable {
+    tr {
+        th,
+        td {
+            &:not(:first-child) { 
+                min-width: 130px;
+            }
+        }
+    }
+}
 .table-actions-col {
     .table-actions {
         > * {
@@ -323,32 +333,46 @@ table.dataTable {
     &.table-brand {
         thead {
             .sorting {
-                padding-right: 16px;
-                background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+                }
+               
             }
             .sorting_asc {
-                padding-right: 16px;
-                background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                }
+                
             }
             .sorting_desc {
-                padding-right: 16px;
-                background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                }
             }
         }
     }
     &.table-secondary {
         thead {
             .sorting {
-                padding-right: 16px;
-                background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+                }
             }
             .sorting_asc {
-                padding-right: 16px;
-                background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                }
             }
             .sorting_desc {
-                padding-right: 16px;
-                background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                }
             }
         }
     }

@@ -51,6 +51,7 @@ export const language = {
         { name: "Sea Consol Export", route_child: "sea-consol-export",display:true },
         { name: "Sea Consol Import", route_child: "sea-consol-import",display:true },
         { name: "Sea FCL Export", route_child: "sea-fcl-export",display:true },
+        { name: "Sea FCL Export Create", route_child: "sea-fcl-export-create",display:false },
         { name: "Sea FCL Import", route_child: "sea-fcl-import",display:true },
         { name: "Sea LCL Export", route_child: "sea-lcl-export",display:true },
         { name: "Sea LCL Import", route_child: "sea-lcl-import",display:true },
