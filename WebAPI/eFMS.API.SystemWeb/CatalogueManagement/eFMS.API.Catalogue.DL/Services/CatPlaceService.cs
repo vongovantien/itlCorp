@@ -230,31 +230,31 @@ namespace eFMS.API.Catalogue.DL.Services
                 result.PlaceTypeId = placeTypeName;
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    result.CountryName = string.Format("Country name is not allow empty");
-                    result.ProvinceName = string.Format("Country name is not allow empty|wrong");
-                    result.DistrictName = string.Format("Country name is not allow empty|wrong");
+                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
+                    result.ProvinceName = result.ProvinceName??string.Format("Province name is not allow empty!|wrong");
+                    result.DistrictName = result.ProvinceName ??string.Format("District name is not allow empty!|wrong");
 
                     result.IsValid = false;
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.CountryName ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName);
 
                     if (country == null)
                     {
                         result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
-                        result.ProvinceName = string.Format("Country '{0}' is not found. Please check country '{0}'!|wrong", item.CountryName);
-                        result.DistrictName = string.Format("Country '{0}' is not found. Please check country '{0}'!|wrong", item.CountryName);
+                        result.ProvinceName = result.ProvinceName ?? string.Format("Province name is not allow empty!|wrong");
+                        result.DistrictName = result.DisplayName ?? string.Format("District name is not allow empty!|wrong");
                         result.IsValid = false;
                     }
                     else
                     {
                         result.CountryId = country.Id;
-                        var province = provinces.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.ProvinceName??"", StringComparison.OrdinalIgnoreCase) >= 0 && (i.CountryId == country.Id || country == null));
+                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
                         if (string.IsNullOrEmpty(item.ProvinceName))
                         {
-                            result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
-                            result.DistrictName = string.Format("Province name is not allow empty!|wrong|wrong");
+                            result.ProvinceName = result.ProvinceName??string.Format("Province name is not allow empty!|wrong");
+                            result.DistrictName = result.DistrictName??string.Format("District name is not allow empty!|wrong");
                             result.IsValid = false;
                         }
                         else if (province == null)
@@ -272,10 +272,10 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                             else
                             {
-                                var district = districts.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.DistrictName??"") >= 0 && (i.ProvinceId == province.Id || province == null));
+                                var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName && (i.ProvinceId == province.Id || province == null));
                                 if(district == null)
                                 {
-                                    result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                    result.DistrictName = string.Format("District name {0} is not found!|wrong", item.DisplayName);
                                     result.IsValid = false;
                                 }
                             }
@@ -298,41 +298,52 @@ namespace eFMS.API.Catalogue.DL.Services
                 item = CheckCatplaceValidImport(districts, list, item);
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    item.CountryName = string.Format("Country name is not allow empty");
-                    item.ProvinceName = string.Format("Country name is not allow empty|wrong");
+                    item.CountryName = string.Format("Country name is not allow empty!|wrong");
+                    item.ProvinceName = item.ProvinceName??string.Format("Province name is not allow empty!|wrong");
                     item.IsValid = false;
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
                     if (country == null)
                     {
                         item.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
-                        item.ProvinceName = string.Format("Country '{0}' is not found. Please check country '{0}'!|wrong", item.CountryName);
+                        item.ProvinceName = item.ProvinceName ?? string.Format("Province name is not allow empty!|wrong");
                         item.IsValid = false;
                     }
                     else
                     {
                         item.CountryId = country.Id;
-                        var province = provinces.FirstOrDefault(i => i.NameEn.IndexOf(item.ProvinceName) >= 0 && (i.CountryId == country.Id || country == null));
                         if (string.IsNullOrEmpty(item.ProvinceName))
                         {
                             item.ProvinceName = string.Format("Province name is not allow empty!|wrong");
                             item.IsValid = false;
                         }
-                        else if (province == null)
-                        {
-                            item.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
-                            item.IsValid = false;
-                        }
                         else
                         {
-                            item.ProvinceId = province.Id;
-                            var district = districts.FirstOrDefault(i => i.NameEn.IndexOf(item.DistrictName) >= 0 && (i.ProvinceId == province.Id || province == null));
-                            if (string.IsNullOrEmpty(item.DistrictName))
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
+
+                            if (province == null)
                             {
-                                item.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                item.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
                                 item.IsValid = false;
+                            }
+                            else
+                            {
+                                item.ProvinceId = province.Id;
+                                if (string.IsNullOrEmpty(item.DistrictName))
+                                {
+                                    item.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                    item.IsValid = false;
+                                }
+                                else
+                                {
+                                    var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
+                                    if(district == null)
+                                    {
+                                        item.DistrictName = string.Format("District name {0} is not found!|wrong", item.DistrictName);
+                                    }
+                                }
                             }
                         }
                     }
@@ -352,12 +363,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 result.PlaceTypeId = placeTypeName;
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    result.CountryName = string.Format("Country name is not allow empty");
+                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
                     result.IsValid = false;
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName) >= 0);
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
                     if (country == null)
                     {
                         result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
@@ -472,45 +483,64 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var result = CheckCatplaceValidImport(warehouses, results, item);
                 result.PlaceTypeId = placeTypeName;
-                var country = countries.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.CountryName ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-
-                if (country == null)
+                if (string.IsNullOrEmpty(item.Address))
                 {
-                    result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
-                    result.ProvinceName = string.Format("Country '{0}' is not found. Please check country '{0}'!|wrong", item.CountryName);
-                    result.DistrictName = string.Format("Country '{0}' is not found. Please check country '{0}'!|wrong", item.CountryName);
+                    result.Address = string.Format("Address is not allow empty!|wrong");
                     result.IsValid = false;
                 }
                 else
                 {
-                    result.CountryId = country.Id;
-                    var province = provinces.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.ProvinceName ?? "", StringComparison.OrdinalIgnoreCase) >= 0 && (i.CountryId == country.Id || country == null));
-                    if (string.IsNullOrEmpty(item.ProvinceName))
+                    result.Address = string.Empty;
+                }
+                if (string.IsNullOrEmpty(item.CountryName))
+                {
+                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
+                    result.ProvinceName = result.ProvinceName??string.Format("Province name is not allow empty!|wrong");
+                    result.DistrictName = result.DistrictName??string.Format("District name is not allow empty!|wrong");
+                    result.IsValid = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
+
+                    if (country == null)
                     {
-                        result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
-                        result.DistrictName = string.Format("Province name is not allow empty!|wrong");
-                        result.IsValid = false;
-                    }
-                    else if (province == null)
-                    {
-                        result.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
+                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.ProvinceName = result.ProvinceName??string.Format("Province name is not allow empty!|wrong");
+                        result.DistrictName = result.DistrictName??string.Format("District name is not allow empty!|wrong");
                         result.IsValid = false;
                     }
                     else
                     {
-                        result.ProvinceId = province.Id;
-                        if (string.IsNullOrEmpty(item.DistrictName))
+                        result.CountryId = country.Id;
+                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
+                        if (string.IsNullOrEmpty(item.ProvinceName))
                         {
-                            result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                            result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
+                            result.DistrictName = result.DistrictName??string.Format("District name is not allow empty!|wrong");
+                            result.IsValid = false;
+                        }
+                        else if (province == null)
+                        {
+                            result.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
                             result.IsValid = false;
                         }
                         else
                         {
-                            var district = districts.FirstOrDefault(i => (i.NameEn ?? "").IndexOf(item.DistrictName ?? "") >= 0 && (i.ProvinceId == province.Id || province == null));
-                            if (district == null)
+                            result.ProvinceId = province.Id;
+                            if (string.IsNullOrEmpty(item.DistrictName))
                             {
                                 result.DistrictName = string.Format("District name is not allow empty!|wrong");
                                 result.IsValid = false;
+                            }
+                            else
+                            {
+                                var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName&& (i.ProvinceId == province.Id || province == null));
+                                if (district == null)
+                                {
+                                    result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                    result.IsValid = false;
+                                }
                             }
                         }
                     }

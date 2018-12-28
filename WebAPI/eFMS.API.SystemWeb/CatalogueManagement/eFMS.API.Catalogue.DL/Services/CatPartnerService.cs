@@ -26,6 +26,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var partners = dc.CatPartner.ToList();
+            var users = dc.SysUser.ToList();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.TaxCode))

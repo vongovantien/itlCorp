@@ -18,6 +18,7 @@ import { CurrencyComponent } from './currency/currency.component';
 import { LocationImportComponent } from './location-import/location-import.component';
 import { StageImportComponent } from './stage-import/stage-import.component';
 import { CommodityImportComponent } from './commodity-import/commodity-import.component';
+import { PartnerDataImportComponent } from './partner-data-import/partner-data-import.component';
 
 const routes: Routes = [
 
@@ -65,6 +66,10 @@ const routes: Routes = [
   {
     path:'partner-data',
     component:PartnerComponent
+  },
+  {
+    path: 'partner-data-import',
+    component: PartnerDataImportComponent
   },
   {
     path:'port-index',
