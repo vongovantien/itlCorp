@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { language } from 'src/languages/language.en';
-import { OAuthService } from 'angular-oauth2-oidc';
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +19,6 @@ export class BaseService implements ErrorHandler {
   constructor(private _http: HttpClient,
     private spinnerService: NgxSpinnerService,
     private toastr: ToastrService,
-    private oauthService: OAuthService,
     private router: Router, ) {
 
     this.headers = new HttpHeaders({
@@ -296,8 +294,7 @@ export class BaseService implements ErrorHandler {
   }
 
   checkLoginSession(display_warning = true): boolean {
-    this.oauthService
-    if (localStorage.getItem("access_token") == null) {
+    if (this.hasValidAccessToken() == false) {
       if (display_warning) {
         this.warningToast("Please login to continue !", "Expired Session");
       }
@@ -317,5 +314,23 @@ export class BaseService implements ErrorHandler {
     }
   }
 
+
+
+  private hasValidAccessToken() {
+    if (this.getAccessToken()) {
+      var expiresAt = localStorage.getItem('expires_at');
+      var now = new Date();
+      if (expiresAt && parseInt(expiresAt, 10) < now.getTime()) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
+
+
+  private getAccessToken() {
+    return localStorage.getItem('access_token');
+  }
 
 }

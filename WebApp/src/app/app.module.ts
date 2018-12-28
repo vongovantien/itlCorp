@@ -26,6 +26,7 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { NgProgressModule } from '@ngx-progressbar/core';
+import { AuthGuardService } from 'src/services-base/auth-guard.service';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -57,6 +58,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     OAuthModule.forRoot()
   ],
   providers: [
+    AuthGuardService,
     BaseService,
     CookieService ,
     PagingService,

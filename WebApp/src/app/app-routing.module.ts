@@ -3,6 +3,7 @@ import { Routes, RouterModule, PreloadingStrategy, PreloadAllModules } from '@an
 import { LoginComponent } from './login/login.component';
 import { MasterPageComponent } from './master-page/master-page.component';
 import { NotfoundPageComponent } from './notfound-page/notfound-page.component';
+import { AuthGuardService } from 'src/services-base/auth-guard.service';
 
 const routes: Routes = [
     {
@@ -11,7 +12,7 @@ const routes: Routes = [
     },
     {
         path: '',
-        redirectTo: 'login', // redirect to 'login' page after login page implement 
+        redirectTo: 'login', 
         pathMatch: 'full'
     },    
   
@@ -21,6 +22,7 @@ const routes: Routes = [
 
     {
         path: 'home',
+        canActivate:[AuthGuardService],
         component: MasterPageComponent,
         children: [
             {
