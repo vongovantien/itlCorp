@@ -207,31 +207,11 @@ namespace eFMS.API.Catalogue.Controllers
                     var stage = new CatPartnerImportModel
                     {
                         IsValid = true,
-                        PartnerGroup = worksheet.Cells[row, 1].Value?.ToString(),
-                        ContactPerson = worksheet.Cells[row, 2].Value?.ToString(),
-                        Tel = worksheet.Cells[row, 3].Value?.ToString(),
-                        Fax = worksheet.Cells[row, 4].Value?.ToString(),
-                        CountryBilling = worksheet.Cells[row, 5].Value?.ToString(),
-                        CityBilling = worksheet.Cells[row, 6].Value?.ToString(),
-                        ZipCode = worksheet.Cells[row, 7].Value?.ToString(),
-                        AddressEn = worksheet.Cells[row, 8].Value?.ToString(),
-                        AddressVn = worksheet.Cells[row, 9].Value?.ToString(),
-                        CountryShipping = worksheet.Cells[row, 10].Value?.ToString(),
-                        CityShipping = worksheet.Cells[row, 11].Value?.ToString(),
-                        ZipCodeShipping = worksheet.Cells[row, 12].Value?.ToString(),
-                        AddressShippingEn = worksheet.Cells[row, 13].Value?.ToString(),
-                        AddressShippingVn = worksheet.Cells[row, 14].Value?.ToString(),
-                        SaleManName = worksheet.Cells[row, 15].Value?.ToString(),
-                        DepartmentName = worksheet.Cells[row, 16].Value?.ToString(),
-                        ACReference = worksheet.Cells[row, 17].Value?.ToString(),
-                        Website = worksheet.Cells[row, 18].Value?.ToString(),
-                        BankAccountNo = worksheet.Cells[row, 19].Value?.ToString(),
-                        BankAccountName = worksheet.Cells[row, 20].Value?.ToString(),
-                        BankAccountAddress = worksheet.Cells[row, 21].Value?.ToString(),
-                        SwiftCode = worksheet.Cells[row, 22].Value?.ToString(),
-                        Profile = worksheet.Cells[row, 23].Value?.ToString(),
-                        Note = worksheet.Cells[row, 24].Value?.ToString(),
-                        Public = worksheet.Cells[row, 25].Value != null? (bool)worksheet.Cells[row, 25].Value: (bool?)null
+                        PartnerNameEn = worksheet.Cells[row, 1].Value?.ToString(),
+                        PartnerNameVn = worksheet.Cells[row, 2].Value?.ToString(),
+                        ShortName = worksheet.Cells[row, 3].Value?.ToString(),
+                        TaxCode = worksheet.Cells[row, 4].Value?.ToString(),
+                        PartnerGroup = worksheet.Cells[row, 5].Value?.ToString()
                     };
                     list.Add(stage);
                 }

@@ -30,6 +30,7 @@ import { LocationImportComponent } from './location-import/location-import.compo
 import { StageImportComponent } from './stage-import/stage-import.component';
 import { CommodityImportComponent } from './commodity-import/commodity-import.component';
 import { CommodityGroupImportComponent } from './commodity-group-import/commodity-group-import.component';
+import { PartnerDataImportComponent } from './partner-data-import/partner-data-import.component';
 
 
 @NgModule({
@@ -65,7 +66,8 @@ import { CommodityGroupImportComponent } from './commodity-group-import/commodit
       LocationImportComponent,
       StageImportComponent,
       CommodityImportComponent,
-      CommodityGroupImportComponent
+      CommodityGroupImportComponent,
+      PartnerDataImportComponent
     ],
 })
 export class CatalogueModule { }

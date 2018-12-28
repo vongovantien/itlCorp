@@ -26,9 +26,41 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var partners = dc.CatPartner.ToList();
+            var users = dc.SysUser.ToList();
             list.ForEach(item =>
             {
-
+                if (string.IsNullOrEmpty(item.TaxCode))
+                {
+                    item.TaxCode = string.Format("Tax code is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if(partners.Any(x => (x.TaxCode??"").ToLower() == item.TaxCode.ToLower())){
+                        item.TaxCode = string.Format("Tax code {0} has been existed!|wrong", item.TaxCode);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.PartnerGroup))
+                {
+                    item.PartnerGroup = string.Format("Partner group is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameEn))
+                {
+                    item.PartnerNameEn = string.Format("Partner name EN is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameVn))
+                {
+                    item.PartnerNameVn = string.Format("Partner name VN is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ShortName))
+                {
+                    item.ShortName = string.Format("Short name is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
             });
             return list;
         }
