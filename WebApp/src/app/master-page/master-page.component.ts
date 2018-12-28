@@ -34,8 +34,8 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   }
  
   logout(){
-    this.oauthService.logOut(false);  
-    this.router.navigateByUrl("/login");
+    this.oauthService.logOut(true);  
+    // this.router.navigateByUrl("/login");
     localStorage.clear()   
   }
 
