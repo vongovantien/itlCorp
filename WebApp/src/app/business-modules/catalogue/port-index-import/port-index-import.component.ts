@@ -38,6 +38,7 @@ export class PortIndexImportComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
     if(!this.baseService.checkLoginSession()) return;

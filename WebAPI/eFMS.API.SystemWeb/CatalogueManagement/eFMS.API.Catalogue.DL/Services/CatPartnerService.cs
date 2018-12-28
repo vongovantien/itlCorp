@@ -4,6 +4,7 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
+using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -25,8 +26,9 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var partners = dc.CatPartner.ToList();
-            var users = dc.SysUser.ToList();
+            var partners = dc.CatPartner.Where(x => x.Inactive == false).ToList();
+            var partnerGroups = DataEnums.CatPartnerGroups;
+            var users = dc.SysUser.Where(x => x.Inactive == false).ToList();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.TaxCode))
@@ -45,6 +47,34 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     item.PartnerGroup = string.Format("Partner group is not allow empty!|wrong");
                     item.IsValid = false;
+                }
+                else 
+                {
+                    if (item.PartnerGroup.ToLower() == DataEnums.AllPartner.ToLower())
+                    {
+                        item.PartnerGroup = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
+                    }
+                    else
+                    {
+                        var group = partnerGroups.FirstOrDefault(x => x.Id.ToLower() == item.PartnerGroup.ToLower());
+                        if (group == null)
+                        {
+                            item.PartnerGroup = string.Format("Partner group {0} is not found!|wrong", item.PartnerGroup);
+                            item.IsValid = false;
+                        }
+                        else
+                        {
+                            item.PartnerGroup = group.Id;
+                            if (group.Id == DataEnums.CustomerPartner)
+                            {
+                                if (string.IsNullOrEmpty(item.SalePersonId))
+                                {
+                                    item.PartnerGroup = string.Format("Saleman is not allow empty!|wrong");
+                                    item.IsValid = false;
+                                }
+                            }
+                        }
+                    }
                 }
                 if (string.IsNullOrEmpty(item.PartnerNameEn))
                 {
@@ -78,7 +108,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach (var item in data)
                 {
                     var partner = mapper.Map<CatPartner>(item);
-                    partner.Inactive = item.Status.ToString().ToLower() == "active" ? false : true;
+                    partner.UserCreated = ChangeTrackerHelper.currentUser;
+                    partner.DatetimeCreated = DateTime.Now;
+                    partner.Id = partner.AccountNo = partner.TaxCode;
+                    //partner.Inactive = item.Status.ToString().ToLower() == "active" ? false : true;
                     dc.CatPartner.Add(partner);
                 }
                 dc.SaveChanges();

@@ -29,7 +29,6 @@ export class LocationImportComponent implements OnInit {
   inProgress: boolean = false;
   type: string;
 
-  @ViewChild('form') form;
   @ViewChild(PaginationComponent) child;
   constructor(
     private pagingService: PagingService,

@@ -18,40 +18,50 @@
           <div class="m-form m-form--state">
               <div class="row">
                   <div class="col-lg-4">
-                      <input type="file" class="form-control m-input m-input--square" placeholder="">
+                      <input type="file" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                       <span class="m-form__help">
-                          <a class="btn-link" href="javascript:void(0)">Download simple</a>
+                          <a class="btn-link" href="javascript:void(0)">Download sample</a>
                       </span>
                   </div>
                   <div class="col-lg-7 offset-lg-1">
                       <div class="row">
                           <div class="col-sm-4 m--margin-top-10 text-right">
                               <span class="m--font-brand m--font-bolder">
-                                  Total rows: 0
+                                  Total rows: {{ totalRows }}
                               </span>
                           </div>
                           <div class="col-sm-4 m--margin-top-10 text-right">
                               <span class="m--font-success m--font-bolder">
-                                  Valid rows: 0
+                                  Valid rows: {{ totalValidRows }}
                               </span>
                           </div>
                           <div class="col-sm-4 m--margin-top-10 text-right">
                               <span class="m--font-danger  m--font-bolder">
-                                  Invalid rows: 0
+                                  Invalid rows: {{ totalInValidRows }}
                               </span>
                           </div>
                       </div>
                   </div>
               </div>
               <div class="form-actions m--margin-top-5 m--align-right">
-                  <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                  <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
                       <span>
                           <span>
                               Show/hide invalid rows
                           </span>
                       </span>
+                  </button> -->
+                  <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+                    <span>
+                        <span *ngIf="isShowInvalid"> 
+                            Show invalid rows
+                        </span>
+                        <span *ngIf="isShowInvalid == false"> 
+                            Show All
+                        </span>
+                    </span>
                   </button>
-                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
                       <span>
                           <i class="la la-save"></i>
                           <span>
@@ -59,13 +69,21 @@
                           </span>
                       </span>
                   </button>
-                  <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                  <!-- <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
                       <span>
                           <i class="la la-ban"></i>
                           <span>
                               close
                           </span>
                       </span>
+                  </button> -->
+                  <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/partner-data">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            close
+                        </span>
+                    </span>
                   </button>
               </div>
           </div>
@@ -75,7 +93,8 @@
   <!--end::m-portlet-->
   <!--begin:: m-portlet-->
   <div class="m-portlet" style="position: relative">
-      <div class="progress--block-ui">
+    <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
+      <!-- <div class="progress--block-ui">
           <div class="progress--block-inner">
               <div class="row">
                   <div class="col-auto">
@@ -89,7 +108,7 @@
                   </div>
               </div>
           </div>
-      </div>
+      </div> -->
       <div class="m-portlet__body">
           <!--begin: Datatable -->
           <div class="table-wrapper" id="">
@@ -100,88 +119,63 @@
                               <span>No</span>
                           </th>
                           <th class="sorting">
-                              <span>Port Code</span>
-                          </th>
-                          <th class="sorting">
                               <span>Name(EN)</span>
                           </th>
                           <th class="sorting">
-                              <span>Name(VI)</span>
+                              <span>Name(Local)</span>
                           </th>
                           <th class="sorting">
-                              <span>Country</span>
+                              <span>Name(Abreviation)</span>
                           </th>
                           <th class="sorting">
-                              <span>Zone</span>
+                              <span>Tax Code</span>
                           </th>
                           <th class="sorting">
-                              <span>Mode</span>
+                              <span>Category</span>
                           </th>
                           <th>
                               <span>Status</span>
                           </th>
                       </tr>
                   </thead>
-                  <tbody>
-                      <tr class="invalid-row">
-                          <td>
-                              <span class="m--font-danger">Đây là lỗi cực kì nghiêm trọng nè</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>Active</span>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>text</span>
-                          </td>
-                          <td>
-                              <span>Active</span>
-                          </td>
-                      </tr>
+                  <tbody *ngIf="data">
+                    <ng-container *ngFor="let item of pagedItems; let i = index">
+                        <tr [ngClass]="{ 'invalid-row': !item.isValid }">
+                            <td>
+                              <span>{{ (i + this.pager.startIndex + 1) }}</span>
+                            </td>
+                            <td> 
+                              <span *ngIf="item.partnerNameEn.split('|').length == 1">{{ item.partnerNameEn }}</span>
+                              <span class="m--font-danger" *ngIf="item.partnerNameEn.split('|').length > 1">{{ item.partnerNameEn.split('|')[0] }}</span>
+                            </td>
+                            <td>
+                              <span *ngIf="item.partnerNameVn.split('|').length == 1">{{ item.partnerNameVn }}</span>
+                              <span class="m--font-danger" *ngIf="item.partnerNameVn.split('|').length > 1">{{ item.partnerNameVn.split('|')[0] }}</span>
+                            </td>
+                            <td>
+                                <span *ngIf="item.shortName.split('|').length == 1">{{ item.shortName }}</span>
+                                <span class="m--font-danger" *ngIf="item.shortName.split('|').length > 1">{{ item.shortName.split('|')[0] }}</span>
+                            </td>
+                            <td>
+                                <span *ngIf="item.taxCode.split('|').length == 1">{{ item.taxCode }}</span>
+                                <span class="m--font-danger" *ngIf="item.taxCode.split('|').length > 1">{{ item.taxCode.split('|')[0] }}</span>
+                            </td>
+                            <td>
+                                <span *ngIf="item.partnerGroup.split('|').length == 1">{{ item.partnerGroup }}</span>
+                                <span class="m--font-danger" *ngIf="item.partnerGroup.split('|').length > 1">{{ item.partnerGroup.split('|')[0] }}</span>
+                            </td>
+                            <td>
+                                <span>Active</span>
+                            </td>
+                        </tr>
+                    </ng-container>
                   </tbody>
               </table>
           </div>
           <!--end: Datatable -->
 
           <!--begin::pagination-->
-          <div class="pagination-nav">
+          <!-- <div class="pagination-nav">
               <div class="row">
                   <div class="col-sm-6">
                       <div class="tatable__pager-size" style="max-width: 190px">
@@ -208,7 +202,8 @@
                       </nav>
                   </div>
               </div>
-          </div>
+          </div> -->
+          <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
           <!--end::pagination-->
       </div>
   </div>

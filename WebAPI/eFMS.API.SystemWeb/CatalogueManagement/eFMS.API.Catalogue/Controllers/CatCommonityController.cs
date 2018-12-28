@@ -198,18 +198,25 @@ namespace eFMS.API.Catalogue.Controllers
                 return Ok(results);
 
             }
-            return BadRequest(new ResultHandle { Status = false, Message = "Cannot upload, file not found !" });
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
 
         [HttpPost]
         [Route("import")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Import([FromBody] List<CommodityImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = "1";  //currentUser.UserID;
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catComonityService.Import(data);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
+            }
         }
 
 
@@ -225,16 +232,15 @@ namespace eFMS.API.Catalogue.Controllers
                 if (result != null)
                 {
                     return result;
-
                 }
                 else
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
 
 

@@ -12,6 +12,8 @@ import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 declare var $:any;
 
 @Component({
@@ -31,6 +33,14 @@ export class WarehouseImportComponent implements OnInit {
   inProgress: boolean = false;
   @ViewChild('form') form;
   @ViewChild(PaginationComponent) child;
+  closeButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.cancel,
+    buttonAttribute: {
+      titleButton: "close",
+      classStyle: "btn m-btn--square m-btn--icon m-btn--uppercase",
+      icon: "la la-ban"
+    }
+  };
 
   constructor(
     private pagingService: PagingService,
