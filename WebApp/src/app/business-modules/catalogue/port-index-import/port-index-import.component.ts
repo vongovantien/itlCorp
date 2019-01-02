@@ -38,6 +38,7 @@ export class PortIndexImportComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
     if(!this.baseService.checkLoginSession()) return;
@@ -124,4 +125,10 @@ export class PortIndexImportComponent implements OnInit {
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
   }
+
+
+  async downloadSample(){
+    await this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel,'ImportPortIndexTemplate.xlsx');
+  }
+  
 }

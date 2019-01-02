@@ -10,7 +10,7 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { language } from 'src/languages/language.en';
 import { ActivatedRoute } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
+import { NgProgressComponent } from '@ngx-progressbar/core';
 
 declare var $:any;
 @Component({
@@ -86,7 +86,7 @@ export class LocationImportComponent implements OnInit {
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
-  downloadSample(){
+  async downloadSample(){
     let url = '';
     if(this.type == 'province'){
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Province;
@@ -100,13 +100,7 @@ export class LocationImportComponent implements OnInit {
     if(this.type == 'country'){
       url = this.api_menu.Catalogue.Country.downloadExcel;
     }
-    this.baseService.downloadfile(url)
-    .subscribe(
-      response => {
-        saveAs(response, this.type + 'ImportTemplate.xlsx');
-      },err=>{
-        this.baseService.handleError(err);
-      });  
+    await this.baseService.downloadfile(url,'ImportTemplate.xlsx');
     }
   async setPage(pager:PagerSetting){
     this.pager.currentPage = pager.currentPage;

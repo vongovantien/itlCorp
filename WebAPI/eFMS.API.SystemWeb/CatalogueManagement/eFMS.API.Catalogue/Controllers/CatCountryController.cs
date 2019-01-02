@@ -151,8 +151,13 @@ namespace eFMS.API.Catalogue.Controllers
             templateName = "Country" + templateName;
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
+            {
                 return result;
-            return BadRequest();
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
         }
 
         [HttpPost]
@@ -186,7 +191,7 @@ namespace eFMS.API.Catalogue.Controllers
                 var results = new { data, totalValidRows };
                 return Ok(results);
             }
-            return BadRequest(file);
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
         [HttpPost]
         [Route("Import")]
@@ -195,7 +200,14 @@ namespace eFMS.API.Catalogue.Controllers
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catCountryService.Import(data);
-            return Ok(result);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
         }
         private string CheckExist(int id, CatCountryModel model)
         {

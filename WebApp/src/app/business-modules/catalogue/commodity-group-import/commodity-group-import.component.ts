@@ -132,18 +132,9 @@ export class CommodityGroupImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
 
-  downloadSample(){
-    this.baseService.spinnerShow();
-    this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel)
-    .subscribe(
-      response => {
-        this.baseService.spinnerHide();
-        saveAs(response, 'CommodityGroupTemplate.xlsx');
-      },err=>{
-        this.baseService.spinnerHide();
-        this.baseService.handleError(err);
-      }
-    )}
+  async downloadSample(){
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel,'CommodityGroupTemplate.xlsx');
+  }
 
 
 }

@@ -10,6 +10,8 @@ import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgressComponent } from '@ngx-progressbar/core';
 declare var $:any;
 
@@ -31,6 +33,15 @@ export class WarehouseImportComponent implements OnInit {
   @ViewChild('form') form:any;
   @ViewChild(PaginationComponent) child:any;
   @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+  closeButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.cancel,
+    buttonAttribute: {
+      titleButton: "close",
+      classStyle: "btn m-btn--square m-btn--icon m-btn--uppercase",
+      icon: "la la-ban"
+    }
+  };
+
   constructor(
     private pagingService: PagingService,
     private baseService: BaseService,
@@ -65,19 +76,10 @@ export class WarehouseImportComponent implements OnInit {
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     console.log(this.pager);
   }
-  downloadSample(){
-    this.baseService.spinnerShow();
-    this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12")
-    .subscribe(
-      response => {
-        this.baseService.spinnerHide();
-        saveAs(response, 'WarehouseImportTemplate.xlsx');
-      },err=>{
-        this.baseService.spinnerHide();
-        this.baseService.handleError(err);
-      }
-    )
+  async downloadSample(){
+    await this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12",'WarehouseImportTemplate.xlsx');
   }
+  
   hideInvalid(){
     if(this.data == null) return;
     this.isShowInvalid = !this.isShowInvalid;

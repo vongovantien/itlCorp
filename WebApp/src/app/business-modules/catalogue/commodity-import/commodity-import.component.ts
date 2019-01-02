@@ -131,19 +131,8 @@ export class CommodityImportComponent implements OnInit {
   }
 
 
-  downloadSample() {
-    this.baseService.spinnerShow();
-    this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel)
-      .subscribe(
-        response => {
-          this.baseService.spinnerHide();
-          saveAs(response, 'CommodityTemplate.xlsx');        
-        }, err => {
-          this.baseService.spinnerHide();
-          this.baseService.handleError(err);
-        }
-      )
+  async downloadSample() {
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel,'CommodityTemplate.xlsx');
   }
-
 
 }

@@ -30,5 +30,6 @@ namespace SystemManagementAPI.Resources
         public static readonly string MSG_DELETE_FAIL_INCLUDED_CHILD = "MSG_DELETE_FAIL_INCLUDED_CHILD";
         public static readonly string EF_ANNOTATIONS_REQUIRED = "EF_ANNOTATIONS_REQUIRED";
         public static readonly string EF_ANNOTATIONS_STRING_LENGTH = "EF_ANNOTATIONS_STRING_LENGTH";
+        public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
     }
 }

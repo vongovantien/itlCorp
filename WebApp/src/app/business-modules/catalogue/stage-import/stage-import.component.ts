@@ -124,18 +124,9 @@ export class StageImportComponent implements OnInit {
     }
   }
 
-  downloadSample(){
-    this.baseService.spinnerShow();
-    this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel)
-    .subscribe(
-      response => {
-        this.baseService.spinnerHide();
-        saveAs(response, 'StageTemplate.xlsx');
-      },err=>{
-        this.baseService.spinnerHide();
-        this.baseService.handleError(err);
-      }
-    )}
+  async downloadSample(){
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel,'ImportStageTemplate.xlsx');
+  }
 
   reset() {
     this.data = null;
