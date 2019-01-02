@@ -67,7 +67,7 @@
             <!--begin: Search Form -->
             <div class="m-form m-form--label-align-right m--margin-bottom-10">
                 <div class="row align-items-center">
-                    <div class="col-lg-6 order-2 order-lg-1">
+                    <div class="col-lg-4 order-2 order-lg-1">
                         <div class="form-group">
                             <div class="m-input-icon m-input-icon--left">
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
@@ -79,7 +79,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
+                    <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                             <span>
                                 <i class="la la-plus"></i>
@@ -269,7 +269,7 @@
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
                     <div class="row align-items-center">
-                        <div class="col-lg-6 order-2 order-lg-1">
+                        <div class="col-lg-4 order-2 order-lg-1">
                             <div class="form-group">
                                 <div class="m-input-icon m-input-icon--left">
                                     <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
@@ -281,7 +281,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                 <span>
                                     <i class="la la-plus"></i>
@@ -424,6 +424,9 @@
                                     </span>
                                 </td>
                                 <td class="">
+                                    <span></span>
+                                </td>
+                                <td class="">
                                     <span>
                                         Note
                                     </span>
@@ -496,15 +499,15 @@
                                 </td>
                                 <td class="">
                                     <span>
-                                        <div class="input-group m-input-group m-input-group--square">
-                                            <div class="input-group-prepend">
-                                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                                    placeholder="Select filter">
-                                                </ng-select>
-                                            </div>
-                                            <input type="text" class="form-control" aria-label="">
-                                        </div>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select filter">
+                                        </ng-select>
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <input type="text" class="form-control m-input m-input--square" aria-label="">
                                     </span>
                                 </td>
                                 <td class="">
@@ -527,7 +530,7 @@
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
                     <div class="row align-items-center">
-                        <div class="col-lg-6 order-2 order-lg-1">
+                        <div class="col-lg-4 order-2 order-lg-1">
                             <div class="form-group">
                                 <div class="m-input-icon m-input-icon--left">
                                     <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
@@ -539,7 +542,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                 <span>
                                     <i class="la la-plus"></i>
