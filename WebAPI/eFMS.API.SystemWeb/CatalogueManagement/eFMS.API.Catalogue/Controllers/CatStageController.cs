@@ -223,7 +223,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = ex.Message});
             }
                 
             

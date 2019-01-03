@@ -134,6 +134,7 @@ ul {
 //typography
 .c-block-title {
     font-size: 16px;
+    margin: 0.5rem 0 0;
 }
 //header
 .m-subheader__title {
@@ -193,13 +194,23 @@ ul {
     }
 }
 //table
+.table-wrapper {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    .table {   
+        min-width: 100%;
+    }
+}
 .table {
     font-size: 13px;
     margin-bottom: 0;
     thead {
         th {
-            padding-left: 8px;
-            padding-right: 8px;
+            padding-left: 4px;
+            padding-right: 4px;
             font-weight: 500;
             vertical-align: middle;
             background-color: #f2dedf;
@@ -220,7 +231,7 @@ ul {
     tbody {
         tr {
             td {
-                padding: 8px;
+                padding: 8px 4px;
                 vertical-align: middle;
                 &:first-child {
                     padding-left: 10px
@@ -294,6 +305,16 @@ ul {
         }
     }
 }
+.table-editable {
+    tr {
+        th,
+        td {
+            &:not(:first-child) { 
+                min-width: 130px;
+            }
+        }
+    }
+}
 .table-actions-col {
     .table-actions {
         > * {
@@ -312,35 +333,52 @@ table.dataTable {
     &.table-brand {
         thead {
             .sorting {
-                padding-right: 16px;
-                background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+                }
+               
             }
             .sorting_asc {
-                padding-right: 16px;
-                background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                }
+                
             }
             .sorting_desc {
-                padding-right: 16px;
-                background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                }
             }
         }
     }
     &.table-secondary {
         thead {
             .sorting {
-                padding-right: 16px;
-                background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+                }
             }
             .sorting_asc {
-                padding-right: 16px;
-                background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                }
             }
             .sorting_desc {
-                padding-right: 16px;
-                background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                span {
+                    padding-right: 16px;
+                    background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                }
             }
         }
     }
+}
+.tatable__pager-size {
+    max-width: 190px; 
 }
 .pagination-nav {
     margin-top: 1rem;

@@ -25,7 +25,6 @@ export class StageImportComponent implements OnInit {
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-  inProgress: boolean = false;
 
   constructor(
     public ngProgress: NgProgress,
@@ -34,16 +33,16 @@ export class StageImportComponent implements OnInit {
     private menu_api: API_MENU,
     private sortService: SortService
   ) { }
-  @ViewChild(PaginationComponent) child;
-  @ViewChild('form') form;
+  @ViewChild(PaginationComponent) child:any;
+  @ViewChild('form') form:any;
+  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   ngOnInit() {
     this.pager.totalItems = 0;
   }
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+
   chooseFile(file: Event) {
     if (!this.baseService.checkLoginSession()) return;
     if (file.target['files'] == null) return;
-    // this.baseService.spinnerShow();
     this.progressBar.start();
     this.baseService.uploadfile(this.menu_api.Catalogue.Stage_Management.uploadExel, file.target['files'], "uploadedFile")
       .subscribe(res => {
@@ -53,7 +52,6 @@ export class StageImportComponent implements OnInit {
         this.totalRows = this.data.length;
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
-        //  this.baseService.spinnerHide();
         this.progressBar.complete();
       }, err => {
         this.progressBar.complete();
@@ -66,7 +64,6 @@ export class StageImportComponent implements OnInit {
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    console.log(this.pagedItems);
   }
 
   async setPage(pager: PagerSetting) {
@@ -87,7 +84,7 @@ export class StageImportComponent implements OnInit {
 
   isDesc = true;
   sortKey: string;
-  sort(property) {
+  sort(property: string) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
@@ -114,31 +111,22 @@ export class StageImportComponent implements OnInit {
       $('#upload-alert-modal').modal('show');
     }
     else {
-      this.inProgress = true;
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()){
         return;
       } 
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems, true, false);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-        this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();
       }
-      console.log(response);
     }
   }
 
-  downloadSample(){
-    this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel)
-    .subscribe(
-      response => {
-        saveAs(response, 'StageTemplate.xlsx');
-      },err=>{
-        this.baseService.handleError(err);
-      }
-    )}
+  async downloadSample(){
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel,'ImportStageTemplate.xlsx');
+  }
 
   reset() {
     this.data = null;

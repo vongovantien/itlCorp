@@ -1,47 +1,990 @@
-<!--begin::Form-->
-<div class="m-form m-form--state">
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label class="form-control-label" for="">
-                    Enter text
-                </label>
-                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text">
+                    House Bill List
+                </h3>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label class="form-control-label" for="">
-                    Select filter
-                </label>
-                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                    placeholder="Select filter">
-                </ng-select>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label class="form-control-label" for="">
-                    Create date: From - To
-                </label>
-                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                    <input type="text" class="form-control m-input m-input--square"
-                        ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                        [(ngModel)]="selectedRange"
-                        [ranges]="ranges"
-                        [maxDate]="maxDate"
-                        [alwaysShowCalendars]="true"
-                        name="daterange"
-                        placeholder="From date - to date" readonly/>
-                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                        <span>
-                            <i class="la la-calendar"></i>
-                        </span>
-                    </span>
+    </div>
+    <div class="m-portlet__body">
+        <div class="div-inside bg-secondary m--margin-bottom-10">
+            <h3 class="c-block-title">Summary</h3>
+            <hr>
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Container:
+                                </span>
+                                <span>02x20DC, </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Commodities:
+                                </span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-xl-4">
+                    <div class="m--margin-bottom-10">
+                        <span class="m--font-bolder">
+                            Total gross weight:
+                        </span>
+                        <span></span>
+                    </div>
+                    <div class="m--margin-bottom-10">
+                        <span class="m--font-bolder">
+                            Total net weight:
+                        </span>
+                        <span></span>
+                    </div>
+                    <div class="m--margin-bottom-10">
+                        <span class="m--font-bolder">
+                            Total chargeable weight:
+                        </span>
+                        <span></span>
+                    </div>
+                    <div class="m--margin-bottom-10">
+                        <span class="m--font-bolder">
+                            Total CBM:
+                        </span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="">
+            <!--begin: Search Form -->
+            <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 order-2 order-lg-1">
+                        <div class="form-group">
+                            <div class="m-input-icon m-input-icon--left">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                    <span>
+                                        <i class="la la-search"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la-plus"></i>
+                                <span>
+                                    add house bill
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--end: Search Form -->
+            <!--begin: Datatable-->
+            <div class="table-wrapper" id="">
+                <table class="table table-striped table-brand dataTable">
+                    <thead class="">
+                        <tr class="">
+                            <th class="table-actions-col"></th>
+                            <th class="sorting">
+                                <span>
+                                    H-B/L No
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Customer
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Saleman
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Nomination Party
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Destination
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Containers
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Qty
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Unit
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    C.W
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    G.W
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    CBM
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="">
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>
+                                    H-B/L No
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Customer
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Saleman
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Nomination Party
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Destination
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Containers
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Qty
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Unit
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    C.W
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    G.W
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    CBM
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--end: Datatable-->
+        </div>
+    </div>
+</div>
+<!--end:: m-portlet-->
+
+<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link active" data-toggle="tab" href="#buying-rate" role="tab">
+                    Buying Rate
+                </a>
+            </li>
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#selling-rate" role="tab">
+                    Selling Rate
+                </a>
+            </li>
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#ohb" role="tab">
+                    OBH
+                </a>
+            </li>
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#logistic-charge" role="tab">
+                    Logistic Charges
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="tab-content" id="">
+            <div class="tab-pane fade show active" id="buying-rate" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add charge
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper" id="">
+                    <table class="table table-striped table-brand table-editable dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="sorting">
+                                    <span>
+                                        Code
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                       Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name Local
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit Price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Payer
+                                    </span>
+                                </th>
+                                <th class=""></th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs 
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 40px">
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Code
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Name Local
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Unit Price
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        VAT
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Payer
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span></span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Docs 
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 40px">
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select filter">
+                                        </ng-select>
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Name Local
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Unit Price
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select filter">
+                                        </ng-select>
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        VAT
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select filter">
+                                        </ng-select>
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <input type="text" class="form-control m-input m-input--square" aria-label="">
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </span>
+                                </td>
+                                <td class="">
+                                    <span>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder=""> 
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
+            </div>
+            <div class="tab-pane fade" id="selling-rate" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add new
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="">
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Customer
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Destination
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class="">
+                                    <div class="">
+                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                            <input type="radio" name="example-1" value="1">
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Customer
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Destination
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class="">
+                                    <div class="">
+                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                            <input type="radio" name="example-1" value="2">
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Customer
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Destination
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
+            </div>
+            <div class="tab-pane fade" id="ohb" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add new
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="">
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Customer
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Destination
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 40px">
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Customer
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Destination
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 40px">
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Customer
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Destination
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
+            </div>
+            <div class="tab-pane fade" id="logistic-charge" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add new
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="">
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Customer
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Destination
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class="">
+                                    <div class="">
+                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                            <input type="radio" name="example-1" value="1">
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Customer
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Destination
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class="">
+                                    <div class="">
+                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                            <input type="radio" name="example-1" value="2">
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        Job ID
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        M-B/L
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Customer
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Saleman
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Nomination Party
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Destination
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
             </div>
         </div>
     </div>
 </div>
-<!--end::Form-->

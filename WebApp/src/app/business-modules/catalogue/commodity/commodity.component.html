@@ -79,7 +79,7 @@
                         <div class="clearfix m--margin-bottom-15">
                             <div class="c-button-actions m--align-right">
                                 <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget" (click)="showAdd(tabName.commodityGroup)"></app-default-button>
-                                <app-default-button [buttonSetting]="importButtonSetting" (click)="importComGroup()"></app-default-button>
+                                <app-default-button [buttonSetting]="importButtonSetting" (click)="importComGroup()" [routerLink]="['/home/catalogue/commodity-group-import']"></app-default-button>
                                 <app-default-button [buttonSetting]="exportButtonSetting" (click)="exportComGroup()"></app-default-button>
                             </div>
                         </div>

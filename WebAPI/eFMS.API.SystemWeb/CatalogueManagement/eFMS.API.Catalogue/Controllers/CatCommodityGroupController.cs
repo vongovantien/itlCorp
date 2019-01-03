@@ -11,11 +11,13 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
@@ -31,6 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityGroupService catComonityGroupService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+        private string templateName = "ImportTemplate.xlsx";
         public CatCommodityGroupController(IStringLocalizer<LanguageSub> localizer, ICatCommodityGroupService service, IMapper iMapper,
             ICurrentUser user)
         {
@@ -157,5 +160,86 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return message;
         }
+
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+                if (worksheet.Cells[1, 1].Value?.ToString() != "English Name")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name'" });
+                }
+                if (worksheet.Cells[1, 2].Value?.ToString() != "Local Name")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'Local Name'" });
+                }
+                if (worksheet.Cells[1, 3].Value?.ToString() != "Status")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Status'" });
+                }
+                List<CommodityGroupImportModel> list = new List<CommodityGroupImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var commodityGroup = new CommodityGroupImportModel
+                    {
+                        IsValid = true,
+                        GroupNameEn = worksheet.Cells[row, 1].Value?.ToString(),
+                        GroupNameVn = worksheet.Cells[row, 2].Value?.ToString(),
+                        Status = worksheet.Cells[row, 3].Value?.ToString()
+                    };
+                    list.Add(commodityGroup);
+                }
+                var data = catComonityGroupService.CheckValidImport(list);
+                var totoalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totoalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = "Cannot upload, file not found !" });
+        }
+
+
+        [HttpPost]
+        [Route("import")]
+        //[Authorize]
+        public IActionResult Import([FromBody] List<CommodityGroupImportModel> data)
+        {
+            ChangeTrackerHelper.currentUser = "1";  //currentUser.UserID;
+            var result = catComonityGroupService.Import(data);
+            return Ok(result);
+        }
+
+        [HttpGet("downloadExcel")]
+        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        {
+
+            try
+            {
+                templateName = "CommodityGroup" + templateName;
+                var result = await new FileHelper().ExportExcel(templateName);
+                if (result != null)
+                {
+                    return result;
+
+                }
+                else
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
+            }
+
+
+        }
+
     }
 }
