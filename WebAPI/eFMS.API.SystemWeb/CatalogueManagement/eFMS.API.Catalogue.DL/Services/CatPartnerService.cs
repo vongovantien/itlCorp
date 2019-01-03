@@ -121,7 +121,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    item.CityBilling = string.Format("Country '{0}' is not found!|wrong", item.CountryBilling);
+                    item.CountryBilling = "Country is empty. Please check again!|wrong";
+                    item.Inactive = false;
                 }
                 if (!string.IsNullOrEmpty(item.CountryShipping))
                 {
@@ -148,22 +149,31 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    item.CityShipping = string.Format("Country '{0}' is not found!|wrong", item.CountryShipping);
+                    item.CountryShipping = "Country is empty. Please check again!| wrong";
                 }
-                //if (!string.IsNullOrEmpty(item.CountryShipping))
-                //{
-                //    item.CountryShippingId = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping)?.Id;
-                //}
-                //if (!string.IsNullOrEmpty(item.CityShipping))
-                //{
-                //    item.ProvinceShippingId = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping)?.Id;
-                //}
-
                 if (!string.IsNullOrEmpty(item.Profile)){
-                    item.WorkPlaceId = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile)?.Id;
+                    var workplace = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile);
+                    if(workplace == null)
+                    {
+                        item.CityBilling = string.Format("Workplace '{0}' is not found!|wrong", item.Profile);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.WorkPlaceId = workplace.Id;
+                    }
                 }
                 if (!string.IsNullOrEmpty(item.SaleManName)) {
-                    item.SalePersonId = salemans.FirstOrDefault(i => i.Username == item.SaleManName)?.Id;
+                    var salePerson = salemans.FirstOrDefault(i => i.Username == item.SaleManName);
+                    if(salePerson == null)
+                    {
+                        item.SaleManName = string.Format("Sale man '{0}' is not found!|wrong", item.SaleManName);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.SalePersonId = salePerson.Id;
+                    }
                 }
             });
             return list;
