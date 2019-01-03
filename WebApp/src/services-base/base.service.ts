@@ -191,15 +191,14 @@ export class BaseService implements ErrorHandler {
   public async downloadfile(url: string,saveAsFileName:string):Promise<any> {    
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
-    //return this._http.get(url,{responseType:'blob'});
     this.spinnerShow();
     try {
       this.spinnerHide();
       const res = await this._http.get(url,{responseType:'blob'}).toPromise();
       saveAs(res,saveAsFileName);
     } catch (error) {
-      console.log({ERROR_FILE:error});
-      this.errorToast("File not found !", this.LANG.NOTIFI_MESS.SERVER_ERR_TITLE);
+      console.log({DOWNLOAD_ERROR_LOG:error});
+      this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
 

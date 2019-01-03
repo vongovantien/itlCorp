@@ -130,6 +130,8 @@ export const language = {
   Warehouse: WAREHOUSEENCOLUMNSETTING,
   WarehouseImport: WAREHOUSEIMPORTENCOLUMNSETTING,
   NOTIFI_MESS: {
+    DOWNLOAD_ERR:"Download Error",
+    FILE_NOT_FOUND:"File Not Found !",
     UNKNOW_ERR:"Unknow Error",
     SERVER_ERR_TITLE: "Server Error",
     CLIENT_ERR_TITLE: "Invalid Request",

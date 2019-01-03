@@ -220,6 +220,8 @@ export const language = {
     }
   ],
   NOTIFI_MESS: {
+    DOWNLOAD_ERR:"Lỗi Tải Xuống",
+    FILE_NOT_FOUND:"Không Tìm Thấy Tệp !",
     UNKNOW_ERR:"Lỗi",
     SERVER_ERR_TITLE: "Lỗi Máy Chủ",
     CLIENT_ERR_TITLE: "Yêu Cầu Không Hợp Lệ",
