@@ -127,4 +127,15 @@ export class PartnerDataImportComponent implements OnInit {
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
   }
+  downloadSample(){
+    this.baseService.downloadfile(this.api_menu.Catalogue.PartnerData.downloadExcel)
+    .subscribe(
+      response => {
+        saveAs(response, 'PartnerImportTemplate.xlsx');
+      },
+      err => {
+        this.baseService.handleError(err);
+      }
+    )
+  }
 }

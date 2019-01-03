@@ -6,6 +6,7 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -29,6 +30,10 @@ namespace eFMS.API.Catalogue.DL.Services
             var partners = dc.CatPartner.Where(x => x.Inactive == false).ToList();
             var partnerGroups = DataEnums.CatPartnerGroups;
             var users = dc.SysUser.Where(x => x.Inactive == false).ToList();
+            var countries = dc.CatCountry.Where(x => x.Inactive == false);
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province) && x.Inactive == false);
+            var branchs = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch) && x.Inactive == false);
+            var salemans = dc.SysUser.Where(x => x.Inactive == false);
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.TaxCode))
@@ -90,6 +95,75 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     item.ShortName = string.Format("Short name is not allow empty!|wrong");
                     item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.CountryBilling))
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryBilling.ToLower());
+                    if (country == null)
+                    {
+                        item.CountryBilling = string.Format("Country '{0}' is not found!|wrong", item.CountryBilling);
+                        item.CityBilling = string.Format("Country '{0}' is not found!|wrong", item.CountryBilling);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.CountryId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityBilling))
+                        {
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityBilling.ToLower() && i.CountryId == country.Id);
+                            if(province == null)
+                            {
+                                item.CityBilling = string.Format("City billing '{0}' is not found!|wrong", item.CityBilling);
+                                item.IsValid = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    item.CityBilling = string.Format("Country '{0}' is not found!|wrong", item.CountryBilling);
+                }
+                if (!string.IsNullOrEmpty(item.CountryShipping))
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping.ToLower());
+                    if (country == null)
+                    {
+                        item.CountryShipping = string.Format("Country '{0}' is not found!|wrong", item.CountryShipping);
+                        item.CityShipping = string.Format("Country '{0}' is not found!|wrong", item.CountryShipping);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.CountryId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityShipping))
+                        {
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == country.Id);
+                            if (province == null)
+                            {
+                                item.CityBilling = string.Format("City shipping '{0}' is not found!|wrong", item.CityShipping);
+                                item.IsValid = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    item.CityShipping = string.Format("Country '{0}' is not found!|wrong", item.CountryShipping);
+                }
+                //if (!string.IsNullOrEmpty(item.CountryShipping))
+                //{
+                //    item.CountryShippingId = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping)?.Id;
+                //}
+                //if (!string.IsNullOrEmpty(item.CityShipping))
+                //{
+                //    item.ProvinceShippingId = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping)?.Id;
+                //}
+
+                if (!string.IsNullOrEmpty(item.Profile)){
+                    item.WorkPlaceId = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile)?.Id;
+                }
+                if (!string.IsNullOrEmpty(item.SaleManName)) {
+                    item.SalePersonId = salemans.FirstOrDefault(i => i.Username == item.SaleManName)?.Id;
                 }
             });
             return list;
