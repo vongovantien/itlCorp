@@ -19,6 +19,8 @@ import { LocationImportComponent } from './location-import/location-import.compo
 import { StageImportComponent } from './stage-import/stage-import.component';
 import { CommodityImportComponent } from './commodity-import/commodity-import.component';
 import { CommodityGroupImportComponent } from './commodity-group-import/commodity-group-import.component';
+import { ChargeImportComponent } from './charge-import/charge-import.component';
+import { ChargeImportAccountVoucherComponent } from './charge-import-account-voucher/charge-import-account-voucher.component';
 
 const routes: Routes = [
 
@@ -54,6 +56,14 @@ const routes: Routes = [
   {
     path:'charge-edit',
     component:ChargeDetailsComponent
+  },
+  {
+    path:'charge-import',
+    component:ChargeImportComponent
+  },
+  {
+    path:'charge-import-account-voucher',
+    component:ChargeImportAccountVoucherComponent
   },
   {
     path:'commodity',

@@ -63,6 +63,17 @@ ul {
     }
     background-color: #fbfbfb;
 }
+.dropdown {
+    &.no-arrow {
+        .btn {
+            &.dropdown-toggle {
+                &:after {
+                    display: none;
+                }
+            }
+        }
+    }
+}
 .m-body {
     width: 100%;
     min-height: 600px;
@@ -194,16 +205,6 @@ ul {
     }
 }
 //table
-.table-wrapper {
-    width: 100%;
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: -ms-autohiding-scrollbar;
-    .table {   
-        min-width: 100%;
-    }
-}
 .table-scrollable {
     width: 100%;
     display: block;

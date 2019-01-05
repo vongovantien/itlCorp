@@ -13,14 +13,20 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
-                <span>
-                    <i class="la la-download"></i>
+            <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span>
-                        import
+                        <i class="la la-download"></i>
+                        <span>
+                            import
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="">
+                    <a routerLink="/home/catalogue/charge-import" class="dropdown-item" href="javascript:void(0)">Import charge</a>
+                    <a routerLink="/home/catalogue/charge-import-account-voucher" class="dropdown-item" href="javascript:void(0)">Import account voucher</a>
+                </div>
+            </div>
             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
                 <span>
                     <i class="la la-upload"></i>

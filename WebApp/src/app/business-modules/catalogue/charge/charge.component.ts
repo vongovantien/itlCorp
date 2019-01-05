@@ -16,7 +16,7 @@ declare var $: any;
 @Component({
   selector: 'app-charge',
   templateUrl: './charge.component.html',
-  styleUrls: ['./charge.component.sass']
+  styleUrls: ['./charge.component.scss']
 })
 export class ChargeComponent implements OnInit {
 
