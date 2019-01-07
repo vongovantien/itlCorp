@@ -16,7 +16,7 @@ declare var $: any;
 @Component({
   selector: 'app-charge',
   templateUrl: './charge.component.html',
-  styleUrls: ['./charge.component.sass']
+  styleUrls: ['./charge.component.scss']
 })
 export class ChargeComponent implements OnInit {
 
@@ -62,12 +62,14 @@ export class ChargeComponent implements OnInit {
 
       }
     }
+    this.pager.currentPage = 1;
     await this.getCharges();
   }
 
   async resetSearch() {
     this.searchKey = "";
     this.searchObject = {};
+    this.pager = PAGINGSETTING;
     this.selectedFilter = this.listFilter[0].filter;
     await this.getCharges();
   }
@@ -88,6 +90,7 @@ export class ChargeComponent implements OnInit {
   }
 
   async getCharges() {
+    console.log(this.pager)
     var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, false, true);
     if(response){
       this.ListCharges = response.data;

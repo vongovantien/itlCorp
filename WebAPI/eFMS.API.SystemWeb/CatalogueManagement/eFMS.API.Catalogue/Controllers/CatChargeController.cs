@@ -261,7 +261,7 @@ namespace eFMS.API.Catalogue.Controllers
 
 
         [HttpGet("downloadExcel")]
-        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        public async Task<ActionResult> DownloadExcel()
         {
 
             try

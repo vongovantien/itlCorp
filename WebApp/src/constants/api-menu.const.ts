@@ -135,6 +135,9 @@ export class API_MENU {
             delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/delete/",
             getById:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/getById/",
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/update",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE)+"CatCharge/uploadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/import",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/downloadExcel",
         },
         Country:{            
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/query",

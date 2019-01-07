@@ -23,7 +23,6 @@ export class LocationImportComponent implements OnInit {
   pagedItems: any[] = [];
   inValidItems: any[] = [];
   totalValidRows: number = 0;
-  totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
@@ -72,7 +71,6 @@ export class LocationImportComponent implements OnInit {
         this.pager.totalItems = this.data.length;
         this.totalValidRows = response.totalValidRows;
         this.totalRows = this.data.length;
-        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.progressBar.complete();
       },err=>{
@@ -132,7 +130,7 @@ export class LocationImportComponent implements OnInit {
   }
   async import(){
     if(this.data == null) return;
-    if(this.totalInValidRows > 0){
+    if(this.totalRows - this.totalValidRows > 0){
       $('#upload-alert-modal').modal('show');
     }
     else{

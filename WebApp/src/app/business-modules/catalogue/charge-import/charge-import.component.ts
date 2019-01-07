@@ -5,17 +5,19 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { language } from 'src/languages/language.en';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
 declare var $: any;
+
 @Component({
-  selector: 'app-stage-import',
-  templateUrl: './stage-import.component.html',
-  styleUrls: ['./stage-import.component.scss']
+  selector: 'app-charge-import',
+  templateUrl: './charge-import.component.html',
+  styleUrls: ['./charge-import.component.scss']
 })
-export class StageImportComponent implements OnInit {
+export class ChargeImportComponent implements OnInit {
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
@@ -24,6 +26,7 @@ export class StageImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
 
+
   constructor(
     public ngProgress: NgProgress,
     private pagingService: PagingService,
@@ -31,20 +34,24 @@ export class StageImportComponent implements OnInit {
     private menu_api: API_MENU,
     private sortService: SortService
   ) { }
-  @ViewChild(PaginationComponent) child:any;
-  @ViewChild('form') form:any;
+  @ViewChild(PaginationComponent) child: any;
+  @ViewChild('form') form: any;
   @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+
+
   ngOnInit() {
     this.pager.totalItems = 0;
   }
+
 
   chooseFile(file: Event) {
     if (!this.baseService.checkLoginSession()) return;
     if (file.target['files'] == null) return;
     this.progressBar.start();
-    this.baseService.uploadfile(this.menu_api.Catalogue.Stage_Management.uploadExel, file.target['files'], "uploadedFile")
+    this.baseService.uploadfile(this.menu_api.Catalogue.Charge.uploadExel, file.target['files'], "uploadedFile")
       .subscribe(res => {
         this.data = res['data'];
+        console.log(this.data)
         this.pager.totalItems = this.data.length;
         this.totalValidRows = res['totalValidRows'];
         this.totalRows = this.data.length;
@@ -104,15 +111,15 @@ export class StageImportComponent implements OnInit {
 
   async import() {
     if (this.data == null) return;
-    if (this.totalRows - this.totalValidRows > 0) {
+    if (this.totalRows-this.totalValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
     else {
       let validItems = this.data.filter(x => x.isValid);
-      if (!this.baseService.checkLoginSession()){
+      if (!this.baseService.checkLoginSession()) {
         return;
-      } 
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems);
+      }
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Charge.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
@@ -121,8 +128,8 @@ export class StageImportComponent implements OnInit {
     }
   }
 
-  async downloadSample(){
-    await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel,'ImportStageTemplate.xlsx');
+  async downloadSample() {
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Charge.downloadExcel, 'ImportChargeTemplate.xlsx');
   }
 
   reset() {
@@ -131,7 +138,6 @@ export class StageImportComponent implements OnInit {
     $("#inputFile").val('');
     this.pager.totalItems = 0;
   }
-
 
 
 }
