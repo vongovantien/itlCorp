@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ButtonModalSetting } from '../../models/layout/button-modal-setting.model';
 import { ButtonType } from '../../enums/type-button.enum';
+import { config } from 'exceljs';
 declare var $: any;
 @Component({
   selector: 'app-search-options',
@@ -38,6 +39,7 @@ export class SearchOptionsComponent implements OnInit {
     }
     this.searchObject.field = configSearch.selectedFilter;
     this.searchObject.fieldDisplayName = configSearch.selectedFilter;
+    this.searchObject.searchString = configSearch.searchString;
   }
   searchTypeChange(field, event) {
     if(field == 'All'){

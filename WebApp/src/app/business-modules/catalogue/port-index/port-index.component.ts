@@ -143,6 +143,7 @@ export class PortIndexComponent implements OnInit {
     this.criteria = {
       placeType: 8
     };
+    this.onSearch(event);
   }
   showAdd() {
     this.initPortIndex();

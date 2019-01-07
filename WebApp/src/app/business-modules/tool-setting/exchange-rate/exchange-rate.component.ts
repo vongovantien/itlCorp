@@ -273,6 +273,7 @@ export class ExchangeRateComponent implements OnInit {
     this.baseService.post(this.api_menu.ToolSetting.ExchangeRate.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.baseService.spinnerHide();
       this.exchangeRates = response.data;
+      console.log(this.exchangeRates);
       this.pager.totalItems = response.totalItems;
     },err=>{
       this.baseService.spinnerHide();

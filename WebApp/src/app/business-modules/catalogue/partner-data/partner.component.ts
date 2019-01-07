@@ -56,7 +56,7 @@ export class PartnerComponent implements OnInit {
   exportButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.export
   };
-  activeTab: string = this.tabName.customerTab;
+  activeTab: string = this.tabName.allTab;
   @ViewChild(PaginationComponent) child;
   //partnerType: any;
 
@@ -76,6 +76,9 @@ export class PartnerComponent implements OnInit {
     this.pager.totalItems = 0;
     this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
+  }
+  resetSearch(event){
+    this.onSearch(event);
   }
   onSearch(event){
     if(event.field == "All"){

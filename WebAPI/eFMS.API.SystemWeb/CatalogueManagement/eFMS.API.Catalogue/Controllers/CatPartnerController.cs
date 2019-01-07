@@ -204,18 +204,38 @@ namespace eFMS.API.Catalogue.Controllers
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
-                if (rowCount < 2) return BadRequest();
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
                 List<CatPartnerImportModel> list = new List<CatPartnerImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
                     var stage = new CatPartnerImportModel
                     {
                         IsValid = true,
-                        PartnerNameEn = worksheet.Cells[row, 1].Value?.ToString(),
-                        PartnerNameVn = worksheet.Cells[row, 2].Value?.ToString(),
-                        ShortName = worksheet.Cells[row, 3].Value?.ToString(),
-                        TaxCode = worksheet.Cells[row, 4].Value?.ToString(),
-                        PartnerGroup = worksheet.Cells[row, 5].Value?.ToString()
+                        ShortName = worksheet.Cells[row, 1].Value == null? string.Empty: worksheet.Cells[row, 1].Value.ToString(),
+                        PartnerNameEn = worksheet.Cells[row, 2].Value == null? string.Empty: worksheet.Cells[row, 2].Value.ToString(),
+                        PartnerNameVn = worksheet.Cells[row, 3].Value == null? string.Empty: worksheet.Cells[row, 3].Value.ToString(),
+                        TaxCode = worksheet.Cells[row, 4].Value == null? string.Empty: worksheet.Cells[row, 4].Value.ToString(),
+                        PartnerGroup = worksheet.Cells[row, 5].Value == null? string.Empty: worksheet.Cells[row, 5].Value.ToString(),
+                        ContactPerson = worksheet.Cells[row, 6].Value == null? string.Empty: worksheet.Cells[row, 6].Value.ToString(),
+                        Tel = worksheet.Cells[row, 7].Value == null? string.Empty: worksheet.Cells[row, 7].Value.ToString(),
+                        AddressEn = worksheet.Cells[row, 8].Value == null? string.Empty: worksheet.Cells[row, 8].Value.ToString(),
+                        AddressVn = worksheet.Cells[row, 9].Value == null? string.Empty: worksheet.Cells[row, 9].Value.ToString(),
+                        CityBilling = worksheet.Cells[row, 10].Value == null? string.Empty: worksheet.Cells[row, 10].Value.ToString(),
+                        CountryBilling = worksheet.Cells[row, 11].Value == null? string.Empty: worksheet.Cells[row, 11].Value.ToString(),
+                        ZipCode = worksheet.Cells[row, 12].Value == null? string.Empty: worksheet.Cells[row, 12].Value.ToString(),
+                        AddressShippingEn = worksheet.Cells[row, 13].Value == null? string.Empty: worksheet.Cells[row, 13].Value.ToString(),
+                        AddressShippingVn = worksheet.Cells[row, 14].Value == null? string.Empty: worksheet.Cells[row, 14].Value.ToString(),
+                        CityShipping = worksheet.Cells[row, 15].Value == null? string.Empty: worksheet.Cells[row, 15].Value.ToString(),
+                        CountryShipping = worksheet.Cells[row, 16].Value == null? string.Empty: worksheet.Cells[row, 16].Value.ToString(),
+                        ZipCodeShipping = worksheet.Cells[row, 17].Value == null? string.Empty: worksheet.Cells[row, 17].Value.ToString(),
+                        Email = worksheet.Cells[row, 18].Value == null? string.Empty: worksheet.Cells[row, 18].Value.ToString(),
+                        SaleManName = worksheet.Cells[row, 19].Value == null? string.Empty: worksheet.Cells[row, 19].Value.ToString(),
+                        Profile = worksheet.Cells[row, 20].Value == null? string.Empty: worksheet.Cells[row, 20].Value.ToString(),
+                        BankAccountNo = worksheet.Cells[row, 21].Value == null? string.Empty: worksheet.Cells[row, 21].Value.ToString(),
+                        BankAccountName = worksheet.Cells[row, 22].Value == null? string.Empty: worksheet.Cells[row, 22].Value.ToString(),
+                        SwiftCode = worksheet.Cells[row, 23].Value == null? string.Empty: worksheet.Cells[row, 23].Value.ToString(),
+                        BankAccountAddress = worksheet.Cells[row, 24].Value == null? string.Empty: worksheet.Cells[row, 24].Value.ToString(),
+                        Note = worksheet.Cells[row, 25].Value == null? string.Empty: worksheet.Cells[row, 25].Value.ToString(),
                     };
                     list.Add(stage);
                 }

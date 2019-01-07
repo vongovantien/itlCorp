@@ -41,66 +41,79 @@
                 </th>
             </tr>
         </thead>
-        <tbody *ngFor="let item of customers;let i = index;">
-            <tr style="background-color: #f2dedf">
-                <td colspan="10">
-                    <span><strong>Sale man: {{item.salePersonName}}</strong></span>
-                    <span style="margin-left: 10px;"><strong>Customer: {{item.sumNumberPartner}}</strong></span>
-                </td>
-            </tr>
-            <tr *ngFor= "let _item of item.catPartnerModels">
-                <td class="table-actions-col">
-                    <div class="table-actions" style="width: 70px">
-                        <!-- <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                            title="Edit stage" routerLink="/home/catalogue/partner-data-detail">
-                            <i class="la la-edit"></i>
-                        </button> -->
-                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                            title="Edit stage" (click)="showDetail(_item)">
-                            <i class="la la-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                        (click)="showConfirmDelete(_item)"
-                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                            <i class="la la-trash"></i>
-                        </button>
-                    </div>
-                </td>
-                <td>
-                    <span>{{_item.id}}</span>
-                </td>
-                <td>
-                    <span>{{_item.shortName}}</span>
-                </td>
-                <td>
-                    <span>{{_item.addressVn}}</span>
-                </td>
-                <td>
-                    <span>{{_item.taxCode}}</span>
-                </td>
-                <td>
-                    <span>{{_item.tel}}</span>
-                </td>
-                <td>
-                    <span>{{_item.fax}}</span>
-                </td>
-                <td>
-                    <span>{{_item.userCreatedName}}</span>
-                </td>
-                <td>
-                    <span>{{_item.datetimeModified | date: 'h:mm'}}</span> &nbsp;
-                    <span>{{_item.datetimeModified | date: 'dd/MM/yyyy'}}</span>
-                </td>
-                <td>
-                    <span>
-                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                            <input type="checkbox" disabled [checked]="_item.inactive">
-                            <span></span>
-                        </label>
-                    </span>
-                </td>
-            </tr>
-        
+        <tbody *ngIf="customers">
+            <ng-container *ngIf="customers.length >0; else norecord">
+                <ng-container *ngFor="let item of customers;let i = index;">
+                    <tr style="background-color: #f2dedf">
+                        <td colspan="10">
+                            <span><strong>Sale man: {{item.salePersonName}}</strong></span>
+                            <span style="margin-left: 10px;"><strong>Customer: {{item.sumNumberPartner}}</strong></span>
+                        </td>
+                    </tr>
+                    <tr *ngFor= "let _item of item.catPartnerModels">
+                        <td class="table-actions-col">
+                            <div class="table-actions" style="width: 70px">
+                                <!-- <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Edit stage" routerLink="/home/catalogue/partner-data-detail">
+                                    <i class="la la-edit"></i>
+                                </button> -->
+                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Edit stage" (click)="showDetail(_item)">
+                                    <i class="la la-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                (click)="showConfirmDelete(_item)"
+                                    title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <span>{{_item.id}}</span>
+                        </td>
+                        <td>
+                            <span>{{_item.shortName}}</span>
+                        </td>
+                        <td>
+                            <span>{{_item.addressVn}}</span>
+                        </td>
+                        <td>
+                            <span>{{_item.taxCode}}</span>
+                        </td>
+                        <td>
+                            <span>{{_item.tel}}</span>
+                        </td>
+                        <td>
+                            <span>{{_item.fax}}</span>
+                        </td>
+                        <td>
+                            <span>{{_item.userCreatedName}}</span>
+                        </td>
+                        <td>
+                            <span>{{_item.datetimeModified | date: 'h:mm'}}</span> &nbsp;
+                            <span>{{_item.datetimeModified | date: 'dd/MM/yyyy'}}</span>
+                        </td>
+                        <td>
+                            <span>
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input type="checkbox" disabled [checked]="_item.inactive">
+                                    <span></span>
+                                </label>
+                            </span>
+                        </td>
+                    </tr>
+                </ng-container>
+            </ng-container>
+            <ng-template #norecord>
+                    <tr>
+                        <td colspan="10">
+                            <div class="no-data">
+                                <i class="flaticon-coins"></i>
+                                <span class="no-data-text">No records found</span>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
         </tbody>
     </table>
 </div>
