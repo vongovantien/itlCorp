@@ -19,6 +19,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import * as lodash from 'lodash';
 import { SystemConstants } from 'src/constants/system.const';
+import { SearchOptionsComponent } from '../../../shared/common/search-options/search-options.component';
 declare var $:any;
 
 @Component({
@@ -32,6 +33,7 @@ export class CommodityComponent implements OnInit {
   declare variable
   */
   @ViewChild(PaginationComponent) child; 
+  @ViewChild(SearchOptionsComponent) searchOption; 
   @ViewChild('formCommodity') formCommodity: NgForm;
   @ViewChild('formGroupCommodity') formGroupCommodity: NgForm;
   @ViewChild('chooseGroup') public groupSelect: SelectComponent;
@@ -83,12 +85,14 @@ export class CommodityComponent implements OnInit {
   configSearchGroup: any = {
     selectedFilter: this.selectedFilter,
     settingFields: this.commodityGroupSettings,
-    typeSearch: TypeSearch.intab
+    typeSearch: TypeSearch.intab,
+    searchString: ''
   };
   configSearchCommonity: any = {
     selectedFilter: this.selectedFilter,
     settingFields: this.commoditySettings,
-    typeSearch: TypeSearch.intab
+    typeSearch: TypeSearch.intab,
+    searchString: ''
   };
   titleConfirmDelete = "You want to delete this Commodity Group";
   isDesc = false;
@@ -127,12 +131,13 @@ export class CommodityComponent implements OnInit {
     this.activeTab = tabName;
     this.pager.currentPage = 1;
     this.pager.pageSize = 15;
-    if(tabName == this.tabName.commodityGroup){
-      this.getGroupCommodities(this.pager);
-    }
-    if(tabName == this.tabName.commodity){
-      this.getCommodities(this.pager);
-    }
+    this.resetSearch({ field: "All", fieldDisplayName: "All" }, tabName);
+    // if(tabName == this.tabName.commodityGroup){
+    //   this.getGroupCommodities(this.pager);
+    // }
+    // if(tabName == this.tabName.commodity){
+    //   this.getCommodities(this.pager);
+    // }
   }
   async getCommodities(pager: PagerSetting) {
     const responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
@@ -150,10 +155,10 @@ export class CommodityComponent implements OnInit {
     }
   }
   onSearch(event, tabName){
-    if(tabName == this.tabName.commodityGroup){
+    if(this.activeTab == this.tabName.commodityGroup){
       this.searchCommodityGroup(event);
     }
-    if(tabName == this.tabName.commodity){
+    if(this.activeTab == this.tabName.commodity){
       this.searchCommodity(event);
     }
   }
@@ -192,8 +197,14 @@ export class CommodityComponent implements OnInit {
     this.pager.currentPage = 1;
     this.getGroupCommodities(this.pager);
   }
-  resetSearch(event){
+  resetSearch(event, tabName){
     this.criteria = {};
+    if(tabName == this.tabName.commodityGroup){
+      this.searchCommodityGroup(event);
+    }
+    if(tabName == this.tabName.commodity){
+      this.searchCommodity(event);
+    }
   }
   
   onSortChange(column) {

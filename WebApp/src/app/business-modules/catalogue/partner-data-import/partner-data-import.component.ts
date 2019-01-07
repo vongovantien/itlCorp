@@ -41,7 +41,7 @@ export class PartnerDataImportComponent implements OnInit {
   chooseFile(file: Event){
     if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
-    this.baseService.spinnerShow();
+    this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.PartnerData.uploadExel, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
@@ -50,15 +50,16 @@ export class PartnerDataImportComponent implements OnInit {
         this.totalRows = this.data.length;
         this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
-        this.baseService.spinnerHide();
+        this.progressBar.complete();
         console.log(this.data);
       },err=>{
+        this.progressBar.complete();
         this.baseService.handleError(err);
       });
   }
   
   pagingData(data: any[]){
-    this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
+    this.pager = this.pagingService.getPager(data.length, this.pager.currentPage, this.pager.pageSize);
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
@@ -80,6 +81,9 @@ export class PartnerDataImportComponent implements OnInit {
         this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();
+        this.progressBar.complete();
+      }
+      else{
         this.progressBar.complete();
       }
       console.log(response);
@@ -127,15 +131,7 @@ export class PartnerDataImportComponent implements OnInit {
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
   }
-  downloadSample(){
-    this.baseService.downloadfile(this.api_menu.Catalogue.PartnerData.downloadExcel)
-    .subscribe(
-      response => {
-        saveAs(response, 'PartnerImportTemplate.xlsx');
-      },
-      err => {
-        this.baseService.handleError(err);
-      }
-    )
+  async downloadSample(){
+    await this.baseService.downloadfile(this.api_menu.Catalogue.PartnerData.downloadExcel,'PartnerImportTemplate.xlsx');
   }
 }

@@ -111,44 +111,56 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody *ngIf="ListCharges.length>0">
-                        <tr *ngFor="let item of ListCharges">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="gotoEditPage(item.charge.id)"
-                                        title="Edit stage">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal" (click)="prepareDeleteCharge(item.charge.id)">
-                                        <i class="la la-trash"></i>
-                                    </button>
+                    <tbody *ngIf="ListCharges">
+                        <ng-container *ngIf="ListCharges.length > 0; else noRecord">
+                            <tr *ngFor="let item of ListCharges">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="gotoEditPage(item.charge.id)"
+                                            title="Edit stage">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal" (click)="prepareDeleteCharge(item.charge.id)">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            
+                                <td>
+                                    <span>{{item.charge.code}}</span>
+                                </td>
+                                <td>
+                                    <span>{{item.charge.chargeNameEn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{item.charge.chargeNameVn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{item.charge.type}}</span>
+                                </td>
+                                <td>
+                                    <span>
+                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                            <input type="checkbox" disabled [checked]="item.charge.inactive">
+                                            <span></span>
+                                        </label>
+                                    </span>
+                                </td>
+                            </tr>
+                            
+                        </ng-container>
+                    </tbody>
+                    <ng-template #noRecord>
+                        <tr>
+                            <td colspan="6">
+                                <div class="no-data">
+                                    <i class="flaticon-coins"></i>
+                                    <span class="no-data-text">No records found</span>
                                 </div>
                             </td>
-                      
-                            <td>
-                                <span>{{item.charge.code}}</span>
-                            </td>
-                            <td>
-                                <span>{{item.charge.chargeNameEn}}</span>
-                            </td>
-                            <td>
-                                <span>{{item.charge.chargeNameVn}}</span>
-                            </td>
-                            <td>
-                                <span>{{item.charge.type}}</span>
-                            </td>
-                            <td>
-                                <span>
-                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                        <input type="checkbox" disabled [checked]="item.charge.inactive">
-                                        <span></span>
-                                    </label>
-                                </span>
-                            </td>
                         </tr>
-                      
-                    </tbody>
+                    </ng-template>
                 </table>
             </div>
             <!--end: Datatable -->
