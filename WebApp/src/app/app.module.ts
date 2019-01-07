@@ -24,8 +24,10 @@ import { SharedModule } from './shared/shared.module';
 import { CookieService } from 'ngx-cookie-service';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { NgxSpinnerModule } from 'ngx-spinner';
-
 import { NgProgressModule } from '@ngx-progressbar/core';
+import { AuthGuardService } from 'src/services-base/auth-guard.service';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -41,6 +43,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     SubheaderComponent
   ],
   imports: [    
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
     SharedModule,
     CommonModule,
     BrowserModule,
@@ -57,6 +60,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     OAuthModule.forRoot()
   ],
   providers: [
+    AuthGuardService,
     BaseService,
     CookieService ,
     PagingService,

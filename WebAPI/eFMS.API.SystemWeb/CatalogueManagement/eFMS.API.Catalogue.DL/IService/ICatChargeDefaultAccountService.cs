@@ -10,8 +10,8 @@ using System.Text;
 namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatChargeDefaultAccountService:IRepositoryBase<CatChargeDefaultAccount,CatChargeDefaultAccountModel>
-    {
-        List<CatChargeDefaultAccount> Query(CatChargeDefaultAccountCriteria criteria);
-        List<CatChargeDefaultAccount> Paging(CatChargeDefaultAccountCriteria criteria, int pageNumber, int pageSize, out int rowCount);
+    {  
+        List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list);
+        HandleState Import(List<CatChargeDefaultAccountImportModel> data);
     }
 }

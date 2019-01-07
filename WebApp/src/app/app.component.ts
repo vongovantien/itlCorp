@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
+import { BaseService } from 'src/services-base/base.service';
+import { Router} from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -6,11 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppComponent implements OnInit {
 
-  ngOnInit(): void {
-
+  ngOnInit(): void {   
+    if(!this.baseService.checkLoginSession(false)){
+      this.router.navigateByUrl('/login');
+    }
   }
 
-  constructor() {
+  constructor(private baseService:BaseService, private router:Router) {
   }
 
 

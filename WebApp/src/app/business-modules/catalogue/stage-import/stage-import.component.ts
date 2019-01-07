@@ -5,7 +5,6 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { language } from 'src/languages/language.en';
@@ -21,11 +20,9 @@ export class StageImportComponent implements OnInit {
   pagedItems: any[] = [];
   inValidItems: any[] = [];
   totalValidRows: number = 0;
-  totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-  inProgress: boolean = false;
 
   constructor(
     public ngProgress: NgProgress,
@@ -36,10 +33,11 @@ export class StageImportComponent implements OnInit {
   ) { }
   @ViewChild(PaginationComponent) child:any;
   @ViewChild('form') form:any;
+  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   ngOnInit() {
     this.pager.totalItems = 0;
   }
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+
   chooseFile(file: Event) {
     if (!this.baseService.checkLoginSession()) return;
     if (file.target['files'] == null) return;
@@ -50,7 +48,6 @@ export class StageImportComponent implements OnInit {
         this.pager.totalItems = this.data.length;
         this.totalValidRows = res['totalValidRows'];
         this.totalRows = this.data.length;
-        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.progressBar.complete();
       }, err => {
@@ -107,34 +104,26 @@ export class StageImportComponent implements OnInit {
 
   async import() {
     if (this.data == null) return;
-    if (this.totalInValidRows > 0) {
+    if (this.totalRows - this.totalValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
     else {
-      this.inProgress = true;
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()){
         return;
       } 
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems, true, true);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-        this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();
       }
     }
   }
 
-  downloadSample(){
-    this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel)
-    .subscribe(
-      response => {
-        saveAs(response, 'StageTemplate.xlsx');
-      },err=>{
-        this.baseService.handleError(err);
-      }
-    )}
+  async downloadSample(){
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel,'ImportStageTemplate.xlsx');
+  }
 
   reset() {
     this.data = null;

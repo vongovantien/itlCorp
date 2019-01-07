@@ -5,15 +5,15 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <a class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" href="javascript:void(0)"  (click)=addPartner()>
+            <!-- <a class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" href="javascript:void(0)"  (click)=addPartner()>
                 <span>
                     <i class="la la-plus"></i>
                     <span>
                         add new
                     </span>
                 </span>
-            </a>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            </a> -->
+            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -28,7 +28,10 @@
                         export
                     </span>
                 </span>
-            </button>
+            </button> -->
+            <app-default-button [buttonSetting]="addButtonSetting" href="javascript:void(0)"  (click)=addPartner()></app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/partner-data-import']"></app-default-button>
         </div>
     </div>
 </div>
@@ -124,11 +127,11 @@
                         Consignee
                     </a>
                 </li>
-                <li class="nav-item m-tabs__item">
+                <!-- <li class="nav-item m-tabs__item">
                     <a class="nav-link m-tabs__link" data-toggle="tab" href="#air-ship-sup-tabview-data" role="tab" (click)="tabSelect(tabName.airshipsupTab)">
                         Air - Ship - SUP
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item m-tabs__item">
                     <a class="nav-link m-tabs__link" data-toggle="tab" href="#shipper-tabview-data" role="tab" (click)="tabSelect(tabName.shipperTab)">
                         Shipper

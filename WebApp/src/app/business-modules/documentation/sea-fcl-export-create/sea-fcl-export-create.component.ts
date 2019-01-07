@@ -1,20 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import * as moment from 'moment'; 
+import * as moment from 'moment';
 
 @Component({
-  selector: 'app-sea-fcl-export-create',
-  templateUrl: './sea-fcl-export-create.component.html',
-  styleUrls: ['./sea-fcl-export-create.component.scss']
+    selector: 'app-sea-fcl-export-create',
+    templateUrl: './sea-fcl-export-create.component.html',
+    styleUrls: ['./sea-fcl-export-create.component.scss']
 })
 export class SeaFclExportCreateComponent implements OnInit {
 
-  constructor() {
-    // this.keepCalendarOpeningWithRange = true;
-  }
+    constructor() {}
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
+    
     /**
      * Daterange picker
      */
@@ -37,11 +36,12 @@ export class SeaFclExportCreateComponent implements OnInit {
                 .endOf('month')
         ]
     };
-   /**
-   * ng2-select
-   */
-  public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
-  'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
+
+     /**
+    * ng2-select
+    */
+   public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
+   'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
 
     private value: any = {};
     private _disabledV: string = '0';
@@ -71,4 +71,5 @@ export class SeaFclExportCreateComponent implements OnInit {
     public refreshValue(value: any): void {
     this.value = value;
     }
+
 }

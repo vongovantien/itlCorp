@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { language } from 'src/languages/language.en';
+import { ResponseType } from '@angular/http';
+import { lang } from 'moment';
 @Injectable({
   providedIn: 'root'
 })
@@ -38,7 +40,7 @@ export class BaseService implements ErrorHandler {
    * @param url 
    */
   public get(url: string) {
-    //  this.checkLoginSession();
+  
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.get(url, { headers: this.headers });
@@ -79,7 +81,7 @@ export class BaseService implements ErrorHandler {
    * @param data 
    */
   public post(url: string, data?: any) {
-    //  this.checkLoginSession();
+
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.post(url, data, { headers: this.headers });
@@ -94,7 +96,6 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async postAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
-    //  this.checkLoginSession();
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
@@ -119,7 +120,6 @@ export class BaseService implements ErrorHandler {
    * @param data 
    */
   public put(url: string, data?: any) {
-    // this.checkLoginSession();
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.put(url, data, { headers: this.headers });
@@ -134,7 +134,6 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async putAsync(url: string, data?: any, display_notify = true, display_spinner = true): Promise<any> {
-    //  this.checkLoginSession();
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
@@ -159,7 +158,6 @@ export class BaseService implements ErrorHandler {
    * @param url 
    */
   public delete(url: string) {
-    //  this.checkLoginSession();
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.delete(url, { headers: this.headers });
@@ -173,7 +171,6 @@ export class BaseService implements ErrorHandler {
    * @param display_spinner 
    */
   public async deleteAsync(url: string, display_notify = true, display_spinner = true): Promise<any> {
-    //  this.checkLoginSession();
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     if (display_spinner)
@@ -191,15 +188,21 @@ export class BaseService implements ErrorHandler {
     }
   }
 
-  downloadfile(url: string) {
-    //  this.checkLoginSession();
+  public async downloadfile(url: string,saveAsFileName:string):Promise<any> {    
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
-    return this._http.get(url, { responseType: 'blob' });
+    this.spinnerShow();
+    try {
+      this.spinnerHide();
+      const res = await this._http.get(url,{responseType:'blob'}).toPromise();
+      saveAs(res,saveAsFileName);
+    } catch (error) {
+      console.log({DOWNLOAD_ERROR_LOG:error});
+      this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
+    }
   }
 
-  uploadfile(url: any, files: any, name: string = null) {
-    //  this.checkLoginSession();
+  uploadfile(url: any, files: any, name: string = null) {   
     var token = 'Bearer ' + localStorage.getItem("access_token");
     if (files.length === 0)
 
@@ -294,9 +297,9 @@ export class BaseService implements ErrorHandler {
   }
 
   checkLoginSession(display_warning = true): boolean {
-    if (localStorage.getItem("access_token") == null) {
+    if (this.hasValidAccessToken() == false) {
       if (display_warning) {
-        this.warningToast("Please login to continue !", "Expired Session");
+        this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
       }
       this.router.navigateByUrl('/login');
       return false;
@@ -314,5 +317,23 @@ export class BaseService implements ErrorHandler {
     }
   }
 
+
+
+  private hasValidAccessToken() {
+    if (this.getAccessToken()) {
+      var expiresAt = localStorage.getItem('expires_at');
+      var now = new Date();
+      if (expiresAt && parseInt(expiresAt, 10) < now.getTime()) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
+
+
+  private getAccessToken() {
+    return localStorage.getItem('access_token');
+  }
 
 }

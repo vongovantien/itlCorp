@@ -33,7 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityGroupService catComonityGroupService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTeamplate.xlsx";
+        private string templateName = "ImportTemplate.xlsx";
         public CatCommodityGroupController(IStringLocalizer<LanguageSub> localizer, ICatCommodityGroupService service, IMapper iMapper,
             ICurrentUser user)
         {

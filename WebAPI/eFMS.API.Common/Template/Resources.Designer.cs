@@ -61,7 +61,7 @@ namespace eFMS.API.Common.Template {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to D:\Workspace\efms\src\WebAPI\eFMS.API.SystemWeb\CatalogueManagement\bin\netcoreapp2.2\Resources\Files.
+        ///   Looks up a localized string similar to D:\FMS WEB PROJECT\eFMS-WebApp\WebAPI\eFMS.API.SystemWeb\CatalogueManagement\bin\netcoreapp2.2\Resources\Files.
         /// </summary>
         internal static string ExcelTemplate {
             get {

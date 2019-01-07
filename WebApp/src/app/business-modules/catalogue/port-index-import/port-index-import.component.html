@@ -20,7 +20,7 @@
                     <div class="col-lg-4">
                         <input type="file" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         <span class="m-form__help">
-                            <a class="btn-link" href="javascript:void(0)">Download simple</a>
+                            <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download simple</a>
                         </span>
                     </div>
                     <div class="col-lg-7 offset-lg-1">
@@ -37,7 +37,7 @@
                             </div>
                             <div class="col-sm-4 m--margin-top-10 text-right">
                                 <span class="m--font-danger  m--font-bolder">
-                                    Invalid rows: {{ totalInValidRows }}
+                                    Invalid rows: {{ totalRows - totalValidRows }}
                                 </span>
                             </div>
                         </div>

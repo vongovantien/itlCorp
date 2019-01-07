@@ -16,10 +16,10 @@ import { BaseService } from 'src/services-base/base.service';
 })
 export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   ngAfterViewInit(): void {
-    if (this.cookieService.get("login_status") === "LOGGED_IN") {
-      this.router.navigateByUrl('/home');
-    }
-    this.getLoginData();
+    // if (this.cookieService.get("login_status") === "LOGGED_IN") {
+    //   this.router.navigateByUrl('/home');
+    // }
+     this.getLoginData();
   }
 
   constructor(
@@ -50,7 +50,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
     this.setupLocalInfo();
     if(this.baseService.checkLoginSession(false)){
       this.router.navigateByUrl('/home');
-    };
+    }
   }
 
   async Login(form: NgForm) {          
@@ -88,7 +88,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
     }
   }
 
-  encryptUserInfo(username, password) {
+  encryptUserInfo(username: string | crypto_js.LibWordArray, password: string | crypto_js.LibWordArray) {
     const username_encrypt = crypto_js.AES.encrypt(username, SystemConstants.SECRET_KEY);
     const password_encrypt = crypto_js.AES.encrypt(password, SystemConstants.SECRET_KEY);
 
@@ -120,7 +120,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
     this.remember_me = (this.username != '' || this.password != '');
   }  
 
-  changeLanguage(lang) {
+  changeLanguage(lang: string) {
     localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, lang);
     if (localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE) === "en") {
       localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"en-US");

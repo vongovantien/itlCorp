@@ -21,11 +21,9 @@ export class CommodityImportComponent implements OnInit {
   pagedItems: any[] = [];
   inValidItems: any[] = [];
   totalValidRows: number = 0;
-  totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-  inProgress: boolean = false;
   constructor(
     public ngProgress: NgProgress,
     private pagingService: PagingService,
@@ -50,10 +48,8 @@ export class CommodityImportComponent implements OnInit {
         this.pager.totalItems = this.data.length;
         this.totalValidRows = res['totalValidRows'];
         this.totalRows = this.data.length;
-        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
         this.progressBar.complete();
-        console.log({ DATA: this.data });
       }, err => {
         this.progressBar.complete();
         this.baseService.handleError(err);
@@ -108,13 +104,13 @@ export class CommodityImportComponent implements OnInit {
 
   async import() {
     if (this.data == null) return;
-    if (this.totalInValidRows > 0) {
+    if (this.totalRows - this.totalValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
     else {     
       let validItems = this.data.filter(x => x.isValid);
       if (!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Commodity.import, validItems, true, true);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Commodity.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
@@ -133,19 +129,8 @@ export class CommodityImportComponent implements OnInit {
   }
 
 
-  downloadSample() {
-    this.baseService.spinnerShow();
-    this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel)
-      .subscribe(
-        response => {
-          this.baseService.spinnerHide();
-          saveAs(response, 'CommodityTemplate.xlsx');        
-        }, err => {
-          this.baseService.spinnerHide();
-          this.baseService.handleError(err);
-        }
-      )
+  async downloadSample() {
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel,'CommodityTemplate.xlsx');
   }
-
 
 }
