@@ -112,11 +112,11 @@ export class ChargeComponent implements OnInit {
 
   isDesc = true;
   sortKey: string = "code";
-  sort(property) {
+  sort(property: string) {
     this.sortKey = property;
     this.isDesc = !this.isDesc;
-    const temp = this.ListCharges.map(x => Object.assign({}, x));
-    this.ListCharges = this.sortService.sort(this.ListCharges.map(x => Object.assign({}, x.charge)), property, this.isDesc);
+    const temp = this.ListCharges.map((x: any) => Object.assign({}, x));
+    this.ListCharges = this.sortService.sort(this.ListCharges.map((x: { charge: any; }) => Object.assign({}, x.charge)), property, this.isDesc);
     // var getDept = this.getDepartmentname;
     // this.ListCharges = this.ListCharges.map(x=>({stage:x,deptName:getDept(x.id,temp)})); 
     this.ListCharges = this.ListCharges.map(x => ({ charge: x }));

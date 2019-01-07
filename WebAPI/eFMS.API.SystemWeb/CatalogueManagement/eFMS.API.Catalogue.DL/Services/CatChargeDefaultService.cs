@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 using eFMS.API.Catalogue.DL.ViewModels;
 using System.Threading;
 using System.Globalization;
+using ITL.NetCore.Common;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -27,14 +28,22 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-        public List<CatChargeDefaultAccount> Paging(CatChargeDefaultAccountCriteria criteria, int pageNumber, int pageSize, out int rowCount)
+        public List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var defaultAccount = dc.CatChargeDefaultAccount.ToList();
+            list.ForEach(item =>
+            {
+
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CatChargeDefaultAccountImportModel> data)
         {
             throw new NotImplementedException();
         }
 
-        public List<CatChargeDefaultAccount> Query(CatChargeDefaultAccountCriteria criteria)
-        {
-            throw new NotImplementedException();
-        }
+ 
     }
 }

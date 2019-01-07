@@ -24,18 +24,21 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/manifest.json"
             ],
             "styles": [
-              "src/assets/style-share/style.scss"            ],
+              "src/assets/style-share/style.scss"
+            ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
               "src/assets/external-libraries/js/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ]
+            ],
+            "serviceWorker": true
           },
           "configurations": {
-            "design":{
+            "design": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -43,15 +46,15 @@
                 }
               ]
             },
-            "vi-dev":{
+            "vi-dev": {
               "fileReplacements": [
                 {
                   "replace": "src/languages/language.en.ts",
                   "with": "src/languages/language.vi.ts"
                 }
               ]
-            },       
-            "test":{
+            },
+            "test": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -59,7 +62,7 @@
                 }
               ]
             },
-            "vi":{
+            "vi": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -68,16 +71,16 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true,         
-              "baseHref": "/vi/",                                 
-              "lazyModules": 
-              ["src/app/business-modules/catalogue/catalogue.module.ts",
+              "buildOptimizer": true,
+              "baseHref": "/vi/",
+              "lazyModules": [
+                "src/app/business-modules/catalogue/catalogue.module.ts",
                 "src/app/business-modules/accounting/accounting.module.ts",
                 "src/app/business-modules/documentation/documentation.module.ts",
                 "src/app/business-modules/operation/operation.module.ts",
                 "src/app/business-modules/report/report.module.ts",
                 "src/app/business-modules/tool-setting/tool.module.ts",
-                "src/app/business-modules/support/support.module.ts"               
+                "src/app/business-modules/support/support.module.ts"
               ],
               "outputPath": "dist/eFMS-vi/",
               "i18nFile": "src/src/locale/messages.vi.xlf",
@@ -92,36 +95,63 @@
                   "replace": "src/languages/language.en.ts",
                   "with": "src/languages/language.vi.ts"
                 }
-              ]
+              ],
+              "serviceWorker": true
             },
-            "en":{
+            "en": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
               "baseHref": "/en/",
-              "lazyModules": 
-              ["src/app/business-modules/catalogue/catalogue.module.ts",
+              "lazyModules": [
+                "src/app/business-modules/catalogue/catalogue.module.ts",
                 "src/app/business-modules/accounting/accounting.module.ts",
                 "src/app/business-modules/documentation/documentation.module.ts",
                 "src/app/business-modules/operation/operation.module.ts",
                 "src/app/business-modules/report/report.module.ts",
                 "src/app/business-modules/tool-setting/tool.module.ts",
-                "src/app/business-modules/support/support.module.ts"               
+                "src/app/business-modules/support/support.module.ts"
               ],
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "progress": true,           
+              "progress": true,
               "outputPath": "dist/eFMS-en/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.test.ts"
                 }
-              ]
+              ],
+              "serviceWorker": true
+            },
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.test.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ],
+              "serviceWorker": true
             }
           }
         },
@@ -130,7 +160,7 @@
           "options": {
             "browserTarget": "eFMS-Web:build"
           },
-          "configurations": {          
+          "configurations": {
             "test": {
               "browserTarget": "eFMS-Web:build:test"
             },
@@ -145,7 +175,7 @@
             },
             "design": {
               "browserTarget": "eFMS-Web:build:design"
-            }        
+            }
           }
         },
         "extract-i18n": {
@@ -159,7 +189,7 @@
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",   
+            "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
               "src/styles.sass"
@@ -167,7 +197,8 @@
             "scripts": [],
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/manifest.json"
             ]
           }
         },
