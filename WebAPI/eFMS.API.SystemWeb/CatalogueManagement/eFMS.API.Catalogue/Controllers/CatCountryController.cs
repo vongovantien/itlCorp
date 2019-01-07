@@ -171,7 +171,7 @@ namespace eFMS.API.Catalogue.Controllers
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
-                if (rowCount < 2) return BadRequest();
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
                 List<CatCountryImportModel> list = new List<CatCountryImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {

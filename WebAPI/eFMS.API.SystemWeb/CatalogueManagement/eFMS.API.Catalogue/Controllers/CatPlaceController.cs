@@ -201,7 +201,7 @@ namespace eFMS.API.Catalogue.Controllers
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
-                if (rowCount < 2) return BadRequest();
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
 
                 List<CatPlaceImportModel> list = null;
                 switch (type)
@@ -376,14 +376,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower()== model.NameEN.ToLower()) || (x.NameVn.ToLower()==model.NameVN.ToLower()) ))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => ((x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower() == model.NameEN.ToLower()) || (x.NameVn.ToLower() == model.NameVN.ToLower())) && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower()) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

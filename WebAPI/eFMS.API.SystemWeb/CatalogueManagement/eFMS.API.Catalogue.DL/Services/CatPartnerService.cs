@@ -23,162 +23,6 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper) : base(repository, mapper)
         {
         }
-
-        public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
-        {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var partners = dc.CatPartner.Where(x => x.Inactive == false).ToList();
-            var partnerGroups = DataEnums.CatPartnerGroups;
-            var users = dc.SysUser.Where(x => x.Inactive == false).ToList();
-            var countries = dc.CatCountry.Where(x => x.Inactive == false);
-            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province) && x.Inactive == false);
-            var branchs = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch) && x.Inactive == false);
-            var salemans = dc.SysUser.Where(x => x.Inactive == false);
-            list.ForEach(item =>
-            {
-                if (string.IsNullOrEmpty(item.TaxCode))
-                {
-                    item.TaxCode = string.Format("Tax code is not allow empty!|wrong");
-                    item.IsValid = false;
-                }
-                else
-                {
-                    if(partners.Any(x => (x.TaxCode??"").ToLower() == item.TaxCode.ToLower())){
-                        item.TaxCode = string.Format("Tax code {0} has been existed!|wrong", item.TaxCode);
-                        item.IsValid = false;
-                    }
-                }
-                if (string.IsNullOrEmpty(item.PartnerGroup))
-                {
-                    item.PartnerGroup = string.Format("Partner group is not allow empty!|wrong");
-                    item.IsValid = false;
-                }
-                else 
-                {
-                    if (item.PartnerGroup.ToLower() == DataEnums.AllPartner.ToLower())
-                    {
-                        item.PartnerGroup = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
-                    }
-                    else
-                    {
-                        var group = partnerGroups.FirstOrDefault(x => x.Id.ToLower() == item.PartnerGroup.ToLower());
-                        if (group == null)
-                        {
-                            item.PartnerGroup = string.Format("Partner group {0} is not found!|wrong", item.PartnerGroup);
-                            item.IsValid = false;
-                        }
-                        else
-                        {
-                            item.PartnerGroup = group.Id;
-                            if (group.Id == DataEnums.CustomerPartner)
-                            {
-                                if (string.IsNullOrEmpty(item.SalePersonId))
-                                {
-                                    item.PartnerGroup = string.Format("Saleman is not allow empty!|wrong");
-                                    item.IsValid = false;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (string.IsNullOrEmpty(item.PartnerNameEn))
-                {
-                    item.PartnerNameEn = string.Format("Partner name EN is not allow empty!|wrong");
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.PartnerNameVn))
-                {
-                    item.PartnerNameVn = string.Format("Partner name VN is not allow empty!|wrong");
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.ShortName))
-                {
-                    item.ShortName = string.Format("Short name is not allow empty!|wrong");
-                    item.IsValid = false;
-                }
-                if (!string.IsNullOrEmpty(item.CountryBilling))
-                {
-                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryBilling.ToLower());
-                    if (country == null)
-                    {
-                        item.CountryBilling = string.Format("Country '{0}' is not found!|wrong", item.CountryBilling);
-                        item.CityBilling = string.Format("Country '{0}' is not found!|wrong", item.CountryBilling);
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.CountryId = country.Id;
-                        if (!string.IsNullOrEmpty(item.CityBilling))
-                        {
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityBilling.ToLower() && i.CountryId == country.Id);
-                            if(province == null)
-                            {
-                                item.CityBilling = string.Format("City billing '{0}' is not found!|wrong", item.CityBilling);
-                                item.IsValid = false;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    item.CountryBilling = "Country is empty. Please check again!|wrong";
-                    item.Inactive = false;
-                }
-                if (!string.IsNullOrEmpty(item.CountryShipping))
-                {
-                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping.ToLower());
-                    if (country == null)
-                    {
-                        item.CountryShipping = string.Format("Country '{0}' is not found!|wrong", item.CountryShipping);
-                        item.CityShipping = string.Format("Country '{0}' is not found!|wrong", item.CountryShipping);
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.CountryId = country.Id;
-                        if (!string.IsNullOrEmpty(item.CityShipping))
-                        {
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == country.Id);
-                            if (province == null)
-                            {
-                                item.CityBilling = string.Format("City shipping '{0}' is not found!|wrong", item.CityShipping);
-                                item.IsValid = false;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    item.CountryShipping = "Country is empty. Please check again!| wrong";
-                }
-                if (!string.IsNullOrEmpty(item.Profile)){
-                    var workplace = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile);
-                    if(workplace == null)
-                    {
-                        item.CityBilling = string.Format("Workplace '{0}' is not found!|wrong", item.Profile);
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.WorkPlaceId = workplace.Id;
-                    }
-                }
-                if (!string.IsNullOrEmpty(item.SaleManName)) {
-                    var salePerson = salemans.FirstOrDefault(i => i.Username == item.SaleManName);
-                    if(salePerson == null)
-                    {
-                        item.SaleManName = string.Format("Sale man '{0}' is not found!|wrong", item.SaleManName);
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.SalePersonId = salePerson.Id;
-                    }
-                }
-            });
-            return list;
-        }
-
         public List<DepartmentPartner> GetDepartments()
         {
             return DataEnums.Departments;
@@ -405,6 +249,173 @@ namespace eFMS.API.Catalogue.DL.Services
             //               ) && ((x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             //}
             //return results;
+        }
+
+        public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var partners = dc.CatPartner.ToList();
+            var partnerGroups = DataEnums.CatPartnerGroups;
+            var users = dc.SysUser.ToList();
+            var countries = dc.CatCountry;
+            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
+            var branchs = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
+            var salemans = dc.SysUser;
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.TaxCode))
+                {
+                    item.TaxCode = string.Format("Tax code is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (partners.Any(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()))
+                    {
+                        item.TaxCode = string.Format("Tax code {0} has been existed!|wrong", item.TaxCode);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.PartnerGroup))
+                {
+                    item.PartnerGroup = string.Format("Partner group is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (item.PartnerGroup.ToLower() == DataEnums.AllPartner.ToLower())
+                    {
+                        item.PartnerGroup = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
+                    }
+                    else
+                    {
+                        var group = partnerGroups.FirstOrDefault(x => x.Id.ToLower() == item.PartnerGroup.ToLower());
+                        if (group == null)
+                        {
+                            item.PartnerGroup = string.Format("Partner group {0} is not found!|wrong", item.PartnerGroup);
+                            item.IsValid = false;
+                        }
+                        else
+                        {
+                            item.PartnerGroup = group.Id;
+                            if (group.Id == DataEnums.CustomerPartner)
+                            {
+                                if (string.IsNullOrEmpty(item.SalePersonId))
+                                {
+                                    item.PartnerGroup = string.Format("Saleman is not allow empty!|wrong");
+                                    item.IsValid = false;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameEn))
+                {
+                    item.PartnerNameEn = string.Format("Partner name EN is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameVn))
+                {
+                    item.PartnerNameVn = string.Format("Partner name VN is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ShortName))
+                {
+                    item.ShortName = string.Format("Short name is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.CountryBilling))
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryBilling.ToLower());
+                    if (country == null)
+                    {
+                        item.CountryBilling = string.Format("Country billing '{0}' is not found!|wrong", item.CountryBilling);
+                        item.CityBilling = string.Format("Country billing '{0}' is not found!|wrong", item.CountryBilling);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.CountryId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityBilling))
+                        {
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityBilling.ToLower() && i.CountryId == country.Id);
+                            if (province == null)
+                            {
+                                item.CityBilling = string.Format("City billing '{0}' is not found!|wrong", item.CityBilling);
+                                item.IsValid = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(item.CityBilling))
+                    {
+                        item.CountryBilling = "Country billing is empty. Please check again!|wrong";
+                        item.CityBilling = "City billing is empty. Please check again!|wrong";
+                        item.Inactive = false;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.CountryShipping))
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping.ToLower());
+                    if (country == null)
+                    {
+                        item.CountryShipping = string.Format("Country shipping '{0}' is not found!|wrong", item.CountryShipping);
+                        item.CityShipping = string.Format("Country shipping '{0}' is not found!|wrong", item.CountryShipping);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.CountryId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityShipping))
+                        {
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == country.Id);
+                            if (province == null)
+                            {
+                                item.CityShipping = string.Format("City shipping '{0}' is not found!|wrong", item.CityShipping);
+                                item.IsValid = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(item.CityShipping))
+                    {
+                        item.CountryShipping = "Country shipping is empty. Please check again!|wrong";
+                        item.CountryShipping = "Country shipping is empty. Please check again!|wrong";
+                        item.Inactive = false;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.Profile))
+                {
+                    var workplace = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile);
+                    if (workplace == null)
+                    {
+                        item.CityBilling = string.Format("Workplace '{0}' is not found!|wrong", item.Profile);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.WorkPlaceId = workplace.Id;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.SaleManName))
+                {
+                    var salePerson = salemans.FirstOrDefault(i => i.Username == item.SaleManName);
+                    if (salePerson == null)
+                    {
+                        item.SaleManName = string.Format("Sale man '{0}' is not found!|wrong", item.SaleManName);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.SalePersonId = salePerson.Id;
+                    }
+                }
+            });
+            return list;
         }
 
         private Expression<Func<CatPartnerModel, bool>> GetQueryExpression(CatPartnerCriteria criteria)
