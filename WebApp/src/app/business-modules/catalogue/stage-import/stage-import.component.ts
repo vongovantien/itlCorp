@@ -31,8 +31,8 @@ export class StageImportComponent implements OnInit {
     private menu_api: API_MENU,
     private sortService: SortService
   ) { }
-  @ViewChild(PaginationComponent) child:any;
-  @ViewChild('form') form:any;
+  @ViewChild(PaginationComponent) child: any;
+  @ViewChild('form') form: any;
   @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   ngOnInit() {
     this.pager.totalItems = 0;
@@ -109,9 +109,9 @@ export class StageImportComponent implements OnInit {
     }
     else {
       let validItems = this.data.filter(x => x.isValid);
-      if (!this.baseService.checkLoginSession()){
+      if (!this.baseService.checkLoginSession()) {
         return;
-      } 
+      }
       var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
@@ -121,8 +121,8 @@ export class StageImportComponent implements OnInit {
     }
   }
 
-  async downloadSample(){
-    await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel,'ImportStageTemplate.xlsx');
+  async downloadSample() {
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel, 'ImportStageTemplate.xlsx');
   }
 
   reset() {
@@ -131,7 +131,5 @@ export class StageImportComponent implements OnInit {
     $("#inputFile").val('');
     this.pager.totalItems = 0;
   }
-
-
 
 }

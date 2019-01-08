@@ -24,6 +24,8 @@ export const language = {
         { name: "Unit", route_child: "unit",display:true },
         { name: "Location", route_child: "location",display:true },
         { name: "Charge", route_child: "charge",display:true },
+        { name: "Import Charge", route_child: "charge-import",display:false },
+        { name: "Import Account Voucher", route_child: "charge-import-account-voucher",display:false },
         { name: "Charge Add New", route_child: "charge-addnew",display:false },
         { name: "Currency", route_child: "currency",display:true }
       ]
