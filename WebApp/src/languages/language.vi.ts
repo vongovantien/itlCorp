@@ -19,6 +19,8 @@ export const language = {
         { name: "Đơn Vị", route_child: "unit" ,display:true},
         { name: "Địa Điểm", route_child: "location",display:true },
         { name: "Phí", route_child: "charge" ,display:true},
+        { name: "Import Charge", route_child: "charge-import",display:false },
+        { name: "Import Account Voucher", route_child: "charge-import-account-voucher",display:false },
         { name: "Tiền Tệ", route_child: "currency",display:true }
       ]
     },

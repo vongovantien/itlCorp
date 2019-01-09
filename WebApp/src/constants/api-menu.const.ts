@@ -139,6 +139,11 @@ export class API_MENU {
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/import",
             downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/downloadExcel",
         },
+        Charge_DefaultAccount:{
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE)+"CatChargeDefaultAccount/uploadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatChargeDefaultAccount/import",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatChargeDefaultAccount/downloadExcel",
+        },
         Country:{            
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/query",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getAll",

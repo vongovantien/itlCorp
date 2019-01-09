@@ -174,6 +174,7 @@ export class WarehouseComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.baseService.spinnerHide();
       this.warehouses = response.data.map(x=>Object.assign({},x));
+      console.log(this.warehouses);
       this.pager.totalItems = response.totalItems;
     },err=>{
       this.baseService.spinnerHide();
@@ -272,6 +273,7 @@ export class WarehouseComponent implements OnInit {
     this.criteria = {
       placeType: 12
     };
+    this.onSearch(event);
   }
   onSearch(event){
     console.log(event);

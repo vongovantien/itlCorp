@@ -141,36 +141,48 @@
                                 </tr>
                             </thead>
                             <tbody *ngIf="ListCountries">
-                                <tr *ngFor="let country of ListCountries">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#update-country-modal"
-                                                (click)="showUpdateCountry(country.id)">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal"
-                                                (click)="prepareDeleteCountry(country.id)">
-                                                <i class="la la-trash"></i>
-                                            </button>
+                                <ng-container *ngIf="ListCountries.length > 0; else noCountryRecord">
+
+                                    <tr *ngFor="let country of ListCountries">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions" style="width: 70px">
+                                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Edit stage" data-toggle="modal" data-target="#update-country-modal"
+                                                    (click)="showUpdateCountry(country.id)">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal"
+                                                    (click)="prepareDeleteCountry(country.id)">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{country.code | uppercase}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{country.nameEn}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{country.nameVn}}</span>
+                                        </td>
+                                        <td>
+                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="country.inactive" disabled type="checkbox"><span></span></label>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                            <ng-template #noCountryRecord>
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="no-data">
+                                            <i class="flaticon-coins"></i>
+                                            <span class="no-data-text">No records found</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span>{{country.code | uppercase}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{country.nameEn}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{country.nameVn}}</span>
-                                    </td>
-                                    <td>
-                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="country.inactive" disabled type="checkbox"><span></span></label>
-                                    </td>
                                 </tr>
-
-                            </tbody>
+                            </ng-template>
                         </table>
                     </div>
                     <!--end: Datatable of table-simple -->
@@ -261,40 +273,51 @@
 
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr *ngFor="let item of ListProvinceCities;let index=index;">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Edit stage" data-toggle="modal" data-target="#update-city-province-modal"
-                                                (click)="showUpdateProvince(item.id)">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                (click)="prepareDeleteProvince(item.id)" title="Remove stage"
-                                                data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
+                            <tbody *ngIf="ListProvinceCities">
+                                <ng-container *ngIf="ListProvinceCities.length > 0; else noProvinceRecord">
+                                    <tr *ngFor="let item of ListProvinceCities;let index=index;">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions" style="width: 70px">
+                                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Edit stage" data-toggle="modal" data-target="#update-city-province-modal"
+                                                    (click)="showUpdateProvince(item.id)">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    (click)="prepareDeleteProvince(item.id)" title="Remove stage"
+                                                    data-toggle="modal" data-target="#confirm-delete-modal">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{item.code}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{item.nameEN}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{item.nameVN}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{item.countryName}}</span>
+                                        </td>
+                                        <td>
+                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="item.inactive" disabled type="checkbox"><span></span></label>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                            <ng-template #noProvinceRecord>
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="no-data">
+                                            <i class="flaticon-coins"></i>
+                                            <span class="no-data-text">No records found</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span>{{item.code}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{item.nameEN}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{item.nameVN}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{item.countryName}}</span>
-                                    </td>
-                                    <td>
-                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="item.inactive" disabled type="checkbox"><span></span></label>
-                                    </td>
                                 </tr>
-
-                            </tbody>
+                            </ng-template>
                         </table>
                     </div>
                 </div>
@@ -388,44 +411,56 @@
 
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr *ngFor="let district of ListDistricts">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                (click)="showUpdateDistrict(district.id)" title="Edit stage"
-                                                data-toggle="modal" data-target="#update-district-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                (click)="prepareDeleteDistrict(district.id)" title="Remove stage"
-                                                data-toggle="modal" data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
+                            <tbody *ngIf="ListDistricts">
+                                <ng-container *ngIf="ListDistricts.length > 0; else noDistrictRecord">
+                                    <tr *ngFor="let district of ListDistricts">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions" style="width: 70px">
+                                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    (click)="showUpdateDistrict(district.id)" title="Edit stage"
+                                                    data-toggle="modal" data-target="#update-district-modal">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    (click)="prepareDeleteDistrict(district.id)" title="Remove stage"
+                                                    data-toggle="modal" data-target="#confirm-delete-modal">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{district.code}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{district.nameEN}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{district.nameVN}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{district.provinceName}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{district.countryName}}</span>
+                                        </td>
+                                        <td>
+                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="district.inactive" disabled type="checkbox"><span></span></label>
+                                        </td>
+                                    </tr>
+    
+    
+                                </ng-container>
+                            </tbody>
+                            <ng-template #noDistrictRecord>
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="no-data">
+                                            <i class="flaticon-coins"></i>
+                                            <span class="no-data-text">No records found</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span>{{district.code}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{district.nameEN}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{district.nameVN}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{district.provinceName}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{district.countryName}}</span>
-                                    </td>
-                                    <td>
-                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="district.inactive" disabled type="checkbox"><span></span></label>
-                                    </td>
                                 </tr>
-
-
-                            </tbody>
+                            </ng-template>
                         </table>
                     </div>
                     <!--end: Datatable of table-simple -->
@@ -524,47 +559,58 @@
 
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr *ngFor="let ward of ListWards;let index = index;">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                (click)="showUpdateWard(ward.id)" title="Edit stage" data-toggle="modal"
-                                                data-target="#update-ward-modal">
-                                                <i class="la la-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                (click)="prepareDeleteWard(ward.id)" title="Remove stage" data-toggle="modal"
-                                                data-target="#confirm-delete-modal">
-                                                <i class="la la-trash"></i>
-                                            </button>
+                            <tbody *ngIf="ListWards">
+                                <ng-container *ngIf="ListWards.length > 0; else noWardRecord">
+                                    <tr *ngFor="let ward of ListWards;let index = index;">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions" style="width: 70px">
+                                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    (click)="showUpdateWard(ward.id)" title="Edit stage" data-toggle="modal"
+                                                    data-target="#update-ward-modal">
+                                                    <i class="la la-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    (click)="prepareDeleteWard(ward.id)" title="Remove stage" data-toggle="modal"
+                                                    data-target="#confirm-delete-modal">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{ward.code}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ward.nameEN}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ward.nameVN}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ward.districtName}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ward.provinceName}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ward.countryName}}</span>
+                                        </td>
+                                        <td>
+                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="ward.inactive" disabled type="checkbox"><span></span></label>
+                                        </td>
+                                    </tr>
+        
+                                </ng-container>
+                            </tbody>
+                            <ng-template #noWardRecord>
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="no-data">
+                                            <i class="flaticon-coins"></i>
+                                            <span class="no-data-text">No records found</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span>{{ward.code}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ward.nameEN}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ward.nameVN}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ward.districtName}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ward.provinceName}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ward.countryName}}</span>
-                                    </td>
-                                    <td>
-                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="ward.inactive" disabled type="checkbox"><span></span></label>
-                                    </td>
                                 </tr>
-
-
-                            </tbody>
+                            </ng-template>
                         </table>
                     </div>
                     <!--end: Datatable of table-simple -->
