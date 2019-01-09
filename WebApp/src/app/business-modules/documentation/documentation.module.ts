@@ -18,6 +18,7 @@ import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLL
 import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-export-create.component';
 import { MasterBillComponent } from './sea-fcl-export-create/master-bill/master-bill.component';
 import { HousebillListComponent } from './sea-fcl-export-create/housebill-list/housebill-list.component';
+import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addnew/housebill-addnew.component';
 
 @NgModule({
   imports: [
@@ -29,6 +30,6 @@ import { HousebillListComponent } from './sea-fcl-export-create/housebill-list/h
     FormsModule,
     PerfectScrollbarModule, // Scrollbar
   ],
-  declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent]
+  declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent]
 })
 export class DocumentationModule { }

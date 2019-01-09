@@ -142,6 +142,22 @@ ul {
         color: #b3b3b3;
     }
 }
+//
+tbody::-webkit-scrollbar,
+div::-webkit-scrollbar,
+ul::-webkit-scrollbar,
+section::-webkit-scrollbar {
+    width: 5px;
+    height: 7px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #b3b3b3;
+}
 //typography
 .c-block-title {
     font-size: 16px;
@@ -219,6 +235,13 @@ ul {
             }
         }
     }
+}
+.table-wrapper {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 .table {
     font-size: 13px;
@@ -417,6 +440,7 @@ table.dataTable {
             background-color: #3966b6;
             .modal-title {
                 color: #fff;
+                text-transform: capitalize;
             }
             .close {
                 width: 44px;

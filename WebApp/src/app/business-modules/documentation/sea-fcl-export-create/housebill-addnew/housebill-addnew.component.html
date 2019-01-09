@@ -1,0 +1,475 @@
+<!--begin::Form-->
+<div class="m-form m-form--state">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-control-label" for="">
+                    Master bill of landing
+                </label>
+                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-control-label" for="">
+                    Customer (Payer)
+                </label>
+                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                    placeholder="Select filter">
+                </ng-select>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-control-label" for="">
+                    Saleman in charge
+                </label>
+                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                    placeholder="Select filter">
+                </ng-select>
+            </div>
+        </div>
+    </div>
+    <div class="div-inside bg-secondary">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Shipper
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Consignee
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Notify party
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        House bill of landing no.
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                            House bill of landing type
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                       Booking no.
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Local vessel & voy no.
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Ocean essel & voy no.
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Poin of country origin
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Place of receipt
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Port of loading
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Port of discharge
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Place of receipt
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Port of loading
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Port of discharge
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Closing date
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square"
+                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                            [(ngModel)]="selectedRange"
+                            [ranges]="ranges"
+                            [maxDate]="maxDate"
+                            [alwaysShowCalendars]="true"
+                            name="daterange"
+                            placeholder="From date - to date" readonly/>
+                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                            <span>
+                                <i class="la la-calendar"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Salling date
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square"
+                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                            [(ngModel)]="selectedRange"
+                            [ranges]="ranges"
+                            [maxDate]="maxDate"
+                            [alwaysShowCalendars]="true"
+                            name="daterange"
+                            placeholder="From date - to date" readonly/>
+                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                            <span>
+                                <i class="la la-calendar"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Freight payment
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div-inside bg-secondary">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Forwarding agent
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Number of origin B/L
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Place of date of issue H-B/L
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Reference no.
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Export reference no.
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Delivery of good
+                    </label>
+                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                        placeholder="Select filter">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Type of move
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Purchase order no.
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Type of sevice
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div-inside bg-secondary">
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="m--margin-bottom-10">
+                            <span class="m--font-bolder">
+                                Commodities:
+                            </span>
+                            <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
+                                <span>Steel</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Consumer Good</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Drug</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Weapon</span>
+                            </perfect-scrollbar>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="m--margin-bottom-10">
+                            <span class="m--font-bolder">
+                                Detail container & packages:
+                            </span>
+                            <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
+                                <span>Steel</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Consumer Good</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Drug</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Weapon</span>
+                            </perfect-scrollbar>
+                        </div>
+                    </div>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Description of good:
+                    </span>
+                    <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
+                        <span></span>
+                    </perfect-scrollbar>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="m--margin-bottom-10">
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal">
+                        <span>
+                            <i class="la la-list"></i>
+                            <span>
+                                container list
+                            </span>
+                        </span>
+                    </button>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total gross weight:
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total net weight:
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total chargeable weight:
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total CBM:
+                    </span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div-inside bg-secondary">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Shipping mark
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        In word
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        On board status
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Form-->
