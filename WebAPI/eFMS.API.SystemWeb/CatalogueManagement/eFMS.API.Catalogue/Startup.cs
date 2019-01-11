@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace SystemManagementAPI
+namespace eFMS.API.Catalogue
 {
     public class Startup
     {

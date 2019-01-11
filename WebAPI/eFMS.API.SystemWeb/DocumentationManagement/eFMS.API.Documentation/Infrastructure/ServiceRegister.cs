@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Shipment.Service.Contexts;
+using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Services;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -21,6 +23,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddTransient<ICurrentUser, CurrentUser>();
+            services.AddTransient<ITerminologyService, TerminologyService>();
         }
     }
 }

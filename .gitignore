@@ -74,3 +74,7 @@ bin
 /WebAPI/eFMS.API.SystemWeb/ShipmentManagement/eFMS.API.Shipment/obj
 /WebAPI/eFMS.API.SystemWeb/ShipmentManagement/eFMS.API.Shipment.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/ShipmentManagement/eFMS.API.Shipment.DL/obj
+/WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation/obj
+/WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DAL/obj
+/WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DL/obj
+/WebAPI/eFMS.API.SystemWeb/DocumentationManagement/.vs
