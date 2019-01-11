@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Shipment.Service", "eFMS.API.Shipment.DAL\eFMS.API.Shipment.Service.csproj", "{97058B7A-D819-4A00-8503-55E2F6F9433D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Documentation.Service", "eFMS.API.Documentation.DAL\eFMS.API.Documentation.Service.csproj", "{97058B7A-D819-4A00-8503-55E2F6F9433D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Shipment", "eFMS.API.Shipment\eFMS.API.Shipment.csproj", "{864F1E4E-7C34-4C29-A9A0-9757E0AF75FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Documentation", "eFMS.API.Documentation\eFMS.API.Documentation.csproj", "{864F1E4E-7C34-4C29-A9A0-9757E0AF75FD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Shipment.DL", "eFMS.API.Shipment.DL\eFMS.API.Shipment.DL.csproj", "{B11A50D1-FFE6-4197-8DEB-F5122E79B1B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Documentation.DL", "eFMS.API.Documentation.DL\eFMS.API.Documentation.DL.csproj", "{B11A50D1-FFE6-4197-8DEB-F5122E79B1B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
