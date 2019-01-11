@@ -1,0 +1,21 @@
+﻿{
+  "ReRoutes": [
+
+    // Category
+    {
+      "DownstreamPathTemplate": "/api/v{version}/{lang}/{controller}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44361
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v{version}/{lang}/{controller}",
+      "UpstreamHttpMethod": [ "Get" ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:52793"
+  }
+}
