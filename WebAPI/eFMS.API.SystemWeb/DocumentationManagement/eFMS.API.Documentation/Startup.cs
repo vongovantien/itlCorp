@@ -131,9 +131,9 @@ namespace eFMS.API.Shipment
                             description.GroupName,
                             new Info()
                             {
-                                Title = $"eFMS Catalogue API {description.ApiVersion}",
+                                Title = $"eFMS Documentation API {description.ApiVersion}",
                                 Version = description.ApiVersion.ToString(),
-                                Description = "eFMS Catalogue API Document"
+                                Description = "eFMS Documentation API Document"
                             });
                     }
                     //options.DocumentFilter<SwaggerAddEnumDescriptions>();
@@ -142,7 +142,7 @@ namespace eFMS.API.Shipment
                     {
                         Flow = "implicit", // just get token via browser (suitable for swagger SPA)
                         AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Catalogue API" } }
+                        Scopes = new Dictionary<string, string> { { "apimobile", "Documentation API" } }
                     });
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
