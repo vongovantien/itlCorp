@@ -29,6 +29,26 @@ perfect-scrollbar > .ps.ps--scrolling-y > .ps__rail-y, perfect-scrollbar > .ps.p
         background-color: transparent !important;
     }
 }
+//
+div::-webkit-scrollbar,
+ul::-webkit-scrollbar,
+section::-webkit-scrollbar {
+    width: 3px;
+    height: 7px;
+}
+/* Track */
+div,
+ul,
+section {
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #b3b3b3;
+    }
+}
+/* Handle */
+
 //layout
 html,
 body {
@@ -74,6 +94,9 @@ ul {
         }
     }
 }
+.dropdown-menu {
+    border-radius: 0;
+}
 .m-body {
     width: 100%;
     min-height: 600px;
@@ -82,6 +105,7 @@ ul {
     background-color: #585858;
 }
 .btn {
+    text-transform: capitalize;
     &.btn-warning {
         color: #fff;
         background-color: #fcb34c;
@@ -141,22 +165,6 @@ ul {
     &::placeholder {
         color: #b3b3b3;
     }
-}
-//
-tbody::-webkit-scrollbar,
-div::-webkit-scrollbar,
-ul::-webkit-scrollbar,
-section::-webkit-scrollbar {
-    width: 5px;
-    height: 7px;
-}
-/* Track */
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #b3b3b3;
 }
 //typography
 .c-block-title {
@@ -449,6 +457,11 @@ table.dataTable {
                 position: absolute;
                 right: 0;
                 margin: 0;
+                &:not(:disabled):not(.disabled):hover, 
+                &:not(:disabled):not(.disabled):focus {
+                    color: #fff;
+                    opacity: 1;
+                }
             }
         }
         .modal-body {
