@@ -40,7 +40,6 @@ namespace eFMS.API.Catalogue.Service.Models
             }
             return result;
         }
-
         public virtual DbSet<CatArea> CatArea { get; set; }
         public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
@@ -94,15 +93,17 @@ namespace eFMS.API.Catalogue.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
-                    options =>
-                    {
-                        options.UseRowNumberForPaging();
-                        options.EnableRetryOnFailure(3);
-                    });            }
+                options =>
+                {
+                    options.UseRowNumberForPaging();
+                });
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+
             modelBuilder.Entity<CatArea>(entity =>
             {
                 entity.ToTable("catArea");
@@ -740,11 +741,11 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                //entity.HasOne(d => d.Partner)
-                //    .WithMany(p => p.CatPartnerContact)
-                //    .HasForeignKey(d => d.PartnerId)
-                //    .OnDelete(DeleteBehavior.ClientSetNull)
-                //    .HasConstraintName("FK_catPartnerContact_catPartner");
+                entity.HasOne(d => d.Partner)
+                    .WithMany(p => p.CatPartnerContact)
+                    .HasForeignKey(d => d.PartnerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_catPartnerContact_catPartner");
             });
 
             modelBuilder.Entity<CatPartnerContract>(entity =>
@@ -1072,6 +1073,7 @@ namespace eFMS.API.Catalogue.Service.Models
             modelBuilder.Entity<CsShipment>(entity =>
             {
                 entity.HasKey(e => e.JobId)
+                    .HasName("csShipment_PK")
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csShipment");
@@ -1173,6 +1175,7 @@ namespace eFMS.API.Catalogue.Service.Models
             modelBuilder.Entity<CsShipmentBuyingRate>(entity =>
             {
                 entity.HasKey(e => new { e.Hawbno, e.ChagreFeeId, e.Qunit, e.Collect })
+                    .HasName("csShipmentBuyingRate_PK")
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csShipmentBuyingRate");
@@ -1263,6 +1266,7 @@ namespace eFMS.API.Catalogue.Service.Models
             modelBuilder.Entity<CsShipmentDetail>(entity =>
             {
                 entity.HasKey(e => new { e.JobId, e.LotNo })
+                    .HasName("csShipmentDetail_PK")
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csShipmentDetail");
@@ -1325,6 +1329,7 @@ namespace eFMS.API.Catalogue.Service.Models
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
             {
                 entity.HasKey(e => e.Hwbno)
+                    .HasName("csShipmentHAWBDetail_PK")
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csShipmentHAWBDetail");
@@ -1358,6 +1363,7 @@ namespace eFMS.API.Catalogue.Service.Models
             modelBuilder.Entity<CsShipmentProfitShares>(entity =>
             {
                 entity.HasKey(e => new { e.Hawbno, e.PartnerId, e.ChagreFeeId, e.Qunit, e.Debit })
+                    .HasName("csShipmentProfitShares_PK")
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csShipmentProfitShares");
@@ -1456,6 +1462,7 @@ namespace eFMS.API.Catalogue.Service.Models
             modelBuilder.Entity<CsShipmentSellingRate>(entity =>
             {
                 entity.HasKey(e => new { e.Hawbno, e.ChagreFeeId, e.Qunit, e.Collect })
+                    .HasName("csShipmentSellingRate_PK")
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csShipmentSellingRate");
@@ -2222,7 +2229,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
             modelBuilder.Entity<SysUserOtherWorkPlace>(entity =>
             {
-                entity.HasKey(e => new { e.UserId, e.WorkPlaceId });
+                entity.HasKey(e => new { e.UserId, e.WorkPlaceId })
+                    .HasName("PK_sysUserOtherBranch");
 
                 entity.ToTable("sysUserOtherWorkPlace");
 

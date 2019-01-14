@@ -20,6 +20,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public ICollection<SysRolePermission> SysRolePermission { get; set; }
+        public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
     }
 }

@@ -33,8 +33,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserCreated { get; set; }
         public string DatetimeCreated { get; set; }
 
-        public ICollection<SysUser> SysUser { get; set; }
-        public ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
-        public ICollection<SysUserRole> SysUserRole { get; set; }
+        public virtual ICollection<SysUser> SysUser { get; set; }
+        public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
+        public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

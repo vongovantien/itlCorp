@@ -49,5 +49,10 @@ namespace eFMS.API.Catalogue.DL.Common
             new CatPartnerGroupModel { Id = ShipperPartner, GroupNameVn = "Người gửi", GroupNameEn = "Shipper" },
             new CatPartnerGroupModel { Id = AllPartner, GroupNameVn = "All", GroupNameEn = "All" }
         };
+        public static List<UnitType> UnitTypes = new List<UnitType>
+        {
+            new UnitType { Value = "Container", DisplayName = "Container" },
+            new UnitType { Value = "Package", DisplayName = "Package" }
+        };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -17,6 +18,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatUnitService(IContextBase<CatUnit> repository,IMapper mapper) : base(repository, mapper)
         {
 
+        }
+
+        public List<UnitType> GetUnitTypes()
+        {
+            return DataEnums.UnitTypes;
         }
 
         public List<CatUnit> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount)

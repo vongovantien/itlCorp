@@ -127,7 +127,8 @@ export class API_MENU {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Update",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Delete/",
-            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit"
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit",
+            getUnitTypes: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/GetUnitTypes"
         },    
         Charge: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/Query",

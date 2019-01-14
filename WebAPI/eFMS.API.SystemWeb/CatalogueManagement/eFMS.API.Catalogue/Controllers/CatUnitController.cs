@@ -46,6 +46,12 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetUnitTypes")]
+        public IActionResult GetUnitTypes()
+        {
+            return Ok(catUnitService.GetUnitTypes());
+        }
+
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatUnitCriteria criteria)
