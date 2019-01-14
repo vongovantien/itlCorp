@@ -62,6 +62,7 @@ export class PortIndexComponent implements OnInit {
   @ViewChild('formAddEdit') form: NgForm;
   @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
   @ViewChild('chooseArea') public ngSelectArea: SelectComponent;
+  @ViewChild('chooseMode') public ngSelectMode: SelectComponent;
   @ViewChild(PaginationComponent) child;
   countries: any[];
   areas: any[];
@@ -70,6 +71,7 @@ export class PortIndexComponent implements OnInit {
   areaActive: any;
   isDesc: boolean = false;
   titleConfirmDelete = "You want to delete this port index";
+  modeActive: any;
 
   constructor(private baseService: BaseService,
     private api_menu: API_MENU,
@@ -149,10 +151,12 @@ export class PortIndexComponent implements OnInit {
     this.initPortIndex();
     this.ngSelectCountry.active = [];
     this.ngSelectArea.active = [];
+    this.ngSelectMode.active = [];
   }
   initPortIndex() {
     this.portIndex = new PortIndex();
     this.portIndex.placeType = 8;
+    this.modeActive = null;
   }
   onSubmit() {
     if (this.form.valid) {
@@ -168,9 +172,12 @@ export class PortIndexComponent implements OnInit {
   update(): any {
     this.baseService.spinnerShow();
     this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.portIndex.id, this.portIndex).subscribe((response: any) => {
-      this.baseService.spinnerHide();
+      
+      this.form.onReset();
+      this.initPortIndex();
       $('#' + this.nameModal).modal('hide');
       this.baseService.successToast(response.message);
+      this.baseService.spinnerHide();
       this.setPage(this.pager);
     }, err => {
       this.baseService.spinnerHide();
@@ -254,11 +261,15 @@ export class PortIndexComponent implements OnInit {
   }
   valueCountry: any = {};
   valueArea: any = {};
+  valueMode: any = {};
   refreshCountryValue(value: any): void {
     this.valueCountry = value;
   }
   refreshAreaValue(value: any): void {
     this.valueArea = value;
+  }
+  refreshModeValue(value: any): void{
+    this.valueMode = value;
   }
   public removed(value: any): void {
     console.log('Removed value is: ', value);
@@ -272,6 +283,9 @@ export class PortIndexComponent implements OnInit {
   onAreachange(area) {
     this.portIndex.areaID = area.id;
   }
+  onModechange(mode){
+    this.portIndex.modeOfTransport = mode.id;
+  }
   showConfirmDelete(item) {
     this.portIndex = item;
   }
@@ -279,6 +293,7 @@ export class PortIndexComponent implements OnInit {
     this.portIndex = item;
     this.countryActive = this.countries.find(x => x.id == this.portIndex.countryID);
     this.areaActive = this.areas.find(x => x.id == this.portIndex.areaID);
+    this.modeActive = this.modes.find(x => x.id == this.portIndex.modeOfTransport);
   }
 
   async onDelete(event) {

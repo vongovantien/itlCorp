@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
 
 @Component({
   selector: 'app-master-bill',
@@ -7,11 +9,62 @@ import * as moment from 'moment';
   styleUrls: ['./master-bill.component.scss']
 })
 export class MasterBillComponent implements OnInit {
+    terms: any[];
+    shipmentTypes: any[];
+    serviceTypes: any[];
+    billOfLadingTypes: any[];
+    portOfLoadings: any[];
+    portOfDestination: any[];
 
-  constructor() { }
+    constructor(
+    private baseServices: BaseService,
+    private api_menu: API_MENU) { }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+        this.getFreightTerms();
+        this.getShipmentTypes();
+        this.getServiceTypes();
+        this.getBillofLadingTypes();
+    }
+    async getBillofLadingTypes() {
+        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetBillofLoadingTypes, false, false);
+        if(response){
+            this.billOfLadingTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+        }
+        else{
+            this.billOfLadingTypes = [];
+        }
+    }
+
+    async getServiceTypes() {
+        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetServiceTypes, false, false);
+        if(response){
+            this.serviceTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+        }
+        else{
+            this.serviceTypes = [];
+        }
+    }
+
+    async getFreightTerms(){
+        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetFreightTerms, false, false);
+        if(response){
+            this.terms = response.map(x=>({"text":x.displayName,"id":x.value}));
+        }
+        else{
+            this.terms = [];
+        }
+    }
+    async getShipmentTypes(){
+        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetShipmentTypes, false, false);
+        if(response){
+            console.log(response);
+            this.shipmentTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+        }
+        else{
+            this.shipmentTypes = [];
+        }
+    }
 
     /**
      * Daterange picker

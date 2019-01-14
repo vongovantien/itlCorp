@@ -115,6 +115,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null)
                            )).Select(x => new CatPartnerViewModel {
                                Id = x.partner.Id,
                                PartnerGroup = x.partner.PartnerGroup,
@@ -172,7 +173,8 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           ) && ((x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
+                           ) && ((x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                           && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null))
                            .Select(x => new CatPartnerViewModel {
                                Id = x.partner.Id,
                                PartnerGroup = x.partner.PartnerGroup,

@@ -28,7 +28,8 @@ export class SystemConstants {
     public static readonly MODULE_NAME = {
         CATALOUGE: "Catalogue",
         SYSTEM: "System",
-        LOG: "auditlog"
+        LOG: "auditlog",
+        Documentation: "Documentation"
     }
     public static readonly LANGUAGES = {
         ENGLISH_API:  "en-US",  //SystemConstants.DEFAULT_LANGUAGE,
