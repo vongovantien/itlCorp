@@ -165,7 +165,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        Place of receipt
+                        Place of delivery
                     </label>
                     <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                 </div>
@@ -173,18 +173,15 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        Port of loading
+                        Final destination
                     </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        Port of discharge
+                        Freight payment
                     </label>
                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -241,7 +238,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        Freight payment
+                        Freight payable at
                     </label>
                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
