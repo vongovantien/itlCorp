@@ -216,11 +216,11 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.partner.countryShippingId = null;
     this.partner.provinceShippingId = null;
     this.partner.departmentId = null;
-    this.partner.partnerGroup = '';
+    //this.partner.partnerGroup = '';
     this.partner.salePersonId = null;
     this.partner.workPlaceId = null;
     this.partner.public = false;
-    this.partnerGroupActives = [];
+    //this.partnerGroupActives = [];
     this.chooseBillingCountry.active = [];
     this.chooseBillingProvince.active = [];
     this.chooseShippingCountry.active = [];
