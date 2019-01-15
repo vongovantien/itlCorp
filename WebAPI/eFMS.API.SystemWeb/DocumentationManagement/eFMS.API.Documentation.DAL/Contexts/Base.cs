@@ -1,4 +1,4 @@
-﻿using eFMS.API.Shipment.Service.Models;
+﻿using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Connection.EF;
 
 namespace eFMS.API.Shipment.Service.Contexts
