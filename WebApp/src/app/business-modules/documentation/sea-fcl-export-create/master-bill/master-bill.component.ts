@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
+import * as shipmentHelper from 'src/helper/shipment.helper';
+import * as lodash from 'lodash';
 
 @Component({
   selector: 'app-master-bill',
@@ -20,51 +22,59 @@ export class MasterBillComponent implements OnInit {
     private baseServices: BaseService,
     private api_menu: API_MENU) { }
 
-    ngOnInit() {
-        this.getFreightTerms();
-        this.getShipmentTypes();
-        this.getServiceTypes();
-        this.getBillofLadingTypes();
-    }
-    async getBillofLadingTypes() {
-        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetBillofLoadingTypes, false, false);
-        if(response){
-            this.billOfLadingTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
-        }
-        else{
-            this.billOfLadingTypes = [];
-        }
+    async ngOnInit() {
+       this.getShipmentCommonData();
     }
 
-    async getServiceTypes() {
-        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetServiceTypes, false, false);
-        if(response){
-            this.serviceTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
-        }
-        else{
-            this.serviceTypes = [];
-        }
+    async getShipmentCommonData(){
+        const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
+        this.billOfLadingTypes = lodash.map(data.billOfLadings,function(x){return {"text":x.displayName,"id":x.value}});
+        this.serviceTypes = lodash.map(data.serviceTypes,function(x){return {"text":x.displayName,"id":x.value}});
+        this.terms = lodash.map(data.freightTerms,function(x){return {"text":x.displayName,"id":x.value}});
+        this.shipmentTypes = lodash.map(data.shipmentTypes,function(x){return {"text":x.displayName,"id":x.value}});
     }
 
-    async getFreightTerms(){
-        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetFreightTerms, false, false);
-        if(response){
-            this.terms = response.map(x=>({"text":x.displayName,"id":x.value}));
-        }
-        else{
-            this.terms = [];
-        }
-    }
-    async getShipmentTypes(){
-        const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetShipmentTypes, false, false);
-        if(response){
-            console.log(response);
-            this.shipmentTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
-        }
-        else{
-            this.shipmentTypes = [];
-        }
-    }
+
+
+    // async getBillofLadingTypes() {
+    //     const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetBillofLoadingTypes, false, false);
+    //     if(response){
+    //         this.billOfLadingTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+    //     }
+    //     else{
+    //         this.billOfLadingTypes = [];
+    //     }
+    // }
+
+    // async getServiceTypes() {
+    //     const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetServiceTypes, false, false);
+    //     if(response){
+    //         this.serviceTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+    //     }
+    //     else{
+    //         this.serviceTypes = [];
+    //     }
+    // }
+
+    // async getFreightTerms(){
+    //     const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetFreightTerms, false, false);
+    //     if(response){
+    //         this.terms = response.map(x=>({"text":x.displayName,"id":x.value}));
+    //     }
+    //     else{
+    //         this.terms = [];
+    //     }
+    // }
+    // async getShipmentTypes(){
+    //     const response = await this.baseServices.getAsync(this.api_menu.Documentation.Terminology.GetShipmentTypes, false, false);
+    //     if(response){
+    //         console.log(response);
+    //         this.shipmentTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+    //     }
+    //     else{
+    //         this.shipmentTypes = [];
+    //     }
+    // }
 
     /**
      * Daterange picker

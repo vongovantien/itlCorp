@@ -11,21 +11,10 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-   public class HouseBillSeaFCLExportService : RepositoryBase<TestHouseBillSeaFclexport, HouseBillSeaFCLExportModel>, IHouseBillSeaFCLExportService,ITerminologyService
+   public class HouseBillSeaFCLExportService : RepositoryBase<TestHouseBillSeaFclexport, HouseBillSeaFCLExportModel>, IHouseBillSeaFCLExportService
     {
         public HouseBillSeaFCLExportService(IContextBase<TestHouseBillSeaFclexport> repository, IMapper mapper) : base(repository, mapper)
         {
-        }
-
-        public object GetAllTermData()
-        {
-            var freightTerms = TermData.FreightTerms;
-            var shipmentTypes = TermData.ShipmentTypes;
-            var billOfLading = TermData.BillofLadingTypes;
-            var serviceTypes = TermData.ServiceTypes;
-            var typeOfMoves = TermData.TypeOfMoves;
-            var termData = new { freightTerms, shipmentTypes, billOfLading, serviceTypes, typeOfMoves };
-            return termData;
         }
     }
 

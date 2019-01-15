@@ -222,11 +222,7 @@ export class API_MENU {
 
     public Documentation = {
         Terminology: {
-            GetFreightTerms: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/GetFreightTerms",
-            GetShipmentTypes: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/GetShipmentTypes",
-            GetBillofLoadingTypes: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/GetBillofLoadingTypes",
-            GetServiceTypes: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/ServiceTypes",
-            GetTypeOfMoves: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/GetTypeOfMoves"
+            getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
         }
     }
 }

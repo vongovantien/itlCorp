@@ -26,10 +26,10 @@ namespace eFMS.API.Documentation.Controllers
 
 
         [HttpGet]
-        [Route("getTermData")]
+        [Route("getShipmentCommonData")]
         public IActionResult Get()
         {
-            var results = terminologyService.GetAllTermData();
+            var results = terminologyService.GetAllShipmentCommonData();
             return Ok(results);
         }
 

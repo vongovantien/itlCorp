@@ -5,8 +5,8 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class TerminologyService : ITerminologyService
     {
-       
-        public object GetAllTermData()
+
+        public object GetAllShipmentCommonData()
         {
             var freightTerms = TermData.FreightTerms;
             var shipmentTypes = TermData.ShipmentTypes;

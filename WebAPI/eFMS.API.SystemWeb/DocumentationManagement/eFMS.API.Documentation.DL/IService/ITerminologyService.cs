@@ -7,6 +7,6 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ITerminologyService
     {
-        object GetAllTermData();
+        object GetAllShipmentCommonData();
     }
 }
