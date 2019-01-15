@@ -2,7 +2,7 @@
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class TestSeaFclexportShipmentModel: TestSeaFclexportShipment
+    public class HouseBillSeaFCLExportModel:TestHouseBillSeaFclexport
     {
     }
 }

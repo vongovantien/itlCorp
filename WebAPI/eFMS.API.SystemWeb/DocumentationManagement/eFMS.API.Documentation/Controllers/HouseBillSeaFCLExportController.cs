@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -14,24 +17,22 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class TerminologyController : ControllerBase
+    public class HouseBillSeaFCLExportController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ITerminologyService terminologyService;
-        public TerminologyController(IStringLocalizer<LanguageSub> localizer, ITerminologyService service)
+        private readonly IHouseBillSeaFCLExportService houseBillSeaFCLExportService;
+        private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
+
+        public HouseBillSeaFCLExportController(IStringLocalizer<LanguageSub> localizer, IHouseBillSeaFCLExportService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
-            terminologyService = service;
+            houseBillSeaFCLExportService = service;
+            mapper = imapper;
+            currentUser = user;
         }
 
 
-        [HttpGet]
-        [Route("getTermData")]
-        public IActionResult Get()
-        {
-            var results = terminologyService.GetAllTermData();
-            return Ok(results);
-        }
 
     }
 }

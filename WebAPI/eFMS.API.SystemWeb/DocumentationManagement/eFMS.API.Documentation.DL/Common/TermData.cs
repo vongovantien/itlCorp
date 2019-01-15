@@ -17,12 +17,12 @@ namespace eFMS.API.Documentation.DL.Common
             new ShipmentType { Value = "Freehand", DisplayName = "Freehand" },
             new ShipmentType { Value = "Nominated", DisplayName = "Nominated" }
         };
-        public static List<BillofLoadingType> BillofLoadingTypes = new List<BillofLoadingType>
+        public static List<BillofLadingType> BillofLadingTypes = new List<BillofLadingType>
         {
-            new BillofLoadingType { Value = "Copy", DisplayName = "Copy" },
-            new BillofLoadingType { Value = "Original", DisplayName = "Original" },
-            new BillofLoadingType { Value = "Sea Waybill", DisplayName = "Sea Waybill" },
-            new BillofLoadingType { Value = "Surendered", DisplayName = "Surendered" }
+            new BillofLadingType { Value = "Copy", DisplayName = "Copy" },
+            new BillofLadingType { Value = "Original", DisplayName = "Original" },
+            new BillofLadingType { Value = "Sea Waybill", DisplayName = "Sea Waybill" },
+            new BillofLadingType { Value = "Surendered", DisplayName = "Surendered" }
         };
         public static List<ServiceType> ServiceTypes = new List<ServiceType>
         {
