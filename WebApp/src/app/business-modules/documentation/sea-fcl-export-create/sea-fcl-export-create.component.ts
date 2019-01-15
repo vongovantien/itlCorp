@@ -1,5 +1,16 @@
-import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Partner } from 'src/app/shared/models/catalogue/partner.model';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+// import { PaginationComponent } from 'ngx-bootstrap';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { SortService } from 'src/app/shared/services/sort.service';
+import * as lodash from 'lodash';
+
 
 @Component({
     selector: 'app-sea-fcl-export-create',
@@ -7,6 +18,15 @@ import * as moment from 'moment';
     styleUrls: ['./sea-fcl-export-create.component.scss']
 })
 export class SeaFclExportCreateComponent implements OnInit {
+
+    listCustomers:any = [];
+    listSaleManInCharge:any=[];
+    listShipper:any=[];
+    listConsignee:any=[];
+    listNotifiParty:any=[];
+    listHouseBillLandingType:any = [];
+    listCountryOrigin:any=[];
+    
 
     constructor() {}
 

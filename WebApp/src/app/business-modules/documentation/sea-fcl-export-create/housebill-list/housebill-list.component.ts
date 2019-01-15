@@ -1,39 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+
 import * as moment from 'moment';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Partner } from 'src/app/shared/models/catalogue/partner.model';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+// import { PaginationComponent } from 'ngx-bootstrap';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { SortService } from 'src/app/shared/services/sort.service';
+import * as lodash from 'lodash';
+
 @Component({
   selector: 'app-housebill-list',
   templateUrl: './housebill-list.component.html',
   styleUrls: ['./housebill-list.component.scss']
 })
 export class HousebillListComponent implements OnInit {
-
   constructor() { }
 
   ngOnInit() {
   }
 
-   /**
-     * Daterange picker
-     */
-    selectedRange: any;
-    selectedDate: any;
-    keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
-    ranges: any = {
-        Today: [moment(), moment()],
-        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [
-            moment()
-                .subtract(1, 'month')
-                .startOf('month'),
-            moment()
-                .subtract(1, 'month')
-                .endOf('month')
-        ]
-    };
+
 
   /**
     * ng2-select
