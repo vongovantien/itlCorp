@@ -41,5 +41,6 @@ namespace eFMS.API.Documentation.DL.Common
             new TypeOfMove { Value = "LCL/FCL-CFS/CY", DisplayName = "LCL/FCL-CFS/CY" },
             new TypeOfMove { Value = "FCL/LCL-CY/CFS", DisplayName = "FCL/LCL-CY/CFS" }
         };
+        
     }
 }

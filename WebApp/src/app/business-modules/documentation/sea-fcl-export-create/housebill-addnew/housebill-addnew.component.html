@@ -72,7 +72,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        House bill of landing no.
+                        House bill of lading no.
                     </label>
                     <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                 </div>
@@ -80,9 +80,9 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                            House bill of landing type
+                            House bill of lading type
                     </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                    <ng-select [allowClear]="true" [items]="listHouseBillLadingType" [disabled]="disabled" (data)="refreshValue($event)"
                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                         placeholder="Select filter">
                     </ng-select>
@@ -109,7 +109,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        Ocean essel & voy no.
+                        Ocean vessel & voy no.
                     </label>
                     <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                 </div>
@@ -117,7 +117,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        Poin of country origin
+                        Point of country origin
                     </label>
                     <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
@@ -183,7 +183,7 @@
                     <label class="form-control-label" for="">
                         Freight payment
                     </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                    <ng-select [allowClear]="true" [items]="listFreightPayment" [disabled]="disabled" (data)="refreshValue($event)"
                         (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                         placeholder="Select filter">
                     </ng-select>
@@ -240,10 +240,7 @@
                     <label class="form-control-label" for="">
                         Freight payable at
                     </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
                 </div>
             </div>
         </div>
@@ -268,7 +265,7 @@
                             <label class="form-control-label" for="">
                                 Number of origin B/L
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                            <ng-select [allowClear]="true" [items]="listNumberOfOriginBL" [disabled]="disabled" (data)="refreshValue($event)"
                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                 placeholder="Select filter">
                             </ng-select>
@@ -325,7 +322,7 @@
                             <label class="form-control-label" for="">
                                 Type of move
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                            <ng-select [allowClear]="true" [items]="listTypeOfMove" [disabled]="disabled" (data)="refreshValue($event)"
                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                 placeholder="Select filter">
                             </ng-select>
@@ -346,7 +343,7 @@
                             <label class="form-control-label" for="">
                                 Type of sevice
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                            <ng-select [allowClear]="true" [items]="listTypeOfService" [disabled]="disabled" (data)="refreshValue($event)"
                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                 placeholder="Select filter">
                             </ng-select>

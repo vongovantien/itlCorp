@@ -14,5 +14,6 @@ namespace eFMS.API.Documentation.DL.Models
     public class BillofLadingType : TermBase { }
     public class ServiceType: TermBase { }
     public class TypeOfMove: TermBase { }
+    public class FreightPayment : TermBase { }
 
 }

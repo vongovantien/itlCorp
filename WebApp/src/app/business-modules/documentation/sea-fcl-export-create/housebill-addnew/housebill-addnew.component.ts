@@ -9,8 +9,8 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
+import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as lodash from 'lodash';
-
 import * as moment from 'moment';
 
 @Component({
@@ -32,18 +32,26 @@ export class HousebillAddnewComponent implements OnInit {
     listFreightPayableAt:any=[];
     listFowardingAgent:any=[];
     listDeliveryOfGoods:any=[];
-    listNumberOfOriginBL:any=[];
+    listNumberOfOriginBL:any=[{id:1,text:'1'},{id:2,text:'2'},{id:3,text:'3'}];
     listTypeOfMove:any=[];
     listTypeOfService:any=[];
 
   constructor(
-    private baseService: BaseService, 
+    private baseServices: BaseService, 
     private api_menu: API_MENU,
     private sortService: SortService
   ) { }
 
   ngOnInit() {
-      
+      this.getShipmentCommonData();
+  }
+
+  async getShipmentCommonData(){
+    const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
+    this.listTypeOfService = lodash.map(data.serviceTypes,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listTypeOfMove = lodash.map(data.typeOfMoves,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listHouseBillLadingType = lodash.map(data.billOfLadings,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listFreightPayment = lodash.map(data.freightTerms,function(x){return {"text":x.displayName,"id":x.value}});
   }
 
 
