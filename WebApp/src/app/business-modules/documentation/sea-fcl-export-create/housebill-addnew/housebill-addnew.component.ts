@@ -10,6 +10,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import * as shipmentHelper from 'src/helper/shipment.helper';
+import * as dataHelper from 'src/helper/data.helper';
 import * as lodash from 'lodash';
 import * as moment from 'moment';
 
@@ -36,6 +37,44 @@ export class HousebillAddnewComponent implements OnInit {
     listTypeOfMove:any=[];
     listTypeOfService:any=[];
 
+    /**
+     * House Bill Variables 
+     */
+    MasterBillOfLading:String = null;
+    Customer:String = null;
+    SaleMan:String = null;
+    Shipper:String = null;
+    Consignee:String = null;
+    NotifyParty:String = null;
+    HouseBillOfLadingNo:String = null;
+    HouseBullOfLadingType:String = null;
+    BookingNo:String = null;
+    LocalVesselAndVoyNo:String = null;
+    OceanVesselAndVoyNo:String = null;
+    CountryOrigin:String = null;
+    PlaceOfReceipt:String = null;
+    PortOfLoading:String = null;
+    PortOfDischarge:String = null;
+    PlaceOfDelivery:String = null;
+    FinalDestination:String = null;
+    FreightPayment:String = null;
+    ClosingDate:Date = null;
+    SellingDate:Date = null;
+    FreightPayableAt:String = null;
+    ForwardingAgent:String = null;
+    NumberOfOriginBL:Number = null;
+    PlaceDateIssueHBL:String = null;
+    ReferenceNo:String = null;
+    ExportReferenceNo:String = null;
+    DeliveryOfGoods:String = null;
+    TypeOfMove :String = null;
+    PurchaseOrderNo : String = null;
+    TypeOfService : String = null;
+    DescriptionOfGoods: String = null;
+    ShippingMark : String = null;
+    InWord:String = null;
+    OnBoardStatus:String = null;
+
   constructor(
     private baseServices: BaseService, 
     private api_menu: API_MENU,
@@ -48,13 +87,36 @@ export class HousebillAddnewComponent implements OnInit {
 
   async getShipmentCommonData(){
     const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
-    this.listTypeOfService = lodash.map(data.serviceTypes,function(x){return {"text":x.displayName,"id":x.value}});
-    this.listTypeOfMove = lodash.map(data.typeOfMoves,function(x){return {"text":x.displayName,"id":x.value}});
-    this.listHouseBillLadingType = lodash.map(data.billOfLadings,function(x){return {"text":x.displayName,"id":x.value}});
-    this.listFreightPayment = lodash.map(data.freightTerms,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listTypeOfService = dataHelper.prepareNg2SelectData(data.serviceTypes,'value','displayName');  //lodash.map(data.serviceTypes,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listTypeOfMove = dataHelper.prepareNg2SelectData(data.typeOfMoves,'value','displayName');  //lodash.map(data.typeOfMoves,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listHouseBillLadingType = dataHelper.prepareNg2SelectData(data.billOfLadings,'value','displayName'); //lodash.map(data.billOfLadings,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listFreightPayment = dataHelper.prepareNg2SelectData(data.freightTerms,'value','displayName'); //lodash.map(data.freightTerms,function(x){return {"text":x.displayName,"id":x.value}});
   }
 
 
+
+   /**
+     * Daterange picker
+     */
+    selectedRange: any;
+    selectedDate: any;
+    keepCalendarOpeningWithRange: true;
+    maxDate: moment.Moment = moment();
+    ranges: any = {
+        Today: [moment(), moment()],
+        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [
+            moment()
+                .subtract(1, 'month')
+                .startOf('month'),
+            moment()
+                .subtract(1, 'month')
+                .endOf('month')
+        ]
+    };
 
     /**
     * ng2-select

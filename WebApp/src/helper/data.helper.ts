@@ -3,7 +3,7 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-
+import * as lodash from 'lodash';
 /**
  * Return list provinces that belong to country has countryId
  * @param countryId 
@@ -57,5 +57,13 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
     }
     var townWards = await baseService.postAsync(api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, searchObj, false, false);
     return townWards;
+}
+
+
+export function prepareNg2SelectData(dataSource:[],idField:any,textField:any){
+    var returnData = lodash.map(dataSource,function(o){
+        return {id:o[idField],text:o[textField]}
+    });
+    return returnData;
 }
 

@@ -216,7 +216,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" for="">
-                        Salling date
+                        Selling date
                     </label>
                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                         <input type="text" class="form-control m-input m-input--square"
@@ -344,7 +344,7 @@
                                 Type of sevice
                             </label>
                             <ng-select [allowClear]="true" [items]="listTypeOfService" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                (selected)="TypeOfService===$event.id" (removed)="TypeOfService===null" (typed)="typed($event)"
                                 placeholder="Select filter">
                             </ng-select>
                         </div>
