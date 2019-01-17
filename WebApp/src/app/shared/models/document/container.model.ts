@@ -1,24 +1,24 @@
 export class Container {
-    id: string;
-    containerType: string;
-    containerQuantity: number;
-    containerNo: string;
-    sealNo: string;
-    markNo: string;
-    commodityId?: number;
-    packageTypeId: string;
-    goodsDescription: string;
-    grossWeight: number;
-    netWeight: number;
-    chargeAbleWeight: number;
-    unitId: number;
-    cbm: number;
-    userCreated: string;
-    datetimeCreated: Date;
-    userModified: string;
-    datetimeModified: Date;
-    inactive: boolean;
-    inactiveOn: Date;
-    jobId: string;
-    hblno: string
-  }
+  id: string = null;
+  containerType: string = null;
+  containerQuantity: number = null;
+  containerNo: string = null;
+  sealNo: string = null;
+  markNo: string = null;
+  commodityId?: number = null;
+  packageTypeId: string = null;
+  goodsDescription: string = null;
+  grossWeight: number = null;
+  netWeight: number = null;
+  chargeAbleWeight: number = null;
+  unitId: number = null;
+  cbm: number = null;
+  userCreated: string = null;
+  datetimeCreated: Date = null;
+  userModified: string = null;
+  datetimeModified: Date = null;
+  inactive: boolean = null;
+  inactiveOn: Date = null;
+  jobId: string = null;
+  hblno: string = null;
+}

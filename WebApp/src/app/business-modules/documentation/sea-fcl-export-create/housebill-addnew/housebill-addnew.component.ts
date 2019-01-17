@@ -13,6 +13,7 @@ import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import * as lodash from 'lodash';
 import * as moment from 'moment';
+import {HouseBillOfLading} from 'src/app/shared/models/document/housebillOfLading.model';
 
 @Component({
   selector: 'app-housebill-addnew',
@@ -40,6 +41,9 @@ export class HousebillAddnewComponent implements OnInit {
     /**
      * House Bill Variables 
      */
+
+    HouseBillToAdd :HouseBillOfLading = new HouseBillOfLading();
+    
     MasterBillOfLading:String = null;
     Customer:String = null;
     SaleMan:String = null;
@@ -83,6 +87,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   ngOnInit() {
       this.getShipmentCommonData();
+    console.log(this.HouseBillToAdd);
   }
 
   async getShipmentCommonData(){
@@ -154,18 +159,6 @@ export class HousebillAddnewComponent implements OnInit {
     }
 
     save(){
-        console.log({
-            FreightPayment:this.FreightPayment,
-            FreightPayableAt:this.FreightPayableAt,
-            ForwardingAgent:this.ForwardingAgent,
-            PlaceOfDelivery:this.PlaceOfDelivery,
-            DeliveryOfGoods:this.DeliveryOfGoods,
-            HouseBillOfLadingNo:this.HouseBillOfLadingNo,
-            TypeOfMove:this.TypeOfMove,
-            OnBoardStatus:this.OnBoardStatus,
-            ClosingDate:this.ClosingDate,
-            SellingDate:this.SellingDate
-        });
-        
+        console.log(this.HouseBillToAdd);
     }
 }
