@@ -52,7 +52,10 @@ namespace eFMS.API.Catalogue.DL.Common
         public static List<UnitType> UnitTypes = new List<UnitType>
         {
             new UnitType { Value = "Container", DisplayName = "Container" },
-            new UnitType { Value = "Package", DisplayName = "Package" }
+            new UnitType { Value = "Package", DisplayName = "Package" },
+            new UnitType { Value = "Weight Measurement", DisplayName = "Weight Measurement" },
+            new UnitType { Value = "Length Measurement", DisplayName = "Length Measurement" },
+            new UnitType { Value = "Volumn Measurement", DisplayName = "Volumn Measurement" }
         };
     }
 }

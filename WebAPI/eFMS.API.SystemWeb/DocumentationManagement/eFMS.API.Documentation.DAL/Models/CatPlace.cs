@@ -1,13 +1,11 @@
-﻿using eFMS.API.Common.Globals;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace eFMS.API.Catalogue.DL.Models.Criteria
+namespace eFMS.API.Documentation.Service.Models
 {
-    public class CatPlaceCriteria
+    public partial class CatPlace
     {
-        public string All { get; set; }
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string NameVn { get; set; }
         public string NameEn { get; set; }
@@ -20,13 +18,13 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string LocalAreaId { get; set; }
         public string ModeOfTransport { get; set; }
         public string GeoCode { get; set; }
-        public CatPlaceTypeEnum PlaceType { get; set; }
-        public string CountryNameVN { get; set; }
-        public string CountryNameEN { get; set; }
-        public string DistrictNameEN { get; set; }
-        public string DistrictNameVN { get; set; }
-        public string ProvinceNameEN { get; set; }
-        public string ProvinceNAmeVN { get; set; }
+        public string PlaceTypeId { get; set; }
+        public string Note { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
+        public DateTime? InactiveOn { get; set; }
     }
 }

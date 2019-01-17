@@ -10,6 +10,12 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as lodash from 'lodash';
+import { SeaFCLExport } from '../../../shared/models/document/seafclExport.model';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+import { NgForm } from '@angular/forms';
+import { MasterBillComponent } from './master-bill/master-bill.component';
+import { Container } from 'src/app/shared/models/document/container.model';
 
 
 @Component({
@@ -18,22 +24,37 @@ import * as lodash from 'lodash';
     styleUrls: ['./sea-fcl-export-create.component.scss']
 })
 export class SeaFclExportCreateComponent implements OnInit {
+    shipment: SeaFCLExport = new SeaFCLExport();
+    containerTypes: any[] = [];
+    containers: any[] = [];
 
-    listCustomers:any = [];
-    listSaleManInCharge:any=[];
-    listShipper:any=[];
-    listConsignee:any=[];
-    listNotifiParty:any=[];
-    listHouseBillLandingType:any = [];
-    listCountryOrigin:any=[];
+    @ViewChild('formAddEdit') formAddEdit: NgForm;
+    @ViewChild(MasterBillComponent) masterBillComponent; 
     
+    saveButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.save
+    };
 
-    constructor() {}
+    constructor(private baseServices: BaseService,
+        private api_menu: API_MENU) {}
 
-    ngOnInit() {
+    async ngOnInit() {
+        this.getContainerTypes();
+        if(this.containers.length == 0){
+            this.containers.push(new Container());
+        }
     }
-
-    
+    async getContainerTypes(){
+        const responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
+        if(responses != null){
+            this.containerTypes = responses;
+        }
+    }
+    onSubmit(){
+        console.log(this.formAddEdit);
+        this.shipment = this.masterBillComponent.shipment;
+        console.log(this.shipment);
+    }
     /**
      * Daterange picker
      */
