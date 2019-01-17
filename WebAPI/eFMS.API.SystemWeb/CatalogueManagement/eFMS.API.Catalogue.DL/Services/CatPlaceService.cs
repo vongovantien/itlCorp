@@ -73,7 +73,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.Inactive ?? true) == (criteria.Inactive ?? true))
+                                    && ((x.Inactive ?? null) == (criteria.Inactive ?? null))
                     ).OrderBy(x => x.Code).ToList();
             }
             else
