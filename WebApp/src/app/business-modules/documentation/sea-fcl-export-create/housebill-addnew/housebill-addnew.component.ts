@@ -152,4 +152,20 @@ export class HousebillAddnewComponent implements OnInit {
     public refreshValue(value: any): void {
     this.value = value;
     }
+
+    save(){
+        console.log({
+            FreightPayment:this.FreightPayment,
+            FreightPayableAt:this.FreightPayableAt,
+            ForwardingAgent:this.ForwardingAgent,
+            PlaceOfDelivery:this.PlaceOfDelivery,
+            DeliveryOfGoods:this.DeliveryOfGoods,
+            HouseBillOfLadingNo:this.HouseBillOfLadingNo,
+            TypeOfMove:this.TypeOfMove,
+            OnBoardStatus:this.OnBoardStatus,
+            ClosingDate:this.ClosingDate,
+            SellingDate:this.SellingDate
+        });
+        
+    }
 }

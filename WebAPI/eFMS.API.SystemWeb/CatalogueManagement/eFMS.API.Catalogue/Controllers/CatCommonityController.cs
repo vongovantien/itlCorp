@@ -193,8 +193,8 @@ namespace eFMS.API.Catalogue.Controllers
                     list.Add(commodity);
                 }
                 var data = catComonityService.CheckValidImport(list);
-                var totoalValidRows = data.Count(x => x.IsValid == true);
-                var results = new { data, totoalValidRows };
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
                 return Ok(results);
 
             }
