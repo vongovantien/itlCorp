@@ -29,6 +29,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     containers: any[] = [];
     packageTypes: any[]=[];
     commodities: any[] = [];
+    weightMesurements: any[] = [];
 
     @ViewChild('formAddEdit') formAddEdit: NgForm;
     @ViewChild(MasterBillComponent) masterBillComponent; 
@@ -42,6 +43,9 @@ export class SeaFclExportCreateComponent implements OnInit {
 
     async ngOnInit() {
         this.getContainerTypes();
+        this.getPackageTypes();
+        this.getComodities();
+        this.getWeightTypes();
         var container = {
             containerType: null,
             containerQuantity: null,
@@ -69,16 +73,25 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.containerTypes = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
         }
     }
+    async getWeightTypes(){
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
+        if(responses != null){
+            this.weightMesurements = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+            console.log(this.weightMesurements);
+        }
+    }
     async getPackageTypes(){
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
         if(responses != null){
             this.packageTypes = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+            console.log(this.packageTypes);
         } 
     }
     async getComodities(){
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
         if(responses != null){
-            this.packageTypes = dataHelper.prepareNg2SelectData(responses,'id','commodityNameEn');
+            this.commodities = dataHelper.prepareNg2SelectData(responses,'id','commodityNameEn');
+            console.log(this.commodities);
         }
     }
     onSubmit(){
