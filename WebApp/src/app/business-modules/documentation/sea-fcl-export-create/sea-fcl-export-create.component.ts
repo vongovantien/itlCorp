@@ -16,6 +16,7 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { NgForm } from '@angular/forms';
 import { MasterBillComponent } from './master-bill/master-bill.component';
 import * as dataHelper from 'src/helper/data.helper';
+import { Container } from '../../../shared/models/document/container.model';
 
 
 @Component({
@@ -98,6 +99,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         console.log(this.formAddEdit);
         this.shipment = this.masterBillComponent.shipment;
         console.log(this.shipment);
+    }
+    addNewContainer(){
+        this.containers.push(new Container());
     }
     /**
      * Daterange picker
