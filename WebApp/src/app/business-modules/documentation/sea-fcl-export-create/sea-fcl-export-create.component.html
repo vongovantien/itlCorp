@@ -533,6 +533,11 @@
                                     </th>
                                     <th class="">
                                         <span>
+                                            C.W
+                                        </span>
+                                    </th>
+                                    <th class="">
+                                        <span>
                                             Unit
                                         </span>
                                     </th>
@@ -618,7 +623,7 @@
                                         </span>
                                     </td>
                                 </tr> -->
-                                <tr class="">
+                                <tr class="" *ngFor="let item of containers; let j = index">
                                     <td class="">
                                         <div class="table-actions">
                                             <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
@@ -628,76 +633,89 @@
                                     </td>
                                     <td class="">
                                         <span>
-                                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            <ng-select [allowClear]="true" [items]="containerTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                                (selected)="item.containerType = $event.id" (removed)="removed($event)" (typed)="typed($event)"
                                                 placeholder="Select filter">
                                             </ng-select>
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter Q'ty"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter container no"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter seal no"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter mark no"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            <ng-select [allowClear]="true" [items]="commodities" [disabled]="disabled" (data)="refreshValue($event)"
                                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                                placeholder="Select filter">
+                                                placeholder="Select commodity">
                                             </ng-select>
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                            <ng-select [allowClear]="true" [items]="packageTypes" [disabled]="disabled" (data)="refreshValue($event)"
                                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                                placeholder="Select filter">
+                                                placeholder="Select package type">
                                             </ng-select>
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter package Q'ty"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter description"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter gross weight"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter net weight"> 
+                                        </span>
+                                    </td>
+                                    
+                                    <td class="">
+                                        <span>
+                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight"> 
                                         </span>
                                     </td>
                                     <td class="">
+                                        <!-- <span>
+                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight">
+                                            
+                                        </span> -->
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
+                                            <ng-select [allowClear]="true" [items]="weightMesurements" [disabled]="disabled" (data)="refreshValue($event)"
+                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                placeholder="Select Unit">
+                                            </ng-select>
+                                        </span> 
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter CBM"> 
                                         </span>
                                     </td>
                                 </tr>

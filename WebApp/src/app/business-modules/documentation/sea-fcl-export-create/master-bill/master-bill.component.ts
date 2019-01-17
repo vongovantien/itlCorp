@@ -4,7 +4,7 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as lodash from 'lodash';
-import { SeaFCLExport } from 'src/app/shared/models/document/seafclExport.model';
+import { SeaFCLExportMasterBill } from '../../../../shared/models/document/seafclExport_master.model';
 import { NgForm } from '@angular/forms';
 import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -16,7 +16,7 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
   styleUrls: ['./master-bill.component.scss']
 })
 export class MasterBillComponent implements OnInit {
-    @Input() shipment: SeaFCLExport = new SeaFCLExport();
+    @Input() shipment: SeaFCLExportMasterBill = new SeaFCLExportMasterBill();
     @Input() formAddEdit: NgForm;
     terms: any[];
     shipmentTypes: any[];

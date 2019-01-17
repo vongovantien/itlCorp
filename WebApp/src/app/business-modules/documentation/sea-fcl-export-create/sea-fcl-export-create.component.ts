@@ -10,12 +10,12 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as lodash from 'lodash';
-import { SeaFCLExport } from '../../../shared/models/document/seafclExport.model';
+import { SeaFCLExportMasterBill } from '../../../shared/models/document/seafclExport_master.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { NgForm } from '@angular/forms';
 import { MasterBillComponent } from './master-bill/master-bill.component';
-import { Container } from 'src/app/shared/models/document/container.model';
+import * as dataHelper from 'src/helper/data.helper';
 
 
 @Component({
@@ -24,9 +24,12 @@ import { Container } from 'src/app/shared/models/document/container.model';
     styleUrls: ['./sea-fcl-export-create.component.scss']
 })
 export class SeaFclExportCreateComponent implements OnInit {
-    shipment: SeaFCLExport = new SeaFCLExport();
+    shipment: SeaFCLExportMasterBill = new SeaFCLExportMasterBill();
     containerTypes: any[] = [];
     containers: any[] = [];
+    packageTypes: any[]=[];
+    commodities: any[] = [];
+    weightMesurements: any[] = [];
 
     @ViewChild('formAddEdit') formAddEdit: NgForm;
     @ViewChild(MasterBillComponent) masterBillComponent; 
@@ -40,14 +43,55 @@ export class SeaFclExportCreateComponent implements OnInit {
 
     async ngOnInit() {
         this.getContainerTypes();
+        this.getPackageTypes();
+        this.getComodities();
+        this.getWeightTypes();
+        var container = {
+            containerType: null,
+            containerQuantity: null,
+            containerNo: "",
+            sealNo: "",
+            markNo: "",
+            commodityId: null,
+            packageTypeId: "",
+            goodsDescription: "",
+            grossWeight: null,
+            netWeight: null,
+            chargeAbleWeight: null,
+            unitId: null,
+            cbm: null,
+            allowEdit: true
+        };
         if(this.containers.length == 0){
-            this.containers.push(new Container());
+            this.containers.push(container);
         }
+        console.log(this.containers);
     }
     async getContainerTypes(){
-        const responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
         if(responses != null){
-            this.containerTypes = responses;
+            this.containerTypes = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+        }
+    }
+    async getWeightTypes(){
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
+        if(responses != null){
+            this.weightMesurements = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+            console.log(this.weightMesurements);
+        }
+    }
+    async getPackageTypes(){
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
+        if(responses != null){
+            this.packageTypes = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+            console.log(this.packageTypes);
+        } 
+    }
+    async getComodities(){
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
+        if(responses != null){
+            this.commodities = dataHelper.prepareNg2SelectData(responses,'id','commodityNameEn');
+            console.log(this.commodities);
         }
     }
     onSubmit(){
