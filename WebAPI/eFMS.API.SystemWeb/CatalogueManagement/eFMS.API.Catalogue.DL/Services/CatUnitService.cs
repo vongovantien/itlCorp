@@ -47,7 +47,10 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 && ((x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"",StringComparison.OrdinalIgnoreCase)>=0)
-                && ((x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"",StringComparison.OrdinalIgnoreCase)>=0)).OrderBy(x=>x.Code);
+                && ((x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"",StringComparison.OrdinalIgnoreCase)>=0)
+                && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                && ((x.Inactive ?? true) == (criteria.Inactive ?? true))
+                ).OrderBy(x=>x.Code);
             }
             else
             {

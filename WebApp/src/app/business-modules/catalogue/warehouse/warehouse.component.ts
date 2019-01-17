@@ -63,7 +63,7 @@ export class WarehouseComponent implements OnInit {
       provinceName: null,
       districtName: null,
       address: null,
-      placeType: 12
+      placeType: PlaceTypeEnum.Warehouse
     };
   }
   importButtonSetting: ButtonModalSetting = {
@@ -103,7 +103,7 @@ export class WarehouseComponent implements OnInit {
 
   ngOnInit() {
     this.pager.totalItems = 0;
-    this.warehouse.placeType = 12;
+    this.warehouse.placeType = PlaceTypeEnum.Warehouse;
     this.getWarehouses(this.pager);
     this.getDataCombobox();
   }
@@ -271,7 +271,7 @@ export class WarehouseComponent implements OnInit {
 
   resetSearch(event){
     this.criteria = {
-      placeType: 12
+      placeType: PlaceTypeEnum.Warehouse
     };
     this.onSearch(event);
   }

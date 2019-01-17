@@ -26,6 +26,6 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string JobId { get; set; }
-        public byte[] Hblid { get; set; }
+        public string Hblno { get; set; }
     }
 }

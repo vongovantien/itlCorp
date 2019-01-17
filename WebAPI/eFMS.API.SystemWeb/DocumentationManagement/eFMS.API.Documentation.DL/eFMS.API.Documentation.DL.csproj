@@ -51,7 +51,6 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="Models\Criteria\" />
     <Folder Include="Models\Views\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>

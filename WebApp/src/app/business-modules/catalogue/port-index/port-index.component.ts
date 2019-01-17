@@ -143,7 +143,7 @@ export class PortIndexComponent implements OnInit {
   }
   resetSearch(event) {
     this.criteria = {
-      placeType: 8
+      placeType: PlaceTypeEnum.Port
     };
     this.onSearch(event);
   }
@@ -155,7 +155,7 @@ export class PortIndexComponent implements OnInit {
   }
   initPortIndex() {
     this.portIndex = new PortIndex();
-    this.portIndex.placeType = 8;
+    this.portIndex.placeType = PlaceTypeEnum.Port;
     this.modeActive = null;
   }
   onSubmit() {
