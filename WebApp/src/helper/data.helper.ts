@@ -33,7 +33,7 @@ export async function getDistricts(countryId: any, provinceId: any, baseService:
     var searchObj = {
         countryId: countryId,
         provinceId: provinceId,
-        placeType: 4
+        placeType:  PlaceTypeEnum.District 
     }
     var districts = await baseService.postAsync(api_menu.Catalogue.CatPlace.query, searchObj, false, false);
     return districts;
@@ -53,7 +53,7 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
         countryId: countryId,
         provinceId: provinceId,
         districtId: districtId,
-        placeType: 11
+        placeType:  PlaceTypeEnum.Ward 
     }
     var townWards = await baseService.postAsync(api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, searchObj, false, false);
     return townWards;
