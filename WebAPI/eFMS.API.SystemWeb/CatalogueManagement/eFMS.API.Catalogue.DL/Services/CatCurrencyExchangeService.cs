@@ -91,7 +91,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var users = ((eFMSDataContext)DataContext.DC).GetViewData<vw_sysUser>();
             var data = Get(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                 && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
-                                && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null))
+                                && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null)
+                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null))
                                 .Join(users, x => x.UserCreated, y => y.ID, (x, y) => new { x, y }).OrderByDescending(x => x.x.DatetimeCreated);
             var dateCreateds = data.GroupBy(x => x.x.DatetimeCreated.Value.Date)
                 .Select(x => x);
@@ -127,6 +128,7 @@ namespace eFMS.API.Catalogue.DL.Services
             list = list.Where(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                 && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
                                 && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate ==  null)
+                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
                 ).ToList();
             return list;
         }

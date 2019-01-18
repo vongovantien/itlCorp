@@ -90,9 +90,9 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   || ((x.Inactive ?? true) == (criteria.Inactive ?? true))
                                    )
                                    && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   && ((x.Inactive ?? true) == (criteria.Inactive ?? true))
                                    ).OrderBy(x => x.Code).ToList();
             }
             return list;
