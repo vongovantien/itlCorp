@@ -83,6 +83,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatCurrencyExchangeModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            model.Inactive = false;
             var hs = catCurrencyExchangeService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

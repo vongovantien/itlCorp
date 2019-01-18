@@ -109,7 +109,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                               && ((x.com.CommodityNameEn ?? "").IndexOf(criteria.CommodityNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                               && ((x.group.GroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                               && ((x.group.GroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              && ((x.com.Inactive ?? null) == (criteria.Inactive ?? null))
+                                              && ((x.com.Inactive ?? false) == (criteria.Inactive ?? false))
                                      ).Select(x => new CatCommodityViewModel {
                                          Id = x.com.Id,
                                          CommodityNameVn = x.com.CommodityNameVn,

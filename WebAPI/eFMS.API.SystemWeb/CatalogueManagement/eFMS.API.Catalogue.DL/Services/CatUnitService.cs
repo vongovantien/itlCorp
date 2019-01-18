@@ -42,15 +42,14 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatUnit> Query(CatUnitCriteria criteria)
         {
-            var list = DataContext.Get();
+            var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"",StringComparison.OrdinalIgnoreCase)>=0)
-                && ((x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"",StringComparison.OrdinalIgnoreCase)>=0)
+                && ((x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"", StringComparison.OrdinalIgnoreCase)>=0)
+                && ((x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"", StringComparison.OrdinalIgnoreCase)>=0)
                 && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                && ((x.Inactive ?? true) == (criteria.Inactive ?? true))
-                ).OrderBy(x=>x.Code);
+                ).OrderBy(x => x.Code);
             }
             else
             {
