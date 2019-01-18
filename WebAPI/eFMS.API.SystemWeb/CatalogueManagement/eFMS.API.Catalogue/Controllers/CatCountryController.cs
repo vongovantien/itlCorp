@@ -33,7 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTeamplate.xlsx";
+        private string templateName = "ImportTemplate.xlsx";
         public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
