@@ -13,7 +13,7 @@ import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import * as lodash from 'lodash';
 import * as moment from 'moment';
-import {HouseBillOfLading} from 'src/app/shared/models/document/housebillOfLading.model';
+import {CsTransactionDetail} from 'src/app/shared/models/document/csTransactionDetail';
 
 @Component({
   selector: 'app-housebill-addnew',
@@ -42,7 +42,7 @@ export class HousebillAddnewComponent implements OnInit {
      * House Bill Variables 
      */
 
-    HouseBillToAdd :HouseBillOfLading = new HouseBillOfLading();
+    HouseBillToAdd :CsTransactionDetail = new CsTransactionDetail();
 
 
   constructor(
