@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Catalogue.Service.Models
+namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CatCommodity
     {

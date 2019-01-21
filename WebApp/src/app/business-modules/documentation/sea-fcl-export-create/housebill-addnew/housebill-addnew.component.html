@@ -321,7 +321,7 @@
                                     <label class="form-control-label" for="">
                                         Freight payable at
                                     </label>
-                                    <input type="text" required name="FreightPayableAtName" (change)="FreightPayableAt=FreightPayableAt.trim()" #FreightPayableAtName="ngModel" [(ngModel)]="HouseBillToAdd.FreightPayableAt" 
+                                    <input type="text" required name="FreightPayableAtName" (change)="HouseBillToAdd.FreightPayableAt=HouseBillToAdd.FreightPayableAt.trim()" #FreightPayableAtName="ngModel" [(ngModel)]="HouseBillToAdd.FreightPayableAt" 
                                     (change)="HouseBillToAdd.FreightPayableAt=HouseBillToAdd.FreightPayableAt.trim()" class="form-control m-input m-input--square"
                                         placeholder="Enter text">
                                         <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && FreightPayableAtName.invalid">
