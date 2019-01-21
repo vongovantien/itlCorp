@@ -42,5 +42,13 @@ export const COMMODITYCOLUMNSETTING: ColumnSetting[] =
     dataType: 'boolean',
     required: true,
     lookup: ''
-  }
+  },
+  {
+    primaryKey: 'code',
+    header: 'Code',
+    isShow: true,
+    dataType: 'text',
+    required: true,
+    lookup: ''
+  },
 ]

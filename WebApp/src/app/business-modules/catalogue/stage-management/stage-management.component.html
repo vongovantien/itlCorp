@@ -413,7 +413,7 @@
                                     <label>
                                         Department <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="ListDepartment" [active]="[ListDepartment[index_stage_edit]]"
+                                    <ng-select [allowClear]="true" [items]="ListDepartment" [active]="[ListDepartment[index_current_department]]"
                                         [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event,'edit')"
                                         *ngIf="resetNg2Select" (removed)="removed($event)" (typed)="typed($event)"
                                         placeholder="Select department">

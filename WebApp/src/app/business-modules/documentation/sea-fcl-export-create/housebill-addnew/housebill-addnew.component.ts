@@ -43,41 +43,7 @@ export class HousebillAddnewComponent implements OnInit {
      */
 
     HouseBillToAdd :HouseBillOfLading = new HouseBillOfLading();
-    
-    MasterBillOfLading:String = null;
-    Customer:String = null;
-    SaleMan:String = null;
-    Shipper:String = null;
-    Consignee:String = null;
-    NotifyParty:String = null;
-    HouseBillOfLadingNo:String = null;
-    HouseBullOfLadingType:String = null;
-    BookingNo:String = null;
-    LocalVesselAndVoyNo:String = null;
-    OceanVesselAndVoyNo:String = null;
-    CountryOrigin:String = null;
-    PlaceOfReceipt:String = null;
-    PortOfLoading:String = null;
-    PortOfDischarge:String = null;
-    PlaceOfDelivery:String = null;
-    FinalDestination:String = null;
-    FreightPayment:String = null;
-    ClosingDate:Date = null;
-    SellingDate:Date = null;
-    FreightPayableAt:String = null;
-    ForwardingAgent:String = null;
-    NumberOfOriginBL:Number = null;
-    PlaceDateIssueHBL:String = null;
-    ReferenceNo:String = null;
-    ExportReferenceNo:String = null;
-    DeliveryOfGoods:String = null;
-    TypeOfMove :String = null;
-    PurchaseOrderNo : String = null;
-    TypeOfService : String = null;
-    DescriptionOfGoods: String = null;
-    ShippingMark : String = null;
-    InWord:String = null;
-    OnBoardStatus:String = null;
+
 
   constructor(
     private baseServices: BaseService, 
@@ -92,10 +58,10 @@ export class HousebillAddnewComponent implements OnInit {
 
   async getShipmentCommonData(){
     const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
-    this.listTypeOfService = dataHelper.prepareNg2SelectData(data.serviceTypes,'value','displayName');  //lodash.map(data.serviceTypes,function(x){return {"text":x.displayName,"id":x.value}});
-    this.listTypeOfMove = dataHelper.prepareNg2SelectData(data.typeOfMoves,'value','displayName');  //lodash.map(data.typeOfMoves,function(x){return {"text":x.displayName,"id":x.value}});
-    this.listHouseBillLadingType = dataHelper.prepareNg2SelectData(data.billOfLadings,'value','displayName'); //lodash.map(data.billOfLadings,function(x){return {"text":x.displayName,"id":x.value}});
-    this.listFreightPayment = dataHelper.prepareNg2SelectData(data.freightTerms,'value','displayName'); //lodash.map(data.freightTerms,function(x){return {"text":x.displayName,"id":x.value}});
+    this.listTypeOfService = dataHelper.prepareNg2SelectData(data.serviceTypes,'value','displayName'); 
+    this.listTypeOfMove = dataHelper.prepareNg2SelectData(data.typeOfMoves,'value','displayName');  
+    this.listHouseBillLadingType = dataHelper.prepareNg2SelectData(data.billOfLadings,'value','displayName'); 
+    this.listFreightPayment = dataHelper.prepareNg2SelectData(data.freightTerms,'value','displayName'); 
   }
 
 
@@ -140,14 +106,6 @@ export class HousebillAddnewComponent implements OnInit {
     private set disabledV(value: string) {
     this._disabledV = value;
     this.disabled = this._disabledV === '1';
-    }
-
-    public selected(value: any): void {
-    console.log('Selected value is: ', value);
-    }
-
-    public removed(value: any): void {
-    console.log('Removed value is: ', value);
     }
 
     public typed(value: any): void {

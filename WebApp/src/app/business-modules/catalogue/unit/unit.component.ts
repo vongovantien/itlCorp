@@ -140,8 +140,7 @@ export class UnitComponent implements OnInit {
   }
 
 
-  async addNewUnit(form: NgForm, action) {
-    console.log(this.UnitToAdd);
+  async addNewUnit(form: NgForm, action: string) {
     if (action == "yes") {
       delete this.UnitToAdd.id;
       if (form.form.status != "INVALID" && this.UnitToAdd.unitType != null) {
@@ -151,7 +150,6 @@ export class UnitComponent implements OnInit {
           this.setPageAfterAdd();
           form.onReset();
           $('#add-unit-modal').modal('hide');
-
         }
       }
     } else {
@@ -161,7 +159,7 @@ export class UnitComponent implements OnInit {
     }
   }
 
-  prepareDeleteUnit(id) {
+  prepareDeleteUnit(id: any) {
     this.idUnitToDelete = id;
   }
 
