@@ -90,20 +90,20 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCommodityGroupModel> Query(CatCommodityGroupCriteria criteria)
         {
-            List<CatCommodityGroupModel> results = null;
+            IQueryable<CatCommodityGroupModel> results = Get(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
                 results = Get(x =>((x.GroupNameEn ?? "").IndexOf(criteria.GroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                         && ((x.GroupNameVn ?? "").IndexOf(criteria.GroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn).ToList();
+                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn);
             }
             else
             {
                 results = Get(x => ((x.GroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                         || ((x.GroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn).ToList();
+                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn);
             }
-            return results;
+            return results?.ToList();
         }
 
         public List<CommodityGroupImportModel> CheckValidImport(List<CommodityGroupImportModel> list)

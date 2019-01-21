@@ -56,7 +56,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCurrency> Query(CatCurrrencyCriteria criteria)
         {
-            var list = DataContext.Get();
+            var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0)

@@ -99,7 +99,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             List<CatCommodityViewModel> results = null;
 
-            var commonities = ((eFMSDataContext)DataContext.DC).CatCommodity;
+            var commonities = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             var catCommonityGroups = ((eFMSDataContext)DataContext.DC).CatCommodityGroup;
             if (criteria.All == null)
             {
@@ -109,7 +109,6 @@ namespace eFMS.API.Catalogue.DL.Services
                                               && ((x.com.CommodityNameEn ?? "").IndexOf(criteria.CommodityNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                               && ((x.group.GroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                               && ((x.group.GroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              && ((x.com.Inactive ?? false) == (criteria.Inactive ?? false))
                                      ).Select(x => new CatCommodityViewModel {
                                          Id = x.com.Id,
                                          CommodityNameVn = x.com.CommodityNameVn,

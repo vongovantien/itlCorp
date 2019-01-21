@@ -43,7 +43,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 var s = DataContext.Get(stage => (stage.Id == criteria.Id || criteria.Id == 0)
                                     && ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
                                     && ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
-                                    && ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0));
+                                    && ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
+                                    && (stage.Inactive == criteria.Inactive || criteria.Inactive == null));
 
                 var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
                 result = (from i in s
@@ -57,11 +58,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 var s = DataContext.Get();
                 var t = ((eFMSDataContext)DataContext.DC).CatDepartment;
                 
-                 result = s.Join(t, stage => stage.DepartmentId, department => department.Id, (stage, department) => new { stage, department }).Where(x => ((x.department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0)
-                    || ((x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
-                    || ((x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >=0)
-                    || ((x.stage.Code ?? "").IndexOf(criteria.Code ?? "")>=0)
-                    || (x.stage.Id == criteria.Id))
+                 result = s.Join(t, stage => stage.DepartmentId, department => department.Id, (stage, department) => new { stage, department }).Where(x => 
+                    ((x.department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0
+                    || (x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0
+                    || (x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0
+                    || (x.stage.Code ?? "").IndexOf(criteria.Code ?? "")>=0)
+                    && (x.stage.Id == criteria.Id || criteria.Inactive == null))
                     .Select(x => x.stage).ToList();              
             }
 

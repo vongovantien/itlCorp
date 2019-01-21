@@ -9,5 +9,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string LocalCurrencyId { get; set; }
+        public bool? Inactive { get; set; }
     }
 }
