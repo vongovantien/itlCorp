@@ -77,7 +77,9 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var s = DataContext.Get(x =>((x.Code??"").IndexOf(criteria.Code??"")>=0)
                 && (x.NameEn??"").IndexOf(criteria.NameEn??"")>=0
-                && (x.NameVn??"").IndexOf(criteria.NameVn??"")>=0).ToList();
+                && (x.NameVn??"").IndexOf(criteria.NameVn??"")>=0
+                && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
+                ).ToList();
                 returnList = s;
             }
             else

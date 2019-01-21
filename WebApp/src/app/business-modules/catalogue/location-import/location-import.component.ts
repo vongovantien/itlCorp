@@ -86,19 +86,24 @@ export class LocationImportComponent implements OnInit {
   }
   async downloadSample(){
     let url = '';
+    let fileName = 'ImportTemplate.xlsx';
     if(this.type == 'province'){
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Province;
+      fileName = "Province" + fileName;
     }
     if(this.type == 'district'){
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.District;
+      fileName = "District" + fileName;
     }
     if(this.type == 'ward'){
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Ward;
+      fileName = "Ward" + fileName;
     }
     if(this.type == 'country'){
       url = this.api_menu.Catalogue.Country.downloadExcel;
+      fileName = "Country" + fileName;
     }
-    await this.baseService.downloadfile(url,'ImportTemplate.xlsx');
+    await this.baseService.downloadfile(url,fileName);
     }
   async setPage(pager:PagerSetting){
     this.pager.currentPage = pager.currentPage;
