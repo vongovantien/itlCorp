@@ -85,7 +85,10 @@ export class PartnerComponent implements OnInit {
       this.criteria.all = event.searchString;
     }
     else{
-      this.criteria.all = null;
+      //this.criteria.all = null;
+      let currentTab = this.criteria.partnerGroup;
+      this.criteria = {};
+      this.criteria.partnerGroup = currentTab;
       if(event.field == "id"){
         this.criteria.id = event.searchString;
       }

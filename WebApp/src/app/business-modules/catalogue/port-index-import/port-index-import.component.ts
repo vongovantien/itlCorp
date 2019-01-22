@@ -126,7 +126,7 @@ export class PortIndexImportComponent implements OnInit {
 
 
   async downloadSample(){
-    await this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel,'ImportPortIndexTemplate.xlsx');
+    await this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel,'PortIndexImportTemplate.xlsx');
   }
   
 }
