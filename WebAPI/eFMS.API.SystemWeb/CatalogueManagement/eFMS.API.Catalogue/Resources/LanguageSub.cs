@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SystemManagementAPI.Resources
+namespace eFMS.API.Catalogue.Resources
 {
     public class LanguageSub
     {

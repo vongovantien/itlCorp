@@ -46,7 +46,7 @@ export class CommodityComponent implements OnInit {
   commodityGroupSettings: ColumnSetting[] = COMMODITYGROUPCOLUMNSETTING;
   groups: any[];
   criteria: any = {};
-  keyCommoditySortDefault = "commodityNameEn";
+  keyCommoditySortDefault = "code";
   keygroupSortDefault = "groupNameEn";
   nameGroupModal = "edit-commodity-group-modal";
   nameCommodityModal = "edit-commodity-modal";

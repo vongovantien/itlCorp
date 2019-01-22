@@ -111,6 +111,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                               && ((x.group.GroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                      ).Select(x => new CatCommodityViewModel {
                                          Id = x.com.Id,
+                                         Code = x.com.Code,
                                          CommodityNameVn = x.com.CommodityNameVn,
                                          CommodityNameEn = x.com.CommodityNameEn,
                                          CommodityGroupId = x.com.CommodityGroupId,

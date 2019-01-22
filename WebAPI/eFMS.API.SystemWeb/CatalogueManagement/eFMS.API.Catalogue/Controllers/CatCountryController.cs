@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Resources;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -19,8 +18,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Catalogue.Controllers
 {
