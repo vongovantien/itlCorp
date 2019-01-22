@@ -561,8 +561,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 result.PlaceTypeId = placeTypeName;
-                result.Status = DataEnums.EnActive;
-                result.Status = item.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
+                //result.Status = DataEnums.EnActive;
+                //result.Status = item.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
                 results.Add(result);
             }
             return results;
@@ -588,7 +588,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = DateTime.Now,
                         UserCreated = ChangeTrackerHelper.currentUser,
                         PlaceTypeId = item.PlaceTypeId,
-                        Inactive = (item.Status ?? "").Contains("active"),
+                        Inactive = false,
                         InactiveOn = item.Status != null ? DateTime.Now : inactive,
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId

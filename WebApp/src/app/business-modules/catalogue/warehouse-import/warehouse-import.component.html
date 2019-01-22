@@ -119,9 +119,9 @@
                                 (click)="sort('districtName')">
                                 <span>Ditrict</span>
                             </th>
-                            <th (click)="sort('status')" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }">
+                            <!-- <th (click)="sort('status')" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }">
                                 <span>Status</span>
-                            </th>
+                            </th> -->
                         </tr>
                     </thead>
                     <tbody *ngIf="data">
@@ -158,9 +158,9 @@
                                     <span *ngIf="item.districtName.split('|').length == 1">{{ item.districtName }}</span>
                                     <span class="m--font-danger" *ngIf="item.districtName.split('|').length > 1">{{ item.districtName.split('|')[0] }}</span>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <span>{{ item.status }}</span>
-                                </td>
+                                </td> -->
                             </tr>
                         </ng-container>
                     </tbody>
