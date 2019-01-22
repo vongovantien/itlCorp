@@ -123,10 +123,8 @@ export class StageManagementComponent implements OnInit {
         }, 200);
     }
 
-    async add_stage(form: NgForm, action) {
-        console.log(this.StageToAdd);
+    async add_stage(form: NgForm, action: string) {
         if (action == "yes") {
-            console.log(this.StageToAdd);
             delete this.StageToAdd.id;
             if (form.form.status != "INVALID") {
                 await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
