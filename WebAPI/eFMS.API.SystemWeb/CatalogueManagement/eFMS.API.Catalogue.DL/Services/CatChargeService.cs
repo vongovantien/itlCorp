@@ -120,7 +120,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCharge> Query(CatChargeCriteria criteria)
         {
-            var list = DataContext.Get();
+            var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if(criteria.All == null)
             {
                 list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -160,6 +160,120 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-  
+        public List<CatChargeImportModel> CheckValidImport(List<CatChargeImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var charges = dc.CatCharge.ToList();
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.ChargeNameEn))
+                {
+                    item.ChargeNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ChargeNameVn))
+                {
+                    item.ChargeNameVn = string.Format("Name local is not allow to empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (item.UnitId<=0)
+                {
+                    item.UnitId = -1;
+                    item.IsValid = false;
+                }
+                if (item.UnitId > 0)
+                {
+                    var unit = dc.CatUnit.First(x => x.Id == item.UnitId);
+                    if (unit == null)
+                    {
+                        item.UnitId = -1;
+                        item.IsValid = false;
+                    }
+                }
+                if (item.UnitPrice < 0)
+                {
+                    item.UnitPrice = -1;
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CurrencyId))
+                {
+                    item.CurrencyId = string.Format("Currency is not allow to empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.CurrencyId))
+                {
+                    var currency = dc.CatCurrency.First(x => x.Id == item.CurrencyId);
+                    if (currency == null)
+                    {
+                        item.CurrencyId = string.Format("Currency not found, maybe wrong CurrencyId !|wrong");
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.Type))
+                {
+                    item.Type = string.Format("Type is not allow to empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ServiceTypeId))
+                {
+                    item.ServiceTypeId = string.Format("Service is not allow to empty!|wrong");
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    item.Code = string.Format("Code is not allow to empty!|wrong");
+                    item.IsValid = false;
+                }
+                if(!string.IsNullOrEmpty(item.Code))
+                {
+                    var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
+                    if (charge != null)
+                    {
+                        item.Code = string.Format("Code {0} has been existed!|wrong", item.Code);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
+                    {
+                        item.Code = string.Format("Code {0} has been duplicated!|wrong", item.Code);
+                        item.IsValid = false;
+                    }
+                }
+
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CatChargeImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach(var item in data)
+                {
+                    var charge = new CatCharge
+                    {
+                        Id              = Guid.NewGuid(),
+                        Code            = item.Code,
+                        ChargeNameEn    = item.ChargeNameEn,
+                        ChargeNameVn    = item.ChargeNameVn,
+                        UnitId          = item.UnitId,
+                        UnitPrice       = item.UnitPrice,
+                        CurrencyId      = item.CurrencyId,
+                        Type            = item.Type,
+                        ServiceTypeId   = item.ServiceTypeId,
+                        Inactive        = item.Status.ToString().ToLower()=="active"?false:true,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated     = "Thor"  // ChangeTrackerHelper.currentUser
+                    };
+                    dc.CatCharge.Add(charge);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
     }
 }

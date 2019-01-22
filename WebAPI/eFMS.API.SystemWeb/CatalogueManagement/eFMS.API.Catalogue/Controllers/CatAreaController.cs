@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using eFMS.API.Catalogue.DL.IService;
-using eFMS.API.Catalogue.DL.Models;
-using eFMS.API.Catalogue.DL.ViewModels;
-using Microsoft.AspNetCore.Http;
+﻿using eFMS.API.Catalogue.DL.IService;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Catalogue.Controllers
 {

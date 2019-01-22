@@ -100,6 +100,7 @@ export class ChargeAddnewComponent implements OnInit {
       if (form.form.status != "INVALID" && this.validatateDefaultAcountLine() && this.isSameVoucherType == false) {
         delete this.ChargeToAdd.charge.Id;
         await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.addNew,this.ChargeToAdd,true,true);
+        console.log(this.ChargeToAdd);
       }  
 
   }
@@ -136,7 +137,6 @@ export class ChargeAddnewComponent implements OnInit {
     }
     if(action=="service"){
       this.ChargeToAdd.charge.serviceTypeId =this.ChargeToAdd.charge.serviceTypeId==undefined?(value.id+";"): this.ChargeToAdd.charge.serviceTypeId += (value.id+";");
-      console.log(this.ChargeToAdd.charge.serviceTypeId);
     }
     //console.log('Selected value is: ', value);
   }

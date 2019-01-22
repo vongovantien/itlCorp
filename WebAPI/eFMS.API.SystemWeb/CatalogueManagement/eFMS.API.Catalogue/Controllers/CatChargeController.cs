@@ -8,18 +8,19 @@ using AutoMapper;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Resources;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
+using OfficeOpenXml;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -34,6 +35,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+        private string templateName = "ImportTemplate.xlsx";
 
         public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, ICatChargeDefaultAccountService catChargeDefaultAccount, IMapper imapper, ICurrentUser user)
         {
@@ -159,6 +161,127 @@ namespace eFMS.API.Catalogue.Controllers
                 }
             }
             return message;
+        }
+
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Code")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Code' " });
+                }
+                if (worksheet.Cells[1, 2].Value?.ToString() != "Name En")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'Name En' " });
+                }
+                if (worksheet.Cells[1, 3].Value?.ToString() != "Name Local")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Name Local' " });
+                }
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Unit")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Unit'" });
+                }
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Unit Price")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 5 must have header is 'Unit Price' " });
+                }
+                if (worksheet.Cells[1, 6].Value?.ToString() != "Currency")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 6 must have header is 'Currency' " });
+                }
+                if (worksheet.Cells[1, 7].Value?.ToString() != "VAT")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 7 must have header is 'VAT' " });
+                }
+                if (worksheet.Cells[1, 8].Value?.ToString() != "Type")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 8 must have header is 'Type' " });
+                }
+                if (worksheet.Cells[1, 9].Value?.ToString() != "Service")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 9 must have header is 'Service' " });
+                }
+                if (worksheet.Cells[1, 10].Value?.ToString() != "Status")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 10 must have header is 'Status' " });
+                }
+                List<CatChargeImportModel> list = new List<CatChargeImportModel>();
+                for(int row = 2; row <= rowCount; row++)
+                {
+                    var charge = new CatChargeImportModel
+                    {
+                        IsValid = true,
+                        Code = worksheet.Cells[row, 1].Value?.ToString(),
+                        ChargeNameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                        ChargeNameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                        UnitId = worksheet.Cells[row, 4].Value == null ? (short)(-1) : Convert.ToInt16(worksheet.Cells[row, 4].Value),
+                        UnitPrice = worksheet.Cells[row,5].Value == null? -1: Convert.ToDouble(worksheet.Cells[row, 5].Value),
+                        CurrencyId = worksheet.Cells[row,6].Value?.ToString(),
+                        Vat = worksheet.Cells[row,7].Value == null ? -1 : Convert.ToDouble(worksheet.Cells[row, 7].Value),
+                        Type = worksheet.Cells[row, 8].Value?.ToString(),
+                        ServiceTypeId = worksheet.Cells[row, 9].Value?.ToString(),
+                        Status = worksheet.Cells[row, 10].Value?.ToString(),
+                    };
+                    list.Add(charge);
+                }
+                var data = catChargeService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        [HttpPost]
+        [Route("import")]
+        //[Authorize]
+        public IActionResult Import([FromBody] List<CatChargeImportModel> data)
+        {
+            //ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var result = catChargeService.Import(data);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
+            }
+        }
+
+
+        [HttpGet("downloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+
+            try
+            {
+                templateName = "Charge" + templateName;
+                var result = await new FileHelper().ExportExcel(templateName);
+                if (result != null)
+                {
+                    return result;
+                }
+                else
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+
+
         }
 
 

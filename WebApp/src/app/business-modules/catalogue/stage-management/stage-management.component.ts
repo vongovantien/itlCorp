@@ -11,6 +11,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { SystemConstants } from 'src/constants/system.const';
+import * as dataHelper from 'src/helper/data.helper';
 // declare var jquery: any;
 declare var $: any;
 
@@ -28,6 +29,8 @@ export class StageManagementComponent implements OnInit {
     StageToUpdate = new StageModel();
     ListDepartment: any = [];
     pager: PagerSetting = PAGINGSETTING;
+    index_stage_edit = null;
+    index_current_department = null;
 
     @ViewChild(PaginationComponent) child;
 
@@ -52,23 +55,20 @@ export class StageManagementComponent implements OnInit {
 
     async getStages(pager: PagerSetting) {
         var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.paging + "/" + pager.currentPage + "/" + pager.pageSize, this.searchObject, false, true);
-        this.ConstStageList = response.data.map(x => Object.assign({}, x));
-        console.log(response);
+        this.ConstStageList = response.data.map((x: any) => Object.assign({}, x));
         pager.totalItems = response.totalItems;
         return response.data;
     }
 
     getDepartments() {
         this.baseServices.get(this.api_menu.System.Department.getAll).subscribe(data => {
-            console.log(data);
             this.ListDepartment = data;
-            this.ListDepartment = this.ListDepartment.map(x => ({ "text": x.code, "id": x.id }));
-            console.log(this.ListDepartment);
+            this.ListDepartment =  dataHelper.prepareNg2SelectData(this.ListDepartment,'id','code');  //this.ListDepartment.map(x => ({ "text": x.code, "id": x.id }));
         });
     }
 
     index_stage_remove = null;
-    async remove_stage(index, action) {
+    async remove_stage(index:number, action:string) {
         if (action == "confirm") {
             this.index_stage_remove = index;
         }
@@ -89,11 +89,17 @@ export class StageManagementComponent implements OnInit {
         }
     }
 
-    index_stage_edit = null;
-    async edit_stage(index, action, form: NgForm) {
+
+    async edit_stage(index: number, action: string, form: NgForm) {       
 
         if (action == "confirm") {
+
             this.index_stage_edit = index;
+            var currentStage = this.ListStages[this.index_stage_edit].stage;
+            this.index_current_department = lodash.findIndex(this.ListDepartment,function(d){
+                return d['id']==currentStage.departmentId; 
+            });
+
         } else {
             if (form.form.status != "INVALID") {
                 this.StageToUpdate = this.ListStages[this.index_stage_edit].stage;
@@ -101,11 +107,11 @@ export class StageManagementComponent implements OnInit {
                 if(res){
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
+                    await this.setPage(this.pager);
                 }
             }
-
-
         }
+   
     }
 
 

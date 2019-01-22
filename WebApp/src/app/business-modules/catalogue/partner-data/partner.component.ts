@@ -18,6 +18,8 @@ import { CarrierComponent } from './carrier/carrier.component';
 import { ShipperComponent } from './shipper/shipper.component';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { SystemConstants } from 'src/constants/system.const';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 
 @Component({
   selector: 'app-partner',
@@ -45,7 +47,16 @@ export class PartnerComponent implements OnInit {
     shipperTab: "shipperTab",
     allTab: "allTab"
   };
-  activeTab: string = this.tabName.customerTab;
+  addButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.add
+  };
+  importButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.import
+  };
+  exportButtonSetting: ButtonModalSetting = {
+    typeButton: ButtonType.export
+  };
+  activeTab: string = this.tabName.allTab;
   @ViewChild(PaginationComponent) child;
   //partnerType: any;
 
@@ -65,6 +76,9 @@ export class PartnerComponent implements OnInit {
     this.pager.totalItems = 0;
     this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
+  }
+  resetSearch(event){
+    this.onSearch(event);
   }
   onSearch(event){
     if(event.field == "All"){

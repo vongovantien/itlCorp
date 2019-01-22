@@ -12,4 +12,5 @@ export class Commodity {
     datetimeModified?: Date;
     inactive: boolean;
     inactiveOn?: Date;
+    code:String
 }

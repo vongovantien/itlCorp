@@ -15,6 +15,7 @@ export const language = {
         { name: "Port Index", route_child: "port-index",display:true },
         { name: "Port Index Import", route_child: "port-index-import",display:false },
         { name: "Partner Data", route_child: "partner-data",display:true },
+        { name: "Partner Data Import", route_child: "partner-data-import",display:false },
         { name: "Commodity", route_child: "commodity",display:true },
         { name: "Commodity Import", route_child: "commodity-import",display:false },
         { name: "Commodity Group Import", route_child: "commodity-group-import",display:false },
@@ -23,6 +24,8 @@ export const language = {
         { name: "Unit", route_child: "unit",display:true },
         { name: "Location", route_child: "location",display:true },
         { name: "Charge", route_child: "charge",display:true },
+        { name: "Import Charge", route_child: "charge-import",display:false },
+        { name: "Import Account Voucher", route_child: "charge-import-account-voucher",display:false },
         { name: "Charge Add New", route_child: "charge-addnew",display:false },
         { name: "Currency", route_child: "currency",display:true }
       ]
@@ -131,6 +134,8 @@ export const language = {
   Warehouse: WAREHOUSEENCOLUMNSETTING,
   WarehouseImport: WAREHOUSEIMPORTENCOLUMNSETTING,
   NOTIFI_MESS: {
+    DOWNLOAD_ERR:"Download Error",
+    FILE_NOT_FOUND:"File Not Found !",
     UNKNOW_ERR:"Unknow Error",
     SERVER_ERR_TITLE: "Server Error",
     CLIENT_ERR_TITLE: "Invalid Request",

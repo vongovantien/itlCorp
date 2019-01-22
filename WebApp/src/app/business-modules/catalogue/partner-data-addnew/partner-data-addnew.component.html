@@ -288,7 +288,7 @@
                         <div class="form-group">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
                                 <label class="form-control-label">
-                                    Saleman <span class="m--font-danger">(*)</span>
+                                    Saleman <span class="m--font-danger" *ngIf="partner.salePersonId == null && isRequiredSaleman">(*)</span>
                                 </label>
                                 <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
                                     (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"

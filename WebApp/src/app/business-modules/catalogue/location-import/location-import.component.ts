@@ -10,6 +10,7 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { language } from 'src/languages/language.en';
 import { ActivatedRoute } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { NgProgressComponent } from '@ngx-progressbar/core';
 
 declare var $:any;
 @Component({
@@ -22,15 +23,14 @@ export class LocationImportComponent implements OnInit {
   pagedItems: any[] = [];
   inValidItems: any[] = [];
   totalValidRows: number = 0;
-  totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-  inProgress: boolean = false;
   type: string;
 
   @ViewChild('form') form:any;
   @ViewChild(PaginationComponent) child:any;
+  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   constructor(
     private pagingService: PagingService,
     private baseService: BaseService,
@@ -51,7 +51,7 @@ export class LocationImportComponent implements OnInit {
   chooseFile(file: Event){
     if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
-    this.baseService.spinnerShow();
+    this.progressBar.start();
     let url = '';
     if(this.type == 'province'){
       url = this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Province;
@@ -71,13 +71,10 @@ export class LocationImportComponent implements OnInit {
         this.pager.totalItems = this.data.length;
         this.totalValidRows = response.totalValidRows;
         this.totalRows = this.data.length;
-        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
-        // this.child.setPage(this.pager.currentPage);
-        this.baseService.spinnerHide();
-        console.log(this.data);
+        this.progressBar.complete();
       },err=>{
-        this.baseService.spinnerHide();
+        this.progressBar.complete();
         this.baseService.handleError(err);
       });
   }
@@ -87,27 +84,26 @@ export class LocationImportComponent implements OnInit {
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
-  downloadSample(){
+  async downloadSample(){
     let url = '';
+    let fileName = 'ImportTemplate.xlsx';
     if(this.type == 'province'){
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Province;
+      fileName = "Province" + fileName;
     }
     if(this.type == 'district'){
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.District;
+      fileName = "District" + fileName;
     }
     if(this.type == 'ward'){
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Ward;
+      fileName = "Ward" + fileName;
     }
     if(this.type == 'country'){
       url = this.api_menu.Catalogue.Country.downloadExcel;
+      fileName = "Country" + fileName;
     }
-    this.baseService.downloadfile(url)
-    .subscribe(
-      response => {
-        saveAs(response, this.type + 'ImportTemplate.xlsx');
-      },err=>{
-        this.baseService.handleError(err);
-      });  
+    await this.baseService.downloadfile(url,fileName);
     }
   async setPage(pager:PagerSetting){
     this.pager.currentPage = pager.currentPage;
@@ -139,11 +135,10 @@ export class LocationImportComponent implements OnInit {
   }
   async import(){
     if(this.data == null) return;
-    if(this.totalInValidRows > 0){
+    if(this.totalRows - this.totalValidRows > 0){
       $('#upload-alert-modal').modal('show');
     }
     else{
-      this.inProgress = true;
       let data = this.data.filter(x => x.isValid);
       if(!this.baseService.checkLoginSession()) return;
       let url = '';
@@ -159,10 +154,9 @@ export class LocationImportComponent implements OnInit {
     if(this.type == 'country'){
       url = this.api_menu.Catalogue.Country.import;
     }
-      var response = await this.baseService.postAsync(url, data, true, false);
+      var response = await this.baseService.postAsync(url, data);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.EXPORT_SUCCES);
-        this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();
       }

@@ -12,7 +12,8 @@ export class API_MENU {
         System: 44360,
         Catalogue: 44361,
         Department: 44242,
-        auditlog: 44363
+        auditlog: 44363,
+        Documentation: 44366
     }
 
     private PROTOCOL = "http://";
@@ -77,7 +78,10 @@ export class API_MENU {
             add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/",
-            getDepartments: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/GetDepartments"
+            getDepartments: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/GetDepartments",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/DownloadExcel",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/UpLoadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Import"
         },
         partnerGroup: {
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartnerGroup"
@@ -123,7 +127,8 @@ export class API_MENU {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Update",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Delete/",
-            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit"
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit",
+            getUnitTypes: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/GetUnitTypes"
         },    
         Charge: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/Query",
@@ -132,6 +137,14 @@ export class API_MENU {
             delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/delete/",
             getById:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/getById/",
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/update",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE)+"CatCharge/uploadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/import",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/downloadExcel",
+        },
+        Charge_DefaultAccount:{
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE)+"CatChargeDefaultAccount/uploadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatChargeDefaultAccount/import",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatChargeDefaultAccount/downloadExcel",
         },
         Country:{            
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/query",
@@ -207,4 +220,9 @@ export class API_MENU {
         }
     }
 
+    public Documentation = {
+        Terminology: {
+            getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
+        }
+    }
 }

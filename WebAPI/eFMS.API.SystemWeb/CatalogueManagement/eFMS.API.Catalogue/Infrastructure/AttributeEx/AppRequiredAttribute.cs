@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.Localization;
+﻿using eFMS.API.Catalogue.Resources;
+using Microsoft.Extensions.Localization;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Catalogue.Infrastructure.AttributeEx
 {

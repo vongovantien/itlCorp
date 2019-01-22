@@ -77,7 +77,9 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var s = DataContext.Get(x =>((x.Code??"").IndexOf(criteria.Code??"")>=0)
                 && (x.NameEn??"").IndexOf(criteria.NameEn??"")>=0
-                && (x.NameVn??"").IndexOf(criteria.NameVn??"")>=0).ToList();
+                && (x.NameVn??"").IndexOf(criteria.NameVn??"")>=0
+                && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
+                ).ToList();
                 returnList = s;
             }
             else
@@ -133,16 +135,18 @@ namespace eFMS.API.Catalogue.DL.Services
             var returnList = new List<CatCountry>();
             if (criteria.condition == SearchCondition.AND)
             {
-                var s = DataContext.Get(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
-                && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "") >= 0
-                && (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "") >= 0).ToList();
+                var s = DataContext.Get(x => (x.Inactive == criteria.Inactive || criteria.Inactive == null)
+                && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                && (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0).ToList();
                 returnList = s;
             }
             else
             {
-                var s = DataContext.Get(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
-                || ((x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null") >= 0)
-                || ((x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null") >= 0)).ToList();
+                var s = DataContext.Get(x => (x.Inactive == criteria.Inactive || criteria.Inactive == null)
+                && ((x.Code ?? "").IndexOf(criteria.Code ?? "") >= 0
+                || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null") >= 0
+                || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null") >= 0)).ToList();
                 returnList = s;
             }
            

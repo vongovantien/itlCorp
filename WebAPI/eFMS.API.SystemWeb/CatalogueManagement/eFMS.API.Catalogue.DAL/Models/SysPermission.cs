@@ -19,6 +19,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? RequireAccessingForm { get; set; }
 
-        public ICollection<SysRolePermission> SysRolePermission { get; set; }
+        public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
     }
 }

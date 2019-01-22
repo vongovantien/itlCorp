@@ -63,7 +63,7 @@ export class WarehouseComponent implements OnInit {
       provinceName: null,
       districtName: null,
       address: null,
-      placeType: 12
+      placeType: PlaceTypeEnum.Warehouse
     };
   }
   importButtonSetting: ButtonModalSetting = {
@@ -103,7 +103,7 @@ export class WarehouseComponent implements OnInit {
 
   ngOnInit() {
     this.pager.totalItems = 0;
-    this.warehouse.placeType = 12;
+    this.warehouse.placeType = PlaceTypeEnum.Warehouse;
     this.getWarehouses(this.pager);
     this.getDataCombobox();
   }
@@ -174,6 +174,7 @@ export class WarehouseComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
       this.baseService.spinnerHide();
       this.warehouses = response.data.map(x=>Object.assign({},x));
+      console.log(this.warehouses);
       this.pager.totalItems = response.totalItems;
     },err=>{
       this.baseService.spinnerHide();
@@ -270,8 +271,9 @@ export class WarehouseComponent implements OnInit {
 
   resetSearch(event){
     this.criteria = {
-      placeType: 12
+      placeType: PlaceTypeEnum.Warehouse
     };
+    this.onSearch(event);
   }
   onSearch(event){
     console.log(event);

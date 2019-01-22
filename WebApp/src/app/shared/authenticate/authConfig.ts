@@ -14,6 +14,7 @@ export const authConfig: AuthConfig = {
   requireHttps:false,
   oidc:false,
   logoutUrl:'/login',
+  
   sessionCheckIntervall:2000,
   // set the scope for the permissions the client should request
   // The first three are defined by OIDC. The 4th is a usecase-specific one

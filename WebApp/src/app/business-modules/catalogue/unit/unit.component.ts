@@ -32,6 +32,8 @@ export class UnitComponent implements OnInit {
   idUnitToUpdate: any = "";
   idUnitToDelete: any = "";
   searchObject: any = {};
+  unitTypes: any[];
+  currentUnitType: any = [];
 
   @ViewChild(PaginationComponent) child;
 
@@ -43,6 +45,7 @@ export class UnitComponent implements OnInit {
 
   async ngOnInit() {
     this.pager.totalItems = 0;
+    this.getUnitTypes();
     await this.getUnits();
   }
 
@@ -94,6 +97,15 @@ export class UnitComponent implements OnInit {
     }
   }
 
+  async getUnitTypes(){
+    const response = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getUnitTypes, false, false);
+    if(response){
+      this.unitTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+    }
+    else{
+      this.unitTypes = [];
+    }
+  }
   async getUnits() {
     const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject, false, true);
     this.ListUnits = response.data;
@@ -101,7 +113,14 @@ export class UnitComponent implements OnInit {
   }
 
   async showUpdateUnit(id) {
-    this.UnitToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getById + id, true, true);
+    this.currentUnitType = [];
+    this.UnitToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getById + id, false, true);
+    if(this.UnitToUpdate != null){
+      const index = this.unitTypes.findIndex(x => x.id == this.UnitToUpdate.unitType);
+      if(index > -1){
+        this.currentUnitType = [this.unitTypes[index]];
+      }
+    }
   }
 
   async updateUnit(form: NgForm, action) {
@@ -121,17 +140,16 @@ export class UnitComponent implements OnInit {
   }
 
 
-  async addNewUnit(form: NgForm, action) {
+  async addNewUnit(form: NgForm, action: string) {
     if (action == "yes") {
       delete this.UnitToAdd.id;
-      if (form.form.status != "INVALID") {
+      if (form.form.status != "INVALID" && this.UnitToAdd.unitType != null) {
         const respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.addNew, this.UnitToAdd, true, true);
         await this.getUnits();
         if (respone) {
           this.setPageAfterAdd();
           form.onReset();
           $('#add-unit-modal').modal('hide');
-
         }
       }
     } else {
@@ -141,7 +159,7 @@ export class UnitComponent implements OnInit {
     }
   }
 
-  prepareDeleteUnit(id) {
+  prepareDeleteUnit(id: any) {
     this.idUnitToDelete = id;
   }
 
@@ -216,5 +234,20 @@ export class UnitComponent implements OnInit {
 
   }
 
-
+  /*ng-select 2
+  */
+ value: any;
+ selected(value: any): void{
+  this.UnitToAdd.unitType = value.id;
+  this.UnitToUpdate.unitType = value.id;
+ }
+ refreshValue(value: any): void {
+    this.value = value;
+  }
+  public removed(value: any): void {
+    console.log('Removed value is: ', value);
+  }
+  public typed(value: any): void {
+    console.log('New search input: ', value);
+  }
 }

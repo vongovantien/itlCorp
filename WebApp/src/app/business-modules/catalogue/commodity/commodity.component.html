@@ -13,7 +13,8 @@
         <div class="col-12">
             <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#commodity-list-tab" role="tab" (click)="tabSelect(tabName.commodity)">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#commodity-list-tab" role="tab"
+                        (click)="tabSelect(tabName.commodity)">
                         Commodity list
                     </a>
                 </li>
@@ -42,8 +43,10 @@
                                         </span>
                                     </span>
                                 </button> -->
-                                <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget" (click)="showAdd(tabName.commodity)"></app-default-button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="importCom()" [routerLink]="['/home/catalogue/commodity-import']">
+                                <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget"
+                                    (click)="showAdd(tabName.commodity)"></app-default-button>
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="importCom()" [routerLink]="['/home/catalogue/commodity-import']">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -51,7 +54,8 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="exportCom()">
+                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="exportCom()">
                                     <span>
                                         <i class="la la-upload"></i>
                                         <span>
@@ -62,39 +66,44 @@
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <app-search-options [configSearch]="configSearchCommonity" (search)="onSearch($event, tabName.commodity)" (reset_search)=resetSearch($event)></app-search-options>
+                            <app-search-options [configSearch]="configSearchCommonity" (search)="onSearch($event, tabName.commodity)"
+                                (reset_search)="resetSearch($event, tabName.commodity)"></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
-                    <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)" [keySort]="keyCommoditySortDefault"
-                        [nameEditModal]="nameCommodityModal"
-                        (edit)="showDetail($event, tabName.commodity)" (delete)="showConfirmDelete($event, tabName.commodity)">
+                    <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)"
+                        [keySort]="keyCommoditySortDefault" [nameEditModal]="nameCommodityModal" (edit)="showDetail($event, tabName.commodity)"
+                        (delete)="showConfirmDelete($event, tabName.commodity)">
                     </app-table-layout>
                     <!--end: Datatable -->
                 </div>
-        
+
                 <div class="tab-pane fade" id="commodity-group-tab" role="tabpanel" aria-labelledby="">
                     <!--begin:: Search-form-->
                     <div class="m-form m--margin-bottom-15">
                         <div class="clearfix m--margin-bottom-15">
                             <div class="c-button-actions m--align-right">
-                                <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget" (click)="showAdd(tabName.commodityGroup)"></app-default-button>
-                                <app-default-button [buttonSetting]="importButtonSetting" (click)="importComGroup()" [routerLink]="['/home/catalogue/commodity-group-import']"></app-default-button>
+                                <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget"
+                                    (click)="showAdd(tabName.commodityGroup)"></app-default-button>
+                                <app-default-button [buttonSetting]="importButtonSetting" (click)="importComGroup()"
+                                    [routerLink]="['/home/catalogue/commodity-group-import']"></app-default-button>
                                 <app-default-button [buttonSetting]="exportButtonSetting" (click)="exportComGroup()"></app-default-button>
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <app-search-options [configSearch]="configSearchGroup" (search)="onSearch($event, tabName.commodityGroup)" (reset_search)=resetSearch($event)></app-search-options>
+                            <app-search-options [configSearch]="configSearchGroup" (search)="onSearch($event, tabName.commodityGroup)"
+                                (reset_search)="resetSearch($event, tabName.commodityGroup)"></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
                     <!--begin: Datatable-->
-                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)" [nameEditModal]="nameGroupModal" [keySort]="keygroupSortDefault"
-                        (edit)="showDetail($event, tabName.commodityGroup)" (delete)="showConfirmDelete($event, tabName.commodityGroup)">
+                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)"
+                        [nameEditModal]="nameGroupModal" [keySort]="keygroupSortDefault" (edit)="showDetail($event, tabName.commodityGroup)"
+                        (delete)="showConfirmDelete($event, tabName.commodityGroup)">
                     </app-table-layout>
                     <!--end: Datatable-->
                 </div>
-                
+
                 <!--begin::pagination-->
                 <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
                 <!--end::pagination-->
@@ -107,11 +116,12 @@
 <!--end::m-content of Commodity-->
 
 <!--begin::add-commodity-modal-->
-<div *ngIf="commodity" class="modal fade" id="{{nameCommodityModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div *ngIf="commodity" class="modal fade" id="{{nameCommodityModal}}" data-backdrop="static" role="dialog"
+    aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form name="formCommodity" #formCommodity="ngForm" novalidate (ngSubmit)="formCommodity.form.valid">
-                
+
                 <div class="modal-header">
                     <h5 class="modal-title" *ngIf="commodity.id == null">{{ titleAddCommodityModal }}</h5>
                     <h5 class="modal-title" *ngIf="commodity.id">{{ titleEditCommodityModal }}</h5>
@@ -123,14 +133,28 @@
                 <div class="modal-body">
                     <!--begin::add-commodity-form-->
                     <div class="m-form m-form--state">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityCode.invalid }">
+                                    <label class="col-lg-4 col-form-label form-control-label">
+                                        Code: <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="col-lg-8">
+                                        <input type="text" [(ngModel)]="commodity.code" (change)="commodity.code = commodity.code.trim()"
+                                            class="form-control m-input m-input-group--square" #commodityCode="ngModel" name="commodityCode"
+                                            required placeholder="Please enter group name">
+                                        <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityCode.invalid">
+                                            Code is required
+                                        </div>
+                                    </div>
+                                </div>
+
                         <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameEn.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Name (EN): <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="commodity.commodityNameEn" (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()" 
-                                    class="form-control m-input m-input-group--square"
-                                    #commodityNameEn="ngModel" name="commodityNameEn" required placeholder="Please enter group name">
+                                <input type="text" [(ngModel)]="commodity.commodityNameEn" (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()"
+                                    class="form-control m-input m-input-group--square" #commodityNameEn="ngModel" name="commodityNameEn"
+                                    required placeholder="Please enter group name">
                                 <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameEn.invalid">
                                     Name(EN) is required
                                 </div>
@@ -141,9 +165,9 @@
                                 Name (Local): <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="commodity.commodityNameVn" (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()" 
-                                    class="form-control m-input m-input-group--square"
-                                    #commodityNameVn="ngModel" name="commodityNameVn" required placeholder="Please enter group name">
+                                <input type="text" [(ngModel)]="commodity.commodityNameVn" (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()"
+                                    class="form-control m-input m-input-group--square" #commodityNameVn="ngModel" name="commodityNameVn"
+                                    required placeholder="Please enter group name">
                                 <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameVn.invalid">
                                     Name (Local) is required
                                 </div>
@@ -154,11 +178,11 @@
                                 Group: <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select #chooseGroup [allowClear]="true" [items]="groups"  [disabled]="disabled" (data)="refreshGroupValue($event)"
-                                    (selected)="onGroupchange($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                    [active]="groupActive==null?[]:[groupActive]" placeholder="Select group commdity">
+                                <ng-select #chooseGroup [allowClear]="true" [items]="groups" [disabled]="disabled"
+                                    (data)="refreshGroupValue($event)" (selected)="onGroupchange($event)" (removed)="removed($event)"
+                                    (typed)="typed($event)" [active]="groupActive==null?[]:[groupActive]" placeholder="Select group commdity">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodity.commodityGroupId == null" >
+                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodity.commodityGroupId == null">
                                     Group commdity is required
                                 </div>
                             </div>
@@ -186,7 +210,8 @@
 <!--end::add-commodity-modal-->
 
 <!--begin::add-commodity-group-modal-->
-<div *ngIf="commodityGroup" class="modal fade" id="{{nameGroupModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div *ngIf="commodityGroup" class="modal fade" id="{{nameGroupModal}}" data-backdrop="static" role="dialog"
+    aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form name="formGroupCommodity" #formGroupCommodity="ngForm" novalidate (ngSubmit)="formGroupCommodity.form.valid">
@@ -201,27 +226,29 @@
                 <div class="modal-body">
                     <!--begin::add-commodity-group-form-->
                     <div class="m-form">
-                        <div class="m-form m-form--state">
+                        <div class="m-form m-form--state">                     
                             <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameEN.invalid }">
                                 <label class="col-lg-4 col-form-label form-control-label">
                                     Group Name(EN): <span class="m--font-danger">(*)</span>
                                 </label>
                                 <div class="col-lg-8">
-                                    <input type="text" [(ngModel)]="commodityGroup.groupNameEn" (change)="commodityGroup.groupNameEn = commodityGroup.groupNameEn.trim()" 
-                                        class="form-control m-input m-input-group--square"
-                                        #groupNameEN="ngModel" name="groupNameEN" required placeholder="Please enter group name">
+                                    <input type="text" [(ngModel)]="commodityGroup.groupNameEn" (change)="commodityGroup.groupNameEn = commodityGroup.groupNameEn.trim()"
+                                        class="form-control m-input m-input-group--square" #groupNameEN="ngModel" name="groupNameEN"
+                                        required placeholder="Please enter group name">
                                     <div class="form-control-feedback" *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
                                         Group Name(EN) is required
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameVN.invalid }">
-                                <label class="col-lg-4 col-form-label form-control-label">Group Name(Local): <span class="m--font-danger">(*)</span></label>
+                                <label class="col-lg-4 col-form-label form-control-label">Group Name(Local): <span
+                                        class="m--font-danger">(*)</span></label>
                                 <div class="col-lg-8">
-                                    <input  type="input" class="form-control m-input m-input-group--square" placeholder="Enter group name (VN)" name="groupNameVN"
-                                        [(ngModel)]="commodityGroup.groupNameVn" #groupNameVN="ngModel" (change)="commodityGroup.groupNameVn = commodityGroup.groupNameVn.trim()" 
+                                    <input type="input" class="form-control m-input m-input-group--square" placeholder="Enter group name (VN)"
+                                        name="groupNameVN" [(ngModel)]="commodityGroup.groupNameVn" #groupNameVN="ngModel"
+                                        (change)="commodityGroup.groupNameVn = commodityGroup.groupNameVn.trim()"
                                         [ngClass]="{ 'm-input--square': formGroupCommodity.submitted && groupNameVN.invalid }"
-                                        minlength="3" required> 
+                                        minlength="3" required>
                                     <div class="form-control-feedback" *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
                                         Group Name(Local) is required
                                     </div>

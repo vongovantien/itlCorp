@@ -14,8 +14,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public SysRole Role { get; set; }
-        public SysUser User { get; set; }
-        public CatBranch WorkPlace { get; set; }
+        public virtual SysRole Role { get; set; }
+        public virtual SysUser User { get; set; }
+        public virtual CatBranch WorkPlace { get; set; }
     }
 }

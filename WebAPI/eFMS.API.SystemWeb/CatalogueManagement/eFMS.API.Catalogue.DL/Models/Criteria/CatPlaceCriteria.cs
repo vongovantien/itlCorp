@@ -27,5 +27,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string DistrictNameVN { get; set; }
         public string ProvinceNameEN { get; set; }
         public string ProvinceNAmeVN { get; set; }
+        public bool? Inactive { get; set; }
     }
 }

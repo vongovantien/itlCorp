@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -17,14 +16,13 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 using System.Linq;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Resources;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -181,8 +179,13 @@ namespace eFMS.API.Catalogue.Controllers
             templateName = GetFileName(type);
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
+            {
                 return result;
-            else return BadRequest(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
         }
 
         [HttpPost]
@@ -196,7 +199,7 @@ namespace eFMS.API.Catalogue.Controllers
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
-                if (rowCount < 2) return BadRequest();
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
 
                 List<CatPlaceImportModel> list = null;
                 switch (type)
@@ -223,7 +226,7 @@ namespace eFMS.API.Catalogue.Controllers
                 var results = new { data, totalValidRows };
                 return Ok(results);
             }
-            return BadRequest(file);
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
         private List<CatPlaceImportModel> ReadWarehouseFromExel(ExcelWorksheet worksheet, int rowCount)
@@ -333,7 +336,14 @@ namespace eFMS.API.Catalogue.Controllers
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catPlaceService.Import(data);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
+            }
         }
 
         private string GetFileName(CatPlaceTypeEnum type)
@@ -364,14 +374,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower()== model.NameEN.ToLower()) || (x.NameVn.ToLower()==model.NameVN.ToLower()) ))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => ((x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower() == model.NameEN.ToLower()) || (x.NameVn.ToLower() == model.NameVN.ToLower())) && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower()) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

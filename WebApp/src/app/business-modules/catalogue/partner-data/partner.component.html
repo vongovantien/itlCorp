@@ -5,15 +5,15 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <a class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" href="javascript:void(0)"  (click)=addPartner()>
+            <!-- <a class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" href="javascript:void(0)"  (click)=addPartner()>
                 <span>
                     <i class="la la-plus"></i>
                     <span>
                         add new
                     </span>
                 </span>
-            </a>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            </a> -->
+            <!-- <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -28,7 +28,10 @@
                         export
                     </span>
                 </span>
-            </button>
+            </button> -->
+            <app-default-button [buttonSetting]="addButtonSetting" href="javascript:void(0)"  (click)=addPartner()></app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/partner-data-import']"></app-default-button>
         </div>
     </div>
 </div>
@@ -94,7 +97,7 @@
                         </button>
                     </div>
                 </div> -->
-                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" ></app-search-options>
+                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (reset_search)=resetSearch($event)></app-search-options>
             </div>
             <!--end::Form-->
         </div>
@@ -105,7 +108,12 @@
         <div class="col-12">
             <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#customer-tabview-tab" role="tab" (click)="tabSelect(tabName.customerTab)">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#all-tabview-data" role="tab" (click)="tabSelect(tabName.allTab)">
+                        All
+                    </a>
+                </li>
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#customer-tabview-tab" role="tab" (click)="tabSelect(tabName.customerTab)">
                         Customer
                     </a>
                 </li>
@@ -124,19 +132,14 @@
                         Consignee
                     </a>
                 </li>
-                <li class="nav-item m-tabs__item">
+                <!-- <li class="nav-item m-tabs__item">
                     <a class="nav-link m-tabs__link" data-toggle="tab" href="#air-ship-sup-tabview-data" role="tab" (click)="tabSelect(tabName.airshipsupTab)">
                         Air - Ship - SUP
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item m-tabs__item">
                     <a class="nav-link m-tabs__link" data-toggle="tab" href="#shipper-tabview-data" role="tab" (click)="tabSelect(tabName.shipperTab)">
                         Shipper
-                    </a>
-                </li>
-                <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#all-tabview-data" role="tab" (click)="tabSelect(tabName.allTab)">
-                        All
                     </a>
                 </li>
             </ul>
@@ -146,7 +149,11 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="tab-content" id="partnerDataTabContent">
-                <div class="tab-pane fade show active" role="tabpanel" id="customer-tabview-tab">
+
+                <div class="tab-pane fade show active" id="all-tabview-data" role="tabpanel" aria-labelledby="">
+                    <app-all-partner (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-all-partner>
+                </div>
+                <div class="tab-pane fade" role="tabpanel" id="customer-tabview-tab">
                     <app-customer (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-customer>
                 </div>
                 <div class="tab-pane fade" id="agent-tabview-tab" role="tabpanel" aria-labelledby="">
@@ -167,10 +174,6 @@
 
                 <div class="tab-pane fade" id="shipper-tabview-data" role="tabpanel" aria-labelledby="">
                     <app-shipper (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-shipper>
-                </div>
-
-                <div class="tab-pane fade" id="all-tabview-data" role="tabpanel" aria-labelledby="">
-                    <app-all-partner (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-all-partner>
                 </div>
                 
                 <!--begin::pagination-->

@@ -22,7 +22,6 @@ export class PortIndexImportComponent implements OnInit {
   pagedItems: any[] = [];
   inValidItems: any[] = [];
   totalValidRows: number = 0;
-  totalInValidRows: number = 0;
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
@@ -38,22 +37,22 @@ export class PortIndexImportComponent implements OnInit {
     private sortService: SortService) { }
 
   ngOnInit() {
+    this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
     if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
-    this.baseService.spinnerShow();
+    this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Port, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         this.data = response.data;
         this.pager.totalItems = this.data.length;
         this.totalValidRows = response.totalValidRows;
         this.totalRows = this.data.length;
-        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
-        this.baseService.spinnerHide();
+        this.progressBar.complete();
       },err=>{
-        this.baseService.spinnerHide();
+        this.progressBar.complete();
         this.baseService.handleError(err);
       });
   }
@@ -67,28 +66,25 @@ export class PortIndexImportComponent implements OnInit {
 
   async import(){
     if(this.data == null) return;
-    if(this.totalInValidRows > 0){
+    if(this.totalRows - this.totalValidRows > 0){
       $('#upload-alert-modal').modal('show');
     }
     else{
-      //this.inProgress = true;
-      this.progressBar.start();
       let data = this.data.filter(x => x.isValid);
       if(!this.baseService.checkLoginSession()) return;
-      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data, true, false);
+      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.inProgress = false;
         this.pager.totalItems = 0;
         this.reset();        
-      }
-      this.progressBar.complete();      
+      }    
     }
   }
   
   isDesc = true;
   sortKey: string;
-  sort(property){
+  sort(property: string){
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
@@ -127,4 +123,10 @@ export class PortIndexImportComponent implements OnInit {
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
   }
+
+
+  async downloadSample(){
+    await this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel,'ImportPortIndexTemplate.xlsx');
+  }
+  
 }

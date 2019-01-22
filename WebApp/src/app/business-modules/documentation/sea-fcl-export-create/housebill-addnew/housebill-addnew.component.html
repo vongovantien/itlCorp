@@ -1,472 +1,584 @@
-<!--begin::Form-->
-<div class="m-form m-form--state">
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label class="form-control-label" for="">
-                    Master bill of landing
-                </label>
-                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label class="form-control-label" for="">
-                    Customer (Payer)
-                </label>
-                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                    placeholder="Select filter">
-                </ng-select>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label class="form-control-label" for="">
-                    Saleman in charge
-                </label>
-                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                    placeholder="Select filter">
-                </ng-select>
-            </div>
-        </div>
-    </div>
-    <div class="div-inside bg-secondary">
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Shipper
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Consignee
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Notify party
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        House bill of landing no.
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                            House bill of landing type
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                       Booking no.
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Local vessel & voy no.
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Ocean essel & voy no.
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Poin of country origin
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Place of receipt
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Port of loading
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Port of discharge
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Place of delivery
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Final destination
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Freight payment
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Closing date
-                    </label>
-                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                        <input type="text" class="form-control m-input m-input--square"
-                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                            [(ngModel)]="selectedRange"
-                            [ranges]="ranges"
-                            [maxDate]="maxDate"
-                            [alwaysShowCalendars]="true"
-                            name="daterange"
-                            placeholder="From date - to date" readonly/>
-                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Salling date
-                    </label>
-                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                        <input type="text" class="form-control m-input m-input--square"
-                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                            [(ngModel)]="selectedRange"
-                            [ranges]="ranges"
-                            [maxDate]="maxDate"
-                            [alwaysShowCalendars]="true"
-                            name="daterange"
-                            placeholder="From date - to date" readonly/>
-                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Freight payable at
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="div-inside bg-secondary">
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Forwarding agent
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-8">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Number of origin B/L
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Place of date of issue H-B/L
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Reference no.
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Export reference no.
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Delivery of good
-                    </label>
-                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                        placeholder="Select filter">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-8">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Type of move
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Purchase order no.
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Type of sevice
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="div-inside bg-secondary">
-        <div class="row">
-            <div class="col-xl-8">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="m--margin-bottom-10">
-                            <span class="m--font-bolder">
-                                Commodities:
-                            </span>
-                            <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
-                                <span>Steel</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Consumer Good</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Drug</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Weapon</span>
-                            </perfect-scrollbar>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="m--margin-bottom-10">
-                            <span class="m--font-bolder">
-                                Detail container & packages:
-                            </span>
-                            <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
-                                <span>Steel</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Consumer Good</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Drug</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Weapon</span>
-                            </perfect-scrollbar>
-                        </div>
-                    </div>
-                </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Description of good:
-                    </span>
-                    <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
-                        <span></span>
-                    </perfect-scrollbar>
-                </div>
-            </div>
-            <div class="col-xl-4">
-                <div class="m--margin-bottom-10">
-                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal">
+<form novalidate #addHouseBillForm="ngForm" (ngSubmit)="addHouseBillForm.form.valid">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add new house bill of landing</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-actions c-button-actions">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
-                            <i class="la la-list"></i>
+                            <i class="la la-list-alt"></i>
                             <span>
-                                container list
+                                Preview
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        data-toggle="modal" data-target="#search-job-detail-modal">
+                        <span>
+                            <i class="la la-search"></i>
+                            <span>
+                                import house bill detail
                             </span>
                         </span>
                     </button>
                 </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total gross weight:
-                    </span>
-                    <span></span>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && MasterBillOfLadingName.invalid }">
+                                <label class="form-control-label" for="">
+                                    Master bill of lading
+                                </label>
+                                <input type="text" (change)="HouseBillToAdd.MasterBillOfLading=HouseBillToAdd.MasterBillOfLading.trim()" [(ngModel)]="HouseBillToAdd.MasterBillOfLading" required class="form-control m-input m-input--square"
+                                    placeholder="Enter text" #MasterBillOfLadingName="ngModel" name="MasterBillOfLadingName">
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && MasterBillOfLadingName.invalid">
+                                        Master bill of lading is required !
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.Customer==null }">
+                                <label class="form-control-label" for="">
+                                    Customer (Payer)
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="HouseBillToAdd.Customer=$event.id" (removed)="HouseBillToAdd.Customer=null" (typed)="typed($event)"
+                                    placeholder="Select option">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.Customer==null">
+                                    Customer is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.SaleMan==null }">
+                                <label class="form-control-label" for="">
+                                    Saleman in charge
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="HouseBillToAdd.SaleMan=$event.id" (removed)="HouseBillToAdd.SaleMan=null" (typed)="typed($event)"
+                                    placeholder="Select option">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.SaleMan==null">
+                                    Saleman is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div-inside bg-secondary">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.Shipper==null }">
+                                    <label class="form-control-label" for="">
+                                        Shipper
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.Shipper=$event.id" (removed)="HouseBillToAdd.Shipper=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.Shipper==null">
+                                        Shipper is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.Consignee==null }">
+                                    <label class="form-control-label" for="">
+                                        Consignee
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.Consignee=$event.id" (removed)="HouseBillToAdd.Consignee=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.Consignee==null">
+                                        Consignee is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.NotifyParty==null }">
+                                    <label class="form-control-label" for="">
+                                        Notify party
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.NotifyParty=$event.id" (removed)="HouseBillToAdd.NotifyParty=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.NotifyParty==null">
+                                        NotifyParty is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillLadingNoName.invalid}">
+                                    <label class="form-control-label" for="">
+                                        House bill of lading no.
+                                    </label>
+                                    <input type="text" (change)="HouseBillToAdd.HouseBillOfLadingNo=HouseBillToAdd.HouseBillOfLadingNo.trim()" required name="HouseBillLadingNoName" #HouseBillLadingNoName="ngModel"
+                                     [(ngModel)]="HouseBillToAdd.HouseBillOfLadingNo" class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                        <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillLadingNoName.invalid">
+                                            House bill of lading no is required
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.HouseBullOfLadingType==null}">
+                                    <label class="form-control-label" for="">
+                                        House bill of lading type
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="listHouseBillLadingType" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="HouseBillToAdd.HouseBullOfLadingType=$event.id"
+                                        (removed)="HouseBillToAdd.HouseBullOfLadingType=null" (typed)="typed($event)" placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.HouseBullOfLadingType==null">
+                                        House bill of lading type is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && BookingNoName.invalid}">
+                                    <label class="form-control-label" for="">
+                                        Booking no.
+                                    </label>
+                                    <input type="text" required name="BookingNoName" #BookingNoName="ngModel" (change)="HouseBillToAdd.BookingNo=HouseBillToAdd.BookingNo.trim()" 
+                                    [(ngModel)]="HouseBillToAdd.BookingNo" class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                        <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && BookingNoName.invalid">
+                                            Booking no is required
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Local vessel & voy no.
+                                    </label>
+                                    <input type="text" name="LocalVesselAndVoyNoName" #LocalVesselAndVoyNoName="ngModel" [(ngModel)]="HouseBillToAdd.LocalVesselAndVoyNo" 
+                                    (change)="HouseBillToAdd.LocalVesselAndVoyNo=HouseBillToAdd.LocalVesselAndVoyNo.trim()" class="form-control m-input m-input--square"
+                                        placeholder="Enter text">            
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && OceanVesselAndVoyNoName.invalid}">
+                                    <label class="form-control-label" for="">
+                                        Ocean vessel & voy no.
+                                    </label>
+                                    <input type="text" required name="OceanVesselAndVoyNoName" #OceanVesselAndVoyNoName [(ngModel)]="HouseBillToAdd.OceanVesselAndVoyNo" 
+                                    (change)="HouseBillToAdd.OceanVesselAndVoyNo=HouseBillToAdd.OceanVesselAndVoyNo.trim()" class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                        <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && OceanVesselAndVoyNoName.invalid">
+                                            Ocean vessel & voy no is required
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.CountryOrigin==null}">
+                                    <label class="form-control-label" for="">
+                                        Point of country origin
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.CountryOrigin=$event.id" (removed)="HouseBillToAdd.CountryOrigin=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.CountryOrigin==null">
+                                        Point of country origin is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.PlaceOfReceipt==null}">
+                                    <label class="form-control-label" for="">
+                                        Place of receipt
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.PlaceOfReceipt=$event.id" (removed)="HouseBillToAdd.PlaceOfReceipt=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.PlaceOfReceipt==null">
+                                        Place of receipt is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.PortOfLoading==null}">
+                                    <label class="form-control-label" for="">
+                                        Port of loading
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.PortOfLoading=$event.id" (removed)="HouseBillToAdd.PortOfLoading=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.PortOfLoading==null">
+                                        Port of loading is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.PortOfDischarge==null}">
+                                    <label class="form-control-label" for="">
+                                        Port of discharge
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.PortOfDischarge=$event.id" (removed)="HouseBillToAdd.PortOfDischarge=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.PortOfDischarge==null">
+                                        Port of discharge is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Place of delivery
+                                    </label>
+                                    <input type="text" name="PlaceOfDelivery" [(ngModel)]="HouseBillToAdd.PlaceOfDelivery" (change)="HouseBillToAdd.PlaceOfDelivery=HouseBillToAdd.PlaceOfDelivery.trim()" 
+                                    class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Final destination
+                                    </label>
+                                    <input type="text" name="FinalDestination" [(ngModel)]="HouseBillToAdd.FinalDestination" (change)="HouseBillToAdd.FinalDestination=HouseBillToAdd.FinalDestination.trim()"
+                                     class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.FreightPayment==null}">
+                                    <label class="form-control-label" for="">
+                                        Freight payment
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="listFreightPayment" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="HouseBillToAdd.FreightPayment=$event.id; HouseBillToAdd.FreightPayableAt = $event.id==='Prepaid'?'Origin':'Destination'"
+                                        (removed)="HouseBillToAdd.FreightPayment=null" (typed)="typed($event)" placeholder="Select option">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.FreightPayment==null">
+                                        Freight payment is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Closing date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [(ngModel)]="HouseBillToAdd.ClosingDate" [ranges]="ranges" [maxDate]="maxDate"[singleDatePicker]="true"
+                                            [alwaysShowCalendars]="true" name="daterange" placeholder="Select date"
+                                            readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Selling date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [(ngModel)]="HouseBillToAdd.SellingDate" [ranges]="ranges" [maxDate]="maxDate" [singleDatePicker]="true"
+                                            [alwaysShowCalendars]="true" name="daterange" placeholder="Select date"
+                                            readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && FreightPayableAtName.invalid}">
+                                    <label class="form-control-label" for="">
+                                        Freight payable at
+                                    </label>
+                                    <input type="text" required name="FreightPayableAtName" (change)="HouseBillToAdd.FreightPayableAt=HouseBillToAdd.FreightPayableAt.trim()" #FreightPayableAtName="ngModel" [(ngModel)]="HouseBillToAdd.FreightPayableAt" 
+                                    (change)="HouseBillToAdd.FreightPayableAt=HouseBillToAdd.FreightPayableAt.trim()" class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                        <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && FreightPayableAtName.invalid">
+                                            Freight payable at is required
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div-inside bg-secondary">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Forwarding agent
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.ForwardingAgent=$event.id" (removed)="HouseBillToAdd.ForwardingAgent=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Number of origin B/L
+                                            </label>
+                                            <ng-select [allowClear]="true" [items]="listNumberOfOriginBL" [disabled]="disabled"
+                                                (data)="refreshValue($event)" (selected)="HouseBillToAdd.NumberOfOriginBL=$event.id"
+                                                (removed)="HouseBillToAdd.NumberOfOriginBL=null" (typed)="typed($event)" placeholder="Select option">
+                                            </ng-select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Place and date of issue H-B/L
+                                            </label>
+                                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                                (selected)="HouseBillToAdd.PlaceDateIssueHBL=$event.id" (removed)="HouseBillToAdd.PlaceDateIssueHBL=null"
+                                                (typed)="typed($event)" placeholder="Select option">
+                                            </ng-select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Reference no.
+                                            </label>
+                                            <input type="text" name="ReferenceNo" [(ngModel)]="HouseBillToAdd.ReferenceNo" (change)="HouseBillToAdd.ReferenceNo=HouseBillToAdd.ReferenceNo.trim()" class="form-control m-input m-input--square"
+                                                placeholder="Enter text">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Export reference no.
+                                            </label>
+                                            <input type="text" name="ExportReferenceNo" [(ngModel)]="HouseBillToAdd.ExportReferenceNo" (change)="HouseBillToAdd.ExportReferenceNo=HouseBillToAdd.ExportReferenceNo.trim()" class="form-control m-input m-input--square"
+                                                placeholder="Enter text">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Delivery of good
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="HouseBillToAdd.DeliveryOfGoods=$event.id" (removed)="HouseBillToAdd.DeliveryOfGoods=null" (typed)="typed($event)"
+                                        placeholder="Select option">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Type of move
+                                            </label>
+                                            <ng-select [allowClear]="true" [items]="listTypeOfMove" [disabled]="disabled"
+                                                (data)="refreshValue($event)" (selected)="HouseBillToAdd.TypeOfMove=$event.id"
+                                                (removed)="HouseBillToAdd.TypeOfMove=null" (typed)="typed($event)" placeholder="Select option">
+                                            </ng-select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Purchase order no.
+                                            </label>
+                                            <input type="text" name="PurchaseOrderNo" [(ngModel)]="HouseBillToAdd.PurchaseOrderNo" (change)="HouseBillToAdd.PurchaseOrderNo=HouseBillToAdd.PurchaseOrderNo.trim()" class="form-control m-input m-input--square" placeholder="Enter text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Type of sevice
+                                            </label>
+                                            <ng-select [allowClear]="true" [items]="listTypeOfService" [disabled]="disabled"
+                                                (data)="refreshValue($event)" (selected)="HouseBillToAdd.TypeOfService=$event.id"
+                                                (removed)="HouseBillToAdd.TypeOfService=null" (typed)="typed($event)" placeholder="Select option">
+                                            </ng-select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div-inside bg-secondary">
+                        <div class="row">
+                            <div class="col-xl-8">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Commodities:
+                                            </span>
+                                            <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
+                                                <span>Steel</span>
+                                                <span class="m--margin-right-5">,</span>
+                                                <span>Consumer Good</span>
+                                                <span class="m--margin-right-5">,</span>
+                                                <span>Drug</span>
+                                                <span class="m--margin-right-5">,</span>
+                                                <span>Weapon</span>
+                                            </perfect-scrollbar>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Detail container & packages:
+                                            </span>
+                                            <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
+                                                <span>Steel</span>
+                                                <span class="m--margin-right-5">,</span>
+                                                <span>Consumer Good</span>
+                                                <span class="m--margin-right-5">,</span>
+                                                <span>Drug</span>
+                                                <span class="m--margin-right-5">,</span>
+                                                <span>Weapon</span>
+                                            </perfect-scrollbar>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        Description of good:
+                                    </span>
+                                    <perfect-scrollbar class="m--padding-10" style="height: 50px; background-color: white">
+                                        <span></span>
+                                    </perfect-scrollbar>
+                                </div>
+                            </div>
+                            <div class="col-xl-4">
+                                <div class="m--margin-bottom-10">
+                                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                        data-toggle="modal" data-target="#container-list-of-job-modal-house">
+                                        <span>
+                                            <i class="la la-list"></i>
+                                            <span>
+                                                container list
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        Total gross weight:
+                                    </span>
+                                    <span></span>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        Total net weight:
+                                    </span>
+                                    <span></span>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        Total chargeable weight:
+                                    </span>
+                                    <span></span>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        Total CBM:
+                                    </span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div-inside bg-secondary">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Shipping mark
+                                    </label>
+                                    <input type="text" name="ShippingMark" [(ngModel)]="HouseBillToAdd.ShippingMark" (change)="HouseBillToAdd.ShippingMark=HouseBillToAdd.ShippingMark.trim()" 
+                                    class="form-control m-input m-input--square" (change)="HouseBillToAdd.ShippingMark=HouseBillToAdd.ShippingMark.trim()"
+                                        placeholder="Enter text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        In word
+                                    </label>
+                                    <input type="text" name="InWord" [(ngModel)]="HouseBillToAdd.InWord" (change)="HouseBillToAdd.InWord=HouseBillToAdd.InWord.trim()" class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        On board status
+                                    </label>
+                                    <input type="text" name="OnBoardStatus" [(ngModel)]="HouseBillToAdd.OnBoardStatus" (change)="HouseBillToAdd.OnBoardStatus=HouseBillToAdd.OnBoardStatus.trim()" class="form-control m-input m-input--square"
+                                        placeholder="Enter text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total net weight:
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
                     </span>
-                    <span></span>
-                </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total chargeable weight:
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
                     </span>
-                    <span></span>
-                </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total CBM:
-                    </span>
-                    <span></span>
-                </div>
+                </button>
             </div>
         </div>
     </div>
-    <div class="div-inside bg-secondary">
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Shipping mark
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        In word
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        On board status
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::Form-->
+</form>
