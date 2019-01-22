@@ -75,7 +75,7 @@ export class WarehouseImportComponent implements OnInit {
     console.log(this.pager);
   }
   async downloadSample(){
-    await this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=12",'WarehouseImportTemplate.xlsx');
+    await this.baseService.downloadfile(this.api_menu.Catalogue.CatPlace.downloadExcel  + "?type=" + PlaceTypeEnum.Warehouse,'WarehouseImportTemplate.xlsx');
   }
   
   hideInvalid(){

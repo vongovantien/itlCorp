@@ -239,7 +239,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
       this.customerComponent.getPartnerData(pager, this.criteria);
     }
-    if(this.activeTab == this.tabName.allTab){
+    if(this.activeTab == this.tabName.agentTab){
       this.criteria.partnerGroup = PartnerGroupEnum.AGENT;
       this.agentComponent.getPartnerData(pager, this.criteria);
     }
