@@ -10,13 +10,13 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as lodash from 'lodash';
-import { SeaFCLExportMasterBill } from '../../../shared/models/document/seafclExport_master.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { NgForm } from '@angular/forms';
 import { MasterBillComponent } from './master-bill/master-bill.component';
 import * as dataHelper from 'src/helper/data.helper';
 import { Container } from '../../../shared/models/document/container.model';
+import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 
 
 @Component({
@@ -25,7 +25,7 @@ import { Container } from '../../../shared/models/document/container.model';
     styleUrls: ['./sea-fcl-export-create.component.scss']
 })
 export class SeaFclExportCreateComponent implements OnInit {
-    shipment: SeaFCLExportMasterBill = new SeaFCLExportMasterBill();
+    shipment: CsTransaction = new CsTransaction();
     containerTypes: any[] = [];
     containers: any[] = [];
     packageTypes: any[]=[];
