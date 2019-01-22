@@ -41,13 +41,13 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partnerAccountNo.invalid }">
                             <label class="form-control-label" for="">
-                                Account No <span class="m--font-danger">(*)</span>
+                                Partner ID <span class="m--font-danger"></span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" disabled name="partnerAccountNo" autocomplete="nope" minlength="3" maxlength="20"
                              [(ngModel)]="partner.accountNo" #partnerAccountNo="ngModel" (change)="partner.accountNo = partner.taxCode.trim()" 
                              [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerAccountNo.invalid }" required >
                              <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerAccountNo.invalid" >
-                                Account No  required least 3 characters
+                                Partner ID  required least 3 characters
                             </div>
                         </div>
                     </div>
@@ -288,7 +288,7 @@
                         <div class="form-group">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
                                 <label class="form-control-label">
-                                    Saleman <span class="m--font-danger">(*)</span>
+                                    Saleman <span class="m--font-danger" *ngIf="partner.salePersonId == null && isRequiredSaleman">(*)</span>
                                 </label>
                                 <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
                                     (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"

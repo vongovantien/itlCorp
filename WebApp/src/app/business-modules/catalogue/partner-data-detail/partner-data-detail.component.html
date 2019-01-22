@@ -41,13 +41,13 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partnerAccountNo.invalid }">
                             <label class="form-control-label" for="">
-                                Account No <span class="m--font-danger">(*)</span>
+                                Partner ID <span class="m--font-danger"></span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""  name="partnerAccountNo" autocomplete="nope" minlength="3" disabled
                              [(ngModel)]="partner.accountNo" #partnerAccountNo="ngModel" (change)="partner.accountNo = partner.taxCode.trim()" 
                              [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerAccountNo.invalid }" required >
                              <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerAccountNo.invalid" >
-                                Account No  required least 3 characters
+                                Partner ID required least 3 characters
                             </div>
                         </div>
                     </div>

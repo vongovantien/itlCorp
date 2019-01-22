@@ -2,35 +2,44 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
         <!--begin::Form-->
-        <div class="m-form m-form--state">
+        <div class="m-form m-form--state" *ngIf="formAddEdit">
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && jobId.invalid }">
                         <label class="form-control-label" for="">
                             Job ID
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        <input type="text" #jobId="ngModel" class="form-control m-input m-input--square" placeholder="" disabled [(ngModel)]="shipment.jobNo" required>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && jobId.invalid" >
+                            Code is required least 3 characters
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && estimatedTimeofDepature.invalid }">
                         <label class="form-control-label" for="">
-                            Estimated time of departure
+                            Estimated time of departure <span class="m--font-danger">(*)</span>
                         </label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                            <input type="text" class="form-control m-input m-input--square"
+                            <input type="text" class="form-control m-input m-input--square" #estimatedTimeofDepature="ngModel"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                [(ngModel)]="selectedRange"
+                                [(ngModel)]="shipment.etd"
                                 [ranges]="ranges"
                                 [maxDate]="maxDate"
                                 [alwaysShowCalendars]="true"
-                                name="daterange"
-                                placeholder="From date - to date" readonly/>
+                                [singleDatePicker]="true"
+                                name="estimatedTimeofDepature"
+                                placeholder="dd/mm/yyyy"
+                                [autoApply]="true"
+                                required readonly/>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && estimatedTimeofDepature.invalid" >
+                                Estimated time of departure is required
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -42,12 +51,15 @@
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                [(ngModel)]="selectedRange"
+                                [(ngModel)]="shipment.eta"
                                 [ranges]="ranges"
                                 [maxDate]="maxDate"
                                 [alwaysShowCalendars]="true"
-                                name="daterange"
-                                placeholder="From date - to date" readonly/>
+                                [singleDatePicker]="true"
+                                [autoApply]="true"
+                                name="estimatedTimeofArrived"
+                                placeholder="dd/mm/yyyy" 
+                                readonly/>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
@@ -59,22 +71,29 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && mblno.invalid }">
                         <label class="form-control-label" for="">
-                            Master bill of landing no
+                            Master bill of lading no <span class="m--font-danger">(*)</span>
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter master bill of lading no" autocomplete="nope" 
+                            (change)="shipment.mawb = shipment.mawb.trim()" [(ngModel)]="shipment.mawb" #mblno="ngModel" required>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && mblno.invalid" >
+                            Master bill of lading no is required least 3 characters
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.mbltype == null }">
                         <label class="form-control-label" for="">
-                                Master bill of landing type
+                                Master bill of lading type <span class="m--font-danger">(*)</span>
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                        <ng-select [allowClear]="true" [items]="billOfLadingTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                            (selected)="shipment.mbltype = $event.id" (removed)="shipment.mbltype = null" (typed)="typed($event)"
+                            placeholder="Select option">
                         </ng-select>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.mbltype == null" >
+                            Master bill of lading type is required
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -84,7 +103,7 @@
                         </label>
                         <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                            placeholder="Select option">
                         </ng-select>
                     </div>
                 </div>
@@ -95,18 +114,22 @@
                         <label class="form-control-label" for="">
                             Booking no
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text" autocomplete="nope"
+                            (change)="shipment.bookingNo = shipment.bookingNo.trim()" [(ngModel)]="shipment.bookingNo">
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.typeOfService == null }">
                         <label class="form-control-label" for="">
-                            Services type
+                            Services type <span class="m--font-danger">(*)</span>
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                        <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                            (selected)="shipment.typeOfService = $event.id" (removed)="shipment.typeOfService = null" (typed)="typed($event)"
+                            placeholder="Select service type">
                         </ng-select>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.typeOfService == null" >
+                            Services type is required
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -116,21 +139,24 @@
                         </label>
                         <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                            placeholder="Select option">
                         </ng-select>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.portOfLoading == null }">
                         <label class="form-control-label" for="">
                             Port of loading
                         </label>
                         <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                            placeholder="Select option">
                         </ng-select>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.portOfLoading == null" >
+                            Port of loading is required
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -140,19 +166,22 @@
                         </label>
                         <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                            placeholder="Select option">
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.paymentTerm == null }">
                         <label class="form-control-label" for="">
                             Term
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                        <ng-select [allowClear]="true" [items]="terms" [disabled]="disabled" (data)="refreshValue($event)"
+                            (selected)="shipment.paymentTerm = $event.id" (removed)="shipment.paymentTerm = null" (typed)="typed($event)"
+                            placeholder="Select option">
                         </ng-select>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.paymentTerm == null" >
+                            Term is required
+                        </div>
                     </div>
                 </div>
             </div>
@@ -162,7 +191,8 @@
                         <label class="form-control-label" for="">
                             Vessel name
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text" autocomplete="nope"
+                            (change)="shipment.flightVesselName = shipment.flightVesselName.trim()" [(ngModel)]="shipment.flightVesselName">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -170,18 +200,22 @@
                         <label class="form-control-label" for="">
                             Voy no
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text" autocomplete="nope"
+                            (change)="shipment.voyNo = shipment.voyNo.trim()" [(ngModel)]="shipment.voyNo">
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.shipmentType == null }">
                         <label class="form-control-label" for="">
                             Shipment type
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                        <ng-select [allowClear]="true" [items]="shipmentTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                            (selected)="shipment.shipmentType = $event.id" (removed)="shipment.shipmentType = null" (typed)="typed($event)"
+                            placeholder="Select option">
                         </ng-select>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.shipmentType == null" >
+                            Shipment type is required
+                        </div>
                     </div>
                 </div>
             </div>
@@ -189,9 +223,10 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label class="form-control-label" for="">
-                            Puschase order(P/O) no 
+                            Purchase order(P/O) no 
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text">
+                        <input type="text" class="form-control m-input m-input--square" placeholder="Enter text" autocomplete="nope"
+                            (change)="shipment.pono = shipment.pono.trim()" [(ngModel)]="shipment.pono">
                     </div>
                     <div class="form-group">
                         <label class="form-control-label" for="">
@@ -199,16 +234,16 @@
                         </label>
                         <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                            placeholder="Select option">
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-8">
                     <div class="form-group">
-                        <label class="form-control-label" for="">
+                        <label class="form-control-label" for="" autocomplete="nope">
                             Note
                         </label>
-                        <textarea class="form-control m-input--square" name="" id="" rows="5"></textarea>
+                        <textarea class="form-control m-input--square" name="" id="" rows="5" (change)="shipment.notes = shipment.notes.trim()" [(ngModel)]="shipment.notes"></textarea>
                     </div>
                 </div>
             </div>
@@ -228,7 +263,7 @@
             </div>
         </div>
         <div class="m-portlet__head-tools">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal-master">
                 <span>
                     <i class="la la-list"></i>
                     <span>
@@ -263,17 +298,15 @@
                             <span class="m--font-bolder">
                                 Detail container & packages:
                             </span>
-                            <div class="bg-secondary m--padding-10">
-                                <perfect-scrollbar style="height: 30px">
-                                    <span>Steel</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Consumer Good</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Drug</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Weapon</span>
-                                </perfect-scrollbar>
-                            </div>
+                            <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
+                                <span>Steel</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Consumer Good</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Drug</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Weapon</span>
+                            </perfect-scrollbar>
                         </div>
                     </div>
                 </div>
@@ -281,11 +314,9 @@
                     <span class="m--font-bolder">
                         Description of good:
                     </span>
-                    <div class="bg-secondary m--padding-10">
-                        <perfect-scrollbar style="height: 100px">
-                            <span></span>
-                        </perfect-scrollbar>
-                    </div>
+                    <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 100px">
+                        <span></span>
+                    </perfect-scrollbar>
                 </div>
             </div>
             <div class="col-xl-4">

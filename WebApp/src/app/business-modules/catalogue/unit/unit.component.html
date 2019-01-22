@@ -16,7 +16,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()" disabled>
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -106,6 +106,10 @@
                                 (click)="sort('unitNameVn')">
                                 <span>Name (Local)</span>
                             </th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitType'), 'sorting_desc': (!isDesc && sortKey == 'unitType') }"
+                                (click)="sort('unitType')">
+                                <span>Unit type</span>
+                            </th>
                             <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'descriptionEn'), 'sorting_desc': (!isDesc && sortKey == 'descriptionEn') }"
                                 (click)="sort('descriptionEn')">
                                 <span>Description (En)</span>
@@ -120,42 +124,56 @@
                         </tr>
                     </thead>
                     <tbody *ngIf="ListUnits">
-                        <tr *ngFor="let unit of ListUnits;let i = index;">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        (click)="showUpdateUnit(unit.id)" title="Edit unit" data-toggle="modal"
-                                        data-target="#update-unit-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        (click)="prepareDeleteUnit(unit.id)" title="Remove unit" data-toggle="modal"
-                                        data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
+                        <ng-container *ngIf="ListUnits.length>0; else norecord" >
+                            <tr *ngFor="let unit of ListUnits;let i = index;">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            (click)="showUpdateUnit(unit.id)" title="Edit unit" data-toggle="modal"
+                                            data-target="#update-unit-modal">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            (click)="prepareDeleteUnit(unit.id)" title="Remove unit" data-toggle="modal"
+                                            data-target="#confirm-delete-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>{{unit.code}}</span>
+                                </td>
+                                <td>
+                                    <span>{{unit.unitNameEn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{unit.unitNameVn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{unit.unitType}}</span>
+                                </td>
+                                <td>
+                                    <span>{{unit.descriptionEn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{unit.descriptionVn}}</span>
+                                </td>
+                                <td>
+                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="unit.inactive" disabled type="checkbox"><span></span></label>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                    <ng-template #norecord>
+                        <tr>
+                            <td colspan="8">
+                                <div class="no-data">
+                                    <i class="flaticon-coins"></i>
+                                    <span class="no-data-text">No records found</span>
                                 </div>
                             </td>
-                            <td>
-                                <span>{{unit.code}}</span>
-                            </td>
-                            <td>
-                                <span>{{unit.unitNameEn}}</span>
-                            </td>
-                            <td>
-                                <span>{{unit.unitNameVn}}</span>
-                            </td>
-                            <td>
-                                <span>{{unit.descriptionEn}}</span>
-                            </td>
-                            <td>
-                                <span>{{unit.descriptionVn}}</span>
-                            </td>
-                            <td>
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="unit.inactive" disabled type="checkbox"><span></span></label>
-                            </td>
-                          
-
-                    </tbody>
+                        </tr>
+                    </ng-template>
                 </table>
             </div>
             <!--end: Datatable of stage-management-list-table -->
@@ -192,7 +210,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.code" (change)="UnitToAdd.code=UnitToAdd.code.trim()" class="form-control m-input m-input--square"
-                                    #code="ngModel" name="code" required placeholder="Please enter unit code">
+                                    #code="ngModel" name="code" required placeholder="Please enter unit code" autocomplete="off">
                                 <div class="form-control-feedback" *ngIf="addUnitForm.submitted && code.invalid">
                                     Unit code is required
                                 </div>
@@ -206,7 +224,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.unitNameEn" (change)="UnitToAdd.unitNameEn=UnitToAdd.unitNameEn.trim()" class="form-control m-input m-input--square"
-                                    #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name">
+                                    #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name" autocomplete="off">
                                 <div class="form-control-feedback" *ngIf="addUnitForm.submitted && english_name.invalid">
                                     English name is required at least 3 characters
                                 </div>
@@ -221,9 +239,24 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.unitNameVn" (change)="UnitToAdd.unitNameVn=UnitToAdd.unitNameVn.trim()" class="form-control m-input m-input--square"
-                                    #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name">
+                                    #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name" autocomplete="off">
                                 <div class="form-control-feedback" *ngIf="addUnitForm.submitted && local_name.invalid">
                                     Local name is required at least 3 characters
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': addUnitForm.submitted && UnitToAdd.unitType==null }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Unit type <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <ng-select [allowClear]="true" [items]="unitTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)"
+                                    (typed)="typed($event)" placeholder="Select unit type">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="addUnitForm.submitted && addUnitForm.unitType==null">
+                                    Unit type is required
                                 </div>
                             </div>
 
@@ -234,7 +267,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.descriptionEn" (change)="UnitToAdd.descriptionEn=UnitToAdd.descriptionEn.trim()" class="form-control m-input m-input--square"
-                                    name="eng_description" placeholder="Please enter english description">                            
+                                    name="eng_description" placeholder="Please enter english description" autocomplete="off">                            
                             </div>
 
                         </div>
@@ -244,21 +277,10 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToAdd.descriptionVn" (change)="UnitToAdd.descriptionVn=UnitToAdd.descriptionVn.trim()" class="form-control m-input m-input--square"
-                                    name="local_description" placeholder="Please enter local description">                            
+                                    name="local_description" placeholder="Please enter local description" autocomplete="off">                            
                             </div>
 
-                        </div>                       
-
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Inactive
-                            </label>
-                            <div class="col-lg-8">
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="UnitToAdd.inactive" (change)="UnitToAdd.inactive=!UnitToAdd.inactive"
-                                        type="checkbox"><span></span></label>
-                            </div>
-                        </div>
-
+                        </div>                      
 
                     </div>
                     <div class="modal-footer m--align-center c-button-actions">
@@ -326,7 +348,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.unitNameEn" (change)="UnitToUpdate.unitNameEn=UnitToUpdate.unitNameEn.trim()" class="form-control m-input m-input--square"
-                                    #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name">
+                                    #english_name="ngModel" required minlength="3" name="english_name" placeholder="Please enter english name" autocomplete="off">
                                 <div class="form-control-feedback" *ngIf="updateUnitForm.submitted && english_name.invalid">
                                     English name is required at least 3 characters
                                 </div>
@@ -341,20 +363,36 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.unitNameVn" (change)="UnitToUpdate.unitNameVn=UnitToUpdate.unitNameVn.trim()" class="form-control m-input m-input--square"
-                                    #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name">
+                                    #local_name="ngModel" required minlength="3" name="local_name" placeholder="Please enter local name" autocomplete="off">
                                 <div class="form-control-feedback" *ngIf="updateUnitForm.submitted && local_name.invalid">
                                     Local name is required at least 3 characters
                                 </div>
                             </div>
 
                         </div>
+                        
+                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': updateUnitForm.submitted && UnitToUpdate.unitType==null }">
+                                <label class="col-lg-4 col-form-label form-control-label">
+                                    Unit type <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="col-lg-8">
+                                    <ng-select [allowClear]="true" [active]="currentUnitType" [items]="unitTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)"
+                                        (typed)="typed($event)" placeholder="Select unit type">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="updateUnitForm.submitted && UnitToUpdate.unitType==null">
+                                        Unit type is required
+                                    </div>
+                                </div>
+    
+                            </div>
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 English description
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.descriptionEn" (change)="UnitToUpdate.descriptionEn=UnitToUpdate.descriptionEn.trim()" class="form-control m-input m-input--square"
-                                    name="eng_description" placeholder="Please enter english description">                            
+                                    name="eng_description" placeholder="Please enter english description" autocomplete="off">                            
                             </div>
 
                         </div>
@@ -364,7 +402,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="UnitToUpdate.descriptionVn" (change)="UnitToUpdate.descriptionVn=UnitToUpdate.descriptionVn.trim()" class="form-control m-input m-input--square"
-                                    name="local_description" placeholder="Please enter local description">                            
+                                    name="local_description" placeholder="Please enter local description" autocomplete="off">                            
                             </div>
 
                         </div>                       
@@ -374,7 +412,8 @@
                                 Inactive
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="UnitToUpdate.inactive" (change)="UnitToUpdate.inactive=!UnitToUpdate.inactive"
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input [checked]="UnitToUpdate.inactive" (change)="UnitToUpdate.inactive=!UnitToUpdate.inactive"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>

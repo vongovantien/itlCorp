@@ -56,7 +56,7 @@ export class PartnerComponent implements OnInit {
   exportButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.export
   };
-  activeTab: string = this.tabName.customerTab;
+  activeTab: string = this.tabName.allTab;
   @ViewChild(PaginationComponent) child;
   //partnerType: any;
 
@@ -77,12 +77,18 @@ export class PartnerComponent implements OnInit {
     this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
   }
+  resetSearch(event){
+    this.onSearch(event);
+  }
   onSearch(event){
     if(event.field == "All"){
       this.criteria.all = event.searchString;
     }
     else{
-      this.criteria.all = null;
+      //this.criteria.all = null;
+      let currentTab = this.criteria.partnerGroup;
+      this.criteria = {};
+      this.criteria.partnerGroup = currentTab;
       if(event.field == "id"){
         this.criteria.id = event.searchString;
       }
@@ -233,7 +239,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
       this.customerComponent.getPartnerData(pager, this.criteria);
     }
-    if(this.activeTab == this.tabName.allTab){
+    if(this.activeTab == this.tabName.agentTab){
       this.criteria.partnerGroup = PartnerGroupEnum.AGENT;
       this.agentComponent.getPartnerData(pager, this.criteria);
     }

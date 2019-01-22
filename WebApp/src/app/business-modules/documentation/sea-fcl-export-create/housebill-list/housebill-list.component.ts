@@ -1,4 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+
+import * as moment from 'moment';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Partner } from 'src/app/shared/models/catalogue/partner.model';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+// import { PaginationComponent } from 'ngx-bootstrap';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { SortService } from 'src/app/shared/services/sort.service';
+import * as lodash from 'lodash';
 
 @Component({
   selector: 'app-housebill-list',
@@ -6,11 +18,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./housebill-list.component.scss']
 })
 export class HousebillListComponent implements OnInit {
-
   constructor() { }
 
   ngOnInit() {
   }
+
+
 
   /**
     * ng2-select

@@ -6,6 +6,8 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Resources;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -17,8 +19,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -73,6 +73,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             catStageModel.DatetimeCreated = DateTime.Now;
             catStageModel.UserCreated = currentUser.UserID;
+            catStageModel.Inactive = false;
             var hs = catStageService.Add(catStageModel);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

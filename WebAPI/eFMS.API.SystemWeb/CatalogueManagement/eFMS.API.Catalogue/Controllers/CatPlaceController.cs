@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -17,14 +16,13 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 using System.Linq;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Resources;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -201,7 +199,7 @@ namespace eFMS.API.Catalogue.Controllers
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
-                if (rowCount < 2) return BadRequest();
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
 
                 List<CatPlaceImportModel> list = null;
                 switch (type)
@@ -246,7 +244,7 @@ namespace eFMS.API.Catalogue.Controllers
                     CountryName = worksheet.Cells[row, 5].Value?.ToString(),
                     ProvinceName = worksheet.Cells[row, 6].Value?.ToString(),
                     DistrictName = worksheet.Cells[row, 7].Value?.ToString(),
-                    Status = worksheet.Cells[row, 8].Value?.ToString()
+                    //Status = worksheet.Cells[row, 8].Value?.ToString()
                 };
                 list.Add(warehouse);
             }
@@ -266,7 +264,7 @@ namespace eFMS.API.Catalogue.Controllers
                     CountryName = worksheet.Cells[row, 4].Value?.ToString(),
                     AreaName = worksheet.Cells[row, 5].Value?.ToString(),
                     ModeOfTransport = worksheet.Cells[row, 6].Value?.ToString(),
-                    Status = worksheet.Cells[row, 7].Value?.ToString()
+                    //Status = worksheet.Cells[row, 7].Value?.ToString()
                 };
                 list.Add(warehouse);
             }
@@ -376,14 +374,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower()== model.NameEN.ToLower()) || (x.NameVn.ToLower()==model.NameVN.ToLower()) ))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => ((x.Code.ToLower() == model.Code.ToLower()) || (x.NameEn.ToLower() == model.NameEN.ToLower()) || (x.NameVn.ToLower() == model.NameVN.ToLower())) && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower()) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

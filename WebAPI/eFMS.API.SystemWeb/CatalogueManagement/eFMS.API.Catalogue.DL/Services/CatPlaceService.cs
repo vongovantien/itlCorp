@@ -54,8 +54,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<vw_catPlace> Query(CatPlaceCriteria criteria)
         {
-            var list = GetView();
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
+            var list = GetView();//.Where(x => ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   //&& (x.Inactive == criteria.Inactive || criteria.Inactive == null)).ToList();
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -72,6 +73,8 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
                     ).OrderBy(x => x.Code).ToList();
             }
             else
@@ -87,8 +90,10 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    )
                                    && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
                                    ).OrderBy(x => x.Code).ToList();
             }
             return list;
@@ -238,7 +243,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName);
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
 
                     if (country == null)
                     {
@@ -391,14 +396,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 item.Code = string.Format("Code is not allow empty!|wrong");
                 item.IsValid = false;
             }
-            else if (newList.Any(x => (x.Code ?? "").IndexOf(item.Code ?? "", StringComparison.OrdinalIgnoreCase) >=0))
+            else if (newList.Any(x => (x.Code ?? "").ToLower() == (item.Code ?? "").ToLower()))
             {
                 item.Code = string.Format("Code {0} is existed!|wrong", item.Code);
                 item.IsValid = false;
             }
             else
             {
-                if(places.Any(i => (i.Code ?? "").IndexOf(item.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
+                if(places.Any(i => (i.Code ?? "").ToLower() == (item.Code ?? "").ToLower()))
                 {
                     item.Code = string.Format("Code '{0}' has been existed!|wrong", item.Code);
                     item.IsValid = false;
@@ -435,7 +440,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.IndexOf(item.CountryName, StringComparison.OrdinalIgnoreCase) >= 0);
+                    var country = countries.FirstOrDefault(i => (i.NameEn ??"")==(item.CountryName ?? "").ToLower());
                     if (country == null)
                     {
                         result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
@@ -450,12 +455,22 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     result.ModeOfTransport = string.Format("Mode of transport is not allow empty!|wrong");
                 }
+                else
+                {
+                    if(DataEnums.ModeOfTransportData.Any(x => x.Id == item.ModeOfTransport)){
+                        result.ModeOfTransport = item.ModeOfTransport;
+                    }
+                    else
+                    {
+                        result.ModeOfTransport = string.Format("Mode of transport {0} is not found!|wrong", item.ModeOfTransport);
+                    }
+                }
                 if (!string.IsNullOrEmpty(item.AreaName))
                 {
-                    var area = areas.FirstOrDefault(i => i.NameEn.IndexOf(item.AreaName, StringComparison.OrdinalIgnoreCase) >= 0);
+                    var area = areas.FirstOrDefault(i => i.NameEn.ToLower() == item.AreaName.ToLower());
                     if (area == null)
                     {
-                        result.CountryName = string.Format("Area '{0}' is not found!|wrong", item.CountryName);
+                        result.AreaName = string.Format("Area '{0}' is not found!|wrong", item.CountryName);
                         result.IsValid = false;
                     }
                     else
@@ -490,7 +505,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    result.Address = string.Empty;
+                    result.Address = item.Address;
                 }
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
@@ -535,7 +550,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                             else
                             {
-                                var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName&& (i.ProvinceId == province.Id || province == null));
+                                var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
                                 if (district == null)
                                 {
                                     result.DistrictName = string.Format("District name is not allow empty!|wrong");
@@ -546,8 +561,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 result.PlaceTypeId = placeTypeName;
-                result.Status = DataEnums.EnActive;
-                result.Status = item.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
+                //result.Status = DataEnums.EnActive;
+                //result.Status = item.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
                 results.Add(result);
             }
             return results;
@@ -573,7 +588,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = DateTime.Now,
                         UserCreated = ChangeTrackerHelper.currentUser,
                         PlaceTypeId = item.PlaceTypeId,
-                        Inactive = (item.Status ?? "").Contains("active"),
+                        Inactive = false,
                         InactiveOn = item.Status != null ? DateTime.Now : inactive,
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId

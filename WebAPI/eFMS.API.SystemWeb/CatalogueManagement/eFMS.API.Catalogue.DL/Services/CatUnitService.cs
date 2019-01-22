@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -19,6 +20,11 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
+        public List<UnitType> GetUnitTypes()
+        {
+            return DataEnums.UnitTypes;
+        }
+
         public List<CatUnit> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
         {
             var list = Query(criteria);
@@ -36,12 +42,14 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatUnit> Query(CatUnitCriteria criteria)
         {
-            var list = DataContext.Get();
+            var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"",StringComparison.OrdinalIgnoreCase)>=0)
-                && ((x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"",StringComparison.OrdinalIgnoreCase)>=0)).OrderBy(x=>x.Code);
+                && ((x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"", StringComparison.OrdinalIgnoreCase)>=0)
+                && ((x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"", StringComparison.OrdinalIgnoreCase)>=0)
+                && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                ).OrderBy(x => x.Code);
             }
             else
             {

@@ -13,55 +13,45 @@
             </tr>
         </thead>
         <tbody *ngIf="records">
-            <tr *ngFor="let record of records; let i = index">
-                <td class="table-actions-col">
-                    <div class="table-actions" style="width: 70px">
-                        <!-- <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                            title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
-                            <i class="la la-edit"></i>
-                        </button> -->
-                        <app-default-button [buttonSetting]="editButtonSetting" [dataTarget]="editButtonSetting.dataTarget" (click)="editClick(record)"></app-default-button>
-                        <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                            <i class="la la-trash"></i>
-                        </button> -->
-                        <app-default-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="deleteClick(record)"></app-default-button>
+            <ng-container *ngIf="records.length>0; else norecord">
+                <tr *ngFor="let record of records; let i = index">
+                        <td class="table-actions-col">
+                            <div class="table-actions" style="width: 70px">
+                                <!-- <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
+                                    <i class="la la-edit"></i>
+                                </button> -->
+                                <app-default-button [buttonSetting]="editButtonSetting" [dataTarget]="editButtonSetting.dataTarget" (click)="editClick(record)"></app-default-button>
+                                <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                    <i class="la la-trash"></i>
+                                </button> -->
+                                <app-default-button [buttonSetting]="deleteButtonSetting" [dataTarget]="deleteButtonSetting.dataTarget" (click)="deleteClick(record)"></app-default-button>
+                            </div>
+                        </td>
+                        <ng-container *ngFor="let map of columnMaps">
+                            <!-- {{ record[map.primaryKey] }} -->
+                            <td [ctStyleCell]="record[map.primaryKey]" *ngIf="map.isShow">
+                                <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
+                            </td>
+                        </ng-container>
+                        <!-- <td *ngFor="let map of columnMaps" [ctStyleCell]="record[map.primaryKey]">
+                            <ng-container *ngIf="map.isShow">
+                                <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
+                            </ng-container>
+                        </td> -->
+                    </tr>
+            </ng-container>
+        </tbody>
+        <ng-template #norecord>
+            <tr>
+                <td attr.colspan="{{ columnColspan }}">
+                    <div class="no-data">
+                        <i class="flaticon-coins"></i>
+                        <span class="no-data-text">No records found</span>
                     </div>
                 </td>
-                <!-- <td>
-                    <span>1</span>
-                </td>
-                <td>
-                    <span>Stage 2</span>
-                </td>
-                <td>
-                    <span>Preprade document</span>
-                </td>
-                <td style="width: 200px;">
-                    <span>Preprade document template and detail Verify and signed Check a</span>
-                </td>
-                <td>
-                    <span>Cargo O.P</span>
-                </td>
-                <td>
-                    <span>4</span>
-                </td>
-                <td>
-                    <span>10/08/2018</span>
-                </td> -->
-                <!-- <td>{{ (i+1) }}</td> -->
-                <ng-container *ngFor="let map of columnMaps">
-                    <!-- {{ record[map.primaryKey] }} -->
-                    <td [ctStyleCell]="record[map.primaryKey]" *ngIf="map.isShow">
-                        <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
-                    </td>
-                </ng-container>
-                <!-- <td *ngFor="let map of columnMaps" [ctStyleCell]="record[map.primaryKey]">
-                    <ng-container *ngIf="map.isShow">
-                        <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
-                    </ng-container>
-                </td> -->
             </tr>
-        </tbody>
+        </ng-template>
     </table>
 </div>

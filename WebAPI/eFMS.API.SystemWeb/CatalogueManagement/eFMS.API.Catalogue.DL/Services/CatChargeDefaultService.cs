@@ -89,7 +89,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var defaultAccount = new CatChargeDefaultAccount
                     {
                         ChargeId = charge.Id,
-                        Inactive = item.Status.ToString().ToLower() == "active" ? false : true,
+                        Inactive = (item.Status==null)?false:item.Status.ToString().ToLower() == "active" ? false : true,
                         UserCreated = ChangeTrackerHelper.currentUser,
                         DatetimeCreated = DateTime.Now,                        
                         Type = item.Type,

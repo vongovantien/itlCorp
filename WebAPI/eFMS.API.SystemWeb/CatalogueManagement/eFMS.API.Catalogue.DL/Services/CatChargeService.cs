@@ -120,7 +120,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCharge> Query(CatChargeCriteria criteria)
         {
-            var list = DataContext.Get();
+            var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if(criteria.All == null)
             {
                 list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
