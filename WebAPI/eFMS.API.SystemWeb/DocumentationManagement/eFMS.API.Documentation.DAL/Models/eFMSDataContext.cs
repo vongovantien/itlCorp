@@ -1746,13 +1746,13 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
 
-                entity.Property(e => e.DeliveryPlaceId).HasColumnName("DeliveryPlaceID");
+                entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
 
                 entity.Property(e => e.ExportReferenceNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.FinalDestinationPlaceId).HasColumnName("FinalDestinationPlaceID");
+                entity.Property(e => e.FinalDestinationPlace).HasMaxLength(500);
 
                 entity.Property(e => e.ForwardingAgentId)
                     .HasColumnName("ForwardingAgentID")
@@ -1800,9 +1800,9 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.OriginBlnumber).HasColumnName("OriginBLNumber");
 
-                entity.Property(e => e.PickupPlaceId)
-                    .HasColumnName("PickupPlaceID")
-                    .HasMaxLength(4000);
+                entity.Property(e => e.OriginCountryId).HasColumnName("OriginCountryID");
+
+                entity.Property(e => e.PickupPlace).HasMaxLength(500);
 
                 entity.Property(e => e.PlaceFreightPay).HasMaxLength(4000);
 
