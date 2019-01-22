@@ -9,6 +9,14 @@ export const COMMODITYCOLUMNSETTING: ColumnSetting[] =
     lookup: ''
   },
   {
+    primaryKey: 'code',
+    header: 'Code',
+    isShow: true,
+    dataType: 'text',
+    required: true,
+    lookup: ''
+  },
+  {
     primaryKey: 'commodityNameEn',
     header: 'Name( EN)',
     isShow: true,
@@ -42,13 +50,5 @@ export const COMMODITYCOLUMNSETTING: ColumnSetting[] =
     dataType: 'boolean',
     required: true,
     lookup: ''
-  },
-  {
-    primaryKey: 'code',
-    header: 'Code',
-    isShow: true,
-    dataType: 'text',
-    required: true,
-    lookup: ''
-  },
+  }
 ]
