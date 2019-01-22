@@ -13,11 +13,12 @@ export class CsTransactionDetail {
   customsBookingNo: String = null;
   localVoyNo: String = null;
   oceanVoyNo: String = null;
+  originCountryId:String = null;
   pickupPlaceId: String = null;
   pol: String = null;
   pod: String = null;
-  deliveryPlaceId: String = null;
-  finalDestinationPlaceId: String = null;
+  deliveryPlace: String = null;
+  finalDestinationPlace: String = null;
   freightPayment: String = null;
   placeFreightPay: String = null;
   closingDate: Date = null;
