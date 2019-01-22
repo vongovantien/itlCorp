@@ -107,17 +107,17 @@
                                 (click)="sort('address')">
                                 <span>Address</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
-                                (click)="sort('districtName')">
-                                <span>Ditrict</span>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
+                                (click)="sort('countryName')">
+                                <span>Country</span>
                             </th>
                             <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
                                 (click)="sort('provinceName')">
                                 <span>City</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
-                                (click)="sort('countryName')">
-                                <span>Country</span>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
+                                (click)="sort('districtName')">
+                                <span>Ditrict</span>
                             </th>
                             <th (click)="sort('status')" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }">
                                 <span>Status</span>
@@ -147,16 +147,16 @@
                                     <span class="m--font-danger" *ngIf="item.address.split('|').length > 1">{{ item.address.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.districtName.split('|').length == 1">{{ item.districtName }}</span>
-                                    <span class="m--font-danger" *ngIf="item.districtName.split('|').length > 1">{{ item.districtName.split('|')[0] }}</span>
+                                    <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
+                                    <span class="m--font-danger" *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.provinceName.split('|').length == 1">{{ item.provinceName }}</span>
                                     <span class="m--font-danger" *ngIf="item.provinceName.split('|').length > 1">{{ item.provinceName.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
-                                    <span class="m--font-danger" *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
+                                    <span *ngIf="item.districtName.split('|').length == 1">{{ item.districtName }}</span>
+                                    <span class="m--font-danger" *ngIf="item.districtName.split('|').length > 1">{{ item.districtName.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>

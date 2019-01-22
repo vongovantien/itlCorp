@@ -281,7 +281,9 @@ export class WarehouseComponent implements OnInit {
       this.criteria.all = event.searchString;
     }
     else{
-      this.criteria.all = null;
+      this.criteria = {
+        placeType: PlaceTypeEnum.Warehouse
+      };
       let language = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
       if(language == SystemConstants.LANGUAGES.ENGLISH){
         if(event.field == "countryName"){

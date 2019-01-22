@@ -54,8 +54,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<vw_catPlace> Query(CatPlaceCriteria criteria)
         {
-            var list = GetView();
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
+            var list = GetView();//.Where(x => ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   //&& (x.Inactive == criteria.Inactive || criteria.Inactive == null)).ToList();
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -89,7 +90,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   || ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    )
                                    && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
@@ -504,7 +505,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    result.Address = string.Empty;
+                    result.Address = item.Address;
                 }
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
@@ -549,7 +550,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                             else
                             {
-                                var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName&& (i.ProvinceId == province.Id || province == null));
+                                var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
                                 if (district == null)
                                 {
                                     result.DistrictName = string.Format("District name is not allow empty!|wrong");

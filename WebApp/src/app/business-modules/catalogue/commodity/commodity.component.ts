@@ -167,15 +167,15 @@ export class CommodityComponent implements OnInit {
       this.criteria.all = event.searchString;
     }
     else{
-      this.criteria.all = null;
+      this.criteria  = {};
       if(event.field == "commodityNameEn"){
         this.criteria.commodityNameEn = event.searchString;
       }
       if(event.field == "commodityNameVn"){
         this.criteria.commodityNameVn = event.searchString;
       }
-      if(event.field == "commonityGroupNameEn"){
-        this.criteria.commonityGroupNameEn = event.searchString;
+      if(event.field == "commodityGroupNameEn"){
+        this.criteria.commodityGroupNameEn = event.searchString;
       }
     }
     this.pager.currentPage = 1;
@@ -186,7 +186,7 @@ export class CommodityComponent implements OnInit {
       this.criteria.all = event.searchString;
     }
     else{
-      this.criteria.all = null;
+      this.criteria = {};
       if(event.field == "groupNameEn"){
         this.criteria.groupNameEn = event.searchString;
       }
