@@ -108,7 +108,7 @@ export class PortIndexComponent implements OnInit {
       this.criteria = {
         placeType: PlaceTypeEnum.Port
       };
-      let language = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
+      let language = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
       if (language == SystemConstants.LANGUAGES.ENGLISH) {
         if (event.field == "countryName") {
           this.criteria.countryNameEN = event.searchString;
