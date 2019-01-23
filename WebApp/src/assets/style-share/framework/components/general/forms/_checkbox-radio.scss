@@ -20,6 +20,7 @@
         margin-bottom: 10px;
         cursor: pointer;
         font-size: get-font-size(regular);
+        line-height: 21px;
         @include transition($transition);
 
         &.m-radio--disabled,

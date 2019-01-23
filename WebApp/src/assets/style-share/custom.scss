@@ -59,11 +59,11 @@ body {
 }
 body {
     overflow-y: scroll;
-    &.body-fixed {
-        width: 100%;
-        position: fixed;
-        top: 0;
-    }
+    // &.body-fixed {
+    //     width: 100%;
+    //     position: fixed;
+    //     top: 0;
+    // }
 }
 //element
 label {

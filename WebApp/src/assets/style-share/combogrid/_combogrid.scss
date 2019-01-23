@@ -14,9 +14,10 @@
             tr {
                 th,
                 td {
-                    min-width: 120px;
+                    min-width: 100px;
                     padding: 4px;
                     border-bottom-width: 1px;
+                    font-size: 12px;
                 }
                 &.data-selected {
                     td {
@@ -39,7 +40,7 @@
         background-color: #f2dedf;
     }
     .table-body-scroll {
-        max-height: 70px;
+        max-height: 100px;
         overflow: auto;
         .table {
             tr {
