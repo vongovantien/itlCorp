@@ -78,3 +78,5 @@ bin
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DL/obj
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/.vs
+/WebAPI/eFMS.API.SystemWeb/IdentityServer/eFMS.IdentityServer/Properties/PublishProfiles/*.pubxml
+/WebAPI/eFMS.API.SystemWeb/IdentityServer/eFMS.IdentityServer/Properties/PublishProfiles/*.user
