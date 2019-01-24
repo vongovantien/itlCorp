@@ -47,7 +47,7 @@ export class StageManagementComponent implements OnInit {
         await this.setPage(this.pager);
     }
 
-    async setPage(pager) {
+    async setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.totalPages = pager.totalPages;
         this.ListStages = await this.getStages(pager);
@@ -55,7 +55,6 @@ export class StageManagementComponent implements OnInit {
 
     async getStages(pager: PagerSetting) {
         var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.paging + "/" + pager.currentPage + "/" + pager.pageSize, this.searchObject, false, true);
-        this.ConstStageList = response.data.map((x: any) => Object.assign({}, x));
         pager.totalItems = response.totalItems;
         return response.data;
     }
@@ -107,7 +106,7 @@ export class StageManagementComponent implements OnInit {
                 if(res){
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
-                    await this.setPage(this.pager);
+                    //await this.setPage(this.pager);
                 }
             }
         }

@@ -59,11 +59,29 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
     return townWards;
 }
 
-
+/**
+ *  Prepare data for ng2-select control from dataSource
+ *  ng2-select required input data following format {id:'',text:''}
+ *  for more information please got to : 
+ *  https://valor-software.com/ng2-select/
+ * @param dataSource 
+ * @param idField 
+ * @param textField 
+ */
 export function prepareNg2SelectData(dataSource:[],idField:any,textField:any){
     var returnData = lodash.map(dataSource,function(o){
         return {id:o[idField],text:o[textField]}
     });
     return returnData;
 }
+
+/**
+ * Return true if input string contains special characters but false
+ * @param str 
+ */
+export function checkSpecialCharacters(str:String){
+    var reg = /[!@#$%^&*()?":{}|<>]/;
+    return reg.test(str.toLowerCase());
+}
+
 

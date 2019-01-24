@@ -95,9 +95,9 @@
                     <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partnerTaxCode.invalid }">
                             <label class="form-control-label" for="">
-                                Tax Code <span class="m--font-danger">(*)</span>
+                                Tax Code test <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Tax Code" autocomplete="nope" minlength="3" maxlength="100"
+                            <input type="text" class="form-control m-input m-input--square" pattern='/([^!@#$%^&*()])/' title="Tax code must be number" placeholder="Please enter Tax Code" autocomplete="nope" minlength="3" maxlength="100"
                                 name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" (change)="partner.taxCode = partner.taxCode.trim()" 
                                 [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerTaxCode.invalid }" required>
                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerTaxCode.invalid" >

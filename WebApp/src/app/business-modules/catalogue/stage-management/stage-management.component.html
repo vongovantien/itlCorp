@@ -187,7 +187,12 @@
                                     <span>{{stage.stage.descriptionEn}}</span>
                                 </td>
                                 <td>
-                                    <span>{{stage.stage.inactive}}</span>
+                                    <span>
+                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                            <input type="checkbox" disabled [checked]="stage.stage.inactive">
+                                            <span></span>
+                                        </label>
+                                    </span>
                                 </td>
                             </tr>
                         </ng-container>
@@ -423,6 +428,16 @@
                                     </div>
                                     <!-- <input type="number" [(ngModel)]="ListStages[index_stage_edit].stage.departmentId" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Role"> -->
+                                </div>
+                                <div class="form-group row" >
+                                    <label class="col-lg-4 col-form-label form-control-label">
+                                        Inactive
+                                    </label>
+                                    <div class="col-lg-8">
+                                        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                            <input [checked]="ListStages[index_stage_edit].stage.inactive" (change)="ListStages[index_stage_edit].stage.inactive=!ListStages[index_stage_edit].stage.inactive"
+                                                name="stageIsActive" type="checkbox"><span></span></label>
+                                    </div>
                                 </div>
 
                             </div>

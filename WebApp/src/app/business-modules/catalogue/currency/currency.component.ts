@@ -248,8 +248,4 @@ export class CurrencyComponent implements OnInit {
      this.excelService.generateExcel(exportModel);
     
   }
-
-  async import() {
-
-  }
 }
