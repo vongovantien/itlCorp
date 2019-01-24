@@ -13,7 +13,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string ContainerNo { get; set; }
         public string SealNo { get; set; }
         public short? UnitOfMeasureId { get; set; }
-        public int? UnitQuantity { get; set; }
+        public short? UnitQuantity { get; set; }
         public string Description { get; set; }
         public decimal? Gw { get; set; }
         public decimal? Cbm { get; set; }
@@ -23,9 +23,5 @@ namespace eFMS.API.Documentation.Service.Models
         public string OffHireRefNo { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-
-        public virtual CatUnit ContainerType { get; set; }
-        public virtual CsTransaction Mbl { get; set; }
-        public virtual CatUnit UnitOfMeasure { get; set; }
     }
 }

@@ -5,12 +5,6 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
-        public CsTransaction()
-        {
-            CsMawbcontainer = new HashSet<CsMawbcontainer>();
-            CsTransactionDetail = new HashSet<CsTransactionDetail>();
-        }
-
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
         public string JobNo { get; set; }
@@ -29,7 +23,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? LoadingDate { get; set; }
         public DateTime? RequestedDate { get; set; }
         public string FlightVesselName { get; set; }
-        public string FlightVoyNo { get; set; }
+        public string VoyNo { get; set; }
         public DateTime? FlightVesselConfirmedDate { get; set; }
         public string ShipmentType { get; set; }
         public string ServiceMode { get; set; }
@@ -56,8 +50,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual ICollection<CsMawbcontainer> CsMawbcontainer { get; set; }
-        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
+        
     }
 }
