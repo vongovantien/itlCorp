@@ -50,7 +50,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Create date: From - To
+                                Shipment date: From - To
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square"
@@ -103,23 +103,127 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Shipper
+                                        Customer
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" value="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Abbr Name</th>
+                                                                    <th style="width: 200px">Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row data-selected" data-id="1">
+                                                                <td>IDAAA</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam</td>
+                                                                <td>taxcode1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>IDBBB</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền đông</td>
+                                                                <td>taxcode1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>IDCCC</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền nam</td>
+                                                                <td>taxcode1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>IDDDD</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam chi nhánh chính</td>
+                                                                <td>taxcode1</td>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Supplier (Co-Loader)
+                                        Notify party
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" value="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Abbr Name</th>
+                                                                    <th style="width: 200px">Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row data-selected" data-id="1">
+                                                                <td>IDAAA</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam</td>
+                                                                <td>taxcode1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>IDBBB</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền đông</td>
+                                                                <td>taxcode1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>IDCCC</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền nam</td>
+                                                                <td>taxcode1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>IDDDD</td>
+                                                                <td>DHL_VN</td>
+                                                                <td style="width: 200px">Công ty DHL Việt Nam chi nhánh chính</td>
+                                                                <td>taxcode1</td>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -127,10 +231,49 @@
                                     <label class="form-control-label" for="">
                                         Saleman
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" value="Scost Phương">
+                                        <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>User name</th>
+                                                                    <th>Full name</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row data-selected" data-id="1">
+                                                                <td>Scost Phương</td>
+                                                                <td>Phương Phương Cả Họ Lẫn Tên</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>Irien Tâm</td>
+                                                                <td>Tâm Phạm</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>Thor Thế</td>
+                                                                <td>Cái Gì Đó Thế</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

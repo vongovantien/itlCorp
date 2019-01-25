@@ -1,0 +1,54 @@
+//combogrid
+.e--combogrid {
+    .dropdown-menu {
+        min-width: 100%;
+        padding: 0;
+        background-color: #fff;
+        -webkit-box-shadow: 0 2px 4px 0 rgba(0,0,0,.16), 0 2px 8px 0 rgba(0,0,0,.12);
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,.16), 0 2px 8px 0 rgba(0,0,0,.12);
+    }
+    .table {
+        min-width: 100%;
+        thead,
+        tbody {
+            tr {
+                th,
+                td {
+                    width: 100px;
+                    padding: 4px;
+                    border-bottom-width: 1px;
+                    font-size: 12px;
+                }
+                &.data-selected {
+                    td {
+                        background-color: #3965b6;
+                        color: #fff;
+                    }
+                }
+            }
+        }
+        &.table-hover {
+            tr {
+                &:hover  {
+                    background-color: #e6e6e6;
+                }
+            }
+        }
+    }
+    .table-header{
+        padding-right: 5px;
+        background-color: #f2dedf;
+    }
+    .table-body-scroll {
+        max-height: 100px;
+        overflow: auto;
+        .table {
+            tr {
+                th,
+                td {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
