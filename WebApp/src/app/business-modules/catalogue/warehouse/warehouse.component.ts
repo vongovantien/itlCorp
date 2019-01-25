@@ -29,11 +29,11 @@ import {language} from 'src/languages/language.en';
 export class WarehouseComponent implements OnInit {
   warehouses: Array<Warehouse>;
   countries: any[] = [];
-  countryActive: {};
+  countryActive: any[] = [];
   provinces: any[] = [];
-  provinceActive: {};
+  provinceActive: any[] = [];
   districts: any[] = [];
-  districtActive: {};
+  districtActive: any[] = [];
   keySortDefault: string = "code";
   warehouse: Warehouse = new Warehouse();
   showModal: boolean = false;
@@ -67,6 +67,9 @@ export class WarehouseComponent implements OnInit {
     };
     this.provinces = [];
     this.districts = [];
+    this.countryActive = [];
+    this.provinceActive = [];
+    this.districtActive = [];
     this.ngSelectCountry.active = [];
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];
@@ -162,16 +165,21 @@ export class WarehouseComponent implements OnInit {
   }
   async showDetail(item) {
     this.warehouse = item;
-    this.getCountries();
+    //await this.getCountries();
     if(this.warehouse.countryID != null){
-      await this.getProvinces(this.warehouse.countryID);
+      let indexOfCountryActive = this.countries.findIndex(x => x.id == this.warehouse.countryID);
+      this.countryActive = [this.countries[indexOfCountryActive]];
     }
     if(this.warehouse.provinceID != null){
-      await this.getDistricts(this.warehouse.provinceID);
+      await this.getProvinces(this.warehouse.countryID);
+      let indexOfProvinceActive = this.provinces.findIndex(x => x.id == this.warehouse.provinceID);
+      this.provinceActive = [this.provinces[indexOfProvinceActive]];
     }
-    this.countryActive = this.countries.find(x => x.id == this.warehouse.countryID);
-    this.provinceActive = this.provinces.find(x => x.id == this.warehouse.provinceID);
-    this.districtActive = this.districts.find(x => x.id == this.warehouse.districtID);
+    if(this.warehouse.districtID != null){
+      await this.getDistricts(this.warehouse.provinceID);
+      let indexOfDistrictActive = this.districts.findIndex(x => x.id == this.warehouse.districtID);
+      this.districtActive = [this.districts[indexOfDistrictActive]];
+    }
   }
   async onDelete(event) {
     console.log(event);
@@ -340,21 +348,23 @@ export class WarehouseComponent implements OnInit {
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];
   }
-  valueCountry: any = {};
-  valueProvince: any = {};
-  valueDistrict: any = {};
+  // valueCountry: any = {};
+  // valueProvince: any = {};
+  // valueDistrict: any = {};
+  value: any = {};
   public refreshValue(value:any, name: any):void {
-    if(name == 'country'){
-      this.valueCountry = value;
-      this.chooseCountryReset();
-    }
-    if(name == 'province'){
-      this.valueDistrict = value;
-      this.chooseProvinceReset();
-    }
-    if(name == 'district'){
-      this.valueDistrict = value;
-    }
+    this.value = value;
+    // if(name == 'country'){
+    //   this.valueCountry = value;
+    //   this.chooseCountryReset();
+    // }
+    // if(name == 'province'){
+    //   this.valueProvince = value;
+    //   this.chooseProvinceReset();
+    // }
+    // if(name == 'district'){
+    //   this.valueDistrict = value;
+    // }
   }
   public removed(value:any, name: any):void {
     if(name == 'country'){
@@ -363,11 +373,13 @@ export class WarehouseComponent implements OnInit {
       this.warehouse.districtID = null;
       this.provinces = [];
       this.districts = [];
+      this.chooseCountryReset();
     }
     if(name == 'province'){
       this.warehouse.provinceID = null;
       this.warehouse.districtID = null;
       this.districts = [];
+      //this.chooseProvinceReset();
     }
     if(name == 'district'){
       this.warehouse.districtID = null;
@@ -380,8 +392,8 @@ export class WarehouseComponent implements OnInit {
   chooseCountryReset(){
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];
-    this.provinceActive = null;
-    this.districtActive = null;
+    this.provinceActive = [];
+    this.districtActive = [];
   }
   chooseProvinceReset(){
     this.ngSelectDistrict.active = [];

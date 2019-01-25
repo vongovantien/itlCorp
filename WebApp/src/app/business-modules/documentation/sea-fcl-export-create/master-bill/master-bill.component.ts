@@ -9,6 +9,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+import { eventNames } from 'cluster';
 
 @Component({
   selector: 'app-master-bill',
@@ -35,11 +36,16 @@ export class MasterBillComponent implements OnInit {
     async ngOnInit() {
        this.getShipmentCommonData();
        this.getPorIndexs();
-       this.getColoaders();
+       this.getColoaders(null);
        this.getAgents();
        this.getUserInCharges();
     }
-
+    changeColoader(event){
+        let value = event.target.value;
+        if(value.length > 2){
+            return this.getColoaders(value);
+        }
+    }
     async getShipmentCommonData(){
         const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
         this.billOfLadingTypes = dataHelper.prepareNg2SelectData(data.billOfLadings,'value','displayName');
@@ -55,10 +61,12 @@ export class MasterBillComponent implements OnInit {
         }
     }
 
-    async getColoaders(){
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", { placeType: PartnerGroupEnum.CARRIER, modeOfTransport : 'SEA', inactive: false }, false, false);
+    async getColoaders(searchText: any){
+        let criteriaSearchColoader = { placeType: PartnerGroupEnum.CARRIER, modeOfTransport : 'SEA',  shortName: searchText, taxCode: searchText, partnerNameEn: searchText, inactive: false };
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
         if(partners != null){
-            this.coloaders = partners;
+            this.coloaders = partners.data;
+            console.log(this.coloaders);
         }
     }
 
