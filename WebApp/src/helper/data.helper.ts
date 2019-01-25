@@ -4,15 +4,15 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import * as lodash from 'lodash';
+
 /**
  * Return list provinces that belong to country has countryId
  * @param countryId 
- * @param pager 
+ * @param baseService 
+ * @param api_menu 
  */
 export async function getProvinces(countryId: any, baseService: BaseService, api_menu: API_MENU) {
 
-    // var baseService: BaseService;
-    // var api_menu: API_MENU;
     var searchObj = {
         countryId: countryId,
         placeType: PlaceTypeEnum.Province
@@ -22,10 +22,11 @@ export async function getProvinces(countryId: any, baseService: BaseService, api
 }
 
 /**
- *  Return list districts that belong to province-city / country 
+ * Return list districts that belong to province-city / country 
  * @param countryId 
  * @param provinceId 
- * @param pager 
+ * @param baseService 
+ * @param api_menu 
  */
 export async function getDistricts(countryId: any, provinceId: any, baseService: BaseService, api_menu: API_MENU) {
     var baseService: BaseService;
@@ -45,6 +46,8 @@ export async function getDistricts(countryId: any, provinceId: any, baseService:
  * @param provinceId 
  * @param districtId 
  * @param pager 
+ * @param baseService 
+ * @param api_menu 
  */
 export async function getTownWards(countryId: any, provinceId: any, districtId, pager: PagerSetting, baseService: BaseService, api_menu: API_MENU) {
     var baseService: BaseService;
