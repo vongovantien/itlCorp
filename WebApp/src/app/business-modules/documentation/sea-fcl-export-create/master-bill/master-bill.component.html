@@ -101,10 +101,50 @@
                         <label class="form-control-label" for="">
                                 Supplier/Vendor (co-loader)
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                        <!-- <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                             placeholder="Select option">
-                        </ng-select>
+                        </ng-select> -->
+                        <div class="dropdown e--combogrid" #selectedColoader>
+                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                [value]="selectedColoader.value == null?'Please selected coloader':selectedColoader.value">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
+                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeColoader($event)">
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-xs-3">Partner ID</th>
+                                                        <th class="col-xs-3">Name ABBR</th>
+                                                        <th class="col-xs-3">Name EN</th>
+                                                        <th class="col-xs-3">Tax Code</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="coloaders">
+                                            <tbody *ngFor="let coloader of coloaders;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.coloaderId!==null && shipment.coloaderId===coloader.id }" data-id="{{i}}" (click)="shipment.coloaderId = coloader.id; selectedColoader.value=coloader.partnerNameEn">
+                                                    <td class="col-xs-3">{{ coloader.accountNo }}</td>
+                                                    <td class="col-xs-3">{{ coloader.shortName }}</td>
+                                                    <td class="col-xs-3">{{ coloader.partnerNameEn }}</td>
+                                                    <td class="col-xs-3">{{ coloader.taxCode }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
