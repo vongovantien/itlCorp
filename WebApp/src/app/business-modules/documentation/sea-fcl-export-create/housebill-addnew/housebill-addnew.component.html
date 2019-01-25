@@ -48,20 +48,16 @@
                                 <label class="form-control-label" for="">
                                     Customer (Payer)
                                 </label>
-                                <!-- <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="HouseBillToAdd.customerId=$event.id" (removed)="HouseBillToAdd.customerId=null" (typed)="typed($event)"
-                                    placeholder="Select option">
-                                </ng-select> -->
-                                <div class="dropdown e--combogrid">
+                                <div class="dropdown e--combogrid" #selectedCustomer>
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="combogrid" value="Vũng Tàu, Bà Rịa, Việt Nam">
+                                        readonly data-toggle="dropdown" placeholder="combogrid" [value]="selectedCustomer.value==null?'Please select customer':selectedCustomer.value">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
                                                 <div class="table-filter-block">
                                                     <div class="search-field">
                                                         <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
+                                                            placeholder="Search..." (keyup)="getListCustomers($event.target.value)">
                                                         <i class="icon-search"></i>
                                                     </div>
                                                 </div>
@@ -81,36 +77,16 @@
                                             <div class="table-body-scroll">
                                                 <table class="table table-hover">
                                                     <tbody>
-                                                        <tr class="data-row data-selected" data-id="-1">
-                                                            <td class="col-xs-2">Vũng Tàu</td>
-                                                            <td class="col-xs-3">Bà Rịa - Vũng Tàu</td>
-                                                            <td class="col-xs-5">Việt Nam</td>
-                                                            <td class="col-xs-2">Việt Nam</td>
-                                                        </tr>
-                                                        <tr class="data-row" *ngFor="let item of listCustomers;let i = index" attr.data-id="{{i}}">
+                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                        <ng-container *ngFor="let item of listCustomers;let i = index">                                                           
+                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.customerId=item.partnerID;selectedCustomer.value=item.nameEN"
+                                                            [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.partnerID }">
                                                                 <td class="col-xs-2">{{item.partnerID}}</td>
                                                                 <td class="col-xs-3">{{item.nameABBR}}</td>
                                                                 <td class="col-xs-5">{{item.nameEN}}</td>
                                                                 <td class="col-xs-2">{{item.taxCode}}</td>
                                                             </tr>
-                                                            <!-- <tr class="data-row data-selected" data-id="1">
-                                                            <td class="col-xs-2">Vũng Tàu</td>
-                                                            <td class="col-xs-3">Bà Rịa - Vũng Tàu</td>
-                                                            <td class="col-xs-5">Việt Nam</td>
-                                                            <td class="col-xs-2">Việt Nam</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="1">
-                                                            <td class="col-xs-2">Vũng Tàu</td>
-                                                            <td class="col-xs-3">Bà Rịa - Vũng Tàu</td>
-                                                            <td class="col-xs-5">Việt Nam</td>
-                                                            <td class="col-xs-2">Việt Nam</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="1">
-                                                            <td class="col-xs-2">Vũng Tàu</td>
-                                                            <td class="col-xs-3">Bà Rịa - Vũng Tàu</td>
-                                                            <td class="col-xs-5">Việt Nam</td>
-                                                            <td class="col-xs-2">Việt Nam</td>
-                                                        </tr> -->
+                                                        </ng-container>
                                                     </tbody>
                                                 </table>
                                             </div>

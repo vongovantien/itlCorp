@@ -61,6 +61,10 @@ export class HousebillAddnewComponent implements OnInit {
      console.log(this.HouseBillToAdd);
   }
 
+  select(form){
+      console.log(form)
+  }
+
   async getShipmentCommonData(){
     const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
     this.listTypeOfService = dataHelper.prepareNg2SelectData(data.serviceTypes,'value','displayName'); 
@@ -69,8 +73,15 @@ export class HousebillAddnewComponent implements OnInit {
     this.listFreightPayment = dataHelper.prepareNg2SelectData(data.freightTerms,'value','displayName'); 
   }
 
-  public getListCustomers(){
-      this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER ,inactive:false}).subscribe(res=>{
+  public getListCustomers(search_key:string=null){
+      var key = "";
+      if(search_key!==null && search_key.length<3 && search_key.length>0){
+        return 0;
+      }else{
+          key = search_key;
+      }
+      
+      this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER ,inactive:false,all:key}).subscribe(res=>{
         var data = res['data']
         this.listCustomers = lodash.map(data, function(d){           
             return {partnerID:d['id'],nameABBR:d['shortName'],nameEN:d['partnerNameEn'],taxCode:d['taxCode']}
