@@ -102,7 +102,7 @@ namespace eFMS.API.Catalogue.DL.Services
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
                          select new { user = y, partner, saleman = x }
-                          ).ToList() ;
+                          );
             IQueryable<CatPartnerViewModel> results = null;
             string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
             if (criteria.All == null)
@@ -165,7 +165,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                InactiveOn = x.partner.InactiveOn,
                                UserCreatedName = x.user.Username,
                                SalePersonName = x.saleman.Username
-                            }).OrderBy(x => x.AccountNo).AsQueryable();
+                            }).OrderBy(x => x.AccountNo);
             }
             else
             {
@@ -229,7 +229,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                InactiveOn = x.partner.InactiveOn,
                                UserCreatedName = x.user.Username,
                                SalePersonName = x.saleman.Username
-                           }).OrderBy(x => x.AccountNo).AsQueryable();
+                           }).OrderBy(x => x.AccountNo);
             }
             return results;
             //var data = Get();

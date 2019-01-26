@@ -61,7 +61,7 @@ export class MasterBillComponent implements OnInit {
     }
 
     async getColoaders(searchText: any){
-        let criteriaSearchColoader = { placeType: PartnerGroupEnum.CARRIER, modeOfTransport : 'SEA',  shortName: searchText, taxCode: searchText, partnerNameEn: searchText, inactive: false };
+        let criteriaSearchColoader = { placeType: PartnerGroupEnum.CARRIER, modeOfTransport : 'SEA', all: searchText, inactive: false };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
         if(partners != null){
             this.coloaders = partners.data;
