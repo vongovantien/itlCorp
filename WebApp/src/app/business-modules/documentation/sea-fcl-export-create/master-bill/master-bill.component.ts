@@ -9,7 +9,6 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
-import { eventNames } from 'cluster';
 
 @Component({
   selector: 'app-master-bill',
