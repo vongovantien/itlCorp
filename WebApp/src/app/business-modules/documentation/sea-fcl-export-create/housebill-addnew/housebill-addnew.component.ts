@@ -79,8 +79,7 @@ export class HousebillAddnewComponent implements OnInit {
         return 0;
       }else{
           key = search_key;
-      }
-      
+      }      
       this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER ,inactive:false,all:key}).subscribe(res=>{
         var data = res['data']
         this.listCustomers = lodash.map(data, function(d){           
@@ -88,8 +87,6 @@ export class HousebillAddnewComponent implements OnInit {
         });       
       });
   }
-
-
 
    /**
      * Daterange picker
