@@ -21,6 +21,6 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public ICollection<SysUser> SysUser { get; set; }
+        public virtual ICollection<SysUser> SysUser { get; set; }
     }
 }

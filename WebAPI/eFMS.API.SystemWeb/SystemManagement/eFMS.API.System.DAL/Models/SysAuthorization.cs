@@ -23,8 +23,8 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public SysUser AssignToNavigation { get; set; }
-        public SysUser User { get; set; }
-        public ICollection<SysAuthorizationDetail> SysAuthorizationDetail { get; set; }
+        public virtual SysUser AssignToNavigation { get; set; }
+        public virtual SysUser User { get; set; }
+        public virtual ICollection<SysAuthorizationDetail> SysAuthorizationDetail { get; set; }
     }
 }

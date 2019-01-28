@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Documentation.Service.Models
+namespace eFMS.API.System.Service.Models
 {
     public partial class CsMawbcontainer
     {
@@ -28,5 +28,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string OffHireRefNo { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+
+        public virtual CatUnit ContainerType { get; set; }
+        public virtual CatUnit UnitOfMeasure { get; set; }
     }
 }

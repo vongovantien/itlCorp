@@ -1,5 +1,4 @@
 ﻿using System;
-using eFMS.API.Shipment.Service.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -76,38 +75,10 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
-                    options =>
-                    {
-                        options.UseRowNumberForPaging();
-                    });
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
             }
         }
-        public override int SaveChanges()
-        {
-            var entities = ChangeTracker.Entries();
-            var mongoDb = Shipment.Service.Helpers.MongoDbHelper.GetDatabase();
-            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
-            var addedList = ChangeTrackerHelper.GetAdded(entities);
-            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
-            var result = base.SaveChanges();
-            if (result > 0)
-            {
-                if (addedList != null)
-                {
-                    ChangeTrackerHelper.InsertToMongoDb(addedList, EntityState.Added);
-                }
-                if (modifiedList != null)
-                {
-                    ChangeTrackerHelper.InsertToMongoDb(modifiedList, EntityState.Modified);
-                }
-                if (deletedList != null)
-                {
-                    ChangeTrackerHelper.InsertToMongoDb(deletedList, EntityState.Deleted);
-                }
-            }
-            return result;
-        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
@@ -1251,7 +1222,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("CBM")
                     .HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.ContainerNo).HasMaxLength(4000);
+                entity.Property(e => e.ChargeAbleWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.ContainerNo).HasMaxLength(100);
 
                 entity.Property(e => e.ContainerTypeId).HasColumnName("ContainerTypeID");
 
@@ -1265,7 +1238,13 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
+                entity.Property(e => e.MarkNo).HasMaxLength(100);
+
                 entity.Property(e => e.Mblid).HasColumnName("MBLID");
+
+                entity.Property(e => e.Nw)
+                    .HasColumnName("NW")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.OffHireDepot).HasMaxLength(800);
 
@@ -1276,7 +1255,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SealNo).HasMaxLength(4000);
+                entity.Property(e => e.SealNo).HasMaxLength(100);
 
                 entity.Property(e => e.UnitOfMeasureId).HasColumnName("UnitOfMeasureID");
 
