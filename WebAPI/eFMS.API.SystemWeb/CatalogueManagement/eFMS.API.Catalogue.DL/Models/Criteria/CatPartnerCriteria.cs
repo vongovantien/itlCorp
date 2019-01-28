@@ -10,6 +10,8 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string All { get; set; }
         public CatPartnerGroupEnum PartnerGroup { get; set; }
         public string Id { get; set; }
+        public string PartnerNameVn { get; set; }
+        public string PartnerNameEn { get; set; }
         public string ShortName { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
@@ -19,5 +21,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string UserCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
+        public string AccountNo { get; set; }
     }
 }

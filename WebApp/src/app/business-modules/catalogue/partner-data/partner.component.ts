@@ -85,7 +85,10 @@ export class PartnerComponent implements OnInit {
       this.criteria.all = event.searchString;
     }
     else{
-      this.criteria.all = null;
+      //this.criteria.all = null;
+      let currentTab = this.criteria.partnerGroup;
+      this.criteria = {};
+      this.criteria.partnerGroup = currentTab;
       if(event.field == "id"){
         this.criteria.id = event.searchString;
       }
@@ -236,7 +239,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
       this.customerComponent.getPartnerData(pager, this.criteria);
     }
-    if(this.activeTab == this.tabName.allTab){
+    if(this.activeTab == this.tabName.agentTab){
       this.criteria.partnerGroup = PartnerGroupEnum.AGENT;
       this.agentComponent.getPartnerData(pager, this.criteria);
     }

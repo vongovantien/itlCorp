@@ -21,6 +21,9 @@ import {CsTransactionDetail} from 'src/app/shared/models/document/csTransactionD
   styleUrls: ['./housebill-addnew.component.scss']
 })
 export class HousebillAddnewComponent implements OnInit {
+    pager: PagerSetting = PAGINGSETTING;
+
+
     listCustomers:any=[];
     listSaleMan:any=[];
     listShipper:any=[];
@@ -52,8 +55,14 @@ export class HousebillAddnewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+       this.getListCustomers();
       this.getShipmentCommonData();
-    console.log(this.HouseBillToAdd);
+     
+     console.log(this.HouseBillToAdd);
+  }
+
+  select(form){
+      console.log(form)
   }
 
   async getShipmentCommonData(){
@@ -62,6 +71,22 @@ export class HousebillAddnewComponent implements OnInit {
     this.listTypeOfMove = dataHelper.prepareNg2SelectData(data.typeOfMoves,'value','displayName');  
     this.listHouseBillLadingType = dataHelper.prepareNg2SelectData(data.billOfLadings,'value','displayName'); 
     this.listFreightPayment = dataHelper.prepareNg2SelectData(data.freightTerms,'value','displayName'); 
+  }
+
+  public getListCustomers(search_key:string=null){
+      var key = "";
+      if(search_key!==null && search_key.length<3 && search_key.length>0){
+        return 0;
+      }else{
+          key = search_key;
+      }
+      
+      this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER ,inactive:false,all:key}).subscribe(res=>{
+        var data = res['data']
+        this.listCustomers = lodash.map(data, function(d){           
+            return {partnerID:d['id'],nameABBR:d['shortName'],nameEN:d['partnerNameEn'],taxCode:d['taxCode']}
+        });       
+      });
   }
 
 
@@ -118,5 +143,6 @@ export class HousebillAddnewComponent implements OnInit {
 
     save(){
         console.log(this.HouseBillToAdd);
+        console.log(this.listCustomers);
     }
 }

@@ -17,11 +17,12 @@ namespace eFMS.API.Documentation.Service.Models
         public string CustomsBookingNo { get; set; }
         public string LocalVoyNo { get; set; }
         public string OceanVoyNo { get; set; }
-        public string PickupPlaceId { get; set; }
+        public short? OriginCountryId { get; set; }
+        public string PickupPlace { get; set; }
         public Guid Pol { get; set; }
         public Guid Pod { get; set; }
-        public Guid DeliveryPlaceId { get; set; }
-        public Guid FinalDestinationPlaceId { get; set; }
+        public string DeliveryPlace { get; set; }
+        public string FinalDestinationPlace { get; set; }
         public string FreightPayment { get; set; }
         public string PlaceFreightPay { get; set; }
         public DateTime ClosingDate { get; set; }
@@ -42,7 +43,5 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-
-        public virtual CsTransaction Job { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class HouseBillSeaFCLExportModel:TestHouseBillSeaFclexport
+    public class CsTransactionModel: CsTransaction
     {
     }
 }

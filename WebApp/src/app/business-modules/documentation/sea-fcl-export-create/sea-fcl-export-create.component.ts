@@ -96,7 +96,6 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
     }
     onSubmit(){
-        console.log(this.formAddEdit);
         this.shipment = this.masterBillComponent.shipment;
         console.log(this.shipment);
     }

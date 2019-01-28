@@ -39,9 +39,9 @@ export class AgentComponent implements OnInit {
   ngOnInit() {
     // this.setPage(this.pager);
   }
-  setPage(pager: PagerSetting): any {
-    this.getPartnerData(pager, this.criteria);
-  }
+  // setPage(pager: PagerSetting): any {
+  //   this.getPartnerData(pager, this.criteria);
+  // }
   getPartnerData(pager: PagerSetting, criteria?: any): any {
     this.baseService.spinnerShow();
     if(criteria != undefined){

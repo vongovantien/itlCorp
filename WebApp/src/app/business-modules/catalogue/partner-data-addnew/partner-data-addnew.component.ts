@@ -388,4 +388,6 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.value = value;
   }
 
+
+
 }

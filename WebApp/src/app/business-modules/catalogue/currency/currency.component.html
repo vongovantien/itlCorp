@@ -7,8 +7,8 @@
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
-            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-              data-target="#add-unit-modal">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+              data-target="#edit-currency-modal" (click)="showAdd()">
               <span>
                   <i class="icon-plus7"></i>
                   <span>
@@ -16,7 +16,7 @@
                   </span>
               </span>
           </button>
-          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" disabled>
               <span>
                   <i class="la la-download"></i>
                   <span>
@@ -24,17 +24,17 @@
                   </span>
               </span>
           </button>
-          <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+          <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
               <span>
                   <i class="la la-upload"></i>
                   <span>
                       export
                   </span>
               </span>
-          </button> -->
-            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
+          </button>
+            <!-- <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
             <app-default-button [buttonSetting]="importButtonSetting" (click)="import()"></app-default-button>           
-            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button> -->
            
         </div>
     </div>

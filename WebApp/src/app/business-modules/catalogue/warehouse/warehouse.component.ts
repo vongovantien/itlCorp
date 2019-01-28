@@ -28,12 +28,12 @@ import {language} from 'src/languages/language.en';
 })
 export class WarehouseComponent implements OnInit {
   warehouses: Array<Warehouse>;
-  countries: any[];
-  countryActive: {};
-  provinces: any[];
-  provinceActive: {};
-  districts: any[];
-  districtActive: {};
+  countries: any[] = [];
+  countryActive: any[] = [];
+  provinces: any[] = [];
+  provinceActive: any[] = [];
+  districts: any[] = [];
+  districtActive: any[] = [];
   keySortDefault: string = "code";
   warehouse: Warehouse = new Warehouse();
   showModal: boolean = false;
@@ -65,6 +65,14 @@ export class WarehouseComponent implements OnInit {
       address: null,
       placeType: PlaceTypeEnum.Warehouse
     };
+    this.provinces = [];
+    this.districts = [];
+    this.countryActive = [];
+    this.provinceActive = [];
+    this.districtActive = [];
+    this.ngSelectCountry.active = [];
+    this.ngSelectProvince.active = [];
+    this.ngSelectDistrict.active = [];
   }
   importButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.import
@@ -109,65 +117,32 @@ export class WarehouseComponent implements OnInit {
   }
   getDataCombobox(){
     this.getCountries();
-    this.getProvinces();
-    this.getDistricts();
   }
-  getCountries(){
-    this.baseService.spinnerShow();
-    this.baseService.get(this.api_menu.Catalogue.Country.getAllByLanguage).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      if(response != null){
-        this.countries = response.map(x=>({"text":x.name,"id":x.id}));
-      }
-      else{
-        this.countries = [];
-      }
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err)
-    });
+  async getCountries(){
+    let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage, false, true);
+    if(responses != null){
+      this.countries = responses.map(x=>({"text":x.name,"id":x.id}));
+    }
   }
-  getProvinces(id?: number){
+  async getProvinces(countryId?: number){
     let url = this.api_menu.Catalogue.CatPlace.getProvinces;
-    if(id != undefined){
-      url = url + "?countryId=" + id; 
+    if(countryId != undefined){
+      url = url + "?countryId=" + countryId; 
     }
-    this.baseService.spinnerShow();
-    this.baseService.get(url).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      if(response != null){
-        this.provinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
-      }
-      else{
-        this.provinces = [];
-      }
-      this.countryLookup.dataLookup = this.provinces;
-      this.countryLookup.value = "id";
-      this.countryLookup.displayName = "nameEn";
-      console.log(this.provinces);
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+    let responses = await this.baseService.getAsync(url, false, true);
+    if(responses != null){
+      this.provinces = responses.map(x=>({"text":x.name_VN,"id":x.id}));
+    }
   }
-  getDistricts(id?: number){
+  async getDistricts(provinceId?: any){
     let url = this.api_menu.Catalogue.CatPlace.getDistricts;
-    if(id != undefined){
-      url = url + "?provinceId=" + id; 
+    if(provinceId != undefined){
+      url = url + "?provinceId=" + provinceId; 
     }
-    this.baseService.spinnerShow();
-    this.baseService.get(url).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      if(response != null){
-        this.districts = response.map(x=>({"text":x.name_VN,"id":x.id}));
-      }
-      else{
-        this.districts = [];
-      }
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+    let responses = await this.baseService.getAsync(url, false, true);
+    if(responses != null){
+      this.districts = responses.map(x=>({"text":x.name_VN,"id":x.id}));
+    }
   }
   async getWarehouses(pager: PagerSetting) {
     this.baseService.spinnerShow();
@@ -188,12 +163,23 @@ export class WarehouseComponent implements OnInit {
       this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
     }
   }
-  showDetail(item) {
+  async showDetail(item) {
     this.warehouse = item;
-    console.log(this.warehouse);
-    this.countryActive = this.countries.find(x => x.id == this.warehouse.countryID);
-    this.provinceActive = this.provinces.find(x => x.id == this.warehouse.provinceID);
-    this.districtActive = this.districts.find(x => x.id == this.warehouse.districtID);
+    //await this.getCountries();
+    if(this.warehouse.countryID != null){
+      let indexOfCountryActive = this.countries.findIndex(x => x.id == this.warehouse.countryID);
+      this.countryActive = [this.countries[indexOfCountryActive]];
+    }
+    if(this.warehouse.provinceID != null){
+      await this.getProvinces(this.warehouse.countryID);
+      let indexOfProvinceActive = this.provinces.findIndex(x => x.id == this.warehouse.provinceID);
+      this.provinceActive = [this.provinces[indexOfProvinceActive]];
+    }
+    if(this.warehouse.districtID != null){
+      await this.getDistricts(this.warehouse.provinceID);
+      let indexOfDistrictActive = this.districts.findIndex(x => x.id == this.warehouse.districtID);
+      this.districtActive = [this.districts[indexOfDistrictActive]];
+    }
   }
   async onDelete(event) {
     console.log(event);
@@ -228,7 +214,7 @@ export class WarehouseComponent implements OnInit {
     this.getWarehouses(pager);
   }
   onSubmit(){
-    if(this.form.valid){
+    if(this.form.valid && this.warehouse.countryID != null && this.warehouse.provinceID != null && this.warehouse.districtID != null){
       if(this.warehouse.id == null){
         this.addNew();
       }
@@ -281,8 +267,10 @@ export class WarehouseComponent implements OnInit {
       this.criteria.all = event.searchString;
     }
     else{
-      this.criteria.all = null;
-      let language = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
+      this.criteria = {
+        placeType: PlaceTypeEnum.Warehouse
+      };
+      let language = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
       if(language == SystemConstants.LANGUAGES.ENGLISH){
         if(event.field == "countryName"){
           this.criteria.countryNameEN = event.searchString;
@@ -329,14 +317,25 @@ export class WarehouseComponent implements OnInit {
   getColumn(field){
     return this.warehouseSettings.find(x => x.primaryKey == field);
   }
-  onCountrychange(country){
-    this.warehouse.countryID = country.id;
-    this.getProvinces(country.id);
-    this.refreshProvinceValue(null);
-  }
-  onProvincechange(province){
-    this.warehouse.provinceID = province.id;
-    this.getDistricts(province.id);
+  onChange(value, name: any){
+    if(name == 'country')
+    {
+      this.warehouse.countryID = value.id;
+      this.getProvinces(value.id);
+      this.chooseCountryReset();
+      this.provinces = [];
+      this.districts = [];
+      //this.refreshValue(null, 'country');
+    }
+    if(name == 'province'){
+      this.warehouse.provinceID = value.id;
+      this.getDistricts(value.id);
+      this.chooseProvinceReset();
+      this.districts = [];
+    }
+    if(name == 'district'){
+      this.warehouse.districtID = value.id;
+    }
   }
   showAdd(){
     this.resetWarehouse();
@@ -349,21 +348,42 @@ export class WarehouseComponent implements OnInit {
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];
   }
-  valueCountry: any = {};
-  valueProvince: any = {};
-  valueDistrict: any = {};
-  public refreshCountryValue(value:any):void {
-    this.valueCountry = value;
-    this.chooseCountryReset();
+  // valueCountry: any = {};
+  // valueProvince: any = {};
+  // valueDistrict: any = {};
+  value: any = {};
+  public refreshValue(value:any, name: any):void {
+    this.value = value;
+    // if(name == 'country'){
+    //   this.valueCountry = value;
+    //   this.chooseCountryReset();
+    // }
+    // if(name == 'province'){
+    //   this.valueProvince = value;
+    //   this.chooseProvinceReset();
+    // }
+    // if(name == 'district'){
+    //   this.valueDistrict = value;
+    // }
   }
-  public refreshDistrictValue(value:any):void {
-    this.valueDistrict = value;
-  }
-  public refreshProvinceValue(value: any): void{
-    this.valueDistrict = value;
-    this.chooseProvinceReset();
-  }
-  public removed(value:any):void {
+  public removed(value:any, name: any):void {
+    if(name == 'country'){
+      this.warehouse.countryID = null;
+      this.warehouse.provinceID = null;
+      this.warehouse.districtID = null;
+      this.provinces = [];
+      this.districts = [];
+      this.chooseCountryReset();
+    }
+    if(name == 'province'){
+      this.warehouse.provinceID = null;
+      this.warehouse.districtID = null;
+      this.districts = [];
+      //this.chooseProvinceReset();
+    }
+    if(name == 'district'){
+      this.warehouse.districtID = null;
+    }
     console.log('Removed value is: ', value);
   }
   public typed(value:any):void {
@@ -372,12 +392,12 @@ export class WarehouseComponent implements OnInit {
   chooseCountryReset(){
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];
+    this.provinceActive = [];
+    this.districtActive = [];
   }
   chooseProvinceReset(){
     this.ngSelectDistrict.active = [];
-  }
-  onDistrictchange(district){
-    this.warehouse.districtID = district.id;
+    this.districtActive = null;
   }
 
   /**

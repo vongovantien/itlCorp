@@ -16,7 +16,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()" disabled>
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -280,18 +280,7 @@
                                     name="local_description" placeholder="Please enter local description" autocomplete="off">                            
                             </div>
 
-                        </div>                       
-
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Inactive
-                            </label>
-                            <div class="col-lg-8">
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="UnitToAdd.inactive" (change)="UnitToAdd.inactive=!UnitToAdd.inactive"
-                                        type="checkbox"><span></span></label>
-                            </div>
-                        </div>
-
+                        </div>                      
 
                     </div>
                     <div class="modal-footer m--align-center c-button-actions">

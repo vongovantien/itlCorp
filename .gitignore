@@ -4,7 +4,7 @@
 /WebAPI/SystemManagement/eFMS.API.System/obj
 /WebAPI/SystemManagement/eFMS.API.System.DL/obj
 /WebAPI/SystemManagement/eFMS.API.System.DAL/obj
-/WebAPI/SystemManagement/.vs
+/WebAPI/SystemManagement/.vs  
 /WebAPI/eFMS.API.Mobile/.vs
 /WebAPI/eFMS.API.Mobile/bin
 /WebAPI/eFMS.API.Mobile/obj 
@@ -78,3 +78,5 @@ bin
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DL/obj
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/.vs
+/WebAPI/eFMS.API.SystemWeb/IdentityServer/eFMS.IdentityServer/Properties/PublishProfiles/*.pubxml
+/WebAPI/eFMS.API.SystemWeb/IdentityServer/eFMS.IdentityServer/Properties/PublishProfiles/*.user

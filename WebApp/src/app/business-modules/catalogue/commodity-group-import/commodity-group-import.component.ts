@@ -133,7 +133,7 @@ export class CommodityGroupImportComponent implements OnInit {
   }
 
   async downloadSample(){
-    await this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel,'CommodityGroupTemplate.xlsx');
+    await this.baseService.downloadfile(this.menu_api.Catalogue.CommodityGroup.downloadExcel,'CommodityGroupTemplate.xlsx');
   }
 
 
