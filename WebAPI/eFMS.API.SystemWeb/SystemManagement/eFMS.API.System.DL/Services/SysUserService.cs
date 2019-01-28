@@ -55,8 +55,15 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysUserViewModel> GetAll()
         {
-            var data = Get().ToList();
-            var results = mapper.Map<List<SysUserViewModel>>(data);
+            var data = ((eFMSDataContext)DataContext.DC).SysUser.Join(((eFMSDataContext)DataContext.DC).SysEmployee, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.x);
+                model.EmployeeNameEn = item.y.EmployeeNameEn;
+                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                results.Add(model);
+            }
             return results;
         }
 

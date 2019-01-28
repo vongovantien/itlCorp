@@ -34,16 +34,28 @@ export class MasterBillComponent implements OnInit {
 
     async ngOnInit() {
        this.getShipmentCommonData();
-       this.getPorIndexs();
+       this.getPorIndexs(null, null);
        this.getColoaders(null);
-       this.getAgents();
-       this.getUserInCharges();
+       this.getAgents(null);
+       this.getUserInCharges(null);
     }
-    changeColoader(event){
-        let value = event.target.value;
-        if(value.length > 2){
-            return this.getColoaders(value);
+    changePort(keySearch: any, isLading: any){
+        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
+        return 0;
         }
+        this.getPorIndexs(keySearch, isLading);
+    }
+    changeAgent(keySearch: any){
+        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
+        return 0;
+        }
+        this.getAgents(keySearch);
+    }
+    changeColoader(keySearch: any){
+        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
+          return 0;
+        }
+        this.getColoaders(keySearch);
     }
     async getShipmentCommonData(){
         const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
@@ -52,16 +64,28 @@ export class MasterBillComponent implements OnInit {
         this.terms = dataHelper.prepareNg2SelectData(data.freightTerms,'value','displayName');
         this.shipmentTypes = dataHelper.prepareNg2SelectData(data.shipmentTypes,'value','displayName');
     }
-    async getPorIndexs(){
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging+"?page=1&size=20", { placeType: PlaceTypeEnum.Port, modeOfTransport : 'SEA', inactive: false }, false, false);
+    async getPorIndexs(searchText: any, isLading: any){
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport : 'SEA', inactive: false, all: searchText };
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging+"?page=1&size=20", portSearchIndex, false, false);
         if(portIndexs != null){
-            this.portOfLadings = portIndexs;
-            this.portOfDestinations = portIndexs;
+            if(isLading == null){
+                this.portOfLadings = portIndexs.data;
+                this.portOfDestinations = portIndexs.data;
+            }
+            else{
+                if(isLading){
+                    this.portOfLadings = portIndexs.data;
+                }
+                else{
+                    this.portOfDestinations = portIndexs.data;
+                }
+            }
+            console.log(this.portOfDestinations);
         }
     }
 
     async getColoaders(searchText: any){
-        let criteriaSearchColoader = { placeType: PartnerGroupEnum.CARRIER, modeOfTransport : 'SEA', all: searchText, inactive: false };
+        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CARRIER, modeOfTransport : 'SEA', all: searchText, inactive: false };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
         if(partners != null){
             this.coloaders = partners.data;
@@ -69,14 +93,15 @@ export class MasterBillComponent implements OnInit {
         }
     }
 
-    async getAgents(){
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", { placeType: PartnerGroupEnum.AGENT, modeOfTransport : 'SEA', inactive: false }, false, false);
+    async getAgents(searchText: any){
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport : 'SEA', inactive: false, all: searchText };
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchAgent, false, false);
         if(partners != null){
-            this.agents = partners;
+            this.agents = partners.data;
         }
     }
 
-    async getUserInCharges(){
+    async getUserInCharges(searchText: any){
         const users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll, false, false);
         if(users != null){
             this.userInCharges = users;

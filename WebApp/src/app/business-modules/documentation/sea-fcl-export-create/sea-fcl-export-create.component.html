@@ -71,6 +71,103 @@
                 <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
                     <app-master-bill [formAddEdit]="formAddEdit"></app-master-bill> 
                 </div>
+                <!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text">
+                    Goods Summary
+                </h3>
+            </div>
+        </div>
+        <div class="m-portlet__head-tools">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal-master">
+                <span>
+                    <i class="la la-list"></i>
+                    <span>
+                        container list
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="m--margin-bottom-10">
+                            <span class="m--font-bolder">
+                                Commodities:
+                            </span>
+                            <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
+                                <span>Steel</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Consumer Good</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Drug</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Weapon</span>
+                            </perfect-scrollbar>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="m--margin-bottom-10">
+                            <span class="m--font-bolder">
+                                Detail container & packages:
+                            </span>
+                            <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
+                                <span>Steel</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Consumer Good</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Drug</span>
+                                <span class="m--margin-right-5">,</span>
+                                <span>Weapon</span>
+                            </perfect-scrollbar>
+                        </div>
+                    </div>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Description of good:
+                    </span>
+                    <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 100px">
+                        <span></span>
+                    </perfect-scrollbar>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total gross weight: {{ totalGrossWeight }}
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total net weight: {{ totalNetWeight }}
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total chargeable weight: {{ totalCharWeight }}
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total CBM: {{ totalCBM }}
+                    </span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: m-portlet--> 
                 <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
                     <app-housebill-list></app-housebill-list>
                 </div>
@@ -635,35 +732,35 @@
                                     <td class="">
                                         <span>
                                             <ng-select [allowClear]="true" [items]="containerTypes" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="item.containerType = $event.id" (removed)="removed($event)" (typed)="typed($event)"
+                                                (selected)="item.containerType = $event.id" (removed)="item.containerType = null" (typed)="typed($event)"
                                                 placeholder="Select filter">
                                             </ng-select>
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter Q'ty"> 
+                                            <input  type="number" [(ngModel)]="item.containerQuantity" class="form-control m-input m-input--square" placeholder="Enter Q'ty"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter container no"> 
+                                            <input  type="input" [(ngModel)]="item.containerNo" class="form-control m-input m-input--square" placeholder="Enter container no"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter seal no"> 
+                                            <input  type="input" [(ngModel)]="item.sealNo" class="form-control m-input m-input--square" placeholder="Enter seal no"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter mark no"> 
+                                            <input  type="input" [(ngModel)]="item.markNo" class="form-control m-input m-input--square" placeholder="Enter mark no"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
                                             <ng-select [allowClear]="true" [items]="commodities" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                (selected)="item.commodityId = $event.id" (removed)="item.commodityId = null" (typed)="typed($event)"
                                                 placeholder="Select commodity">
                                             </ng-select>
                                         </span>
@@ -671,7 +768,7 @@
                                     <td class="">
                                         <span>
                                             <ng-select [allowClear]="true" [items]="packageTypes" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                (selected)="item.packageTypeId = $event.id" (removed)="item.packageTypeId = null" (typed)="typed($event)"
                                                 placeholder="Select package type">
                                             </ng-select>
                                         </span>
@@ -683,23 +780,23 @@
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter description"> 
+                                            <input  type="input" [(ngModel)]="item.goodsDescription" class="form-control m-input m-input--square" placeholder="Enter description"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter gross weight"> 
+                                            <input  type="number" [(ngModel)]="item.grossWeight" class="form-control m-input m-input--square" placeholder="Enter gross weight"> 
                                         </span>
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter net weight"> 
+                                            <input  type="number" [(ngModel)]="item.netWeight" class="form-control m-input m-input--square" placeholder="Enter net weight"> 
                                         </span>
                                     </td>
                                     
                                     <td class="">
                                         <span>
-                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight"> 
+                                            <input  type="number" [(ngModel)]="item.chargeAbleWeight" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight"> 
                                         </span>
                                     </td>
                                     <td class="">
@@ -709,14 +806,14 @@
                                         </span> -->
                                         <span>
                                             <ng-select [allowClear]="true" [items]="weightMesurements" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                (selected)="item.unitId = $event.id" (removed)="item.unitId = null" (typed)="typed($event)"
                                                 placeholder="Select Unit">
                                             </ng-select>
                                         </span> 
                                     </td>
                                     <td class="">
                                         <span>
-                                            <input  type="number" class="form-control m-input m-input--square" placeholder="Enter CBM"> 
+                                            <input  type="number" [(ngModel)]="item.cbm" class="form-control m-input m-input--square" placeholder="Enter CBM"> 
                                         </span>
                                     </td>
                                 </tr>
@@ -727,7 +824,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button type="button" (click)="onSubmit()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" (click)="onSubmitContainer()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>
                         <span>
