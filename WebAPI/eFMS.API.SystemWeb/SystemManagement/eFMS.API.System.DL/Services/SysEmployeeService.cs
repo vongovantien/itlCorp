@@ -19,6 +19,7 @@ namespace eFMS.API.System.DL.Services
     {
         public SysEmployeeService(IContextBase<SysEmployee> repository, IMapper mapper) : base(repository, mapper)
         {
+            SetChildren<SysUser>("Id", "EmployeeId");
         }
 
         public HandleState AddEmployee(SysEmployeeModel sysEmployee)

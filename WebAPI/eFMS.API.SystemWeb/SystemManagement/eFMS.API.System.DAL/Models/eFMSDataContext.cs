@@ -1747,11 +1747,6 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
-
-                entity.HasOne(d => d.SaleResourceNavigation)
-                    .WithMany(p => p.SysEmployee)
-                    .HasForeignKey(d => d.SaleResource)
-                    .HasConstraintName("FK_sysEmployee_catSaleResource");
             });
 
             modelBuilder.Entity<SysMenu>(entity =>
