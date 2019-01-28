@@ -24,7 +24,6 @@
                             <input type="text" class="form-control m-input m-input--square" #estimatedTimeofDepature="ngModel"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                 [(ngModel)]="shipment.estimatedTimeofDepature"
-                                [ranges]="ranges"
                                 [maxDate]="maxDate"
                                 [alwaysShowCalendars]="true"
                                 [singleDatePicker]="true"
@@ -52,7 +51,6 @@
                             <input type="text" class="form-control m-input m-input--square"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                 [(ngModel)]="shipment.estimatedTimeofArrived"
-                                [ranges]="ranges"
                                 [maxDate]="maxDate"
                                 [alwaysShowCalendars]="true"
                                 [singleDatePicker]="true"
@@ -258,7 +256,7 @@
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title">
                 <h3 class="m-portlet__head-text">
-                    Goods Summary
+                    Shipment Good Summary
                 </h3>
             </div>
         </div>
@@ -282,15 +280,7 @@
                             <span class="m--font-bolder">
                                 Commodities:
                             </span>
-                            <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
-                                <span>Steel</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Consumer Good</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Drug</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Weapon</span>
-                            </perfect-scrollbar>
+                            <textarea class="form-control m-input--square" name="" id="" rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -298,15 +288,7 @@
                             <span class="m--font-bolder">
                                 Detail container & packages:
                             </span>
-                            <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
-                                <span>Steel</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Consumer Good</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Drug</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Weapon</span>
-                            </perfect-scrollbar>
+                            <textarea class="form-control m-input--square" name="" id="" rows="3">container-1, container-2, container-3</textarea>
                         </div>
                     </div>
                 </div>
@@ -314,9 +296,7 @@
                     <span class="m--font-bolder">
                         Description of good:
                     </span>
-                    <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 100px">
-                        <span></span>
-                    </perfect-scrollbar>
+                    <textarea class="form-control m-input--square" name="" id="" rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
                 </div>
             </div>
             <div class="col-xl-4">
