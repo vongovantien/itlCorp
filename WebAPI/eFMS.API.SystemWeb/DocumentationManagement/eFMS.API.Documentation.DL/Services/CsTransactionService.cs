@@ -32,30 +32,36 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.CreatedDate = DateTime.Now;
                 var hsTrans = dc.CsTransaction.Add(transaction);
                 var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-                foreach (var tranDetail in model.CsTransactionDetails)
+                if(model.CsTransactionDetails != null)
                 {
-                    var modelDetail = mapper.Map<CsTransactionDetail>(tranDetail);
-                    tranDetail.Id = Guid.NewGuid();
-                    tranDetail.JobId = transaction.Id;
-                    tranDetail.UserCreated = "01";
-                    tranDetail.DatetimeCreated = DateTime.Now;
-                    dc.CsTransactionDetail.Add(tranDetail);
-
-                    containers.ForEach(x =>
+                    foreach (var tranDetail in model.CsTransactionDetails)
                     {
-                        if(tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
+                        var modelDetail = mapper.Map<CsTransactionDetail>(tranDetail);
+                        tranDetail.Id = Guid.NewGuid();
+                        tranDetail.JobId = transaction.Id;
+                        tranDetail.UserCreated = "01";
+                        tranDetail.DatetimeCreated = DateTime.Now;
+                        dc.CsTransactionDetail.Add(tranDetail);
+
+                        containers.ForEach(x =>
                         {
-                            x.Hblid = tranDetail.Id;
-                        }
-                    });
+                            if (tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
+                            {
+                                x.Hblid = tranDetail.Id;
+                            }
+                        });
+                    }
                 }
-                foreach (var container in containers)
+                if(containers != null)
                 {
-                    container.Id = Guid.NewGuid();
-                    container.Mblid = transaction.Id;
-                    container.UserModified = "01";
-                    container.DatetimeModified = DateTime.Now;
-                    dc.CsMawbcontainer.Add(container);
+                    foreach (var container in containers)
+                    {
+                        container.Id = Guid.NewGuid();
+                        container.Mblid = transaction.Id;
+                        container.UserModified = "01";
+                        container.DatetimeModified = DateTime.Now;
+                        dc.CsMawbcontainer.Add(container);
+                    }
                 }
                 dc.SaveChanges();
                 return new HandleState();

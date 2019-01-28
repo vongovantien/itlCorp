@@ -8,11 +8,11 @@ export class Container {
   commodityId?: number = null;
   packageTypeId: string = null;
   goodsDescription: string = null;
-  grossWeight: number = null;
-  netWeight: number = null;
-  chargeAbleWeight: number = null;
+  grossWeight: number = 0;
+  netWeight: number = 0;
+  chargeAbleWeight: number = 0;
   unitId: number = null;
-  cbm: number = null;
+  cbm: number = 0;
   userCreated: string = null;
   datetimeCreated: Date = null;
   userModified: string = null;
@@ -21,4 +21,5 @@ export class Container {
   inactiveOn: Date = null;
   jobId: string = null;
   hblno: string = null;
+  isSave: boolean = false;
 }

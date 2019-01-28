@@ -23,9 +23,8 @@
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" #estimatedTimeofDepature="ngModel"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                [(ngModel)]="shipment.etd"
+                                [(ngModel)]="shipment.etdSelected"
                                 [ranges]="ranges"
-                                [maxDate]="maxDate"
                                 [alwaysShowCalendars]="true"
                                 [singleDatePicker]="true"
                                 name="estimatedTimeofDepature"
@@ -44,16 +43,15 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && (shipment.etaSelected!= null && shipment.etdSelected.startDate >= shipment.etaSelected.startDate) }">
                         <label class="form-control-label" for="">
                             Estimated time of Arrival
                         </label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                [(ngModel)]="shipment.eta"
+                                [(ngModel)]="shipment.etaSelected"
                                 [ranges]="ranges"
-                                [maxDate]="maxDate"
                                 [alwaysShowCalendars]="true"
                                 [singleDatePicker]="true"
                                 [autoApply]="true"
@@ -65,6 +63,9 @@
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && (shipment.etaSelected!= null && shipment.etdSelected.startDate >= shipment.etaSelected.startDate)" >
+                                Estimated time of Arrival must more or equal estimated time of departure
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -113,7 +114,7 @@
                                     <div class="table-head-fixed">
                                         <div class="table-filter-block">
                                             <div class="search-field">
-                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeColoader($event)">
+                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeColoader($event.target.value)">
                                                 <i class="icon-search"></i>
                                             </div>
                                         </div>
@@ -177,24 +178,96 @@
                         <label class="form-control-label" for="">
                             Aggent
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select option">
-                        </ng-select>
+                        <div class="dropdown e--combogrid" #selectedAgent>
+                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                [value]="selectedAgent.value == null?'Please selected agent':selectedAgent.value">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
+                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeAgent($event.target.value)">
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-xs-3">Partner ID</th>
+                                                        <th class="col-xs-3">Name ABBR</th>
+                                                        <th class="col-xs-3">Name EN</th>
+                                                        <th class="col-xs-3">Tax Code</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="agents">
+                                            <tbody *ngFor="let agent of agents;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.agentId!==null && shipment.agentId===agent.id }" data-id="{{i}}" 
+                                                    (click)="shipment.agentId = agent.id; selectedAgent.value=agent.partnerNameEn">
+                                                    <td class="col-xs-3">{{ agent.accountNo }}</td>
+                                                    <td class="col-xs-3">{{ agent.shortName }}</td>
+                                                    <td class="col-xs-3">{{ agent.partnerNameEn }}</td>
+                                                    <td class="col-xs-3">{{ agent.taxCode }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.portOfLoading == null }">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.pol == null }">
                         <label class="form-control-label" for="">
-                            Port of loading
+                            Port of loading <span class="m--font-danger">(*)</span>
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select option">
-                        </ng-select>
-                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.portOfLoading == null" >
+                        <div class="dropdown e--combogrid" #selectedPOL>
+                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                [value]="selectedPOL.value == null?'Please selected port of loading':selectedPOL.value">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
+                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changePort($event.target.value, true)">
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-xs-4">Port Code</th>
+                                                        <th class="col-xs-4">Port Name</th>
+                                                        <th class="col-xs-4">Country</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="portOfLadings">
+                                            <tbody *ngFor="let pol of portOfLadings;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{i}}" 
+                                                    (click)="shipment.pol = pol.id; selectedPOL.value= pol.nameEN">
+                                                    <td class="col-xs-4">{{ pol.code }}</td>
+                                                    <td class="col-xs-4">{{ pol.nameEN }}</td>
+                                                    <td class="col-xs-4">{{ pol.countryName }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.pol == null" >
                             Port of loading is required
                         </div>
                     </div>
@@ -204,10 +277,45 @@
                         <label class="form-control-label" for="">
                             Port of destination
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select option">
-                        </ng-select>
+                        <div class="dropdown e--combogrid" #selectedPOD>
+                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                [value]="selectedPOD.value == null?'Please selected port of loading':selectedPOD.value">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
+                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changePort($event.target.value, false)">
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-xs-4">Port Code</th>
+                                                        <th class="col-xs-4">Port Name</th>
+                                                        <th class="col-xs-4">Country</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="portOfDestinations">
+                                            <tbody *ngFor="let pod of portOfDestinations;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
+                                                    (click)="shipment.pod = pod.id; selectedPOD.value= pod.nameEN">
+                                                    <td class="col-xs-4">{{ pod.code }}</td>
+                                                    <td class="col-xs-4">{{ pod.nameEN }}</td>
+                                                    <td class="col-xs-4">{{ pod.countryName }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -272,10 +380,45 @@
                         <label class="form-control-label" for="">
                             Person in charge
                         </label>
-                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select option">
-                        </ng-select>
+                        <div class="dropdown e--combogrid" #selectedPersonInCharge>
+                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                [value]="selectedPersonInCharge.value == null?'Please selected person in charge':selectedPersonInCharge.value">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
+                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changePort($event.target.value, false)">
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-xs-4">User Name</th>
+                                                        <th class="col-xs-4">Full Name</th>
+                                                        <th class="col-xs-4">Role</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="userInCharges">
+                                            <tbody *ngFor="let user of userInCharges;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
+                                                    (click)="shipment.personIncharge = user.id; selectedPersonInCharge.value= user.employeeNameVn">
+                                                    <td class="col-xs-4">{{ user.username }}</td>
+                                                    <td class="col-xs-4">{{ user.employeeNameVn }}</td>
+                                                    <td class="col-xs-4">{{ user.employeeNameVn }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-8">
@@ -289,103 +432,6 @@
             </div>
         </div>
         <!--end::Form-->
-    </div>
-</div>
-<!--end:: m-portlet--> 
-<!--begin:: m-portlet-->
-<div class="m-portlet">
-    <div class="m-portlet__head">
-        <div class="m-portlet__head-caption">
-            <div class="m-portlet__head-title">
-                <h3 class="m-portlet__head-text">
-                    Goods Summary
-                </h3>
-            </div>
-        </div>
-        <div class="m-portlet__head-tools">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal-master">
-                <span>
-                    <i class="la la-list"></i>
-                    <span>
-                        container list
-                    </span>
-                </span>
-            </button>
-        </div>
-    </div>
-    <div class="m-portlet__body">
-        <div class="row">
-            <div class="col-xl-8">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="m--margin-bottom-10">
-                            <span class="m--font-bolder">
-                                Commodities:
-                            </span>
-                            <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
-                                <span>Steel</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Consumer Good</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Drug</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Weapon</span>
-                            </perfect-scrollbar>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="m--margin-bottom-10">
-                            <span class="m--font-bolder">
-                                Detail container & packages:
-                            </span>
-                            <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
-                                <span>Steel</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Consumer Good</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Drug</span>
-                                <span class="m--margin-right-5">,</span>
-                                <span>Weapon</span>
-                            </perfect-scrollbar>
-                        </div>
-                    </div>
-                </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Description of good:
-                    </span>
-                    <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 100px">
-                        <span></span>
-                    </perfect-scrollbar>
-                </div>
-            </div>
-            <div class="col-xl-4">
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total gross weight:
-                    </span>
-                    <span></span>
-                </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total net weight:
-                    </span>
-                    <span></span>
-                </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total chargeable weight:
-                    </span>
-                    <span></span>
-                </div>
-                <div class="m--margin-bottom-10">
-                    <span class="m--font-bolder">
-                        Total CBM:
-                    </span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 <!--end:: m-portlet--> 

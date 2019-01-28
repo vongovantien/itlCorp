@@ -18,7 +18,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string ShippingServiceType { get; set; }
         public string AgentId { get; set; }
         public Guid? Pol { get; set; }
-        public string Pod { get; set; }
+        public Guid? Pod { get; set; }
         public string PaymentTerm { get; set; }
         public DateTime? LoadingDate { get; set; }
         public DateTime? RequestedDate { get; set; }
@@ -50,6 +50,5 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-        
     }
 }
