@@ -525,7 +525,7 @@
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <form name="formAddEdit" #formAddEditContainer="ngForm" novalidate (ngSubmit)="formAddEditContainer.form.valid">
-            <div class="modal-content">
+            <div class="modal-content m-form m-form--state">
                 <div class="modal-header">
                     <h5 class="modal-title">Container List</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -723,7 +723,11 @@
                                             </span>
                                         </td>
                                     </tr> -->
-                                    <tr class="" *ngFor="let item of containers; let j = index">
+                                    <tr class="" *ngFor="let item of containers; let j = index"
+                                        [ngClass]="{ 'm-form__group has-danger': 
+                                        validatateDefaultAcountLine()!=true
+                                        && isAddNewLine
+                                        && index == ChargeToAdd.listChargeDefaultAccount.length-1}">
                                         <td class="">
                                             <div class="table-actions">
                                                 <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
@@ -741,22 +745,22 @@
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="number" [(ngModel)]="item.containerQuantity" [name]="'m_con_quan'+i" class="form-control m-input m-input--square" placeholder="Enter Q'ty"> 
+                                                <input  type="number" [(ngModel)]="item.quantity" [name]="'m_con_quan'+i" class="form-control m-input m-input--square" placeholder="Enter Q'ty"> 
                                             </span>
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="input" [(ngModel)]="item.containerNo" [name]="'m_con_quan'+i" class="form-control m-input m-input--square" placeholder="Enter container no"> 
+                                                <input  type="input" [(ngModel)]="item.containerNo" [name]="'m_con_no'+i" class="form-control m-input m-input--square" placeholder="Enter container no"> 
                                             </span>
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="input" [(ngModel)]="item.sealNo" [name]="'m_con_quan'+i" class="form-control m-input m-input--square" placeholder="Enter seal no"> 
+                                                <input  type="input" [(ngModel)]="item.sealNo" [name]="'m_con_sealno'+i" class="form-control m-input m-input--square" placeholder="Enter seal no"> 
                                             </span>
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="input" [(ngModel)]="item.markNo" [name]="'m_con_quan'+i" class="form-control m-input m-input--square" placeholder="Enter mark no"> 
+                                                <input  type="input" [(ngModel)]="item.markNo" [name]="'m_con_marko'+i" class="form-control m-input m-input--square" placeholder="Enter mark no"> 
                                             </span>
                                         </td>
                                         <td class="">
@@ -777,28 +781,28 @@
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="number" class="form-control m-input m-input--square" [name]="'m_con_quan'+i" placeholder="Enter package Q'ty"> 
+                                                <input  type="number" [(ngModel)]="item.packageQuantity" [name]="'m_con_packno'+i" class="form-control m-input m-input--square" [name]="'m_con_quan'+i" placeholder="Enter package Q'ty"> 
                                             </span>
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="input" [(ngModel)]="item.goodsDescription" class="form-control m-input m-input--square" placeholder="Enter description"> 
+                                                <input  type="input" [(ngModel)]="item.goodsDescription" [name]="'m_con_gooddes'+i" class="form-control m-input m-input--square" placeholder="Enter description"> 
                                             </span>
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="number" [(ngModel)]="item.grossWeight" class="form-control m-input m-input--square" placeholder="Enter gross weight"> 
+                                                <input  type="number" [(ngModel)]="item.gw" [name]="'m_con_gw'+i"  class="form-control m-input m-input--square" placeholder="Enter gross weight"> 
                                             </span>
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="number" [(ngModel)]="item.netWeight" class="form-control m-input m-input--square" placeholder="Enter net weight"> 
+                                                <input  type="number" [(ngModel)]="item.nw" [name]="'m_con_nw'+i" class="form-control m-input m-input--square" placeholder="Enter net weight"> 
                                             </span>
                                         </td>
                                         
                                         <td class="">
                                             <span>
-                                                <input  type="number" [(ngModel)]="item.chargeAbleWeight" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight"> 
+                                                <input  type="number" [(ngModel)]="item.chargeAbleWeight" [name]="'m_con_charge'+i" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight"> 
                                             </span>
                                         </td>
                                         <td class="">
@@ -808,14 +812,14 @@
                                             </span> -->
                                             <span>
                                                 <ng-select [allowClear]="true" [items]="weightMesurements" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="item.unitId = $event.id" (removed)="item.unitId = null" (typed)="typed($event)"
+                                                    (selected)="item.unitOfMeasureId = $event.id" (removed)="item.unitOfMeasureId = null" (typed)="typed($event)"
                                                     placeholder="Select Unit">
                                                 </ng-select>
                                             </span> 
                                         </td>
                                         <td class="">
                                             <span>
-                                                <input  type="number" [(ngModel)]="item.cbm" class="form-control m-input m-input--square" placeholder="Enter CBM"> 
+                                                <input  type="number" [(ngModel)]="item.cbm" [name]="'m_con_cbm'+i" class="form-control m-input m-input--square" placeholder="Enter CBM"> 
                                             </span>
                                         </td>
                                     </tr>
