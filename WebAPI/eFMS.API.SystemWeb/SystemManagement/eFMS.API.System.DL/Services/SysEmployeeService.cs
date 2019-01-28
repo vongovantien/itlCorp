@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using eFMS.API.System.DL.Models.Criteria;
+using ITL.NetCore.Common;
+using eFMS.API.Common;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -17,6 +19,33 @@ namespace eFMS.API.System.DL.Services
     {
         public SysEmployeeService(IContextBase<SysEmployee> repository, IMapper mapper) : base(repository, mapper)
         {
+        }
+
+        public HandleState AddEmployee(SysEmployeeModel sysEmployee)
+        {
+            return DataContext.Add(sysEmployee);
+        }
+
+        public HandleState DeleteEmployee(string id)
+        {
+            return DataContext.Delete(x => x.Id == id);
+        }
+        public HandleState UpdateEmployee(SysEmployeeModel sysEmployee)
+        {
+            try
+            {
+                var emp = ((eFMSDataContext)DataContext.DC).SysEmployee.FirstOrDefault(x => x.Id == sysEmployee.Id);
+                if (emp == null)
+                {
+                    throw new SystemException("Employee not found, maybe wrong ID");
+                }
+                return DataContext.Update(sysEmployee, x => x.Id == sysEmployee.Id);
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+         
         }
 
         public List<EmployeeViewModel> Query(EmployeeCriteria employee)
@@ -56,5 +85,7 @@ namespace eFMS.API.System.DL.Services
                 }).ToList();
             return results;
         }
+
+       
     }
 }

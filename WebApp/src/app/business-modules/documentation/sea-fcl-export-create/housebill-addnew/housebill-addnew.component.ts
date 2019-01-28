@@ -88,6 +88,10 @@ export class HousebillAddnewComponent implements OnInit {
       });
   }
 
+  public getCustomerSaleman(idCustomer:string){
+
+  }
+
    /**
      * Daterange picker
      */
@@ -142,4 +146,5 @@ export class HousebillAddnewComponent implements OnInit {
         console.log(this.HouseBillToAdd);
         console.log(this.listCustomers);
     }
+
 }
