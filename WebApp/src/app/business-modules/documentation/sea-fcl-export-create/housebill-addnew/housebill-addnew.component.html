@@ -79,7 +79,7 @@
                                                     <tbody>
                                                             <!-- HouseBillToAdd.customerId=item.partnerID -->
                                                         <ng-container *ngFor="let item of listCustomers;let i = index">                                                           
-                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.customerId=item.partnerID;selectedCustomer.value=item.nameEN"
+                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.customerId=item.partnerID;selectedCustomer.value=item.nameEN;getCustomerSaleman(item.saleManID)"
                                                             [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.partnerID }">
                                                                 <td class="col-xs-2">{{item.partnerID}}</td>
                                                                 <td class="col-xs-3">{{item.nameABBR}}</td>

@@ -83,13 +83,15 @@ export class HousebillAddnewComponent implements OnInit {
       this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER ,inactive:false,all:key}).subscribe(res=>{
         var data = res['data']
         this.listCustomers = lodash.map(data, function(d){           
-            return {partnerID:d['id'],nameABBR:d['shortName'],nameEN:d['partnerNameEn'],taxCode:d['taxCode']}
-        });       
+            return {partnerID:d['id'],nameABBR:d['shortName'],nameEN:d['partnerNameEn'],taxCode:d['taxCode'],saleManID:d['salePersonId']}
+        });
+               
       });
+
   }
 
-  public getCustomerSaleman(idCustomer:string){
-
+  public getCustomerSaleman(idSaleMan:string){
+    console.log(idSaleMan); 
   }
 
    /**

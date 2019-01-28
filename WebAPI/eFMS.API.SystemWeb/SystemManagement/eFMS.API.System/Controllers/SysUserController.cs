@@ -8,6 +8,7 @@ using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Infrastructure.Common;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +40,13 @@ namespace eFMS.API.System.Controllers
         {
             var results = sysUserService.GetAll();
             return Ok(results);
+        }
+
+        [HttpGet]
+        [Route("GetById/{id}")]
+        public SysUserViewModel GetUserById(string id)
+        {
+            return sysUserService.GetUserById(id);
         }
 
         [HttpPost]
