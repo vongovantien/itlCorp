@@ -107,7 +107,7 @@
                         <div class="dropdown e--combogrid" #selectedColoader>
                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
                                 [value]="selectedColoader.value == null?'Please selected coloader':selectedColoader.value">
-                            <div class="dropdown-menu e--combogrid-content">
+                            <div class="dropdown-menu e--combogrid-content dropdown-menu-right">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
                                         <div class="table-filter-block">
@@ -120,10 +120,10 @@
                                             <table class="table table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th class="col-xs-3">Partner ID</th>
-                                                        <th class="col-xs-3">Name ABBR</th>
-                                                        <th class="col-xs-3">Name EN</th>
-                                                        <th class="col-xs-3">Tax Code</th>
+                                                        <th>Partner ID</th>
+                                                        <th>Name ABBR</th>
+                                                        <th>Name EN</th>
+                                                        <th>Tax Code</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -133,10 +133,10 @@
                                         <table class="table table-hover" *ngIf="coloaders">
                                             <tbody *ngFor="let coloader of coloaders;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.coloaderId!==null && shipment.coloaderId===coloader.id }" data-id="{{i}}" (click)="shipment.coloaderId = coloader.id; selectedColoader.value=coloader.partnerNameEn">
-                                                    <td class="col-xs-3">{{ coloader.accountNo }}</td>
-                                                    <td class="col-xs-3">{{ coloader.shortName }}</td>
-                                                    <td class="col-xs-3">{{ coloader.partnerNameEn }}</td>
-                                                    <td class="col-xs-3">{{ coloader.taxCode }}</td>
+                                                    <td>{{ coloader.accountNo }}</td>
+                                                    <td>{{ coloader.shortName }}</td>
+                                                    <td>{{ coloader.partnerNameEn }}</td>
+                                                    <td>{{ coloader.taxCode }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -192,10 +192,10 @@
                                             <table class="table table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th class="col-xs-3">Partner ID</th>
-                                                        <th class="col-xs-3">Name ABBR</th>
-                                                        <th class="col-xs-3">Name EN</th>
-                                                        <th class="col-xs-3">Tax Code</th>
+                                                        <th>Partner ID</th>
+                                                        <th>Name ABBR</th>
+                                                        <th>Name EN</th>
+                                                        <th>Tax Code</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -206,10 +206,10 @@
                                             <tbody *ngFor="let agent of agents;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.agentId!==null && shipment.agentId===agent.id }" data-id="{{i}}" 
                                                     (click)="shipment.agentId = agent.id; selectedAgent.value=agent.partnerNameEn">
-                                                    <td class="col-xs-3">{{ agent.accountNo }}</td>
-                                                    <td class="col-xs-3">{{ agent.shortName }}</td>
-                                                    <td class="col-xs-3">{{ agent.partnerNameEn }}</td>
-                                                    <td class="col-xs-3">{{ agent.taxCode }}</td>
+                                                    <td>{{ agent.accountNo }}</td>
+                                                    <td>{{ agent.shortName }}</td>
+                                                    <td>{{ agent.partnerNameEn }}</td>
+                                                    <td>{{ agent.taxCode }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -242,9 +242,9 @@
                                             <table class="table table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th class="col-xs-4">Port Code</th>
-                                                        <th class="col-xs-4">Port Name</th>
-                                                        <th class="col-xs-4">Country</th>
+                                                        <th>Port Code</th>
+                                                        <th>Port Name</th>
+                                                        <th>Country</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -255,9 +255,9 @@
                                             <tbody *ngFor="let pol of portOfLadings;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{i}}" 
                                                     (click)="shipment.pol = pol.id; selectedPOL.value= pol.nameEN">
-                                                    <td class="col-xs-4">{{ pol.code }}</td>
-                                                    <td class="col-xs-4">{{ pol.nameEN }}</td>
-                                                    <td class="col-xs-4">{{ pol.countryName }}</td>
+                                                    <td>{{ pol.code }}</td>
+                                                    <td>{{ pol.nameEN }}</td>
+                                                    <td>{{ pol.countryName }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -291,9 +291,9 @@
                                             <table class="table table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th class="col-xs-4">Port Code</th>
-                                                        <th class="col-xs-4">Port Name</th>
-                                                        <th class="col-xs-4">Country</th>
+                                                        <th>Port Code</th>
+                                                        <th>Port Name</th>
+                                                        <th>Country</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -304,9 +304,9 @@
                                             <tbody *ngFor="let pod of portOfDestinations;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
                                                     (click)="shipment.pod = pod.id; selectedPOD.value= pod.nameEN">
-                                                    <td class="col-xs-4">{{ pod.code }}</td>
-                                                    <td class="col-xs-4">{{ pod.nameEN }}</td>
-                                                    <td class="col-xs-4">{{ pod.countryName }}</td>
+                                                    <td>{{ pod.code }}</td>
+                                                    <td>{{ pod.nameEN }}</td>
+                                                    <td>{{ pod.countryName }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -394,9 +394,9 @@
                                             <table class="table table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th class="col-xs-4">User Name</th>
-                                                        <th class="col-xs-4">Full Name</th>
-                                                        <th class="col-xs-4">Role</th>
+                                                        <th>User Name</th>
+                                                        <th>Full Name</th>
+                                                        <th>Role</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -407,9 +407,9 @@
                                             <tbody *ngFor="let user of userInCharges;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
                                                     (click)="shipment.personIncharge = user.id; selectedPersonInCharge.value= user.employeeNameVn">
-                                                    <td class="col-xs-4">{{ user.username }}</td>
-                                                    <td class="col-xs-4">{{ user.employeeNameVn }}</td>
-                                                    <td class="col-xs-4">{{ user.employeeNameVn }}</td>
+                                                    <td>{{ user.username }}</td>
+                                                    <td>{{ user.employeeNameVn }}</td>
+                                                    <td>{{ user.employeeNameVn }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -430,6 +430,85 @@
             </div>
         </div>
         <!--end::Form-->
+    </div>
+</div>
+<!--end:: m-portlet--> 
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text">
+                    Shipment Good Summary
+                </h3>
+            </div>
+        </div>
+        <div class="m-portlet__head-tools">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal-master">
+                <span>
+                    <i class="la la-list"></i>
+                    <span>
+                        container list
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="m--margin-bottom-10">
+                            <span class="m--font-bolder">
+                                Commodities:
+                            </span>
+                            <textarea class="form-control m-input--square" name="" id="" rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="m--margin-bottom-10">
+                            <span class="m--font-bolder">
+                                Detail container & packages:
+                            </span>
+                            <textarea class="form-control m-input--square" name="" id="" rows="3">container-1, container-2, container-3</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Description of good:
+                    </span>
+                    <textarea class="form-control m-input--square" name="" id="" rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total gross weight:
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total net weight:
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total chargeable weight:
+                    </span>
+                    <span></span>
+                </div>
+                <div class="m--margin-bottom-10">
+                    <span class="m--font-bolder">
+                        Total CBM:
+                    </span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <!--end:: m-portlet--> 
