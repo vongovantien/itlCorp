@@ -3,20 +3,17 @@ using System.Collections.Generic;
 
 namespace eFMS.API.System.Service.Models
 {
-    public partial class CatSaleResource
+    public partial class CatContainerType
     {
-        public CatSaleResource()
-        {
-            SysEmployee = new HashSet<SysEmployee>();
-        }
-
         public string Id { get; set; }
-        public string ResourceName { get; set; }
+        public string Name { get; set; }
+        public decimal? ExtraWeight { get; set; }
+        public string Note { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual ICollection<SysEmployee> SysEmployee { get; set; }
     }
 }

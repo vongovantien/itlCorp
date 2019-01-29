@@ -16,5 +16,6 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+        public string Code { get; set; }
     }
 }

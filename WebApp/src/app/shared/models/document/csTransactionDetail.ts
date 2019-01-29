@@ -1,8 +1,8 @@
 import { Container } from './container.model';
 
 export class CsTransactionDetail {
-  id: String = null;
-  jobId: String = null;
+  id: String = "00000000-0000-0000-0000-000000000000";
+  jobId: String = "00000000-0000-0000-0000-000000000000";
   hwbno: String = null;
   hbltype: String = null;
   customerId: String = null;

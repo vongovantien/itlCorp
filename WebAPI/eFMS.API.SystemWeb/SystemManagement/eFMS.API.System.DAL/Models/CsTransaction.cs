@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Documentation.Service.Models
+namespace eFMS.API.System.Service.Models
 {
     public partial class CsTransaction
     {
+        public CsTransaction()
+        {
+            CsTransactionDetail = new HashSet<CsTransactionDetail>();
+        }
 
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
@@ -51,5 +55,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }

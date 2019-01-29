@@ -16,6 +16,7 @@ namespace eFMS.API.System.DL.IService
         List<vw_sysUser> GetUserWorkplace();
         HandleState AddUser(SysUserAddModel model);
         LoginReturnModel Login(string username, string password);
+        SysUserViewModel GetUserById(string Id);
 
-     }
+    }
 }

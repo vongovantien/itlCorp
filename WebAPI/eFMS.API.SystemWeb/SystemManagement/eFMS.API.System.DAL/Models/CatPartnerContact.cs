@@ -24,6 +24,6 @@ namespace eFMS.API.System.Service.Models
         public DateTime? InactiveOn { get; set; }
         public string SugarId { get; set; }
 
-        public CatPartner Partner { get; set; }
+        public virtual CatPartner Partner { get; set; }
     }
 }
