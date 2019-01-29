@@ -6,6 +6,7 @@ export class Container {
   quantity: number = null;
   containerNo: string = null;
   sealNo: string = null;
+  markNo: string = null;
   unitOfMeasureId: number = null;
   commodityId: number = null;
   packageTypeId: number = null;

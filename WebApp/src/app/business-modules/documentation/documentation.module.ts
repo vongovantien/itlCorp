@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { DocumentationRoutingModule } from './documentation-routing.module';
 import { AirExportComponent } from './air-export/air-export.component';
 import { AirImportComponent } from './air-import/air-import.component';
@@ -24,6 +24,7 @@ import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addn
   imports: [
     CommonModule,
     DocumentationRoutingModule,
+    ReactiveFormsModule,
     SharedModule,
     NgxDaterangepickerMd,
     SelectModule,

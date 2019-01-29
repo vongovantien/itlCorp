@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as lodash from 'lodash';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormGroup } from '@angular/forms';
 import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -18,6 +18,7 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 export class MasterBillComponent implements OnInit {
     @Input() shipment: CsTransaction = new CsTransaction();
     @Input() formAddEdit: NgForm;
+    @Input() submitted: boolean;
     terms: any[];
     shipmentTypes: any[];
     serviceTypes: any[];
@@ -27,6 +28,8 @@ export class MasterBillComponent implements OnInit {
     portOfLadings: any[] = [];
     portOfDestinations: any[] = [];
     userInCharges: any[] = [];
+    etdSelected: any = null;
+    etaSelected: any = null;
 
     constructor(
     private baseServices: BaseService,
@@ -92,7 +95,6 @@ export class MasterBillComponent implements OnInit {
             console.log(this.coloaders);
         }
     }
-
     async getAgents(searchText: any){
         let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport : 'SEA', inactive: false, all: searchText };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchAgent, false, false);
@@ -107,7 +109,6 @@ export class MasterBillComponent implements OnInit {
             this.userInCharges = users;
         }
     }
-
     /**
      * Daterange picker
      */

@@ -12,7 +12,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import * as lodash from 'lodash';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { MasterBillComponent } from './master-bill/master-bill.component';
 import * as dataHelper from 'src/helper/data.helper';
 import { Container } from '../../../shared/models/document/container.model';
@@ -35,8 +35,9 @@ export class SeaFclExportCreateComponent implements OnInit {
     totalNetWeight: number = 0;
     totalCharWeight: number = 0;
     totalCBM: number = 0;
-
-    @ViewChild('formAddEdit') formAddEdit: NgForm;
+    myForm: FormGroup;
+    submitted = false;
+    @ViewChild('formAddEditContainer') formAddEditContainer: NgForm;
     @ViewChild(MasterBillComponent) masterBillComponent; 
     
     saveButtonSetting: ButtonModalSetting = {
@@ -44,7 +45,25 @@ export class SeaFclExportCreateComponent implements OnInit {
     };
 
     constructor(private baseServices: BaseService,
-        private api_menu: API_MENU) {}
+        private api_menu: API_MENU, private fb: FormBuilder) {
+            this.myForm = this.fb.group({
+                jobId: new FormControl({value: ''}, Validators.required),
+                estimatedTimeofDepature: ['', Validators.required ],
+                estimatedTimeofArrived: [''],
+                mawb: ['', Validators.required ],
+                mbltype: [null, Validators.required ],
+                coloaderId: [''],
+                bookingNo: ['' ],
+                typeOfService: [null, Validators.required],
+                flightVesselName: [''],
+                agentId: [null],
+                pol: [null, Validators.required],
+                pod: [null, Validators.required],
+                paymentTerm: [''],
+                voyNo: [''],
+                shipmentType: [null, Validators.required]
+              });
+        }
 
     async ngOnInit() {
         this.getContainerTypes();
@@ -98,26 +117,35 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.commodities = dataHelper.prepareNg2SelectData(responses,'id','commodityNameEn');
         }
     }
-    async onSubmit(){
-        this.shipment = this.masterBillComponent.shipment;
-        this.shipment.eta = this.shipment["etaSelected"]!= null?this.shipment["etaSelected"]["startDate"]: null;
-        this.shipment.etd = this.shipment["etdSelected"]!= null?this.shipment["etdSelected"]["startDate"]: null;
-        console.log(this.shipment.etd);
-        if(!this.formAddEdit.invalid){
-            this.shipment.csMawbcontainers = this.containers.filter(x => x.isSave == true);
-            await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
+    async onSubmit(form){
+        this.submitted = true;
+        // this.shipment = this.masterBillComponent.shipment;
+        // this.shipment.eta = this.shipment["etaSelected"]!= null?this.shipment["etaSelected"]["startDate"]: null;
+        // this.shipment.etd = this.shipment["etdSelected"]!= null?this.shipment["etdSelected"]["startDate"]: null;
+        // console.log(this.shipment.etd);
+        this.shipment = this.myForm.value;
+        this.shipment.etd = this.myForm.value.estimatedTimeofDepature != null? this.myForm.value.estimatedTimeofDepature["startDate"]: null;
+        this.shipment.eta = this.myForm.value.estimatedTimeofArrived != null? this.myForm.value.estimatedTimeofArrived["startDate"]: null;
+        console.log(this.shipment);
+
+        if(this.myForm.valid){
+            console.log('abc');
+            // this.shipment.csMawbcontainers = this.containers.filter(x => x.isSave == true);
+            // await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
         }
     }
     addNewContainer(){
         this.containers.push(new Container());
     }
     onSubmitContainer(){
-        for(var i = 0; i<this.containers.length; i++){
-            this.containers[i].isSave = true;
-            this.totalGrossWeight = this.totalGrossWeight + this.containers[i].grossWeight;
-            this.totalNetWeight = this.totalNetWeight + this.containers[i].netWeight;
-            this.totalCharWeight = this.totalCharWeight + this.containers[i].chargeAbleWeight;
-            this.totalCBM = this.totalCBM + this.containers[i].cbm;
+        if(this.formAddEditContainer.valid){
+            for(var i = 0; i<this.containers.length; i++){
+                this.containers[i].isSave = true;
+                this.totalGrossWeight = this.totalGrossWeight + this.containers[i].grossWeight;
+                this.totalNetWeight = this.totalNetWeight + this.containers[i].netWeight;
+                this.totalCharWeight = this.totalCharWeight + this.containers[i].chargeAbleWeight;
+                this.totalCBM = this.totalCBM + this.containers[i].cbm;
+            }
         }
     }
     /**

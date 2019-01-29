@@ -140,7 +140,7 @@
                                     <div class="col-lg-8">
                                         <input type="text" [(ngModel)]="commodity.code" (change)="commodity.code = commodity.code.trim()"
                                             class="form-control m-input m-input-group--square" #commodityCode="ngModel" name="commodityCode"
-                                            required placeholder="Please enter group name" maxlength="25">
+                                            required placeholder="Please enter group name" maxlength="25" [attr.disabled]="commodity.id ? '' : null">
                                         <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityCode.invalid">
                                             Code is required
                                         </div>

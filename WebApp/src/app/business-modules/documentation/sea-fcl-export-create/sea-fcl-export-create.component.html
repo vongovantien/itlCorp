@@ -1,1427 +1,1411 @@
-<!--begin:: subheader-->
-<form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+<!-- <form [formGroup]="myForm">
+  <app-master-bill [shipmentDetail]="myForm"></app-master-bill>
+</form>
 
-    <div class="m-subheader">
-        <div class="d-flex align-items-center">
-            <div class="mr-auto">
-                <!--begin:: breadcrumbs-->
-                <app-breadcrumb></app-breadcrumb>
-                <!--end:: breadcrumbs-->
-            </div>
-            <div class="c-button-actions">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#search-job-detail-modal">
-                    <span>
-                        <i class="la la-search"></i>
-                        <span>
-                            import job detail
-                        </span>
-                    </span>
-                </button>
-                <!-- <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save
-                        </span>
-                    </span>
-                </button> -->
-                <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
+<button type="submit" (click)="onSubmitTed()">Submit</button> -->
+<!--begin:: subheader-->
+<!--begin:: subheader-->
+<form name="formAddEdit" #formAddEdit="ngForm" [formGroup]="myForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+
+  <div class="m-subheader">
+      <div class="d-flex align-items-center">
+          <div class="mr-auto">
+              <!--begin:: breadcrumbs-->
+              <app-breadcrumb></app-breadcrumb>
+              <!--end:: breadcrumbs-->
+          </div>
+          <div class="c-button-actions">
+              <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#search-job-detail-modal">
+                  <span>
+                      <i class="la la-search"></i>
+                      <span>
+                          import job detail
+                      </span>
+                  </span>
+              </button>
+              <!-- <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                  <span>
+                      <i class="la la-save"></i>
+                      <span>
+                          save
+                      </span>
+                  </span>
+              </button> -->
+              <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit(formAddEdit)"></app-default-button>
+              <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                  <span>
+                      <i class="la la-ban"></i>
+                      <span>
+                          cancel
+                      </span>
+                  </span>
+              </button>
+          </div>
+      </div>
+  </div>
 <!--end::m-content-->
 
 <!--begin::add-house-bill-modal-->
 <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby=""  aria-hidden="true">
- <app-housebill-addnew></app-housebill-addnew>
+<app-housebill-addnew></app-housebill-addnew>
 </div>
 <!--end::add-house-bill-modal-->
 
-    <!--end:: subheader-->
-    <!--begin::m-content-->
-    <div class="m-content">
-        <!-- <form  name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid"> -->
-            <div class="row">
-                <div class="col-12">
-                    <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
-                        <li class="nav-item m-tabs__item">
-                            <a class="nav-link m-tabs__link active" data-toggle="tab" href="#masterbill-tabview-tab" role="tab">
-                                Master Bill
-                            </a>
-                        </li>
-                        <li class="nav-item m-tabs__item">
-                            <a class="nav-link m-tabs__link" data-toggle="tab" href="#housebill-tabview-tab" role="tab">
-                                House Bill List
-                            </a>
-                        </li>
+  <!--end:: subheader-->
+  <!--begin::m-content-->
+  <div class="m-content">
+          <div class="row">
+              <div class="col-12">
+                  <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
+                      <li class="nav-item m-tabs__item">
+                          <a class="nav-link m-tabs__link active" data-toggle="tab" href="#masterbill-tabview-tab" role="tab">
+                                  Shipment detail
+                          </a>
+                      </li>
+                      <li class="nav-item m-tabs__item">
+                          <a class="nav-link m-tabs__link" data-toggle="tab" href="#housebill-tabview-tab" role="tab">
+                              House Bill List
+                          </a>
+                      </li>
 
-                    </ul>
-                </div>
-            </div>
-        
-            <div class="tab-content" id="jobTabContent">
-                <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                    <app-master-bill [formAddEdit]="formAddEdit"></app-master-bill> 
-                    
-                <!--begin:: m-portlet-->
-<div class="m-portlet">
-        <div class="m-portlet__head">
-            <div class="m-portlet__head-caption">
-                <div class="m-portlet__head-title">
-                    <h3 class="m-portlet__head-text">
-                        Goods Summary
-                    </h3>
-                </div>
-            </div>
-            <div class="m-portlet__head-tools">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal-master">
-                    <span>
-                        <i class="la la-list"></i>
-                        <span>
-                            container list
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-        <div class="m-portlet__body">
-            <div class="row">
-                <div class="col-xl-8">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="m--margin-bottom-10">
-                                <span class="m--font-bolder">
-                                    Commodities:
-                                </span>
-                                <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
-                                    <span>Steel</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Consumer Good</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Drug</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Weapon</span>
-                                </perfect-scrollbar>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="m--margin-bottom-10">
-                                <span class="m--font-bolder">
-                                    Detail container & packages:
-                                </span>
-                                <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 50px">
-                                    <span>Steel</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Consumer Good</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Drug</span>
-                                    <span class="m--margin-right-5">,</span>
-                                    <span>Weapon</span>
-                                </perfect-scrollbar>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="m--margin-bottom-10">
-                        <span class="m--font-bolder">
-                            Description of good:
-                        </span>
-                        <perfect-scrollbar class="bg-secondary m--padding-10" style="height: 100px">
-                            <span></span>
-                        </perfect-scrollbar>
-                    </div>
-                </div>
-                <div class="col-xl-4">
-                    <div class="m--margin-bottom-10">
-                        <span class="m--font-bolder">
-                            Total gross weight: {{ totalGrossWeight }}
-                        </span>
-                        <span></span>
-                    </div>
-                    <div class="m--margin-bottom-10">
-                        <span class="m--font-bolder">
-                            Total net weight: {{ totalNetWeight }}
-                        </span>
-                        <span></span>
-                    </div>
-                    <div class="m--margin-bottom-10">
-                        <span class="m--font-bolder">
-                            Total chargeable weight: {{ totalCharWeight }}
-                        </span>
-                        <span></span>
-                    </div>
-                    <div class="m--margin-bottom-10">
-                        <span class="m--font-bolder">
-                            Total CBM: {{ totalCBM }}
-                        </span>
-                        <span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--end:: m-portlet--> 
-                </div>
-                <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
-                    <app-housebill-list></app-housebill-list>
-                </div>
-            </div>
-        
-            <div class="form-actions">
-                <div class="row">
-                    <div class="col-lg-6">
-                    </div>
-                    <div class="col-lg-6 m--align-right">
-                        <!-- <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save 1
-                                </span>
-                            </span>
-                        </button> -->
-                        <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
-                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        <!-- </form> -->
-    </div>
-    <!--end::m-content-->
-    
-    <!--begin::add-house-bill-modal-->
-    <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby=""  aria-hidden="true">
-        <div class="modal-dialog c-modal-fullscreen" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add new house bill of landing</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <div class="modal-actions c-button-actions">
-                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-list-alt"></i>
-                                <span>
-                                    Preview
-                                </span>
-                            </span>
-                        </button>
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#search-job-detail-modal">
-                            <span>
-                                <i class="la la-search"></i>
-                                <span>
-                                    import house bill detail
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <app-housebill-addnew></app-housebill-addnew>
-                </div>
-                <div class="modal-footer m--align-center">
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span>
-                                save
-                            </span>
-                        </span>
-                    </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                        <span>
-                            <i class="la la-ban"></i>
-                            <span>
-                                cancel
-                            </span>
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--end::add-house-bill-modal-->
-    
+                  </ul>
+              </div>
+          </div>
+          <div class="tab-content" id="jobTabContent">
+              <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
+                  <app-master-bill [formAddEdit]="myForm" [submitted]="submitted"></app-master-bill> 
+                  <!--begin:: m-portlet-->
+
+<!--end:: m-portlet--> 
+                  
+  <!--begin:: m-portlet-->
+  <div class="m-portlet">
+      <div class="m-portlet__head">
+          <div class="m-portlet__head-caption">
+              <div class="m-portlet__head-title">
+                  <h3 class="m-portlet__head-text">
+                      Shipment Good Summary
+                  </h3>
+              </div>
+          </div>
+          <div class="m-portlet__head-tools">
+              <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#container-list-of-job-modal-master">
+                  <span>
+                      <i class="la la-list"></i>
+                      <span>
+                          container list
+                      </span>
+                  </span>
+              </button>
+          </div>
+      </div>
+      <div class="m-portlet__body">
+          <div class="row">
+              <div class="col-xl-8">
+                  <div class="row">
+                      <div class="col-lg-6">
+                          <div class="m--margin-bottom-10">
+                              <span class="m--font-bolder">
+                                  Commodities:
+                              </span>
+                              <textarea class="form-control m-input--square" name="" id="" rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
+                          </div>
+                      </div>
+                      <div class="col-lg-6">
+                          <div class="m--margin-bottom-10">
+                              <span class="m--font-bolder">
+                                  Detail container & packages:
+                              </span>
+                              <textarea class="form-control m-input--square" name="" id="" rows="3">container-1, container-2, container-3</textarea>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="m--margin-bottom-10">
+                      <span class="m--font-bolder">
+                          Description of good:
+                      </span>
+                      <textarea class="form-control m-input--square" name="" id="" rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
+                  </div>
+              </div>
+              <div class="col-xl-4">
+                  <div class="m--margin-bottom-10">
+                      <span class="m--font-bolder">
+                          Total gross weight:
+                      </span>
+                      <span></span>
+                  </div>
+                  <div class="m--margin-bottom-10">
+                      <span class="m--font-bolder">
+                          Total net weight:
+                      </span>
+                      <span></span>
+                  </div>
+                  <div class="m--margin-bottom-10">
+                      <span class="m--font-bolder">
+                          Total chargeable weight:
+                      </span>
+                      <span></span>
+                  </div>
+                  <div class="m--margin-bottom-10">
+                      <span class="m--font-bolder">
+                          Total CBM:
+                      </span>
+                      <span></span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!--end:: m-portlet--> 
+              </div>
+              <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
+                  <app-housebill-list></app-housebill-list>
+              </div>
+          </div>
+      
+          <div class="form-actions">
+              <div class="row">
+                  <div class="col-lg-6">
+                  </div>
+                  <div class="col-lg-6 m--align-right">
+                      <!-- <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                          <span>
+                              <i class="la la-save"></i>
+                              <span>
+                                  save 1
+                              </span>
+                          </span>
+                      </button> -->
+                      <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                      <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                          <span>
+                              <i class="la la-ban"></i>
+                              <span>
+                                  cancel
+                              </span>
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+  </div>
+  <!--end::m-content-->
+  
+  <!--begin::add-house-bill-modal-->
+  <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby=""  aria-hidden="true">
+      <div class="modal-dialog c-modal-fullscreen" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Add new house bill of landing</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+                  <div class="modal-actions c-button-actions">
+                      <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                          <span>
+                              <i class="la la-list-alt"></i>
+                              <span>
+                                  Preview
+                              </span>
+                          </span>
+                      </button>
+                      <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#search-job-detail-modal">
+                          <span>
+                              <i class="la la-search"></i>
+                              <span>
+                                  import house bill detail
+                              </span>
+                          </span>
+                      </button>
+                  </div>
+              </div>
+              <div class="modal-body">
+                  <app-housebill-addnew></app-housebill-addnew>
+              </div>
+              <div class="modal-footer m--align-center">
+                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                      <span>
+                          <i class="la la-save"></i>
+                          <span>
+                              save
+                          </span>
+                      </span>
+                  </button>
+                  <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                      <span>
+                          <i class="la la-ban"></i>
+                          <span>
+                              cancel
+                          </span>
+                      </span>
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!--end::add-house-bill-modal-->
+  
 </form>
 <!--begin::container-list-of-job-modal-->
 <div class="modal fade" id="housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Search Job Detail</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="bg-secondary m--padding-10 m--margin-bottom-10">
-                    <!--begin::Form-->
-                    <div class="m-form m-form--state">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Search text
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Select filter
-                                    </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Create date: From - To
-                                    </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedRange"
-                                            [ranges]="ranges"
-                                            [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true"
-                                            name="daterange"
-                                            placeholder="From date - to date" readonly/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Search Job Detail</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <div class="bg-secondary m--padding-10 m--margin-bottom-10">
+                  <!--begin::Form-->
+                  <div class="m-form m-form--state">
+                      <div class="row">
+                          <div class="col-lg-4">
+                              <div class="form-group">
+                                  <label class="form-control-label" for="">
+                                      Search text
+                                  </label>
+                                  <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                              </div>
+                          </div>
+                          <div class="col-lg-4">
+                              <div class="form-group">
+                                  <label class="form-control-label" for="">
+                                      Select filter
+                                  </label>
+                                  <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                      (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                      placeholder="Select filter">
+                                  </ng-select>
+                              </div>
+                          </div>
+                          <div class="col-lg-4">
+                              <div class="form-group">
+                                  <label class="form-control-label" for="">
+                                      Create date: From - To
+                                  </label>
+                                  <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                      <input type="text" class="form-control m-input m-input--square"
+                                          ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                          [(ngModel)]="selectedRange"
+                                          [ranges]="ranges"
+                                          [maxDate]="maxDate"
+                                          [alwaysShowCalendars]="true"
+                                          name="daterange"
+                                          placeholder="From date - to date" readonly/>
+                                      <span class="m-input-icon__icon m-input-icon__icon--right">
+                                          <span>
+                                              <i class="la la-calendar"></i>
+                                          </span>
+                                      </span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
 
-                        <div class="form-actions">
-                            <div class="row">
-                                <div class="col-lg-6"></div>
-                                <div class="col-lg-6 m--align-right">
-                                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span>
-                                                Search
-                                            </span>
-                                        </span>
-                                    </button>
-                                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-refresh"></i>
-                                            <span>
-                                                Reset
-                                            </span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Form-->
-                </div>
-                <!--begin: Datatable-->
-                <div class="table-wrapper" id="">
-                    <table class="table table-striped table-secondary dataTable">
-                        <thead class="">
-                            <tr class="">
-                                <th class=""></th>
-                                <th class="">
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Customer
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Destination
-                                    </span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="1">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Customer
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="2">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Customer
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--end: Datatable-->
-                <!--begin::pagination-->
-                <div class="pagination-nav">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="tatable__pager-size">
-                                <div class="select-box">
-                                    <select class="form-control m-input m-input--square" id="" aria-label="">
-                                        <option value="1">15 line/screen</option>
-                                        <option value="2">30 line/screen</option>
-                                        <option value="3">50 line/screen</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <nav aria-label="">
-                                <ul class="pagination justify-content-end">
-                                    <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-                <!--end::pagination-->
-            </div>
-            <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            import
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
+                      <div class="form-actions">
+                          <div class="row">
+                              <div class="col-lg-6"></div>
+                              <div class="col-lg-6 m--align-right">
+                                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                      <span>
+                                          <i class="la la-search"></i>
+                                          <span>
+                                              Search
+                                          </span>
+                                      </span>
+                                  </button>
+                                  <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                      <span>
+                                          <i class="la la-refresh"></i>
+                                          <span>
+                                              Reset
+                                          </span>
+                                      </span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <!--end::Form-->
+              </div>
+              <!--begin: Datatable-->
+              <div class="table-wrapper" id="">
+                  <table class="table table-striped table-secondary dataTable">
+                      <thead class="">
+                          <tr class="">
+                              <th class=""></th>
+                              <th class="">
+                                  <span>
+                                      Job ID
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      M-B/L
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Customer
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Saleman
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Nomination Party
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Destination
+                                  </span>
+                              </th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr class="">
+                              <td class="">
+                                  <div class="">
+                                      <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                          <input type="radio" name="example-1" value="1">
+                                          <span></span>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td>
+                                  <span>
+                                      Job ID
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      M-B/L
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Customer
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Saleman
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Nomination Party
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Destination
+                                  </span>
+                              </td>
+                          </tr>
+                          <tr class="">
+                              <td class="">
+                                  <div class="">
+                                      <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                          <input type="radio" name="example-1" value="2">
+                                          <span></span>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td>
+                                  <span>
+                                      Job ID
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      M-B/L
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Customer
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Saleman
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Nomination Party
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Destination
+                                  </span>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+              <!--end: Datatable-->
+              <!--begin::pagination-->
+              <div class="pagination-nav">
+                  <div class="row">
+                      <div class="col-sm-6">
+                          <div class="tatable__pager-size">
+                              <div class="select-box">
+                                  <select class="form-control m-input m-input--square" id="" aria-label="">
+                                      <option value="1">15 line/screen</option>
+                                      <option value="2">30 line/screen</option>
+                                      <option value="3">50 line/screen</option>
+                                  </select>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-sm-6">
+                          <nav aria-label="">
+                              <ul class="pagination justify-content-end">
+                                  <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                              </ul>
+                          </nav>
+                      </div>
+                  </div>
+              </div>
+              <!--end::pagination-->
+          </div>
+          <div class="modal-footer m--align-center">
+              <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                  <span>
+                      <i class="la la-save"></i>
+                      <span>
+                          import
+                      </span>
+                  </span>
+              </button>
+              <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                  <span>
+                      <i class="la la-ban"></i>
+                      <span>
+                          cancel
+                      </span>
+                  </span>
+              </button>
+          </div>
+      </div>
+  </div>
 </div>
 <!--end::container-list-of-job-modal-->
 
 <!--begin::container-list-of-job-modal-->
 <div class="modal fade" id="container-list-of-job-modal-master" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
-        <form name="formAddEdit" #formAddEditContainer="ngForm" novalidate (ngSubmit)="formAddEditContainer.form.valid">
-            <div class="modal-content m-form m-form--state">
-                <div class="modal-header">
-                    <h5 class="modal-title">Container List</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-list-table">
-                        <!--begin: Search Form -->
-                        <div class="m-form m-form--label-align-right m--margin-bottom-10">
-                            <div class="row align-items-center">
-                                <div class="col-lg-4 order-2 order-lg-1">
-                                    <div class="form-group">
-                                        <div class="m-input-icon m-input-icon--left">
-                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
-                                            <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                <span>
-                                                    <i class="la la-search"></i>
-                                                </span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-download"></i>
-                                            <span>
-                                                import
-                                            </span>
-                                        </span>
-                                    </button>
-                                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="addNewContainer()">
-                                        <span>
-                                            <i class="la la-plus"></i>
-                                            <span>
-                                                add container
-                                            </span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <!--end: Search Form -->
-                        <!--begin: Datatable -->
-                        <div class="table-wrapper table-scrollable" id="">
-                            <table class="table table-striped table-brand table-editable">
-                                <thead class="">
-                                    <tr class="">
-                                        <th class=""></th>
-                                        <th class="">
-                                            <span>
-                                                Cont Type
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Cont Q'ty
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Cont No.
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Seal No.
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Mark No.
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Commodity
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Package Type
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Package Q'ty
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Description of Good
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                N.W
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                G.W
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                C.W
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Unit
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                CBM
-                                            </span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- <tr class="">
-                                        <td class="">
-                                            <div class="table-actions">
-                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Cont Type
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Cont Q'ty
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Cont No.
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Seal No.
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Mark No.
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Commodity
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Package Type
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Package Q'ty
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Description of Good
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                N.W
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                G.W
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                Unit
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                CBM
-                                            </span>
-                                        </td>
-                                    </tr> -->
-                                    <tr class="" *ngFor="let item of containers; let j = index"
-                                        [ngClass]="{ 'm-form__group has-danger': 
-                                        validatateDefaultAcountLine()!=true
-                                        && isAddNewLine
-                                        && index == ChargeToAdd.listChargeDefaultAccount.length-1}">
-                                        <td class="">
-                                            <div class="table-actions">
-                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <ng-select [allowClear]="true" [items]="containerTypes" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="item.containerType = $event.id" (removed)="item.containerType = null" (typed)="typed($event)"
-                                                    placeholder="Select filter">
-                                                </ng-select>
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="number" [(ngModel)]="item.quantity" [name]="'m_con_quan'+i" class="form-control m-input m-input--square" placeholder="Enter Q'ty"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="input" [(ngModel)]="item.containerNo" [name]="'m_con_no'+i" class="form-control m-input m-input--square" placeholder="Enter container no"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="input" [(ngModel)]="item.sealNo" [name]="'m_con_sealno'+i" class="form-control m-input m-input--square" placeholder="Enter seal no"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="input" [(ngModel)]="item.markNo" [name]="'m_con_marko'+i" class="form-control m-input m-input--square" placeholder="Enter mark no"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <ng-select [allowClear]="true" [items]="commodities" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="item.commodityId = $event.id" (removed)="item.commodityId = null" (typed)="typed($event)"
-                                                    placeholder="Select commodity">
-                                                </ng-select>
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <ng-select [allowClear]="true" [items]="packageTypes" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="item.packageTypeId = $event.id" (removed)="item.packageTypeId = null" (typed)="typed($event)"
-                                                    placeholder="Select package type">
-                                                </ng-select>
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="number" [(ngModel)]="item.packageQuantity" [name]="'m_con_packno'+i" class="form-control m-input m-input--square" [name]="'m_con_quan'+i" placeholder="Enter package Q'ty"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="input" [(ngModel)]="item.goodsDescription" [name]="'m_con_gooddes'+i" class="form-control m-input m-input--square" placeholder="Enter description"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="number" [(ngModel)]="item.gw" [name]="'m_con_gw'+i"  class="form-control m-input m-input--square" placeholder="Enter gross weight"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="number" [(ngModel)]="item.nw" [name]="'m_con_nw'+i" class="form-control m-input m-input--square" placeholder="Enter net weight"> 
-                                            </span>
-                                        </td>
-                                        
-                                        <td class="">
-                                            <span>
-                                                <input  type="number" [(ngModel)]="item.chargeAbleWeight" [name]="'m_con_charge'+i" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight"> 
-                                            </span>
-                                        </td>
-                                        <td class="">
-                                            <!-- <span>
-                                                <input  type="input" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight">
-                                                
-                                            </span> -->
-                                            <span>
-                                                <ng-select [allowClear]="true" [items]="weightMesurements" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="item.unitOfMeasureId = $event.id" (removed)="item.unitOfMeasureId = null" (typed)="typed($event)"
-                                                    placeholder="Select Unit">
-                                                </ng-select>
-                                            </span> 
-                                        </td>
-                                        <td class="">
-                                            <span>
-                                                <input  type="number" [(ngModel)]="item.cbm" [name]="'m_con_cbm'+i" class="form-control m-input m-input--square" placeholder="Enter CBM"> 
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!--end: Datatable -->
-                    </div>
-                </div>
-                <div class="modal-footer m--align-center">
-                    <!-- <button type="button" (click)="onSubmitContainer()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span>
-                                save
-                            </span>
-                        </span>
-                    </button> -->
-                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmitContainer()"></app-default-button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                        <span>
-                            <i class="la la-ban"></i>
-                            <span>
-                                cancel
-                            </span>
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
+  aria-hidden="true">
+  <div class="modal-dialog c-modal-fullscreen" role="document">
+      <form >
+          <div class="modal-content m-form m-form--state">
+              <div class="modal-header">
+                  <h5 class="modal-title">Container List</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <div class="container-list-table">
+                      <!--begin: Search Form -->
+                      <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                          <div class="row align-items-center">
+                              <div class="col-lg-4 order-2 order-lg-1">
+                                  <div class="form-group">
+                                      <div class="m-input-icon m-input-icon--left">
+                                          <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                          <span class="m-input-icon__icon m-input-icon__icon--left">
+                                              <span>
+                                                  <i class="la la-search"></i>
+                                              </span>
+                                          </span>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                      <span>
+                                          <i class="la la-download"></i>
+                                          <span>
+                                              import
+                                          </span>
+                                      </span>
+                                  </button>
+                                  <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="addNewContainer()">
+                                      <span>
+                                          <i class="la la-plus"></i>
+                                          <span>
+                                              add container
+                                          </span>
+                                      </span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                      <!--end: Search Form -->
+                      <!--begin: Datatable -->
+                      <div class="table-wrapper table-scrollable" id="">
+                          <table class="table table-striped table-brand table-editable">
+                              <thead class="">
+                                  <tr class="">
+                                      <th class=""></th>
+                                      <th class="">
+                                          <span>
+                                              Cont Type
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Cont Q'ty
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Cont No.
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Seal No.
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Mark No.
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Commodity
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Package Type
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Package Q'ty
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Description of Good
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              N.W
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              G.W
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              C.W
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              Unit
+                                          </span>
+                                      </th>
+                                      <th class="">
+                                          <span>
+                                              CBM
+                                          </span>
+                                      </th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <!-- <tr class="">
+                                      <td class="">
+                                          <div class="table-actions">
+                                              <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                  <i class="la la-trash"></i>
+                                              </button>
+                                          </div>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Cont Type
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Cont Q'ty
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Cont No.
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Seal No.
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Mark No.
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Commodity
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Package Type
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Package Q'ty
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Description of Good
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              N.W
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              G.W
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              Unit
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              CBM
+                                          </span>
+                                      </td>
+                                  </tr> -->
+                                  <tr class="" *ngFor="let item of containers; let j = index">
+                                      <td class="">
+                                          <div class="table-actions">
+                                              <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                  <i class="la la-trash"></i>
+                                              </button>
+                                          </div>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <ng-select [allowClear]="true" [items]="containerTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                                  (selected)="item.containerType = $event.id" (removed)="item.containerType = null" (typed)="typed($event)"
+                                                  placeholder="Select filter">
+                                              </ng-select>
+                                          </span>
+                                      </td>
+                                      <td class="" [ngClass]="{ 'm-form__group has-danger': item.quantity!= null }">
+                                          <span>
+                                              <input type="number" [(ngModel)]="item.quantity" [name]="'m_con_quan'+i" class="form-control m-input m-input--square" placeholder="Enter Q'ty"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="input" [(ngModel)]="item.containerNo" [name]="'m_con_no'+i" class="form-control m-input m-input--square" placeholder="Enter container no"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="input" [(ngModel)]="item.sealNo" [name]="'m_con_sealno'+i" class="form-control m-input m-input--square" placeholder="Enter seal no"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="input" [(ngModel)]="item.markNo" [name]="'m_con_marko'+i" class="form-control m-input m-input--square" placeholder="Enter mark no"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <ng-select [allowClear]="true" [items]="commodities" [disabled]="disabled" (data)="refreshValue($event)"
+                                                  (selected)="item.commodityId = $event.id" (removed)="item.commodityId = null" (typed)="typed($event)"
+                                                  placeholder="Select commodity">
+                                              </ng-select>
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <ng-select [allowClear]="true" [items]="packageTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                                  (selected)="item.packageTypeId = $event.id" (removed)="item.packageTypeId = null" (typed)="typed($event)"
+                                                  placeholder="Select package type">
+                                              </ng-select>
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="number" [(ngModel)]="item.packageQuantity" [name]="'m_con_packno'+i" class="form-control m-input m-input--square" [name]="'m_con_quan'+i" placeholder="Enter package Q'ty"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="input" [(ngModel)]="item.goodsDescription" [name]="'m_con_gooddes'+i" class="form-control m-input m-input--square" placeholder="Enter description"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="number" [(ngModel)]="item.gw" [name]="'m_con_gw'+i"  class="form-control m-input m-input--square" placeholder="Enter gross weight"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="number" [(ngModel)]="item.nw" [name]="'m_con_nw'+i" class="form-control m-input m-input--square" placeholder="Enter net weight"> 
+                                          </span>
+                                      </td>
+                                      
+                                      <td class="">
+                                          <span>
+                                              <input  type="number" [(ngModel)]="item.chargeAbleWeight" [name]="'m_con_charge'+i" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight"> 
+                                          </span>
+                                      </td>
+                                      <td class="">
+                                          <!-- <span>
+                                              <input  type="input" class="form-control m-input m-input--square" placeholder="Enter Chargeable Weight">
+                                              
+                                          </span> -->
+                                          <span>
+                                              <ng-select [allowClear]="true" [items]="weightMesurements" [disabled]="disabled" (data)="refreshValue($event)"
+                                                  (selected)="item.unitOfMeasureId = $event.id" (removed)="item.unitOfMeasureId = null" (typed)="typed($event)"
+                                                  placeholder="Select Unit">
+                                              </ng-select>
+                                          </span> 
+                                      </td>
+                                      <td class="">
+                                          <span>
+                                              <input  type="number" [(ngModel)]="item.cbm" [name]="'m_con_cbm'+i" class="form-control m-input m-input--square" placeholder="Enter CBM"> 
+                                          </span>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                      <!--end: Datatable -->
+                  </div>
+              </div>
+              <div class="modal-footer m--align-center">
+                  <!-- <button type="button" (click)="onSubmitContainer()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                      <span>
+                          <i class="la la-save"></i>
+                          <span>
+                              save
+                          </span>
+                      </span>
+                  </button> -->
+                  <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmitContainer()"></app-default-button>
+                  <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                      <span>
+                          <i class="la la-ban"></i>
+                          <span>
+                              cancel
+                          </span>
+                      </span>
+                  </button>
+              </div>
+          </div>
+      </form>
+  </div>
 </div>
 <!--end::container-list-of-job-modal-->
 
 <!--begin::container-list-of-job-modal-->
 <div class="modal fade" id="container-list-of-job-modal-house" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Container List</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="container-list-table">
-                    <!--begin: Search Form -->
-                    <div class="m-form m-form--label-align-right m--margin-bottom-10">
-                        <div class="row align-items-center">
-                            <div class="col-lg-4 order-2 order-lg-1">
-                                <div class="form-group">
-                                    <div class="m-input-icon m-input-icon--left">
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
-                                        <span class="m-input-icon__icon m-input-icon__icon--left">
-                                            <span>
-                                                <i class="la la-search"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                    <span>
-                                        <i class="la la-download"></i>
-                                        <span>
-                                            import
-                                        </span>
-                                    </span>
-                                </button>
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                    <span>
-                                        <i class="la la-plus"></i>
-                                        <span>
-                                            add container
-                                        </span>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end: Search Form -->
-                    <!--begin: Datatable -->
-                    <div class="table-wrapper table-scrollable" id="">
-                        <table class="table table-striped table-brand table-editable">
-                            <thead class="">
-                                <tr class="">
-                                    <th class=""></th>
-                                    <th class="">
-                                        <span>
-                                            Cont Type
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Cont Q'ty
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Cont No.
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Seal No.
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Mark No.
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Commodity
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Package Type
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Package Q'ty
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Description of Good
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            N.W
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            G.W
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            Unit
-                                        </span>
-                                    </th>
-                                    <th class="">
-                                        <span>
-                                            CBM
-                                        </span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- <tr class="">
-                                    <td class="">
-                                        <div class="table-actions">
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Cont Type
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Cont Q'ty
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Cont No.
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Seal No.
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Mark No.
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Commodity
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Package Type
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Package Q'ty
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Description of Good
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            N.W
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            G.W
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            Unit
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            CBM
-                                        </span>
-                                    </td>
-                                </tr> -->
-                                <tr class="">
-                                    <td class="">
-                                        <div class="table-actions">
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                                placeholder="Select filter">
-                                            </ng-select>
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                                placeholder="Select filter">
-                                            </ng-select>
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                                placeholder="Select filter">
-                                            </ng-select>
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                    <td class="">
-                                        <span>
-                                            <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!--end: Datatable -->
-                </div>
-            </div>
-            <div class="modal-footer m--align-center">
-                <button type="button" (click)="onSubmit()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save
-                        </span>
-                    </span>
-                </button>
-                <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
+  aria-hidden="true">
+  <div class="modal-dialog c-modal-fullscreen" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Container List</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <div class="container-list-table">
+                  <!--begin: Search Form -->
+                  <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                      <div class="row align-items-center">
+                          <div class="col-lg-4 order-2 order-lg-1">
+                              <div class="form-group">
+                                  <div class="m-input-icon m-input-icon--left">
+                                      <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                      <span class="m-input-icon__icon m-input-icon__icon--left">
+                                          <span>
+                                              <i class="la la-search"></i>
+                                          </span>
+                                      </span>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                              <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                  <span>
+                                      <i class="la la-download"></i>
+                                      <span>
+                                          import
+                                      </span>
+                                  </span>
+                              </button>
+                              <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                  <span>
+                                      <i class="la la-plus"></i>
+                                      <span>
+                                          add container
+                                      </span>
+                                  </span>
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+                  <!--end: Search Form -->
+                  <!--begin: Datatable -->
+                  <div class="table-wrapper table-scrollable" id="">
+                      <table class="table table-striped table-brand table-editable">
+                          <thead class="">
+                              <tr class="">
+                                  <th class=""></th>
+                                  <th class="">
+                                      <span>
+                                          Cont Type
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Cont Q'ty
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Cont No.
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Seal No.
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Mark No.
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Commodity
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Package Type
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Package Q'ty
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Description of Good
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          N.W
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          G.W
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          Unit
+                                      </span>
+                                  </th>
+                                  <th class="">
+                                      <span>
+                                          CBM
+                                      </span>
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <!-- <tr class="">
+                                  <td class="">
+                                      <div class="table-actions">
+                                          <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                              <i class="la la-trash"></i>
+                                          </button>
+                                      </div>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Cont Type
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Cont Q'ty
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Cont No.
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Seal No.
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Mark No.
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Commodity
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Package Type
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Package Q'ty
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Description of Good
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          N.W
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          G.W
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          Unit
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          CBM
+                                      </span>
+                                  </td>
+                              </tr> -->
+                              <tr class="">
+                                  <td class="">
+                                      <div class="table-actions">
+                                          <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                              <i class="la la-trash"></i>
+                                          </button>
+                                      </div>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                              (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                              placeholder="Select filter">
+                                          </ng-select>
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                              (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                              placeholder="Select filter">
+                                          </ng-select>
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                              (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                              placeholder="Select filter">
+                                          </ng-select>
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                                  <td class="">
+                                      <span>
+                                          <input  type="input" class="form-control m-input m-input--square" placeholder="Enter text"> 
+                                      </span>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <!--end: Datatable -->
+              </div>
+          </div>
+          <div class="modal-footer m--align-center">
+              <button (click)="onSubmit()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                  <span>
+                      <i class="la la-save"></i>
+                      <span>
+                          save
+                      </span>
+                  </span>
+              </button>
+              <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
+              <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                  <span>
+                      <i class="la la-ban"></i>
+                      <span>
+                          cancel
+                      </span>
+                  </span>
+              </button>
+          </div>
+      </div>
+  </div>
 </div>
 <!--end::container-list-of-job-modal-->
 
 <!--begin::container-list-of-job-modal-->
 <div class="modal fade" id="search-job-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Search Job Detail</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="bg-secondary m--padding-10 m--margin-bottom-10">
-                    <!--begin::Form-->
-                    <div class="m-form m-form--state">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Search text
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Select filter
-                                    </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Create date: From - To
-                                    </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedRange"
-                                            [ranges]="ranges"
-                                            [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true"
-                                            name="daterange"
-                                            placeholder="From date - to date" readonly/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Search Job Detail</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <div class="bg-secondary m--padding-10 m--margin-bottom-10">
+                  <!--begin::Form-->
+                  <div class="m-form m-form--state">
+                      <div class="row">
+                          <div class="col-lg-4">
+                              <div class="form-group">
+                                  <label class="form-control-label" for="">
+                                      Search text
+                                  </label>
+                                  <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                              </div>
+                          </div>
+                          <div class="col-lg-4">
+                              <div class="form-group">
+                                  <label class="form-control-label" for="">
+                                      Select filter
+                                  </label>
+                                  <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                      (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                      placeholder="Select filter">
+                                  </ng-select>
+                              </div>
+                          </div>
+                          <div class="col-lg-4">
+                              <div class="form-group">
+                                  <label class="form-control-label" for="">
+                                      Create date: From - To
+                                  </label>
+                                  <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                      <input type="text" class="form-control m-input m-input--square"
+                                          ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                          [(ngModel)]="selectedRange"
+                                          [ranges]="ranges"
+                                          [maxDate]="maxDate"
+                                          [alwaysShowCalendars]="true"
+                                          name="daterange"
+                                          placeholder="From date - to date" readonly/>
+                                      <span class="m-input-icon__icon m-input-icon__icon--right">
+                                          <span>
+                                              <i class="la la-calendar"></i>
+                                          </span>
+                                      </span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
 
-                        <div class="form-actions">
-                            <div class="row">
-                                <div class="col-lg-6"></div>
-                                <div class="col-lg-6 m--align-right">
-                                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span>
-                                                Search
-                                            </span>
-                                        </span>
-                                    </button>
-                                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-refresh"></i>
-                                            <span>
-                                                Reset
-                                            </span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Form-->
-                </div>
-                <!--begin: Datatable-->
-                <div class="table-wrapper" id="">
-                    <table class="table table-striped table-secondary dataTable">
-                        <thead class="">
-                            <tr class="">
-                                <th class=""></th>
-                                <th class="">
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Customer
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Destination
-                                    </span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="1">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Customer
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="2">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Customer
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--end: Datatable-->
-                <!--begin::pagination-->
-                <div class="pagination-nav">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="tatable__pager-size">
-                                <div class="select-box">
-                                    <select class="form-control m-input m-input--square" id="" aria-label="">
-                                        <option value="1">15 line/screen</option>
-                                        <option value="2">30 line/screen</option>
-                                        <option value="3">50 line/screen</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <nav aria-label="">
-                                <ul class="pagination justify-content-end">
-                                    <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-                <!--end::pagination-->
-            </div>
-            <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            import
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
+                      <div class="form-actions">
+                          <div class="row">
+                              <div class="col-lg-6"></div>
+                              <div class="col-lg-6 m--align-right">
+                                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                      <span>
+                                          <i class="la la-search"></i>
+                                          <span>
+                                              Search
+                                          </span>
+                                      </span>
+                                  </button>
+                                  <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                      <span>
+                                          <i class="la la-refresh"></i>
+                                          <span>
+                                              Reset
+                                          </span>
+                                      </span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <!--end::Form-->
+              </div>
+              <!--begin: Datatable-->
+              <div class="table-wrapper" id="">
+                  <table class="table table-striped table-secondary dataTable">
+                      <thead class="">
+                          <tr class="">
+                              <th class=""></th>
+                              <th class="">
+                                  <span>
+                                      Job ID
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      M-B/L
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Customer
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Saleman
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Nomination Party
+                                  </span>
+                              </th>
+                              <th class="sorting">
+                                  <span>
+                                      Destination
+                                  </span>
+                              </th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr class="">
+                              <td class="">
+                                  <div class="">
+                                      <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                          <input type="radio" name="example-1" value="1">
+                                          <span></span>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td>
+                                  <span>
+                                      Job ID
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      M-B/L
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Customer
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Saleman
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Nomination Party
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Destination
+                                  </span>
+                              </td>
+                          </tr>
+                          <tr class="">
+                              <td class="">
+                                  <div class="">
+                                      <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                          <input type="radio" name="example-1" value="2">
+                                          <span></span>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td>
+                                  <span>
+                                      Job ID
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      M-B/L
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Customer
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Saleman
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Nomination Party
+                                  </span>
+                              </td>
+                              <td>
+                                  <span>
+                                      Destination
+                                  </span>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+              <!--end: Datatable-->
+              <!--begin::pagination-->
+              <div class="pagination-nav">
+                  <div class="row">
+                      <div class="col-sm-6">
+                          <div class="tatable__pager-size">
+                              <div class="select-box">
+                                  <select class="form-control m-input m-input--square" id="" aria-label="">
+                                      <option value="1">15 line/screen</option>
+                                      <option value="2">30 line/screen</option>
+                                      <option value="3">50 line/screen</option>
+                                  </select>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-sm-6">
+                          <nav aria-label="">
+                              <ul class="pagination justify-content-end">
+                                  <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                              </ul>
+                          </nav>
+                      </div>
+                  </div>
+              </div>
+              <!--end::pagination-->
+          </div>
+          <div class="modal-footer m--align-center">
+              <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                  <span>
+                      <i class="la la-save"></i>
+                      <span>
+                          import
+                      </span>
+                  </span>
+              </button>
+              <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                  <span>
+                      <i class="la la-ban"></i>
+                      <span>
+                          cancel
+                      </span>
+                  </span>
+              </button>
+          </div>
+      </div>
+  </div>
 </div>
 <!--end::container-list-of-job-modal-->
