@@ -97,7 +97,7 @@
                       <label class="form-control-label" for="">
                               Master bill of lading type <span class="m--font-danger">(*)</span>
                       </label>
-                      <ng-select [allowClear]="true" [items]="billOfLadingTypes" [attr.disabled]="disabled" (data)="refreshValue($event)" formControlName ="mbltype"
+                      <ng-select [allowClear]="true" [items]="billOfLadingTypes" [disabled]="disabled" (data)="refreshValue($event)" formControlName ="mbltype"
                           (selected)="shipment.mbltype = $event.id" (removed)="shipment.mbltype = null" (typed)="typed($event)"
                           placeholder="Select option">
                       </ng-select>

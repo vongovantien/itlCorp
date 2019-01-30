@@ -53,7 +53,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 estimatedTimeofDepature: ['', Validators.required ],
                 estimatedTimeofArrived: [''],
                 mawb: ['', Validators.required ],
-                mbltype: new FormControl({value: null, disabled: true}),
+                mbltype: [null, Validators.required ],
                 coloaderId: [''],
                 bookingNo: ['' ],
                 typeOfService: [null, Validators.required],
