@@ -67,6 +67,22 @@ namespace eFMS.API.System.DL.Services
             return results;
         }
 
+        public SysUserViewModel GetUserById(string Id)
+        {
+            var query = (from user in ((eFMSDataContext)DataContext.DC).SysUser 
+                         join employee in ((eFMSDataContext)DataContext.DC).SysEmployee on user.EmployeeId equals employee.Id
+                         where user.Id == Id
+                         select new { user,employee}).FirstOrDefault();
+            if (query == null)
+            {
+                return null;
+            }
+            var result = mapper.Map<SysUserViewModel>(query.user);
+            result.EmployeeNameEn = query.employee.EmployeeNameEn;
+            result.EmployeeNameVn = query.employee.EmployeeNameVn;
+            return result;
+        }
+
         public List<vw_sysUser> GetUserWorkplace()
         {
             List<vw_sysUser> lvWorkspace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_sysUser>();
@@ -121,5 +137,7 @@ namespace eFMS.API.System.DL.Services
                 return userInfo;
             }
         }
+
+   
     }
 }

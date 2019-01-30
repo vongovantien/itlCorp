@@ -24,7 +24,7 @@ import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addn
   imports: [
     CommonModule,
     DocumentationRoutingModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule.withConfig({warnOnNgModelWithFormControl: 'never'}),
     SharedModule,
     NgxDaterangepickerMd,
     SelectModule,

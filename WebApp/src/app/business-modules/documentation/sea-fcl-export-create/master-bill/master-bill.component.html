@@ -6,7 +6,7 @@
 <div class="m-portlet">
   <div class="m-portlet__body">
       <!--begin::Form-->
-      <div class="m-form m-form--state" *ngIf="formAddEdit" [formGroup]="formAddEdit">
+      <div class="m-form m-form--state" [formGroup]="formAddEdit">
           <div class="row">
               <div class="col-lg-4">
                   <div class="form-group" [ngClass]="{ 'm-form__group has-danger': !formAddEdit.controls.jobId.valid && submitted }">
@@ -97,7 +97,7 @@
                       <label class="form-control-label" for="">
                               Master bill of lading type <span class="m--font-danger">(*)</span>
                       </label>
-                      <ng-select [allowClear]="true" [items]="billOfLadingTypes" [disabled]="disabled" (data)="refreshValue($event)" formControlName ="mbltype"
+                      <ng-select [allowClear]="true" [items]="billOfLadingTypes" [attr.disabled]="disabled" (data)="refreshValue($event)" formControlName ="mbltype"
                           (selected)="shipment.mbltype = $event.id" (removed)="shipment.mbltype = null" (typed)="typed($event)"
                           placeholder="Select option">
                       </ng-select>
@@ -140,7 +140,7 @@
                                       <table class="table table-hover" *ngIf="coloaders">
                                           <tbody *ngFor="let coloader of coloaders;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.coloaderId!==null && shipment.coloaderId===coloader.id }" data-id="{{i}}" 
-                                              (click)="formAddEdit.value['coloaderId'] = coloader.id; selectedColoader.value=coloader.partnerNameEn">
+                                              (click)="formAddEdit.controls['coloaderId'].setValue(coloader.id); selectedColoader.value=coloader.partnerNameEn">
                                                   <td class="col-xs-3">{{ coloader.accountNo }}</td>
                                                   <td class="col-xs-3">{{ coloader.shortName }}</td>
                                                   <td class="col-xs-3">{{ coloader.partnerNameEn }}</td>
@@ -213,7 +213,7 @@
                                       <table class="table table-hover" *ngIf="agents">
                                           <tbody *ngFor="let agent of agents;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.agentId!==null && shipment.agentId===agent.id }" data-id="{{i}}" 
-                                                  (click)="formAddEdit.value['agentId'] = agent.id; selectedAgent.value=agent.partnerNameEn">
+                                                  (click)="formAddEdit.controls['agentId'].setValue(agent.id); selectedAgent.value=agent.partnerNameEn">
                                                   <td class="col-xs-3">{{ agent.accountNo }}</td>
                                                   <td class="col-xs-3">{{ agent.shortName }}</td>
                                                   <td class="col-xs-3">{{ agent.partnerNameEn }}</td>
@@ -262,7 +262,7 @@
                                       <table class="table table-hover" *ngIf="portOfLadings">
                                           <tbody *ngFor="let pol of portOfLadings;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{i}}" 
-                                                  (click)="formAddEdit.value['pol'] = pol.id; selectedPOL.value= pol.nameEN">
+                                                  (click)="formAddEdit.controls['pol'].setValue(pol.id); selectedPOL.value= pol.nameEN">
                                                   <td class="col-xs-4">{{ pol.code }}</td>
                                                   <td class="col-xs-4">{{ pol.nameEN }}</td>
                                                   <td class="col-xs-4">{{ pol.countryName }}</td>
@@ -311,7 +311,7 @@
                                       <table class="table table-hover" *ngIf="portOfDestinations">
                                           <tbody *ngFor="let pod of portOfDestinations;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
-                                                  (click)="shipment.pod = pod.id; selectedPOD.value= pod.nameEN">
+                                                  (click)="formAddEdit.controls['pod'].setValue(pod.id); selectedPOD.value= pod.nameEN">
                                                   <td class="col-xs-4">{{ pod.code }}</td>
                                                   <td class="col-xs-4">{{ pod.nameEN }}</td>
                                                   <td class="col-xs-4">{{ pod.countryName }}</td>
@@ -325,15 +325,15 @@
                   </div>
               </div>
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shipment.paymentTerm == null }">
+                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && formAddEdit.controls.paymentTerm.invalid }">
                       <label class="form-control-label" for="">
-                          Term
+                          Term <span class="m--font-danger">(*)</span>
                       </label>
                       <ng-select [allowClear]="true" [items]="terms" [disabled]="disabled" (data)="refreshValue($event)"
                           (selected)="shipment.paymentTerm = $event.id" (removed)="shipment.paymentTerm = null" (typed)="typed($event)"
                           placeholder="Select option" formControlName = "paymentTerm">
                       </ng-select>
-                      <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shipment.paymentTerm == null" >
+                      <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.paymentTerm.invalid" >
                           Term is required
                       </div>
                   </div>
@@ -373,14 +373,14 @@
                   </div>
               </div>
           </div>
-          <!-- <div class="row">
+          <div class="row">
               <div class="col-lg-4">
                   <div class="form-group">
                       <label class="form-control-label" for="">
                           Purchase order(P/O) no 
                       </label>
                       <input type="text" class="form-control m-input m-input--square" name="pono" placeholder="Enter text" autocomplete="nope"
-                          (change)="shipment.pono = shipment.pono.trim()" [(ngModel)]="shipment.pono">
+                          (change)="shipment.pono = shipment.pono.trim()" [(ngModel)]="shipment.pono" formControlName="pono">
                   </div>
                   <div class="form-group">
                       <label class="form-control-label" for="">
@@ -414,7 +414,7 @@
                                       <table class="table table-hover" *ngIf="userInCharges">
                                           <tbody *ngFor="let user of userInCharges;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
-                                                  (click)="shipment.personIncharge = user.id; selectedPersonInCharge.value= user.employeeNameVn">
+                                                  (click)="formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.employeeNameVn">
                                                   <td class="col-xs-4">{{ user.username }}</td>
                                                   <td class="col-xs-4">{{ user.employeeNameVn }}</td>
                                                   <td class="col-xs-4">{{ user.employeeNameVn }}</td>
@@ -432,10 +432,11 @@
                       <label class="form-control-label" for="" autocomplete="nope">
                           Note
                       </label>
-                      <textarea class="form-control m-input--square" name="" id="" rows="5" name="shipmentNotes" (change)="shipment.notes = shipment.notes.trim()" [(ngModel)]="shipment.notes"></textarea>
+                      <textarea class="form-control m-input--square" name="" id="" rows="5" name="shipmentNotes" (change)="shipment.notes = shipment.notes.trim()"
+                        formControlName="notes" [(ngModel)]="shipment.notes"></textarea>
                   </div>
               </div>
-          </div> -->
+          </div>
       </div>
       <!--end::Form-->
   </div>

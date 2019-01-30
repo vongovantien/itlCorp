@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -43,15 +43,17 @@ export class SeaFclExportCreateComponent implements OnInit {
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
     };
-
+    ngAfterViewInit() {
+        this.cdr.detectChanges();
+      }
     constructor(private baseServices: BaseService,
-        private api_menu: API_MENU, private fb: FormBuilder) {
+        private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
             this.myForm = this.fb.group({
-                jobId: new FormControl({value: ''}, Validators.required),
+                jobId: ['', Validators.required],
                 estimatedTimeofDepature: ['', Validators.required ],
                 estimatedTimeofArrived: [''],
                 mawb: ['', Validators.required ],
-                mbltype: [null, Validators.required ],
+                mbltype: new FormControl({value: null, disabled: true}),
                 coloaderId: [''],
                 bookingNo: ['' ],
                 typeOfService: [null, Validators.required],
@@ -61,7 +63,10 @@ export class SeaFclExportCreateComponent implements OnInit {
                 pod: [null, Validators.required],
                 paymentTerm: [''],
                 voyNo: [''],
-                shipmentType: [null, Validators.required]
+                shipmentType: [null, Validators.required],
+                pono: [''],
+                personIncharge: [''],
+                notes: ['']
               });
         }
 
@@ -133,6 +138,9 @@ export class SeaFclExportCreateComponent implements OnInit {
             // this.shipment.csMawbcontainers = this.containers.filter(x => x.isSave == true);
             // await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
         }
+    }
+    fuckoff(test:NgForm){
+        console.log(test)
     }
     addNewContainer(){
         this.containers.push(new Container());
