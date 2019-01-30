@@ -14,6 +14,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import * as lodash from 'lodash';
 import * as moment from 'moment';
 import {CsTransactionDetail} from 'src/app/shared/models/document/csTransactionDetail';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-housebill-addnew',
@@ -40,6 +41,8 @@ export class HousebillAddnewComponent implements OnInit {
     listNumberOfOriginBL:any=[{id:1,text:'1'},{id:2,text:'2'},{id:3,text:'3'}];
     listTypeOfMove:any=[];
     listTypeOfService:any=[];
+
+    customerSaleman:any= null;
 
     /**
      * House Bill Variables 
@@ -79,17 +82,41 @@ export class HousebillAddnewComponent implements OnInit {
         return 0;
       }else{
           key = search_key;
-      }
-      
+      }      
       this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER ,inactive:false,all:key}).subscribe(res=>{
         var data = res['data']
         this.listCustomers = lodash.map(data, function(d){           
-            return {partnerID:d['id'],nameABBR:d['shortName'],nameEN:d['partnerNameEn'],taxCode:d['taxCode']}
-        });       
+            return {partnerID:d['id'],nameABBR:d['shortName'],nameEN:d['partnerNameEn'],taxCode:d['taxCode'],saleManID:d['salePersonId']}
+        });
+               
       });
+
   }
 
+  public getListShippers(search_key:string = null){
+      var key = "";
+      if(search_key!==null && search_key.length<3 && search_key.length>0){
+        return 0;
+      }else{
+          key = search_key;
+      }
+      this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.SHIPPER ,inactive:false,all:key}).subscribe(res=>{
+        var data = res['data']
+        this.listShipper = lodash.map(data, function(d){           
+            return {partnerID:d['id'],nameABBR:d['shortName'],nameEN:d['partnerNameEn']}
+        });
+               
+      });   
+  }
 
+  public async getCustomerSaleman(idSaleMan:string){    
+    var saleMan = await this.baseServices.getAsync(this.api_menu.System.User_Management.getUserByID+idSaleMan);
+    console.log(saleMan);
+    this.customerSaleman = [{id:saleMan['id'],text:saleMan["employeeNameEn"]}];
+    this.HouseBillToAdd.saleManId = this.customerSaleman.id;
+    var users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll);
+    this.listSaleMan = dataHelper.prepareNg2SelectData(users,"id","employeeNameEn");
+  }
 
    /**
      * Daterange picker
@@ -141,8 +168,10 @@ export class HousebillAddnewComponent implements OnInit {
     this.value = value;
     }
 
-    save(){
+    save(form:NgForm){
+        console.log(form);
         console.log(this.HouseBillToAdd);
         console.log(this.listCustomers);
     }
+
 }

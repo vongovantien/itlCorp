@@ -16,6 +16,6 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public SysAuthorization Authorization { get; set; }
+        public virtual SysAuthorization Authorization { get; set; }
     }
 }

@@ -15,9 +15,9 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public SysMenu Menu { get; set; }
-        public SysMenuPermissionInstruction OtherIntruction { get; set; }
-        public SysPermission Permission { get; set; }
-        public SysRole Role { get; set; }
+        public virtual SysMenu Menu { get; set; }
+        public virtual SysMenuPermissionInstruction OtherIntruction { get; set; }
+        public virtual SysPermission Permission { get; set; }
+        public virtual SysRole Role { get; set; }
     }
 }

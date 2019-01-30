@@ -28,11 +28,11 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public SysUserGroup UserGroup { get; set; }
-        public CatBranch WorkPlace { get; set; }
-        public ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
-        public ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
-        public ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
-        public ICollection<SysUserRole> SysUserRole { get; set; }
+        public virtual SysUserGroup UserGroup { get; set; }
+        public virtual CatBranch WorkPlace { get; set; }
+        public virtual ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
+        public virtual ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
+        public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
+        public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

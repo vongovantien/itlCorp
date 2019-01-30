@@ -55,9 +55,32 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysUserViewModel> GetAll()
         {
-            var data = Get().ToList();
-            var results = mapper.Map<List<SysUserViewModel>>(data);
+            var data = ((eFMSDataContext)DataContext.DC).SysUser.Join(((eFMSDataContext)DataContext.DC).SysEmployee, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.x);
+                model.EmployeeNameEn = item.y.EmployeeNameEn;
+                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                results.Add(model);
+            }
             return results;
+        }
+
+        public SysUserViewModel GetUserById(string Id)
+        {
+            var query = (from user in ((eFMSDataContext)DataContext.DC).SysUser 
+                         join employee in ((eFMSDataContext)DataContext.DC).SysEmployee on user.EmployeeId equals employee.Id
+                         where user.Id == Id
+                         select new { user,employee}).FirstOrDefault();
+            if (query == null)
+            {
+                return null;
+            }
+            var result = mapper.Map<SysUserViewModel>(query.user);
+            result.EmployeeNameEn = query.employee.EmployeeNameEn;
+            result.EmployeeNameVn = query.employee.EmployeeNameVn;
+            return result;
         }
 
         public List<vw_sysUser> GetUserWorkplace()
@@ -114,5 +137,7 @@ namespace eFMS.API.System.DL.Services
                 return userInfo;
             }
         }
+
+   
     }
 }

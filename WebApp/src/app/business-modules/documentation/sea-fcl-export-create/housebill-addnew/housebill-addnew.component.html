@@ -79,7 +79,7 @@
                                                     <tbody>
                                                             <!-- HouseBillToAdd.customerId=item.partnerID -->
                                                         <ng-container *ngFor="let item of listCustomers;let i = index">                                                           
-                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.customerId=item.partnerID;selectedCustomer.value=item.nameEN"
+                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.customerId=item.partnerID;selectedCustomer.value=item.nameEN;getCustomerSaleman(item.saleManID)"
                                                             [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.partnerID }">
                                                                 <td class="col-xs-2">{{item.partnerID}}</td>
                                                                 <td class="col-xs-3">{{item.nameABBR}}</td>
@@ -103,8 +103,8 @@
                                 <label class="form-control-label" for="">
                                     Saleman in charge
                                 </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="HouseBillToAdd.saleManId=$event.id" (removed)="HouseBillToAdd.saleManId=null"
+                                <ng-select [allowClear]="true" [items]="listSaleMan" [disabled]="disabled" (data)="refreshValue($event)" *ngIf="listSaleMan.length>0"
+                                    (selected)="HouseBillToAdd.saleManId=$event.id" (removed)="HouseBillToAdd.saleManId=null" [active]="customerSaleman"
                                     (typed)="typed($event)" placeholder="Select option">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.saleManId==null">
@@ -120,10 +120,51 @@
                                     <label class="form-control-label" for="">
                                         Shipper
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="HouseBillToAdd.shipperId=$event.id" (removed)="HouseBillToAdd.shipperId=null"
-                                        (typed)="typed($event)" placeholder="Select option">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid" #selectedShipper>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            readonly data-toggle="dropdown" placeholder="combogrid" [value]="selectedCustomer.value==null?'Please select customer':selectedCustomer.value">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text"
+                                                                placeholder="Search..." (keyup)="getListCustomers($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="col-xs-2">Partner ID</th>
+                                                                    <th class="col-xs-3">Name ABBR</th>
+                                                                    <th class="col-xs-5">Name EN</th>
+                                                                    <th class="col-xs-2">Tax Code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                                <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <ng-container *ngFor="let item of listShipper;let i = index">                                                           
+                                                                <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.customerId=item.partnerID;selectedCustomer.value=item.nameEN;getCustomerSaleman(item.saleManID)"
+                                                                [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.partnerID }">
+                                                                    <td class="col-xs-2">{{item.partnerID}}</td>
+                                                                    <td class="col-xs-3">{{item.nameABBR}}</td>
+                                                                    <td class="col-xs-5">{{item.nameEN}}</td>
+                                                                    <td class="col-xs-2">{{item.taxCode}}</td>
+                                                                </tr>
+                                                            </ng-container>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.shipperId==null">
                                         Shipper is required
                                     </div>
@@ -615,7 +656,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save(addHouseBillForm)">
                     <span>
                         <i class="la la-save"></i>
                         <span>

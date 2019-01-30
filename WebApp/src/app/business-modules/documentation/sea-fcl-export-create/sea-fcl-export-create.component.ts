@@ -31,6 +31,10 @@ export class SeaFclExportCreateComponent implements OnInit {
     packageTypes: any[]=[];
     commodities: any[] = [];
     weightMesurements: any[] = [];
+    totalGrossWeight: number = 0;
+    totalNetWeight: number = 0;
+    totalCharWeight: number = 0;
+    totalCBM: number = 0;
 
     @ViewChild('formAddEdit') formAddEdit: NgForm;
     @ViewChild(MasterBillComponent) masterBillComponent; 
@@ -92,15 +96,33 @@ export class SeaFclExportCreateComponent implements OnInit {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
         if(responses != null){
             this.commodities = dataHelper.prepareNg2SelectData(responses,'id','commodityNameEn');
-            console.log(this.commodities);
         }
     }
-    onSubmit(){
+    async onSubmit(form:NgForm){
+        console.log(form)
         this.shipment = this.masterBillComponent.shipment;
-        console.log(this.shipment);
+        this.shipment.eta = this.shipment["etaSelected"]!= null?this.shipment["etaSelected"]["startDate"]: null;
+        this.shipment.etd = this.shipment["etdSelected"]!= null?this.shipment["etdSelected"]["startDate"]: null;
+        console.log(this.shipment.etd);
+        if(this.formAddEdit.valid){
+            this.shipment.csMawbcontainers = this.containers.filter(x => x.isSave == true);
+            await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
+        }
+    }
+    fuckoff(test:NgForm){
+        console.log(test)
     }
     addNewContainer(){
         this.containers.push(new Container());
+    }
+    onSubmitContainer(){
+        for(var i = 0; i<this.containers.length; i++){
+            this.containers[i].isSave = true;
+            this.totalGrossWeight = this.totalGrossWeight + this.containers[i].grossWeight;
+            this.totalNetWeight = this.totalNetWeight + this.containers[i].netWeight;
+            this.totalCharWeight = this.totalCharWeight + this.containers[i].chargeAbleWeight;
+            this.totalCBM = this.totalCBM + this.containers[i].cbm;
+        }
     }
     /**
      * Daterange picker

@@ -180,6 +180,7 @@ export class API_MENU {
         User_Management: {
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser",
             login : this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/login",
+            getUserByID: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/GetById/",
         },
         Group: {
 
@@ -223,6 +224,9 @@ export class API_MENU {
     public Documentation = {
         Terminology: {
             getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
+        },
+        CsTransaction: {
+            post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction"
         }
     }
 }

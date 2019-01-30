@@ -64,6 +64,6 @@ namespace eFMS.API.System.Service.Models
         public DateTime? InactiveOn { get; set; }
         public Guid? WorkPlaceId { get; set; }
 
-        public ICollection<CatPartnerContact> CatPartnerContact { get; set; }
+        public virtual ICollection<CatPartnerContact> CatPartnerContact { get; set; }
     }
 }

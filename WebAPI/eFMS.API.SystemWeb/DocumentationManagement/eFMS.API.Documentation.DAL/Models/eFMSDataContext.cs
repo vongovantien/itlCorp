@@ -283,18 +283,18 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Code)
-                    .HasMaxLength(10)
+                    .HasMaxLength(25)
                     .IsUnicode(false);
 
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CommodityNameEn)
                     .HasColumnName("CommodityName_EN")
-                    .HasMaxLength(4000);
+                    .HasMaxLength(250);
 
                 entity.Property(e => e.CommodityNameVn)
                     .HasColumnName("CommodityName_VN")
-                    .HasMaxLength(4000);
+                    .HasMaxLength(250);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
 
@@ -1222,7 +1222,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("CBM")
                     .HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.ContainerNo).HasMaxLength(4000);
+                entity.Property(e => e.ChargeAbleWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.ContainerNo).HasMaxLength(100);
 
                 entity.Property(e => e.ContainerTypeId).HasColumnName("ContainerTypeID");
 
@@ -1236,7 +1238,13 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
+                entity.Property(e => e.MarkNo).HasMaxLength(100);
+
                 entity.Property(e => e.Mblid).HasColumnName("MBLID");
+
+                entity.Property(e => e.Nw)
+                    .HasColumnName("NW")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.OffHireDepot).HasMaxLength(800);
 
@@ -1247,7 +1255,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SealNo).HasMaxLength(4000);
+                entity.Property(e => e.SealNo).HasMaxLength(100);
 
                 entity.Property(e => e.UnitOfMeasureId).HasColumnName("UnitOfMeasureID");
 
@@ -1657,9 +1665,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Pod)
-                    .HasColumnName("POD")
-                    .HasMaxLength(160);
+                entity.Property(e => e.Pod).HasColumnName("POD");
 
                 entity.Property(e => e.Pol).HasColumnName("POL");
 
