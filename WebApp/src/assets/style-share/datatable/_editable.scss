@@ -1,0 +1,20 @@
+
+//fixid actions-side
+.fixed-side {
+    background-color: #b7d0ff;
+    position: sticky;
+    left: 0;
+    z-index: 9;
+}
+//editable
+.control-editable {
+    display: none;
+}
+.row-editing {
+    .control-editable {
+        display: block;
+    }
+    .content-editable {
+        display: none;
+    }
+}
