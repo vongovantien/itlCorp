@@ -347,7 +347,7 @@
                                     <label class="form-control-label" for="">
                                         Point of country origin
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select [allowClear]="true" [items]="listCountryOrigin" [disabled]="disabled" (data)="refreshValue($event)"
                                         (selected)="HouseBillToAdd.originCountryId=$event.id" (removed)="HouseBillToAdd.originCountryId=null"
                                         (typed)="typed($event)" placeholder="Select option">
                                     </ng-select>
@@ -359,15 +359,15 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.pickupPlaceId==null}">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.pickupPlace==null}">
                                     <label class="form-control-label" for="">
                                         Place of receipt
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="HouseBillToAdd.pickupPlaceId=$event.id" (removed)="HouseBillToAdd.pickupPlaceId=null"
-                                        (typed)="typed($event)" placeholder="Select option">
-                                    </ng-select>
-                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.pickupPlaceId==null">
+                
+                                    <input type="text" name="PlaceOfReceipt" #PlaceOfReceipt="ngModel"
+                                    [(ngModel)]="HouseBillToAdd.pickupPlace" (change)="HouseBillToAdd.pickupPlace=HouseBillToAdd.pickupPlace.trim()"
+                                    class="form-control m-input m-input--square" placeholder="Enter text">
+                                    <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.pickupPlace==null">
                                         Place of receipt is required
                                     </div>
                                 </div>

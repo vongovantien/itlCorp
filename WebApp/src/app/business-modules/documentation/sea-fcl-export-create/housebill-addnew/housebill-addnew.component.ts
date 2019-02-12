@@ -62,6 +62,7 @@ export class HousebillAddnewComponent implements OnInit {
     this.getShipmentCommonData();
     this.getListShippers();
     this.getListConsignees();
+    this.getlistCountryOrigin()
     console.log(this.HouseBillToAdd);
   }
 
@@ -122,6 +123,25 @@ export class HousebillAddnewComponent implements OnInit {
       this.listConsignee = lodash.map(data, function (d) {
         return { partnerID: d['id'], nameABBR: d['shortName'], nameEN: d['partnerNameEn'] }
       });
+
+    });
+  }
+
+ 
+  public getlistCountryOrigin(search_key: string = null) {
+    var key = "";
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
+      return 0;
+    } else {
+      key = search_key;
+    }
+    this.baseServices.post(this.api_menu.Catalogue.Country.query, {inactive: false}).subscribe(res => {
+      var data = res
+      console.log(data);
+      this.listCountryOrigin = lodash.map(data, function (d) {
+        return { id: d['id'], text: d['nameEn'] }
+      });
+      console.log({'countries':this.listCountryOrigin});
 
     });
   }
