@@ -140,7 +140,7 @@
                                       <table class="table table-hover" *ngIf="coloaders">
                                           <tbody *ngFor="let coloader of coloaders;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.coloaderId!==null && shipment.coloaderId===coloader.id }" data-id="{{i}}" 
-                                              (click)="formAddEdit.controls['coloaderId'].setValue(coloader.id); selectedColoader.value=coloader.partnerNameEn">
+                                              (click)="shipment.coloaderId = coloader.id; formAddEdit.controls['coloaderId'].setValue(coloader.id); selectedColoader.value=coloader.partnerNameEn">
                                                   <td class="col-xs-3">{{ coloader.accountNo }}</td>
                                                   <td class="col-xs-3">{{ coloader.shortName }}</td>
                                                   <td class="col-xs-3">{{ coloader.partnerNameEn }}</td>
@@ -213,7 +213,7 @@
                                       <table class="table table-hover" *ngIf="agents">
                                           <tbody *ngFor="let agent of agents;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.agentId!==null && shipment.agentId===agent.id }" data-id="{{i}}" 
-                                                  (click)="formAddEdit.controls['agentId'].setValue(agent.id); selectedAgent.value=agent.partnerNameEn">
+                                                  (click)="shipment.agentId = agent.id; formAddEdit.controls['agentId'].setValue(agent.id); selectedAgent.value=agent.partnerNameEn">
                                                   <td class="col-xs-3">{{ agent.accountNo }}</td>
                                                   <td class="col-xs-3">{{ agent.shortName }}</td>
                                                   <td class="col-xs-3">{{ agent.partnerNameEn }}</td>
@@ -262,7 +262,7 @@
                                       <table class="table table-hover" *ngIf="portOfLadings">
                                           <tbody *ngFor="let pol of portOfLadings;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{i}}" 
-                                                  (click)="formAddEdit.controls['pol'].setValue(pol.id); selectedPOL.value= pol.nameEN">
+                                                  (click)="shipment.pol = pol.id;formAddEdit.controls['pol'].setValue(pol.id); selectedPOL.value= pol.nameEN">
                                                   <td class="col-xs-4">{{ pol.code }}</td>
                                                   <td class="col-xs-4">{{ pol.nameEN }}</td>
                                                   <td class="col-xs-4">{{ pol.countryName }}</td>
@@ -311,7 +311,7 @@
                                       <table class="table table-hover" *ngIf="portOfDestinations">
                                           <tbody *ngFor="let pod of portOfDestinations;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
-                                                  (click)="formAddEdit.controls['pod'].setValue(pod.id); selectedPOD.value= pod.nameEN">
+                                                  (click)="shipment.pod = pod.id;formAddEdit.controls['pod'].setValue(pod.id); selectedPOD.value= pod.nameEN">
                                                   <td class="col-xs-4">{{ pod.code }}</td>
                                                   <td class="col-xs-4">{{ pod.nameEN }}</td>
                                                   <td class="col-xs-4">{{ pod.countryName }}</td>
@@ -414,7 +414,7 @@
                                       <table class="table table-hover" *ngIf="userInCharges">
                                           <tbody *ngFor="let user of userInCharges;let i = index;">
                                               <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
-                                                  (click)="formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.employeeNameVn">
+                                                  (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.employeeNameVn">
                                                   <td class="col-xs-4">{{ user.username }}</td>
                                                   <td class="col-xs-4">{{ user.employeeNameVn }}</td>
                                                   <td class="col-xs-4">{{ user.employeeNameVn }}</td>

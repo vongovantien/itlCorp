@@ -17,5 +17,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string SaleManID { get; set; }
         public string SealNo { get; set; }
         public string ContainerNo { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
 }

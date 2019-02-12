@@ -1,5 +1,6 @@
 import { SystemConstants } from "./system.const";
 import {environment} from 'src/environments/environment';
+import { CsTransactionDetail } from "../app/shared/models/document/csTransactionDetail";
 
 export class API_MENU {
     private HOST = {
@@ -226,7 +227,11 @@ export class API_MENU {
             getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
         },
         CsTransaction: {
-            post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction"
+            post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Query"
+        },
+        CsTransactionDetail: {
+            getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob"
         }
     }
 }

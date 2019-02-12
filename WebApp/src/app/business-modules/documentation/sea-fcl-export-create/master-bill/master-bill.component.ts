@@ -16,7 +16,7 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
   styleUrls: ['./master-bill.component.scss']
 })
 export class MasterBillComponent implements OnInit {
-    @Input() shipment: CsTransaction = new CsTransaction();
+    shipment: CsTransaction = new CsTransaction();
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
     terms: any[];
@@ -108,6 +108,9 @@ export class MasterBillComponent implements OnInit {
         if(users != null){
             this.userInCharges = users;
         }
+    }
+    clickColoader(id){
+        console.log(this.shipment);
     }
     /**
      * Daterange picker

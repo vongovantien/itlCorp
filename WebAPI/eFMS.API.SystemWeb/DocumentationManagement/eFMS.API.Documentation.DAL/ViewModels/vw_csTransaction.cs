@@ -11,21 +11,21 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string JobNo { get; set; }
         public string MAWB { get; set; }
         public string TypeOfService { get; set; }
-        public DateTime? ETD { get; set; }
-        public DateTime? ETA { get; set; }
+        public Nullable<DateTime> ETD { get; set; }
+        public Nullable<DateTime> ETA { get; set; }
         public string MBLType { get; set; }
         public string ColoaderID { get; set; }
         public string BookingNo { get; set; }
         public string ShippingServiceType { get; set; }
         public string AgentID { get; set; }
-        public Guid? POL { get; set; }
-        public string POD { get; set; }
+        public Nullable<Guid> POL { get; set; }
+        public Nullable<Guid> POD { get; set; }
         public string PaymentTerm { get; set; }
-        public DateTime? LoadingDate { get; set; }
-        public DateTime? RequestedDate { get; set; }
+        public Nullable<DateTime> LoadingDate { get; set; }
+        public Nullable<DateTime> RequestedDate { get; set; }
         public string FlightVesselName { get; set; }
         public string VoyNo { get; set; }
-        public DateTime? FlightVesselConfirmedDate { get; set; }
+        public Nullable<DateTime> FlightVesselConfirmedDate { get; set; }
         public string ShipmentType { get; set; }
         public string ServiceMode { get; set; }
         public string Commodity { get; set; }
@@ -44,13 +44,13 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string WareHouseID { get; set; }
         public string Notes { get; set; }
         public Nullable<bool> Locked { get; set; }
-        public DateTime? LockedDate { get; set; }
+        public Nullable<DateTime> LockedDate { get; set; }
         public string UserCreated { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public Nullable<DateTime> CreatedDate { get; set; }
         public string UserModified { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public Nullable<DateTime> ModifiedDate { get; set; }
         public Nullable<bool> Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public Nullable<DateTime> InactiveOn { get; set; }
         public string SupplierName { get; set; }
         public string AgentName { get; set; }
         public string HWBNo { get; set; }
@@ -59,5 +59,10 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string SaleManID { get; set; }
         public string SealNo { get; set; }
         public string ContainerNo { get; set; }
+        public string PODName { get; set; }
+        public string POLName { get; set; }
+        public string CreatorName { get; set; }
+        public Nullable<int> SumCont { get; set; }
+        public Nullable<decimal> SumCBM { get; set; }
     }
 }

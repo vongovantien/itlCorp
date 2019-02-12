@@ -20,7 +20,7 @@ export class CsTransaction {
   loadingDate: Date = null;
   requestedDate: Date = null;
   flightVesselName: String = null;
-  flightVoyNo: String = null;
+  voyNo: String = null;
   flightVesselConfirmedDate: Date = null;
   shipmentType: String = null;
   serviceMode: String = null;

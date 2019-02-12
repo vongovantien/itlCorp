@@ -122,7 +122,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.commodities = dataHelper.prepareNg2SelectData(responses,'id','commodityNameEn');
         }
     }
-    async onSubmit(form){
+    async onSubmit(){
         this.submitted = true;
         // this.shipment = this.masterBillComponent.shipment;
         // this.shipment.eta = this.shipment["etaSelected"]!= null?this.shipment["etaSelected"]["startDate"]: null;
@@ -138,9 +138,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             // this.shipment.csMawbcontainers = this.containers.filter(x => x.isSave == true);
             // await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
         }
-    }
-    fuckoff(test:NgForm){
-        console.log(test)
     }
     addNewContainer(){
         this.containers.push(new Container());

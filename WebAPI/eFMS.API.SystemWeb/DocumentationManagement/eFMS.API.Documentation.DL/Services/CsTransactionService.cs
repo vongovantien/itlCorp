@@ -103,6 +103,8 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
                     && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    //&& ((x.ETD ?? null) >= (criteria.FromDate ?? null))
+                    //&& ((x.ETD ?? null) <= (criteria.ToDate ?? null))
                     )).AsQueryable();
             }
             else
@@ -117,6 +119,7 @@ namespace eFMS.API.Documentation.DL.Services
                              || ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
                              || (x.SealNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                             //|| ((x.ETD ?? null) >= (criteria.FromDate ?? null) && (x.ETD ?? null) <= (criteria.ToDate ?? null))
                     )).AsQueryable();
             }
             return results;
