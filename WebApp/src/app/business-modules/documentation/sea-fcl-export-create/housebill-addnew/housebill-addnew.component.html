@@ -122,14 +122,14 @@
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedShipper>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="combogrid" [value]="selectedCustomer.value==null?'Please select customer':selectedCustomer.value">
+                                            readonly data-toggle="dropdown" placeholder="combogrid" [value]="selectedShipper.value==null?'Please select customer':selectedShipper.value">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
                                                     <div class="table-filter-block">
                                                         <div class="search-field">
                                                             <input class="form-control m-input m-input--square" type="text"
-                                                                placeholder="Search..." (keyup)="getListCustomers($event.target.value)">
+                                                                placeholder="Search..." (keyup)="getListShippers($event.target.value)">
                                                             <i class="icon-search"></i>
                                                         </div>
                                                     </div>
@@ -140,7 +140,6 @@
                                                                     <th class="col-xs-2">Partner ID</th>
                                                                     <th class="col-xs-3">Name ABBR</th>
                                                                     <th class="col-xs-5">Name EN</th>
-                                                                    <th class="col-xs-2">Tax Code</th>
                                                                 </tr>
                                                             </thead>
                                                         </table>
@@ -151,12 +150,11 @@
                                                         <tbody>
                                                                 <!-- HouseBillToAdd.customerId=item.partnerID -->
                                                             <ng-container *ngFor="let item of listShipper;let i = index">                                                           
-                                                                <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.customerId=item.partnerID;selectedCustomer.value=item.nameEN;getCustomerSaleman(item.saleManID)"
-                                                                [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.partnerID }">
+                                                                <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.shipperId=item.partnerID;selectedShipper.value=item.nameEN;"
+                                                                [ngClass]="{ 'data-selected': HouseBillToAdd.shipperId!==null && HouseBillToAdd.shipperId===item.partnerID }">
                                                                     <td class="col-xs-2">{{item.partnerID}}</td>
                                                                     <td class="col-xs-3">{{item.nameABBR}}</td>
                                                                     <td class="col-xs-5">{{item.nameEN}}</td>
-                                                                    <td class="col-xs-2">{{item.taxCode}}</td>
                                                                 </tr>
                                                             </ng-container>
                                                         </tbody>
@@ -175,10 +173,49 @@
                                     <label class="form-control-label" for="">
                                         Consignee
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="HouseBillToAdd.consigneeId=$event.id" (removed)="HouseBillToAdd.consigneeId=null"
-                                        (typed)="typed($event)" placeholder="Select option">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid" #selectedConsignee>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            readonly data-toggle="dropdown" placeholder="combogrid" [value]="selectedConsignee.value==null?'Please select customer':selectedConsignee.value">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text"
+                                                                placeholder="Search..." (keyup)="getListShippers($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="col-xs-2">Partner ID</th>
+                                                                    <th class="col-xs-3">Name ABBR</th>
+                                                                    <th class="col-xs-5">Name EN</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                                <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <ng-container *ngFor="let item of listConsignee;let i = index">                                                           
+                                                                <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.consigneeId=item.partnerID;selectedConsignee.value=item.nameEN;"
+                                                                [ngClass]="{ 'data-selected': HouseBillToAdd.consigneeId!==null && HouseBillToAdd.consigneeId===item.partnerID }">
+                                                                    <td class="col-xs-2">{{item.partnerID}}</td>
+                                                                    <td class="col-xs-3">{{item.nameABBR}}</td>
+                                                                    <td class="col-xs-5">{{item.nameEN}}</td>
+                                                                </tr>
+                                                            </ng-container>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.consigneeId==null">
                                         Consignee is required
                                     </div>
@@ -189,10 +226,49 @@
                                     <label class="form-control-label" for="">
                                         Notify party
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="HouseBillToAdd.notifyPartyId=$event.id" (removed)="HouseBillToAdd.notifyPartyId=null"
-                                        (typed)="typed($event)" placeholder="Select option">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid" #selectedPartner>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            readonly data-toggle="dropdown" placeholder="combogrid" [value]="selectedPartner.value==null?'Please select customer':selectedPartner.value">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text"
+                                                                placeholder="Search..." (keyup)="getListShippers($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="col-xs-2">Partner ID</th>
+                                                                    <th class="col-xs-3">Name ABBR</th>
+                                                                    <th class="col-xs-5">Name EN</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                                <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <ng-container *ngFor="let item of listConsignee;let i = index">                                                           
+                                                                <tr class="data-row" attr.data-id="{{i}}" (click)="HouseBillToAdd.notifyPartyId=item.partnerID;selectedPartner.value=item.nameEN;"
+                                                                [ngClass]="{ 'data-selected': HouseBillToAdd.notifyPartyId!==null && HouseBillToAdd.notifyPartyId===item.partnerID }">
+                                                                    <td class="col-xs-2">{{item.partnerID}}</td>
+                                                                    <td class="col-xs-3">{{item.nameABBR}}</td>
+                                                                    <td class="col-xs-5">{{item.nameEN}}</td>
+                                                                </tr>
+                                                            </ng-container>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="form-control-feedback" *ngIf="addHouseBillForm.submitted && HouseBillToAdd.notifyPartyId==null">
                                         NotifyParty is required
                                     </div>
