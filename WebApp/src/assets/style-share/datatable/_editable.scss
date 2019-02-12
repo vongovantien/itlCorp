@@ -1,7 +1,7 @@
 
 //fixid actions-side
 .fixed-side {
-    background-color: #b7d0ff;
+    background-color: #cee5ff;
     position: sticky;
     left: 0;
     z-index: 9;
@@ -9,6 +9,9 @@
 //editable
 .control-editable {
     display: none;
+    .form-control-feedback {
+        font-size: 10px;
+    }
 }
 .row-editing {
     .control-editable {
@@ -16,5 +19,8 @@
     }
     .content-editable {
         display: none;
+    }
+    .dropdown-menu {
+        z-index: 9;
     }
 }

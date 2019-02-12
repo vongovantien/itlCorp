@@ -766,9 +766,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="row-editing">
+                        <tr class="m-form m-form--state row-editing">
                             <td class="table-actions-col fixed-side">
-                                <div class="table-actions" style="width: 70px">
+                                <div class="table-actions content-editable" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="table-actions control-editable" style="width: 70px">
                                     <button type="button" class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Save">
                                         <i class="la la-save"></i>
@@ -794,8 +804,11 @@
                                 <span class="content-editable">
                                     Cont Q'ty
                                 </span>
-                                <div class="control-editable">
+                                <div class="control-editable has-danger">
                                     <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <div class="form-control-feedback">
+                                        Sorry, that's not correct. Try another?
+                                    </div>
                                 </div>
                             </td>
                             <td class="">
@@ -827,10 +840,58 @@
                                     Commodity
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="Vũng Tàu, Bà Rịa, Việt">
+                                        <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                    <th>Group</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row data-selected" data-id="1">
+                                                                <td>Option EN 1</td>
+                                                                <td>Option VN 1</td>
+                                                                <td>Group 1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>Option EN 2</td>
+                                                                <td>Option VN 2</td>
+                                                                <td>Group 2</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="3">
+                                                                <td>Option EN 3</td>
+                                                                <td>Option VN 3</td>
+                                                                <td>Group 3</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="4">
+                                                                <td>Option EN 4</td>
+                                                                <td>Option VN 4</td>
+                                                                <td>Group 4</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="">
