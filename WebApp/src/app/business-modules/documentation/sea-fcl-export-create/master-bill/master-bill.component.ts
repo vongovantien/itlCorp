@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import * as moment from 'moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -15,7 +15,11 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
   templateUrl: './master-bill.component.html',
   styleUrls: ['./master-bill.component.scss']
 })
-export class MasterBillComponent implements OnInit {
+export class MasterBillComponent implements OnInit,AfterViewInit {
+    ngAfterViewInit(): void {
+        this.cdr.detach();
+        
+    }
     shipment: CsTransaction = new CsTransaction();
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
@@ -33,6 +37,7 @@ export class MasterBillComponent implements OnInit {
 
     constructor(
     private baseServices: BaseService,
+    private cdr: ChangeDetectorRef,
     private api_menu: API_MENU) { }
 
     async ngOnInit() {

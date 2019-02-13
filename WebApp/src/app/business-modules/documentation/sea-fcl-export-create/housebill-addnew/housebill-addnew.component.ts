@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -21,7 +21,10 @@ import { NgForm } from '@angular/forms';
   templateUrl: './housebill-addnew.component.html',
   styleUrls: ['./housebill-addnew.component.scss']
 })
-export class HousebillAddnewComponent implements OnInit {
+export class HousebillAddnewComponent implements OnInit,AfterViewInit {
+  ngAfterViewInit(): void {
+    this.cdr.detach()
+  }
   pager: PagerSetting = PAGINGSETTING;
 
 
@@ -32,8 +35,7 @@ export class HousebillAddnewComponent implements OnInit {
   listNotifyParty: any = [];
   listHouseBillLadingType: any = [];
   listCountryOrigin: any = [];
-  listPortOfLoading: any = [];
-  listPortOfDischarge: any = [];
+  listPort: any = [];
   listFreightPayment: any = [];
   listFreightPayableAt: any = [];
   listFowardingAgent: any = [];
@@ -54,7 +56,8 @@ export class HousebillAddnewComponent implements OnInit {
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService
+    private sortService: SortService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -63,7 +66,7 @@ export class HousebillAddnewComponent implements OnInit {
     this.getListShippers();
     this.getListConsignees();
     this.getlistCountryOrigin()
-    console.log(this.HouseBillToAdd);
+    this.getListPorts();
   }
 
   select(form) {
@@ -135,13 +138,27 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.Country.query, {inactive: false}).subscribe(res => {
-      var data = res
-      console.log(data);
+    this.baseServices.post(this.api_menu.Catalogue.Country.query, {inactive: false,all:key}).subscribe(res => {
+      var data = res;
       this.listCountryOrigin = lodash.map(data, function (d) {
         return { id: d['id'], text: d['nameEn'] }
       });
-      console.log({'countries':this.listCountryOrigin});
+
+    });
+  }
+
+  getListPorts(search_key: string = null){
+    var key = "";
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
+      return 0;
+    } else {
+      key = search_key;
+    }
+    this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, {modeOfTransport:"sea",inactive: false,all:key}).subscribe(res => {
+      var data = res
+      this.listPort = lodash.map(data, function (d) {
+        return { id: d['id'], text: d['name_EN'] }
+      });
 
     });
   }

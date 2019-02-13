@@ -377,7 +377,7 @@
                                     <label class="form-control-label" for="">
                                         Port of loading
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select [allowClear]="true" [items]="listPort" [disabled]="disabled" (data)="refreshValue($event)"
                                         (selected)="HouseBillToAdd.pol=$event.id" (removed)="HouseBillToAdd.pol=null"
                                         (typed)="typed($event)" placeholder="Select option">
                                     </ng-select>

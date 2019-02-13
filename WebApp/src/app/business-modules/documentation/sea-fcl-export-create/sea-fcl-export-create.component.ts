@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { Component, OnInit, ViewChild, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -24,11 +24,11 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
     templateUrl: './sea-fcl-export-create.component.html',
     styleUrls: ['./sea-fcl-export-create.component.scss']
 })
-export class SeaFclExportCreateComponent implements OnInit {
+export class SeaFclExportCreateComponent implements OnInit, AfterViewInit {
     shipment: CsTransaction = new CsTransaction();
     containerTypes: any[] = [];
     containers: any[] = [];
-    packageTypes: any[]=[];
+    packageTypes: any[] = [];
     commodities: any[] = [];
     weightMesurements: any[] = [];
     totalGrossWeight: number = 0;
@@ -38,37 +38,38 @@ export class SeaFclExportCreateComponent implements OnInit {
     myForm: FormGroup;
     submitted = false;
     @ViewChild('formAddEditContainer') formAddEditContainer: NgForm;
-    @ViewChild(MasterBillComponent) masterBillComponent; 
-    
+    @ViewChild(MasterBillComponent) masterBillComponent;
+
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
     };
     ngAfterViewInit() {
-        this.cdr.detectChanges();
-      }
+        // this.cdr.detach()
+        // this.cdr.detectChanges();
+    }
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
-            this.myForm = this.fb.group({
-                jobId: ['', Validators.required],
-                estimatedTimeofDepature: ['', Validators.required ],
-                estimatedTimeofArrived: [''],
-                mawb: ['', Validators.required ],
-                mbltype: [null, Validators.required ],
-                coloaderId: [''],
-                bookingNo: ['' ],
-                typeOfService: [null, Validators.required],
-                flightVesselName: [''],
-                agentId: [null],
-                pol: [null, Validators.required],
-                pod: [null, Validators.required],
-                paymentTerm: [''],
-                voyNo: [''],
-                shipmentType: [null, Validators.required],
-                pono: [''],
-                personIncharge: [''],
-                notes: ['']
-              });
-        }
+        this.myForm = this.fb.group({
+            jobId: ['', Validators.required],
+            estimatedTimeofDepature: ['', Validators.required],
+            estimatedTimeofArrived: [''],
+            mawb: ['', Validators.required],
+            mbltype: [null, Validators.required],
+            coloaderId: [''],
+            bookingNo: [''],
+            typeOfService: [null, Validators.required],
+            flightVesselName: [''],
+            agentId: [null],
+            pol: [null, Validators.required],
+            pod: [null, Validators.required],
+            paymentTerm: [''],
+            voyNo: [''],
+            shipmentType: [null, Validators.required],
+            pono: [''],
+            personIncharge: [''],
+            notes: ['']
+        });
+    }
 
     async ngOnInit() {
         this.getContainerTypes();
@@ -91,60 +92,60 @@ export class SeaFclExportCreateComponent implements OnInit {
             cbm: null,
             allowEdit: true
         };
-        if(this.containers.length == 0){
+        if (this.containers.length == 0) {
             this.containers.push(container);
         }
         console.log(this.containers);
     }
-    async getContainerTypes(){
+    async getContainerTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
-        if(responses != null){
-            this.containerTypes = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+        if (responses != null) {
+            this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
         }
     }
-    async getWeightTypes(){
+    async getWeightTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
-        if(responses != null){
-            this.weightMesurements = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+        if (responses != null) {
+            this.weightMesurements = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
             console.log(this.weightMesurements);
         }
     }
-    async getPackageTypes(){
+    async getPackageTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
-        if(responses != null){
-            this.packageTypes = dataHelper.prepareNg2SelectData(responses,'id','unitNameEn');
+        if (responses != null) {
+            this.packageTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
             console.log(this.packageTypes);
-        } 
-    }
-    async getComodities(){
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
-        if(responses != null){
-            this.commodities = dataHelper.prepareNg2SelectData(responses,'id','commodityNameEn');
         }
     }
-    async onSubmit(){
+    async getComodities() {
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
+        if (responses != null) {
+            this.commodities = dataHelper.prepareNg2SelectData(responses, 'id', 'commodityNameEn');
+        }
+    }
+    async onSubmit() {
         this.submitted = true;
         // this.shipment = this.masterBillComponent.shipment;
         // this.shipment.eta = this.shipment["etaSelected"]!= null?this.shipment["etaSelected"]["startDate"]: null;
         // this.shipment.etd = this.shipment["etdSelected"]!= null?this.shipment["etdSelected"]["startDate"]: null;
         // console.log(this.shipment.etd);
         this.shipment = this.myForm.value;
-        this.shipment.etd = this.myForm.value.estimatedTimeofDepature != null? this.myForm.value.estimatedTimeofDepature["startDate"]: null;
-        this.shipment.eta = this.myForm.value.estimatedTimeofArrived != null? this.myForm.value.estimatedTimeofArrived["startDate"]: null;
+        this.shipment.etd = this.myForm.value.estimatedTimeofDepature != null ? this.myForm.value.estimatedTimeofDepature["startDate"] : null;
+        this.shipment.eta = this.myForm.value.estimatedTimeofArrived != null ? this.myForm.value.estimatedTimeofArrived["startDate"] : null;
         console.log(this.shipment);
 
-        if(this.myForm.valid){
+        if (this.myForm.valid) {
             console.log('abc');
             // this.shipment.csMawbcontainers = this.containers.filter(x => x.isSave == true);
             // await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
         }
     }
-    addNewContainer(){
+    addNewContainer() {
         this.containers.push(new Container());
     }
-    onSubmitContainer(){
-        if(this.formAddEditContainer.valid){
-            for(var i = 0; i<this.containers.length; i++){
+    onSubmitContainer() {
+        if (this.formAddEditContainer.valid) {
+            for (var i = 0; i < this.containers.length; i++) {
                 this.containers[i].isSave = true;
                 this.totalGrossWeight = this.totalGrossWeight + this.containers[i].grossWeight;
                 this.totalNetWeight = this.totalNetWeight + this.containers[i].netWeight;
@@ -176,39 +177,39 @@ export class SeaFclExportCreateComponent implements OnInit {
         ]
     };
 
-     /**
-    * ng2-select
-    */
-   public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
-   'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
+    /**
+   * ng2-select
+   */
+    public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
+        'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
 
     private value: any = {};
     private _disabledV: string = '0';
     public disabled: boolean = false;
 
     private get disabledV(): string {
-    return this._disabledV;
+        return this._disabledV;
     }
 
     private set disabledV(value: string) {
-    this._disabledV = value;
-    this.disabled = this._disabledV === '1';
+        this._disabledV = value;
+        this.disabled = this._disabledV === '1';
     }
 
     public selected(value: any): void {
-    console.log('Selected value is: ', value);
+        console.log('Selected value is: ', value);
     }
 
     public removed(value: any): void {
-    console.log('Removed value is: ', value);
+        console.log('Removed value is: ', value);
     }
 
     public typed(value: any): void {
-    console.log('New search input: ', value);
+        console.log('New search input: ', value);
     }
 
     public refreshValue(value: any): void {
-    this.value = value;
+        this.value = value;
     }
 
 }
