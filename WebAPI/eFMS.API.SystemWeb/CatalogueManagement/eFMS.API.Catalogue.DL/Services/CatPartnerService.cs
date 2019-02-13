@@ -86,7 +86,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var partner = new CustomerPartnerViewModel();
                 partner.SalePersonId = item.Key;
-                partner.SalePersonName = ((eFMSDataContext)DataContext.DC).SysUser.First(x => x.Id == item.Key).Username;
+                partner.SalePersonName = item.Key!=null? ((eFMSDataContext)DataContext.DC).SysUser.First(x => x.Id == item.Key).Username: null;
                 partner.CatPartnerModels = item.ToList();
                 partner.SumNumberPartner = item.Count();
                 results.Add(partner);
