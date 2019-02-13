@@ -93,7 +93,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<vw_csTransaction> results = null;
             if (criteria.All == null)
             {
-                results = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                var query = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.MAWB ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -103,9 +103,10 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
                     && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    //&& ((x.ETD ?? null) >= (criteria.FromDate ?? null))
-                    //&& ((x.ETD ?? null) <= (criteria.ToDate ?? null))
-                    )).AsQueryable();
+                    && ((x.ETD ?? null) >= (criteria.FromDate ?? null))
+                    && ((x.ETD ?? null) <= (criteria.ToDate ?? null))
+                    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).ToList();
+                results = query.AsQueryable();
             }
             else
             {
@@ -119,8 +120,8 @@ namespace eFMS.API.Documentation.DL.Services
                              || ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
                              || (x.SealNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                             //|| ((x.ETD ?? null) >= (criteria.FromDate ?? null) && (x.ETD ?? null) <= (criteria.ToDate ?? null))
-                    )).AsQueryable();
+                             || ((x.ETD ?? null) >= (criteria.FromDate ?? null) && (x.ETD ?? null) <= (criteria.ToDate ?? null))
+                    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).AsQueryable();
             }
             return results;
         }

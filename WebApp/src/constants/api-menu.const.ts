@@ -182,6 +182,7 @@ export class API_MENU {
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser",
             login : this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/login",
             getUserByID: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/GetById/",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/Paging"
         },
         Group: {
 
@@ -228,7 +229,7 @@ export class API_MENU {
         },
         CsTransaction: {
             post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
-            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Query"
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Paging"
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob"

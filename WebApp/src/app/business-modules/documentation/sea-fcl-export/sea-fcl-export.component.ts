@@ -3,6 +3,8 @@ import * as moment from 'moment';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 
 @Component({
     selector: 'app-sea-fcl-export',
@@ -14,10 +16,13 @@ export class SeaFCLExportComponent implements OnInit {
     selectFilter: string = 'Job ID';
     criteria: any = {
     };
+    searchString: string = '';
     notifyPartries: any[];
     salemans: any[];
     shipments: any[] = [];
     shipmentDetails: any[] = [];
+    isReset= true;
+    pager: PagerSetting = PAGINGSETTING;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU) {
@@ -37,7 +42,7 @@ export class SeaFCLExportComponent implements OnInit {
         this.shipmentDetails = responses;
     }
     async getCustomers(searchText: any){
-        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, modeOfTransport : 'SEA', all: searchText, inactive: false };
+        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, modeOfTransport : 'SEA', all: searchText };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
         if(partners != null){
             this.customers = partners.data;
@@ -45,7 +50,7 @@ export class SeaFCLExportComponent implements OnInit {
         }
     }
     async getNotifyPartries(searchText: any){
-        let criteriaSearchColoader = { modeOfTransport : 'SEA', all: searchText, inactive: false };
+        let criteriaSearchColoader = { modeOfTransport : 'SEA', all: searchText };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
         if(partners != null){
             this.notifyPartries = partners.data;
@@ -54,35 +59,71 @@ export class SeaFCLExportComponent implements OnInit {
     }
     
     async getUserInCharges(searchText: any){
-        let users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll, false, false);
-        if(users != null){
-            this.salemans = users;
+        let responses = await this.baseServices.postAsync(this.api_menu.System.User_Management.paging +"?page=1&size=20", { all: searchText }, false, false);
+        if(responses != null){
+            this.salemans = responses.data;
         }
     }
     async getShipments(){
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=1&size=20", this.criteria,true, true);
-        this.shipments = responses;
+        this.shipments = responses.data;
+        this.pager.totalItems = responses.totalItems;
     }
     searchShipment(){
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;
         if(this.selectFilter === 'Job ID'){
-            this.criteria.jobNo = this.criteria.searchString;
+            this.criteria.jobNo = this.searchString;
         }
         if(this.selectFilter === 'MBL No'){
-            this.criteria.mawb = this.criteria.searchString;
+            this.criteria.mawb = this.searchString;
         }
         if(this.selectFilter === 'Supplier'){
-            this.criteria.supplierName = this.criteria.searchString;
+            this.criteria.supplierName = this.searchString;
         }
         if(this.selectFilter === 'Agent'){
-            this.criteria.agentName = this.criteria.searchString;
+            this.criteria.agentName = this.searchString;
         }
         if(this.selectFilter === 'HBL No'){
-            this.criteria.hwbNo = this.criteria.searchString;
+            this.criteria.hwbNo = this.searchString;
         }
         this.getShipments();
     }
+    changeCustomer(keySearch: any){
+        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
+        return 0;
+        }
+        this.getCustomers(keySearch);
+    }
+    changeNotifyparty(keySearch: any){
+        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
+            return 0;
+        }
+        this.getNotifyPartries(keySearch);
+    }
+    changeSaleman(keySearch: any){
+        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
+            return 0;
+        }
+        this.getUserInCharges(keySearch);
+    }
+    resetSearch(){
+        this.searchFilterActive = ['Job ID'];
+        this.criteria = {};
+        this.searchString = null;
+        this.getShipments();
+
+        this.isReset = false;
+        setTimeout(() => {
+            this.isReset = true;
+        }, 100);
+    }
+    async setPage(pager: PagerSetting) {
+        this.pager.currentPage = pager.currentPage;
+        this.pager.pageSize = pager.pageSize;
+        this.pager.totalPages = pager.totalPages;
+        await this.getShipments();
+      }
     /**
        * Daterange picker
        */
@@ -127,7 +168,7 @@ export class SeaFCLExportComponent implements OnInit {
 
     public selected(value: any): void {
         console.log('Selected value is: ', value);
-        this.selectFilter = value.id;
+        //this.selectFilter = value.id;
     }
 
     public removed(value: any): void {
