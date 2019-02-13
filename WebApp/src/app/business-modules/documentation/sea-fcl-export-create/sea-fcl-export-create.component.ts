@@ -24,7 +24,7 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
     templateUrl: './sea-fcl-export-create.component.html',
     styleUrls: ['./sea-fcl-export-create.component.scss']
 })
-export class SeaFclExportCreateComponent implements OnInit, AfterViewInit {
+export class SeaFclExportCreateComponent implements OnInit {
     shipment: CsTransaction = new CsTransaction();
     containerTypes: any[] = [];
     containers: any[] = [];
@@ -43,10 +43,22 @@ export class SeaFclExportCreateComponent implements OnInit, AfterViewInit {
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
     };
-    ngAfterViewInit() {
-        // this.cdr.detach()
-        // this.cdr.detectChanges();
+
+
+     /**
+        * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
+        * this method imporove performance for web when detecting change 
+        * for more informations, check this reference please 
+        * https://blog.bitsrc.io/boosting-angular-app-performance-with-local-change-detection-8a6a3afa8d4d
+        *
+      */
+    switchTab(){
+        this.cdr.detach();
+        setTimeout(() => {
+            this.cdr.reattach();
+        }, 1000);
     }
+
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
         this.myForm = this.fb.group({

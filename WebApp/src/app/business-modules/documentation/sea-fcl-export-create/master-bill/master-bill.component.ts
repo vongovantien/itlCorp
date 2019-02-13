@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit, AfterContentChecked, AfterViewChecked } from '@angular/core';
 import * as moment from 'moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -11,15 +11,12 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 
 @Component({
-  selector: 'app-master-bill',
-  templateUrl: './master-bill.component.html',
-  styleUrls: ['./master-bill.component.scss']
+    selector: 'app-master-bill',
+    templateUrl: './master-bill.component.html',
+    styleUrls: ['./master-bill.component.scss']
 })
-export class MasterBillComponent implements OnInit,AfterViewInit {
-    ngAfterViewInit(): void {
-        this.cdr.detach();
-        
-    }
+export class MasterBillComponent implements OnInit{
+
     shipment: CsTransaction = new CsTransaction();
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
@@ -36,55 +33,55 @@ export class MasterBillComponent implements OnInit,AfterViewInit {
     etaSelected: any = null;
 
     constructor(
-    private baseServices: BaseService,
-    private cdr: ChangeDetectorRef,
-    private api_menu: API_MENU) { }
+        private baseServices: BaseService,
+        private cdr: ChangeDetectorRef,
+        private api_menu: API_MENU) { }
 
     async ngOnInit() {
-       this.getShipmentCommonData();
-       this.getPorIndexs(null, null);
-       this.getColoaders(null);
-       this.getAgents(null);
-       this.getUserInCharges(null);
+        this.getShipmentCommonData();
+        this.getPorIndexs(null, null);
+        this.getColoaders(null);
+        this.getAgents(null);
+        this.getUserInCharges(null);
     }
-    changePort(keySearch: any, isLading: any){
-        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
-        return 0;
+    changePort(keySearch: any, isLading: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
         }
         this.getPorIndexs(keySearch, isLading);
     }
-    changeAgent(keySearch: any){
-        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
-        return 0;
+    changeAgent(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
         }
         this.getAgents(keySearch);
     }
-    changeColoader(keySearch: any){
-        if(keySearch!==null && keySearch.length<3 && keySearch.length>0){
-          return 0;
+    changeColoader(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
         }
         this.getColoaders(keySearch);
     }
-    async getShipmentCommonData(){
-        const data = await shipmentHelper.getShipmentCommonData(this.baseServices,this.api_menu);
-        this.billOfLadingTypes = dataHelper.prepareNg2SelectData(data.billOfLadings,'value','displayName');
-        this.serviceTypes = dataHelper.prepareNg2SelectData(data.serviceTypes,'value','displayName');
-        this.terms = dataHelper.prepareNg2SelectData(data.freightTerms,'value','displayName');
-        this.shipmentTypes = dataHelper.prepareNg2SelectData(data.shipmentTypes,'value','displayName');
+    async getShipmentCommonData() {
+        const data = await shipmentHelper.getShipmentCommonData(this.baseServices, this.api_menu);
+        this.billOfLadingTypes = dataHelper.prepareNg2SelectData(data.billOfLadings, 'value', 'displayName');
+        this.serviceTypes = dataHelper.prepareNg2SelectData(data.serviceTypes, 'value', 'displayName');
+        this.terms = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
+        this.shipmentTypes = dataHelper.prepareNg2SelectData(data.shipmentTypes, 'value', 'displayName');
     }
-    async getPorIndexs(searchText: any, isLading: any){
-        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport : 'SEA', inactive: false, all: searchText };
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging+"?page=1&size=20", portSearchIndex, false, false);
-        if(portIndexs != null){
-            if(isLading == null){
+    async getPorIndexs(searchText: any, isLading: any) {
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        if (portIndexs != null) {
+            if (isLading == null) {
                 this.portOfLadings = portIndexs.data;
                 this.portOfDestinations = portIndexs.data;
             }
-            else{
-                if(isLading){
+            else {
+                if (isLading) {
                     this.portOfLadings = portIndexs.data;
                 }
-                else{
+                else {
                     this.portOfDestinations = portIndexs.data;
                 }
             }
@@ -92,29 +89,29 @@ export class MasterBillComponent implements OnInit,AfterViewInit {
         }
     }
 
-    async getColoaders(searchText: any){
-        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CARRIER, modeOfTransport : 'SEA', all: searchText, inactive: false };
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
-        if(partners != null){
+    async getColoaders(searchText: any) {
+        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CARRIER, modeOfTransport: 'SEA', all: searchText, inactive: false };
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchColoader, false, false);
+        if (partners != null) {
             this.coloaders = partners.data;
             console.log(this.coloaders);
         }
     }
-    async getAgents(searchText: any){
-        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport : 'SEA', inactive: false, all: searchText };
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchAgent, false, false);
-        if(partners != null){
+    async getAgents(searchText: any) {
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
+        if (partners != null) {
             this.agents = partners.data;
         }
     }
 
-    async getUserInCharges(searchText: any){
+    async getUserInCharges(searchText: any) {
         const users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll, false, false);
-        if(users != null){
+        if (users != null) {
             this.userInCharges = users;
         }
     }
-    clickColoader(id){
+    clickColoader(id) {
         console.log(this.shipment);
     }
     /**
