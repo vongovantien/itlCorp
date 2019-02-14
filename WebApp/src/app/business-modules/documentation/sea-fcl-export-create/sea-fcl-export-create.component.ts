@@ -131,9 +131,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async getComodities() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
-        if (responses != null) {
-            this.commodities = dataHelper.prepareNg2SelectData(responses, 'id', 'commodityNameEn');
-        }
+        this.commodities = responses;
     }
     async onSubmit() {
         this.submitted = true;
