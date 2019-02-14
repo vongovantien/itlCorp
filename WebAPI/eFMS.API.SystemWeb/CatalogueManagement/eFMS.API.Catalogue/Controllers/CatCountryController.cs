@@ -39,11 +39,11 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPost]
-        [Route("paging/{pageNumber}/{pageSize}")]
-        public IActionResult Get(CatCountryCriteria criteria,int pageNumber,int pageSize)
+        [Route("paging")]
+        public IActionResult Get(CatCountryCriteria criteria, int page, int size)
         {
-            var data = catCountryService.GetCountries(criteria,pageNumber,pageSize, out int rowCount);
-            var result = new { data, totalItems = rowCount, pageNumber, pageSize };
+            var data = catCountryService.GetCountries(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
 
