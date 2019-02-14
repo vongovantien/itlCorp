@@ -93,7 +93,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<vw_csTransaction> results = null;
             if (criteria.All == null)
             {
-                results = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                var query = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.MAWB ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -103,7 +103,10 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
                     && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )).AsQueryable();
+                    && ((x.ETD ?? null) >= (criteria.FromDate ?? null))
+                    && ((x.ETD ?? null) <= (criteria.ToDate ?? null))
+                    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).ToList();
+                results = query.AsQueryable();
             }
             else
             {
@@ -117,7 +120,8 @@ namespace eFMS.API.Documentation.DL.Services
                              || ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
                              || (x.SealNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )).AsQueryable();
+                             || ((x.ETD ?? null) >= (criteria.FromDate ?? null) && (x.ETD ?? null) <= (criteria.ToDate ?? null))
+                    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).AsQueryable();
             }
             return results;
         }
@@ -131,7 +135,14 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.UserModified = "01";
                 transaction.ModifiedDate = DateTime.Now;
                 var hsTrans = dc.CsTransaction.Update(transaction);
-                var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+                //var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+                foreach (var container in model.CsMawbcontainers)
+                {
+                    container.Mblid = transaction.Id;
+                    container.UserModified = "01";
+                    container.DatetimeModified = DateTime.Now;
+                    dc.CsMawbcontainer.Update(container);
+                }
                 foreach (var tranDetail in model.CsTransactionDetails)
                 {
                     var modelDetail = mapper.Map<CsTransactionDetail>(tranDetail);
@@ -140,20 +151,21 @@ namespace eFMS.API.Documentation.DL.Services
                     tranDetail.DatetimeModified = DateTime.Now;
                     dc.CsTransactionDetail.Update(tranDetail);
 
-                    containers.ForEach(x =>
+                    //containers.ForEach(x =>
+                    //{
+                    //    if (tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
+                    //    {
+                    //        x.Hblid = tranDetail.Id;
+                    //    }
+                    //});
+
+                    foreach (var container in tranDetail.CsMawbcontainers)
                     {
-                        if (tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
-                        {
-                            x.Hblid = tranDetail.Id;
-                        }
-                    });
-                }
-                foreach (var container in containers)
-                {
-                    container.Mblid = transaction.Id;
-                    container.UserModified = "01";
-                    container.DatetimeModified = DateTime.Now;
-                    dc.CsMawbcontainer.Update(container);
+                        container.Hblid = tranDetail.Id;
+                        container.UserModified = "01";
+                        container.DatetimeModified = DateTime.Now;
+                        dc.CsMawbcontainer.Update(container);
+                    }
                 }
                 dc.SaveChanges();
                 return new HandleState();

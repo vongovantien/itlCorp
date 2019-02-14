@@ -7,7 +7,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                 <span>
                     <i class="la la la-save"></i>
                     <span> 
@@ -98,11 +98,11 @@
                             <label class="form-control-label" for="">
                                 Tax Code <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Please enter Tax Code" autocomplete="nope" minlength="3" maxlength="100"
-                                name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" (change)="partner.taxCode = partner.taxCode.trim()" 
+                            <input type="number" min="0" class="form-control m-input m-input--square" placeholder="Please enter Tax Code" autocomplete="nope"
+                                disabled name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" (change)="partner.taxCode = partner.taxCode.trim()" oninput="validity.valid||(value='');"
                                 [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerTaxCode.invalid }" required>
                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerTaxCode.invalid" >
-                                Partner Tax Code is required
+                                Partner Tax Code is required and must be number
                             </div>
                         </div>
                     </div>
@@ -167,27 +167,33 @@
                         <div class="col-lg-4">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.countryId == null }">
                                         <label class="form-control-label">
-                                            Country
+                                            Country <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select #chooseBillingCountry [allowClear]="true" [items]="countries" [active]="billingCountryActive==null?[]:[billingCountryActive]" [disabled]="disabled" (data)="refreshValue($event)" 
                                             (selected)="selected($event, 'billingCountry')" (removed)="removed($event, 'billingCountry')" (typed)="typed($event)"
                                             [active]="billingCountryActive==null?[]:[billingCountryActive]"
                                             placeholder="Select country">
                                         </ng-select>
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.countryId == null" >
+                                            Country is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.provinceId == null }">
                                         <label class="form-control-label">
-                                            City
+                                            City <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select #chooseBillingProvince [allowClear]="true" [items]="billingProvinces" [active]="billingProvinceActive==null?[]:[billingProvinceActive]" [disabled]="disabled" (data)="refreshValue($event)"
                                             (selected)="selected($event, 'billingProvince')" (removed)="removed($event, 'billingProvince')" (typed)="typed($event)"
                                             [active]="billingProvinceActive==null?[]:[billingProvinceActive]"
                                             placeholder="Select city/ province">
                                         </ng-select>
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.provinceId == null" >
+                                            City is required
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -204,23 +210,31 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && billingAddressEN.invalid }">
                                 <label class="form-control-label">
-                                    Address EN
+                                    Address EN <span class="m--font-danger">(*)</span>
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" maxlength="300" autocomplete="nope"
+                                <textarea  class="form-control m-input m-input--square" id="" rows="6" maxlength="300" autocomplete="nope"
                                     name="billingAddressEN" [(ngModel)]="partner.addressEn" (change)="partner.addressEn = partner.addressEn.trim()"
+                                    #billingAddressEN="ngModel" required
                                 ></textarea>
+                                <div class="form-control-feedback" *ngIf="formAddEdit.submitted && billingAddressEN.invalid" >
+                                    Address EN required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && billingAddressLocal.invalid }">
                                 <label class="form-control-label">
-                                    Address Local
+                                    Address Local <span class="m--font-danger">(*)</span>
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" maxlength="300" autocomplete="nope"
+                                <textarea  class="form-control m-input m-input--square" id=""  rows="6" maxlength="300" autocomplete="nope"
                                     name="billingAddressLocal" [(ngModel)]="partner.addressVn" (change)="partner.addressVn = partner.addressVn.trim()"
+                                    #billingAddressLocal="ngModel" required
                                 ></textarea>
+                                <div class="form-control-feedback" *ngIf="formAddEdit.submitted && billingAddressLocal.invalid" >
+                                    Address Local is required
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -232,25 +246,31 @@
                         <div class="col-lg-4">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.countryShippingId == null }">
                                         <label class="form-control-label">
-                                            Country
+                                            Country <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select #chooseShippingCountry [allowClear]="true" [items]="countries" [active]="shippingCountryActive==null?[]:[shippingCountryActive]" [disabled]="disabled" (data)="refreshValue($event)"
                                             (selected)="selected($event, 'shippingCountry')" (removed)="removed($event, 'shippingCountry')" (typed)="typed($event)"
                                             placeholder="Select country">
                                         </ng-select>
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.countryShippingId == null" >
+                                            Country is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.provinceShippingId == null }">
                                         <label class="form-control-label">
-                                            City
+                                            City <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select #chooseShippingProvince [allowClear]="true" [items]="shippingProvinces" [active]="shippingProvinceActive==null?[]:[shippingProvinceActive]" [disabled]="disabled" (data)="refreshValue($event)"
                                             (selected)="selected($event, 'shippingProvince')" (removed)="removed($event, 'shippingProvince')" (typed)="typed($event)"
                                             placeholder="Select province/ city">
                                         </ng-select>
+                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.provinceShippingId == null" >
+                                            City is required
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -267,21 +287,27 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shippingAddressEN.invalid }">
                                 <label class="form-control-label">
-                                    Address EN
+                                    Address EN <span class="m--font-danger">(*)</span>
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" autocomplete="nope"
+                                <textarea  class="form-control m-input m-input--square" id="" rows="6" autocomplete="nope" #shippingAddressEN="ngModel" required
                                     name="shippingAddressEN" [(ngModel)]="partner.addressShippingEn" (change)="partner.addressShippingEn = partner.addressShippingEn.trim()"></textarea>
+                                <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shippingAddressEN.invalid" >
+                                    Address EN is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && shippingAddressVN.invalid }">
                                 <label class="form-control-label">
-                                    Address Local
+                                    Address Local <span class="m--font-danger">(*)</span>
                                 </label>
-                                <textarea  class="form-control m-input m-input--square" id=""  name="" rows="6" autocomplete="nope"
-                                name="shippingAddressVN" [(ngModel)]="partner.addressShippingVn" (change)="partner.addressShippingVn = partner.addressShippingVn.trim()"></textarea>
+                                <textarea  class="form-control m-input m-input--square" id=""  rows="6" autocomplete="nope" #shippingAddressVN="ngModel" required
+                                    name="shippingAddressVN" [(ngModel)]="partner.addressShippingVn" [(ngModel)]="partner.addressShippingVn" (change)="partner.addressShippingVn = partner.addressShippingVn.trim()"></textarea>
+                                <div class="form-control-feedback" *ngIf="formAddEdit.submitted && shippingAddressVN.invalid" >
+                                    Address Local is required
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -291,10 +317,10 @@
                         <div class="form-group">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
                                 <label class="form-control-label">
-                                    Saleman <span class="m--font-danger">(*)</span>
+                                    Saleman <span class="m--font-danger" *ngIf="partner.salePersonId == null && isRequiredSaleman">(*)</span>
                                 </label>
-                                <ng-select [allowClear]="true" [items]="saleMans" [active]="salemanActive==null?[]:[salemanActive]" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
-                                    (selected)="selected($event, 'saleman')" (removed)="removed($event, 'saleman')" (typed)="typed($event)"
+                                <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
+                                    (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"
                                     placeholder="">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="(partner.salePersonId == null && isRequiredSaleman)" >
@@ -350,13 +376,16 @@
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && this.partner.departmentId == null }">
                             <label class="form-control-label" for="">
-                                Department
+                                Department <span class="m--font-danger">(*)</span>
                             </label>
                             <ng-select [allowClear]="true" [items]="departments" [active]="departmentActive==null?[]:[departmentActive]" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
                                 (selected)="selected($event, 'department')" (removed)="removed($event,'department')" placeholder="Select filter">
                             </ng-select>
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && this.partner.departmentId == null" >
+                                Department is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -494,7 +523,7 @@
                 </button>
             </div>
             <div class="col-6 m--align-right">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                     <span>
                         <i class="la la-save"></i>
                         <span> 

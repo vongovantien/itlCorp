@@ -14,7 +14,7 @@ export class CsTransactionDetail {
   localVoyNo: String = null;
   oceanVoyNo: String = null;
   originCountryId:String = null;
-  pickupPlaceId: String = null;
+  pickupPlace: String = null;
   pol: String = null;
   pod: String = null;
   deliveryPlace: String = null;

@@ -304,7 +304,7 @@ export class LocationComponent implements OnInit {
   totalItemWards:number = null;
 
   async getCountries() {
-    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.paging + "/" + this.pager.currentPage + "/" + this.pager.pageSize, this.searchObject, false, true);
+    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject, false, true);
     this.ListCountries = response.data;
     this.totalItemCountries = response.totalItems;
     this.pager.totalItems = this.totalItemCountries;

@@ -15,7 +15,7 @@ using ITL.NetCore.Common;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-
+using eFMS.API.System.DL.Models.Criteria;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -138,6 +138,59 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-   
+        public IQueryable<SysUserViewModel> Paging(SysUserCriteria criteria, int page, int size, out int rowsCount)
+        {
+            var data = ((eFMSDataContext)DataContext.DC).SysUser.Join(((eFMSDataContext)DataContext.DC).SysEmployee, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            if (criteria.All == null)
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            else
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            
+            rowsCount = data.Count();
+            if (size > 1)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.x);
+                model.EmployeeNameEn = item.y.EmployeeNameEn;
+                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                results.Add(model);
+            }
+            return results.AsQueryable();
+        }
+
+        public IQueryable<SysUserViewModel> Query(SysUserCriteria criteria)
+        {
+            var data = ((eFMSDataContext)DataContext.DC).SysUser.Join(((eFMSDataContext)DataContext.DC).SysEmployee, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            if (criteria.All == null)
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            else
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.x);
+                model.EmployeeNameEn = item.y.EmployeeNameEn;
+                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                results.Add(model);
+            }
+            return results.AsQueryable();
+        }
     }
 }

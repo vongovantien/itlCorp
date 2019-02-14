@@ -26,292 +26,260 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Form-->
-            <div class="m-form m-form--state">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Search text
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Select filter
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Shipment date: From - To
-                            </label>
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square"
-                                    ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selectedRange"
-                                    [ranges]="ranges"
-                                    [maxDate]="maxDate"
-                                    [alwaysShowCalendars]="true"
-                                    name="daterange"
-                                    placeholder="From date - to date" readonly/>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--begin::Advance-search-->
-                <div class="collapse" id="advance-search-of-job">
-                    <div class="div-inside bg-secondary">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        HBL No.
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Cont No.
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Seal No.
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Customer
-                                    </label>
-                                    <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" value="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner ID</th>
-                                                                    <th>Abbr Name</th>
-                                                                    <th style="width: 200px">Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover">
-                                                        <tbody>
-                                                            <tr class="data-row data-selected" data-id="1">
-                                                                <td>IDAAA</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam</td>
-                                                                <td>taxcode1</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="2">
-                                                                <td>IDBBB</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền đông</td>
-                                                                <td>taxcode1</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="1">
-                                                                <td>IDCCC</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền nam</td>
-                                                                <td>taxcode1</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="2">
-                                                                <td>IDDDD</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam chi nhánh chính</td>
-                                                                <td>taxcode1</td>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Notify party
-                                    </label>
-                                    <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" value="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner ID</th>
-                                                                    <th>Abbr Name</th>
-                                                                    <th style="width: 200px">Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover">
-                                                        <tbody>
-                                                            <tr class="data-row data-selected" data-id="1">
-                                                                <td>IDAAA</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam</td>
-                                                                <td>taxcode1</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="2">
-                                                                <td>IDBBB</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền đông</td>
-                                                                <td>taxcode1</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="1">
-                                                                <td>IDCCC</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam khu vực miền nam</td>
-                                                                <td>taxcode1</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="2">
-                                                                <td>IDDDD</td>
-                                                                <td>DHL_VN</td>
-                                                                <td style="width: 200px">Công ty DHL Việt Nam chi nhánh chính</td>
-                                                                <td>taxcode1</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Saleman
-                                    </label>
-                                    <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" value="Scost Phương">
-                                        <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>User name</th>
-                                                                    <th>Full name</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover">
-                                                        <tbody>
-                                                            <tr class="data-row data-selected" data-id="1">
-                                                                <td>Scost Phương</td>
-                                                                <td>Phương Phương Cả Họ Lẫn Tên</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="2">
-                                                                <td>Irien Tâm</td>
-                                                                <td>Tâm Phạm</td>
-                                                            </tr>
-                                                            <tr class="data-row" data-id="2">
-                                                                <td>Thor Thế</td>
-                                                                <td>Cái Gì Đó Thế</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--end::Advance-search-->
-                <div class="form-actions">
+            <div class="m-form m-form--state" >
+
                     <div class="row">
-                        <div class="col-lg-6">
-                            <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
-                                role="button" aria-expanded="false" aria-controls="advance-search-of-job">
-                                <span>
-                                    <i class="la la-angle-up"></i>
-                                    <span>Advance search</span>
-                                </span>
-                            </a>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Search text
+                                </label>
+                                <input type="text" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                                    name="searchString" (change)="searchString = searchString.trim()" placeholder="Search text">
+                            </div>
                         </div>
-                        <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                <span>
-                                    <i class="la la-search"></i>
-                                    <span>
-                                        Search
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Select filter
+                                </label>
+                                <ng-select [allowClear]="true" [items]="searchFilters" [active]="searchFilterActive" [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selectFilter = $event.id" (removed)="removed($event)"
+                                    placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Shipment date: From - To
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                        [(ngModel)]="selectedRange"
+                                        [ranges]="ranges"
+                                        [maxDate]="maxDate"
+                                        [alwaysShowCalendars]="true"
+                                        name="daterange"
+                                        placeholder="From date - to date" readonly/>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
                                     </span>
-                                </span>
-                            </button>
-                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
-                                <span>
-                                    <i class="la la-refresh"></i>
-                                    <span>
-                                        Reset
-                                    </span>
-                                </span>
-                            </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <!--begin::Advance-search-->
+                    <div class="collapse" id="advance-search-of-job">
+                        <div class="div-inside bg-secondary">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            HBL No.
+                                        </label>
+                                        <input type="text" [(ngModel)]="criteria.hwbno" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Cont No.
+                                        </label>
+                                        <input type="text" [(ngModel)]="criteria.containerNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Seal No.
+                                        </label>
+                                        <input type="text" [(ngModel)]="criteria.sealNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" *ngIf="isReset">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Customer
+                                        </label>
+                                        <div class="dropdown e--combogrid" #selectedCustomer>
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" 
+                                                [value]="selectedCustomer.value == null?'Please selected customer':selectedCustomer.value">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeCustomer($event.target.value)">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner ID</th>
+                                                                        <th>Abbr Name</th>
+                                                                        <th style="width: 200px">Name EN</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody *ngIf="customers">
+                                                                <tr class="data-row" [ngClass]="{ 'data-selected': criteria.customerId!==null && criteria.customerId===item.id }"
+                                                                (click)="criteria.customerId = item.id; selectedCustomer.value= item.partnerNameEn" 
+                                                                    data-id="{{item.id}}" *ngFor="let item of customers; let i = index">
+                                                                    <td>{{ item.accountNo }}</td>
+                                                                    <td>{{ item.shortName }}</td>
+                                                                    <td style="width: 200px">{{ item.partnerNameEn }}</td>
+                                                                    <td>{{ item.taxCode }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Notify party
+                                        </label>
+                                        <div class="dropdown e--combogrid" #selectedNotifyPartry>
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select"
+                                                [value]="selectedNotifyPartry.value == null?'Please selected notify party':selectedNotifyPartry.value">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeNotifyparty($event.target.value)">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner ID</th>
+                                                                        <th>Abbr Name</th>
+                                                                        <th style="width: 200px">Name EN</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody *ngIf="notifyPartries">
+                                                                <tr class="data-row" [ngClass]="{ 'data-selected': criteria.notifyPartyId!==null && criteria.notifyPartyId===item.id }"
+                                                                    (click)="criteria.notifyPartyId = item.id; selectedNotifyPartry.value= item.partnerNameEn" 
+                                                                    data-id="{{item.id}}" *ngFor="let item of notifyPartries; let i = index">
+                                                                    <td>{{ item.accountNo }}</td>
+                                                                    <td>{{ item.shortName }}</td>
+                                                                    <td style="width: 200px">{{ item.partnerNameEn }}</td>
+                                                                    <td>{{ item.taxCode }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Saleman
+                                        </label>
+                                        <div class="dropdown e--combogrid" #selectedSaleman>
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                                [value]="selectedSaleman.value == null?'Please selected a saleman':selectedSaleman.value" autocomplete="nope">
+                                            <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeSaleman($event.target.value)">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>User name</th>
+                                                                        <th>Full name</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody *ngIf="salemans">
+                                                                <tr class="data-row" [class.data-selected] = "criteria.saleman !==null && criteria.saleman===user.id"
+                                                                    data-id="{{user.id}}" *ngFor="let user of salemans;let i = index;" 
+                                                                    (click)="criteria.saleManID=user.id; selectedSaleman.value= user.employeeNameVn">
+                                                                    <td>{{ user.username }}</td>
+                                                                    <td>{{ user.employeeNameVn}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Advance-search-->
+                    <div class="form-actions" >
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
+                                    role="button" aria-expanded="false" aria-controls="advance-search-of-job">
+                                    <span>
+                                        <i class="la la-angle-up"></i>
+                                        <span>Advance search</span>
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="col-lg-6 m--align-right">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
+                                    <span>
+                                        <i class="la la-search"></i>
+                                        <span>
+                                            Search
+                                        </span>
+                                    </span>
+                                </button>
+                                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
+                                    <span>
+                                        <i class="la la-refresh"></i>
+                                        <span>
+                                            Reset
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
             </div>
             <!--end::Form-->
         </div>
@@ -339,7 +307,7 @@
                                 <span>ETA</span>
                             </th>
                             <th class="sorting">
-                                <span>Shipping Line</span>
+                                <span>Supplier</span>
                             </th>
                             <th class="sorting">
                                 <span>Agent</span>
@@ -351,7 +319,7 @@
                                 <span>POD</span>
                             </th>
                             <th class="no-sorting">
-                                <span>Gross Weight</span>
+                                <span>Total Cont</span>
                             </th>
                             <th class="no-sorting">
                                 <span>CBM</span>
@@ -359,805 +327,157 @@
                             <th class="no-sorting">
                                 <span>Creator</span>
                             </th>
+                            <th class="no-sorting">
+                                <span>Created Date</span>
+                            </th>
+                            <th class="no-sorting">
+                                <span>Modified Date</span>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
-                        <tr class="collapse-toggle-row">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 100px">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-001"
-                                        title="Collapse">
-                                        <i class="la la-angle-up"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
-                                    <span>
-                                        job-id
-                                    </span>
-                                </a>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
-                        <tr class="collapse-panel-row">
-                            <td colspan="12">
-                                <div class="detail-panel-block collapse" id="id-001" data-parent="#sea-fcl-export-table">
-                                    <div class="table-inside-block">
-                                        <perfect-scrollbar style="max-height: 180px">
-                                            <table class="table table-secondary dataTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="sorting_asc">
-                                                            <span>H-B/L No.</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Customer</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Sale Man</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Nomination Party</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Destination</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Containers</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Qty</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Unit</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>G.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>C.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>CBM</span>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </perfect-scrollbar>
+                    <tbody class="tbody-group" *ngIf="shipments">
+                        <ng-container *ngFor="let item of shipments; let i=index">
+                            <!-- begin collapse-toggle-row -->
+                            <tr class="collapse-toggle-row">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 100px">
+                                        <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
+                                            title="Collapse" (click)="getShipmentDetails(item.id)">
+                                            <i class="la la-angle-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <!--end of collapse-panel-row -->
-                    </tbody>
-                    <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
-                        <tr class="collapse-toggle-row">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 100px">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-002"
-                                        title="Collapse">
-                                        <i class="la la-angle-up"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
-                                    <span>
-                                        job-id
-                                    </span>
-                                </a>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
-                        <tr class="collapse-panel-row">
-                            <td colspan="12">
-                                <div class="detail-panel-block collapse" id="id-002" data-parent="#sea-fcl-export-table">
-                                    <div class="table-inside-block">
-                                        <perfect-scrollbar style="max-height: 180px">
-                                            <table class="table table-secondary dataTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="sorting_asc">
-                                                            <span>H-B/L No.</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Customer</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Sale Man</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Nomination Party</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Destination</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Containers</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Qty</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Unit</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>G.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>C.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>CBM</span>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </perfect-scrollbar>
+                                </td>
+                                <td>
+                                    <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
+                                        <span>
+                                            {{ item.jobNo }}
+                                        </span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span>{{ item.mawb }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.etd }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.eta }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.supplierName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.agentName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.polName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.podName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.sumCont }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.sumCBM }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.creatorName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.createdDate | date: 'dd/MM/yyyy'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.modifiedDate | date: 'dd/MM/yyyy'}}</span>
+                                </td>
+                            </tr>
+                            <!-- end of collapse-toggle-row -->
+                            <!-- begin collapse-panel-row -->
+                            <tr class="collapse-panel-row">
+                                <td colspan="14">
+                                    <div class="detail-panel-block collapse" id="id-00{{(i+1)}}" data-parent="#sea-fcl-export-table">
+                                        <div class="table-inside-block">
+                                            <perfect-scrollbar style="max-height: 180px">
+                                                <table class="table table-secondary dataTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="sorting_asc">
+                                                                <span>H-B/L No.</span>
+                                                            </th>
+                                                            <th class="sorting">
+                                                                <span>Customer</span>
+                                                            </th>
+                                                            <th class="sorting">
+                                                                <span>Sale Man</span>
+                                                            </th>
+                                                            <th class="sorting">
+                                                                <span>Nomination Party</span>
+                                                            </th>
+                                                            <th class="sorting">
+                                                                <span>Destination</span>
+                                                            </th>
+                                                            <th class="no-sorting">
+                                                                <span>Containers</span>
+                                                            </th>
+                                                            <th class="no-sorting">
+                                                                <span>Packages</span>
+                                                            </th>
+                                                            <th class="no-sorting">
+                                                                <span>CBM</span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody *ngIf="shipmentDetails">
+                                                        <tr *ngFor="let detail of shipmentDetails">
+                                                            <td>
+                                                                <span>{{ detail.hwbno }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.customerName }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.saleManName }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.notifyParty }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.finalDestinationPlace }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.containerNames }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.packageTypes }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.cbm }}</span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </perfect-scrollbar>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <!--end of collapse-panel-row -->
-                    </tbody>
-                    <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
-                        <tr class="collapse-toggle-row">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 100px">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-003"
-                                        title="Collapse">
-                                        <i class="la la-angle-up"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
-                                    <span>
-                                        job-id
-                                    </span>
-                                </a>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
-                        <tr class="collapse-panel-row">
-                            <td colspan="12">
-                                <div class="detail-panel-block collapse" id="id-003" data-parent="#sea-fcl-export-table">
-                                    <div class="table-inside-block">
-                                        <perfect-scrollbar style="max-height: 180px">
-                                            <table class="table table-secondary dataTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="sorting_asc">
-                                                            <span>H-B/L No.</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Customer</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Sale Man</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Nomination Party</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Destination</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Containers</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Qty</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Unit</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>G.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>C.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>CBM</span>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </perfect-scrollbar>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <!--end of collapse-panel-row -->
+                                </td>
+                            </tr>
+                            <!--end of collapse-panel-row -->
+                        </ng-container>
                     </tbody>
                 </table>
             </div>
             <!--end: Datatable -->
 
             <!--begin::pagination-->
-            <div class="pagination-nav">
+            <!-- <div class="pagination-nav">
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="tatable__pager-size" style="max-width: 190px">
@@ -1184,7 +504,9 @@
                         </nav>
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
         </div>
     </div>
