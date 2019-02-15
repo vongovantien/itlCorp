@@ -110,7 +110,7 @@
                                             <label class="form-control-label" for="">
                                   Commodities:
                                             </label>
-                              <textarea class="form-control m-input--square" name="" id="" rows="3" [(ngModel)]="shipment.commodity">Steel, Consumer Good, Drug, Weapon</textarea>
+                              <textarea class="form-control m-input--square" id="" rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
                           </div>
                       </div>
                       <div class="col-lg-6">
@@ -126,7 +126,7 @@
                                     <label class="form-control-label" for="">
                           Description of good:
                                     </label>
-                      <textarea class="form-control m-input--square" name="" id="" rows="3" [(ngModel)]="shipment.commodity">Description-1, Description-2, Description-3, Description-4</textarea>
+                      <textarea class="form-control m-input--square" name="" id="" rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
                   </div>
               </div>
               <div class="col-xl-4">
@@ -517,7 +517,7 @@
 <div class="modal fade" id="container-list-of-job-modal-master" data-backdrop="static" role="dialog" aria-labelledby=""
   aria-hidden="true">
   <div class="modal-dialog c-modal-fullscreen" role="document">
-        <form>
+        <form novalidate #containerMasterForm="ngForm" (ngSubmit)="containerMasterForm.form.valid"> 
           <div class="modal-content m-form m-form--state">
               <div class="modal-header">
                     <h5 class="modal-title">Shippment list of container</h5>
@@ -642,8 +642,9 @@
                                       </th>
                                   </tr>
                               </thead>
-                              <tbody>
-                                    <tr class="m-form m-form--state row-editing">
+                              <tbody *ngIf="lstMasterContainers">
+                                  <ng-container *ngFor="let container of lstMasterContainers">
+                                    <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
                                         <td class="table-actions-col fixed-side">
                                             <div class="table-actions content-editable" style="width: 70px">
                                                 <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -670,21 +671,25 @@
                                             <span class="content-editable">
                                               Cont Type
                                           </span>
-                                            <div class="control-editable">
-                                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                            <div class="control-editable" [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null }">
+                                                <ng-select [allowClear]="true" [items]="containerTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                                    (selected)="container.containerTypeId = $event.id" (removed)="removed($event)" (typed)="typed($event)"
                                                     placeholder="Select filter">
                                                 </ng-select>
+                                                <div class="form-control-feedback" *ngIf="containerMasterForm.submitted && container.containerTypeId == null">
+                                                    Container type is required.
+                                                </div>
                                             </div>
                                       </td>
                                       <td class="">
                                             <span class="content-editable">
                                               Cont Q'ty
-                                          </span>
-                                            <div class="control-editable has-danger">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
-                                                <div class="form-control-feedback">
-                                                    Sorry, that's not correct. Try another?
+                                            </span>
+                                            <div class="control-editable" [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid }">
+                                                <input type="number" class="form-control m-input m-input--square" min="1" value="1" oninput="validity.valid||(value='');"
+                                                    placeholder="Please enter" [ngModel]="container.quantity" name="conQuantity" #conQuantity="ngModel" required>
+                                                <div class="form-control-feedback" *ngIf="containerMasterForm.submitted && conQuantity.invalid">
+                                                    Cont Q'ty must be a number
                                                 </div>
                                             </div>
                                       </td>
@@ -693,7 +698,8 @@
                                               Cont No.
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                    [ngModel]="container.containerNo" name="containerNo" #containerNo="ngModel">
                                             </div>
                                       </td>
                                       <td class="">
@@ -701,7 +707,8 @@
                                               Seal No.
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                    [ngModel]="container.sealNo" name="sealNo" #sealNo="ngModel">
                                             </div>
                                       </td>
                                       <td class="">
@@ -709,7 +716,8 @@
                                               Mark No.
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                    [ngModel]="container.markNo" name="markNo" #markNo="ngModel">
                                             </div>
                                       </td>
                                       <td class="">
@@ -717,8 +725,9 @@
                                               Commodity
                                           </span>
                                             <div class="control-editable">
-                                                <div class="dropdown e--combogrid">
-                                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="Vũng Tàu, Bà Rịa, Việt">
+                                                <div class="dropdown e--combogrid" #selectedCommodity>
+                                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
+                                                        [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value">
                                                     <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
                                                         <div class="tabel-wrapper table-fixed">
                                                             <div class="table-head-fixed">
@@ -742,26 +751,13 @@
                                                             </div>
                                                             <div class="table-body-scroll">
                                                                 <table class="table table-hover">
-                                                                    <tbody>
-                                                                        <tr class="data-row data-selected" data-id="1">
-                                                                            <td>Option EN 1</td>
-                                                                            <td>Option VN 1</td>
-                                                                            <td>Group 1</td>
-                                                                        </tr>
-                                                                        <tr class="data-row" data-id="2">
-                                                                            <td>Option EN 2</td>
-                                                                            <td>Option VN 2</td>
-                                                                            <td>Group 2</td>
-                                                                        </tr>
-                                                                        <tr class="data-row" data-id="3">
-                                                                            <td>Option EN 3</td>
-                                                                            <td>Option VN 3</td>
-                                                                            <td>Group 3</td>
-                                                                        </tr>
-                                                                        <tr class="data-row" data-id="4">
-                                                                            <td>Option EN 4</td>
-                                                                            <td>Option VN 4</td>
-                                                                            <td>Group 4</td>
+                                                                    <tbody *ngIf="commodities">
+                                                                        <tr class="data-row " *ngFor="let commodity of commodities; let i= index" data-id="{{(i+1)}}"
+                                                                            (click)="container.commodityId=commodity.id; selectedCommodity.value= commodity.commodityNameEn"
+                                                                            [class.data-selected] = "container.commodityId !==null && container.commodityId===commodity.id">
+                                                                            <td>{{ commodity.commodityNameEn }}</td>
+                                                                            <td>{{ commodity.commodityNameVn }}</td>
+                                                                            <td>{{ commodity.commonityGroupNameEn }}</td>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
@@ -776,8 +772,8 @@
                                               Package Type
                                           </span>
                                             <div class="control-editable">
-                                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                <ng-select [allowClear]="true" [items]="packageTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                                    (selected)="container.packageTypeId = $event.id" (removed)="container.packageTypeId = null" (typed)="typed($event)"
                                                     placeholder="Select filter">
                                                 </ng-select>
                                             </div>
@@ -787,7 +783,8 @@
                                               Package Q'ty
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" min="1" [ngModel]="container.markNo" name="markNo" #markNo="ngModel" 
+                                                    oninput="validity.valid||(value='');" placeholder="Please enter">
                                             </div>
                                       </td>
                                         <td class="" style="width: 130px">
@@ -795,7 +792,8 @@
                                                 Description of Good dài thiệt là dài đó nha Tem Tem
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="text" class="form-control m-input m-input--square" 
+                                                    [ngModel]="container.description" name="descriptionOfGood" #descriptionOfGood="ngModel" placeholder="Please enter">
                                             </div>
                                       </td>
                                       <td class="">
@@ -803,7 +801,8 @@
                                               N.W
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square"  placeholder="Please enter"
+                                                    [ngModel]="container.nw | number:'1.2-2'" name="containerNW" min="0.01" appTwoDigitDecimaNumber #containerNW="ngModel">
                                             </div>
                                       </td>
                                       <td class="">
@@ -811,7 +810,7 @@
                                               G.W
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                       </td>
                                       <td class="">
@@ -819,15 +818,18 @@
                                                 C.W
                                             </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                         </td>
                                         <td class="">
                                             <span class="content-editable">
                                               Unit
                                           </span>
-                                            <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter" value="Kgs" readonly>
+                                          <div class="control-editable">
+                                                <ng-select [allowClear]="true" [items]="weightMesurements" [disabled]="disabled" (data)="refreshValue($event)"
+                                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                    placeholder="Select filter">
+                                                </ng-select>
                                             </div>
                                       </td>
                                       <td class="">
@@ -835,11 +837,11 @@
                                               CBM
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                       </td>
                                     </tr>
-                                    <!-- <tr class="">
+                                    <tr class="" *ngIf="!container.allowEdit">
                                         <td class="table-actions-col fixed-side">
                                             <div class="table-actions" style="width: 70px">
                                                 <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -922,7 +924,7 @@
                                                 Package Q'ty
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                       </td>
                                         <td class="" style="width: 130px">
@@ -938,7 +940,7 @@
                                                 N.W
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                       </td>
                                       <td class="">
@@ -946,7 +948,7 @@
                                                 G.W
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                       </td>
                                       <td class="">
@@ -954,7 +956,7 @@
                                                 C.W
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                       </td>
                                       <td class="">
@@ -962,7 +964,10 @@
                                                 Unit
                                             </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <ng-select [allowClear]="true" [items]="weightMesurements" [disabled]="disabled" (data)="refreshValue($event)"
+                                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                    placeholder="Select filter">
+                                                </ng-select>
                                             </div>
                                       </td>
                                       <td class="">
@@ -970,10 +975,12 @@
                                                 CBM
                                           </span>
                                             <div class="control-editable">
-                                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
                                             </div>
                                       </td>
-                                    </tr> -->
+                                    </tr>
+                                      
+                                  </ng-container>
                               </tbody>
                           </table>
                       </div>
