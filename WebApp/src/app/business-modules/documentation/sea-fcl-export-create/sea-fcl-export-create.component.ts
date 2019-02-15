@@ -56,6 +56,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.cdr.detach();
         setTimeout(() => {
             this.cdr.reattach();
+            this.cdr.checkNoChanges();
         }, 1000);
     }
 

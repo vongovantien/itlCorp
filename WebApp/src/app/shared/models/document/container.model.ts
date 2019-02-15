@@ -14,7 +14,7 @@ export class Container {
   description: string = null;
   gw: number = 0;
   nw: number = 0;
-  chargeAbleWeight 
+  chargeAbleWeight :number = 0;
   cbm: number = 0;
   partof: boolean = null;
   ownerId: string = null;

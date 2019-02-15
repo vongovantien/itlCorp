@@ -15,13 +15,14 @@ import * as lodash from 'lodash';
 import * as moment from 'moment';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { NgForm } from '@angular/forms';
+declare var $: any;
 
 @Component({
   selector: 'app-housebill-addnew',
   templateUrl: './housebill-addnew.component.html',
   styleUrls: ['./housebill-addnew.component.scss']
 })
-export class HousebillAddnewComponent implements OnInit{
+export class HousebillAddnewComponent implements OnInit {
 
   pager: PagerSetting = PAGINGSETTING;
 
@@ -49,6 +50,9 @@ export class HousebillAddnewComponent implements OnInit{
    */
 
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
+  ListHouseBill: CsTransactionDetail[] = [];
+
+
 
 
   constructor(
@@ -58,7 +62,7 @@ export class HousebillAddnewComponent implements OnInit{
     private cdr: ChangeDetectorRef
   ) { }
 
-  ngOnInit() {   
+  ngOnInit() {
     this.getListCustomers();
     this.getShipmentCommonData();
     this.getListShippers();
@@ -66,6 +70,7 @@ export class HousebillAddnewComponent implements OnInit{
     this.getlistCountryOrigin()
     this.getListPorts();
     this.getListForwardingAgent();
+    this.getListSaleman();
   }
 
   select(form) {
@@ -122,7 +127,7 @@ export class HousebillAddnewComponent implements OnInit{
     });
   }
 
- 
+
   public getlistCountryOrigin(search_key: string = null) {
     var key = "";
     if (search_key !== null && search_key.length < 2 && search_key.length > 0) {
@@ -130,29 +135,29 @@ export class HousebillAddnewComponent implements OnInit{
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.Country.paging+ "?page=" + 1 + "&size=" + 20, {inactive: false,code:key,nameEn:key,nameVn:key,condition:1}).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Country.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, code: key, nameEn: key, nameVn: key, condition: 1 }).subscribe(res => {
       var data = res['data'];
-      this.listCountryOrigin = data;     
+      this.listCountryOrigin = data;
     });
 
     console.log(this.listCountryOrigin);
   }
 
-  getListPorts(search_key: string = null){
+  getListPorts(search_key: string = null) {
     var key = "";
     if (search_key !== null && search_key.length < 2 && search_key.length > 0) {
       return 0;
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.CatPlace.paging+ "?page=" + 1 + "&size=" + 20, {modeOfTransport:"sea",inactive: false,all:key}).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.CatPlace.paging + "?page=" + 1 + "&size=" + 20, { modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
       var data = res['data'];
       this.listPort = data;
-      console.log({list_port:this.listPort});
+      console.log({ list_port: this.listPort });
     });
   }
 
-  getListForwardingAgent(search_key: string = null){
+  getListForwardingAgent(search_key: string = null) {
     var key = "";
     if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
       return 0;
@@ -168,9 +173,23 @@ export class HousebillAddnewComponent implements OnInit{
   public async getCustomerSaleman(idSaleMan: string) {
     var saleMan = await this.baseServices.getAsync(this.api_menu.System.User_Management.getUserByID + idSaleMan);
     this.customerSaleman = [{ id: saleMan['id'], text: saleMan["employeeNameEn"] }];
-    this.HouseBillToAdd.saleManId = this.customerSaleman.id;
-    var users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll);
-    this.listSaleMan = dataHelper.prepareNg2SelectData(users, "id", "employeeNameEn");
+    console.log({SALE_MAN:this.customerSaleman});
+    this.HouseBillToAdd.saleManId = saleMan['id'];
+    // var users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll);
+    // this.listSaleMan = dataHelper.prepareNg2SelectData(users, "id", "employeeNameEn");
+  }
+
+  public async getListSaleman(search_key: string = null) {
+    var key = "";
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
+      return 0;
+    } else {
+      key = search_key;
+    }
+    this.baseServices.post(this.api_menu.System.User_Management.paging + "?page=" + 1 + "&size=" + 20, { all: key }).subscribe(res => {
+      var data = res['data'];
+      this.listSaleMan = dataHelper.prepareNg2SelectData(data, "id", "employeeNameEn");
+    });
   }
 
   /**
@@ -223,8 +242,13 @@ export class HousebillAddnewComponent implements OnInit{
     this.value = value;
   }
 
-  save(form: NgForm) {
-    console.log(this.HouseBillToAdd);
+  save(form: NgForm) {    
+    if(form.status){
+      this.ListHouseBill.push(this.HouseBillToAdd); 
+      form.onReset();
+      $('#add-house-bill-modal').modal('hide');   
+      
+    }
   }
 
 }

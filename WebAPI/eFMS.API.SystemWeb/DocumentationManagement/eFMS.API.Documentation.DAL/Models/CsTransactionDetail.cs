@@ -11,8 +11,11 @@ namespace eFMS.API.Documentation.Service.Models
         public string Hbltype { get; set; }
         public string CustomerId { get; set; }
         public string SaleManId { get; set; }
+        public string ShipperDescription { get; set; }
         public string ShipperId { get; set; }
+        public string ConsigneeDescription { get; set; }
         public string ConsigneeId { get; set; }
+        public string NotifyPartyDescription { get; set; }
         public string NotifyPartyId { get; set; }
         public string CustomsBookingNo { get; set; }
         public string LocalVoyNo { get; set; }
@@ -28,6 +31,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime ClosingDate { get; set; }
         public DateTime SailingDate { get; set; }
         public string ForwardingAgentId { get; set; }
+        public string GoodsDeliveryDescription { get; set; }
         public string GoodsDeliveryId { get; set; }
         public int? OriginBlnumber { get; set; }
         public string IssueHblplaceAndDate { get; set; }
@@ -43,5 +47,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }

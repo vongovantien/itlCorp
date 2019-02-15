@@ -75,7 +75,11 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
+                    options =>
+                    {
+                        options.UseRowNumberForPaging();
+                    });
             }
         }
 
@@ -1262,6 +1266,16 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.ContainerType)
+                    .WithMany(p => p.CsMawbcontainerContainerType)
+                    .HasForeignKey(d => d.ContainerTypeId)
+                    .HasConstraintName("FK_csMAWBContainer_catUnit1");
+
+                entity.HasOne(d => d.UnitOfMeasure)
+                    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
+                    .HasForeignKey(d => d.UnitOfMeasureId)
+                    .HasConstraintName("FK_csMAWBContainer_catUnit");
             });
 
             modelBuilder.Entity<CsShipmentBuyingRate>(entity =>
@@ -1716,6 +1730,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ClosingDate).HasColumnType("smalldatetime");
 
+                entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
+
                 entity.Property(e => e.ConsigneeId)
                     .HasColumnName("ConsigneeID")
                     .HasMaxLength(50)
@@ -1749,6 +1765,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.GoodsDeliveryDescription).HasMaxLength(500);
+
                 entity.Property(e => e.GoodsDeliveryId)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1774,6 +1792,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.LocalVoyNo).HasMaxLength(800);
 
                 entity.Property(e => e.MoveType).HasMaxLength(160);
+
+                entity.Property(e => e.NotifyPartyDescription).HasMaxLength(500);
 
                 entity.Property(e => e.NotifyPartyId)
                     .HasColumnName("NotifyPartyID")
@@ -1813,6 +1833,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ServiceType).HasMaxLength(160);
 
+                entity.Property(e => e.ShipperDescription).HasMaxLength(500);
+
                 entity.Property(e => e.ShipperId)
                     .HasColumnName("ShipperID")
                     .HasMaxLength(50)
@@ -1827,6 +1849,12 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.CsTransactionDetail)
+                    .HasForeignKey(d => d.JobId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<SysAuthorization>(entity =>
