@@ -7,8 +7,11 @@ export class CsTransactionDetail {
   hbltype: String = null;
   customerId: String = null;
   saleManId: String = null;
+  shipperDescription:String = null;
   shipperId: String = null;
+  consigneeDescription:String = null;
   consigneeId: String = null;
+  notifyPartyDescription:String = null;
   notifyPartyId: String = null;
   customsBookingNo: String = null;
   localVoyNo: String = null;
@@ -23,7 +26,9 @@ export class CsTransactionDetail {
   placeFreightPay: String = null;
   closingDate: Date = null;
   sailingDate: Date = null;
+  forwardingAgentDescription:String= null;
   forwardingAgentId: String = null;
+  goodsDeliveryDescription:String = null;
   goodsDeliveryId: String = null;
   originBlNumber: Number = null;
   issueHblplaceAndDate: String = null;

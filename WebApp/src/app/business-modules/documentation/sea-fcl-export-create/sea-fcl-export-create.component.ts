@@ -27,7 +27,7 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 export class SeaFclExportCreateComponent implements OnInit {
     shipment: CsTransaction = new CsTransaction();
     containerTypes: any[] = [];
-    containers: any[] = [];
+    lstMasterContainers: any[] = [];
     packageTypes: any[] = [];
     commodities: any[] = [];
     weightMesurements: any[] = [];
@@ -56,6 +56,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.cdr.detach();
         setTimeout(() => {
             this.cdr.reattach();
+            this.cdr.checkNoChanges();
         }, 1000);
     }
 
@@ -104,10 +105,10 @@ export class SeaFclExportCreateComponent implements OnInit {
             cbm: null,
             allowEdit: true
         };
-        if (this.containers.length == 0) {
-            this.containers.push(container);
+        if (this.lstMasterContainers.length == 0) {
+            this.lstMasterContainers.push(container);
         }
-        console.log(this.containers);
+        console.log(this.lstMasterContainers);
     }
     async getContainerTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
@@ -132,6 +133,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     async getComodities() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
         this.commodities = responses;
+        console.log(this.commodities);
     }
     async onSubmit() {
         this.submitted = true;
@@ -151,16 +153,16 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
     }
     addNewContainer() {
-        this.containers.push(new Container());
+        this.lstMasterContainers.push(new Container());
     }
     onSubmitContainer() {
         if (this.formAddEditContainer.valid) {
-            for (var i = 0; i < this.containers.length; i++) {
-                this.containers[i].isSave = true;
-                this.totalGrossWeight = this.totalGrossWeight + this.containers[i].grossWeight;
-                this.totalNetWeight = this.totalNetWeight + this.containers[i].netWeight;
-                this.totalCharWeight = this.totalCharWeight + this.containers[i].chargeAbleWeight;
-                this.totalCBM = this.totalCBM + this.containers[i].cbm;
+            for (var i = 0; i < this.lstMasterContainers.length; i++) {
+                this.lstMasterContainers[i].isSave = true;
+                this.totalGrossWeight = this.totalGrossWeight + this.lstMasterContainers[i].grossWeight;
+                this.totalNetWeight = this.totalNetWeight + this.lstMasterContainers[i].netWeight;
+                this.totalCharWeight = this.totalCharWeight + this.lstMasterContainers[i].chargeAbleWeight;
+                this.totalCBM = this.totalCBM + this.lstMasterContainers[i].cbm;
             }
         }
     }

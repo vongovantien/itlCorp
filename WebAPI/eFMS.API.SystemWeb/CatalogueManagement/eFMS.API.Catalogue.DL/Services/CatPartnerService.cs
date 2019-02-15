@@ -126,6 +126,8 @@ namespace eFMS.API.Catalogue.DL.Services
                                PartnerNameEn = x.partner.PartnerNameEn,
                                AddressVn = x.partner.AddressVn,
                                AddressEn = x.partner.AddressEn,
+                               AddressShippingVn = x.partner.AddressShippingVn,
+                               AddressShippingEn = x.partner.AddressShippingEn,
                                ShortName = x.partner.ShortName,
                                CountryId = x.partner.CountryId,
                                AccountNo = x.partner.AccountNo,

@@ -19,6 +19,7 @@ import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-exp
 import { MasterBillComponent } from './sea-fcl-export-create/master-bill/master-bill.component';
 import { HousebillListComponent } from './sea-fcl-export-create/housebill-list/housebill-list.component';
 import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addnew/housebill-addnew.component';
+import { TwoDigitDecimaNumberDirective } from 'src/app/shared/directives/two-digit-decima-number.directive';
 
 @NgModule({
   imports: [
@@ -31,6 +32,16 @@ import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addn
     FormsModule,
     PerfectScrollbarModule, // Scrollbar
   ],
-  declarations: [AirExportComponent, AirImportComponent, SeaFCLExportComponent, SeaLCLExportComponent, SeaConsolExportComponent, SeaFCLImportComponent, SeaLCLImportComponent, SeaConsolImportComponent, InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent]
+  declarations: [   
+    // TwoDigitDecimaNumberDirective,
+    AirExportComponent, 
+    AirImportComponent, 
+    SeaFCLExportComponent, 
+    SeaLCLExportComponent, 
+    SeaConsolExportComponent, 
+    SeaFCLImportComponent, 
+    SeaLCLImportComponent, 
+    SeaConsolImportComponent, 
+    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent]
 })
 export class DocumentationModule { }
