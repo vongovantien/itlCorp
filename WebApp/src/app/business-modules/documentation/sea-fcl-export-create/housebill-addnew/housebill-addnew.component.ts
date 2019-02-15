@@ -4,7 +4,6 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-// import { PaginationComponent } from 'ngx-bootstrap';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -15,6 +14,7 @@ import * as lodash from 'lodash';
 import * as moment from 'moment';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { NgForm } from '@angular/forms';
+import { Container } from 'src/app/shared/models/document/container.model';
 declare var $: any;
 
 @Component({
@@ -51,9 +51,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
   ListHouseBill: CsTransactionDetail[] = [];
-
-
-
+  ListContainers : Array<Container> = [];
 
   constructor(
     private baseServices: BaseService,
@@ -100,6 +98,15 @@ export class HousebillAddnewComponent implements OnInit {
 
   }
 
+  public getShipperDescription(shipper: any) {
+    this.HouseBillToAdd.shipperDescription =
+      "Name: " + shipper.partnerNameEn + "\n" +
+      "Billing Address: " + shipper.addressEn + "\n" +
+      "Tel: " + shipper.tel + "\n" +
+      "Fax: " + shipper.fax + "\n";
+
+  }
+
   public getListShippers(search_key: string = null) {
     var key = "";
     if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
@@ -112,6 +119,22 @@ export class HousebillAddnewComponent implements OnInit {
       this.listShipper = data;
 
     });
+  }
+
+  public getNotifyPartyDescription(notifyParty: any) {
+    this.HouseBillToAdd.notifyPartyDescription =
+      "Name: " + notifyParty.partnerNameEn + "\n" +
+      "Billing Address: " + notifyParty.addressEn + "\n" +
+      "Tel: " + notifyParty.tel + "\n" +
+      "Fax: " + notifyParty.fax + "\n";
+  }
+
+  public getConsigneeDescription(consignee: any) {
+    this.HouseBillToAdd.consigneeDescription =
+      "Name: " + consignee.partnerNameEn + "\n" +
+      "Billing Address: " + consignee.addressEn + "\n" +
+      "Tel: " + consignee.tel + "\n" +
+      "Fax: " + consignee.fax + "\n";
   }
 
   public getListConsignees(search_key: string = null) {
@@ -157,6 +180,22 @@ export class HousebillAddnewComponent implements OnInit {
     });
   }
 
+  public getForwardingAgentDescription(forwardingAgent: any) {
+    this.HouseBillToAdd.forwardingAgentDescription =
+      "Name: " + forwardingAgent.partnerNameEn + "\n" +
+      "Billing Address: " + forwardingAgent.addressEn + "\n" +
+      "Tel: " + forwardingAgent.tel + "\n" +
+      "Fax: " + forwardingAgent.fax + "\n";
+  }
+
+  public getGoodDeliveryDescription(goodDelivery:any){
+    this.HouseBillToAdd.goodsDeliveryDescription =
+      "Name: " + goodDelivery.partnerNameEn + "\n" +
+      "Billing Address: " + goodDelivery.addressEn + "\n" +
+      "Tel: " + goodDelivery.tel + "\n" +
+      "Fax: " + goodDelivery.fax + "\n";
+  }
+
   getListForwardingAgent(search_key: string = null) {
     var key = "";
     if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
@@ -173,7 +212,7 @@ export class HousebillAddnewComponent implements OnInit {
   public async getCustomerSaleman(idSaleMan: string) {
     var saleMan = await this.baseServices.getAsync(this.api_menu.System.User_Management.getUserByID + idSaleMan);
     this.customerSaleman = [{ id: saleMan['id'], text: saleMan["employeeNameEn"] }];
-    console.log({SALE_MAN:this.customerSaleman});
+    console.log({ SALE_MAN: this.customerSaleman });
     this.HouseBillToAdd.saleManId = saleMan['id'];
     // var users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll);
     // this.listSaleMan = dataHelper.prepareNg2SelectData(users, "id", "employeeNameEn");
@@ -243,19 +282,17 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   isDisplay = true;
-  save(form: NgForm) {   
-    if(form.valid){      
-      this.ListHouseBill.push(this.HouseBillToAdd); 
+  save(form: NgForm) {
+    if (form.valid) {
+      console.log(this.HouseBillToAdd);
+      this.ListHouseBill.push(this.HouseBillToAdd);
       this.HouseBillToAdd = new CsTransactionDetail();
       this.customerSaleman = null;
-      form.onReset();
-      // this.isDisplay = false;
-      // setTimeout(() => {
-      //   this.isDisplay = true;
-      // }, 300);
-      $('#add-house-bill-modal').modal('hide');   
-      console.log(form);
-      
+      this.isDisplay = false;
+      setTimeout(() => {
+        this.isDisplay = true;
+      }, 300);
+      $('#add-house-bill-modal').modal('hide');
     }
   }
 

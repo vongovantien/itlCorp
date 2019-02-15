@@ -1756,6 +1756,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.FinalDestinationPlace).HasMaxLength(500);
 
+                entity.Property(e => e.ForwardingAgentDescription).HasMaxLength(500);
+
                 entity.Property(e => e.ForwardingAgentId)
                     .HasColumnName("ForwardingAgentID")
                     .HasMaxLength(50)
