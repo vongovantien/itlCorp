@@ -10,6 +10,14 @@
     .table {
         min-width: 100%;
         table-layout: fixed;
+        thead {
+            tr {
+                th {
+                    background-color: #f2dedf;
+                    color: #212529;
+                }
+            }
+        }
         thead,
         tbody {
             tr {
@@ -38,7 +46,7 @@
     }
     .table-header{
         padding-right: 5px;
-        background-color: #f2dedf;
+        background-color: #f2dedf;;
     }
     .table-body-scroll {
         max-height: 100px;
