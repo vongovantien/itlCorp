@@ -231,7 +231,7 @@
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
                                                             <tbody *ngIf="salemans">
-                                                                <tr class="data-row" [class.data-selected] = "criteria.saleman !==null && criteria.saleman===user.id"
+                                                                <tr class="data-row" [class.data-selected] = "criteria.saleManID !==null && criteria.saleManID===user.id"
                                                                     data-id="{{user.id}}" *ngFor="let user of salemans;let i = index;" 
                                                                     (click)="criteria.saleManID=user.id; selectedSaleman.value= user.employeeNameVn">
                                                                     <td>{{ user.username }}</td>

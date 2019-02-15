@@ -9,7 +9,7 @@
       <div class="m-form m-form--state" [formGroup]="formAddEdit">
           <div class="row">
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': !formAddEdit.controls.jobId.valid && submitted }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': !formAddEdit.controls.jobId.valid && submitted }">
                       <label class="form-control-label" for="">
                           Job ID
                       </label>
@@ -24,7 +24,7 @@
                   </div>
               </div>
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && !formAddEdit.controls.estimatedTimeofDepature.valid }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && !formAddEdit.controls.estimatedTimeofDepature.valid }">
                       <label class="form-control-label" for="">
                           Estimated time of departure <span class="m--font-danger">(*)</span>
                       </label>
@@ -46,7 +46,7 @@
                   </div>
               </div>
               <div class="col-lg-4">
-                  <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
                       <label class="form-control-label" for="">
                           Estimated time of Arrival
                       </label>
@@ -70,7 +70,7 @@
           </div>
           <div class="row">
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && formAddEdit.controls.mawb.invalid }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.mawb.invalid }">
                       <label class="form-control-label" for="">
                           Master bill of lading no <span class="m--font-danger">(*)</span>
                       </label>
@@ -83,7 +83,7 @@
                   </div>
               </div>
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && formAddEdit.controls.mbltype.invalid }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.mbltype.invalid }">
                       <label class="form-control-label" for="">
                               Master bill of lading type <span class="m--font-danger">(*)</span>
                       </label>
@@ -158,7 +158,7 @@
                   </div>
               </div>
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && formAddEdit.controls.typeOfService.invalid }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.typeOfService.invalid }">
                       <label class="form-control-label" for="">
                           Services type <span class="m--font-danger">(*)</span>
                       </label>
@@ -223,7 +223,7 @@
           </div>
           <div class="row">
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && formAddEdit.value.typeOfService == null }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.value.typeOfService == null }">
                       <label class="form-control-label" for="">
                           Port of loading <span class="m--font-danger">(*)</span>
                       </label>
@@ -320,7 +320,7 @@
                   </div>
               </div>
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && formAddEdit.controls.paymentTerm.invalid }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.paymentTerm.invalid }">
                       <label class="form-control-label" for="">
                           Term <span class="m--font-danger">(*)</span>
                       </label>
@@ -356,7 +356,7 @@
                   </div>
               </div>
               <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'm-form__group has-danger': submitted && formAddEdit.controls.shipmentType.invalid }">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.shipmentType.invalid }">
                       <label class="form-control-label" for="">
                           Shipment type <span class="m--font-danger">(*)</span>
                       </label>
