@@ -51,7 +51,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
   ListHouseBill: CsTransactionDetail[] = [];
-  ListContainers : Array<Container> = [];
+  ListContainers : Array<Container> = [new Container()];
 
   constructor(
     private baseServices: BaseService,
@@ -61,6 +61,7 @@ export class HousebillAddnewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    console.log(this.ListContainers);
     this.getListCustomers();
     this.getShipmentCommonData();
     this.getListShippers();
