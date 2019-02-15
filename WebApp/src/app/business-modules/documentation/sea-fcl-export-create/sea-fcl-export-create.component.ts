@@ -90,19 +90,26 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.getComodities();
         this.getWeightTypes();
         var container = {
-            containerType: null,
-            containerQuantity: null,
-            containerNo: "",
-            sealNo: "",
-            markNo: "",
+            containerTypeId: null,
+            quantity: null,
+            containerNo: '',
+            sealNo: '',
+            markNo: '',
+            unitOfMeasureId: null,
             commodityId: null,
-            packageTypeId: "",
-            goodsDescription: "",
-            grossWeight: null,
-            netWeight: null,
-            chargeAbleWeight: null,
-            unitId: null,
+            packageTypeId: null,
+            packageQuantity: null,
+            description: '',
+            gw: null,
+            nw: null,
+            chargeAbleWeight :null,
             cbm: null,
+            partof: null,
+            ownerId: '',
+            offHireDepot: '',
+            offHireRefNo: '',
+            userModified: '',
+            datetimeModified: null,
             allowEdit: true
         };
         if (this.lstMasterContainers.length == 0) {
