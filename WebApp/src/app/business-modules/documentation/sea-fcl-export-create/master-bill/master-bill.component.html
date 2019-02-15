@@ -4,440 +4,440 @@
 </div> -->
 <!--begin:: m-portlet-->
 <div class="m-portlet">
-  <div class="m-portlet__body">
-      <!--begin::Form-->
-      <div class="m-form m-form--state" [formGroup]="formAddEdit">
-          <div class="row">
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': !formAddEdit.controls.jobId.valid && submitted }">
-                      <label class="form-control-label" for="">
-                          Job ID
-                      </label>
+    <div class="m-portlet__body">
+        <!--begin::Form-->
+        <div class="m-form m-form--state" [formGroup]="formAddEdit">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': !formAddEdit.controls.jobId.valid && submitted }">
+                        <label class="form-control-label" for="">
+                            Job ID
+                        </label>
                         <input type="text" name="jobId" formControlName="jobId" class="form-control m-input m-input--square"
                             placeholder="" [(ngModel)]="shipment.jobNo" minlength="3" required>
-                      <!-- <div class="form-control-feedback" *ngIf="formAddEdit.submitted && jobId.invalid" >
+                        <!-- <div class="form-control-feedback" *ngIf="formAddEdit.submitted && jobId.invalid" >
                         Job ID is required least 3 characters
                       </div> -->
                         <div class="form-control-feedback" *ngIf="!formAddEdit.controls.jobId.valid && submitted">
-                        Job ID is required least 3 characters
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': submitted && !formAddEdit.controls.estimatedTimeofDepature.valid }">
-                      <label class="form-control-label" for="">
-                          Estimated time of departure <span class="m--font-danger">(*)</span>
-                      </label>
-                      <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            Job ID is required least 3 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && !formAddEdit.controls.estimatedTimeofDepature.valid }">
+                        <label class="form-control-label" for="">
+                            Estimated time of departure <span class="m--font-danger">(*)</span>
+                        </label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="etdSelected"
                                 [alwaysShowCalendars]="true" [singleDatePicker]="true" name="estimatedTimeofDepature"
                                 formControlName="estimatedTimeofDepature" placeholder="dd/mm/yyyy" [autoApply]="true"
                                 required readonly />
-                          <span class="m-input-icon__icon m-input-icon__icon--right">
-                              <span>
-                                  <i class="la la-calendar"></i>
-                              </span>
-                          </span>
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
                             <div class="form-control-feedback" *ngIf="submitted && !formAddEdit.controls.estimatedTimeofDepature.valid">
-                              Estimated time of departure is required
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group"  [ngClass]="{ 'has-danger': submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
-                      <label class="form-control-label" for="">
-                          Estimated time of Arrival
-                      </label>
-                      <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                Estimated time of departure is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
+                        <label class="form-control-label" for="">
+                            Estimated time of Arrival
+                        </label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="etaSelected"
                                 [alwaysShowCalendars]="true" formControlName="estimatedTimeofArrived"
                                 [singleDatePicker]="true" [autoApply]="true" name="estimatedTimeofArrived" placeholder="dd/mm/yyyy"
                                 readonly />
-                          <span class="m-input-icon__icon m-input-icon__icon--right">
-                              <span>
-                                  <i class="la la-calendar"></i>
-                              </span>
-                          </span>
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
                             <div class="form-control-feedback" *ngIf="submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
-                              Estimated time of Arrival must more or equal estimated time of departure
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.mawb.invalid }">
-                      <label class="form-control-label" for="">
-                          Master bill of lading no <span class="m--font-danger">(*)</span>
-                      </label>
+                                Estimated time of Arrival must more or equal estimated time of departure
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.mawb.invalid }">
+                        <label class="form-control-label" for="">
+                            Master bill of lading no <span class="m--font-danger">(*)</span>
+                        </label>
                         <input type="text" class="form-control m-input m-input--square" placeholder="Enter master bill of lading no"
                             autocomplete="nope" [(ngModel)]="shipment.mawb" formControlName="mawb" name="mawb"
                             minlength="3" (change)="shipment.mawb = shipment.mawb.trim()" required>
                         <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.mawb.invalid">
-                          Master bill of lading no is required least 3 characters
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.mbltype.invalid }">
-                      <label class="form-control-label" for="">
-                              Master bill of lading type <span class="m--font-danger">(*)</span>
-                      </label>
+                            Master bill of lading no is required least 3 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.mbltype.invalid }">
+                        <label class="form-control-label" for="">
+                            Master bill of lading type <span class="m--font-danger">(*)</span>
+                        </label>
                         <ng-select [allowClear]="true" [items]="billOfLadingTypes" [disabled]="disabled" (data)="refreshValue($event)"
                             formControlName="mbltype" (selected)="shipment.mbltype = $event.id" (removed)="shipment.mbltype = null"
                             (typed)="typed($event)" placeholder="Select option">
-                      </ng-select>
+                        </ng-select>
                         <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.mbltype.invalid">
-                          Master bill of lading type is required
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
-                              Supplier/Vendor (co-loader)
-                      </label>
-                      <div class="dropdown e--combogrid" #selectedColoader>
+                            Master bill of lading type is required
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Supplier/Vendor (co-loader)
+                        </label>
+                        <div class="dropdown e--combogrid" #selectedColoader>
                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                 data-toggle="dropdown" placeholder="combogrid" [value]="selectedColoader.value == null?'Please selected coloader':selectedColoader.value">
-                          <div class="dropdown-menu e--combogrid-content">
-                              <div class="tabel-wrapper table-fixed">
-                                  <div class="table-head-fixed">
-                                      <div class="table-filter-block">
-                                          <div class="search-field">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
                                                 <input class="form-control m-input m-input--square" type="text"
                                                     placeholder="Search..." (keyup)="changeColoader($event.target.value)">
-                                              <i class="icon-search"></i>
-                                          </div>
-                                      </div>
-                                      <div class="table-header">
-                                          <table class="table table-hover">
-                                              <thead>
-                                                  <tr>
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
                                                         <th>Partner ID</th>
                                                         <th>Name ABBR</th>
                                                         <th>Name EN</th>
                                                         <th>Tax Code</th>
-                                                  </tr>
-                                              </thead>
-                                          </table>
-                                      </div>
-                                  </div>
-                                  <div class="table-body-scroll">
-                                      <table class="table table-hover" *ngIf="coloaders">
-                                          <tbody *ngFor="let coloader of coloaders;let i = index;">
-                                              <tr class="data-row" [ngClass]="{ 'data-selected': shipment.coloaderId!==null && shipment.coloaderId===coloader.id }" data-id="{{i}}" 
-                                              (click)="shipment.coloaderId = coloader.id; formAddEdit.controls['coloaderId'].setValue(coloader.id); selectedColoader.value=coloader.partnerNameEn">
-                                                  <td>{{ coloader.accountNo }}</td>
-                                                  <td>{{ coloader.shortName }}</td>
-                                                  <td>{{ coloader.partnerNameEn }}</td>
-                                                  <td>{{ coloader.taxCode }}</td>
-                                              </tr>
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="col-lg-4">
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
-                          Booking no
-                      </label>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="coloaders">
+                                            <tbody *ngFor="let coloader of coloaders;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.coloaderId!==null && shipment.coloaderId===coloader.id }"
+                                                    data-id="{{i}}" (click)="shipment.coloaderId = coloader.id; formAddEdit.controls['coloaderId'].setValue(coloader.id); selectedColoader.value=coloader.partnerNameEn">
+                                                    <td>{{ coloader.accountNo }}</td>
+                                                    <td>{{ coloader.shortName }}</td>
+                                                    <td>{{ coloader.partnerNameEn }}</td>
+                                                    <td>{{ coloader.taxCode }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Booking no
+                        </label>
                         <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
                             autocomplete="nope" formControlName="bookingNo" (change)="shipment.bookingNo = shipment.bookingNo.trim()"
                             formControlName="bookingNo" name="bookingNo" [(ngModel)]="shipment.bookingNo">
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.typeOfService.invalid }">
-                      <label class="form-control-label" for="">
-                          Services type <span class="m--font-danger">(*)</span>
-                      </label>
-                      <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.typeOfService.invalid }">
+                        <label class="form-control-label" for="">
+                            Services type <span class="m--font-danger">(*)</span>
+                        </label>
+                        <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="shipment.typeOfService = $event.id" (removed)="shipment.typeOfService = null"
                             (typed)="typed($event)" placeholder="Select service type" formControlName="typeOfService">
-                      </ng-select>
+                        </ng-select>
                         <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.typeOfService.invalid">
-                          Services type is required
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
-                          Aggent
-                      </label>
-                      <div class="dropdown e--combogrid" #selectedAgent>
+                            Services type is required
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Aggent
+                        </label>
+                        <div class="dropdown e--combogrid" #selectedAgent>
                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                 data-toggle="dropdown" placeholder="combogrid" [value]="selectedAgent.value == null?'Please selected agent':selectedAgent.value">
-                          <div class="dropdown-menu e--combogrid-content">
-                              <div class="tabel-wrapper table-fixed">
-                                  <div class="table-head-fixed">
-                                      <div class="table-filter-block">
-                                          <div class="search-field">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
                                                 <input class="form-control m-input m-input--square" type="text"
                                                     placeholder="Search..." (keyup)="changeAgent($event.target.value)">
-                                              <i class="icon-search"></i>
-                                          </div>
-                                      </div>
-                                      <div class="table-header">
-                                          <table class="table table-hover">
-                                              <thead>
-                                                  <tr>
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
                                                         <th>Partner ID</th>
                                                         <th>Name ABBR</th>
                                                         <th>Name EN</th>
                                                         <th>Tax Code</th>
-                                                  </tr>
-                                              </thead>
-                                          </table>
-                                      </div>
-                                  </div>
-                                  <div class="table-body-scroll">
-                                      <table class="table table-hover" *ngIf="agents">
-                                          <tbody *ngFor="let agent of agents;let i = index;">
-                                              <tr class="data-row" [ngClass]="{ 'data-selected': shipment.agentId!==null && shipment.agentId===agent.id }" data-id="{{i}}" 
-                                                  (click)="shipment.agentId = agent.id; formAddEdit.controls['agentId'].setValue(agent.id); selectedAgent.value=agent.partnerNameEn">
-                                                  <td>{{ agent.accountNo }}</td>
-                                                  <td>{{ agent.shortName }}</td>
-                                                  <td>{{ agent.partnerNameEn }}</td>
-                                                  <td>{{ agent.taxCode }}</td>
-                                              </tr>
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.value.typeOfService == null }">
-                      <label class="form-control-label" for="">
-                          Port of loading <span class="m--font-danger">(*)</span>
-                      </label>
-                      <div class="dropdown e--combogrid" #selectedPOL>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="agents">
+                                            <tbody *ngFor="let agent of agents;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.agentId!==null && shipment.agentId===agent.id }"
+                                                    data-id="{{i}}" (click)="shipment.agentId = agent.id; formAddEdit.controls['agentId'].setValue(agent.id); selectedAgent.value=agent.partnerNameEn">
+                                                    <td>{{ agent.accountNo }}</td>
+                                                    <td>{{ agent.shortName }}</td>
+                                                    <td>{{ agent.partnerNameEn }}</td>
+                                                    <td>{{ agent.taxCode }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.value.typeOfService == null }">
+                        <label class="form-control-label" for="">
+                            Port of loading <span class="m--font-danger">(*)</span>
+                        </label>
+                        <div class="dropdown e--combogrid" #selectedPOL>
                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                 data-toggle="dropdown" placeholder="combogrid" [value]="selectedPOL.value == null?'Please selected port of loading':selectedPOL.value">
-                          <div class="dropdown-menu e--combogrid-content">
-                              <div class="tabel-wrapper table-fixed">
-                                  <div class="table-head-fixed">
-                                      <div class="table-filter-block">
-                                          <div class="search-field">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
                                                 <input class="form-control m-input m-input--square" type="text"
                                                     placeholder="Search..." (keyup)="changePort($event.target.value, true)">
-                                              <i class="icon-search"></i>
-                                          </div>
-                                      </div>
-                                      <div class="table-header">
-                                          <table class="table table-hover">
-                                              <thead>
-                                                  <tr>
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
                                                         <th>Port Code</th>
                                                         <th>Port Name</th>
                                                         <th>Country</th>
-                                                  </tr>
-                                              </thead>
-                                          </table>
-                                      </div>
-                                  </div>
-                                  <div class="table-body-scroll">
-                                      <table class="table table-hover" *ngIf="portOfLadings">
-                                          <tbody *ngFor="let pol of portOfLadings;let i = index;">
-                                              <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{i}}" 
-                                                  (click)="shipment.pol = pol.id;formAddEdit.controls['pol'].setValue(pol.id); selectedPOL.value= pol.nameEN">
-                                                  <td>{{ pol.code }}</td>
-                                                  <td>{{ pol.nameEN }}</td>
-                                                  <td>{{ pol.countryName }}</td>
-                                              </tr>
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="portOfLadings">
+                                            <tbody *ngFor="let pol of portOfLadings;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }"
+                                                    data-id="{{i}}" (click)="shipment.pol = pol.id;formAddEdit.controls['pol'].setValue(pol.id); selectedPOL.value= pol.nameEN">
+                                                    <td>{{ pol.code }}</td>
+                                                    <td>{{ pol.nameEN }}</td>
+                                                    <td>{{ pol.countryName }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-control-feedback" *ngIf="submitted && formAddEdit.value.typeOfService == null">
-                          Port of loading is required
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
-                          Port of destination
-                      </label>
-                      <div class="dropdown e--combogrid" #selectedPOD>
+                            Port of loading is required
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Port of destination
+                        </label>
+                        <div class="dropdown e--combogrid" #selectedPOD>
                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                 data-toggle="dropdown" placeholder="combogrid" [value]="selectedPOD.value == null?'Please selected port of loading':selectedPOD.value">
-                          <div class="dropdown-menu e--combogrid-content">
-                              <div class="tabel-wrapper table-fixed">
-                                  <div class="table-head-fixed">
-                                      <div class="table-filter-block">
-                                          <div class="search-field">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
                                                 <input class="form-control m-input m-input--square" type="text"
                                                     placeholder="Search..." (keyup)="changePort($event.target.value, false)">
-                                              <i class="icon-search"></i>
-                                          </div>
-                                      </div>
-                                      <div class="table-header">
-                                          <table class="table table-hover">
-                                              <thead>
-                                                  <tr>
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
                                                         <th>Port Code</th>
                                                         <th>Port Name</th>
                                                         <th>Country</th>
-                                                  </tr>
-                                              </thead>
-                                          </table>
-                                      </div>
-                                  </div>
-                                  <div class="table-body-scroll">
-                                      <table class="table table-hover" *ngIf="portOfDestinations">
-                                          <tbody *ngFor="let pod of portOfDestinations;let i = index;">
-                                              <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
-                                                  (click)="shipment.pod = pod.id;formAddEdit.controls['pod'].setValue(pod.id); selectedPOD.value= pod.nameEN">
-                                                  <td>{{ pod.code }}</td>
-                                                  <td>{{ pod.nameEN }}</td>
-                                                  <td>{{ pod.countryName }}</td>
-                                              </tr>
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.paymentTerm.invalid }">
-                      <label class="form-control-label" for="">
-                          Term <span class="m--font-danger">(*)</span>
-                      </label>
-                      <ng-select [allowClear]="true" [items]="terms" [disabled]="disabled" (data)="refreshValue($event)"
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="portOfDestinations">
+                                            <tbody *ngFor="let pod of portOfDestinations;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }"
+                                                    data-id="{{i}}" (click)="shipment.pod = pod.id;formAddEdit.controls['pod'].setValue(pod.id); selectedPOD.value= pod.nameEN">
+                                                    <td>{{ pod.code }}</td>
+                                                    <td>{{ pod.nameEN }}</td>
+                                                    <td>{{ pod.countryName }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.paymentTerm.invalid }">
+                        <label class="form-control-label" for="">
+                            Term <span class="m--font-danger">(*)</span>
+                        </label>
+                        <ng-select [allowClear]="true" [items]="terms" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="shipment.paymentTerm = $event.id" (removed)="shipment.paymentTerm = null"
                             (typed)="typed($event)" placeholder="Select option" formControlName="paymentTerm">
-                      </ng-select>
+                        </ng-select>
                         <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.paymentTerm.invalid">
-                          Term is required
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="col-lg-4">
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
-                          Vessel name
-                      </label>
+                            Term is required
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Vessel name
+                        </label>
                         <input type="text" class="form-control m-input m-input--square" name="flightVesselName"
                             placeholder="Enter text" autocomplete="nope" (change)="shipment.flightVesselName = shipment.flightVesselName.trim()"
                             [(ngModel)]="shipment.flightVesselName" formControlName="flightVesselName">
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
-                          Voy no
-                      </label>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Voy no
+                        </label>
                         <input type="text" class="form-control m-input m-input--square" placeholder="Enter text" name="voyNo"
                             autocomplete="nope" (change)="shipment.voyNo = shipment.voyNo.trim()" [(ngModel)]="shipment.voyNo"
                             formControlName="voyNo">
-                  </div>
-              </div>
-              <div class="col-lg-4">
-                  <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.shipmentType.invalid }">
-                      <label class="form-control-label" for="">
-                          Shipment type <span class="m--font-danger">(*)</span>
-                      </label>
-                      <ng-select [allowClear]="true" [items]="shipmentTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.shipmentType.invalid }">
+                        <label class="form-control-label" for="">
+                            Shipment type <span class="m--font-danger">(*)</span>
+                        </label>
+                        <ng-select [allowClear]="true" [items]="shipmentTypes" [disabled]="disabled" (data)="refreshValue($event)"
                             (selected)="shipment.shipmentType = $event.id" (removed)="shipment.shipmentType = null"
                             (typed)="typed($event)" placeholder="Select option" formControlName="shipmentType">
-                      </ng-select>
+                        </ng-select>
                         <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.shipmentType.invalid">
-                          Shipment type is required
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="col-lg-4">
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
+                            Shipment type is required
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
                             Purchase order(P/O) no
-                      </label>
+                        </label>
                         <input type="text" class="form-control m-input m-input--square" name="pono" placeholder="Enter text"
                             autocomplete="nope" (change)="shipment.pono = shipment.pono.trim()" [(ngModel)]="shipment.pono"
                             formControlName="pono">
-                  </div>
-                  <div class="form-group">
-                      <label class="form-control-label" for="">
-                          Person in charge
-                      </label>
-                      <div class="dropdown e--combogrid" #selectedPersonInCharge>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Person in charge
+                        </label>
+                        <div class="dropdown e--combogrid" #selectedPersonInCharge>
                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                 data-toggle="dropdown" placeholder="combogrid" [value]="selectedPersonInCharge.value == null?'Please selected person in charge':selectedPersonInCharge.value">
-                          <div class="dropdown-menu e--combogrid-content">
-                              <div class="tabel-wrapper table-fixed">
-                                  <div class="table-head-fixed">
-                                      <div class="table-filter-block">
-                                          <div class="search-field">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
                                                 <input class="form-control m-input m-input--square" type="text"
                                                     placeholder="Search..." (keyup)="changePort($event.target.value, false)">
-                                              <i class="icon-search"></i>
-                                          </div>
-                                      </div>
-                                      <div class="table-header">
-                                          <table class="table table-hover">
-                                              <thead>
-                                                  <tr>
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
                                                         <th>User Name</th>
                                                         <th>Full Name</th>
                                                         <th>Role</th>
-                                                  </tr>
-                                              </thead>
-                                          </table>
-                                      </div>
-                                  </div>
-                                  <div class="table-body-scroll">
-                                      <table class="table table-hover" *ngIf="userInCharges">
-                                          <tbody *ngFor="let user of userInCharges;let i = index;">
-                                              <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
-                                                  (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.employeeNameVn">
-                                                  <td>{{ user.username }}</td>
-                                                  <td>{{ user.employeeNameVn }}</td>
-                                                  <td>{{ user.employeeNameVn }}</td>
-                                              </tr>
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-8">
-                  <div class="form-group">
-                      <label class="form-control-label" for="" autocomplete="nope">
-                          Note
-                      </label>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover" *ngIf="userInCharges">
+                                            <tbody *ngFor="let user of userInCharges;let i = index;">
+                                                <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }"
+                                                    data-id="{{i}}" (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.employeeNameVn">
+                                                    <td>{{ user.username }}</td>
+                                                    <td>{{ user.employeeNameVn }}</td>
+                                                    <td>{{ user.employeeNameVn }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="form-group">
+                        <label class="form-control-label" for="" autocomplete="nope">
+                            Note
+                        </label>
                         <textarea class="form-control m-input--square" name="" id="" rows="5" name="shipmentNotes"
                             (change)="shipment.notes = shipment.notes.trim()" formControlName="notes" [(ngModel)]="shipment.notes"></textarea>
-                  </div>
-              </div>
-          </div>
-      </div>
-      <!--end::Form-->
-  </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::Form-->
+    </div>
 </div>
 <!--end:: m-portlet-->
