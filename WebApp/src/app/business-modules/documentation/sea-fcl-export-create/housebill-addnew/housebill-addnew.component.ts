@@ -242,11 +242,19 @@ export class HousebillAddnewComponent implements OnInit {
     this.value = value;
   }
 
-  save(form: NgForm) {    
-    if(form.status){
+  isDisplay = true;
+  save(form: NgForm) {   
+    if(form.valid){      
       this.ListHouseBill.push(this.HouseBillToAdd); 
+      this.HouseBillToAdd = new CsTransactionDetail();
+      this.customerSaleman = null;
       form.onReset();
+      // this.isDisplay = false;
+      // setTimeout(() => {
+      //   this.isDisplay = true;
+      // }, 300);
       $('#add-house-bill-modal').modal('hide');   
+      console.log(form);
       
     }
   }

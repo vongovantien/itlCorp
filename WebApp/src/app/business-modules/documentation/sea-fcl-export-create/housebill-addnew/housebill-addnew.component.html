@@ -1,5 +1,6 @@
-<div class="modal-dialog c-modal-fullscreen" role="document">
-    <form novalidate #addHouseBillForm="ngForm" (ngSubmit)="addHouseBillForm.form.valid">
+<form novalidate #addHouseBillForm="ngForm" (ngSubmit)="addHouseBillForm.form.valid" *ngIf="isDisplay" name="addHouseBillForm">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add new house bill of landing</h5>
@@ -1054,5 +1055,6 @@
                 </button>
             </div>
         </div>
-    </form>
-</div>
+
+    </div>
+</form>
