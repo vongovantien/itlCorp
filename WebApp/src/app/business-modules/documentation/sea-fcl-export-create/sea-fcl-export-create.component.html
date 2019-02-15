@@ -673,7 +673,7 @@
                                             </span>
                                               <div class="control-editable" [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null }">
                                                   <ng-select [allowClear]="true" [items]="containerTypes" [disabled]="disabled" (data)="refreshValue($event)"
-                                                      (selected)="container.containerTypeId = $event.id" (removed)="removed($event)" (typed)="typed($event)"
+                                                      (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text" (removed)="removed($event)" (typed)="typed($event)"
                                                       placeholder="Select filter">
                                                   </ng-select>
                                                   <div class="form-control-feedback" *ngIf="containerMasterForm.submitted && container.containerTypeId == null">
@@ -687,7 +687,7 @@
                                               </span>
                                               <div class="control-editable" [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid }">
                                                   <input type="number" class="form-control m-input m-input--square" min="1" value="1" oninput="validity.valid||(value='');"
-                                                      placeholder="Please enter" [ngModel]="container.quantity" name="conQuantity" #conQuantity="ngModel" required>
+                                                      placeholder="Please enter" [(ngModel)]="container.quantity" name="conQuantity" #conQuantity="ngModel" required>
                                                   <div class="form-control-feedback" *ngIf="containerMasterForm.submitted && conQuantity.invalid">
                                                       Cont Q'ty must be a number
                                                   </div>
@@ -699,7 +699,7 @@
                                             </span>
                                               <div class="control-editable">
                                                   <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
-                                                      [ngModel]="container.containerNo" name="containerNo" #containerNo="ngModel">
+                                                    [(ngModel)]="container.containerNo" name="containerNo" #containerNo="ngModel">
                                               </div>
                                         </td>
                                         <td class="">
@@ -708,7 +708,7 @@
                                             </span>
                                               <div class="control-editable">
                                                   <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
-                                                      [ngModel]="container.sealNo" name="sealNo" #sealNo="ngModel">
+                                                    [(ngModel)]="container.sealNo" name="sealNo" #sealNo="ngModel">
                                               </div>
                                         </td>
                                         <td class="">
@@ -717,7 +717,7 @@
                                             </span>
                                               <div class="control-editable">
                                                   <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
-                                                      [ngModel]="container.markNo" name="markNo" #markNo="ngModel">
+                                                    [(ngModel)]="container.markNo" name="markNo" #markNo="ngModel">
                                               </div>
                                         </td>
                                         <td class="">
@@ -783,7 +783,7 @@
                                                 Package Q'ty
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square" min="1" [ngModel]="container.markNo" name="markNo" #markNo="ngModel" 
+                                                  <input type="number" class="form-control m-input m-input--square" min="1" [(ngModel)]="container.markNo" name="markNo" #markNo="ngModel" 
                                                       oninput="validity.valid||(value='');" placeholder="Please enter">
                                               </div>
                                         </td>
@@ -793,7 +793,7 @@
                                             </span>
                                               <div class="control-editable">
                                                   <input type="text" class="form-control m-input m-input--square" 
-                                                      [ngModel]="container.description" name="descriptionOfGood" #descriptionOfGood="ngModel" placeholder="Please enter">
+                                                    [(ngModel)]="container.description" name="descriptionOfGood" #descriptionOfGood="ngModel" placeholder="Please enter">
                                               </div>
                                         </td>
                                         <td class="">
@@ -802,7 +802,7 @@
                                             </span>
                                               <div class="control-editable">
                                                   <input type="number" class="form-control m-input m-input--square"  placeholder="Please enter"
-                                                      [ngModel]="container.nw | number:'1.2-2'" name="containerNW" min="0.01" appTwoDigitDecimaNumber #containerNW="ngModel">
+                                                    [(ngModel)]="container.nw" name="containerNW" min="0.01" appTwoDigitDecimaNumber #containerNW="ngModel">
                                               </div>
                                         </td>
                                         <td class="">
@@ -810,7 +810,8 @@
                                                 G.W
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                    [(ngModel)]="container.gw" name="containerGW" min="0.01" appTwoDigitDecimaNumber #containerGW="ngModel">
                                               </div>
                                         </td>
                                         <td class="">
@@ -818,7 +819,8 @@
                                                   C.W
                                               </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                    [(ngModel)]="container.chargeAbleWeight" name="containerchargeAbleWeight" min="0.01" appTwoDigitDecimaNumber #containerchargeAbleWeight="ngModel">
                                               </div>
                                           </td>
                                           <td class="">
@@ -837,7 +839,8 @@
                                                 CBM
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter">
+                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                  [(ngModel)]="container.cbm" name="containerCBM" min="0.01" appTwoDigitDecimaNumber #containerCBM="ngModel">
                                               </div>
                                         </td>
                                       </tr>
@@ -1009,11 +1012,11 @@
             </div>
         </form>
     </div>
-  </div>
-  <!--end::container-list-of-job-modal-master-->
-  
-  <!--begin::container-list-of-job-modal-house-->
-  <div class="modal fade" id="container-list-of-job-modal-house" data-backdrop="static" role="dialog" aria-labelledby=""
+</div>
+<!--end::container-list-of-job-modal-master-->
+
+<!--begin::search-job-detail-modal-->
+<div class="modal fade" id="search-job-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
