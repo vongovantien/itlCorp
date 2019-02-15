@@ -27,259 +27,258 @@
         <div class="m-portlet__body">
             <!--begin::Form-->
             <div class="m-form m-form--state" >
-
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Search text
-                                </label>
-                                <input type="text" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
-                                    name="searchString" (change)="searchString = searchString.trim()" placeholder="Search text">
-                            </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Search text
+                            </label>
+                            <input type="text" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                                name="searchString" (change)="searchString = searchString.trim()" placeholder="Search text">
                         </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Select filter
-                                </label>
-                                <ng-select [allowClear]="true" [items]="searchFilters" [active]="searchFilterActive" [disabled]="disabled" (data)="refreshValue($event)"
-                                    (selected)="selectFilter = $event.id" (removed)="removed($event)"
-                                    placeholder="Select filter">
-                                </ng-select>
-                            </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Select filter
+                            </label>
+                            <ng-select [allowClear]="true" [items]="searchFilters" [active]="searchFilterActive" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selectFilter = $event.id" (removed)="removed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Shipment date: From - To
-                                </label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                        [(ngModel)]="selectedRange"
-                                        [ranges]="ranges"
-                                        [maxDate]="maxDate"
-                                        [alwaysShowCalendars]="true"
-                                        name="daterange"
-                                        placeholder="From date - to date" readonly/>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Shipment date: From - To
+                            </label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                    [(ngModel)]="selectedRange"
+                                    [ranges]="ranges"
+                                    [maxDate]="maxDate"
+                                    [alwaysShowCalendars]="true"
+                                    name="daterange"
+                                    placeholder="From date - to date" readonly/>
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
                                     </span>
-                                </div>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <!--begin::Advance-search-->
-                    <div class="collapse" id="advance-search-of-job">
-                        <div class="div-inside bg-secondary">
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            HBL No.
-                                        </label>
-                                        <input type="text" [(ngModel)]="criteria.hwbno" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Cont No.
-                                        </label>
-                                        <input type="text" [(ngModel)]="criteria.containerNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Seal No.
-                                        </label>
-                                        <input type="text" [(ngModel)]="criteria.sealNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row" *ngIf="isReset">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Customer
-                                        </label>
-                                        <div class="dropdown e--combogrid" #selectedCustomer>
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" 
-                                                [value]="selectedCustomer.value == null?'Please selected customer':selectedCustomer.value">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeCustomer($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner ID</th>
-                                                                        <th>Abbr Name</th>
-                                                                        <th style="width: 200px">Name EN</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="customers">
-                                                                <tr class="data-row" [ngClass]="{ 'data-selected': criteria.customerId!==null && criteria.customerId===item.id }"
-                                                                (click)="criteria.customerId = item.id; selectedCustomer.value= item.partnerNameEn" 
-                                                                    data-id="{{item.id}}" *ngFor="let item of customers; let i = index">
-                                                                    <td>{{ item.accountNo }}</td>
-                                                                    <td>{{ item.shortName }}</td>
-                                                                    <td style="width: 200px">{{ item.partnerNameEn }}</td>
-                                                                    <td>{{ item.taxCode }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Notify party
-                                        </label>
-                                        <div class="dropdown e--combogrid" #selectedNotifyPartry>
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select"
-                                                [value]="selectedNotifyPartry.value == null?'Please selected notify party':selectedNotifyPartry.value">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeNotifyparty($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner ID</th>
-                                                                        <th>Abbr Name</th>
-                                                                        <th style="width: 200px">Name EN</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="notifyPartries">
-                                                                <tr class="data-row" [ngClass]="{ 'data-selected': criteria.notifyPartyId!==null && criteria.notifyPartyId===item.id }"
-                                                                    (click)="criteria.notifyPartyId = item.id; selectedNotifyPartry.value= item.partnerNameEn" 
-                                                                    data-id="{{item.id}}" *ngFor="let item of notifyPartries; let i = index">
-                                                                    <td>{{ item.accountNo }}</td>
-                                                                    <td>{{ item.shortName }}</td>
-                                                                    <td style="width: 200px">{{ item.partnerNameEn }}</td>
-                                                                    <td>{{ item.taxCode }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Saleman
-                                        </label>
-                                        <div class="dropdown e--combogrid" #selectedSaleman>
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
-                                                [value]="selectedSaleman.value == null?'Please selected a saleman':selectedSaleman.value" autocomplete="nope">
-                                            <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeSaleman($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>User name</th>
-                                                                        <th>Full name</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="salemans">
-                                                                <tr class="data-row" [class.data-selected] = "criteria.saleManID !==null && criteria.saleManID===user.id"
-                                                                    data-id="{{user.id}}" *ngFor="let user of salemans;let i = index;" 
-                                                                    (click)="criteria.saleManID=user.id; selectedSaleman.value= user.employeeNameVn">
-                                                                    <td>{{ user.username }}</td>
-                                                                    <td>{{ user.employeeNameVn}}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Advance-search-->
-                    <div class="form-actions" >
+                </div>
+                <!--begin::Advance-search-->
+                <div class="collapse" id="advance-search-of-job">
+                    <div class="div-inside bg-secondary">
                         <div class="row">
-                            <div class="col-lg-6">
-                                <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
-                                    role="button" aria-expanded="false" aria-controls="advance-search-of-job">
-                                    <span>
-                                        <i class="la la-angle-up"></i>
-                                        <span>Advance search</span>
-                                    </span>
-                                </a>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        HBL No.
+                                    </label>
+                                    <input type="text" [(ngModel)]="criteria.hwbno" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                </div>
                             </div>
-                            <div class="col-lg-6 m--align-right">
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
-                                    <span>
-                                        <i class="la la-search"></i>
-                                        <span>
-                                            Search
-                                        </span>
-                                    </span>
-                                </button>
-                                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
-                                    <span>
-                                        <i class="la la-refresh"></i>
-                                        <span>
-                                            Reset
-                                        </span>
-                                    </span>
-                                </button>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Cont No.
+                                    </label>
+                                    <input type="text" [(ngModel)]="criteria.containerNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Seal No.
+                                    </label>
+                                    <input type="text" [(ngModel)]="criteria.sealNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="isReset">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Customer
+                                    </label>
+                                    <div class="dropdown e--combogrid" #selectedCustomer>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" 
+                                            [value]="selectedCustomer.value == null?'Please selected customer':selectedCustomer.value">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeCustomer($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Abbr Name</th>
+                                                                    <th style="width: 200px">Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody *ngIf="customers">
+                                                            <tr class="data-row" [ngClass]="{ 'data-selected': criteria.customerId!==null && criteria.customerId===item.id }"
+                                                            (click)="criteria.customerId = item.id; selectedCustomer.value= item.partnerNameEn" 
+                                                                data-id="{{item.id}}" *ngFor="let item of customers; let i = index">
+                                                                <td>{{ item.accountNo }}</td>
+                                                                <td>{{ item.shortName }}</td>
+                                                                <td style="width: 200px">{{ item.partnerNameEn }}</td>
+                                                                <td>{{ item.taxCode }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Notify party
+                                    </label>
+                                    <div class="dropdown e--combogrid" #selectedNotifyPartry>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select"
+                                            [value]="selectedNotifyPartry.value == null?'Please selected notify party':selectedNotifyPartry.value">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeNotifyparty($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Abbr Name</th>
+                                                                    <th style="width: 200px">Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody *ngIf="notifyPartries">
+                                                            <tr class="data-row" [ngClass]="{ 'data-selected': criteria.notifyPartyId!==null && criteria.notifyPartyId===item.id }"
+                                                                (click)="criteria.notifyPartyId = item.id; selectedNotifyPartry.value= item.partnerNameEn" 
+                                                                data-id="{{item.id}}" *ngFor="let item of notifyPartries; let i = index">
+                                                                <td>{{ item.accountNo }}</td>
+                                                                <td>{{ item.shortName }}</td>
+                                                                <td style="width: 200px">{{ item.partnerNameEn }}</td>
+                                                                <td>{{ item.taxCode }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Saleman
+                                    </label>
+                                    <div class="dropdown e--combogrid" #selectedSaleman>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                            [value]="selectedSaleman.value == null?'Please selected a saleman':selectedSaleman.value" autocomplete="nope">
+                                        <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeSaleman($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>User Name</th>
+                                                                    <th>Full Name</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody *ngIf="salemans">
+                                                            <tr class="data-row" [class.data-selected] = "criteria.saleman !==null && criteria.saleman===user.id"
+                                                                data-id="{{user.id}}" *ngFor="let user of salemans;let i = index;" 
+                                                                (click)="criteria.saleManID=user.id; selectedSaleman.value= user.employeeNameVn">
+                                                                <td>{{ user.username }}</td>
+                                                                <td>{{ user.employeeNameVn}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <!--end::Advance-search-->
+                <div class="form-actions" >
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
+                                role="button" aria-expanded="false" aria-controls="advance-search-of-job">
+                                <span>
+                                    <i class="la la-angle-up"></i>
+                                    <span>Advance search</span>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="col-lg-6 m--align-right">
+                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
+                                <span>
+                                    <i class="la la-search"></i>
+                                    <span>
+                                        Search
+                                    </span>
+                                </span>
+                            </button>
+                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
+                                <span>
+                                    <i class="la la-refresh"></i>
+                                    <span>
+                                        Reset
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!--end::Form-->
         </div>
