@@ -34,11 +34,11 @@ import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-num
     InputFormComponent, 
     TableDetailComponent, 
     CloseModalButtonComponent,
-    // TwoDigitDecimaNumberDirective
+    TwoDigitDecimaNumberDirective
   ],
   exports: [
     CommonModule,
-    // ModalModule,
+    TwoDigitDecimaNumberDirective,
     TableLayoutComponent,
     BreadcrumbComponent,
     DefaultButtonComponent,

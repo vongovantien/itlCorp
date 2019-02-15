@@ -33,7 +33,7 @@ import { TwoDigitDecimaNumberDirective } from 'src/app/shared/directives/two-dig
     PerfectScrollbarModule, // Scrollbar
   ],
   declarations: [   
-    TwoDigitDecimaNumberDirective,
+    // TwoDigitDecimaNumberDirective,
     AirExportComponent, 
     AirImportComponent, 
     SeaFCLExportComponent, 
