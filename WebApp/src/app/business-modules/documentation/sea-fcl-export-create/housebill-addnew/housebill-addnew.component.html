@@ -1076,7 +1076,7 @@
         <form>
             <div class="modal-content m-form m-form--state">
                 <div class="modal-header">
-                    <h5 class="modal-title">Container List</h5>
+                    <h5 class="modal-title">Container List Module</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1237,9 +1237,9 @@
                                                     Cont Type
                                                 </span>
                                                 <div class="control-editable">
-                                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                                        (data)="refreshValue($event)" (selected)="selected($event)"
-                                                        (removed)="removed($event)" (typed)="typed($event)"
+                                                    <ng-select [allowClear]="true" [items]="listContainerTypes" [disabled]="disabled"
+                                                        (data)="refreshValue($event)" (selected)="cont.containerTypeId=$event.id"
+                                                        (removed)="cont.containerTypeId=null" (typed)="typed($event)"
                                                         placeholder="Select filter">
                                                     </ng-select>
                                                 </div>
@@ -1249,7 +1249,7 @@
                                                     Cont Q'ty
                                                 </span>
                                                 <div class="control-editable has-danger">
-                                                    <input type="text" class="form-control m-input m-input--square"
+                                                    <input appIntergerInputCheck name="cont-quantity" type="number"  [(ngModel)]="cont.quantity" class="form-control m-input m-input--square"
                                                         placeholder="Please enter">
                                                     <div class="form-control-feedback">
                                                         Sorry, that's not correct. Try another?

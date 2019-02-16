@@ -20,6 +20,7 @@ import { CloseModalButtonComponent } from './common/close-modal-button/close-mod
 import { ExcelService } from './services/excel.service';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-number.directive';
+import { IntergerInputDirective } from './directives/interger-input.directive';
 @NgModule({
   imports: [CommonModule, FormsModule,SelectModule],
   declarations: [
@@ -34,11 +35,13 @@ import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-num
     InputFormComponent, 
     TableDetailComponent, 
     CloseModalButtonComponent,
-    TwoDigitDecimaNumberDirective
+    TwoDigitDecimaNumberDirective,
+    IntergerInputDirective
   ],
   exports: [
     CommonModule,
     TwoDigitDecimaNumberDirective,
+    IntergerInputDirective,
     TableLayoutComponent,
     BreadcrumbComponent,
     DefaultButtonComponent,

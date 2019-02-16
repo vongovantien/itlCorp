@@ -3,7 +3,7 @@ export class Container {
   mblid: string = "00000000-0000-0000-0000-000000000000";
   hblid: string = null;
   containerTypeId: number = null;
-  quantity: number = null;
+  quantity: number = 1;
   containerNo: string = null;
   sealNo: string = null;
   markNo: string = null;
