@@ -26,7 +26,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   pager: PagerSetting = PAGINGSETTING;
 
-
+  listContainerTypes: any[] = [];
   listCustomers: any = [];
   listSaleMan: any = [];
   listShipper: any = [];
@@ -51,7 +51,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
   ListHouseBill: CsTransactionDetail[] = [];
-  ListContainers : Array<Container> = [new Container()];
+  ListContainers: Array<Container> = [new Container()];
 
   constructor(
     private baseServices: BaseService,
@@ -70,6 +70,7 @@ export class HousebillAddnewComponent implements OnInit {
     this.getListPorts();
     this.getListForwardingAgent();
     this.getListSaleman();
+    this.getContainerTypes();
   }
 
   select(form) {
@@ -189,7 +190,7 @@ export class HousebillAddnewComponent implements OnInit {
       "Fax: " + forwardingAgent.fax + "\n";
   }
 
-  public getGoodDeliveryDescription(goodDelivery:any){
+  public getGoodDeliveryDescription(goodDelivery: any) {
     this.HouseBillToAdd.goodsDeliveryDescription =
       "Name: " + goodDelivery.partnerNameEn + "\n" +
       "Billing Address: " + goodDelivery.addressEn + "\n" +
@@ -230,6 +231,16 @@ export class HousebillAddnewComponent implements OnInit {
       var data = res['data'];
       this.listSaleMan = dataHelper.prepareNg2SelectData(data, "id", "employeeNameEn");
     });
+  }
+
+
+   getContainerTypes() {
+    this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }).subscribe((res: any) => {
+      if (res != null) {
+        this.listContainerTypes = dataHelper.prepareNg2SelectData(res, 'id', 'unitNameEn');
+      }
+    });
+
   }
 
   /**
