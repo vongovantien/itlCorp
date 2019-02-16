@@ -75,11 +75,7 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
-                    options =>
-                    {
-                        options.UseRowNumberForPaging();
-                    });
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
             }
         }
 
@@ -1632,6 +1628,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DeliveryPoint).HasMaxLength(1600);
 
+                entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
+
                 entity.Property(e => e.Dimension).HasMaxLength(1600);
 
                 entity.Property(e => e.Eta)
@@ -1672,6 +1670,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ModifiedDate).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.Notes).HasMaxLength(4000);
+
+                entity.Property(e => e.PackageContainer).HasMaxLength(1600);
 
                 entity.Property(e => e.PaymentTerm).HasMaxLength(1600);
 

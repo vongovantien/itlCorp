@@ -47,6 +47,8 @@ export class CsTransaction {
   modifiedDate: Date = null;
   inactive: Boolean = null;
   inactiveOn: Date = null;
+  packageContainer: string = null;
+  desOfGoods: string =  null;
   csMawbcontainers: Container[] = null;
   csTransactionDetails: CsTransactionDetail[] = null;
 }
