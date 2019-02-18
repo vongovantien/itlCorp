@@ -929,7 +929,8 @@
                                 </h3>
                             </div>
                             <div class="col-6 m--align-right">
-                                <button type="button" class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                <button type="button"
+                                    class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase">
                                     <span>
                                         <i class="la la-refresh"></i>
                                         <span>
@@ -939,7 +940,7 @@
                                 </button>
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         <div class="row">
                             <div class="col-xl-8">
                                 <div class="row">
@@ -948,7 +949,8 @@
                                             <label class="form-control-label" for="">
                                                 Commodities:
                                             </label>
-                                            <textarea class="form-control m-input--square" name="" id="" rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
+                                            <textarea class="form-control m-input--square" name="" id=""
+                                                rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -956,7 +958,8 @@
                                             <label class="form-control-label" for="">
                                                 Detail container & packages:
                                             </label>
-                                            <textarea class="form-control m-input--square" name="" id="" rows="3">container-1, container-2, container-3</textarea>
+                                            <textarea class="form-control m-input--square" name="" id=""
+                                                rows="3">container-1, container-2, container-3</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -964,7 +967,8 @@
                                     <label class="form-control-label" for="">
                                         Description of good:
                                     </label>
-                                    <textarea class="form-control m-input--square" name="" id="" rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
+                                    <textarea class="form-control m-input--square" name="" id=""
+                                        rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
                                 </div>
                             </div>
                             <div class="col-xl-4">
@@ -993,7 +997,8 @@
                                     <span></span>
                                 </div>
                                 <div class="m--margin-top-10">
-                                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button"
+                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                         data-toggle="modal" data-target="#container-list-of-job-modal-house">
                                         <span>
                                             <i class="la la-list"></i>
@@ -1082,351 +1087,356 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="container-list-table">
-                        <!--begin: Search Form -->
-                        <div class="m-form m-form--label-align-right m--margin-bottom-10">
-                            <div class="row align-items-center">
-                                <div class="col-lg-4 order-2 order-lg-1">
-                                    <div class="form-group">
-                                        <div class="m-input-icon m-input-icon--left">
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                placeholder="Search...">
-                                            <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                <span>
-                                                    <i class="la la-search"></i>
+                    <form novalidate #containerListForm (ngSubmit)="containerListForm.form.valid">
+                        <div class="container-list-table">
+                            <!--begin: Search Form -->
+                            <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-4 order-2 order-lg-1">
+                                        <div class="form-group">
+                                            <div class="m-input-icon m-input-icon--left">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    placeholder="Search...">
+                                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                    <span>
+                                                        <i class="la la-search"></i>
+                                                    </span>
                                                 </span>
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                                    <button type="button"
-                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-download"></i>
+                                    <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                                        <button type="button"
+                                            class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                                             <span>
-                                                import
+                                                <i class="la la-download"></i>
+                                                <span>
+                                                    import
+                                                </span>
                                             </span>
-                                        </span>
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                        (click)="addNewContainer()">
-                                        <span>
-                                            <i class="la la-plus"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                            (click)="addNewContainer()">
                                             <span>
-                                                add container
+                                                <i class="la la-plus"></i>
+                                                <span>
+                                                    add container
+                                                </span>
                                             </span>
-                                        </span>
-                                    </button>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!--end: Search Form -->
-                        <!--begin: Datatable -->
-                        <div class="table-wrapper" id="" style="min-height: 300px">
-                            <table class="table table-striped table-brand table-editable">
-                                <thead class="">
-                                    <tr class="">
-                                        <th class="fixed-side"></th>
-                                        <th class="">
-                                            <span>
-                                                Cont Type
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Cont Q'ty
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Cont No.
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Seal No.
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Mark No.
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Commodity
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Package Type
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Package Q'ty
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Description of Good
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                N.W
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                G.W
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                C.W
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                Unit
-                                            </span>
-                                        </th>
-                                        <th class="">
-                                            <span>
-                                                CBM
-                                            </span>
-                                        </th>
-                                    </tr>
-                                </thead>
-
-
-                                <tbody>
-                                    <ng-container *ngFor="let cont of ListContainers;let i = index;">
-                                        <tr class="m-form m-form--state row-editing">
-                                            <td class="table-actions-col fixed-side">
-                                                <div class="table-actions content-editable" style="width: 70px">
-                                                    <button type="button"
-                                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button"
-                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="table-actions control-editable" style="width: 70px">
-                                                    <button type="button"
-                                                        class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Save">
-                                                        <i class="la la-save"></i>
-                                                    </button>
-                                                    <button type="button"
-                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Cancel">
-                                                        <i class="la la-ban"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
+                            <!--end: Search Form -->
+                            <!--begin: Datatable -->
+                            <div class="table-wrapper" id="" style="min-height: 300px">
+                                <table class="table table-striped table-brand table-editable">
+                                    <thead class="">
+                                        <tr class="">
+                                            <th class="fixed-side"></th>
+                                            <th class="">
+                                                <span>
                                                     Cont Type
                                                 </span>
-                                                <div class="control-editable">
-                                                    <ng-select [allowClear]="true" [items]="listContainerTypes" [disabled]="disabled"
-                                                        (data)="refreshValue($event)" (selected)="cont.containerTypeId=$event.id"
-                                                        (removed)="cont.containerTypeId=null" (typed)="typed($event)"
-                                                        placeholder="Select filter">
-                                                    </ng-select>
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
+                                            </th>
+                                            <th class="">
+                                                <span>
                                                     Cont Q'ty
                                                 </span>
-                                                <div class="control-editable has-danger">
-                                                    <input appIntergerInputCheck name="cont-quantity" type="number"  [(ngModel)]="cont.quantity" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                    <div class="form-control-feedback">
-                                                        Sorry, that's not correct. Try another?
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
+                                            </th>
+                                            <th class="">
+                                                <span>
                                                     Cont No.
                                                 </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
+                                            </th>
+                                            <th class="">
+                                                <span>
                                                     Seal No.
                                                 </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
+                                            </th>
+                                            <th class="">
+                                                <span>
                                                     Mark No.
                                                 </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
+                                            </th>
+                                            <th class="">
+                                                <span>
                                                     Commodity
                                                 </span>
-                                                <div class="control-editable">
-                                                    <div class="dropdown e--combogrid">
-                                                        <input
-                                                            class="form-control m-input m-input--square dropdown-toggle"
-                                                            type="text" readonly data-toggle="dropdown"
-                                                            placeholder="Please selected"
-                                                            value="Vũng Tàu, Bà Rịa, Việt">
-                                                        <div
-                                                            class="dropdown-menu  dropdown-menu-right e--combogrid-content">
-                                                            <div class="tabel-wrapper table-fixed">
-                                                                <div class="table-head-fixed">
-                                                                    <div class="table-filter-block">
-                                                                        <div class="search-field">
-                                                                            <input
-                                                                                class="form-control m-input m-input--square"
-                                                                                type="text" placeholder="Search...">
-                                                                            <i class="icon-search"></i>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    Package Type
+                                                </span>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    Package Q'ty
+                                                </span>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    Description of Good
+                                                </span>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    N.W
+                                                </span>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    G.W
+                                                </span>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    C.W
+                                                </span>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    Unit
+                                                </span>
+                                            </th>
+                                            <th class="">
+                                                <span>
+                                                    CBM
+                                                </span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+
+                                    <tbody>
+                                        <ng-container *ngFor="let cont of ListContainers;let i = index;">
+                                            <tr class="m-form m-form--state row-editing">
+                                                <td class="table-actions-col fixed-side">
+                                                    <div class="table-actions content-editable" style="width: 70px">
+                                                        <button 
+                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit">
+                                                            <i class="la la-edit"></i>
+                                                        </button>
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove">
+                                                            <i class="la la-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="table-actions control-editable" style="width: 70px">
+                                                        <button type="button"
+                                                            class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Save">
+                                                            <i class="la la-save"></i>
+                                                        </button>
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Cancel">
+                                                            <i class="la la-ban"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Cont Type
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <ng-select [allowClear]="true" [items]="listContainerTypes"
+                                                            [disabled]="disabled" (data)="refreshValue($event)"
+                                                            (selected)="cont.containerTypeId=$event.id"
+                                                            (removed)="cont.containerTypeId=null"
+                                                            (typed)="typed($event)" placeholder="Select filter">
+                                                        </ng-select>
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Cont Q'ty
+                                                    </span>
+                                                    <div class="control-editable"
+                                                    [ngClass]="{ 'has-danger': containerListForm.submitted && cont.quantity==null }">
+                                                        <input appIntergerInputCheck name="cont-quantity" type="number"
+                                                            [(ngModel)]="cont.quantity" required
+                                                            class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                        <div class="form-control-feedback" *ngIf="containerListForm.submitted && cont.quantity==null">
+                                                            Sorry, that's not correct. Try another?
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Cont No.
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Seal No.
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Mark No.
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Commodity
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <div class="dropdown e--combogrid">
+                                                            <input
+                                                                class="form-control m-input m-input--square dropdown-toggle"
+                                                                type="text" readonly data-toggle="dropdown"
+                                                                placeholder="Please selected"
+                                                                value="Vũng Tàu, Bà Rịa, Việt">
+                                                            <div
+                                                                class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                                                <div class="tabel-wrapper table-fixed">
+                                                                    <div class="table-head-fixed">
+                                                                        <div class="table-filter-block">
+                                                                            <div class="search-field">
+                                                                                <input
+                                                                                    class="form-control m-input m-input--square"
+                                                                                    type="text" placeholder="Search...">
+                                                                                <i class="icon-search"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="table-header">
+                                                                            <table class="table table-hover">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Name EN</th>
+                                                                                        <th>Name VN</th>
+                                                                                        <th>Group</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                            </table>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="table-header">
+                                                                    <div class="table-body-scroll">
                                                                         <table class="table table-hover">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th>Name EN</th>
-                                                                                    <th>Name VN</th>
-                                                                                    <th>Group</th>
+                                                                            <tbody>
+                                                                                <tr class="data-row data-selected"
+                                                                                    data-id="1">
+                                                                                    <td>Option EN 1</td>
+                                                                                    <td>Option VN 1</td>
+                                                                                    <td>Group 1</td>
                                                                                 </tr>
-                                                                            </thead>
+                                                                                <tr class="data-row" data-id="2">
+                                                                                    <td>Option EN 2</td>
+                                                                                    <td>Option VN 2</td>
+                                                                                    <td>Group 2</td>
+                                                                                </tr>
+                                                                                <tr class="data-row" data-id="3">
+                                                                                    <td>Option EN 3</td>
+                                                                                    <td>Option VN 3</td>
+                                                                                    <td>Group 3</td>
+                                                                                </tr>
+                                                                                <tr class="data-row" data-id="4">
+                                                                                    <td>Option EN 4</td>
+                                                                                    <td>Option VN 4</td>
+                                                                                    <td>Group 4</td>
+                                                                                </tr>
+                                                                            </tbody>
                                                                         </table>
                                                                     </div>
-                                                                </div>
-                                                                <div class="table-body-scroll">
-                                                                    <table class="table table-hover">
-                                                                        <tbody>
-                                                                            <tr class="data-row data-selected"
-                                                                                data-id="1">
-                                                                                <td>Option EN 1</td>
-                                                                                <td>Option VN 1</td>
-                                                                                <td>Group 1</td>
-                                                                            </tr>
-                                                                            <tr class="data-row" data-id="2">
-                                                                                <td>Option EN 2</td>
-                                                                                <td>Option VN 2</td>
-                                                                                <td>Group 2</td>
-                                                                            </tr>
-                                                                            <tr class="data-row" data-id="3">
-                                                                                <td>Option EN 3</td>
-                                                                                <td>Option VN 3</td>
-                                                                                <td>Group 3</td>
-                                                                            </tr>
-                                                                            <tr class="data-row" data-id="4">
-                                                                                <td>Option EN 4</td>
-                                                                                <td>Option VN 4</td>
-                                                                                <td>Group 4</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
-                                                    Package Type
-                                                </span>
-                                                <div class="control-editable">
-                                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                                        (data)="refreshValue($event)" (selected)="selected($event)"
-                                                        (removed)="removed($event)" (typed)="typed($event)"
-                                                        placeholder="Select filter">
-                                                    </ng-select>
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
-                                                    Package Q'ty
-                                                </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="" style="width: 130px">
-                                                <span class="content-editable">
-                                                    Description of Good dài thiệt là dài đó nha Tem Tem
-                                                </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
-                                                    N.W
-                                                </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
-                                                    G.W
-                                                </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
-                                                    C.W
-                                                </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
-                                                    Unit
-                                                </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" value="Kgs" readonly>
-                                                </div>
-                                            </td>
-                                            <td class="">
-                                                <span class="content-editable">
-                                                    CBM
-                                                </span>
-                                                <div class="control-editable">
-                                                    <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter">
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!-- <tr class="">
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Package Type
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <ng-select [allowClear]="true" [items]="items"
+                                                            [disabled]="disabled" (data)="refreshValue($event)"
+                                                            (selected)="selected($event)" (removed)="removed($event)"
+                                                            (typed)="typed($event)" placeholder="Select filter">
+                                                        </ng-select>
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Package Q'ty
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="" style="width: 130px">
+                                                    <span class="content-editable">
+                                                        Description of Good dài thiệt là dài đó nha Tem Tem
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        N.W
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        G.W
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        C.W
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        Unit
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter" value="Kgs" readonly>
+                                                    </div>
+                                                </td>
+                                                <td class="">
+                                                    <span class="content-editable">
+                                                        CBM
+                                                    </span>
+                                                    <div class="control-editable">
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            placeholder="Please enter">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <!-- <tr class="">
                                             <td class="table-actions-col fixed-side">
                                                 <div class="table-actions" style="width: 70px">
                                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -1561,17 +1571,18 @@
                                                 </div>
                                           </td>
                                         </tr> -->
-                                    </ng-container>
-                                </tbody>
+                                        </ng-container>
+                                    </tbody>
 
 
-                            </table>
+                                </table>
+                            </div>
+                            <!--end: Datatable -->
                         </div>
-                        <!--end: Datatable -->
-                    </div>
+                    </form>
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button type="button" (click)="onSubmitContainer()"
+                    <button type="submit" (click)="onSubmitContainer(containerListForm)"
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>

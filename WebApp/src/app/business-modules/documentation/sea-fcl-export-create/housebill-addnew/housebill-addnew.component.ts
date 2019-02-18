@@ -243,6 +243,10 @@ export class HousebillAddnewComponent implements OnInit {
 
   }
 
+  public onSubmitContainer(form:NgForm){
+    console.log(this.ListContainers)
+  }
+
   /**
     * Daterange picker
     */
