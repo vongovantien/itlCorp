@@ -22,5 +22,5 @@ export class Container {
   offHireRefNo: string = null;
   userModified: string = null;
   datetimeModified: Date = null;
-  isSave: boolean = false;
+  allowEdit: boolean = false;
 }
