@@ -11,6 +11,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 declare var $: any;
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
+declare var $: any;
 
 
 @Component({
@@ -49,11 +50,19 @@ export class SeaFclExportCreateComponent implements OnInit {
         *
       */
     switchTab(){
-        // this.cdr.detach();
-        // setTimeout(() => {
-        //     this.cdr.reattach();
-        //     this.cdr.checkNoChanges();
-        // }, 1000);
+        this.cdr.detach();
+        setTimeout(() => {
+            this.cdr.reattach();
+            this.cdr.checkNoChanges();
+        }, 1000);
+    }
+
+    //open tab by link
+    activeTab() {
+        $('#masterbill-tablink').removeClass('active');
+        $('#masterbill-tabview-tab').removeClass('active show');
+        $('#housebill-tablink').addClass('active');
+        $('#housebill-tabview-tab').addClass('active show');
     }
 
     constructor(private baseServices: BaseService,
