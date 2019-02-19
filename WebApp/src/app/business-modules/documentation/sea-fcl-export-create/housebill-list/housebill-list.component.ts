@@ -18,10 +18,8 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
   templateUrl: './housebill-list.component.html',
   styleUrls: ['./housebill-list.component.scss']
 })
-export class HousebillListComponent implements OnInit,AfterViewInit{
-  ngAfterViewInit(): void {
-    this.cdr.detach();
-  }
+export class HousebillListComponent implements OnInit{
+
 
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
@@ -30,6 +28,7 @@ export class HousebillListComponent implements OnInit,AfterViewInit{
   @Input() set houseBillList(lstHB: any[]) {
     this.HouseBillListData = lstHB;
     this.ConstHouseBillListData = lstHB;
+    console.log({"HSHSHSH":this.HouseBillListData})
   }
 
   ngOnInit() {
@@ -42,7 +41,7 @@ export class HousebillListComponent implements OnInit,AfterViewInit{
 
   searchHouseBill(key: any) {
     const search_key = key.toLowerCase();
-    this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x) {
+    this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x:{data:CsTransactionDetail,extend_data:any}) {
       return (
         x.data.hwbno.toLowerCase().includes(search_key) ||
         x.extend_data.customer_nameEn.toLowerCase().includes(search_key) ||
@@ -53,6 +52,7 @@ export class HousebillListComponent implements OnInit,AfterViewInit{
         x.data.finalDestinationPlace.toLowerCase().includes(search_key)
       )
     });
+    console.log({"HBL AFTER SEARCH":this.HouseBillListData});
   }
 
 
