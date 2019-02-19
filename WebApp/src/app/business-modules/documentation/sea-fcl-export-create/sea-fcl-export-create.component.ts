@@ -10,6 +10,7 @@ import { MasterBillComponent } from './master-bill/master-bill.component';
 import * as dataHelper from 'src/helper/data.helper';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 declare var $: any;
+import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 
 
 @Component({
@@ -48,11 +49,11 @@ export class SeaFclExportCreateComponent implements OnInit {
         *
       */
     switchTab(){
-        this.cdr.detach();
-        setTimeout(() => {
-            this.cdr.reattach();
-            this.cdr.checkNoChanges();
-        }, 1000);
+        // this.cdr.detach();
+        // setTimeout(() => {
+        //     this.cdr.reattach();
+        //     this.cdr.checkNoChanges();
+        // }, 1000);
     }
 
     constructor(private baseServices: BaseService,
@@ -333,6 +334,13 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
     public refreshValue(value: any): void {
+    }
+
+    public houseBillList:any= [];
+    public houseBillCatcher(e:CsTransactionDetail){
+        console.log(e);
+        this.houseBillList.push(e);
+
     }
 
 }
