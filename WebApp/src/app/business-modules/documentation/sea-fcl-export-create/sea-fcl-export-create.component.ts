@@ -1,4 +1,5 @@
 import * as moment from 'moment';
+import { Directive } from '@angular/core';
 import { Component, OnInit, ViewChild, Output, EventEmitter, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
@@ -58,6 +59,14 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.cdr.reattach();
             this.cdr.checkNoChanges();
         }, 1000);
+    }
+
+    //open tab by link
+    activeTab() {
+        $('#masterbill-tablink').removeClass('active');
+        $('#masterbill-tabview-tab').removeClass('active show');
+        $('#housebill-tablink').addClass('active');
+        $('#housebill-tabview-tab').addClass('active show');
     }
 
     constructor(private baseServices: BaseService,

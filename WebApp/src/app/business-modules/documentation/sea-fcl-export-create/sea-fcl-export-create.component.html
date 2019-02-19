@@ -59,15 +59,15 @@
     <div class="m-content">
         <div class="row">
             <div class="col-12">
-                <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
+                <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
                     <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link active" data-toggle="tab" href="#masterbill-tabview-tab" role="tab"
+                        <a class="nav-link m-tabs__link active" id="masterbill-tablink" data-toggle="tab" href="#masterbill-tabview-tab" role="tab"
                             (click)="switchTab()">
                             Shipment detail
                         </a>
                     </li>
                     <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#housebill-tabview-tab" role="tab"
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" data-toggle="modal" href="#confirm-create-job-modal" role="modal"
                             (click)="switchTab()">
                             House Bill List
                         </a>
@@ -1581,7 +1581,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit(formAddEdit)"
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="activeTab()"
                     data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
