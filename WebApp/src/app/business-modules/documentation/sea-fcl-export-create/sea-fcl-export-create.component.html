@@ -189,7 +189,7 @@
                             </span>
                         </button> -->
                         <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
-                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#confirm-cancel-create-job-modal">
                             <span>
                                 <i class="la la-ban"></i>
                                 <span>
@@ -524,7 +524,7 @@
             <div class="modal-content m-form m-form--state">
                 <div class="modal-header">
                       <h5 class="modal-title">Shippment list of container</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeContainerPopup()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -536,7 +536,8 @@
                                 <div class="col-lg-4 order-2 order-lg-1">
                                     <div class="form-group">
                                         <div class="m-input-icon m-input-icon--left">
-                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." autocomplete="nope"
+                                                [ngModel]="searchcontainer" (ngModelChange)="searchContainer($event)" name="searchcontainer">
                                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                                 <span>
                                                     <i class="la la-search"></i>
@@ -665,7 +666,7 @@
                                                       <i class="la la-save"></i>
                                                   </button>
                                                   <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                      title="Cancel">
+                                                      title="Cancel" (click)="cancelNewContainer(i)">
                                                       <i class="la la-ban"></i>
                                                   </button>
                                               </div>
@@ -690,7 +691,7 @@
                                               </span>
                                               <div class="control-editable" [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid }">
                                                   <input type="number" class="form-control m-input m-input--square" min="1" value="1" oninput="validity.valid||(value='');"
-                                                      placeholder="Please enter" [(ngModel)]="container.quantity" name="conQuantity" #conQuantity="ngModel" required>
+                                                      placeholder="Please enter" [(ngModel)]="container.quantity" name="conQuantity" #conQuantity="ngModel" autocomplete="nope" required>
                                                   <div class="form-control-feedback" *ngIf="containerMasterForm.submitted && conQuantity.invalid">
                                                       Cont Q'ty must be a number
                                                   </div>
@@ -701,7 +702,7 @@
                                                 Cont No.
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                  <input type="text" class="form-control m-input m-input--square" placeholder="Please enter" autocomplete="nope"
                                                     [(ngModel)]="container.containerNo" name="containerNo" #containerNo="ngModel">
                                               </div>
                                         </td>
@@ -710,7 +711,7 @@
                                                 Seal No.
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                  <input type="text" class="form-control m-input m-input--square" placeholder="Please enter" autocomplete="nope"
                                                     [(ngModel)]="container.sealNo" name="sealNo" #sealNo="ngModel">
                                               </div>
                                         </td>
@@ -719,7 +720,7 @@
                                                 Mark No.
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="text" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                  <input type="text" class="form-control m-input m-input--square" placeholder="Please enter" autocomplete="nope"
                                                     [(ngModel)]="container.markNo" name="markNo" #markNo="ngModel">
                                               </div>
                                         </td>
@@ -787,7 +788,7 @@
                                             </span>
                                             <div class="control-editable">
                                                 <input type="number" class="form-control m-input m-input--square" min="1" [(ngModel)]="container.packageQuantity" name="packageQuantity" #packageQuantity="ngModel" 
-                                                    oninput="validity.valid||(value='');" placeholder="Please enter">
+                                                    oninput="validity.valid||(value='');" placeholder="Please enter" autocomplete="nope">
                                             </div>
                                         </td>
                                           <td class="" style="width: 130px">
@@ -795,7 +796,7 @@
                                                   Description of Good dài thiệt là dài đó nha Tem Tem
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="text" class="form-control m-input m-input--square" 
+                                                  <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
                                                     [(ngModel)]="container.description" name="descriptionOfGood" #descriptionOfGood="ngModel" placeholder="Please enter">
                                               </div>
                                         </td>
@@ -804,7 +805,7 @@
                                                 N.W
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square"  placeholder="Please enter"
+                                                  <input type="number" class="form-control m-input m-input--square"  placeholder="Please enter" autocomplete="nope"
                                                     [(ngModel)]="container.nw" name="containerNW" min="0.01" appTwoDigitDecimaNumber #containerNW="ngModel">
                                               </div>
                                         </td>
@@ -813,7 +814,7 @@
                                                 G.W
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter" autocomplete="nope"
                                                     [(ngModel)]="container.gw" name="containerGW" min="0.01" appTwoDigitDecimaNumber #containerGW="ngModel">
                                               </div>
                                         </td>
@@ -822,7 +823,7 @@
                                                   C.W
                                               </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter"
+                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter" autocomplete="nope"
                                                     [(ngModel)]="container.chargeAbleWeight" name="containerchargeAbleWeight" min="0.01" appTwoDigitDecimaNumber #containerchargeAbleWeight="ngModel">
                                               </div>
                                           </td>
@@ -843,8 +844,8 @@
                                                 CBM
                                             </span>
                                               <div class="control-editable">
-                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter"
-                                                  [(ngModel)]="container.cbm" name="containerCBM" min="0.01" appTwoDigitDecimaNumber #containerCBM="ngModel">
+                                                  <input type="number" class="form-control m-input m-input--square" placeholder="Please enter" autocomplete="nope"
+                                                    [(ngModel)]="container.cbm" name="containerCBM" min="0.01" appTwoDigitDecimaNumber #containerCBM="ngModel">
                                               </div>
                                         </td>
                                       </tr>
@@ -856,7 +857,7 @@
                                                     <i class="la la-edit"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                    title="Remove">
+                                                    title="Remove" (click)=removeAContainer(i)>
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </div>
@@ -941,16 +942,16 @@
                     </div>
                 </div>
                 <div class="modal-footer m--align-center">
-                    <!-- <button type="button" (click)="onSubmitContainer()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" (click)="onSubmitContainer()"  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>
                             <span>
                                 save
                             </span>
                         </span>
-                    </button> -->
-                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmitContainer()"></app-default-button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    </button>
+                    <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmitContainer()"></app-default-button> -->
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="closeContainerPopup()">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -1560,7 +1561,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit(formAddEdit)" data-dismiss="modal"> 
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSaveJob()" data-dismiss="modal"> 
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1568,7 +1569,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="cancelSaveJob()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

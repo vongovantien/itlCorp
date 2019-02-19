@@ -12,6 +12,7 @@ using System.Linq;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -28,6 +29,8 @@ namespace eFMS.API.Documentation.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
+                int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Date == DateTime.Now.Date);
+                transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
                 transaction.UserCreated = "01";
                 transaction.CreatedDate = DateTime.Now;
                 var hsTrans = dc.CsTransaction.Add(transaction);

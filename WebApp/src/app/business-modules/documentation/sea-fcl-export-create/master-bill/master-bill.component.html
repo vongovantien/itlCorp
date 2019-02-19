@@ -83,15 +83,15 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.mbltype.invalid }">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && shipment.mbltype == null }">
                         <label class="form-control-label" for="">
                                 Master bill of lading type <span class="m--font-danger">(*)</span>
                         </label>
                           <ng-select [allowClear]="true" [items]="billOfLadingTypes" [disabled]="disabled" (data)="refreshValue($event)"
-                              formControlName="mbltype" (selected)="shipment.mbltype = $event.id" (removed)="shipment.mbltype = null"
+                              (selected)="shipment.mbltype = $event.id" (removed)="shipment.mbltype = null"
                               (typed)="typed($event)" placeholder="Select option">
                         </ng-select>
-                          <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.mbltype.invalid">
+                          <div class="form-control-feedback" *ngIf="submitted && shipment.mbltype == null">
                             Master bill of lading type is required
                         </div>
                     </div>
@@ -158,15 +158,15 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.typeOfService.invalid }">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && shipment.typeOfService == null }">
                         <label class="form-control-label" for="">
                             Services type <span class="m--font-danger">(*)</span>
                         </label>
                         <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled" (data)="refreshValue($event)"
                               (selected)="shipment.typeOfService = $event.id" (removed)="shipment.typeOfService = null"
-                              (typed)="typed($event)" placeholder="Select service type" formControlName="typeOfService">
+                              (typed)="typed($event)" placeholder="Select service type">
                         </ng-select>
-                          <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.typeOfService.invalid">
+                          <div class="form-control-feedback" *ngIf="submitted && shipment.typeOfService == null">
                             Services type is required
                         </div>
                     </div>
@@ -223,7 +223,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.value.typeOfService == null }">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && shipment.pol == null }">
                         <label class="form-control-label" for="">
                             Port of loading <span class="m--font-danger">(*)</span>
                         </label>
@@ -267,7 +267,7 @@
                                 </div>
                             </div>
                         </div>
-                          <div class="form-control-feedback" *ngIf="submitted && formAddEdit.value.typeOfService == null">
+                          <div class="form-control-feedback" *ngIf="submitted && shipment.pol == null">
                             Port of loading is required
                         </div>
                     </div>
@@ -320,15 +320,15 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.paymentTerm.invalid }">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && shipment.paymentTerm == null }">
                         <label class="form-control-label" for="">
                             Term <span class="m--font-danger">(*)</span>
                         </label>
                         <ng-select [allowClear]="true" [items]="terms" [disabled]="disabled" (data)="refreshValue($event)"
                               (selected)="shipment.paymentTerm = $event.id" (removed)="shipment.paymentTerm = null"
-                              (typed)="typed($event)" placeholder="Select option" formControlName="paymentTerm">
+                              (typed)="typed($event)" placeholder="Select option">
                         </ng-select>
-                          <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.paymentTerm.invalid">
+                          <div class="form-control-feedback" *ngIf="submitted && shipment.paymentTerm == null">
                             Term is required
                         </div>
                     </div>
@@ -356,15 +356,15 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && formAddEdit.controls.shipmentType.invalid }">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && shipment.shipmentType == null }">
                         <label class="form-control-label" for="">
                             Shipment type <span class="m--font-danger">(*)</span>
                         </label>
                         <ng-select [allowClear]="true" [items]="shipmentTypes" [disabled]="disabled" (data)="refreshValue($event)"
                               (selected)="shipment.shipmentType = $event.id" (removed)="shipment.shipmentType = null"
-                              (typed)="typed($event)" placeholder="Select option" formControlName="shipmentType">
+                              (typed)="typed($event)" placeholder="Select option">
                         </ng-select>
-                          <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.shipmentType.invalid">
+                          <div class="form-control-feedback" *ngIf="submitted && shipment.shipmentType == null">
                             Shipment type is required
                         </div>
                     </div>

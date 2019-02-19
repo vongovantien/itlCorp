@@ -31,6 +31,12 @@ namespace eFMS.API.Documentation.Controllers
             csTransactionService = service;
         }
 
+        [HttpGet("CountJobByDate/{{date}}")]
+        public IActionResult CountJob(DateTime date)
+        {
+            var result = csTransactionService.Count(x => x.CreatedDate == date);
+            return Ok(result);
+        }
         [HttpPost]
         [Route("Query")]
         public IActionResult Query(CsTransactionCriteria criteria)

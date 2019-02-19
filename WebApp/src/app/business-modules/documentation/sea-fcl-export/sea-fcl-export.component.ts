@@ -32,6 +32,8 @@ export class SeaFCLExportComponent implements OnInit {
     }
 
     async ngOnInit() {
+        this.criteria.fromDate = this.selectedRange.startDate;
+        this.criteria.toDate = this.selectedRange.endDate;
         await this.getShipments();
         this.getCustomers(null);
         this.getNotifyPartries(null);
@@ -65,7 +67,7 @@ export class SeaFCLExportComponent implements OnInit {
         }
     }
     async getShipments(){
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=1&size=20", this.criteria,true, true);
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
         this.shipments = responses.data;
         this.pager.totalItems = responses.totalItems;
     }
@@ -111,6 +113,8 @@ export class SeaFCLExportComponent implements OnInit {
         this.searchFilterActive = ['Job ID'];
         this.criteria = {};
         this.searchString = null;
+        this.pager.currentPage = 1;
+        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
         this.getShipments();
     }
     async setPage(pager: PagerSetting) {
