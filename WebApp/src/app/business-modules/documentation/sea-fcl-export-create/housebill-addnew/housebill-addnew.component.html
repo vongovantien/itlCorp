@@ -88,7 +88,13 @@
                                                         <!-- HouseBillToAdd.customerId=item.partnerID -->
                                                         <ng-container *ngFor="let item of listCustomers;let i = index">
                                                             <tr class="data-row" attr.data-id="{{i}}"
-                                                                (click)="HouseBillToAdd.customerId=item.id;selectedCustomer.value=item.partnerNameEn;getCustomerSaleman(item.salePersonId)"
+                                                                (click)="
+                                                                HouseBillToAdd.customerId=item.id;
+                                                                selectedCustomer.value=item.partnerNameEn;
+                                                                getCustomerSaleman(item.salePersonId);
+                                                                extend_data.customer_nameEn=item.partnerNameEn;
+                                                                extend_data.customer_nameVn=item.partnerNameVn;
+                                                                "
                                                                 [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.id }">
                                                                 <td class="col-xs-2">{{item.id}}</td>
                                                                 <td class="col-xs-3">{{item.shortName}}</td>
@@ -116,7 +122,9 @@
                                 </label>
                                 <ng-select [allowClear]="true" [items]="listSaleMan" [disabled]="disabled"
                                     (data)="refreshValue($event)" *ngIf="listSaleMan.length>0"
-                                    (selected)="HouseBillToAdd.saleManId=$event.id"
+                                    (selected)="
+                                    HouseBillToAdd.saleManId=$event.id;
+                                    extend_data.saleman_nameEn=$event.text"
                                     (removed)="HouseBillToAdd.saleManId=null" [active]="customerSaleman"
                                     (typed)="getListSaleman($event.text)" placeholder="Select option">
                                 </ng-select>
@@ -298,7 +306,12 @@
                                                             <ng-container
                                                                 *ngFor="let item of listConsignee;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.notifyPartyId=item.id;selectedPartner.value=item.partnerNameEn;getNotifyPartyDescription(item)"
+                                                                    (click)="
+                                                                    HouseBillToAdd.notifyPartyId=item.id;
+                                                                    selectedPartner.value=item.partnerNameEn;
+                                                                    getNotifyPartyDescription(item);
+                                                                    extend_data.notify_party_nameEn=item.partnerNameEn;
+                                                                    extend_data.notify_party_nameVn=item.partnerNameVn;"
                                                                     [ngClass]="{ 'data-selected': HouseBillToAdd.notifyPartyId!==null && HouseBillToAdd.notifyPartyId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-3">{{item.shortName}}</td>

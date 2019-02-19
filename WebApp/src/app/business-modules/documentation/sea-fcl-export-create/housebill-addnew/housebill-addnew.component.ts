@@ -42,16 +42,18 @@ export class HousebillAddnewComponent implements OnInit {
   listNumberOfOriginBL: any = [{ id: 1, text: '1' }, { id: 2, text: '2' }, { id: 3, text: '3' }];
   listTypeOfMove: any = [];
   listTypeOfService: any = [];
-
   customerSaleman: any = null;
+  extend_data:any= {};
 
   /**
    * House Bill Variables 
    */
 
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
-  ListHouseBill: CsTransactionDetail[] = [];
+  ListHouseBill: any = ["gggg"];
   ListContainers: Array<Container> = [new Container()];
+  @Output() houseBillComing = new EventEmitter<{data:CsTransactionDetail,extend_data:any}>();
+
 
   constructor(
     private baseServices: BaseService,
@@ -216,6 +218,7 @@ export class HousebillAddnewComponent implements OnInit {
     this.customerSaleman = [{ id: saleMan['id'], text: saleMan["employeeNameEn"] }];
     console.log({ SALE_MAN: this.customerSaleman });
     this.HouseBillToAdd.saleManId = saleMan['id'];
+    this.extend_data.saleman_nameEn = saleMan['employeeNameEn'];
     // var users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll);
     // this.listSaleMan = dataHelper.prepareNg2SelectData(users, "id", "employeeNameEn");
   }
@@ -234,7 +237,7 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
 
-   getContainerTypes() {
+  getContainerTypes() {
     this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }).subscribe((res: any) => {
       if (res != null) {
         this.listContainerTypes = dataHelper.prepareNg2SelectData(res, 'id', 'unitNameEn');
@@ -243,7 +246,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   }
 
-  public onSubmitContainer(form:NgForm){
+  public onSubmitContainer(form: NgForm) {
     console.log(this.ListContainers)
   }
 
@@ -300,9 +303,9 @@ export class HousebillAddnewComponent implements OnInit {
   isDisplay = true;
   save(form: NgForm) {
     if (form.valid) {
-      console.log(this.HouseBillToAdd);
-      this.ListHouseBill.push(this.HouseBillToAdd);
-      this.HouseBillToAdd = new CsTransactionDetail();
+      this.houseBillComing.emit({data:this.HouseBillToAdd,extend_data:this.extend_data});
+      this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
+      this.HouseBillToAdd = new CsTransactionDetail();      
       this.customerSaleman = null;
       this.isDisplay = false;
       setTimeout(() => {
