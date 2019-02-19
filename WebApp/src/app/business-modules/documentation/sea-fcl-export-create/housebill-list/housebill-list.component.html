@@ -81,7 +81,7 @@
                     <div class="col-lg-4 order-2 order-lg-1">
                         <div class="form-group">
                             <div class="m-input-icon m-input-icon--left">
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                <input type="text" name="search_house_bill" (keyup)="searchHouseBill($event.target.value)" class="form-control m-input m-input--square" placeholder="Search..." >
                                 <span class="m-input-icon__icon m-input-icon__icon--left">
                                     <span>
                                         <i class="la la-search"></i>
@@ -127,7 +127,7 @@
                             </th>
                             <th class="sorting">
                                 <span>
-                                    Nomination Party
+                                    Notify Party
                                 </span>
                             </th>
                             <th class="sorting">
@@ -167,12 +167,11 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="">
+                    <tbody *ngIf="HouseBillListData.length>0">
+                        <tr class="" *ngFor="let hb of HouseBillListData;let i = index;">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button"
-                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="viewdata()"
                                         title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
                                         <i class="la la-edit"></i>
                                     </button>
@@ -185,27 +184,27 @@
                             </td>
                             <td>
                                 <span>
-                                    H-B/L No
+                                    {{hb.data.hwbno}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    Customer
+                                    {{hb.extend_data.customer_nameEn}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    Saleman
+                                    {{hb.extend_data.saleman_nameEn}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    Nomination Party
+                                    {{hb.extend_data.notify_party_nameEn}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    Destination
+                                    {{hb.data.finalDestinationPlace}}
                                 </span>
                             </td>
                             <td>
@@ -563,7 +562,7 @@
                                 <td class="">
                                     <div class="">
                                         <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="1">
+                                            <input type="radio" name="example-abc" value="1">
                                             <span></span>
                                         </label>
                                     </div>
@@ -603,7 +602,7 @@
                                 <td class="">
                                     <div class="">
                                         <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="2">
+                                            <input type="radio" name="example-abc" value="2">
                                             <span></span>
                                         </label>
                                     </div>
@@ -873,7 +872,7 @@
                                 <td class="">
                                     <div class="">
                                         <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="1">
+                                            <input type="radio" name="example-1a" value="1">
                                             <span></span>
                                         </label>
                                     </div>
@@ -913,7 +912,7 @@
                                 <td class="">
                                     <div class="">
                                         <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="2">
+                                            <input type="radio" name="example-1a" value="2">
                                             <span></span>
                                         </label>
                                     </div>

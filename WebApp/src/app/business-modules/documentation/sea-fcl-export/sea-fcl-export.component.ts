@@ -112,11 +112,6 @@ export class SeaFCLExportComponent implements OnInit {
         this.criteria = {};
         this.searchString = null;
         this.getShipments();
-
-        this.isReset = false;
-        setTimeout(() => {
-            this.isReset = true;
-        }, 100);
     }
     async setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;

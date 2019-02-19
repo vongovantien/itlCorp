@@ -23,7 +23,7 @@
     "@angular/router": "^7.1.4",
     "@angular/service-worker": "^7.1.4",
     "@ngx-progressbar/core": "^5.3.1",
-    "@types/jquery": "^3.3.13",
+    "@types/jquery": "^3.3.29",
     "angular-oauth2-oidc": "^5.0.2",
     "bootstrap": "^4.1.3",
     "core-js": "^2.5.4",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.12.2",
     "@angular/cli": "^7.1.0",
-    "@angular/compiler-cli": "^7.1.4",
+    "@angular/compiler-cli": "^7.2.5",
     "@angular/language-service": "^7.1.4",
     "@types/crypto-js": "^3.1.43",
     "@types/exceljs": "^0.5.2",

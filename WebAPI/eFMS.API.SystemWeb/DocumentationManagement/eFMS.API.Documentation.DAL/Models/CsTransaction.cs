@@ -5,11 +5,6 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
-        public CsTransaction()
-        {
-            CsTransactionDetail = new HashSet<CsTransactionDetail>();
-        }
-
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
         public string JobNo { get; set; }
@@ -33,6 +28,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string ShipmentType { get; set; }
         public string ServiceMode { get; set; }
         public string Commodity { get; set; }
+        public string DesOfGoods { get; set; }
+        public string PackageContainer { get; set; }
         public string InvoiceNo { get; set; }
         public string Pono { get; set; }
         public string PersonIncharge { get; set; }
@@ -55,7 +52,5 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }
