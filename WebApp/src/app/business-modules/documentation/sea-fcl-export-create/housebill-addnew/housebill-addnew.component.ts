@@ -305,14 +305,18 @@ export class HousebillAddnewComponent implements OnInit {
     if (form.valid) {
       this.houseBillComing.emit({data:this.HouseBillToAdd,extend_data:this.extend_data});
       this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
-      this.HouseBillToAdd = new CsTransactionDetail();      
-      this.customerSaleman = null;
-      this.isDisplay = false;
-      setTimeout(() => {
-        this.isDisplay = true;
-      }, 300);
+      this.resetForm();
       $('#add-house-bill-modal').modal('hide');
     }
+  }
+
+  resetForm(){    
+    this.HouseBillToAdd = new CsTransactionDetail();      
+    this.customerSaleman = null;
+    this.isDisplay = false;
+    setTimeout(() => {
+      this.isDisplay = true;
+    }, 300);
   }
 
 }
