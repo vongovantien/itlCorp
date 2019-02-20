@@ -52,18 +52,26 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
+        
+        [HttpGet]
+        public IActionResult Get(Guid id)
+        {
+            var data = csTransactionService.Get(x => x.Id == id).FirstOrDefault();
+            return Ok(data);
+        }
 
         [HttpPost]
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var hs = csTransactionService.AddCSTransaction(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
+            var result = csTransactionService.AddCSTransaction(model);
+            //var message = HandleError.GetMessage(hs, Crud.Insert);
+            //ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            //if (!hs.Success)
+            //{
+            //    return BadRequest(result);
+            //}
+            //return Ok(result);
             return Ok(result);
         }
 

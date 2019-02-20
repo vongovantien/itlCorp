@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Documentation.DL.Common;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
@@ -15,7 +16,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         IQueryable<vw_csTransaction> Query(CsTransactionCriteria criteria);
         IQueryable<vw_csTransaction> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
-        HandleState AddCSTransaction(CsTransactionEditModel model);
+        object AddCSTransaction(CsTransactionEditModel model);
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
     }
 }

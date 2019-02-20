@@ -9,18 +9,18 @@
         <div class="m-form m-form--state" [formGroup]="formAddEdit">
             <div class="row">
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': !formAddEdit.controls.jobId.valid && submitted }">
+                      <div class="form-group">
                         <label class="form-control-label" for="">
                             Job ID
                         </label>
                           <input type="text" name="jobId" formControlName="jobId" class="form-control m-input m-input--square"
-                              placeholder="" [(ngModel)]="shipment.jobNo" minlength="3" required>
+                              placeholder="" [(ngModel)]="shipment.jobNo" minlength="3">
                         <!-- <div class="form-control-feedback" *ngIf="formAddEdit.submitted && jobId.invalid" >
                           Job ID is required least 3 characters
                         </div> -->
-                          <div class="form-control-feedback" *ngIf="!formAddEdit.controls.jobId.valid && submitted">
+                          <!-- <div class="form-control-feedback" *ngIf="!formAddEdit.controls.jobId.valid && submitted">
                           Job ID is required least 3 characters
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
+                      <div class="form-group" [ngClass]="{ 'has-danger': etaSelected && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
                         <label class="form-control-label" for="">
                             Estimated time of Arrival
                         </label>
@@ -61,7 +61,7 @@
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                              <div class="form-control-feedback" *ngIf="submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
+                              <div class="form-control-feedback" *ngIf="etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
                                 Estimated time of Arrival must more or equal estimated time of departure
                             </div>
                         </div>
