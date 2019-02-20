@@ -73,6 +73,9 @@ export class HousebillAddnewComponent implements OnInit {
     this.getListForwardingAgent();
     this.getListSaleman();
     this.getContainerTypes();
+    this.getComodities();
+    this.getWeightTypes();
+    this.getPackageTypes();
   }
 
   select(form) {
@@ -237,14 +240,6 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
 
-  getContainerTypes() {
-    this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }).subscribe((res: any) => {
-      if (res != null) {
-        this.listContainerTypes = dataHelper.prepareNg2SelectData(res, 'id', 'unitNameEn');
-      }
-    });
-
-  }
 
   public onSubmitContainer(form: NgForm) {
     console.log(this.ListContainers)
@@ -317,6 +312,96 @@ export class HousebillAddnewComponent implements OnInit {
     setTimeout(() => {
       this.isDisplay = true;
     }, 300);
+    $('#add-house-bill-modal').modal('hide');
   }
+
+
+
+  /**
+   * ADD CONTAINER LIST
+   */
+  lstHouseBillContainers: any[] = [];
+  containerTypes: any[] = [];
+  weightMesurements: any[] = [];
+  packageTypes: any[] = [];
+  commodities: any[] = [];
+  @ViewChild('containerListForm') containerListForm: NgForm;
+
+  async getContainerTypes() {
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
+    if (responses != null) {
+        this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+    }
+}
+async getWeightTypes() {
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
+    if (responses != null) {
+        this.weightMesurements = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+        console.log(this.weightMesurements);
+    }
+}
+async getPackageTypes() {
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
+    if (responses != null) {
+        this.packageTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+        console.log(this.packageTypes);
+    }
+}
+async getComodities() {
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
+    this.commodities = responses;
+    console.log(this.commodities);
+}
+
+addNewContainer() {
+  let hasItemEdited = false;
+  for(let i=0; i< this.lstHouseBillContainers.length; i++){
+      if(this.lstHouseBillContainers[i].allowEdit == true){
+          hasItemEdited = true;
+          break;
+      }
+  }
+  if(hasItemEdited == false){
+      console.log(this.containerListForm);
+      //this.containerMasterForm.onReset();
+      this.lstHouseBillContainers.push(this.initNewContainer());
+  }
+  else{
+      this.baseServices.errorToast("Current container must be save!!!");
+  }
+}
+
+initNewContainer(){
+  var container = {
+      containerTypeId: null,
+      containerTypeName: '',
+      containerTypeActive: [],
+      quantity: null,
+      containerNo: '',
+      sealNo: '',
+      markNo: '',
+      unitOfMeasureId: null,
+      unitOfMeasureName: '',
+      unitOfMeasureActive: [],
+      commodityId: null,
+      commodityName: '',
+      packageTypeId: null,
+      packageTypeName: '',
+      packageTypeActive: [],
+      packageQuantity: null,
+      description: '',
+      gw: null,
+      nw: null,
+      chargeAbleWeight :null,
+      cbm: null,
+      packageContainer: '',
+      //desOfGoods: '',
+      allowEdit: true,
+      isNew: true
+  };
+  return container;
+}
+
+ 
 
 }

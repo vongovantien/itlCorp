@@ -44,5 +44,5 @@ export class CsTransactionDetail {
   datetimeCreated: Date = null;
   userModified: String = null;
   datetimeModified: Date = null;
-  // listContainers:Container[]=[] ;
+  csMawbcontainers:Container[]=[] ; // list containers 
 }
