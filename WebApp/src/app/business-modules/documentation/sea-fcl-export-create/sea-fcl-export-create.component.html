@@ -24,15 +24,15 @@
                         </span>
                     </span>
                 </button>
-                <!-- <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCreateJob()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
                             save
                         </span>
                     </span>
-                </button> -->
-                <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                </button>
+                <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
                 <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                     data-target="#confirm-cancel-create-job-modal">
                     <span>
@@ -190,15 +190,15 @@
         </div>
 
         <div class="form-actions m--align-right">
-            <!-- <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save 1
-                                </span>
-                            </span>
-                        </button> -->
-            <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCreateJob()">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        save
+                    </span>
+                </span>
+            </button>
+            <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
             <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                 data-target="#confirm-cancel-create-job-modal">
                 <span>
@@ -211,6 +211,47 @@
         </div>
     </div>
     <!--end::m-content-->
+
+    <!--begin::confirm-create-job-modal-->
+    <div class="modal fade" id="confirm-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create job</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-text-block">
+                        <span>You are about to create a new job, are you sure all entered details are correct?</span>
+                    </div>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="onSubmit()" data-dismiss="modal">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                Yes
+                            </span>
+                        </span>
+                    </button>
+                    <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                        (click)="cancelSaveJob()">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                No
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::confirm-create-job-modal-->
 </form>
 
 <!--begin::container-list-of-job-modal-master-->
@@ -980,46 +1021,6 @@
 </div>
 <!--end::import-job-detail-modal-->
 
-<!--begin::confirm-create-job-modal-->
-<div class="modal fade" id="confirm-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create job</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>You are about to create a new job, are you sure all entered details are correct?</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="activeTab()" data-dismiss="modal">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Yes
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
-                    (click)="cancelSaveJob()">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            No
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::confirm-create-job-modal-->
 <!--begin::confirm-cancel-create-job-modal-->
 <div class="modal fade" id="confirm-cancel-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
@@ -1037,7 +1038,8 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" routerLink="/home/documentation/sea-fcl-export">
                     <span>
                         <i class="la la-save"></i>
                         <span>

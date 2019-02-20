@@ -158,6 +158,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.commodities = responses;
         console.log(this.commodities);
     }
+    confirmCreateJob(){
+        $('#confirm-create-job-modal').modal('show');
+    }
     async onSubmit() {
         this.submitted = true;
         this.shipment = this.myForm.value;
@@ -168,14 +171,14 @@ export class SeaFclExportCreateComponent implements OnInit {
         if (this.myForm.valid) {
             console.log('abc');
             this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
-
-            $('#confirm-create-job-modal').modal('show');
+            await this.saveJob();
+            this.activeTab();
+            //$('#confirm-create-job-modal').modal('show');
         }
     }
-    async onSaveJob(){
+    async saveJob(){
         await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
         $('#confirm-create-job-modal').modal('hide');
-        this.myForm.reset();
     }
     cancelSaveJob(){
         $('#confirm-create-job-modal').modal('hide');
