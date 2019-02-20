@@ -20,7 +20,6 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 })
 export class HousebillListComponent implements OnInit{
 
-
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
 
