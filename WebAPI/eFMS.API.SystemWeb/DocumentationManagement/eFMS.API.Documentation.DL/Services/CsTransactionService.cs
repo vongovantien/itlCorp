@@ -22,7 +22,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
         }
 
-        public HandleState AddCSTransaction(CsTransactionEditModel model)
+        public object AddCSTransaction(CsTransactionEditModel model)
         {
             try
             {
@@ -67,11 +67,13 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
                 dc.SaveChanges();
-                return new HandleState();
+                var result = new HandleState();
+                return new { model = transaction, result };
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                var result = new HandleState(ex.Message);
+                return new { model = new object { }, result };
             }
         }
 

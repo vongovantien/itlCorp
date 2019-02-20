@@ -64,13 +64,14 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var hs = csTransactionService.AddCSTransaction(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
+            var result = csTransactionService.AddCSTransaction(model);
+            //var message = HandleError.GetMessage(hs, Crud.Insert);
+            //ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            //if (!hs.Success)
+            //{
+            //    return BadRequest(result);
+            //}
+            //return Ok(result);
             return Ok(result);
         }
 

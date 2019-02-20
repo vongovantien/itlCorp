@@ -62,13 +62,13 @@
                 <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
                     <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link active" id="masterbill-tablink" data-toggle="tab"
-                            href="#masterbill-tabview-tab" role="tab" (click)="switchTab()">
+                            href="#masterbill-tabview-tab" role="tab" (click)="switchTab(shipment.id)">
                             Shipment detail
                         </a>
                     </li>
                     <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link" id="housebill-tablink" data-toggle="modal"
-                            href="#confirm-create-job-modal" role="modal" (click)="switchTab()">
+                            href="{{housebillTabviewHref}}" role="modal" (click)="switchTab(shipment.id)">
                             House Bill List
                         </a>
                     </li>

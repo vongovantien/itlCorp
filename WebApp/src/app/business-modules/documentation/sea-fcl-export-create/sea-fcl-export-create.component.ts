@@ -41,7 +41,8 @@ export class SeaFclExportCreateComponent implements OnInit {
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
     };
-
+    //
+    housebillTabviewHref= '#confirm-create-job-modal';
      /**
         * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
         * this method imporove performance for web when detecting change 
@@ -49,7 +50,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         * https://blog.bitsrc.io/boosting-angular-app-performance-with-local-change-detection-8a6a3afa8d4d
         *
       */
-    switchTab(){
+    switchTab(id: string){
         this.cdr.detach();
         setTimeout(() => {
             this.cdr.reattach();
@@ -68,7 +69,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
         this.myForm = this.fb.group({
-            jobId: new FormControl('', Validators.required),
+            jobId: new FormControl({value: '', disabled: true}),
             estimatedTimeofDepature: new FormControl('', Validators.required),
             estimatedTimeofArrived: new FormControl(''),
             mawb: new FormControl('', Validators.required),
@@ -177,8 +178,13 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
     }
     async saveJob(){
-        await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
-        $('#confirm-create-job-modal').modal('hide');
+        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
+        if(response != null){
+            if(response.result.success){
+                this.shipment = response.model;
+            }
+        }
+        this.housebillTabviewHref = "#housebill-tabview-tab";
     }
     cancelSaveJob(){
         $('#confirm-create-job-modal').modal('hide');

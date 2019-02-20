@@ -10,7 +10,7 @@ namespace eFMS.API.Documentation.DL.Common
         {
             number = number + 1;
             var currentDate = DateTime.Now;
-            return servicePrefix + currentDate.Year + currentDate.Month + String.Format("{0:00000}", number);
+            return servicePrefix + currentDate.Year + String.Format("{0:00}", currentDate.Month) + String.Format("{0:00000}", number);
         }
     }
 }
