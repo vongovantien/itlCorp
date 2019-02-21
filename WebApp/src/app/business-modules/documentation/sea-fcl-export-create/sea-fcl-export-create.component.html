@@ -50,7 +50,11 @@
     <!--begin::add-house-bill-modal-->
     <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby=""
         aria-hidden="true">
-        <app-housebill-addnew (houseBillComing)="houseBillCatcher($event)"></app-housebill-addnew>
+        <app-housebill-addnew
+        (houseBillComing)="houseBillCatcher($event)" 
+        [masterBillData]="shipment">
+
+        </app-housebill-addnew>
     </div>
     <!--end::add-house-bill-modal-->
 
@@ -67,8 +71,8 @@
                         </a>
                     </li>
                     <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" id="housebill-tablink" data-toggle="modal"
-                            href="{{housebillTabviewHref}}" role="modal" (click)="switchTab(shipment.id)">
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" data-toggle="tab"
+                            href="#housebill-tabview-tab" role="tab" (click)="switchTab(shipment.id)">
                             House Bill List
                         </a>
                     </li>
@@ -422,7 +426,7 @@
                                                     Cont Type
                                                 </span>
                                                 <div class="control-editable"
-                                                    [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null }">
+                                                    [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
                                                     <ng-select [allowClear]="true" [items]="containerTypes"
                                                         [disabled]="disabled" (data)="refreshValue($event)"
                                                         (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
@@ -431,7 +435,7 @@
                                                         placeholder="Select filter">
                                                     </ng-select>
                                                     <div class="form-control-feedback"
-                                                        *ngIf="containerMasterForm.submitted && container.containerTypeId == null">
+                                                        *ngIf="containerMasterForm.submitted && container.containerTypeId == null && container.verifying">
                                                         Container type is required.
                                                     </div>
                                                 </div>
@@ -441,13 +445,13 @@
                                                     Cont Q'ty
                                                 </span>
                                                 <div class="control-editable"
-                                                    [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid }">
+                                                    [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid && container.verifying}">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         min="1" value="1" oninput="validity.valid||(value='');"
                                                         placeholder="Please enter" [(ngModel)]="container.quantity"
                                                         name="conQuantity" #conQuantity="ngModel" required>
                                                     <div class="form-control-feedback"
-                                                        *ngIf="containerMasterForm.submitted && conQuantity.invalid">
+                                                        *ngIf="containerMasterForm.submitted && conQuantity.invalid && container.verifying">
                                                         Cont Q'ty must be a number
                                                     </div>
                                                 </div>
@@ -658,7 +662,7 @@
                                                     {{ container.containerTypeName }}
                                                 </span>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="">
                                                 <span class="content-editable">
                                                     {{ container.quantity }}
                                                 </span>
@@ -688,7 +692,7 @@
                                                     {{ container.packageTypeName }}
                                                 </span>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="">
                                                 <span class="content-editable">
                                                     {{ container.packageQuantity }}
                                                 </span>
@@ -698,17 +702,17 @@
                                                     {{ container.description }}
                                                 </span>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="">
                                                 <span class="content-editable">
                                                     {{ container.nw | number: '1.2-2' }}
                                                 </span>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="">
                                                 <span class="content-editable">
                                                     {{ container.gw | number: '1.2-2' }}
                                                 </span>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="">
                                                 <span class="content-editable">
                                                     {{ container.chargeAbleWeight | number: '1.2-2' }}
                                                 </span>
@@ -718,7 +722,7 @@
                                                     {{ container.unitOfMeasureName }}
                                                 </span>
                                             </td>
-                                            <td class="text-right">
+                                            <td class="">
                                                 <span class="content-editable">
                                                     {{ container.cbm }}
                                                 </span>

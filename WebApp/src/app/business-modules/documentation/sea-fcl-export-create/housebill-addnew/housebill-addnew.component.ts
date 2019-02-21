@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, AfterViewChecked, Input } from '@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -15,6 +15,7 @@ import * as moment from 'moment';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { NgForm } from '@angular/forms';
 import { Container } from 'src/app/shared/models/document/container.model';
+import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 declare var $: any;
 
 @Component({
@@ -23,7 +24,13 @@ declare var $: any;
   styleUrls: ['./housebill-addnew.component.scss']
 })
 export class HousebillAddnewComponent implements OnInit {
-
+  
+  MasterBillData : CsTransaction = null;
+  @Input() set masterBillData(_masterBilData:CsTransaction){   
+    this.MasterBillData = _masterBilData;
+    this.HouseBillToAdd.jobId = this.MasterBillData.jobNo;
+  }
+  
   pager: PagerSetting = PAGINGSETTING;
 
   listContainerTypes: any[] = [];
@@ -306,7 +313,8 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   resetForm(){    
-    this.HouseBillToAdd = new CsTransactionDetail();      
+    this.HouseBillToAdd = new CsTransactionDetail(); 
+    this.HouseBillToAdd.jobId = this.MasterBillData.jobNo;
     this.customerSaleman = null;
     this.isDisplay = false;
     setTimeout(() => {
@@ -326,7 +334,6 @@ export class HousebillAddnewComponent implements OnInit {
   packageTypes: any[] = [];
   commodities: any[] = [];
   @ViewChild('containerListForm') containerListForm: NgForm;
-
   async getContainerTypes() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
     if (responses != null) {
@@ -363,13 +370,52 @@ addNewContainer() {
   }
   if(hasItemEdited == false){
       console.log(this.containerListForm);
-      //this.containerMasterForm.onReset();
+      //this.containerMasterForm.onReset();      
       this.lstHouseBillContainers.push(this.initNewContainer());
   }
   else{
       this.baseServices.errorToast("Current container must be save!!!");
   }
+
+  console.log(this.lstHouseBillContainers);
 }
+
+saveNewContainer(index:number,form:NgForm){
+  this.lstHouseBillContainers[index].verifying = true;
+  if(this.containerListForm.invalid) return;
+  //Cont Type, Cont Q'ty, Container No, Package Type
+  let existedItem = this.lstHouseBillContainers.filter(x => x.containerTypeId == this.lstHouseBillContainers[index].containerTypeId 
+      && x.quantity == this.lstHouseBillContainers[index].quantity
+      && x.containerNo == this.lstHouseBillContainers[index].containerNo
+      && x.packageTypeId == this.lstHouseBillContainers[index].packageTypeId);
+      console.log(existedItem)
+  if(existedItem.length > 1) { 
+      this.baseServices.errorToast("This container has been existed");
+      return;
+  }
+  else{
+      if(this.lstHouseBillContainers[index].isNew == true) this.lstHouseBillContainers[index].isNew = false;
+      this.lstHouseBillContainers[index].verifying = false;
+      this.lstHouseBillContainers[index].allowEdit = false;
+      this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }]: [];
+      this.lstHouseBillContainers[index].packageTypeActive = this.lstHouseBillContainers[index].packageTypeId != null? [{ id: this.lstHouseBillContainers[index].packageTypeId, text: this.lstHouseBillContainers[index].packageTypeName }]: [];
+      this.lstHouseBillContainers[index].unitOfMeasureActive = this.lstHouseBillContainers[index].unitOfMeasureId!= null? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }]: [];
+     
+  }
+  // this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
+}
+removeAContainer(index: number){
+  this.lstHouseBillContainers.splice(index, 1);
+}
+cancelNewContainer(index: number){
+  if(this.lstHouseBillContainers[index].isNew == true){
+      this.lstHouseBillContainers.splice(index, 1);
+  }
+  else{
+      this.lstHouseBillContainers[index].allowEdit = false;
+  }
+}
+
 
 initNewContainer(){
   var container = {
@@ -397,9 +443,19 @@ initNewContainer(){
       packageContainer: '',
       //desOfGoods: '',
       allowEdit: true,
-      isNew: true
+      isNew: true,
+      verifying:false
   };
   return container;
+}
+
+changeEditStatus(index: any){
+  if(this.lstHouseBillContainers[index].allowEdit == false){
+      this.lstHouseBillContainers[index].allowEdit = true;
+  }
+  else{
+      this.lstHouseBillContainers[index].allowEdit = false;
+  }
 }
 
  

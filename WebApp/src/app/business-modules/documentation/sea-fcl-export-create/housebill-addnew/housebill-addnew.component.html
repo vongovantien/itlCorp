@@ -1091,7 +1091,7 @@
 <div class="modal fade" id="container-list-of-job-modal-house" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
-        <form>
+        <form novalidate #containerListForm="ngForm" (ngSubmit)="containerListForm.form.valid">
             <div class="modal-content m-form m-form--state">
                 <div class="modal-header">
                     <h5 class="modal-title">Container List Module</h5>
@@ -1100,7 +1100,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form novalidate #containerListForm (ngSubmit)="containerListForm.form.valid">
+                  
                         <div class="container-list-table">
                             <!--begin: Search Form -->
                             <div class="m-form m-form--label-align-right m--margin-bottom-10">
@@ -1226,22 +1226,10 @@
                                         <ng-container *ngFor="let container of lstHouseBillContainers; let i= index">
                                             <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
                                                 <td class="table-actions-col fixed-side">
-                                                    <div class="table-actions content-editable" style="width: 70px">
-                                                        <button type="button"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit">
-                                                            <i class="la la-edit"></i>
-                                                        </button>
-                                                        <button type="button"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove">
-                                                            <i class="la la-trash"></i>
-                                                        </button>
-                                                    </div>
                                                     <div class="table-actions control-editable" style="width: 70px">
-                                                        <button type=""
+                                                        <button type="submit"
                                                             class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Save" (click)="saveNewContainer(i)">
+                                                            title="Save" (click)="saveNewContainer(i,containerListForm)">
                                                             <i class="la la-save"></i>
                                                         </button>
                                                         <button type="button"
@@ -1256,7 +1244,7 @@
                                                         Cont Type
                                                     </span>
                                                     <div class="control-editable"
-                                                        [ngClass]="{ 'has-danger': containerListForm.submitted && container.containerTypeId == null }">
+                                                        [ngClass]="{ 'has-danger': containerListForm.submitted && container.containerTypeId == null && container.verifying}">
                                                         <ng-select [allowClear]="true" [items]="containerTypes"
                                                             [disabled]="disabled" (data)="refreshValue($event)"
                                                             (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
@@ -1265,7 +1253,7 @@
                                                             placeholder="Select filter">
                                                         </ng-select>
                                                         <div class="form-control-feedback"
-                                                            *ngIf="containerListForm.submitted && container.containerTypeId == null">
+                                                            *ngIf="containerListForm.submitted && container.containerTypeId == null && container.verifying">
                                                             Container type is required.
                                                         </div>
                                                     </div>
@@ -1275,13 +1263,13 @@
                                                         Cont Q'ty
                                                     </span>
                                                     <div class="control-editable"
-                                                        [ngClass]="{ 'has-danger': containerListForm.submitted && conQuantity.invalid }">
+                                                        [ngClass]="{ 'has-danger': containerListForm.submitted && conQuantity.invalid && container.verifying}">
                                                         <input type="number" class="form-control m-input m-input--square"
                                                             min="1" value="1" oninput="validity.valid||(value='');"
                                                             placeholder="Please enter" [(ngModel)]="container.quantity"
                                                             name="conQuantity" #conQuantity="ngModel" required>
                                                         <div class="form-control-feedback"
-                                                            *ngIf="containerListForm.submitted && conQuantity.invalid">
+                                                            *ngIf="containerListForm.submitted && conQuantity.invalid && container.verifying">
                                                             Cont Q'ty must be a number
                                                         </div>
                                                     </div>
@@ -1492,7 +1480,7 @@
                                                         {{ container.containerTypeName }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="">
                                                     <span class="content-editable">
                                                         {{ container.quantity }}
                                                     </span>
@@ -1522,7 +1510,7 @@
                                                         {{ container.packageTypeName }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="">
                                                     <span class="content-editable">
                                                         {{ container.packageQuantity }}
                                                     </span>
@@ -1532,17 +1520,17 @@
                                                         {{ container.description }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="">
                                                     <span class="content-editable">
                                                         {{ container.nw | number: '1.2-2' }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="">
                                                     <span class="content-editable">
                                                         {{ container.gw | number: '1.2-2' }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="">
                                                     <span class="content-editable">
                                                         {{ container.chargeAbleWeight | number: '1.2-2' }}
                                                     </span>
@@ -1552,7 +1540,7 @@
                                                         {{ container.unitOfMeasureName }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="">
                                                     <span class="content-editable">
                                                         {{ container.cbm }}
                                                     </span>
@@ -1567,7 +1555,7 @@
                             </div>
                             <!--end: Datatable -->
                         </div>
-                    </form>
+                   
                 </div>
                 <div class="modal-footer m--align-center">
                     <button type="submit" (click)="onSubmitContainer(containerListForm)"
