@@ -261,7 +261,7 @@
                 </a>
             </li>
             <li class="nav-item m-tabs__item">
-                <a class="nav-link m-tabs__link" data-toggle="tab" href="#ohb" role="tab">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#obh-charge" role="tab">
                     OBH
                 </a>
             </li>
@@ -507,7 +507,7 @@
                             </div>
                         </div>
                         <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-selling-rate-modal">
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
@@ -520,121 +520,177 @@
                 </div>
                 <!--end: Search Form -->
                 <!--begin: Datatable-->
-                <div class="table-wrapper" id="">
+                <div class="table-wrapper table-scrollable" id="">
                     <table class="table table-striped table-brand dataTable">
                         <thead class="">
                             <tr class="">
                                 <th class=""></th>
+                                <th class="sorting">
+                                    <span>
+                                        Partner
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit Price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
                                 <th class="">
                                     <span>
-                                        Job ID
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        M-B/L
+                                        SOA
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Customer
+                                        Credit/ Debit note
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Saleman
+                                        Settle payment
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Nomination Party
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Destination
+                                        Exchange rate date
                                     </span>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-abc" value="1">
-                                            <span></span>
-                                        </label>
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" data-toggle="modal" data-target="#edit-selling-rate-modal">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                                 <td>
                                     <span>
-                                        Job ID
+                                        Partner
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        M-B/L
+                                        Name EN
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Customer
+                                        Quantity
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Saleman
+                                        Unit
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Nomination Party
+                                        Unit price
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-abc" value="2">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
+                                        Unit Price
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        M-B/L
+                                        Currency
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Customer
+                                        VAT
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Saleman
+                                        Total
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Nomination Party
+                                        Note
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Destination
+                                        Docs
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        SOA
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Credit/ Debit note
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Exchange rate date
                                     </span>
                                 </td>
                             </tr>
@@ -643,7 +699,7 @@
                 </div>
                 <!--end: Datatable-->
             </div>
-            <div class="tab-pane fade" id="ohb" role="tabpanel">
+            <div class="tab-pane fade" id="obh-charge" role="tabpanel">
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
                     <div class="row align-items-center">
@@ -661,7 +717,7 @@
                             </div>
                         </div>
                         <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
-                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-obh-charge-modal">
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
@@ -674,39 +730,89 @@
                 </div>
                 <!--end: Search Form -->
                 <!--begin: Datatable-->
-                <div class="table-wrapper" id="">
+                <div class="table-wrapper table-scrollable" id="">
                     <table class="table table-striped table-brand dataTable">
                         <thead class="">
                             <tr class="">
                                 <th class=""></th>
+                                <th class="sorting">
+                                    <span>
+                                        Receiver
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Payer
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit Price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
                                 <th class="">
                                     <span>
-                                        Job ID
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        M-B/L
+                                        SOA
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Customer
+                                        Credit/ Debit note
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Saleman
+                                        Settle payment
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Nomination Party
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Destination
+                                        Exchange rate date
                                     </span>
                                 </th>
                             </tr>
@@ -714,7 +820,12 @@
                         <tbody>
                             <tr class="">
                                 <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 40px">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" data-toggle="modal" data-target="#edit-obh-charge-modal">
+                                            <i class="la la-edit"></i>
+                                        </button>
                                         <button type="button"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
@@ -724,73 +835,82 @@
                                 </td>
                                 <td>
                                     <span>
-                                        Job ID
+                                        Receiver
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        M-B/L
+                                        Payer
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Customer
+                                        Name EN
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Saleman
+                                        Quantity
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Nomination Party
+                                        Unit
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 40px">
-                                        <button type="button"
-                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
+                                        Unit price
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        M-B/L
+                                        Unit Price
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Customer
+                                        Currency
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Saleman
+                                        VAT
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Nomination Party
+                                        Total
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Destination
+                                        Note
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Docs
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        SOA
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Credit/ Debit note
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Exchange rate date
                                     </span>
                                 </td>
                             </tr>
@@ -816,135 +936,166 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
-                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                                <span>
-                                    <i class="la la-plus"></i>
-                                    <span>
-                                        add new
-                                    </span>
-                                </span>
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <!--end: Search Form -->
                 <!--begin: Datatable-->
-                <div class="table-wrapper" id="">
+                <div class="table-wrapper table-scrollable" id="">
                     <table class="table table-striped table-brand dataTable">
                         <thead class="">
                             <tr class="">
-                                <th class=""></th>
+                                <th class="sorting">
+                                    <span>
+                                        Partner
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit Price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
                                 <th class="">
                                     <span>
-                                        Job ID
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        M-B/L
+                                        SOA
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Customer
+                                        Credit/ Debit note
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Saleman
+                                        Settle payment
                                     </span>
                                 </th>
                                 <th class="sorting">
                                     <span>
-                                        Nomination Party
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Destination
+                                        Exchange rate date
                                     </span>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1a" value="1">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
                                 <td>
                                     <span>
-                                        Job ID
+                                        Partner
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        M-B/L
+                                        Name EN
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Customer
+                                        Quantity
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Saleman
+                                        Unit
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Nomination Party
+                                        Unit price
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1a" value="2">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
+                                        Unit Price
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        M-B/L
+                                        Currency
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Customer
+                                        VAT
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Saleman
+                                        Total
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Nomination Party
+                                        Note
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Destination
+                                        Docs
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        SOA
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Credit/ Debit note
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Exchange rate date
                                     </span>
                                 </td>
                             </tr>
@@ -1048,7 +1199,7 @@
                                 </label>
                                 <div class="dropdown e--combogrid">
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
@@ -1066,6 +1217,7 @@
                                                                 <th>Partner name</th>
                                                                 <th>Name ABBR</th>
                                                                 <th>Name EN</th>
+                                                                <th>Tax code</th>
                                                             </tr>
                                                         </thead>
                                                     </table>
@@ -1078,16 +1230,19 @@
                                                             <td>partner name 1234567</td>
                                                             <td>Đây là một charge name viết tắt</td>
                                                             <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
                                                         </tr>
                                                         <tr class="data-row" data-id="2">
                                                             <td>partner name 1234567</td>
                                                             <td>Đây là một charge name viết tắt</td>
                                                             <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
                                                         </tr>
                                                         <tr class="data-row" data-id="3">
                                                             <td>partner name 1234567</td>
                                                             <td>Đây là một charge name viết tắt</td>
                                                             <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1358,7 +1513,7 @@
                                 </label>
                                 <div class="dropdown e--combogrid">
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
@@ -1376,6 +1531,7 @@
                                                                 <th>Partner name</th>
                                                                 <th>Name ABBR</th>
                                                                 <th>Name EN</th>
+                                                                <th>Tax code</th>
                                                             </tr>
                                                         </thead>
                                                     </table>
@@ -1388,16 +1544,19 @@
                                                             <td>partner name 1234567</td>
                                                             <td>Đây là một charge name viết tắt</td>
                                                             <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
                                                         </tr>
                                                         <tr class="data-row" data-id="2">
                                                             <td>partner name 1234567</td>
                                                             <td>Đây là một charge name viết tắt</td>
                                                             <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
                                                         </tr>
                                                         <tr class="data-row" data-id="3">
                                                             <td>partner name 1234567</td>
                                                             <td>Đây là một charge name viết tắt</td>
                                                             <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1584,3 +1743,1321 @@
     </div>
 </div>
 <!--end:: Edit-buying-rate-modal-->
+
+<!--begin:: add-selling-rate-modal-->
+<div class="modal fade" id="add-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add selling rate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Charge <small class="m--margin-left-5 m--font-primary">chargecode1234567</small>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value=""
+                                        title="Đây là một charge name dài thật là dài luôn nạ Thor">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Charge code</th>
+                                                                <th>Name EN</th>
+                                                                <th>Name VN</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Partner type
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Partner name
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Partner name</th>
+                                                                <th>Name ABBR</th>
+                                                                <th>Name EN</th>
+                                                                <th>Tax code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Quantity
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name EN</th>
+                                                                <th>Unit type</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit price
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Currency
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    VAT
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Doc no
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Note
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-plus"></i>
+                        <span>
+                            save & continue
+                        </span>
+                    </span>
+                </button>
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: add-selling-rate-modal-->
+<!--begin:: edit-selling-rate-modal-->
+<div class="modal fade" id="edit-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit selling rate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Charge <small class="m--margin-left-5 m--font-primary">chargecode1234567</small>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value=""
+                                        title="Đây là một charge name dài thật là dài luôn nạ Thor">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Charge code</th>
+                                                                <th>Name EN</th>
+                                                                <th>Name VN</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Partner type
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Partner name
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Partner name</th>
+                                                                <th>Name ABBR</th>
+                                                                <th>Name EN</th>
+                                                                <th>Tax code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Quantity
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name EN</th>
+                                                                <th>Unit type</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit price
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Currency
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    VAT
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Doc no
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Note
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Exchange rate date
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Edit
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: Edit-selling-rate-modal-->
+
+<!--begin:: add-obh-charge-modal-->
+<div class="modal fade" id="add-obh-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add OBH charge</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Charge <small class="m--margin-left-5 m--font-primary">chargecode1234567</small>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value=""
+                                        title="Đây là một charge name dài thật là dài luôn nạ Thor">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Charge code</th>
+                                                                <th>Name EN</th>
+                                                                <th>Name VN</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Receiver
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Partner name</th>
+                                                                <th>Name ABBR</th>
+                                                                <th>Name EN</th>
+                                                                <th>Tax code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Payer
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Partner name</th>
+                                                                <th>Name ABBR</th>
+                                                                <th>Name EN</th>
+                                                                <th>Tax code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Quantity
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name EN</th>
+                                                                <th>Unit type</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit price
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Currency
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    VAT
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Doc no
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Note
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-plus"></i>
+                        <span>
+                            save & continue
+                        </span>
+                    </span>
+                </button>
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: add-obh-charge-modal-->
+<!--begin:: edit-obh-charge-modal-->
+<div class="modal fade" id="edit-obh-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit OBH charge</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Charge <small class="m--margin-left-5 m--font-primary">chargecode1234567</small>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value=""
+                                        title="Đây là một charge name dài thật là dài luôn nạ Thor">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Charge code</th>
+                                                                <th>Name EN</th>
+                                                                <th>Name VN</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>chargecode1234567</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Receiver
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Partner name</th>
+                                                                <th>Name ABBR</th>
+                                                                <th>Name EN</th>
+                                                                <th>Tax code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Payer
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Partner name</th>
+                                                                <th>Name ABBR</th>
+                                                                <th>Name EN</th>
+                                                                <th>Tax code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>partner name 1234567</td>
+                                                            <td>Đây là một charge name viết tắt</td>
+                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                            <td>090xxxxxxxxxx</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Quantity
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name EN</th>
+                                                                <th>Unit type</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected" data-id="1">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="2">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                        <tr class="data-row" data-id="3">
+                                                            <td>Kgs</td>
+                                                            <td>Weight Measurement</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Unit price
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Currency
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    VAT
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Doc no
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Note
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Exchange rate date
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Edit
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: Edit-obh-charge-modal-->
