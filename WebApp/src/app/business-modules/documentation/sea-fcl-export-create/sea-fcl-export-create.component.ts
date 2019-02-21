@@ -183,6 +183,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
+                this.shipment.csMawbcontainers = this.lstMasterContainers;
             }
         }
         this.housebillTabviewHref = "#housebill-tabview-tab";
@@ -272,7 +273,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                     this.shipment.desOfGoods = this.shipment.desOfGoods + (this.lstMasterContainers[i].description== ""?"": this.lstMasterContainers[i].description + ", ");
                 }
             }
-            //this.shipment.csMawbcontainers = this.lstMasterContainers;
+                 this.shipment.csMawbcontainers = this.lstMasterContainers;
         }
     }
     searchContainer(keySearch: any){

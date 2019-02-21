@@ -40,10 +40,10 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CatUnit> CatUnit { get; set; }
         public virtual DbSet<CsFcltransactionDetailContainer> CsFcltransactionDetailContainer { get; set; }
         public virtual DbSet<CsMawbcontainer> CsMawbcontainer { get; set; }
-        public virtual DbSet<CsShipmentBuyingRate> CsShipmentBuyingRate { get; set; }
         public virtual DbSet<CsShipmentHawbdetail> CsShipmentHawbdetail { get; set; }
         public virtual DbSet<CsShipmentProfitShares> CsShipmentProfitShares { get; set; }
         public virtual DbSet<CsShipmentSellingRate> CsShipmentSellingRate { get; set; }
+        public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<CsTransaction> CsTransaction { get; set; }
         public virtual DbSet<CsTransactionDetail> CsTransactionDetail { get; set; }
         public virtual DbSet<SysAuthorization> SysAuthorization { get; set; }
@@ -75,7 +75,11 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
+                    options =>
+                    {
+                        options.UseRowNumberForPaging();
+                    });
             }
         }
 
@@ -202,14 +206,17 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(4000);
 
                 entity.Property(e => e.ChargeNameVn)
+                    .IsRequired()
                     .HasColumnName("ChargeName_VN")
-                    .HasMaxLength(4000);
+                    .HasMaxLength(250);
 
                 entity.Property(e => e.Code)
-                    .HasMaxLength(10)
+                    .IsRequired()
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.CurrencyId)
+                    .HasColumnName("CurrencyID")
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
@@ -218,6 +225,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
 
                 entity.Property(e => e.ServiceTypeId)
                     .HasColumnName("ServiceTypeID")
@@ -228,6 +237,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.UnitId).HasColumnName("UnitID");
+
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -236,7 +249,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Vat).HasColumnName("VAT");
+                entity.Property(e => e.Vatrate)
+                    .HasColumnName("VATRate")
+                    .HasColumnType("decimal(18, 4)");
             });
 
             modelBuilder.Entity<CatChargeDefaultAccount>(entity =>
@@ -1262,97 +1277,16 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-            });
 
-            modelBuilder.Entity<CsShipmentBuyingRate>(entity =>
-            {
-                entity.HasKey(e => new { e.Hawbno, e.ChagreFeeId, e.Qunit, e.Collect })
-                    .HasName("csShipmentBuyingRate_PK")
-                    .ForSqlServerIsClustered(false);
+                entity.HasOne(d => d.ContainerType)
+                    .WithMany(p => p.CsMawbcontainerContainerType)
+                    .HasForeignKey(d => d.ContainerTypeId)
+                    .HasConstraintName("FK_csMAWBContainer_catUnit1");
 
-                entity.ToTable("csShipmentBuyingRate");
-
-                entity.Property(e => e.Hawbno)
-                    .HasColumnName("HAWBNO")
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.ChagreFeeId)
-                    .HasColumnName("ChagreFeeID")
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.Qunit)
-                    .HasColumnName("QUnit")
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.AcctantCreated).HasMaxLength(1600);
-
-                entity.Property(e => e.AcctantDate).HasMaxLength(1600);
-
-                entity.Property(e => e.Address).HasMaxLength(4000);
-
-                entity.Property(e => e.AmountNoVatusd).HasColumnName("AmountNoVATUSD");
-
-                entity.Property(e => e.AmountNoVatvnd).HasColumnName("AmountNoVATVND");
-
-                entity.Property(e => e.AmountVatusd).HasColumnName("AmountVATUSD");
-
-                entity.Property(e => e.AmountVatvnd).HasColumnName("AmountVATVND");
-
-                entity.Property(e => e.ContactCollect).HasMaxLength(4000);
-
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.CurrUnit).HasMaxLength(1600);
-
-                entity.Property(e => e.CurrencyConvertRate).HasMaxLength(1600);
-
-                entity.Property(e => e.DocNo).HasMaxLength(1600);
-
-                entity.Property(e => e.ExRateInvoiceVnd).HasColumnName("ExRateInvoiceVND");
-
-                entity.Property(e => e.ExRateSaleVnd).HasColumnName("ExRateSaleVND");
-
-                entity.Property(e => e.Fax).HasMaxLength(1600);
-
-                entity.Property(e => e.InoiceNo).HasMaxLength(1600);
-
-                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.NameOfCollect).HasMaxLength(4000);
-
-                entity.Property(e => e.Notes).HasMaxLength(4000);
-
-                entity.Property(e => e.PaidDate).HasColumnType("datetime");
-
-                entity.Property(e => e.SeriNo).HasMaxLength(1600);
-
-                entity.Property(e => e.ShipmentLockedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Soano)
-                    .HasColumnName("SOANo")
-                    .HasMaxLength(1600);
-
-                entity.Property(e => e.TaxCode).HasMaxLength(1600);
-
-                entity.Property(e => e.Tel).HasMaxLength(1600);
-
-                entity.Property(e => e.UserCreated).HasMaxLength(1600);
-
-                entity.Property(e => e.UserModified).HasMaxLength(1600);
-
-                entity.Property(e => e.Vat).HasColumnName("VAT");
-
-                entity.Property(e => e.VatinvId)
-                    .HasColumnName("VATInvID")
-                    .HasMaxLength(1600);
-
-                entity.Property(e => e.VoucherId)
-                    .HasColumnName("VoucherID")
-                    .HasMaxLength(1600);
-
-                entity.Property(e => e.VoucherIdse)
-                    .HasColumnName("VoucherIDSE")
-                    .HasMaxLength(1600);
+                entity.HasOne(d => d.UnitOfMeasure)
+                    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
+                    .HasForeignKey(d => d.UnitOfMeasureId)
+                    .HasConstraintName("FK_csMAWBContainer_catUnit");
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -1579,6 +1513,127 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(1600);
             });
 
+            modelBuilder.Entity<CsShipmentSurcharge>(entity =>
+            {
+                entity.HasKey(e => e.Id)
+                    .HasName("csShipmentBuyingRate_PK")
+                    .ForSqlServerIsClustered(false);
+
+                entity.ToTable("csShipmentSurcharge");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AccountantDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.AccountantId)
+                    .HasColumnName("AccountantID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountantNote).HasMaxLength(500);
+
+                entity.Property(e => e.AccountantStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
+
+                entity.Property(e => e.ChiefAccountantDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.ChiefAccountantId)
+                    .HasColumnName("ChiefAccountantID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ChiefAccountantNote).HasMaxLength(500);
+
+                entity.Property(e => e.ChiefAccountantStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CsdateSettlement)
+                    .HasColumnName("CSDateSettlement")
+                    .HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Csidsettlement)
+                    .HasColumnName("CSIDSettlement")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CsstatusSettlement)
+                    .HasColumnName("CSStatusSettlement")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CurrencyId)
+                    .IsRequired()
+                    .HasColumnName("CurrencyID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DocNo).HasMaxLength(500);
+
+                entity.Property(e => e.ExchangeDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
+
+                entity.Property(e => e.InvoiceNo).HasMaxLength(50);
+
+                entity.Property(e => e.Notes).HasMaxLength(500);
+
+                entity.Property(e => e.ObjectBePaid)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentObjectId)
+                    .HasColumnName("PaymentObjectID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentRefNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SettlementCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UnitId).HasColumnName("UnitID");
+
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Vatrate)
+                    .HasColumnName("VATRate")
+                    .HasColumnType("decimal(18, 4)");
+            });
+
             modelBuilder.Entity<CsTransaction>(entity =>
             {
                 entity.HasKey(e => e.Id)
@@ -1720,6 +1775,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ClosingDate).HasColumnType("smalldatetime");
 
+                entity.Property(e => e.Commodity).HasMaxLength(1600);
+
                 entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ConsigneeId)
@@ -1739,6 +1796,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
+
+                entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
 
                 entity.Property(e => e.ExportReferenceNo)
                     .HasMaxLength(50)
@@ -1800,6 +1859,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.OriginCountryId).HasColumnName("OriginCountryID");
 
+                entity.Property(e => e.PackageContainer).HasMaxLength(1600);
+
                 entity.Property(e => e.PickupPlace).HasMaxLength(500);
 
                 entity.Property(e => e.PlaceFreightPay).HasMaxLength(4000);
@@ -1841,6 +1902,12 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.CsTransactionDetail)
+                    .HasForeignKey(d => d.JobId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<SysAuthorization>(entity =>

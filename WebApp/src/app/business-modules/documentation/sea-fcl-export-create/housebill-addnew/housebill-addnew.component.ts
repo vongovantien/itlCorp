@@ -248,9 +248,7 @@ export class HousebillAddnewComponent implements OnInit {
 
 
 
-  public onSubmitContainer(form: NgForm) {
-    console.log(this.ListContainers)
-  }
+  
 
   /**
     * Daterange picker
@@ -404,6 +402,40 @@ saveNewContainer(index:number,form:NgForm){
   }
   // this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
 }
+
+totalGrossWeight:number ;
+totalNetWeight:number;
+totalCharWeight:number;
+totalCBM:number;
+numberOfTimeSaveContainer:number = 0;
+onSubmitContainer() {
+  console.log(this.MasterBillData)
+  this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
+  if (this.containerListForm.valid) {
+      this.totalGrossWeight = 0;
+      this.totalNetWeight = 0;
+      this.totalCharWeight = 0;
+      this.totalCBM = 0;      
+      this.HouseBillToAdd.commodity = '';
+      this.HouseBillToAdd.desOfGoods = '';
+      this.HouseBillToAdd.packageContainer = '';
+      for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+          this.lstHouseBillContainers[i].isSave = true;
+          this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
+          this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
+          this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
+          this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
+          this.HouseBillToAdd.packageContainer = this.HouseBillToAdd.packageContainer + (this.lstHouseBillContainers[i].quantity == ""?"": this.lstHouseBillContainers[i].quantity + "x" +this.lstHouseBillContainers[i].containerTypeName + ", ");
+          if(this.numberOfTimeSaveContainer == 1){
+              this.HouseBillToAdd.commodity = this.HouseBillToAdd.commodity + (this.lstHouseBillContainers[i].commodityName== ""?"": this.lstHouseBillContainers[i].commodityName + ", ");
+              this.HouseBillToAdd.desOfGoods = this.HouseBillToAdd.desOfGoods + (this.lstHouseBillContainers[i].description== ""?"": this.lstHouseBillContainers[i].description + ", ");
+          }
+      }
+      //this.shipment.csMawbcontainers = this.lstMasterContainers;
+      $('#container-list-of-job-modal-house').modal('hide');
+  }
+}
+
 removeAContainer(index: number){
   this.lstHouseBillContainers.splice(index, 1);
 }
