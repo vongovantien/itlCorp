@@ -29,7 +29,8 @@
                             Estimated time of departure <span class="m--font-danger">(*)</span>
                         </label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                              <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                              <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd startKey="start"
+                              endKey="end"
                                   [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="etdSelected"
                                   [alwaysShowCalendars]="true" [singleDatePicker]="true" name="estimatedTimeofDepature"
                                   formControlName="estimatedTimeofDepature" placeholder="dd/mm/yyyy" [autoApply]="true"
@@ -46,7 +47,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': etaSelected && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
+                      <div class="form-group" [ngClass]="{ 'has-danger': etaSelected && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) > (etaSelected != null?etaSelected.startDate: null)}">
                         <label class="form-control-label" for="">
                             Estimated time of Arrival
                         </label>
@@ -61,7 +62,7 @@
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                              <div class="form-control-feedback" *ngIf="etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
+                              <div class="form-control-feedback" *ngIf="etaSelected != null && (etdSelected != null?etdSelected.startDate: null) > (etaSelected != null?etaSelected.startDate: null)">
                                 Estimated time of Arrival must more or equal estimated time of departure
                             </div>
                         </div>
@@ -87,7 +88,7 @@
                         <label class="form-control-label" for="">
                                 Master bill of lading type <span class="m--font-danger">(*)</span>
                         </label>
-                          <ng-select [allowClear]="true" [items]="billOfLadingTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                          <ng-select [allowClear]="true" [active]="billOfLadingTypeActive" [items]="billOfLadingTypes" [disabled]="disabled" (data)="refreshValue($event)"
                               (selected)="shipment.mbltype = $event.id" (removed)="shipment.mbltype = null"
                               (typed)="typed($event)" placeholder="Select option">
                         </ng-select>
@@ -103,7 +104,8 @@
                         </label>
                         <div class="dropdown e--combogrid" #selectedColoader>
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedColoader.value == null?'Please selected coloader':selectedColoader.value">
+                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedColoader.value == null?'Please selected coloader':selectedColoader.value"
+                                  formControlName="coloaderName" [(ngModel)]="shipment.coloaderName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
@@ -162,7 +164,7 @@
                         <label class="form-control-label" for="">
                             Services type <span class="m--font-danger">(*)</span>
                         </label>
-                        <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                        <ng-select [allowClear]="true" [items]="serviceTypes" [active]="servicetypeActive" [disabled]="disabled" (data)="refreshValue($event)"
                               (selected)="shipment.typeOfService = $event.id" (removed)="shipment.typeOfService = null"
                               (typed)="typed($event)" placeholder="Select service type">
                         </ng-select>
@@ -178,7 +180,8 @@
                         </label>
                         <div class="dropdown e--combogrid" #selectedAgent>
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedAgent.value == null?'Please selected agent':selectedAgent.value">
+                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedAgent.value == null?'Please selected agent':selectedAgent.value"
+                                  formControlName="agentName" [(ngModel)]="shipment.agentName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
@@ -229,14 +232,15 @@
                         </label>
                         <div class="dropdown e--combogrid" #selectedPOL>
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedPOL.value == null?'Please selected port of loading':selectedPOL.value">
+                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedPOL.value == null?'Please selected port of loading':selectedPOL.value"
+                                  formControlName="polName" [(ngModel)]="shipment.polName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
                                         <div class="table-filter-block">
                                             <div class="search-field">
                                                   <input class="form-control m-input m-input--square" type="text"
-                                                      placeholder="Search..." (keyup)="changePort($event.target.value, true)">
+                                                      placeholder="Search..." (keyup)="changePort($event.target.value)">
                                                 <i class="icon-search"></i>
                                             </div>
                                         </div>
@@ -279,14 +283,15 @@
                         </label>
                         <div class="dropdown e--combogrid" #selectedPOD>
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedPOD.value == null?'Please selected port of loading':selectedPOD.value">
+                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedPOD.value == null?'Please selected port of loading':selectedPOD.value"
+                                  formControlName="podName" [(ngModel)]="shipment.podName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
                                         <div class="table-filter-block">
                                             <div class="search-field">
                                                   <input class="form-control m-input m-input--square" type="text"
-                                                      placeholder="Search..." (keyup)="changePort($event.target.value, false)">
+                                                      placeholder="Search..." (keyup)="changePort($event.target.value)">
                                                 <i class="icon-search"></i>
                                             </div>
                                         </div>
@@ -324,7 +329,7 @@
                         <label class="form-control-label" for="">
                             Term <span class="m--font-danger">(*)</span>
                         </label>
-                        <ng-select [allowClear]="true" [items]="terms" [disabled]="disabled" (data)="refreshValue($event)"
+                        <ng-select [allowClear]="true" [items]="terms" [disabled]="disabled" (data)="refreshValue($event)" [active]="paymentTermActive"
                               (selected)="shipment.paymentTerm = $event.id" (removed)="shipment.paymentTerm = null"
                               (typed)="typed($event)" placeholder="Select option">
                         </ng-select>
@@ -360,7 +365,7 @@
                         <label class="form-control-label" for="">
                             Shipment type <span class="m--font-danger">(*)</span>
                         </label>
-                        <ng-select [allowClear]="true" [items]="shipmentTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                        <ng-select [allowClear]="true" [items]="shipmentTypes" [disabled]="disabled" (data)="refreshValue($event)" [active]="shimentTypeActive"
                               (selected)="shipment.shipmentType = $event.id" (removed)="shipment.shipmentType = null"
                               (typed)="typed($event)" placeholder="Select option">
                         </ng-select>
@@ -386,7 +391,8 @@
                         </label>
                         <div class="dropdown e--combogrid" #selectedPersonInCharge>
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedPersonInCharge.value == null?'Please selected person in charge':selectedPersonInCharge.value">
+                                  data-toggle="dropdown" placeholder="combogrid" [value]="selectedPersonInCharge.value == null?'Please selected person in charge':selectedPersonInCharge.value"
+                                  formControlName="personInChargeName" [(ngModel)]="shipment.personInChargeName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">

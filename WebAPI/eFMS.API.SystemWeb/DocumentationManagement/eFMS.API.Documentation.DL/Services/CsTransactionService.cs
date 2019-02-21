@@ -80,6 +80,10 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<vw_csTransaction> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
             var list = Query(criteria);
+            if (list == null)
+            {
+                rowsCount = 0; return list;
+            }
             rowsCount = list.Count();
             if (size > 1)
             {
@@ -98,7 +102,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<vw_csTransaction> results = null;
             if (criteria.All == null)
             {
-                var query = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                results = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.MAWB ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -110,8 +114,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.ETD ?? null) >= (criteria.FromDate ?? null))
                     && ((x.ETD ?? null) <= (criteria.ToDate ?? null))
-                    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).ToList();
-                results = query.AsQueryable();
+                    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).AsQueryable();
             }
             else
             {

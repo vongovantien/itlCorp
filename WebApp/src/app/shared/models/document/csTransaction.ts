@@ -11,11 +11,15 @@ export class CsTransaction {
   eta: Date = null;
   mbltype: String = null;
   coloaderId: String = null;
+  coloaderName: String = null;
   bookingNo: String = null;
   shippingServiceType: String = null;
   agentId: String = null;
+  agentName: String = null;
   pol: String = null;
+  polName: String = null;
   pod: String = null;
+  podName: String = null;
   paymentTerm: String = null;
   loadingDate: Date = null;
   requestedDate: Date = null;
@@ -28,6 +32,7 @@ export class CsTransaction {
   invoiceNo: String = null;
   pono: String = null;
   personIncharge: String = null;
+  personInChargeName: String = null;
   deliveryPoint: String = null;
   routeShipment: String = null;
   quantity: Number = null;

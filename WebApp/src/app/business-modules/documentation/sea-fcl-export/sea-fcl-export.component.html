@@ -355,7 +355,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
+                                    <a class="btn-link" routerLink="/home/documentation/sea-fcl-export-create" (click)="showDetail(item)">
                                         <span>
                                             {{ item.jobNo }}
                                         </span>
@@ -471,7 +471,7 @@
                             <!--end of collapse-panel-row -->
                         </ng-container>
                     </tbody>
-                    <tbody *ngIf="shipments.length == 0">
+                    <tbody *ngIf="shipments == null">
                         <tr>
                             <td colspan="14">
                                 <div class="no-data">

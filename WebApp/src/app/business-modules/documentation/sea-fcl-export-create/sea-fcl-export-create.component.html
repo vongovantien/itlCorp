@@ -62,13 +62,13 @@
                 <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
                     <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link active" id="masterbill-tablink" data-toggle="tab"
-                            href="#masterbill-tabview-tab" role="tab" (click)="switchTab(shipment.id)">
+                            href="#masterbill-tabview-tab" role="tab" (click)="switchTab()">
                             Shipment detail
                         </a>
                     </li>
                     <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" id="housebill-tablink" data-toggle="modal"
-                            href="{{housebillTabviewHref}}" role="modal" (click)="switchTab(shipment.id)">
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" [attr.data-toggle] ="housebillRoleToggle"
+                            href="{{housebillTabviewHref}}" [attr.role]="housebillRoleToggle" (click)="switchTab()">
                             House Bill List
                         </a>
                     </li>
@@ -78,7 +78,7 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <app-master-bill [formAddEdit]="myForm" [submitted]="submitted"></app-master-bill>
+                <app-master-bill [shipment]="shipment" [formAddEdit]="myForm" [submitted]="submitted"></app-master-bill>
                 <!--begin:: m-portlet-->
 
                 <!--end:: m-portlet-->
@@ -94,11 +94,11 @@
                             </div>
                         </div>
                         <div class="m-portlet__head-tools">
-                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSumContainer()">
                                 <span>
                                     <i class="la la-refresh"></i>
                                     <span>
-                                        Reset
+                                        Refresh
                                     </span>
                                 </span>
                             </button>
@@ -494,7 +494,7 @@
                                                             type="text" readonly data-toggle="dropdown"
                                                             placeholder="Please selected"
                                                             [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value"
-                                                            [(ngModel)]="selectedCommodityValue"
+                                                            [(ngModel)]="container.commodityName"
                                                             name="selectedCommodityValue">
                                                         <div
                                                             class="dropdown-menu  dropdown-menu-right e--combogrid-content">

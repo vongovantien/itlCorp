@@ -5,6 +5,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-sea-fcl-export',
@@ -25,6 +26,7 @@ export class SeaFCLExportComponent implements OnInit {
     pager: PagerSetting = PAGINGSETTING;
 
     constructor(private baseServices: BaseService,
+        private router:Router,
         private api_menu: API_MENU) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
@@ -122,7 +124,10 @@ export class SeaFCLExportComponent implements OnInit {
         this.pager.pageSize = pager.pageSize;
         this.pager.totalPages = pager.totalPages;
         await this.getShipments();
-      }
+    }
+    showDetail(item: { id: any; }){
+        this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: item.id }]);
+    }
     /**
        * Daterange picker
        */
