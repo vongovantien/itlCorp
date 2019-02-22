@@ -290,6 +290,9 @@ ul {
             &.invalid-row {
                 background-color: #ffe3e4;
             }
+            &.selected-row {
+                background-color: #e3f1fc;
+            }
             .collapsed .la-angle-up:before {
                 content: "\f110";
             }
