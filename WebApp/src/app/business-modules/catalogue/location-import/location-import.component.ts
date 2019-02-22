@@ -156,7 +156,7 @@ export class LocationImportComponent implements OnInit {
     }
       var response = await this.baseService.postAsync(url, data);
       if(response){
-        this.baseService.successToast(language.NOTIFI_MESS.EXPORT_SUCCES);
+        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
         this.reset();
       }
@@ -170,6 +170,8 @@ export class LocationImportComponent implements OnInit {
     //this.form.nativeElement.onReset();
     this.pager.totalItems = 0;
   }
+
+
   isDesc = true;
   sortKey: string;
   sort(property: string){

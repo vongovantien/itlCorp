@@ -15,6 +15,9 @@ namespace eFMS.API.Documentation.Service.Models
         public string ShipperId { get; set; }
         public string ConsigneeDescription { get; set; }
         public string ConsigneeId { get; set; }
+        public string Commodity { get; set; }
+        public string PackageContainer { get; set; }
+        public string DesOfGoods { get; set; }
         public string NotifyPartyDescription { get; set; }
         public string NotifyPartyId { get; set; }
         public string CustomsBookingNo { get; set; }
@@ -48,5 +51,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }

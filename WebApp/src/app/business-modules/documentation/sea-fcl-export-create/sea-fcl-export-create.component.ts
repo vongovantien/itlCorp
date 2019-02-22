@@ -155,7 +155,8 @@ export class SeaFclExportCreateComponent implements OnInit {
             packageContainer: '',
             //desOfGoods: '',
             allowEdit: true,
-            isNew: true
+            isNew: true,
+            verifying:false
         };
         return container;
     }
@@ -206,6 +207,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
+                this.shipment.csMawbcontainers = this.lstMasterContainers;
             }
         }
         this.housebillTabviewHref = "#housebill-tabview-tab";
@@ -234,6 +236,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.lstMasterContainers.splice(index, 1);
     }
     saveNewContainer(index: any){
+        this.lstMasterContainers[index].verifying = true;
         if(this.containerMasterForm.invalid) return;
         //Cont Type, Cont Q'ty, Container No, Package Type
         let existedItem = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId 
@@ -253,6 +256,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
         this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
     }
+
+    
     cancelNewContainer(index: number){
         if(this.lstMasterContainers[index].isNew == true){
             this.lstMasterContainers.splice(index, 1);
@@ -291,7 +296,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                     this.shipment.desOfGoods = this.shipment.desOfGoods + (this.lstMasterContainers[i].description== ""?"": this.lstMasterContainers[i].description + ", ");
                 }
             }
-            //this.shipment.csMawbcontainers = this.lstMasterContainers;
+                 this.shipment.csMawbcontainers = this.lstMasterContainers;
         }
     }
     searchContainer(keySearch: any){

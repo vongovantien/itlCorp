@@ -50,13 +50,9 @@ export class MasterBillComponent implements OnInit{
         await this.getShipmentCommonData();
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             this.inEditing = true;
-           
-            this.etdSelected.start = moment(this.shipment.etd); // this.shipment.etd;
-            this.etdSelected.end = moment(this.shipment.etd); // this.shipment.etd;
-            this.etaSelected.start = moment(this.shipment.eta);
-            this.etaSelected.end = moment(this.shipment.eta);
-            console.log({"ETD":this.etdSelected});
-            console.log({"ETA":this.etaSelected});
+            console.log(this.shipment.etd);
+            this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
+            this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
             let index = this.billOfLadingTypes.findIndex(x => x.id == this.shipment.mbltype);
             if(index > -1) this.billOfLadingTypeActive = [this.billOfLadingTypes[index]];
             index = this.serviceTypes.findIndex(x => x.id == this.shipment.typeOfService);

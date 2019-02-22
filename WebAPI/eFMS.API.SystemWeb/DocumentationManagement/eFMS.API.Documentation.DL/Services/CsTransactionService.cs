@@ -77,23 +77,73 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public IQueryable<vw_csTransaction> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount)
+        public List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
+            var results = new List<CsTransactionModel>();
             var list = Query(criteria);
             if (list == null)
             {
-                rowsCount = 0; return list;
+                rowsCount = 0; return results;
             }
-            rowsCount = list.Count();
+            var tempList = list.GroupBy(x => new CsTransactionModel { Id = x.ID,
+                                BranchId = x.BranchID,
+                                JobNo = x.JobNo,
+                                Mawb = x.MAWB,
+                                TypeOfService = x.TypeOfService,
+                                Etd = x.ETD,
+                                Eta = x.ETA,
+                                Mbltype = x.MBLType,
+                                ColoaderId = x.ColoaderID,
+                                BookingNo = x.BookingNo,
+                                ShippingServiceType = x.ShippingServiceType,
+                                AgentId = x.AgentID,
+                                Pol = x.POL,
+                                Pod = x.POD,
+                                PaymentTerm = x.PaymentTerm,
+                                LoadingDate = x.LoadingDate,
+                                RequestedDate = x.RequestedDate,
+                                FlightVesselName = x.FlightVesselName,
+                                VoyNo = x.VoyNo,
+                                FlightVesselConfirmedDate = x.FlightVesselConfirmedDate,
+                                ShipmentType = x.ShipmentType,
+                                ServiceMode = x.ServiceMode,
+                                Commodity = x.Commodity,
+                                InvoiceNo = x.InvoiceNo,
+                                Pono = x.PONo,
+                                PersonIncharge = x.PersonIncharge,
+                                DeliveryPoint = x.DeliveryPoint,
+                                RouteShipment = x.RouteShipment,
+                                Notes = x.Notes,
+                                Locked = x.Locked,
+                                LockedDate = x.LockedDate,
+                                UserCreated = x.UserCreated,
+                                CreatedDate = x.CreatedDate,
+                                UserModified = x.UserModified,
+                                ModifiedDate = x.ModifiedDate,
+                                Inactive = x.Inactive,
+                                InactiveOn = x.InactiveOn,
+                                SupplierName = x.SupplierName,
+                                AgentName = x.AgentName,
+                                PODName = x.PODName,
+                                POLName = x.POLName,
+                                CreatorName = x.CreatorName,
+                                SumCont = x.SumCont,
+                                SumCBM = x.SumCBM
+                            });
+            rowsCount = tempList.Count();
             if (size > 1)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                list = list.Skip((page - 1) * size).Take(size);
+                tempList = tempList.Skip((page - 1) * size).Take(size);
+                foreach(var item in tempList)
+                {
+                    results.Add(item.Key);
+                }
             }
-            return list;
+            return results;
         }
 
         public IQueryable<vw_csTransaction> Query(CsTransactionCriteria criteria)
