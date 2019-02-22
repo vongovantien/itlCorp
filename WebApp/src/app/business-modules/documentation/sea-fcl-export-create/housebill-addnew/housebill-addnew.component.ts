@@ -24,13 +24,13 @@ declare var $: any;
   styleUrls: ['./housebill-addnew.component.scss']
 })
 export class HousebillAddnewComponent implements OnInit {
-  
-  MasterBillData : CsTransaction = null;
-  @Input() set masterBillData(_masterBilData:CsTransaction){   
+
+  MasterBillData: CsTransaction = null;
+  @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
     this.HouseBillToAdd.jobId = this.MasterBillData.jobNo;
   }
-  
+
   pager: PagerSetting = PAGINGSETTING;
 
   listContainerTypes: any[] = [];
@@ -50,7 +50,7 @@ export class HousebillAddnewComponent implements OnInit {
   listTypeOfMove: any = [];
   listTypeOfService: any = [];
   customerSaleman: any = null;
-  extend_data:any= {};
+  extend_data: any = {};
 
   /**
    * House Bill Variables 
@@ -59,7 +59,7 @@ export class HousebillAddnewComponent implements OnInit {
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
   ListHouseBill: any = ["gggg"];
   ListContainers: Array<Container> = [new Container()];
-  @Output() houseBillComing = new EventEmitter<{data:CsTransactionDetail,extend_data:any}>();
+  @Output() houseBillComing = new EventEmitter<{ data: CsTransactionDetail, extend_data: any }>();
 
 
   constructor(
@@ -248,7 +248,7 @@ export class HousebillAddnewComponent implements OnInit {
 
 
 
-  
+
 
   /**
     * Daterange picker
@@ -303,15 +303,15 @@ export class HousebillAddnewComponent implements OnInit {
   isDisplay = true;
   save(form: NgForm) {
     if (form.valid) {
-      this.houseBillComing.emit({data:this.HouseBillToAdd,extend_data:this.extend_data});
+      this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
       this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
       this.resetForm();
       $('#add-house-bill-modal').modal('hide');
     }
   }
 
-  resetForm(){    
-    this.HouseBillToAdd = new CsTransactionDetail(); 
+  resetForm() {
+    this.HouseBillToAdd = new CsTransactionDetail();
     this.HouseBillToAdd.jobId = this.MasterBillData.jobNo;
     this.customerSaleman = null;
     this.isDisplay = false;
@@ -335,122 +335,151 @@ export class HousebillAddnewComponent implements OnInit {
   async getContainerTypes() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
     if (responses != null) {
-        this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+      this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
     }
-}
-async getWeightTypes() {
+  }
+  async getWeightTypes() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
     if (responses != null) {
-        this.weightMesurements = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-        console.log(this.weightMesurements);
+      this.weightMesurements = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+      console.log(this.weightMesurements);
     }
-}
-async getPackageTypes() {
+  }
+  async getPackageTypes() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
     if (responses != null) {
-        this.packageTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-        console.log(this.packageTypes);
+      this.packageTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+      console.log(this.packageTypes);
     }
-}
-async getComodities() {
+  }
+  async getComodities() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
     this.commodities = responses;
     console.log(this.commodities);
-}
-
-addNewContainer() {
-  let hasItemEdited = false;
-  for(let i=0; i< this.lstHouseBillContainers.length; i++){
-      if(this.lstHouseBillContainers[i].allowEdit == true){
-          hasItemEdited = true;
-          break;
-      }
   }
-  if(hasItemEdited == false){
+
+  addNewContainer() {
+    let hasItemEdited = false;
+    for (let i = 0; i < this.lstHouseBillContainers.length; i++) {
+      if (this.lstHouseBillContainers[i].allowEdit == true) {
+        hasItemEdited = true;
+        break;
+      }
+    }
+    if (hasItemEdited == false) {
       console.log(this.containerListForm);
       //this.containerMasterForm.onReset();      
       this.lstHouseBillContainers.push(this.initNewContainer());
-  }
-  else{
+    }
+    else {
       this.baseServices.errorToast("Current container must be save!!!");
+    }
+
+    console.log(this.lstHouseBillContainers);
   }
 
-  console.log(this.lstHouseBillContainers);
-}
+  saveNewContainer(index: number, form: NgForm) {
+    this.lstHouseBillContainers[index].verifying = true;
+    if (this.containerListForm.invalid) return;
 
-saveNewContainer(index:number,form:NgForm){
-  this.lstHouseBillContainers[index].verifying = true;
-  if(this.containerListForm.invalid) return;
-  //Cont Type, Cont Q'ty, Container No, Package Type
-  let existedItem = this.lstHouseBillContainers.filter(x => x.containerTypeId == this.lstHouseBillContainers[index].containerTypeId 
+    if(this.compareContainerList(this.lstHouseBillContainers[index],this.MasterBillData.csMawbcontainers)!=true){
+
+      this.baseServices.errorToast(
+        "The Cont qty value you entered will make the Total Container number of all HBL exceeded the Container number of Shipment detail. Please recheck and try again !",
+        "Cannot save container detail");
+      return;
+    }
+
+    //Cont Type, Cont Q'ty, Container No, Package Type
+    let existedItem = this.lstHouseBillContainers.filter(x => x.containerTypeId == this.lstHouseBillContainers[index].containerTypeId
       && x.quantity == this.lstHouseBillContainers[index].quantity
       && x.containerNo == this.lstHouseBillContainers[index].containerNo
       && x.packageTypeId == this.lstHouseBillContainers[index].packageTypeId);
-      console.log(existedItem)
-  if(existedItem.length > 1) { 
+    console.log(existedItem)
+    if (existedItem.length > 1) {
       this.baseServices.errorToast("This container has been existed");
       return;
-  }
-  else{
-      if(this.lstHouseBillContainers[index].isNew == true) this.lstHouseBillContainers[index].isNew = false;
+    }
+    else {
+      if (this.lstHouseBillContainers[index].isNew == true) this.lstHouseBillContainers[index].isNew = false;
       this.lstHouseBillContainers[index].verifying = false;
       this.lstHouseBillContainers[index].allowEdit = false;
-      this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }]: [];
-      this.lstHouseBillContainers[index].packageTypeActive = this.lstHouseBillContainers[index].packageTypeId != null? [{ id: this.lstHouseBillContainers[index].packageTypeId, text: this.lstHouseBillContainers[index].packageTypeName }]: [];
-      this.lstHouseBillContainers[index].unitOfMeasureActive = this.lstHouseBillContainers[index].unitOfMeasureId!= null? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }]: [];
-     
-  }
-  // this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
-}
+      this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null ? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }] : [];
+      this.lstHouseBillContainers[index].packageTypeActive = this.lstHouseBillContainers[index].packageTypeId != null ? [{ id: this.lstHouseBillContainers[index].packageTypeId, text: this.lstHouseBillContainers[index].packageTypeName }] : [];
+      this.lstHouseBillContainers[index].unitOfMeasureActive = this.lstHouseBillContainers[index].unitOfMeasureId != null ? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }] : [];
 
-totalGrossWeight:number ;
-totalNetWeight:number;
-totalCharWeight:number;
-totalCBM:number;
-numberOfTimeSaveContainer:number = 0;
-onSubmitContainer() {
-  console.log(this.MasterBillData)
-  this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
-  if (this.containerListForm.valid) {
+    }
+    // this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
+  }
+
+
+  compareContainerList(currentContainer: Container, masterBillContainerList: Container[]): Boolean {
+    masterBillContainerList = lodash.filter(masterBillContainerList, function (o: Container) {
+      return o.containerTypeId == currentContainer.containerTypeId;
+    });
+    
+    const listHBWithCurrentContainerType = lodash.filter(this.lstHouseBillContainers,function(o:Container){
+      return o.containerTypeId == currentContainer.containerTypeId;
+    });
+
+    const totalHBContainer = listHBWithCurrentContainerType.length==0 ? 0 : listHBWithCurrentContainerType.map(x=>x.quantity).reduce((a,c)=>a+c);
+    const totalMasterContainer = masterBillContainerList.length==0 ? 0: masterBillContainerList.map(x => x.quantity).reduce((a, c) => a + c);
+    if (totalHBContainer > totalMasterContainer) {
+      return false;
+    } else {
+      return true;
+    }
+
+  }
+
+  totalGrossWeight: number;
+  totalNetWeight: number;
+  totalCharWeight: number;
+  totalCBM: number;
+  numberOfTimeSaveContainer: number = 0;
+  onSubmitContainer() {
+    console.log(this.MasterBillData)
+    this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
+    if (this.containerListForm.valid) {
       this.totalGrossWeight = 0;
       this.totalNetWeight = 0;
       this.totalCharWeight = 0;
-      this.totalCBM = 0;      
+      this.totalCBM = 0;
       this.HouseBillToAdd.commodity = '';
       this.HouseBillToAdd.desOfGoods = '';
       this.HouseBillToAdd.packageContainer = '';
       for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
-          this.lstHouseBillContainers[i].isSave = true;
-          this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
-          this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
-          this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
-          this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
-          this.HouseBillToAdd.packageContainer = this.HouseBillToAdd.packageContainer + (this.lstHouseBillContainers[i].quantity == ""?"": this.lstHouseBillContainers[i].quantity + "x" +this.lstHouseBillContainers[i].containerTypeName + ", ");
-          if(this.numberOfTimeSaveContainer == 1){
-              this.HouseBillToAdd.commodity = this.HouseBillToAdd.commodity + (this.lstHouseBillContainers[i].commodityName== ""?"": this.lstHouseBillContainers[i].commodityName + ", ");
-              this.HouseBillToAdd.desOfGoods = this.HouseBillToAdd.desOfGoods + (this.lstHouseBillContainers[i].description== ""?"": this.lstHouseBillContainers[i].description + ", ");
-          }
+        this.lstHouseBillContainers[i].isSave = true;
+        this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
+        this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
+        this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
+        this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
+        this.HouseBillToAdd.packageContainer = this.HouseBillToAdd.packageContainer + (this.lstHouseBillContainers[i].quantity == "" ? "" : this.lstHouseBillContainers[i].quantity + "x" + this.lstHouseBillContainers[i].containerTypeName + ", ");
+        if (this.numberOfTimeSaveContainer == 1) {
+          this.HouseBillToAdd.commodity = this.HouseBillToAdd.commodity + (this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ", ");
+          this.HouseBillToAdd.desOfGoods = this.HouseBillToAdd.desOfGoods + (this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ", ");
+        }
       }
       //this.shipment.csMawbcontainers = this.lstMasterContainers;
       $('#container-list-of-job-modal-house').modal('hide');
+    }
   }
-}
 
-removeAContainer(index: number){
-  this.lstHouseBillContainers.splice(index, 1);
-}
-cancelNewContainer(index: number){
-  if(this.lstHouseBillContainers[index].isNew == true){
+  removeAContainer(index: number) {
+    this.lstHouseBillContainers.splice(index, 1);
+  }
+  cancelNewContainer(index: number) {
+    if (this.lstHouseBillContainers[index].isNew == true) {
       this.lstHouseBillContainers.splice(index, 1);
-  }
-  else{
+    }
+    else {
       this.lstHouseBillContainers[index].allowEdit = false;
+    }
   }
-}
 
 
-initNewContainer(){
-  var container = {
+  initNewContainer() {
+    var container = {
       containerTypeId: null,
       containerTypeName: '',
       containerTypeActive: [],
@@ -470,26 +499,26 @@ initNewContainer(){
       description: '',
       gw: null,
       nw: null,
-      chargeAbleWeight :null,
+      chargeAbleWeight: null,
       cbm: null,
       packageContainer: '',
       //desOfGoods: '',
       allowEdit: true,
       isNew: true,
-      verifying:false
-  };
-  return container;
-}
+      verifying: false
+    };
+    return container;
+  }
 
-changeEditStatus(index: any){
-  if(this.lstHouseBillContainers[index].allowEdit == false){
+  changeEditStatus(index: any) {
+    if (this.lstHouseBillContainers[index].allowEdit == false) {
       this.lstHouseBillContainers[index].allowEdit = true;
-  }
-  else{
+    }
+    else {
       this.lstHouseBillContainers[index].allowEdit = false;
+    }
   }
-}
 
- 
+
 
 }
