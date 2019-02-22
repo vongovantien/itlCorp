@@ -277,21 +277,23 @@ export class SeaFclExportCreateComponent implements OnInit {
     onSubmitContainer() {
         this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
         if (this.containerMasterForm.valid) {
-            this.totalGrossWeight = 0;
-            this.totalNetWeight = 0;
-            this.totalCharWeight = 0;
-            this.totalCBM = 0;
-            this.shipment.commodity = '';
-            this.shipment.desOfGoods = '';
-            this.shipment.packageContainer = '';
+            if(this.numberOfTimeSaveContainer == 1){
+                this.totalGrossWeight = 0;
+                this.totalNetWeight = 0;
+                this.totalCharWeight = 0;
+                this.totalCBM = 0;
+                this.shipment.commodity = '';
+                this.shipment.desOfGoods = '';
+                this.shipment.packageContainer = '';
+            }
             for (var i = 0; i < this.lstMasterContainers.length; i++) {
                 this.lstMasterContainers[i].isSave = true;
                 this.totalGrossWeight = this.totalGrossWeight + this.lstMasterContainers[i].gw;
                 this.totalNetWeight = this.totalNetWeight + this.lstMasterContainers[i].nw;
                 this.totalCharWeight = this.totalCharWeight + this.lstMasterContainers[i].chargeAbleWeight;
                 this.totalCBM = this.totalCBM + this.lstMasterContainers[i].cbm;
-                this.shipment.packageContainer = this.shipment.packageContainer + (this.lstMasterContainers[i].quantity == ""?"": this.lstMasterContainers[i].quantity + "x" +this.lstMasterContainers[i].containerTypeName + ", ");
                 if(this.numberOfTimeSaveContainer == 1){
+                    this.shipment.packageContainer = this.shipment.packageContainer + (this.lstMasterContainers[i].quantity == ""?"": this.lstMasterContainers[i].quantity + "x" +this.lstMasterContainers[i].containerTypeName + ", ");
                     this.shipment.commodity = this.shipment.commodity + (this.lstMasterContainers[i].commodityName== ""?"": this.lstMasterContainers[i].commodityName + ", ");
                     this.shipment.desOfGoods = this.shipment.desOfGoods + (this.lstMasterContainers[i].description== ""?"": this.lstMasterContainers[i].description + ", ");
                 }
