@@ -301,9 +301,10 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   isDisplay = true;
-  save(form: NgForm) {
+  async save(form: NgForm) {
     if (form.valid) {
       this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
+      await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew,this.HouseBillToAdd);
       this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
       this.resetForm();
       $('#add-house-bill-modal').modal('hide');

@@ -233,7 +233,8 @@ export class API_MENU {
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/"
         },
         CsTransactionDetail: {
-            getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob"
+            getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/addNew"
         }
     }
 }

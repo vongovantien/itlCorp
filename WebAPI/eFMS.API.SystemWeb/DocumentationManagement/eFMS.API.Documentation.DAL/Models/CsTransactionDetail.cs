@@ -45,6 +45,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string PurchaseOrderNo { get; set; }
         public string ServiceType { get; set; }
         public string ShippingMark { get; set; }
+        public bool? Inactive { get; set; }
+        public DateTime? InactiveOn { get; set; }
         public string InWord { get; set; }
         public string OnBoardStatus { get; set; }
         public string UserCreated { get; set; }
@@ -52,6 +54,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
 
-        public virtual CsTransaction Job { get; set; }
+      //  public virtual CsTransaction Job { get; set; }
     }
 }

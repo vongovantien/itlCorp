@@ -1278,15 +1278,15 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.ContainerType)
-                    .WithMany(p => p.CsMawbcontainerContainerType)
-                    .HasForeignKey(d => d.ContainerTypeId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit1");
+                //entity.HasOne(d => d.ContainerType)
+                //    .WithMany(p => p.CsMawbcontainerContainerType)
+                //    .HasForeignKey(d => d.ContainerTypeId)
+                //    .HasConstraintName("FK_csMAWBContainer_catUnit1");
 
-                entity.HasOne(d => d.UnitOfMeasure)
-                    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
-                    .HasForeignKey(d => d.UnitOfMeasureId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit");
+                //entity.HasOne(d => d.UnitOfMeasure)
+                //    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
+                //    .HasForeignKey(d => d.UnitOfMeasureId)
+                //    .HasConstraintName("FK_csMAWBContainer_catUnit");
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -1834,6 +1834,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.InWord).HasMaxLength(4000);
 
+                entity.Property(e => e.InactiveOn).HasColumnType("smalldatetime");
+
                 entity.Property(e => e.IssueHblplaceAndDate)
                     .HasColumnName("IssueHBLPlaceAndDate")
                     .HasMaxLength(4000);
@@ -1903,11 +1905,11 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
+                //entity.HasOne(d => d.Job)
+                //    .WithMany(p => p.CsTransactionDetail)
+                //    .HasForeignKey(d => d.JobId)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<SysAuthorization>(entity =>

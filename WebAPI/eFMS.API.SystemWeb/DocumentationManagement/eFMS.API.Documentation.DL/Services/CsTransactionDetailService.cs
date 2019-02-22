@@ -3,8 +3,11 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Shipment.Service.Helpers;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +17,36 @@ namespace eFMS.API.Documentation.DL.Services
     {
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository, IMapper mapper) : base(repository, mapper)
         {
+        }
+
+        public HandleState AddTransactionDetail(CsTransactionDetailModel model)
+        {
+           
+            model.Id = Guid.NewGuid();
+            model.Inactive = false;
+            model.UserCreated = "thor";  //ChangeTrackerHelper.currentUser;
+            model.DatetimeCreated = DateTime.Now;
+
+            try
+            {
+                DataContext.Add(model);
+                foreach(var x in model.CsMawbcontainers)
+                {
+                    x.Hblid = model.Id;
+                    x.Id = Guid.NewGuid();
+                    x.Mblid = model.JobId;
+                    ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);
+                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                }
+                var hs = new HandleState();
+                return hs;
+
+            }
+            catch(Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
         }
 
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)

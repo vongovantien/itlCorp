@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICsTransactionDetailService : IRepositoryBase<CsTransactionDetail, CsTransactionDetailModel>
     {
         IQueryable<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
+
         List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria);
+        HandleState AddTransactionDetail(CsTransactionDetailModel model);
     }
 }
