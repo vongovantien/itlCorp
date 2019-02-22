@@ -54,6 +54,6 @@ export class CsTransaction {
   inactiveOn: Date = null;
   packageContainer: string = '';
   desOfGoods: string = '';
-  csMawbcontainers: Container[] = '';
+  csMawbcontainers: Container[] = null;
   csTransactionDetails: CsTransactionDetail[] = null;
 }

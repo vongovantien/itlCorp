@@ -27,6 +27,8 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ShipmentType { get; set; }
         public string ServiceMode { get; set; }
         public string Commodity { get; set; }
+        public string DesOfGoods { get; set; }
+        public string PackageContainer { get; set; }
         public string InvoiceNo { get; set; }
         public string PONo { get; set; }
         public string PersonIncharge { get; set; }
@@ -55,8 +57,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string CustomerID { get; set; }
         public string NotifyPartyID { get; set; }
         public string SaleManID { get; set; }
-        public string SealNo { get; set; }
-        public string ContainerNo { get; set; }
         public string PODName { get; set; }
         public string POLName { get; set; }
         public string CreatorName { get; set; }
