@@ -29,7 +29,7 @@ namespace eFMS.API.Documentation.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
-                int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Date == DateTime.Now.Date);
+                int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month);
                 transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
                 transaction.UserCreated = "01";
                 transaction.CreatedDate = DateTime.Now;
