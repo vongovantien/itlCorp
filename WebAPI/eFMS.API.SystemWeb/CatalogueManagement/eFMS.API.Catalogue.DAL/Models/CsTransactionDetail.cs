@@ -5,34 +5,53 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CsTransactionDetail
     {
-        public string JobId { get; set; }
-        public string LotNo { get; set; }
+        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
         public string Hwbno { get; set; }
+        public string Hbltype { get; set; }
+        public string CustomerId { get; set; }
+        public string SaleManId { get; set; }
+        public string ShipperDescription { get; set; }
         public string ShipperId { get; set; }
-        public string SalesManId { get; set; }
-        public bool? ShipmentType { get; set; }
-        public string BookingCustomsNo { get; set; }
-        public string ReceiptAt { get; set; }
-        public string Deliveryat { get; set; }
-        public DateTime? Etd { get; set; }
-        public DateTime? Eta { get; set; }
-        public double? Qty { get; set; }
-        public string Unit { get; set; }
-        public double? GrossWeight { get; set; }
-        public double? ChargeWeight { get; set; }
-        public double? Cbm { get; set; }
-        public double? TotalSellingRate { get; set; }
-        public double? TotalBuyingRate { get; set; }
-        public double? TotalOtherCredit { get; set; }
-        public double? TotalOtherDebit { get; set; }
-        public double? TotalProfitShared { get; set; }
-        public string Attn { get; set; }
-        public string NominationParty { get; set; }
-        public string Notes { get; set; }
+        public string ConsigneeDescription { get; set; }
+        public string ConsigneeId { get; set; }
+        public string Commodity { get; set; }
+        public string PackageContainer { get; set; }
+        public string DesOfGoods { get; set; }
+        public string NotifyPartyDescription { get; set; }
+        public string NotifyPartyId { get; set; }
+        public string CustomsBookingNo { get; set; }
+        public string LocalVoyNo { get; set; }
+        public string OceanVoyNo { get; set; }
+        public short? OriginCountryId { get; set; }
+        public string PickupPlace { get; set; }
+        public Guid Pol { get; set; }
+        public Guid Pod { get; set; }
+        public string DeliveryPlace { get; set; }
+        public string FinalDestinationPlace { get; set; }
+        public string FreightPayment { get; set; }
+        public string PlaceFreightPay { get; set; }
+        public DateTime ClosingDate { get; set; }
+        public DateTime SailingDate { get; set; }
+        public string ForwardingAgentDescription { get; set; }
+        public string ForwardingAgentId { get; set; }
+        public string GoodsDeliveryDescription { get; set; }
+        public string GoodsDeliveryId { get; set; }
+        public int? OriginBlnumber { get; set; }
+        public string IssueHblplaceAndDate { get; set; }
+        public string ReferenceNo { get; set; }
+        public string ExportReferenceNo { get; set; }
+        public string MoveType { get; set; }
+        public string PurchaseOrderNo { get; set; }
+        public string ServiceType { get; set; }
+        public string ShippingMark { get; set; }
+        public string InWord { get; set; }
+        public string OnBoardStatus { get; set; }
         public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string ContainerSize { get; set; }
+        public DateTime? DatetimeModified { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }
