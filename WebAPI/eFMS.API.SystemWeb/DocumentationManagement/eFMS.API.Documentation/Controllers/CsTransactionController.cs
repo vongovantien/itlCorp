@@ -52,8 +52,8 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
-        
-        [HttpGet]
+
+        [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
             var data = csTransactionService.Get(x => x.Id == id).FirstOrDefault();

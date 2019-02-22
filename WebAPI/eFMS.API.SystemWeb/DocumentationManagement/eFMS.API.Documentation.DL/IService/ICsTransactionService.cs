@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICsTransactionService : IRepositoryBase<CsTransaction, CsTransactionModel>
     {
         IQueryable<vw_csTransaction> Query(CsTransactionCriteria criteria);
-        IQueryable<vw_csTransaction> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
+        List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
         object AddCSTransaction(CsTransactionEditModel model);
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
     }

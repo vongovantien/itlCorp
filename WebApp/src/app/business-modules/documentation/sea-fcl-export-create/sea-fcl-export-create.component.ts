@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 // import { PaginationComponent } from 'ngx-bootstrap';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -11,7 +11,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 declare var $: any;
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
-declare var $: any;
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -42,7 +42,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         typeButton: ButtonType.save
     };
     //
-    housebillTabviewHref= '#confirm-create-job-modal';
+    housebillTabviewHref = '#confirm-create-job-modal';
+    housebillRoleToggle = 'modal';
      /**
         * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
         * this method imporove performance for web when detecting change 
@@ -50,7 +51,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         * https://blog.bitsrc.io/boosting-angular-app-performance-with-local-change-detection-8a6a3afa8d4d
         *
       */
-    switchTab(id: string){
+    switchTab(){
         this.cdr.detach();
         setTimeout(() => {
             this.cdr.reattach();
@@ -67,33 +68,23 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
     constructor(private baseServices: BaseService,
+        private route:ActivatedRoute,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
-        this.myForm = this.fb.group({
-            jobId: new FormControl({value: '', disabled: true}),
-            estimatedTimeofDepature: new FormControl('', Validators.required),
-            estimatedTimeofArrived: new FormControl(''),
-            mawb: new FormControl('', Validators.required),
-            //mbltype: new FormControl(null, Validators.required),
-            coloaderId: new FormControl(''),
-            bookingNo: new FormControl(''),
-            //typeOfService: new FormControl(null, Validators.required),
-            flightVesselName: new FormControl(''),
-            agentId: new FormControl(null),
-            pol: new FormControl(null, Validators.required),
-            pod: new FormControl(null),
-            //paymentTerm: new FormControl(''),
-            voyNo: new FormControl(''),
-            //shipmentType: new FormControl(null, Validators.required),
-            pono: new FormControl(''),
-            personIncharge: new FormControl(''),
-            notes: new FormControl(''),
-            commodity: new FormControl(''),
-            packageContainer: new FormControl(''),
-            desOfGoods: new FormControl('')
-        });
+        this.initNewShipmentForm();
     }
 
     async ngOnInit() {
+        await this.route.params.subscribe(prams => {
+        if(prams.id != undefined){
+          this.shipment.id = prams.id;
+          this.getShipmentDetail(this.shipment.id);
+          this.housebillTabviewHref = "#housebill-tabview-tab";
+          this.housebillRoleToggle = "tab";
+        }
+        // else{
+        //     this.shipment = new CsTransaction();
+        // }
+      });
         this.getContainerTypes();
         this.getPackageTypes();
         this.getComodities();
@@ -103,6 +94,40 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.lstMasterContainers.push(this.initNewContainer());
         }
         console.log(this.lstMasterContainers);
+    }
+    async getShipmentDetail(id: String) {
+        this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
+        console.log(this.shipment);
+    }
+    initNewShipmentForm(){
+        this.myForm = this.fb.group({
+            jobId: new FormControl({value: '', disabled: true}),
+            estimatedTimeofDepature: new FormControl('', Validators.required),
+            estimatedTimeofArrived: new FormControl(''),
+            mawb: new FormControl('', Validators.required),
+            //mbltype: new FormControl(null, Validators.required),
+            coloaderId: new FormControl(''),
+            coloaderName: new FormControl(''),
+            bookingNo: new FormControl(''),
+            //typeOfService: new FormControl(null, Validators.required),
+            flightVesselName: new FormControl(''),
+            agentId: new FormControl(null),
+            agentName: new FormControl(null),
+            pol: new FormControl(null, Validators.required),
+            polName: new FormControl(null),
+            pod: new FormControl(null),
+            podName: new FormControl(null),
+            //paymentTerm: new FormControl(''),
+            voyNo: new FormControl(''),
+            //shipmentType: new FormControl(null, Validators.required),
+            pono: new FormControl(''),
+            personIncharge: new FormControl(''),
+            personInChargeName: new FormControl(''),
+            notes: new FormControl(''),
+            commodity: new FormControl(''),
+            packageContainer: new FormControl(''),
+            desOfGoods: new FormControl('')
+        });
     }
     initNewContainer(){
         var container = {
@@ -165,7 +190,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async onSubmit() {
         this.submitted = true;
-        this.shipment = this.myForm.value;
+        //this.shipment = this.myForm.value;
         this.shipment.etd = this.myForm.value.estimatedTimeofDepature != null ? this.myForm.value.estimatedTimeofDepature["startDate"] : null;
         this.shipment.eta = this.myForm.value.estimatedTimeofArrived != null ? this.myForm.value.estimatedTimeofArrived["startDate"] : null;
         console.log(this.shipment);
@@ -175,7 +200,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
             await this.saveJob();
             this.activeTab();
-            //$('#confirm-create-job-modal').modal('show');
         }
     }
     async saveJob(){
@@ -187,6 +211,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             }
         }
         this.housebillTabviewHref = "#housebill-tabview-tab";
+        this.housebillRoleToggle = "tab";
     }
     cancelSaveJob(){
         $('#confirm-create-job-modal').modal('hide');
@@ -201,7 +226,6 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
         if(hasItemEdited == false){
             console.log(this.containerMasterForm);
-            //this.containerMasterForm.onReset();
             this.lstMasterContainers.push(this.initNewContainer());
         }
         else{
@@ -229,7 +253,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
             this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
             this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId!= null? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
-            this.selectedCommodityValue = this.lstMasterContainers[index].commodityName;
         }
         this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
     }
@@ -305,6 +328,11 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(this.numberOfTimeSaveContainer == 0){
             this.lstMasterContainers = [];
         }
+    }
+    resetSumContainer(){
+        this.shipment.desOfGoods = '';
+        this.shipment.packageContainer = '';
+        this.shipment.commodity = '';
     }
     /**
      * Daterange picker

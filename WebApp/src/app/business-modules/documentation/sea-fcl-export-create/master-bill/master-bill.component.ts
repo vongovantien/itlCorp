@@ -17,7 +17,7 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 })
 export class MasterBillComponent implements OnInit{
 
-    shipment: CsTransaction = new CsTransaction();
+    @Input()shipment: CsTransaction;
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
     terms: any[];
@@ -29,8 +29,13 @@ export class MasterBillComponent implements OnInit{
     portOfLadings: any[] = [];
     portOfDestinations: any[] = [];
     userInCharges: any[] = [];
-    etdSelected: any = null;
-    etaSelected: any = null;
+    etdSelected: any;
+    etaSelected: any;
+    billOfLadingTypeActive: any[] = [];
+    servicetypeActive: any[] = [];
+    paymentTermActive: any[] = [];
+    shimentTypeActive: any[] = [];
+    inEditing: boolean = false;
 
     constructor(
         private baseServices: BaseService,
@@ -38,17 +43,56 @@ export class MasterBillComponent implements OnInit{
         private api_menu: API_MENU) { }
 
     async ngOnInit() {
-        this.getShipmentCommonData();
-        this.getPorIndexs(null, null);
-        this.getColoaders(null);
-        this.getAgents(null);
-        this.getUserInCharges(null);
+        await this.getPorIndexs(null);
+        await this.getColoaders(null);
+        await this.getAgents(null);
+        await this.getUserInCharges(null);
+        await this.getShipmentCommonData();
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            this.inEditing = true;
+            console.log(this.shipment.etd);
+            this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
+            this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
+            let index = this.billOfLadingTypes.findIndex(x => x.id == this.shipment.mbltype);
+            if(index > -1) this.billOfLadingTypeActive = [this.billOfLadingTypes[index]];
+            index = this.serviceTypes.findIndex(x => x.id == this.shipment.typeOfService);
+            if(index > -1) this.servicetypeActive = [this.serviceTypes[index]];
+            index = this.terms.findIndex(x => x.id == this.shipment.paymentTerm);
+            if(index > -1) this.paymentTermActive = [this.terms[index]];
+            index = this.shipmentTypes.findIndex(x => x.id == this.shipment.shipmentType);
+            if(index > -1) this.shimentTypeActive = [this.shipmentTypes[index]];
+            if(this.portOfLadings.length > 0){
+                index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
+                if(index > -1) this.shipment.polName = this.portOfLadings[index].nameEN;
+                else this.shipment.polName = '';
+            }
+            if(this.portOfDestinations.length > 0){
+                index = this.portOfDestinations.findIndex(x => x.id == this.shipment.pod);
+                if(index > -1) this.shipment.podName = this.portOfDestinations[index].nameEN;
+                else this.shipment.podName = '';
+            }
+            if(this.agents.length > 0){
+                index = this.agents.findIndex(x => x.id == this.shipment.agentId);
+                if(index > -1) this.shipment.agentName = this.agents[index].partnerNameEn;
+                else this.shipment.agentName = '';
+            }
+            if(this.coloaders.length > 0){
+                index = this.coloaders.findIndex(x => x.id == this.shipment.coloaderId);
+                if(index > -1) this.shipment.coloaderName = this.coloaders[index].partnerNameEn;
+                else this.shipment.coloaderName = '';
+            }
+            if(this.userInCharges.length > 0){
+                index = this.userInCharges.findIndex(x => x.id == this.shipment.personIncharge);
+                if(index > -1) this.shipment.personInChargeName = this.userInCharges[index].username;
+                else this.shipment.personInChargeName = '';
+            }
+        }
     }
-    changePort(keySearch: any, isLading: any) {
+    changePort(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
             return 0;
         }
-        this.getPorIndexs(keySearch, isLading);
+        this.getPorIndexs(keySearch);
     }
     changeAgent(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
@@ -69,23 +113,17 @@ export class MasterBillComponent implements OnInit{
         this.terms = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
         this.shipmentTypes = dataHelper.prepareNg2SelectData(data.shipmentTypes, 'value', 'displayName');
     }
-    async getPorIndexs(searchText: any, isLading: any) {
+    async getPorIndexs(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        if(this.inEditing == false){
+            portSearchIndex.inactive = null;
+        }
+        //let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
         const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
         if (portIndexs != null) {
-            if (isLading == null) {
-                this.portOfLadings = portIndexs.data;
-                this.portOfDestinations = portIndexs.data;
-            }
-            else {
-                if (isLading) {
-                    this.portOfLadings = portIndexs.data;
-                }
-                else {
-                    this.portOfDestinations = portIndexs.data;
-                }
-            }
-            console.log(this.portOfDestinations);
+            this.portOfLadings = portIndexs.data;
+            this.portOfDestinations = portIndexs.data;
+            console.log(this.portOfLadings);
         }
     }
 
@@ -110,9 +148,6 @@ export class MasterBillComponent implements OnInit{
         if (users != null) {
             this.userInCharges = users;
         }
-    }
-    clickColoader(id) {
-        console.log(this.shipment);
     }
     /**
      * Daterange picker
