@@ -5,10 +5,10 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
-        public CsTransaction()
-        {
-            CsTransactionDetail = new HashSet<CsTransactionDetail>();
-        }
+        //public CsTransaction()
+        //{
+        //    CsTransactionDetail = new HashSet<CsTransactionDetail>();
+        //}
 
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
@@ -58,6 +58,6 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
+        //public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }
