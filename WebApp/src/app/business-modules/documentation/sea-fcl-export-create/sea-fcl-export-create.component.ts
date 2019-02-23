@@ -78,6 +78,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(prams.id != undefined){
           this.shipment.id = prams.id;
           this.getShipmentDetail(this.shipment.id);
+          this.getShipmentContainer(this.shipment.id);
           this.housebillTabviewHref = "#housebill-tabview-tab";
           this.housebillRoleToggle = "tab";
         }
@@ -94,6 +95,28 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.lstMasterContainers.push(this.initNewContainer());
         }
         console.log(this.lstMasterContainers);
+    }
+    async getShipmentContainer(id: String) {
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: id}, false, false);
+        this.shipment.csMawbcontainers = this.lstMasterContainers = responses;
+        console.log(this.lstMasterContainers);
+        if(this.lstMasterContainers != null){
+            this.getShipmentContainerDescription(this.lstMasterContainers);
+        }
+    }
+    getShipmentContainerDescription(listContainers: any[]){
+        for (var i = 0; i < listContainers.length; i++) {
+            listContainers[i].isSave = true;
+            this.totalGrossWeight = this.totalGrossWeight + listContainers[i].gw;
+            this.totalNetWeight = this.totalNetWeight + listContainers[i].nw;
+            this.totalCharWeight = this.totalCharWeight + listContainers[i].chargeAbleWeight;
+            this.totalCBM = this.totalCBM + listContainers[i].cbm;
+            if(this.numberOfTimeSaveContainer == 1){
+                this.shipment.packageContainer = this.shipment.packageContainer + (listContainers[i].quantity == ""?"": listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", ");
+                this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName== ""?"": listContainers[i].commodityName + ", ");
+                this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description== ""?"": listContainers[i].description + ", ");
+            }
+        }
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
@@ -286,19 +309,20 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.shipment.desOfGoods = '';
                 this.shipment.packageContainer = '';
             }
-            for (var i = 0; i < this.lstMasterContainers.length; i++) {
-                this.lstMasterContainers[i].isSave = true;
-                this.totalGrossWeight = this.totalGrossWeight + this.lstMasterContainers[i].gw;
-                this.totalNetWeight = this.totalNetWeight + this.lstMasterContainers[i].nw;
-                this.totalCharWeight = this.totalCharWeight + this.lstMasterContainers[i].chargeAbleWeight;
-                this.totalCBM = this.totalCBM + this.lstMasterContainers[i].cbm;
-                if(this.numberOfTimeSaveContainer == 1){
-                    this.shipment.packageContainer = this.shipment.packageContainer + (this.lstMasterContainers[i].quantity == ""?"": this.lstMasterContainers[i].quantity + "x" +this.lstMasterContainers[i].containerTypeName + ", ");
-                    this.shipment.commodity = this.shipment.commodity + (this.lstMasterContainers[i].commodityName== ""?"": this.lstMasterContainers[i].commodityName + ", ");
-                    this.shipment.desOfGoods = this.shipment.desOfGoods + (this.lstMasterContainers[i].description== ""?"": this.lstMasterContainers[i].description + ", ");
-                }
-            }
-                 this.shipment.csMawbcontainers = this.lstMasterContainers;
+            // for (var i = 0; i < this.lstMasterContainers.length; i++) {
+            //     this.lstMasterContainers[i].isSave = true;
+            //     this.totalGrossWeight = this.totalGrossWeight + this.lstMasterContainers[i].gw;
+            //     this.totalNetWeight = this.totalNetWeight + this.lstMasterContainers[i].nw;
+            //     this.totalCharWeight = this.totalCharWeight + this.lstMasterContainers[i].chargeAbleWeight;
+            //     this.totalCBM = this.totalCBM + this.lstMasterContainers[i].cbm;
+            //     if(this.numberOfTimeSaveContainer == 1){
+            //         this.shipment.packageContainer = this.shipment.packageContainer + (this.lstMasterContainers[i].quantity == ""?"": this.lstMasterContainers[i].quantity + "x" +this.lstMasterContainers[i].containerTypeName + ", ");
+            //         this.shipment.commodity = this.shipment.commodity + (this.lstMasterContainers[i].commodityName== ""?"": this.lstMasterContainers[i].commodityName + ", ");
+            //         this.shipment.desOfGoods = this.shipment.desOfGoods + (this.lstMasterContainers[i].description== ""?"": this.lstMasterContainers[i].description + ", ");
+            //     }
+            // }
+            this.getShipmentContainerDescription(this.lstMasterContainers);
+            this.shipment.csMawbcontainers = this.lstMasterContainers;
         }
     }
     searchContainer(keySearch: any){
@@ -327,7 +351,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(index> -1){
             this.lstMasterContainers.splice(index, 1);
         }
-        if(this.numberOfTimeSaveContainer == 0){
+        if(this.shipment.csMawbcontainers == null){
             this.lstMasterContainers = [];
         }
     }

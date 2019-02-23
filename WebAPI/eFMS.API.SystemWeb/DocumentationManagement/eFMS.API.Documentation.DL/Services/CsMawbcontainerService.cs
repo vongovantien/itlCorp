@@ -20,7 +20,10 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<CsMawbcontainerModel> Query(CsMawbcontainerCriteria criteria)
         {
-            throw new NotImplementedException();
+            var results = Get(x => (x.Mblid == criteria.Mblid || criteria.Mblid == null)
+                                && (x.Hblid == criteria.Hblid || criteria.Hblid == null)
+                                 );
+            return results;
         }
     }
 }
