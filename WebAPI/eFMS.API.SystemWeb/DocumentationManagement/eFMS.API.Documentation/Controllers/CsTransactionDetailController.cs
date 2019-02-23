@@ -49,7 +49,7 @@ namespace eFMS.API.Documentation.Controllers
       //  [Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
+      //      ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model);
             if (checkExistMessage.Length > 0)

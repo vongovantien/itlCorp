@@ -36,8 +36,9 @@ namespace eFMS.API.Documentation.DL.Services
                     x.Id = Guid.NewGuid();
                     x.Mblid = model.JobId;
                     ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                  
                 }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
                 var hs = new HandleState();
                 return hs;
 
