@@ -99,10 +99,16 @@ export class SeaFclExportCreateComponent implements OnInit {
     async getShipmentContainer(id: String) {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: id}, false, false);
         this.shipment.csMawbcontainers = this.lstMasterContainers = responses;
-        console.log(this.lstMasterContainers);
         if(this.lstMasterContainers != null){
             this.getShipmentContainerDescription(this.lstMasterContainers);
         }
+    }
+    showListContainer(){
+        this.lstMasterContainers.forEach(container =>{
+            container.allowEdit = false;
+            let index = this.containerTypes.findIndex(x => x.id == container.id);
+            if(index > -1) container.containerTypeName = this.containerTypes[index].name;
+        });
     }
     getShipmentContainerDescription(listContainers: any[]){
         for (var i = 0; i < listContainers.length; i++) {
