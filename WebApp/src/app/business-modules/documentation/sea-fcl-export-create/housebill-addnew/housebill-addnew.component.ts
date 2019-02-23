@@ -28,7 +28,7 @@ export class HousebillAddnewComponent implements OnInit {
   MasterBillData: CsTransaction = null;
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
-    this.HouseBillToAdd.jobId = this.MasterBillData.jobNo;
+    this.HouseBillToAdd.jobId = this.MasterBillData.id;
   }
 
   pager: PagerSetting = PAGINGSETTING;
@@ -306,8 +306,9 @@ export class HousebillAddnewComponent implements OnInit {
       this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
       await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew,this.HouseBillToAdd);
       this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
-      this.resetForm();
-      $('#add-house-bill-modal').modal('hide');
+      this.HouseBillToAdd.csMawbcontainers = this.lstHouseBillContainers;
+      //this.resetForm();
+      //$('#add-house-bill-modal').modal('hide');
     }
   }
 
