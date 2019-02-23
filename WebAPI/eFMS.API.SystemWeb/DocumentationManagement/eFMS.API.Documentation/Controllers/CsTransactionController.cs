@@ -56,7 +56,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
-            var data = csTransactionService.Get(x => x.Id == id).FirstOrDefault();
+            var data = csTransactionService.GetById(id);
             return Ok(data);
         }
 

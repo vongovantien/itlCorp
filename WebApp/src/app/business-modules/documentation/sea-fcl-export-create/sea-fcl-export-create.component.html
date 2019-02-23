@@ -48,7 +48,7 @@
     <!--end::m-content-->
 
     <!--begin::add-house-bill-modal-->
-    <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="shipment"
         aria-hidden="true">
         <app-housebill-addnew
         (houseBillComing)="houseBillCatcher($event)" 
@@ -82,7 +82,7 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <app-master-bill [shipment]="shipment" [formAddEdit]="myForm" [submitted]="submitted"></app-master-bill>
+                <app-master-bill [shipment]="shipment" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment"></app-master-bill>
                 <!--begin:: m-portlet-->
 
                 <!--end:: m-portlet-->
@@ -108,7 +108,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="m-portlet__body">
+                    <div class="m-portlet__body" *ngIf="shipment">
                         <div class="row">
                             <div class="col-xl-8">
                                 <div class="row">

@@ -16,6 +16,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         IQueryable<vw_csTransaction> Query(CsTransactionCriteria criteria);
         List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
+        CsTransactionModel GetById(Guid id);
         object AddCSTransaction(CsTransactionEditModel model);
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
     }
