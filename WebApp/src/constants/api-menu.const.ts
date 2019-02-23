@@ -234,6 +234,9 @@ export class API_MENU {
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob"
+        },
+        CsMawbcontainer: {
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query"
         }
     }
 }
