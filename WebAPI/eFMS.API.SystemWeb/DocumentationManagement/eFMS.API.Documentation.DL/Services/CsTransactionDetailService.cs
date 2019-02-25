@@ -103,6 +103,7 @@ namespace eFMS.API.Documentation.DL.Services
                          where detail.JobId == criteria.JobId
                          select new { detail, customer = y, notiParty = detailNoti, saleman = x }
                           );
+            if (query == null) return null;
             foreach(var item in query)
             {
                 var detail = mapper.Map<CsTransactionDetailModel>(item.detail);

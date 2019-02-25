@@ -44,6 +44,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     //
     housebillTabviewHref = '#confirm-create-job-modal';
     housebillRoleToggle = 'modal';
+    inEditing: boolean = false;
      /**
         * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
         * this method imporove performance for web when detecting change 
@@ -74,18 +75,19 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
     async ngOnInit() {
-        await this.route.params.subscribe(prams => {
-        if(prams.id != undefined){
-          this.shipment.id = prams.id;
-          this.getShipmentDetail(this.shipment.id);
-          this.getShipmentContainer(this.shipment.id);
-          this.housebillTabviewHref = "#housebill-tabview-tab";
-          this.housebillRoleToggle = "tab";
-        }
-        // else{
-        //     this.shipment = new CsTransaction();
-        // }
-      });
+        await this.route.params.subscribe(async prams => {
+            if(prams.id != undefined){
+                this.inEditing = true;
+                this.shipment.id = prams.id;
+                await this.getShipmentDetail(this.shipment.id);
+                await this.getShipmentContainer(this.shipment.id);
+                this.housebillTabviewHref = "#housebill-tabview-tab";
+                this.housebillRoleToggle = "tab";
+            }
+            // else{
+            //     this.shipment = new CsTransaction();
+            // }
+        });
         this.getContainerTypes();
         this.getPackageTypes();
         this.getComodities();
@@ -103,13 +105,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.getShipmentContainerDescription(this.lstMasterContainers);
         }
     }
-    showListContainer(){
-        this.lstMasterContainers.forEach(container =>{
-            container.allowEdit = false;
-            let index = this.containerTypes.findIndex(x => x.id == container.id);
-            if(index > -1) container.containerTypeName = this.containerTypes[index].name;
-        });
-    }
     getShipmentContainerDescription(listContainers: any[]){
         for (var i = 0; i < listContainers.length; i++) {
             listContainers[i].isSave = true;
@@ -117,10 +112,17 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.totalNetWeight = this.totalNetWeight + listContainers[i].nw;
             this.totalCharWeight = this.totalCharWeight + listContainers[i].chargeAbleWeight;
             this.totalCBM = this.totalCBM + listContainers[i].cbm;
-            if(this.numberOfTimeSaveContainer == 1){
-                this.shipment.packageContainer = this.shipment.packageContainer + (listContainers[i].quantity == ""?"": listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", ");
-                this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName== ""?"": listContainers[i].commodityName + ", ");
-                this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description== ""?"": listContainers[i].description + ", ");
+            // if(this.inEditing){
+            //     this.shipment.packageContainer = this.shipment.packageContainer + ((listContainers[i].quantity == null && listContainers[i].containerTypeName == null)?"": listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", ");
+            //     this.shipment.commodity = this.shipment.commodity + ((listContainers[i].commodityName== null)?"": listContainers[i].commodityName + ", ");
+            //     this.shipment.desOfGoods = this.shipment.desOfGoods + ((listContainers[i].description== "")?"": listContainers[i].description + ", ");
+            // }
+            if(this.inEditing == false){
+                if(this.numberOfTimeSaveContainer == 1){
+                this.shipment.packageContainer = this.shipment.packageContainer + (listContainers[i].quantity == null?"": listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", ");
+                this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName== null?"": listContainers[i].commodityName + ", ");
+                this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description== null?"": listContainers[i].description + ", ");
+                }
             }
         }
     }
@@ -142,8 +144,8 @@ export class SeaFclExportCreateComponent implements OnInit {
             flightVesselName: new FormControl(''),
             agentId: new FormControl(null),
             agentName: new FormControl(null),
-            pol: new FormControl(null, Validators.required),
-            polName: new FormControl(null),
+            pol: new FormControl(null),
+            polName: new FormControl(null, Validators.required),
             pod: new FormControl(null),
             podName: new FormControl(null),
             //paymentTerm: new FormControl(''),
@@ -176,7 +178,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             packageTypeName: '',
             packageTypeActive: [],
             packageQuantity: null,
-            description: '',
+            description: null,
             gw: null,
             nw: null,
             chargeAbleWeight :null,
@@ -231,16 +233,38 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.activeTab();
         }
     }
-    async saveJob(){
-        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
-        if(response != null){
-            if(response.result.success){
-                this.shipment = response.model;
-                this.shipment.csMawbcontainers = this.lstMasterContainers;
+    showListContainer(){
+        if(this.inEditing){
+            for(let i=0; i< this.lstMasterContainers.length; i++){
+                this.lstMasterContainers[i].allowEdit = false;
+                this.lstMasterContainers[i].isNew = false;
+                this.lstMasterContainers[i].containerTypeActive = this.lstMasterContainers[i].containerTypeID != null? [{ id: this.lstMasterContainers[i].containerTypeID, text: this.lstMasterContainers[i].containerTypeName }]: [];
+                this.lstMasterContainers[i].packageTypeActive = this.lstMasterContainers[i].packageTypeId != null? [{ id: this.lstMasterContainers[i].packageTypeId, text: this.lstMasterContainers[i].packageTypeName }]: [];
+                this.lstMasterContainers[i].unitOfMeasureActive = this.lstMasterContainers[i].unitOfMeasureID!= null? [{ id: this.lstMasterContainers[i].unitOfMeasureID, text: this.lstMasterContainers[i].unitOfMeasureName }]: [];
             }
         }
-        this.housebillTabviewHref = "#housebill-tabview-tab";
-        this.housebillRoleToggle = "tab";
+    }
+    async saveJob(){
+        if(this.inEditing == false){
+            var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
+            if(response != null){
+                if(response.result.success){
+                    this.shipment = response.model;
+                    this.shipment.csMawbcontainers = this.lstMasterContainers;
+                }
+            }
+            this.housebillTabviewHref = "#housebill-tabview-tab";
+            this.housebillRoleToggle = "tab";
+        }
+        else{
+            var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsTransaction.update, this.shipment, true, false);
+            if(response != null){
+                if(response.status){
+                    this.shipment = response.model;
+                    this.shipment.csMawbcontainers = this.lstMasterContainers;
+                }
+            }
+        }
     }
     cancelSaveJob(){
         $('#confirm-create-job-modal').modal('hide');
@@ -298,6 +322,11 @@ export class SeaFclExportCreateComponent implements OnInit {
     changeEditStatus(index: any){
         if(this.lstMasterContainers[index].allowEdit == false){
             this.lstMasterContainers[index].allowEdit = true;
+            for(let i =0; i< this.lstMasterContainers.length; i++){
+                if(i != index){
+                    this.lstMasterContainers[i].allowEdit = false;
+                }
+            }
         }
         else{
             this.lstMasterContainers[index].allowEdit = false;
@@ -329,6 +358,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             // }
             this.getShipmentContainerDescription(this.lstMasterContainers);
             this.shipment.csMawbcontainers = this.lstMasterContainers;
+            $('#container-list-of-job-modal-master').modal('hide');
         }
     }
     searchContainer(keySearch: any){
@@ -357,6 +387,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(index> -1){
             this.lstMasterContainers.splice(index, 1);
         }
+        this.shipment.csMawbcontainers = this.lstMasterContainers;
         if(this.shipment.csMawbcontainers == null){
             this.lstMasterContainers = [];
         }

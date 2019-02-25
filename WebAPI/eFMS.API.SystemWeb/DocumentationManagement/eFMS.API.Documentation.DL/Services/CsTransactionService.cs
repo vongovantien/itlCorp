@@ -35,26 +35,26 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.CreatedDate = DateTime.Now;
                 var hsTrans = dc.CsTransaction.Add(transaction);
                 var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-                if(model.CsTransactionDetails != null)
-                {
-                    foreach (var tranDetail in model.CsTransactionDetails)
-                    {
-                        var modelDetail = mapper.Map<CsTransactionDetail>(tranDetail);
-                        tranDetail.Id = Guid.NewGuid();
-                        tranDetail.JobId = transaction.Id;
-                        tranDetail.UserCreated = "01";
-                        tranDetail.DatetimeCreated = DateTime.Now;
-                        dc.CsTransactionDetail.Add(tranDetail);
+                //if(model.CsTransactionDetails != null)
+                //{
+                //    foreach (var tranDetail in model.CsTransactionDetails)
+                //    {
+                //        var modelDetail = mapper.Map<CsTransactionDetail>(tranDetail);
+                //        tranDetail.Id = Guid.NewGuid();
+                //        tranDetail.JobId = transaction.Id;
+                //        tranDetail.UserCreated = "01";
+                //        tranDetail.DatetimeCreated = DateTime.Now;
+                //        dc.CsTransactionDetail.Add(tranDetail);
 
-                        containers.ForEach(x =>
-                        {
-                            if (tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
-                            {
-                                x.Hblid = tranDetail.Id;
-                            }
-                        });
-                    }
-                }
+                //        containers.ForEach(x =>
+                //        {
+                //            if (tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
+                //            {
+                //                x.Hblid = tranDetail.Id;
+                //            }
+                //        });
+                //    }
+                //}
                 if(containers != null)
                 {
                     foreach (var container in containers)
@@ -236,33 +236,19 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.UserModified = "01";
                 transaction.ModifiedDate = DateTime.Now;
                 var hsTrans = dc.CsTransaction.Update(transaction);
-                //var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
                 foreach (var container in model.CsMawbcontainers)
                 {
-                    container.Mblid = transaction.Id;
-                    container.UserModified = "01";
-                    container.DatetimeModified = DateTime.Now;
-                    dc.CsMawbcontainer.Update(container);
-                }
-                foreach (var tranDetail in model.CsTransactionDetails)
-                {
-                    var modelDetail = mapper.Map<CsTransactionDetail>(tranDetail);
-                    tranDetail.JobId = transaction.Id;
-                    tranDetail.UserModified = "01";
-                    tranDetail.DatetimeModified = DateTime.Now;
-                    dc.CsTransactionDetail.Update(tranDetail);
-
-                    //containers.ForEach(x =>
-                    //{
-                    //    if (tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
-                    //    {
-                    //        x.Hblid = tranDetail.Id;
-                    //    }
-                    //});
-
-                    foreach (var container in tranDetail.CsMawbcontainers)
+                    if(container.Id == Guid.Empty)
                     {
-                        container.Hblid = tranDetail.Id;
+                        container.Id = Guid.NewGuid();
+                        container.Mblid = transaction.Id;
+                        container.UserModified = "01";
+                        container.DatetimeModified = DateTime.Now;
+                        dc.CsMawbcontainer.Add(container);
+                    }
+                    else
+                    {
+                        container.Mblid = transaction.Id;
                         container.UserModified = "01";
                         container.DatetimeModified = DateTime.Now;
                         dc.CsMawbcontainer.Update(container);

@@ -8,6 +8,6 @@ namespace eFMS.API.Documentation.DL.Models
     public class CsTransactionEditModel: CsTransaction
     {
         public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
-        public List<CsTransactionDetailModel> CsTransactionDetails { get; set; }
+        //public List<CsTransactionDetailModel> CsTransactionDetails { get; set; }
     }
 }
