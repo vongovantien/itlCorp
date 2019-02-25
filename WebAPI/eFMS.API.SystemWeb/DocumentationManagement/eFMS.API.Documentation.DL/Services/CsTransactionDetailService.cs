@@ -21,24 +21,25 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
-           
-            model.Id = Guid.NewGuid();
-            model.Inactive = false;
-            model.UserCreated = "thor";  //ChangeTrackerHelper.currentUser;
-            model.DatetimeCreated = DateTime.Now;
+            var detail = mapper.Map<CsTransactionDetail>(model);
+            detail.Id = Guid.NewGuid();
+            detail.Inactive = false;
+            detail.UserCreated = "thor";  //ChangeTrackerHelper.currentUser;
+            detail.DatetimeCreated = DateTime.Now;
 
             try
             {
-                DataContext.Add(model);
-                foreach(var x in model.CsMawbcontainers)
+                DataContext.Add(detail);
+
+                foreach (var x in model.CsMawbcontainers)
                 {
                     x.Hblid = model.Id;
                     x.Id = Guid.NewGuid();
                     x.Mblid = model.JobId;
                     ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);
-                  
-                }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
+
+                 }
+                 ((eFMSDataContext)DataContext.DC).SaveChanges();
                 var hs = new HandleState();
                 return hs;
 
