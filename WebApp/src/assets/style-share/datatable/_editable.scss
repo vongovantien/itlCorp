@@ -23,4 +23,13 @@
     .dropdown-menu {
         z-index: 9;
     }
+    .row-control-feedback {
+        height: 15px;
+        position: relative;
+        .form-control-feedback {
+            position: absolute;
+            left: 0;
+            white-space: pre;
+        }
+    }
 }

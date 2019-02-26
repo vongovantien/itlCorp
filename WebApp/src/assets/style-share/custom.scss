@@ -73,6 +73,11 @@ ul {
     margin-bottom: 0;
     padding-left: 15px;
 }
+a {
+    &:hover {
+        text-decoration: none;
+    }
+}
 .form-control-label {
     text-transform: capitalize;
 }
@@ -339,7 +344,7 @@ ul {
         text-align: center;
         font-size: 16px;
         i {
-            font-size: 2rem;
+            font-size: 3rem;
             line-height: 0;
             vertical-align: middle;
             margin-right: 10px;
