@@ -93,14 +93,15 @@ namespace eFMS.API.Documentation.DL.Services
         {
             //var results = Get(x => x.JobId == criteria.JobId);
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
+            var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == criteria.JobId);
+            var query = (from detail in details
                          join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into detailCustomers
                          from y in detailCustomers.DefaultIfEmpty()
                          join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
                          from detailNoti in detailNotis.DefaultIfEmpty()
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         where detail.JobId == criteria.JobId
+                         //where detail.JobId == criteria.JobId
                          select new { detail, customer = y, notiParty = detailNoti, saleman = x }
                           );
             if (query == null) return null;

@@ -129,7 +129,7 @@
                                                 Detail container & packages:
                                             </label>
                                             <textarea class="form-control m-input--square" name="packageContainer" id=""
-                                                rows="3"
+                                                rows="3" disabled
                                                 (change)="shipment.packageContainer = shipment.packageContainer.trim()"
                                                 formControlName="packageContainer"
                                                 [(ngModel)]="shipment.packageContainer"></textarea>
@@ -396,7 +396,7 @@
                                     <ng-container *ngFor="let container of lstMasterContainers; let i= index">
                                         <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
                                             <td class="table-actions-col fixed-side">
-                                                <div class="table-actions content-editable" style="width: 70px">
+                                                <!-- <div class="table-actions content-editable" style="width: 70px">
                                                     <button type="button"
                                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Edit">
@@ -407,7 +407,7 @@
                                                         title="Remove">
                                                         <i class="la la-trash"></i>
                                                     </button>
-                                                </div>
+                                                </div> -->
                                                 <div class="table-actions control-editable" style="width: 70px">
                                                     <button type=""
                                                         class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -422,9 +422,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Cont Type
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
                                                     <ng-select [allowClear]="true" [items]="containerTypes"
@@ -441,9 +441,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Cont Q'ty
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid && container.verifying}">
                                                     <input type="number" class="form-control m-input m-input--square"
@@ -457,9 +457,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Cont No.
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -468,9 +468,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Seal No.
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -478,9 +478,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Mark No.
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -488,9 +488,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Commodity
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <div class="dropdown e--combogrid" #selectedCommodity>
                                                         <input
@@ -546,9 +546,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Package Type
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="packageTypes"
                                                         [disabled]="disabled" (data)="refreshValue($event)"
@@ -560,9 +560,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Package Q'ty
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         min="1" [(ngModel)]="container.packageQuantity"
@@ -572,9 +572,9 @@
                                                 </div>
                                             </td>
                                             <td class="" style="width: 130px">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Description of Good dài thiệt là dài đó nha Tem Tem
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         autocomplete="nope" [(ngModel)]="container.description"
@@ -583,9 +583,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     N.W
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -594,9 +594,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     G.W
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -605,9 +605,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     C.W
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -617,9 +617,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Unit
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="weightMesurements"
                                                         [disabled]="disabled" (data)="refreshValue($event)"
@@ -631,9 +631,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     CBM
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -652,7 +652,8 @@
                                                     </button>
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" (click)=removeAContainer(i)>
+                                                        title="Remove" data-toggle="modal"
+                                                        data-target="#confirm-accept-delete-container-modal" >
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
@@ -1044,6 +1045,46 @@
             <div class="modal-footer m--align-center c-button-actions">
                 <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                     data-dismiss="modal" routerLink="/home/documentation/sea-fcl-export">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-cancel-create-job-modal-->
+
+<!--begin::confirm-cancel-create-job-modal-->
+<div class="modal fade" id="confirm-accept-delete-container-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Container</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure you want to delete the selected container?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)=removeAContainer(i)>
                     <span>
                         <i class="la la-save"></i>
                         <span>

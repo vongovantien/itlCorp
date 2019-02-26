@@ -119,9 +119,9 @@ export class SeaFclExportCreateComponent implements OnInit {
             // }
             if(this.inEditing == false){
                 if(this.numberOfTimeSaveContainer == 1){
-                this.shipment.packageContainer = this.shipment.packageContainer + (listContainers[i].quantity == null?"": listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", ");
-                this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName== null?"": listContainers[i].commodityName + ", ");
-                this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description== null?"": listContainers[i].description + ", ");
+                    this.shipment.packageContainer = this.shipment.packageContainer + ((listContainers[i].quantity == null && listContainers[i].containerTypeName==null)?"": (listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", "));
+                    this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName== ""?"": (listContainers[i].commodityName + ", "));
+                    this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description== null?"": (listContainers[i].description + ", "));
                 }
             }
         }
@@ -260,7 +260,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsTransaction.update, this.shipment, true, false);
             if(response != null){
                 if(response.status){
-                    this.shipment = response.model;
                     this.shipment.csMawbcontainers = this.lstMasterContainers;
                 }
             }
@@ -287,6 +286,9 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     removeAContainer(index: number){
         this.lstMasterContainers.splice(index, 1);
+        this.shipment.csMawbcontainers = this.lstMasterContainers;
+        $('#confirm-accept-delete-container-modal').modal('hide');
+        this.resetSumContainer();
     }
     saveNewContainer(index: any){
         this.lstMasterContainers[index].verifying = true;
@@ -358,7 +360,20 @@ export class SeaFclExportCreateComponent implements OnInit {
             // }
             this.getShipmentContainerDescription(this.lstMasterContainers);
             this.shipment.csMawbcontainers = this.lstMasterContainers;
-            $('#container-list-of-job-modal-master').modal('hide');
+
+            let hasItemEdited = false;
+            for(let i=0; i< this.lstMasterContainers.length; i++){
+                if(this.lstMasterContainers[i].allowEdit == true){
+                    hasItemEdited = true;
+                    break;
+                }
+            }
+            if(hasItemEdited == false){
+                $('#container-list-of-job-modal-master').modal('hide');
+            }
+            else{
+                this.baseServices.errorToast("Current container must be save!!!");
+            }
         }
     }
     searchContainer(keySearch: any){
@@ -393,9 +408,23 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
     }
     resetSumContainer(){
-        this.shipment.desOfGoods = '';
+        this.totalGrossWeight = 0;
+        this.totalNetWeight = 0;
+        this.totalCharWeight = 0;
+        this.totalCBM = 0;
         this.shipment.packageContainer = '';
         this.shipment.commodity = '';
+        this.shipment.desOfGoods = '';
+        if(this.shipment.csMawbcontainers == null) return;
+        for (var i = 0; i < this.shipment.csMawbcontainers.length; i++) {
+            this.totalGrossWeight = this.totalGrossWeight + this.shipment.csMawbcontainers[i].gw;
+            this.totalNetWeight = this.totalNetWeight + this.shipment.csMawbcontainers[i].nw;
+            this.totalCharWeight = this.totalCharWeight + this.shipment.csMawbcontainers[i].chargeAbleWeight;
+            this.totalCBM = this.totalCBM + this.shipment.csMawbcontainers[i].cbm;
+            this.shipment.packageContainer = this.shipment.packageContainer + ((this.shipment.csMawbcontainers[i].quantity == null && this.shipment.csMawbcontainers[i].containerTypeName == "")?"": (this.shipment.csMawbcontainers[i].quantity + "x" + this.shipment.csMawbcontainers[i].containerTypeName + ", "));
+            this.shipment.commodity = this.shipment.commodity + (this.shipment.csMawbcontainers[i].commodityName== ""?"": (this.shipment.csMawbcontainers[i].commodityName + ", "));
+            this.shipment.desOfGoods = this.shipment.desOfGoods + (this.shipment.csMawbcontainers[i].description== null?"": (this.shipment.csMawbcontainers[i].description + ", "));
+        }
     }
     /**
      * Daterange picker

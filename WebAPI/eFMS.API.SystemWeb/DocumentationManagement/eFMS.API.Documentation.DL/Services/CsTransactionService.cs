@@ -35,26 +35,6 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.CreatedDate = DateTime.Now;
                 var hsTrans = dc.CsTransaction.Add(transaction);
                 var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-                //if(model.CsTransactionDetails != null)
-                //{
-                //    foreach (var tranDetail in model.CsTransactionDetails)
-                //    {
-                //        var modelDetail = mapper.Map<CsTransactionDetail>(tranDetail);
-                //        tranDetail.Id = Guid.NewGuid();
-                //        tranDetail.JobId = transaction.Id;
-                //        tranDetail.UserCreated = "01";
-                //        tranDetail.DatetimeCreated = DateTime.Now;
-                //        dc.CsTransactionDetail.Add(tranDetail);
-
-                //        containers.ForEach(x =>
-                //        {
-                //            if (tranDetail.CsMawbcontainers.Any(y => y.Mblid == x.Mblid))
-                //            {
-                //                x.Hblid = tranDetail.Id;
-                //            }
-                //        });
-                //    }
-                //}
                 if(containers != null)
                 {
                     foreach (var container in containers)
@@ -91,53 +71,92 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 rowsCount = 0; return results;
             }
-            var tempList = list.Select(x => new CsTransactionModel {
-                    Id = x.ID,
-                    BranchId = x.BranchID,
-                    JobNo = x.JobNo,
-                    Mawb = x.MAWB,
-                    TypeOfService = x.TypeOfService,
-                    Etd = x.ETD,
-                    Eta = x.ETA,
-                    Mbltype = x.MAWB,
-                    ColoaderId = x.ColoaderID,
-                    BookingNo = x.BookingNo,
-                    ShippingServiceType  = x.ShippingServiceType,
-                    AgentId = x.AgentID,
-                    Pol = x.POL,
-                    Pod = x.POD,
-                    PaymentTerm = x.PaymentTerm,
-                    LoadingDate = x.LoadingDate,
-                    RequestedDate = x.RequestedDate,
-                    FlightVesselName = x.FlightVesselName,
-                    VoyNo = x.VoyNo,
-                    FlightVesselConfirmedDate = x.FlightVesselConfirmedDate,
-                    ShipmentType = x.ShipmentType,
-                    ServiceMode = x.ServiceMode,
-                    Commodity = x.Commodity,
-                    InvoiceNo = x.InvoiceNo,
-                    Pono = x.PONo,
-                    PersonIncharge = x.PersonIncharge,
-                    DeliveryPoint = x.DeliveryPoint,
-                    RouteShipment = x.RouteShipment,
-                    Notes = x.Notes,
-                    Locked = x.Locked,
-                    LockedDate = x.LockedDate,
-                    UserCreated = x.UserCreated,
-                    CreatedDate = x.CreatedDate,
-                    UserModified = x.UserCreated,
-                    ModifiedDate = x.ModifiedDate,
-                    Inactive = x.Inactive,
-                    InactiveOn = x.InactiveOn,
-                    SupplierName = x.SupplierName,
-                    AgentName = x.AgentName,
-                    PODName = x.PODName,
-                    POLName = x.POLName,
-                    CreatorName = x.CreatorName,
-                    SumCont = x.SumCont,
-                    SumCBM = x.SumCBM
-
-            }).ToList().Distinct();
+            var tempList = list.GroupBy(x => new { x.ID,
+                x.BranchID,
+                x.MAWB,
+                x.JobNo,
+                x.TypeOfService,
+                x.ETD,
+                x.ETA,
+                x.MBLType,
+                x.ColoaderID,
+                x.BookingNo,
+                x.ShippingServiceType,
+                x.AgentID,
+                x.AgentName,
+                x.POL,
+                x.POLName,
+                x.POD,
+                x.PODName,
+                x.PaymentTerm,
+                x.LoadingDate,
+                x.RequestedDate,
+                x.FlightVesselName,
+                x.VoyNo,
+                x.FlightVesselConfirmedDate,
+                x.ShipmentType,
+                x.ServiceMode,
+                x.Commodity,
+                x.InvoiceNo,
+                x.PONo,
+                x.PersonIncharge,
+                x.DeliveryPoint,
+                x.RouteShipment,
+                x.Notes,
+                x.Locked,
+                x.LockedDate,
+                x.UserCreated,
+                x.CreatedDate,
+                x.ModifiedDate,
+                x.Inactive,
+                x.InactiveOn,
+                x.SupplierName,
+                x.CreatorName,
+                x.SumCont,
+                x.SumCBM
+            }).Select(x => new CsTransactionModel { Id = x.Key.ID,
+                BranchId = x.Key.BranchID,
+                Mawb = x.Key.MAWB,
+                JobNo = x.Key.JobNo,
+                TypeOfService = x.Key.TypeOfService,
+                Etd = x.Key.ETD,
+                Eta = x.Key.ETA,
+                Mbltype = x.Key.MBLType,
+                ColoaderId = x.Key.ColoaderID,
+                BookingNo = x.Key.BookingNo,
+                ShippingServiceType = x.Key.ShippingServiceType,
+                AgentId = x.Key.AgentID,
+                AgentName = x.Key.AgentName,
+                Pol = x.Key.POL,
+                POLName = x.Key.POLName,
+                Pod = x.Key.POD,
+                PODName = x.Key.PODName,
+                PaymentTerm = x.Key.PaymentTerm,
+                LoadingDate = x.Key.LoadingDate,
+                RequestedDate = x.Key.RequestedDate,
+                FlightVesselName = x.Key.FlightVesselName,
+                VoyNo = x.Key.VoyNo,
+                FlightVesselConfirmedDate = x.Key.FlightVesselConfirmedDate,
+                ShipmentType = x.Key.ShipmentType,
+                ServiceMode = x.Key.ServiceMode,
+                Commodity = x.Key.Commodity,
+                InvoiceNo = x.Key.InvoiceNo,
+                Pono = x.Key.PONo,
+                PersonIncharge = x.Key.PersonIncharge,
+                DeliveryPoint = x.Key.DeliveryPoint,
+                RouteShipment = x.Key.RouteShipment,
+                Notes = x.Key.Notes,
+                Locked = x.Key.Locked,
+                LockedDate = x.Key.LockedDate,
+                UserCreated = x.Key.UserCreated,
+                CreatedDate = x.Key.CreatedDate,
+                ModifiedDate = x.Key.ModifiedDate,
+                Inactive = x.Key.Inactive,
+                InactiveOn = x.Key.InactiveOn,
+                SupplierName = x.Key.SupplierName,
+                CreatorName = x.Key.CreatorName,
+                SumCont = x.Key.SumCont,
+                SumCBM = x.Key.SumCBM });
             rowsCount = tempList.Count();
             if (size > 1)
             {
@@ -155,13 +174,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var list = GetView();
             var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer;
-
-            //var query = list.GroupJoin(containers,
-            //    transaction => transaction.ID,
-            //    container => container.Mblid,
-            //    (transaction, container) => new { transaction, container })
-            //    .SelectMany(x => x.container.DefaultIfEmpty(),
-            //                (x, y) => new { x.transaction, container = y });
+            
             var query = (from transaction in list
                          join container in containers on transaction.ID equals container.Mblid into containerTrans
                          from cont in containerTrans.DefaultIfEmpty()
@@ -183,34 +196,9 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.transaction.ETD ?? null) >= (criteria.FromDate ?? null))
                     && ((x.transaction.ETD ?? null) <= (criteria.ToDate ?? null))
                     ).OrderByDescending(x => x.transaction.CreatedDate).ThenByDescending(x => x.transaction.ModifiedDate);
-                //results = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //    && (x.MAWB ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //    && (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //    && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //    && (x.AgentName ?? "").IndexOf(criteria.AgentName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //    && ((x.CustomerID ?? "") == criteria.CustomerID || string.IsNullOrEmpty(criteria.CustomerID))
-                //    && ((x.NotifyPartyID ?? "") == criteria.NotifyPartyID || string.IsNullOrEmpty(criteria.NotifyPartyID))
-                //    && ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
-                //    && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //    && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //    && ((x.ETD ?? null) >= (criteria.FromDate ?? null))
-                //    && ((x.ETD ?? null) <= (criteria.ToDate ?? null))
-                //    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).AsQueryable();
             }
             else
             {
-                //results = list.Where(x => ((x.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //             || (x.MAWB ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //             || (x.HWBNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //             || (x.SupplierName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //             || (x.AgentName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //             || ((x.CustomerID ?? "") == criteria.CustomerID || string.IsNullOrEmpty(criteria.CustomerID))
-                //             || ((x.NotifyPartyID ?? "") == criteria.NotifyPartyID || string.IsNullOrEmpty(criteria.NotifyPartyID))
-                //             || ((x.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
-                //             || (x.SealNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //             || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //             || ((x.ETD ?? null) >= (criteria.FromDate ?? null) && (x.ETD ?? null) <= (criteria.ToDate ?? null))
-                //    )).OrderByDescending(x => x.CreatedDate).ThenByDescending(x => x.ModifiedDate).AsQueryable();
                 query = query.Where(x => ((x.transaction.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.MAWB ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.HWBNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
