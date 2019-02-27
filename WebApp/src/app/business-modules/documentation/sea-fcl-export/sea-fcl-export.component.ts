@@ -117,6 +117,8 @@ export class SeaFCLExportComponent implements OnInit {
         this.searchString = null;
         this.pager.currentPage = 1;
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.criteria.fromDate = this.selectedRange.startDate;
+        this.criteria.toDate = this.selectedRange.endDate;
         this.getShipments();
     }
     async setPage(pager: PagerSetting) {

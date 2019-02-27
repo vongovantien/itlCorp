@@ -12,6 +12,6 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsMawbcontainerService : IRepositoryBase<CsMawbcontainer, CsMawbcontainerModel>
     {
-        List<vw_csMAWBContainer> Query(CsMawbcontainerCriteria criteria);
+        IQueryable<CsMawbcontainerModel> Query(CsMawbcontainerCriteria criteria);
     }
 }

@@ -71,7 +71,7 @@
                         </a>
                     </li>
                     <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" id="housebill-tablink" [attr.data-toggle] ="housebillRoleToggle"
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" [attr.data-toggle] ="housebillRoleToggle" type=""
                             href="{{housebillTabviewHref}}" [attr.role]="housebillRoleToggle" (click)="switchTab()">
                             House Bill List
                         </a>
@@ -256,6 +256,69 @@
         </div>
     </div>
     <!--end::confirm-create-job-modal-->
+
+    <!--begin::confirm-can-not-create-job-modal-->
+    <div class="modal fade" id="confirm-can-not-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cannot Create Job</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-text-block">
+                        <span>Oops, It's look like you missed something, Please recheck the highlighted field below.</span>
+                    </div>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="submitted = true;">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                OK
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::confirm-can-not-create-job-modal-->
+
+    
+    <!--begin::confirm-not-create-job-misscont-modal-->
+    <div class="modal fade" id="confirm-not-create-job-misscont-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cannot Create Job</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-text-block">
+                        <span>You need to enter container data to create a job. Please recheck and try again!</span>
+                    </div>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="submitted = true;">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                OK
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::confirm-not-create-job-misscont-modal-->
 </form>
 
 <!--begin::container-list-of-job-modal-master-->
@@ -738,7 +801,7 @@
                     </div>
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button type="button" (click)="onSubmitContainer()"
+                    <button type="" (click)="onSubmitContainer()"
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>
