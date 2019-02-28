@@ -1,0 +1,599 @@
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <!--begin: Search Form -->
+        <div class="m-form m-form--label-align-right m--margin-bottom-10">
+            <div class="row align-items-center">
+                <div class="col-lg-4 order-2 order-lg-1">
+                    <div class="form-group">
+                        <div class="m-input-icon m-input-icon--left">
+                            <input type="text" class="form-control m-input m-input--square"
+                                placeholder="Search...">
+                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                <span>
+                                    <i class="la la-search"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        data-toggle="modal" data-target="#add-credit-debit-note-modal">
+                        <span>
+                            <i class="la la-plus"></i>
+                            <span>
+                                add credit/debit note
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--end: Search Form -->
+        <!--begin: Datatable-->
+        <div class="table-wrapper" id="table-001">
+            <table class="table table-striped table-brand dataTable">
+                <thead>
+                    <tr>
+                        <th class="table-actions-col no-sorting">
+                            <span>Action</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Port Code</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Name(EN)</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Name(VI)</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Country</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Zone</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Mode</span>
+                        </th>
+                        <th>
+                            <span>Status</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="tbody-group">
+                    <!-- begin collapse-toggle-row -->
+                    <tr class="collapse-toggle-row group" style="background-color: #f2dedf">
+                        <td colspan="8">
+                            <!-- <a class="m--font-danger collapsed" href="javascript:void(0)" title="" data-toggle="collapse" data-target="#id-001" >
+                                <i class="la la-plus-square"></i>
+                            </a> -->
+                            <strong>No 1</strong>
+                        </td>
+                    </tr>
+                    <!-- end of collapse-toggle-row -->
+                    <!-- begin collapse-panel-row -->
+                    <tr class="">
+                        <td class="table-actions-col">
+                            <div class="table-actions">
+                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Edit">
+                                    <i class="la la-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>Active</span>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="table-actions-col">
+                            <div class="table-actions">
+                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Edit">
+                                    <i class="la la-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>Active</span>
+                        </td>
+                    </tr>
+                    <!--end of collapse-panel-row -->
+
+                    <!-- begin collapse-toggle-row -->
+                    <tr class="collapse-toggle-row group" style="background-color: #f2dedf">
+                        <td colspan="8">
+                            <!-- <a class="m--font-danger collapsed" href="javascript:void(0)" title="" data-toggle="collapse" data-target="#id-001" >
+                                <i class="la la-plus-square"></i>
+                            </a> -->
+                            <strong>No 2</strong>
+                        </td>
+                    </tr>
+                    <!-- end of collapse-toggle-row -->
+                    <!-- begin collapse-panel-row -->
+                    <tr class="">
+                        <td class="table-actions-col">
+                            <div class="table-actions">
+                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Edit">
+                                    <i class="la la-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>Active</span>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="table-actions-col">
+                            <div class="table-actions">
+                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Edit">
+                                    <i class="la la-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>text</span>
+                        </td>
+                        <td>
+                            <span>Active</span>
+                        </td>
+                    </tr>
+                    <!--end of collapse-panel-row -->
+                </tbody>
+            </table>
+        </div>
+        <!--end: Datatable-->   
+    </div>
+</div>
+<!--end:: m-portlet-->
+
+<!--begin:: add-credit-debit-note-modal-->
+<div class="modal fade" id="add-credit-debit-note-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Credit/Debit Note</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="div-inside bg-secondary m--margin-bottom-15">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note type
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Subject to Partner
+                                    </label>
+                                    <!--begin: Datatable-->
+                                    <div class="table-wrapper">
+                                        <table class="table table-striped table-secondary dataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="table-actions-col no-sorting">
+                                                        <span>Action</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Port Code</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name(EN)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Name(VI)</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Country</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Zone</span>
+                                                    </th>
+                                                    <th class="sorting">
+                                                        <span>Mode</span>
+                                                    </th>
+                                                    <th>
+                                                        <span>Status</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="tbody-group">
+                                                <tr class="">
+                                                    <td class="">
+                                                        <div class="">
+                                                            <label class="m-radio m-radio--solid m-radio--brand">
+                                                                <input type="radio" name="partner-raido-check" value="1">
+                                                                <span></span>
+                                                            </label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Active</span>
+                                                    </td>
+                                                </tr>
+                                                <tr class="">
+                                                    <td class="">
+                                                        <div class="">
+                                                            <label class="m-radio m-radio--solid m-radio--brand">
+                                                                <input type="radio" name="partner-raido-check" value="2">
+                                                                <span></span>
+                                                            </label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>text</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>Active</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--end: Datatable-->   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::m-portlet -->   
+                    <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Filtered Charges </h3>
+                        </div>
+                        <div class="m-portlet__body">
+                            <!--begin: Datatable-->
+                            <div class="table-wrapper">
+                                <table class="table table-striped table-brand dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-actions-col no-sorting">
+                                                <span>Action</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Port Code</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Name(EN)</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Name(VI)</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Country</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Zone</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Mode</span>
+                                            </th>
+                                            <th>
+                                                <span>Status</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="tbody-group">
+                                        <tr>
+                                            <td colspan="8">
+                                                <div class="no-data">
+                                                    <i class="flaticon-coins"></i>
+                                                    <span class="no-data-text">No records found</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- <tr class="">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>Active</span>
+                                            </td>
+                                        </tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--end: Datatable-->   
+                        </div>
+                    </div>
+                    <!--end::m-portlet --> 
+
+                    <div class="row justify-content-center m--margin-bottom-15">
+                        <div class="col-2">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-download"></i>
+                                    <span>
+                                        add charges
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-upload"></i>
+                                    <span>
+                                        remove charges
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!--begin::m-portlet -->   
+                    <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title">Selected Charges </h3>
+                        </div>
+                        <div class="m-portlet__body">
+                            <!--begin: Datatable-->
+                            <div class="table-wrapper">
+                                <table class="table table-striped  table-brand dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-actions-col no-sorting">
+                                                <span>Action</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Port Code</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Name(EN)</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Name(VI)</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Country</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Zone</span>
+                                            </th>
+                                            <th class="sorting">
+                                                <span>Mode</span>
+                                            </th>
+                                            <th>
+                                                <span>Status</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="tbody-group">
+                                        <tr>
+                                            <td colspan="8">
+                                                <div class="no-data">
+                                                    <i class="flaticon-coins"></i>
+                                                    <span class="no-data-text">No records found</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- <tr class="">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>Active</span>
+                                            </td>
+                                        </tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--end: Datatable-->   
+                        </div>
+                    </div>
+                    <!--end::m-portlet --> 
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            create
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: add-credit-debit-note-modal-->
+

@@ -238,7 +238,8 @@ export class API_MENU {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/addNew"
         },
         CsMawbcontainer: {
-            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query"
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Update"
         }
     }
 }

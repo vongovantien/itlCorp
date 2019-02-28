@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Shipment.Infrastructure.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -30,6 +34,20 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Query(CsMawbcontainerCriteria criteria)
         {
             return Ok(csContainerService.Query(criteria));
+        }
+        [HttpPut]
+        [Route("Update")]
+        public IActionResult Update(CsMawbcontainerEdit model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csContainerService.Update(model.CsMawbcontainerModels, model.MasterId, model.HousebillId);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

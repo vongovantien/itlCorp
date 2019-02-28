@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICsMawbcontainerService : IRepositoryBase<CsMawbcontainer, CsMawbcontainerModel>
     {
         IQueryable<CsMawbcontainerModel> Query(CsMawbcontainerCriteria criteria);
+        HandleState Update(List<CsMawbcontainerModel> list, Guid? masterId, Guid? housebillId);
     }
 }

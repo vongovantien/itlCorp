@@ -70,23 +70,30 @@
                             Shipment detail
                         </a>
                     </li>
-                    <li class="nav-item m-tabs__item">
+                    <!-- <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link" id="housebill-tablink" [attr.data-toggle] ="housebillRoleToggle" type=""
                             href="{{housebillTabviewHref}}" [attr.role]="housebillRoleToggle" (click)="switchTab()">
                             House Bill List
                         </a>
+                    </li> -->
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" 
+                            href="#housebill-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
+                            House Bill List
+                        </a>
                     </li>
-
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" 
+                            href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
+                            Credit Note & Debit Note
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
                 <app-master-bill [shipment]="shipment" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment"></app-master-bill>
-                <!--begin:: m-portlet-->
-
-                <!--end:: m-portlet-->
-
                 <!--begin:: m-portlet-->
                 <div class="m-portlet">
                     <div class="m-portlet__head">
@@ -191,6 +198,9 @@
             <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
                 <app-housebill-list [houseBillList]="houseBillList"></app-housebill-list>
             </div>
+            <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="">
+                <app-credit-and-debit-note></app-credit-and-debit-note>
+        </div>
         </div>
 
         <div class="form-actions m--align-right">
@@ -457,7 +467,7 @@
                                 </thead>
                                 <tbody *ngIf="lstMasterContainers">
                                     <ng-container *ngFor="let container of lstMasterContainers; let i= index">
-                                        <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
+                                        <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit" [ngClass]="{ 'invalid-row': container.inValidRow }">
                                             <td class="table-actions-col fixed-side">
                                                 <!-- <div class="table-actions content-editable" style="width: 70px">
                                                     <button type="button"
@@ -500,6 +510,11 @@
                                                     <div class="form-control-feedback"
                                                         *ngIf="containerMasterForm.submitted && container.containerTypeId == null && container.verifying">
                                                         Container type is required.
+                                                    </div>
+                                                </div>
+                                                <div class="has-danger row-control-feedback" *ngIf="container.inValidRow">
+                                                    <div class="form-control-feedback">
+                                                        Duplicate container detail
                                                     </div>
                                                 </div>
                                             </td>

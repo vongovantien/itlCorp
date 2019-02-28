@@ -17,6 +17,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsTransactionEditModel, CsTransaction>();
             CreateMap<CsTransactionDetailModel, CsTransactionDetail>();
             CreateMap<CsMawbcontainerModel, CsMawbcontainer>();
+            CreateMap<CsMawbcontainerModel, CsMawbcontainer>();
         }
     }
 }

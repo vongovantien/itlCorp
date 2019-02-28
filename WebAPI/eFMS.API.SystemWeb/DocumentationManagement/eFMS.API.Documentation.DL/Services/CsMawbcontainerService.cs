@@ -4,6 +4,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -51,6 +52,52 @@ namespace eFMS.API.Documentation.DL.Services
                                  }).AsQueryable();
             
             return results;
+        }
+
+        public HandleState Update(List<CsMawbcontainerModel> list, Guid? masterId, Guid? housebillId)
+        {
+            List<CsMawbcontainer> oldList = null;
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                if (masterId != null)
+                {
+                    oldList = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Mblid == masterId).ToList();
+                    foreach(var item in oldList)
+                    {
+                        if(list.FirstOrDefault(x => x.Id == item.Id) == null)
+                        {
+                            dc.CsMawbcontainer.Remove(item);
+                        }
+                    }
+                    dc.SaveChanges();
+                }
+                foreach (var item in list)
+                {
+                    if (item.Id == Guid.Empty)
+                    {
+                        item.Id = Guid.NewGuid();
+                        item.UserModified = "01";
+                        item.Mblid = (Guid)masterId;
+                        item.DatetimeModified = DateTime.Now;
+                        var hs = Add(item);
+                    }
+                    else
+                    {
+                        if (((eFMSDataContext)DataContext.DC).CsMawbcontainer.Count(x => x.Id == item.Id) == 1)
+                        {
+                            item.UserModified = "01";
+                            item.DatetimeModified = DateTime.Now;
+                            var hs = Update(item, x => x.Id == item.Id);
+                        }
+                    }
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
 
         private List<vw_csMAWBContainer> GetView(){
