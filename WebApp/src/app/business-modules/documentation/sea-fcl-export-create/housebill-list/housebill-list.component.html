@@ -1248,7 +1248,7 @@
                                                     <table class="table table-hover" *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
                                                         <tbody>
                                                             <tr class="data-row" data-id="1" *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                            (click)="BuyingRateChargeToAdd.">
+                                                            (click)="BuyingRateChargeToAdd.paymentObjectId = item.id">
                                                                 <td>{{item.id}}</td>
                                                                 <td>{{item.shortName}}</td>
                                                                 <td>{{item.partnerNameEn}}</td>
