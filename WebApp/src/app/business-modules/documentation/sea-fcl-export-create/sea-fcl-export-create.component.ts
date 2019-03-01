@@ -16,10 +16,10 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 
 export class FirstLoadData {
-    listPartner: any[] = null;
-    listUnit: any[] = null;
-    listCurrency: any[] = null;
-    listCharge: any[] = null;
+    lstPartner: any[] = null;
+    lstUnit: any[] = null;
+    lstCurrency: any[] = null;
+    lstCharge: any[] = null;
 }
 
 @Component({
@@ -130,7 +130,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.getComodities();
         this.getWeightTypes();
         this.getListPartner();
-
+        this.getListUnits()
         if (this.lstMasterContainers.length == 0) {
             this.lstMasterContainers.push(this.initNewContainer());
         }
@@ -536,13 +536,13 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
             var data = res['data'];
-            this._firstLoadData.listPartner = data;
+            this._firstLoadData.lstPartner = data;
             console.log({"firstLoadData":this._firstLoadData})
         });
     }
-    getUnits() {
+    getListUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { all: "", inactive: false }).subscribe((data: any) => {
-          this._firstLoadData.listUnit = data;
+          this._firstLoadData.lstUnit = data;
         });
     }
 

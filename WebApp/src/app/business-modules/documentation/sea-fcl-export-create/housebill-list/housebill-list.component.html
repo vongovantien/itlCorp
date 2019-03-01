@@ -1245,9 +1245,10 @@
                                                     </div>
                                                 </div>
                                                 <div class="table-body-scroll">
-                                                    <table class="table table-hover" *ngIf="lstPartner!==null && lstPartner.length>0">
+                                                    <table class="table table-hover" *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
                                                         <tbody>
-                                                            <tr class="data-row data-selected" data-id="1" *ngFor="let item of lstPartner;let i = index;">
+                                                            <tr class="data-row" data-id="1" *ngFor="let item of comboBoxData.lstPartner;let i = index;"
+                                                            (click)="BuyingRateChargeToAdd.paymentObjectId = item.id">
                                                                 <td>{{item.id}}</td>
                                                                 <td>{{item.shortName}}</td>
                                                                 <td>{{item.partnerNameEn}}</td>
@@ -1306,8 +1307,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="table-body-scroll">
-                                                    <table class="table table-hover" *ngIf="lstUnit!==null && lstUnit.length>0">
-                                                        <tbody *ngFor="let item of lstUnit;let i = index;">
+                                                    <table class="table table-hover" *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
+                                                        <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
                                                             <tr class="data-row data-selected" attr.data-id="{{i}}"
                                                             (click)="BuyingRateChargeToAdd.unitId=item.id;
                                                             selectedBuyingUnit.value=item.unitNameEn"
