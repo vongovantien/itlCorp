@@ -53,5 +53,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        //public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }

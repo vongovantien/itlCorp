@@ -37,18 +37,32 @@ export class ChargeAddnewComponent implements OnInit {
     /**
      * Need to update ngDataServices by get data from databse after implement documentation module 
      */
+    // ngDataService2 = [
+    //   {text:"Landing Truckinng",id:"LT"},
+    //   {text:"Air Import",id:"AI"},
+    //   {text:"Air Export",id:"AE"},
+    //   {text:"Sea Import",id:"SI"},
+    //   {text:"Sea Export",id:"SE"},      
+    //   {text:"Sea FCL Export",id:"SFCLE"},
+    //   {text:"Sea FCL Import",id:"SFCLI"},
+    //   {text:"Sea LCL Export",id:"SLCLE"},
+    //   {text:"Sea LCL Import",id:"SLCLI"},
+    //   {text:"Sea Consol Export",id:"SCE"},
+    //   {text:"Sea Consol Import",id:"SCI"}
+    // ];
+
     ngDataService = [
       {text:"Landing Truckinng",id:"LT"},
       {text:"Air Import",id:"AI"},
       {text:"Air Export",id:"AE"},
       {text:"Sea Import",id:"SI"},
       {text:"Sea Export",id:"SE"},      
-      {text:"Sea FCL Export",id:"SFCLE"},
-      {text:"Sea FCL Import",id:"SFCLI"},
-      {text:"Sea LCL Export",id:"SLCLE"},
-      {text:"Sea LCL Import",id:"SLCLI"},
-      {text:"Sea Consol Export",id:"SCE"},
-      {text:"Sea Consol Import",id:"SCI"}
+      {text:"Sea Export FCL",id:"SEF"},
+      {text:"Sea Import FCL",id:"SIF"},
+      {text:"Sea Export LCL",id:"SEL"},
+      {text:"Sea Import LCL",id:"SIL"},
+      {text:"Sea Export Consol",id:"SEC"},
+      {text:"Sea Import Consol",id:"SIC"}
     ];
 
   async ngOnInit() {
