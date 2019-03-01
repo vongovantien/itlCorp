@@ -53,7 +53,7 @@ export class HousebillAddnewComponent implements OnInit {
    */
 
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
-  ListHouseBill: any = ["gggg"];
+  // ListHouseBill: any = ["gggg"];
   ListContainers: Array<Container> = [new Container()];
   @Output() houseBillComing = new EventEmitter<{ data: CsTransactionDetail, extend_data: any }>();
 
@@ -301,7 +301,7 @@ export class HousebillAddnewComponent implements OnInit {
       this.HouseBillToAdd.csMawbcontainers = this.lstHouseBillContainers;
       const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillToAdd);
       if (res.status) {
-        this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
+        // this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
         this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
        // this.resetForm();
         $('#add-house-bill-modal').modal('hide');

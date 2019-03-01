@@ -763,7 +763,10 @@
                                                             <ng-container
                                                                 *ngFor="let item of listFowardingAgent;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.forwardingAgentId=item.id;selectedForwardingAgent.value=item.partnerNameEn;getForwardingAgentDescription(item)"
+                                                                    (click)="HouseBillToAdd.forwardingAgentId=item.id;
+                                                                             selectedForwardingAgent.value=item.partnerNameEn;
+                                                                             extend_data.forwarding_agent_nameEn=item.partnerNameEn;
+                                                                             getForwardingAgentDescription(item)"
                                                                     [ngClass]="{ 'data-selected': HouseBillToAdd.forwardingAgentId!==null && HouseBillToAdd.forwardingAgentId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-5">{{item.shortName}}</td>

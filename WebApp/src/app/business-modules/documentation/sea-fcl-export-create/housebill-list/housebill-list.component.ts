@@ -7,26 +7,27 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { FirstLoadData } from '../sea-fcl-export-create.component';
+import { prepareNg2SelectData } from 'src/helper/data.helper';
 
 @Component({
   selector: 'app-housebill-list',
   templateUrl: './housebill-list.component.html',
   styleUrls: ['./housebill-list.component.scss']
 })
-export class HousebillListComponent implements OnInit{
+export class HousebillListComponent implements OnInit {
+
 
   lstBuyingRateCharges: any[] = [];
   lstSellingRateCharges: any[] = [];
   lstOBHCharges: any[] = [];
-  lstUnit: any[] = [];
-  lstPartner: any = null;
   BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
 
-  comboBoxData : FirstLoadData = new FirstLoadData();
+  comboBoxData: FirstLoadData = new FirstLoadData();
+  houseBillSelected: { data: CsTransactionDetail, extend_data: any } = { data: null, extend_data: null };
 
-  @Input() set firstLoadData(data:FirstLoadData){
+  @Input() set firstLoadData(data: FirstLoadData) {
     this.comboBoxData = data;
   };
 
@@ -35,12 +36,29 @@ export class HousebillListComponent implements OnInit{
     this.ConstHouseBillListData = lstHB;
   }
 
+  /**
+   * Calculate 'total' base on 'quantity' , 'unit price', 'VAT'
+   */
+  calculateTotal(){
+    if(this.BuyingRateChargeToAdd.vatrate>=0){
+      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity*this.BuyingRateChargeToAdd.unitPrice*(1+(this.BuyingRateChargeToAdd.vatrate/100));
+    }else{
+      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity*this.BuyingRateChargeToAdd.unitPrice+ this.BuyingRateChargeToAdd.vatrate;
+    }
+  }
+ 
+
   partnerTypes = [
     { text: "Agent", id: "AGENT" },
     { text: "Customer", id: "CUSTOMER" },
     { text: "Other", id: "OTHER" }
 
   ]
+
+  selectPartnerType() {
+    console.log(this.BuyingRateChargeToAdd);
+    console.log(this.houseBillSelected);
+  }
 
 
   constructor(
@@ -52,14 +70,6 @@ export class HousebillListComponent implements OnInit{
     this.getListBuyingRateCharges();
     this.getListSellingRateCharges();
     this.getListOBHCharges();
-    // const d = this.firstLoadData;
-    // this.lstPartner =
-   
-    // setTimeout(() => {
-    //   this.lstPartner = d.listPartner;
-    //   console.log({"DATA_PN":this.lstPartner})
-    // }, 10000);
-    
   }
 
   getListBuyingRateCharges(search_key: string = null) {
@@ -109,8 +119,7 @@ export class HousebillListComponent implements OnInit{
     }
     this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
       var data = res['data']
-      this.lstPartner = data;
-      console.log({ "List_parner ": this.lstPartner });
+      this.comboBoxData.lstPartner = data;
     });
   }
 
@@ -141,16 +150,27 @@ export class HousebillListComponent implements OnInit{
 
   getUnits() {
     this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { all: "", inactive: false }).subscribe((data: any) => {
-      this.lstUnit = data;
+      this.comboBoxData.lstUnit = data;
     });
   }
 
-  getCurrencies(chargeId: string) {
-    console.log("")
-  }
   async getListCharge(type: 'CREDIT' | 'DEBIT' | 'OBH', serviceType: 'SEF' | 'SIF' | 'SEL' | 'SIL' | 'SEC' | 'SIC', key_search: String = null) {
     const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: type, serviceTypeId: serviceType });
     return res['data'];
+  }
+
+
+
+
+
+  currencies: any[] = [];
+  addChargeClick() {
+    this.currencies = prepareNg2SelectData(this.comboBoxData.lstCurrency, "id", "currencyName");
+  }
+  getListCurrency(key: string) {
+    // this.baseServices.post(this.api_menu.Catalogue.Currency.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }).subscribe(res => {
+    //   this.currencies = prepareNg2SelectData(res['data'], "id", "currencyName");
+    // });
   }
 
 

@@ -107,7 +107,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.getComodities();
         this.getWeightTypes();
         this.getListPartner();
-        this.getListUnits()
+        this.getListUnits();
+        this.getListCurrency();
         if (this.lstMasterContainers.length == 0) {
             this.lstMasterContainers.push(this.initNewContainer());
         }
@@ -436,11 +437,12 @@ export class SeaFclExportCreateComponent implements OnInit {
     public refreshValue(value: any): void {
     }
 
-    public houseBillList: any = [];
+    public _houseBillList: any = [];
     public houseBillCatcher(e: CsTransactionDetail) {
         console.log(e);
-        this.houseBillList.push(e);
-
+        var hb = Object.assign({},e);
+        this._houseBillList.push(hb);
+        console.log({"HOUSE_BILL_LIST":this._houseBillList});
     }
 
 
@@ -466,6 +468,14 @@ export class SeaFclExportCreateComponent implements OnInit {
     getListUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { all: "", inactive: false }).subscribe((data: any) => {
           this._firstLoadData.lstUnit = data;
+        });
+    }
+    getListCurrency(){
+        // this.baseServices.post(this.api_menu.Catalogue.Currency.paging+"?page="+1+"&size="+20,{inactive:false,all:""}).subscribe(res=>{
+        //     this._firstLoadData.lstCurrency = res['data'];
+        // });
+        this.baseServices.get(this.api_menu.Catalogue.Currency.getAll).subscribe((res:any)=>{
+            this._firstLoadData.lstCurrency = res;
         });
     }
 
