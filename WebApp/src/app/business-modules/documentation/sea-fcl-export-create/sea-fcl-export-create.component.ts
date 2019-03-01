@@ -43,8 +43,11 @@ export class SeaFclExportCreateComponent implements OnInit {
     };
     //
     housebillTabviewHref = '#';//'#confirm-create-job-modal';
+    creditdebitnoteTabviewHref= '#';
     housebillRoleToggle = 'modal';
-    inEditing: boolean = false;
+    indexItemConDelete = null;
+    //inEditing: boolean = false;
+
      /**
         * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
         * this method imporove performance for web when detecting change 
@@ -62,15 +65,18 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
             if(this.myForm.invalid){
                 this.housebillTabviewHref = "#confirm-can-not-create-job-modal";
+                this.creditdebitnoteTabviewHref = "#confirm-can-not-create-job-modal";
                 //$('#confirm-can-not-create-job-modal').modal('show');
             }
             else{
                 if(this.shipment.csMawbcontainers != null){
                     this.housebillTabviewHref = "#confirm-create-job-modal";
+                    this.creditdebitnoteTabviewHref = "#confirm-create-job-modal";
                     //$('#confirm-create-job-modal').modal('show');
                 }
                 else{
                     this.housebillTabviewHref = "#confirm-not-create-job-misscont-modal";
+                    this.creditdebitnoteTabviewHref = "#confirm-not-create-job-misscont-modal";
                     //$('#confirm-not-create-job-misscont-modal').modal('show');
                 }
             }
@@ -99,6 +105,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
+                this.creditdebitnoteTabviewHref = "#credit-debit-note-tabview-tab";
                 this.housebillRoleToggle = "tab";
             }
         });
@@ -253,6 +260,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.activeTab();
         }
     }
+    
     showListContainer(){
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             for(let i=0; i< this.lstMasterContainers.length; i++){
@@ -305,7 +313,10 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
     }
     removeAContainer(index: number){
-        this.lstMasterContainers.splice(index, 1);
+        this.indexItemConDelete = index;
+    }
+    removeContainer(){
+        this.lstMasterContainers.splice(this.indexItemConDelete, 1);
         this.shipment.csMawbcontainers = this.lstMasterContainers;
         $('#confirm-accept-delete-container-modal').modal('hide');
         this.resetSumContainer();
@@ -469,41 +480,29 @@ export class SeaFclExportCreateComponent implements OnInit {
         ]
     };
 
-    /**
-   * ng2-select
-   */
-    public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
-        'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
-
-    private _disabledV: string = '0';
-    public disabled: boolean = false;
-
-
-    private set disabledV(value: string) {
-        this._disabledV = value;
-        this.disabled = this._disabledV === '1';
-    }
-
-    public selected(value: any): void {
-        console.log('Selected value is: ', value);
-    }
-
-    public removed(value: any): void {
-        console.log('Removed value is: ', value);
-    }
-
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
-
-    public refreshValue(value: any): void {
-    }
 
     public houseBillList:any= [];
     public houseBillCatcher(e:CsTransactionDetail){
-        console.log(e);
-        this.houseBillList.push(e);
-
+      console.log(e);
+      this.houseBillList.push(e);
+  
     }
+     /**
+   * ng2-select
+   */
+  
+  public selected(value: any): void {
+    console.log('Selected value is: ', value);
+  }
 
+  public removed(value: any): void {
+    console.log('Removed value is: ', value);
+  }
+
+  public typed(value: any): void {
+    console.log('New search input: ', value);
+  }
+
+  public refreshValue(value: any): void {
+  }
 }

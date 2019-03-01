@@ -64,14 +64,12 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model.Id, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
             var result = csTransactionService.AddCSTransaction(model);
-            //var message = HandleError.GetMessage(hs, Crud.Insert);
-            //ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            //if (!hs.Success)
-            //{
-            //    return BadRequest(result);
-            //}
-            //return Ok(result);
             return Ok(result);
         }
 
@@ -87,6 +85,25 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+        private string CheckExist(Guid id, CsTransactionEditModel model)
+        {
+            string message = string.Empty;
+            if (id == Guid.Empty)
+            {
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                }
+            }
+            else
+            {
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                }
+            }
+            return message;
         }
     }
 }

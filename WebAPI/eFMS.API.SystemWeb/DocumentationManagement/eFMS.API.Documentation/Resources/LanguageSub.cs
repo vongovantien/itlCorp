@@ -32,5 +32,6 @@ namespace SystemManagementAPI.Resources
         public static readonly string EF_ANNOTATIONS_STRING_LENGTH = "EF_ANNOTATIONS_STRING_LENGTH";
         public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
+        public static readonly string MSG_MAWB_EXISTED = "MSG_MAWB_EXISTED";
     }
 }
