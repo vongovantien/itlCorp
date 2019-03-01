@@ -45,7 +45,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // TwoDigitDecimaNumberDirective
   ],
   imports: [    
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
+   // ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
     SharedModule,
     CommonModule,
     BrowserModule,

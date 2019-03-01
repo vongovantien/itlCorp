@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string FinalDestinationPlace { get; set; }
         public string FreightPayment { get; set; }
         public string PlaceFreightPay { get; set; }
-        public DateTime ClosingDate { get; set; }
+        public DateTime? ClosingDate { get; set; }
         public DateTime SailingDate { get; set; }
         public string ForwardingAgentDescription { get; set; }
         public string ForwardingAgentId { get; set; }
@@ -53,5 +53,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+
+       // public virtual CsTransaction Job { get; set; }
     }
 }

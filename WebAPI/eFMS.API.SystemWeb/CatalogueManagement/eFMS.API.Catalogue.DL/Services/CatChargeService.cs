@@ -91,10 +91,10 @@ namespace eFMS.API.Catalogue.DL.Services
 
 
 
-        public List<Object> GetCharges(CatChargeCriteria criteria, int page, int size, out int rowsCount)
+        public List<object> GetCharges(CatChargeCriteria criteria, int page, int size, out int rowsCount)
         {
             var list = Query(criteria);
-            var listReturn = new List<Object>();
+            List<object> listReturn = new List<object>();
 
             rowsCount = list.Count;
             if (size > 1)
@@ -125,13 +125,17 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 && ((x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                && ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.Type??"").IndexOf(criteria.Type??"",StringComparison.OrdinalIgnoreCase)>=0)
+                && ((x.ServiceTypeId??"").IndexOf(criteria.ServiceTypeId+";"??"",StringComparison.OrdinalIgnoreCase)>=0));
             }
             else
             {
                list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                || ((x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               || ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+               || ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+               || ((x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+               || ((x.ServiceTypeId ?? "").IndexOf(criteria.All + ";" ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
             return list.ToList(); ;
         }

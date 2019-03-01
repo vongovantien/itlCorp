@@ -27,13 +27,14 @@ namespace eFMS.API.Documentation.DL.Services
             detail.UserCreated = "thor";  //ChangeTrackerHelper.currentUser;
             detail.DatetimeCreated = DateTime.Now;
 
+
             try
             {
                 DataContext.Add(detail);
 
                 foreach (var x in model.CsMawbcontainers)
                 {
-                    x.Hblid = model.Id;
+                    x.Hblid = detail.Id;
                     x.Id = Guid.NewGuid();
                     x.Mblid = model.JobId;
                     ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);

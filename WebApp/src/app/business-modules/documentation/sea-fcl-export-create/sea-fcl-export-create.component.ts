@@ -12,14 +12,30 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 declare var $: any;
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { ActivatedRoute } from '@angular/router';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
+
+export class FirstLoadData {
+    listPartner: any[] = null;
+    listUnit: any[] = null;
+    listCurrency: any[] = null;
+    listCharge: any[] = null;
+}
 
 @Component({
     selector: 'app-sea-fcl-export-create',
     templateUrl: './sea-fcl-export-create.component.html',
     styleUrls: ['./sea-fcl-export-create.component.scss']
 })
+
+
 export class SeaFclExportCreateComponent implements OnInit {
+
+
+    _firstLoadData:FirstLoadData = new FirstLoadData();
+    
+
+
     shipment: CsTransaction = new CsTransaction();
     containerTypes: any[] = [];
     lstMasterContainers: any[] = [];
@@ -44,14 +60,14 @@ export class SeaFclExportCreateComponent implements OnInit {
     //
     housebillTabviewHref = '#confirm-create-job-modal';
     housebillRoleToggle = 'modal';
-     /**
-        * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
-        * this method imporove performance for web when detecting change 
-        * for more informations, check this reference please 
-        * https://blog.bitsrc.io/boosting-angular-app-performance-with-local-change-detection-8a6a3afa8d4d
-        *
-      */
-    switchTab(){
+    /**
+       * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
+       * this method imporove performance for web when detecting change 
+       * for more informations, check this reference please 
+       * https://blog.bitsrc.io/boosting-angular-app-performance-with-local-change-detection-8a6a3afa8d4d
+       *
+     */
+    switchTab() {
         this.cdr.detach();
         setTimeout(() => {
             this.cdr.reattach();
@@ -68,59 +84,60 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
     constructor(private baseServices: BaseService,
-        private route:ActivatedRoute,
+        private route: ActivatedRoute,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
         this.initNewShipmentForm();
     }
 
     async ngOnInit() {
         await this.route.params.subscribe(prams => {
-        if(prams.id != undefined){
-          this.shipment.id = prams.id;
-          this.getShipmentDetail(this.shipment.id);
-          this.getShipmentContainer(this.shipment.id);
-          this.housebillTabviewHref = "#housebill-tabview-tab";
-          this.housebillRoleToggle = "tab";
-        }
-        // else{
-        //     this.shipment = new CsTransaction();
-        // }
-      });
+            if (prams.id != undefined) {
+                this.shipment.id = prams.id;
+                this.getShipmentDetail(this.shipment.id);
+                this.getShipmentContainer(this.shipment.id);
+                this.housebillTabviewHref = "#housebill-tabview-tab";
+                this.housebillRoleToggle = "tab";
+            }
+            // else{
+            //     this.shipment = new CsTransaction();
+            // }
+        });
         this.getContainerTypes();
         this.getPackageTypes();
         this.getComodities();
         this.getWeightTypes();
-        
+        this.getListPartner();
+
         if (this.lstMasterContainers.length == 0) {
             this.lstMasterContainers.push(this.initNewContainer());
         }
         console.log(this.lstMasterContainers);
     }
     async getShipmentContainer(id: String) {
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: id}, false, false);
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
         this.shipment.csMawbcontainers = this.lstMasterContainers = responses;
-        if(this.lstMasterContainers != null){
+        if (this.lstMasterContainers != null) {
             this.getShipmentContainerDescription(this.lstMasterContainers);
         }
     }
-    showListContainer(){
-        this.lstMasterContainers.forEach(container =>{
+    showListContainer() {
+        this.lstMasterContainers.forEach(container => {
             container.allowEdit = false;
             let index = this.containerTypes.findIndex(x => x.id == container.id);
-            if(index > -1) container.containerTypeName = this.containerTypes[index].name;
+            if (index > -1) container.containerTypeName = this.containerTypes[index].name;
         });
     }
-    getShipmentContainerDescription(listContainers: any[]){
+    getShipmentContainerDescription(listContainers: any[]) {
         for (var i = 0; i < listContainers.length; i++) {
             listContainers[i].isSave = true;
             this.totalGrossWeight = this.totalGrossWeight + listContainers[i].gw;
             this.totalNetWeight = this.totalNetWeight + listContainers[i].nw;
             this.totalCharWeight = this.totalCharWeight + listContainers[i].chargeAbleWeight;
             this.totalCBM = this.totalCBM + listContainers[i].cbm;
-            if(this.numberOfTimeSaveContainer == 1){
-                this.shipment.packageContainer = this.shipment.packageContainer + (listContainers[i].quantity == ""?"": listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", ");
-                this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName== ""?"": listContainers[i].commodityName + ", ");
-                this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description== ""?"": listContainers[i].description + ", ");
+            if (this.numberOfTimeSaveContainer == 1) {
+                this.shipment.packageContainer = this.shipment.packageContainer + (listContainers[i].quantity == "" ? "" : listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", ");
+                this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName == "" ? "" : listContainers[i].commodityName + ", ");
+                this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description == "" ? "" : listContainers[i].description + ", ");
             }
         }
     }
@@ -128,9 +145,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
         console.log(this.shipment);
     }
-    initNewShipmentForm(){
+    initNewShipmentForm() {
         this.myForm = this.fb.group({
-            jobId: new FormControl({value: '', disabled: true}),
+            jobId: new FormControl({ value: '', disabled: true }),
             estimatedTimeofDepature: new FormControl('', Validators.required),
             estimatedTimeofArrived: new FormControl(''),
             mawb: new FormControl('', Validators.required),
@@ -158,7 +175,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             desOfGoods: new FormControl('')
         });
     }
-    initNewContainer(){
+    initNewContainer() {
         var container = {
             containerTypeId: null,
             containerTypeName: '',
@@ -179,13 +196,13 @@ export class SeaFclExportCreateComponent implements OnInit {
             description: '',
             gw: null,
             nw: null,
-            chargeAbleWeight :null,
+            chargeAbleWeight: null,
             cbm: null,
             packageContainer: '',
             //desOfGoods: '',
             allowEdit: true,
             isNew: true,
-            verifying:false
+            verifying: false
         };
         return container;
     }
@@ -214,7 +231,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.commodities = responses;
         console.log(this.commodities);
     }
-    confirmCreateJob(){
+    confirmCreateJob() {
         $('#confirm-create-job-modal').modal('show');
     }
     async onSubmit() {
@@ -231,10 +248,10 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.activeTab();
         }
     }
-    async saveJob(){
+    async saveJob() {
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
-        if(response != null){
-            if(response.result.success){
+        if (response != null) {
+            if (response.result.success) {
                 this.shipment = response.model;
                 this.shipment.csMawbcontainers = this.lstMasterContainers;
             }
@@ -242,71 +259,71 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.housebillTabviewHref = "#housebill-tabview-tab";
         this.housebillRoleToggle = "tab";
     }
-    cancelSaveJob(){
+    cancelSaveJob() {
         $('#confirm-create-job-modal').modal('hide');
     }
     addNewContainer() {
         let hasItemEdited = false;
-        for(let i=0; i< this.lstMasterContainers.length; i++){
-            if(this.lstMasterContainers[i].allowEdit == true){
+        for (let i = 0; i < this.lstMasterContainers.length; i++) {
+            if (this.lstMasterContainers[i].allowEdit == true) {
                 hasItemEdited = true;
                 break;
             }
         }
-        if(hasItemEdited == false){
+        if (hasItemEdited == false) {
             console.log(this.containerMasterForm);
             this.lstMasterContainers.push(this.initNewContainer());
         }
-        else{
+        else {
             this.baseServices.errorToast("Current container must be save!!!");
         }
     }
-    removeAContainer(index: number){
+    removeAContainer(index: number) {
         this.lstMasterContainers.splice(index, 1);
     }
-    saveNewContainer(index: any){
+    saveNewContainer(index: any) {
         this.lstMasterContainers[index].verifying = true;
-        if(this.containerMasterForm.invalid) return;
+        if (this.containerMasterForm.invalid) return;
         //Cont Type, Cont Q'ty, Container No, Package Type
-        let existedItem = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId 
+        let existedItem = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
             && x.quantity == this.lstMasterContainers[index].quantity
             && x.containerNo == this.lstMasterContainers[index].containerNo
             && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
-        if(existedItem.length > 1) { 
+        if (existedItem.length > 1) {
             this.baseServices.errorToast("This container has been existed");
             return;
         }
-        else{
-            if(this.lstMasterContainers[index].isNew == true) this.lstMasterContainers[index].isNew = false;
+        else {
+            if (this.lstMasterContainers[index].isNew == true) this.lstMasterContainers[index].isNew = false;
             this.lstMasterContainers[index].allowEdit = false;
-            this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
-            this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
-            this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId!= null? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
+            this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null ? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
+            this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
+            this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId != null ? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
         }
         this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
     }
 
-    
-    cancelNewContainer(index: number){
-        if(this.lstMasterContainers[index].isNew == true){
+
+    cancelNewContainer(index: number) {
+        if (this.lstMasterContainers[index].isNew == true) {
             this.lstMasterContainers.splice(index, 1);
         }
-        else{
+        else {
             this.lstMasterContainers[index].allowEdit = false;
         }
     }
-    changeEditStatus(index: any){
-        if(this.lstMasterContainers[index].allowEdit == false){
+    changeEditStatus(index: any) {
+        if (this.lstMasterContainers[index].allowEdit == false) {
             this.lstMasterContainers[index].allowEdit = true;
         }
-        else{
+        else {
             this.lstMasterContainers[index].allowEdit = false;
         }
     }
     onSubmitContainer() {
         this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
         if (this.containerMasterForm.valid) {
-            if(this.numberOfTimeSaveContainer == 1){
+            if (this.numberOfTimeSaveContainer == 1) {
                 this.totalGrossWeight = 0;
                 this.totalNetWeight = 0;
                 this.totalCharWeight = 0;
@@ -331,37 +348,37 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.shipment.csMawbcontainers = this.lstMasterContainers;
         }
     }
-    searchContainer(keySearch: any){
-        keySearch = keySearch!=null? keySearch.trim().toLowerCase(): "";
+    searchContainer(keySearch: any) {
+        keySearch = keySearch != null ? keySearch.trim().toLowerCase() : "";
         this.lstMasterContainers = Object.assign([], this.lstContainerTemp).filter(
             item => (item.containerTypeName.toLowerCase().includes(keySearch)
-                ||  (item.quantity!= null? item.quantity.toString(): "").includes(keySearch)
-                ||  (item.containerNo!= null? item.containerNo.toLowerCase(): "").includes(keySearch)
-                ||  (item.sealNo!= null? item.sealNo.toLowerCase(): "").includes(keySearch)
-                ||  (item.markNo != null? item.markNo.toLowerCase(): "").includes(keySearch)
-                ||  (item.commodityName != null? item.commodityName.toLowerCase(): "").includes(keySearch)
-                ||  (item.packageTypeName != null? item.packageTypeName.toLowerCase(): "").includes(keySearch)
-                ||  (item.packageQuantity != null? item.packageQuantity.toString().toLowerCase(): "").includes(keySearch)
-                ||  (item.description!= null? item.description.toLowerCase(): "").includes(keySearch)
-                ||  (item.nw!= null? item.nw.toString().toLowerCase():"").includes(keySearch)
-                ||  (item.chargeAbleWeight!= null? item.chargeAbleWeight.toString():"").toLowerCase().includes(keySearch)
-                ||  (item.gw != null? item.gw.toString().toLowerCase(): "").includes(keySearch)
-                ||  (item.unitOfMeasureName != null? item.unitOfMeasureName.toLowerCase(): "").includes(keySearch)
-                ||  (item.cbm != null? item.cbm.toString().toLowerCase(): "").includes(keySearch)
-                    )
-         );
-         console.log(this.lstMasterContainers);
+                || (item.quantity != null ? item.quantity.toString() : "").includes(keySearch)
+                || (item.containerNo != null ? item.containerNo.toLowerCase() : "").includes(keySearch)
+                || (item.sealNo != null ? item.sealNo.toLowerCase() : "").includes(keySearch)
+                || (item.markNo != null ? item.markNo.toLowerCase() : "").includes(keySearch)
+                || (item.commodityName != null ? item.commodityName.toLowerCase() : "").includes(keySearch)
+                || (item.packageTypeName != null ? item.packageTypeName.toLowerCase() : "").includes(keySearch)
+                || (item.packageQuantity != null ? item.packageQuantity.toString().toLowerCase() : "").includes(keySearch)
+                || (item.description != null ? item.description.toLowerCase() : "").includes(keySearch)
+                || (item.nw != null ? item.nw.toString().toLowerCase() : "").includes(keySearch)
+                || (item.chargeAbleWeight != null ? item.chargeAbleWeight.toString() : "").toLowerCase().includes(keySearch)
+                || (item.gw != null ? item.gw.toString().toLowerCase() : "").includes(keySearch)
+                || (item.unitOfMeasureName != null ? item.unitOfMeasureName.toLowerCase() : "").includes(keySearch)
+                || (item.cbm != null ? item.cbm.toString().toLowerCase() : "").includes(keySearch)
+            )
+        );
+        console.log(this.lstMasterContainers);
     }
-    closeContainerPopup(){
+    closeContainerPopup() {
         let index = this.lstMasterContainers.findIndex(x => x.isNew == true);
-        if(index> -1){
+        if (index > -1) {
             this.lstMasterContainers.splice(index, 1);
         }
-        if(this.shipment.csMawbcontainers == null){
+        if (this.shipment.csMawbcontainers == null) {
             this.lstMasterContainers = [];
         }
     }
-    resetSumContainer(){
+    resetSumContainer() {
         this.shipment.desOfGoods = '';
         this.shipment.packageContainer = '';
         this.shipment.commodity = '';
@@ -419,11 +436,37 @@ export class SeaFclExportCreateComponent implements OnInit {
     public refreshValue(value: any): void {
     }
 
-    public houseBillList:any= [];
-    public houseBillCatcher(e:CsTransactionDetail){
+    public houseBillList: any = [];
+    public houseBillCatcher(e: CsTransactionDetail) {
         console.log(e);
         this.houseBillList.push(e);
 
+    }
+
+
+
+
+    /**
+     * PREPARE DATA
+     */
+
+    getListPartner(search_key: string = null) {
+        var key = "";
+        if (search_key !== null && search_key.length < 3) {
+            return;
+        } else {
+            key = search_key;
+        }
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
+            var data = res['data'];
+            this._firstLoadData.listPartner = data;
+            console.log({"firstLoadData":this._firstLoadData})
+        });
+    }
+    getUnits() {
+        this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { all: "", inactive: false }).subscribe((data: any) => {
+          this._firstLoadData.listUnit = data;
+        });
     }
 
 }
