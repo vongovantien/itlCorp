@@ -13,16 +13,16 @@ import { FirstLoadData } from '../sea-fcl-export-create.component';
   templateUrl: './housebill-list.component.html',
   styleUrls: ['./housebill-list.component.scss']
 })
-export class HousebillListComponent implements OnInit,AfterViewInit,OnChanges{
-  ngOnChanges(changes: SimpleChanges): void {
-    const _firstLoadData: SimpleChange = changes.firstLoadData;
-    this.lstPartner = _firstLoadData.currentValue.listPartner;
-    console.log({"DATA_PN":this.lstPartner})
-  }
+export class HousebillListComponent implements OnInit{
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   const _firstLoadData: SimpleChange = changes.firstLoadData;
+  //   this.comboBoxData = _firstLoadData.currentValue;
+  //   console.log({"DATA_PN":this.lstPartner})
+  // }
  
-  ngAfterViewInit(): void {
+  // ngAfterViewInit(): void {
      
-  }
+  // }
 
   lstBuyingRateCharges: any[] = [];
   lstSellingRateCharges: any[] = [];
@@ -33,7 +33,11 @@ export class HousebillListComponent implements OnInit,AfterViewInit,OnChanges{
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
 
-  @Input()  firstLoadData:FirstLoadData;
+  comboBoxData : FirstLoadData = new FirstLoadData();
+
+  @Input() set firstLoadData(data:FirstLoadData){
+    this.comboBoxData = data;
+  };
 
   @Input() set houseBillList(lstHB: any[]) {
     this.HouseBillListData = lstHB;
