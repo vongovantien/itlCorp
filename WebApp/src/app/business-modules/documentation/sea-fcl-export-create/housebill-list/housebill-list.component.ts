@@ -31,6 +31,7 @@ export class HousebillListComponent implements OnInit {
     this.comboBoxData = data;
   };
 
+
   @Input() set houseBillList(lstHB: any[]) {
     this.HouseBillListData = lstHB;
     this.ConstHouseBillListData = lstHB;

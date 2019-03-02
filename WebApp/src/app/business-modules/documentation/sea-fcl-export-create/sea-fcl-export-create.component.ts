@@ -437,12 +437,10 @@ export class SeaFclExportCreateComponent implements OnInit {
     public refreshValue(value: any): void {
     }
 
-    public _houseBillList: any = [];
-    public houseBillCatcher(e: CsTransactionDetail) {
-        console.log(e);
-        var hb = Object.assign({},e);
-        this._houseBillList.push(hb);
-        console.log({"HOUSE_BILL_LIST":this._houseBillList});
+    public houseBillList: Array<object> = [];
+    public houseBillCatcher(e:any) {
+      this.houseBillList = e ;
+      console.log({"AAAA":this.houseBillList});
     }
 
 

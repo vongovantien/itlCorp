@@ -55,7 +55,8 @@ export class HousebillAddnewComponent implements OnInit {
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
   // ListHouseBill: any = ["gggg"];
   ListContainers: Array<Container> = [new Container()];
-  @Output() houseBillComing = new EventEmitter<{ data: CsTransactionDetail, extend_data: any }>();
+  //@Output() houseBillComing = new EventEmitter<{ data: CsTransactionDetail, extend_data: any }>();
+  @Output() houseBillComing = new EventEmitter<any>();
 
 
   constructor(
@@ -295,14 +296,16 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   isDisplay = true;
+  ListHouseBill:any[]=[];
   async save(form: NgForm) {
 
     if (form.valid) {
       this.HouseBillToAdd.csMawbcontainers = this.lstHouseBillContainers;
       const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillToAdd);
       if (res.status) {
-        // this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
-        this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
+        this.ListHouseBill.push({ data: Object.assign({},this.HouseBillToAdd), extend_data: this.extend_data });
+        // this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
+        this.houseBillComing.emit(this.ListHouseBill);
        // this.resetForm();
         $('#add-house-bill-modal').modal('hide');
       }
