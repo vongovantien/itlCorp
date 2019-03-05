@@ -238,6 +238,10 @@ export class API_MENU {
         },
         CsMawbcontainer: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query"
+        },
+        CsShipmentSurcharge:{
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Add",
+            getByHBId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetByHB",
         }
     }
 }

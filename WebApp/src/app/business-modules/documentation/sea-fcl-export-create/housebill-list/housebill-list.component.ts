@@ -8,6 +8,10 @@ import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSu
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { FirstLoadData } from '../sea-fcl-export-create.component';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
+import { NgForm } from '@angular/forms';
+import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
+declare var $: any;
 
 @Component({
   selector: 'app-housebill-list',
@@ -17,15 +21,27 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 export class HousebillListComponent implements OnInit {
 
 
-  lstBuyingRateCharges: any[] = [];
-  lstSellingRateCharges: any[] = [];
-  lstOBHCharges: any[] = [];
+  MasterBillData: CsTransaction = null;
+  @Input() set masterBillData(_masterBilData: CsTransaction) {
+    this.MasterBillData = _masterBilData;
+  }
+
+
+ 
   BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
 
+  ListBuyingRateCharges:any[]= [];
+  ListSellingRateCharges:any[] =[];
+  ListOBHCharges:any[]=[];
+
+  lstBuyingRateChargesComboBox: any[] = [];
+  lstSellingRateChargesComboBox: any[] = [];
+  lstOBHChargesComboBox: any[] = [];
+
   comboBoxData: FirstLoadData = new FirstLoadData();
-  houseBillSelected: { data: CsTransactionDetail, extend_data: any } = { data: null, extend_data: null };
+  houseBillSelected:any = null; //{ data: CsTransactionDetail, extend_data: any } = { data: null, extend_data: null };
 
   @Input() set firstLoadData(data: FirstLoadData) {
     this.comboBoxData = data;
@@ -35,6 +51,10 @@ export class HousebillListComponent implements OnInit {
   @Input() set houseBillList(lstHB: any[]) {
     this.HouseBillListData = lstHB;
     this.ConstHouseBillListData = lstHB;
+    this.ListBuyingRateCharges = [];
+    this.ListSellingRateCharges = [];
+    this.ListOBHCharges = [];
+    // this.getHouseBillsOfMaster();
   }
 
   /**
@@ -71,6 +91,14 @@ export class HousebillListComponent implements OnInit {
     this.getListBuyingRateCharges();
     this.getListSellingRateCharges();
     this.getListOBHCharges();
+    this.getHouseBillsOfMaster();
+  }
+
+  getHouseBillsOfMaster(){
+    this.baseServices.get(this.api_menu.Documentation.CsTransactionDetail.getByJob+"?jobId="+this.MasterBillData.id).subscribe((res:any)=>{
+      this.HouseBillListData = res;
+      this.ConstHouseBillListData = res;
+    });
   }
 
   getListBuyingRateCharges(search_key: string = null) {
@@ -82,7 +110,7 @@ export class HousebillListComponent implements OnInit {
     }
 
     this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
-      this.lstBuyingRateCharges = res['data'];
+      this.lstBuyingRateChargesComboBox = res['data'];
     });
   }
 
@@ -94,8 +122,8 @@ export class HousebillListComponent implements OnInit {
       key = search_key;
     }
     this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
-      this.lstSellingRateCharges = res['data'];
-      console.log({ "lstSellingRateCharges": this.lstSellingRateCharges });
+      this.lstSellingRateChargesComboBox = res['data'];
+      console.log({ "lstSellingRateCharges": this.lstSellingRateChargesComboBox });
     });
   }
 
@@ -107,7 +135,7 @@ export class HousebillListComponent implements OnInit {
       key = search_key;
     }
     this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF', all: key }).subscribe(res => {
-      this.lstOBHCharges = res['data'];
+      this.lstOBHChargesComboBox = res['data'];
     });
   }
 
@@ -124,7 +152,24 @@ export class HousebillListComponent implements OnInit {
     });
   }
 
-  save() {
+  async saveNewBuyingRateCharge(form:NgForm,IsContinue:boolean=false) {  
+    
+
+    if(form.valid){
+      this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
+      this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
+      var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew,this.BuyingRateChargeToAdd);
+      this.getChargesOfHouseBill(this.houseBillSelected);
+      if(IsContinue && res.status){
+        this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+      }else if(res.status){
+        this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+        $('#add-buying-rate-modal').modal('hide');
+      }else{
+        
+      }
+      
+    }
     console.log(this.BuyingRateChargeToAdd);
   }
 
@@ -135,15 +180,14 @@ export class HousebillListComponent implements OnInit {
 
   searchHouseBill(key: any) {
     const search_key = key.toLowerCase();
-    this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x: { data: CsTransactionDetail, extend_data: any }) {
+    this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x:any) {
       return (
-        x.data.hwbno.toLowerCase().includes(search_key) ||
-        x.extend_data.customer_nameEn.toLowerCase().includes(search_key) ||
-        x.extend_data.customer_nameVn.toLowerCase().includes(search_key) ||
-        x.extend_data.saleman_nameEn.toLowerCase().includes(search_key) ||
-        x.extend_data.notify_party_nameEn.toLowerCase().includes(search_key) ||
-        x.extend_data.notify_party_nameVn.toLowerCase().includes(search_key) ||
-        x.data.finalDestinationPlace.toLowerCase().includes(search_key)
+        x.hwbno.toLowerCase().includes(search_key) ||
+        x.customerName.toLowerCase().includes(search_key) ||
+        x.customerNameVn.toLowerCase().includes(search_key) ||
+        x.saleManName.toLowerCase().includes(search_key) ||
+        x.notifyParty.toLowerCase().includes(search_key) ||
+        x.finalDestinationPlace.toLowerCase().includes(search_key)
       )
     });
     console.log({ "HBL AFTER SEARCH": this.HouseBillListData });
@@ -158,6 +202,12 @@ export class HousebillListComponent implements OnInit {
   async getListCharge(type: 'CREDIT' | 'DEBIT' | 'OBH', serviceType: 'SEF' | 'SIF' | 'SEL' | 'SIL' | 'SEC' | 'SIC', key_search: String = null) {
     const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: type, serviceTypeId: serviceType });
     return res['data'];
+  }
+
+  async getChargesOfHouseBill(hb:any){
+    this.houseBillSelected = hb ;
+    this.ListBuyingRateCharges = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId+"?hbId="+this.houseBillSelected.id)
+
   }
 
 

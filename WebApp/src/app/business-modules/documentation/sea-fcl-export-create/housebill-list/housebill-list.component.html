@@ -107,7 +107,7 @@
             </div>
             <!--end: Search Form -->
             <!--begin: Datatable-->
-            <div class="table-wrapper" id="">
+            <div class="table-wrapper fit-height-div" id="">
                 <table class="table table-striped table-brand dataTable">
                     <thead class="">
                         <tr class="">
@@ -173,7 +173,7 @@
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
                         <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
                             (click)="$event.path[0].closest('tbody').querySelector('tr.selected-row')==null?return:$event.path[0].closest('tbody').querySelector('tr.selected-row').classList.remove('selected-row');$event.path[0].closest('tr').classList.add('selected-row');
-                                    houseBillSelected=hb">
+                                    getChargesOfHouseBill(hb)">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
@@ -191,27 +191,27 @@
                             </td>
                             <td>
                                 <span>
-                                    {{hb.data.hwbno}}
+                                    {{hb.hwbno}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    {{hb.extend_data.customer_nameEn}}
+                                    {{hb.customerName}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    {{hb.extend_data.saleman_nameEn}}
+                                    {{hb.saleManName}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    {{hb.extend_data.notify_party_nameEn}}
+                                    {{hb.notifyParty}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    {{hb.data.finalDestinationPlace}}
+                                    {{hb.finalDestinationPlace}}
                                 </span>
                             </td>
                             <td>
@@ -347,11 +347,7 @@
                                         Unit price
                                     </span>
                                 </th>
-                                <th class="sorting">
-                                    <span>
-                                        Unit Price
-                                    </span>
-                                </th>
+                           
                                 <th class="sorting">
                                     <span>
                                         Currency
@@ -400,7 +396,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="selected-row">
+                            <tr class=""  *ngFor="let charge of ListBuyingRateCharges;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
                                         <button type="button"
@@ -417,57 +413,53 @@
                                 </td>
                                 <td>
                                     <span>
-                                        Partner
+                                        {{charge.partnerName}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Name EN
+                                        {{charge.nameEn}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Quantity
+                                        {{charge.quantity}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Unit
+                                        {{charge.unit}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Unit price
+                                       {{charge.unitPrice}}
+                                    </span>
+                                </td>
+                              
+                                <td>
+                                    <span>
+                                        {{charge.currency}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Unit Price
+                                        {{charge.vatrate}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Currency
+                                        {{charge.total}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        VAT
+                                        {{charge.notes}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Total
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Note
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Docs
+                                        {{charge.docNo}}
                                     </span>
                                 </td>
                                 <td>
@@ -1169,8 +1161,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="table-body-scroll">
-                                                    <table class="table table-hover" *ngIf="lstBuyingRateCharges!==null && lstBuyingRateCharges.length>0">
-                                                        <tbody *ngFor="let item of lstBuyingRateCharges;let i = index;">
+                                                    <table class="table table-hover" *ngIf="lstBuyingRateChargesComboBox!==null && lstBuyingRateChargesComboBox.length>0">
+                                                        <tbody *ngFor="let item of lstBuyingRateChargesComboBox;let i = index;">
                                                             <tr class="data-row" attr.data-id="{{i}}" 
                                                             (click)="BuyingRateChargeToAdd.chargeId=item.charge.id;
                                                                      BuyingRateChargeToAdd.unitId=item.charge.unitId;
@@ -1206,12 +1198,12 @@
                                     <ng-select [allowClear]="true" [items]="partnerTypes" [disabled]="disabled"
                                         (data)="refreshValue($event)" 
                                         (selected)="BuyingRateChargeToAdd.objectBePaid=$event.id;
-                                                    BuyingRateChargeToAdd.objectBePaid==='AGENT'? BuyingRateChargeToAdd.paymentObjectId=houseBillSelected.data.forwardingAgentId:continue;
-                                                    BuyingRateChargeToAdd.objectBePaid==='CUSTOMER'? BuyingRateChargeToAdd.paymentObjectId=houseBillSelected.data.customerId:continue;
-                                                    BuyingRateChargeToAdd.objectBePaid==='CUSTOMER'? selectedPartner.value=houseBillSelected.extend_data.customer_nameEn:continue;
-                                                    BuyingRateChargeToAdd.objectBePaid==='AGENT'? selectedPartner.value=houseBillSelected.extend_data.forwarding_agent_nameEn:continue;
-                                                    BuyingRateChargeToAdd.objectBePaid==='OTHER'? selectedPartner.value=null:continue;
-                                                    BuyingRateChargeToAdd.objectBePaid==='OTHER'? BuyingRateChargeToAdd.paymentObjectId=null:continue;selectPartnerType();"
+                                                    BuyingRateChargeToAdd.objectBePaid==='AGENT'? BuyingRateChargeToAdd.paymentObjectId=houseBillSelected.forwardingAgentId:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='CUSTOMER'? BuyingRateChargeToAdd.paymentObjectId=houseBillSelected.customerId:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='CUSTOMER'? selectedPartner.value=houseBillSelected.customerName:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='AGENT'? selectedPartner.value=houseBillSelected.forwardingAgentName:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='OTHER'? selectedPartner.value=null:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='OTHER'? BuyingRateChargeToAdd.paymentObjectId=null:null;selectPartnerType();"
                                         (removed)="BuyingRateChargeToAdd.objectBePaid=null;BuyingRateChargeToAdd.paymentObjectId=null;selectedPartner.value=null" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                     <div class="form-control-feedback"
@@ -1259,7 +1251,7 @@
                                                             <tr class="data-row" data-id="1" *ngFor="let item of comboBoxData.lstPartner;let i = index;"
                                                             [ngClass]="{'data-selected':BuyingRateChargeToAdd.paymentObjectId!==null && BuyingRateChargeToAdd.paymentObjectId===item.id}"
                                                             (click)="BuyingRateChargeToAdd.paymentObjectId = item.id;
-                                                                     selectedPartner.value=item.partnerNameEn;">
+                                                                     selectedPartner.value=item.shortName;">
                                                                 <td>{{item.id}}</td>
                                                                 <td>{{item.shortName}}</td>
                                                                 <td>{{item.partnerNameEn}}</td>
@@ -1436,7 +1428,7 @@
                     <!--end::Form-->
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="saveNewBuyingRateCharge(addBuyingRateChargeForm,true)">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -1444,7 +1436,7 @@
                             </span>
                         </span>
                     </button>
-                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" type="submit" (click)="save()">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" type="submit" (click)="saveNewBuyingRateCharge(addBuyingRateChargeForm)">
                         <span>
                             <i class="la la-save"></i>
                             <span>

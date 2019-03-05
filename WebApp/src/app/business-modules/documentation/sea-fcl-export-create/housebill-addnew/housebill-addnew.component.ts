@@ -303,14 +303,14 @@ export class HousebillAddnewComponent implements OnInit {
       this.HouseBillToAdd.csMawbcontainers = this.lstHouseBillContainers;
       const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillToAdd);
       if (res.status) {
-        this.ListHouseBill.push({ data: Object.assign({},this.HouseBillToAdd), extend_data: this.extend_data });
-        // this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
-        this.houseBillComing.emit(this.ListHouseBill);
-       // this.resetForm();
+        var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob+"?jobId="+this.MasterBillData.id);
+
+       // this.ListHouseBill.push({ data: Object.assign({},this.HouseBillToAdd), extend_data: Object.assign({},this.extend_data) });
+       // this.houseBillComing.emit(this.ListHouseBill);
+        this.houseBillComing.emit(latestListHouseBill);
         $('#add-house-bill-modal').modal('hide');
       }
     }
-
   }
 
   resetForm() {
