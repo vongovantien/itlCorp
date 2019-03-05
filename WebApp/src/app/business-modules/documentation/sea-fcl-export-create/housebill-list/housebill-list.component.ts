@@ -1,5 +1,5 @@
 
-import { Component, OnInit, Input, AfterViewInit, AfterViewChecked, OnChanges, SimpleChange, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as lodash from 'lodash';
@@ -25,23 +25,26 @@ export class HousebillListComponent implements OnInit {
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
   }
-
-
- 
   BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
 
-  ListBuyingRateCharges:any[]= [];
-  ListSellingRateCharges:any[] =[];
-  ListOBHCharges:any[]=[];
+  ListBuyingRateCharges: any[] = [];
+  ConstListBuyingRateCharges: any = [];
+
+  ListSellingRateCharges: any[] = [];
+  ConstListSellingRateCharges: any[] = [];
+
+  ListOBHCharges: any[] = [];
+  ConstListOBHCharges: any[] = [];
 
   lstBuyingRateChargesComboBox: any[] = [];
   lstSellingRateChargesComboBox: any[] = [];
   lstOBHChargesComboBox: any[] = [];
 
   comboBoxData: FirstLoadData = new FirstLoadData();
-  houseBillSelected:any = null; //{ data: CsTransactionDetail, extend_data: any } = { data: null, extend_data: null };
+  houseBillSelected: any = null; //{ data: CsTransactionDetail, extend_data: any } = { data: null, extend_data: null };
 
   @Input() set firstLoadData(data: FirstLoadData) {
     this.comboBoxData = data;
@@ -52,22 +55,26 @@ export class HousebillListComponent implements OnInit {
     this.HouseBillListData = lstHB;
     this.ConstHouseBillListData = lstHB;
     this.ListBuyingRateCharges = [];
+    this.ConstListBuyingRateCharges = [];
+
     this.ListSellingRateCharges = [];
+    this.ConstListSellingRateCharges = [];
+
     this.ListOBHCharges = [];
-    // this.getHouseBillsOfMaster();
+    this.ConstListOBHCharges = [];
   }
 
   /**
    * Calculate 'total' base on 'quantity' , 'unit price', 'VAT'
    */
-  calculateTotal(){
-    if(this.BuyingRateChargeToAdd.vatrate>=0){
-      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity*this.BuyingRateChargeToAdd.unitPrice*(1+(this.BuyingRateChargeToAdd.vatrate/100));
-    }else{
-      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity*this.BuyingRateChargeToAdd.unitPrice+ this.BuyingRateChargeToAdd.vatrate;
+  calculateTotal() {
+    if (this.BuyingRateChargeToAdd.vatrate >= 0) {
+      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
+    } else {
+      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + this.BuyingRateChargeToAdd.vatrate;
     }
   }
- 
+
 
   partnerTypes = [
     { text: "Agent", id: "AGENT" },
@@ -94,8 +101,8 @@ export class HousebillListComponent implements OnInit {
     this.getHouseBillsOfMaster();
   }
 
-  getHouseBillsOfMaster(){
-    this.baseServices.get(this.api_menu.Documentation.CsTransactionDetail.getByJob+"?jobId="+this.MasterBillData.id).subscribe((res:any)=>{
+  getHouseBillsOfMaster() {
+    this.baseServices.get(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id).subscribe((res: any) => {
       this.HouseBillListData = res;
       this.ConstHouseBillListData = res;
     });
@@ -152,23 +159,23 @@ export class HousebillListComponent implements OnInit {
     });
   }
 
-  async saveNewBuyingRateCharge(form:NgForm,IsContinue:boolean=false) {  
-    
+  async saveNewBuyingRateCharge(form: NgForm, IsContinue: boolean = false) {
 
-    if(form.valid){
+
+    if (form.valid) {
       this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
       this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
-      var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew,this.BuyingRateChargeToAdd);
+      var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
       this.getChargesOfHouseBill(this.houseBillSelected);
-      if(IsContinue && res.status){
+      if (IsContinue && res.status) {
         this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-      }else if(res.status){
+      } else if (res.status) {
         this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
         $('#add-buying-rate-modal').modal('hide');
-      }else{
-        
+      } else {
+
       }
-      
+
     }
     console.log(this.BuyingRateChargeToAdd);
   }
@@ -180,8 +187,7 @@ export class HousebillListComponent implements OnInit {
 
   searchHouseBill(key: any) {
     const search_key = key.toLowerCase();
-    this.HouseBillListData = [];
-    this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x:any) {
+    this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x: any) {
 
       return (
         x.hwbno.toLowerCase().includes(search_key) ||
@@ -192,12 +198,15 @@ export class HousebillListComponent implements OnInit {
         x.finalDestinationPlace.toLowerCase().includes(search_key)
       )
     });
-    console.log(this.HouseBillListData.indexOf(this.houseBillSelected.id));
-    if(this.HouseBillListData.indexOf(this.houseBillSelected.id)<0){
+    const idSelectedHB = this.houseBillSelected.id;
+    if (lodash.findIndex(this.HouseBillListData, function (o) { return o.id === idSelectedHB }) < 0) {
       this.ListBuyingRateCharges = [];
     }
-  
   }
+
+  
+
+
 
   getUnits() {
     this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { all: "", inactive: false }).subscribe((data: any) => {
@@ -205,14 +214,12 @@ export class HousebillListComponent implements OnInit {
     });
   }
 
-  async getListCharge(type: 'CREDIT' | 'DEBIT' | 'OBH', serviceType: 'SEF' | 'SIF' | 'SEL' | 'SIL' | 'SEC' | 'SIC', key_search: String = null) {
-    const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: type, serviceTypeId: serviceType });
-    return res['data'];
-  }
-
-  async getChargesOfHouseBill(hb:any){
-    this.houseBillSelected = hb ;
-    this.ListBuyingRateCharges = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId+"?hbId="+this.houseBillSelected.id)
+  getChargesOfHouseBill(hb: any) {
+    this.houseBillSelected = hb;
+    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id).subscribe((res: any) => {
+      this.ListBuyingRateCharges = res;
+      this.ConstListBuyingRateCharges = res;
+    })
 
   }
 
