@@ -29,10 +29,20 @@ namespace eFMS.API.Documentation.Controllers
             csShipmentSurchargeService = service;
         }
 
-         
+        [HttpGet]
+        [Route("GetByHB")]
+        public IActionResult GetByHouseBill(Guid hbId)
+        {
+
+            return Ok(csShipmentSurchargeService.GetByHB(hbId));
+        }
+
+
         [HttpPost]
+        [Route("Add")]
         public IActionResult AddNew(CsShipmentSurchargeModel model)
         {
+            model.Id = Guid.NewGuid();
             if (!ModelState.IsValid) return BadRequest();
             var hs = csShipmentSurchargeService.Add(model);           
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -45,6 +55,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPut]
+        [Route("Update")]
         public IActionResult Update(CsShipmentSurchargeModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

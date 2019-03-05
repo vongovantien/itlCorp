@@ -1,15 +1,15 @@
 export class CsShipmentSurcharge{
-    id: String = null;
+    id: String =  "00000000-0000-0000-0000-000000000000";
     hblid: String = null;
     type: String = null;
     chargeId: String = null;
-    quantity: Number = 1;
-    unitId: Number = null;
-    unitPrice: Number = null;
+    quantity: number = 1;
+    unitId: number = null;
+    unitPrice: number = null;
     currencyId: String = null;
     includedVat: Boolean = null;
-    vatrate: Number = null;
-    total: Number = null;
+    vatrate: number = null;
+    total: number = null;
     objectBePaid: String = null;
     paymentObjectId: String = null;
     kickBack: Boolean = null;

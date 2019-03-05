@@ -9,5 +9,6 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsShipmentSurchargeService : IRepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>
     {
+        List<CsShipmentSurchargeDetailsModel> GetByHB(Guid HbID);
     }
 }

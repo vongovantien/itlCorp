@@ -104,19 +104,23 @@ namespace eFMS.API.Documentation.DL.Services
                          join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into detailCustomers
                          from y in detailCustomers.DefaultIfEmpty()
                          join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
-                         from detailNoti in detailNotis.DefaultIfEmpty()
+                         from noti in detailNotis.DefaultIfEmpty()
+                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on  detail.ForwardingAgentId equals fwd.Id into forwarding
+                         from f in forwarding.DefaultIfEmpty()
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
                          //where detail.JobId == criteria.JobId
-                         select new { detail, customer = y, notiParty = detailNoti, saleman = x }
+                         select new { detail, customer = y, notiParty = noti, saleman = x ,agent = f}
                           );
             if (query == null) return null;
             foreach(var item in query)
             {
                 var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
                 detail.CustomerName = item.customer?.PartnerNameEn;
-                detail.NotifyParty = item.notiParty?.PartnerNameEn;
+                detail.CustomerNameVn = item.customer?.PartnerNameVn;
                 detail.SaleManName = item.saleman?.Username;
+                detail.NotifyParty = item.notiParty?.PartnerNameEn;
+                detail.ForwardingAgentName = item.agent?.PartnerNameEn;
                 results.Add(detail);
             }
             return results.AsQueryable();
