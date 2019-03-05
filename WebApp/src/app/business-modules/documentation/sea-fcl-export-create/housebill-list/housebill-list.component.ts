@@ -180,7 +180,9 @@ export class HousebillListComponent implements OnInit {
 
   searchHouseBill(key: any) {
     const search_key = key.toLowerCase();
+    this.HouseBillListData = [];
     this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x:any) {
+
       return (
         x.hwbno.toLowerCase().includes(search_key) ||
         x.customerName.toLowerCase().includes(search_key) ||
@@ -190,7 +192,11 @@ export class HousebillListComponent implements OnInit {
         x.finalDestinationPlace.toLowerCase().includes(search_key)
       )
     });
-    console.log({ "HBL AFTER SEARCH": this.HouseBillListData });
+    console.log(this.HouseBillListData.indexOf(this.houseBillSelected.id));
+    if(this.HouseBillListData.indexOf(this.houseBillSelected.id)<0){
+      this.ListBuyingRateCharges = [];
+    }
+  
   }
 
   getUnits() {
