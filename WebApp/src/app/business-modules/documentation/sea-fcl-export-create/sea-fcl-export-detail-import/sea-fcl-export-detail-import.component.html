@@ -2,7 +2,7 @@
   <div class="modal-content">
       <div class="modal-header">
           <h5 class="modal-title">Search Job Detail</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeImport()">
               <span aria-hidden="true">&times;</span>
           </button>
       </div>
@@ -27,8 +27,7 @@
                                   Select filter
                               </label>
                               <ng-select [allowClear]="true" [items]="searchFilters" [disabled]="disabled" [active]="searchFilterActive"
-                                  (data)="refreshValue($event)" (selected)="selected($event)"
-                                  (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                  (data)="refreshValue($event)" (selected)="selectFilter = $event.id" (removed)="selectFilter = null" (typed)="typed($event)" placeholder="Select filter">
                               </ng-select>
                           </div>
                       </div>
@@ -66,7 +65,7 @@
                                       </span>
                                   </span>
                               </button>
-                              <button type="button"
+                              <button type="button" (click)="resetSearchShipment()"
                                   class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
                                   <span>
                                       <i class="la la-refresh"></i>
@@ -114,7 +113,8 @@
                           <td class="">
                               <div class="">
                                   <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                      <input type="radio" name="example-1" value="{{item.id}}">
+                                      <input type="radio" name="example-1" [value]="item.id" (click)="shipment = item" 
+                                        [checked]="item === shipment">
                                       <span></span>
                                   </label>
                               </div>
@@ -150,7 +150,7 @@
           <!--end::pagination-->
       </div>
       <div class="modal-footer m--align-center">
-          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="importShipment()">
               <span>
                   <i class="la la-save"></i>
                   <span>
@@ -158,7 +158,7 @@
                   </span>
               </span>
           </button>
-          <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+          <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="cancelImport()">
               <span>
                   <i class="la la-ban"></i>
                   <span>

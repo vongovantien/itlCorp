@@ -8,6 +8,8 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -25,10 +27,12 @@ namespace eFMS.API.Documentation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionService csTransactionService;
-        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service)
+        private readonly ICurrentUser currentUser;
+        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
+            currentUser = user;
         }
 
         [HttpGet("CountJobByDate/{{date}}")]
@@ -61,6 +65,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -69,15 +74,34 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+            model.UserCreated = currentUser.UserID;
             var result = csTransactionService.AddCSTransaction(model);
             return Ok(result);
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("Import")]
+        public IActionResult Import(CsTransactionEditModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model.Id, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+            model.UserCreated = currentUser.UserID;
+            var result = csTransactionService.ImportCSTransaction(model);
+            return Ok(result);
+        }
+
         [HttpPut]
+        [Authorize]
         public IActionResult Put(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             var hs = csTransactionService.UpdateCSTransaction(model);
+            model.UserCreated = currentUser.UserID;
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

@@ -31,8 +31,9 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.Id = Guid.NewGuid();
                 int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
                 transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
-                transaction.UserCreated = "01";
+                //transaction.UserCreated = "01";
                 transaction.CreatedDate = DateTime.Now;
+                transaction.Inactive = false;
                 var hsTrans = dc.CsTransaction.Add(transaction);
                 var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
                 if(containers != null)
@@ -41,9 +42,33 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         container.Id = Guid.NewGuid();
                         container.Mblid = transaction.Id;
-                        container.UserModified = "01";
+                        container.UserModified = transaction.UserCreated;
                         container.DatetimeModified = DateTime.Now;
                         dc.CsMawbcontainer.Add(container);
+                    }
+                }
+                if(model.CsTransactionDetails != null)
+                {
+                    foreach(var item in model.CsTransactionDetails)
+                    {
+                        var transDetail = mapper.Map<CsTransactionDetail>(item);
+                        transDetail.Id = Guid.NewGuid();
+                        transDetail.JobId = transaction.Id;
+                        transDetail.Inactive = false;
+                        transDetail.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
+                        transDetail.DatetimeCreated = DateTime.Now;
+                        dc.CsTransactionDetail.Add(transDetail);
+                        if (item.CsMawbcontainers == null) continue;
+                        else
+                        {
+                            foreach (var x in item.CsMawbcontainers)
+                            {
+                                var houseCont = mapper.Map<CsMawbcontainer>(x);
+                                x.Hblid = x.Id;
+                                x.Id = Guid.NewGuid();
+                                dc.CsMawbcontainer.Add(x);
+                            }
+                        }
                     }
                 }
                 dc.SaveChanges();
@@ -61,6 +86,69 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var data = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault(x => x.Id == id);
             return data != null ? mapper.Map<CsTransactionModel>(data): null;
+        }
+
+        public object ImportCSTransaction(CsTransactionEditModel model)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var transaction = mapper.Map<CsTransaction>(model);
+                transaction.Id = Guid.NewGuid();
+                int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+                transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
+                //transaction.UserCreated = "01";
+                transaction.CreatedDate = DateTime.Now;
+                transaction.Inactive = false;
+                var hsTrans = dc.CsTransaction.Add(transaction);
+                var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+                if (containers != null)
+                {
+                    foreach (var container in containers)
+                    {
+                        container.Id = Guid.NewGuid();
+                        container.Mblid = transaction.Id;
+                        container.UserModified = transaction.UserModified;
+                        container.DatetimeModified = DateTime.Now;
+                        dc.CsMawbcontainer.Add(container);
+                    }
+                }
+                if (model.CsTransactionDetails != null)
+                {
+                    int countDetail = 0;
+                    foreach (var item in model.CsTransactionDetails)
+                    {
+                        var transDetail = mapper.Map<CsTransactionDetail>(item);
+                        transDetail.Id = Guid.NewGuid();
+                        transDetail.JobId = transaction.Id;
+                        transDetail.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
+                        countDetail = countDetail + 1;
+                        transDetail.Inactive = false;
+                        transDetail.UserCreated = transaction.UserModified;  //ChangeTrackerHelper.currentUser;
+                        transDetail.DatetimeCreated = DateTime.Now;
+                        dc.CsTransactionDetail.Add(transDetail);
+                        if (item.CsMawbcontainers == null) continue;
+                        else
+                        {
+                            foreach (var x in item.CsMawbcontainers)
+                            {
+                                var houseCont = mapper.Map<CsMawbcontainer>(x);
+                                x.Hblid = x.Id;
+                                x.Id = Guid.NewGuid();
+                                dc.CsMawbcontainer.Add(x);
+                            }
+                        }
+                    }
+                }
+                dc.SaveChanges();
+                var result = new HandleState();
+                return new { model = transaction, result };
+            }
+            catch (Exception ex)
+            {
+                var result = new HandleState(ex.Message);
+                return new { model = new object { }, result };
+            }
         }
 
         public List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount)
@@ -199,18 +287,20 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
+                query = query.ToList();
                 query = query.Where(x => ((x.transaction.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.MAWB ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.HWBNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.SupplierName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.AgentName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                             || ((x.transaction.CustomerID ?? "") == criteria.CustomerID || string.IsNullOrEmpty(criteria.CustomerID))
-                             || ((x.transaction.NotifyPartyID ?? "") == criteria.NotifyPartyID || string.IsNullOrEmpty(criteria.NotifyPartyID))
-                             || ((x.transaction.SaleManID ?? "") == criteria.SaleManID || string.IsNullOrEmpty(criteria.SaleManID))
+                             || ((x.transaction.CustomerID ?? "") == criteria.All || string.IsNullOrEmpty(criteria.All))
+                             || ((x.transaction.NotifyPartyID ?? "") == criteria.All || string.IsNullOrEmpty(criteria.All))
+                             || ((x.transaction.SaleManID ?? "") == criteria.All || string.IsNullOrEmpty(criteria.All))
                              || (x.SealNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                             || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                             || ((x.transaction.ETD ?? null) >= (criteria.FromDate ?? null) && (x.transaction.ETD ?? null) <= (criteria.ToDate ?? null))
-                    )).OrderByDescending(x => x.transaction.CreatedDate).ThenByDescending(x => x.transaction.ModifiedDate).AsQueryable();
+                             || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                             && ((x.transaction.ETD ?? null) >= (criteria.FromDate ?? null) && (x.transaction.ETD ?? null) <= (criteria.ToDate ?? null))
+                    );
+                query = query.OrderByDescending(x => x.transaction.CreatedDate).ThenByDescending(x => x.transaction.ModifiedDate).AsQueryable();
             }
             return results = query.Select(x => x.transaction).Distinct().AsQueryable();
         }
@@ -221,7 +311,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
-                transaction.UserModified = "01";
+                //transaction.UserModified = "01";
                 transaction.ModifiedDate = DateTime.Now;
                 var hsTrans = dc.CsTransaction.Update(transaction);
                 foreach (var container in model.CsMawbcontainers)
@@ -230,14 +320,14 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         container.Id = Guid.NewGuid();
                         container.Mblid = transaction.Id;
-                        container.UserModified = "01";
+                        container.UserModified = transaction.UserModified;
                         container.DatetimeModified = DateTime.Now;
                         dc.CsMawbcontainer.Add(container);
                     }
                     else
                     {
                         container.Mblid = transaction.Id;
-                        container.UserModified = "01";
+                        container.UserModified = transaction.UserModified;
                         container.DatetimeModified = DateTime.Now;
                         dc.CsMawbcontainer.Update(container);
                     }

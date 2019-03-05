@@ -231,7 +231,8 @@ export class API_MENU {
             post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Paging",
-            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/"
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Import"
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob",

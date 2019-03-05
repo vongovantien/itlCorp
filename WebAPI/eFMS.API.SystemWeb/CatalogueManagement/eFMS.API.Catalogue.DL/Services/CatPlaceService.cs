@@ -29,6 +29,8 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatCountry>("Id", "CountryId");
             SetChildren<CatPlace>("Id", "ProvinceId");
             SetChildren<CatPlace>("Id", "DistrictId");
+            SetChildren<CatPlace>("Id", "Pol");
+            SetChildren<CatPlace>("Id", "Pod");
         }
 
         public List<vw_catProvince> GetProvinces(short? countryId)

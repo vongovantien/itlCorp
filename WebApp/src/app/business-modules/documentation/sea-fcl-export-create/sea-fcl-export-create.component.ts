@@ -11,7 +11,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 declare var $: any;
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 
@@ -59,11 +59,11 @@ export class SeaFclExportCreateComponent implements OnInit {
     };
     //
     housebillTabviewHref = '#';//'#confirm-create-job-modal';
-    creditdebitnoteTabviewHref= '#';
     housebillRoleToggle = 'modal';
     indexItemConDelete = null;
-    //inEditing: boolean = false;
-
+    isLoaded = true;
+    inEditing: boolean = false;
+    isImport: boolean = false;
      /**
         * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
         * this method imporove performance for web when detecting change 
@@ -78,21 +78,19 @@ export class SeaFclExportCreateComponent implements OnInit {
         //     this.cdr.reattach();
         //     this.cdr.checkNoChanges();
         // }, 1000);
-        if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
+        //if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
+        if(this.inEditing == false){
             if(this.myForm.invalid){
                 this.housebillTabviewHref = "#confirm-can-not-create-job-modal";
-                this.creditdebitnoteTabviewHref = "#confirm-can-not-create-job-modal";
                 //$('#confirm-can-not-create-job-modal').modal('show');
             }
             else{
                 if(this.shipment.csMawbcontainers != null){
                     this.housebillTabviewHref = "#confirm-create-job-modal";
-                    this.creditdebitnoteTabviewHref = "#confirm-create-job-modal";
                     //$('#confirm-create-job-modal').modal('show');
                 }
                 else{
                     this.housebillTabviewHref = "#confirm-not-create-job-misscont-modal";
-                    this.creditdebitnoteTabviewHref = "#confirm-not-create-job-misscont-modal";
                     //$('#confirm-not-create-job-misscont-modal').modal('show');
                 }
             }
@@ -108,6 +106,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
     constructor(private baseServices: BaseService,
+        private router:Router,
         private route: ActivatedRoute,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
         this.initNewShipmentForm();
@@ -116,13 +115,17 @@ export class SeaFclExportCreateComponent implements OnInit {
     async ngOnInit() {
         await this.route.params.subscribe(async prams => {
             if(prams.id != undefined){
-                //this.inEditing = true;
+                this.inEditing = true;
                 this.shipment.id = prams.id;
                 await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
-                this.creditdebitnoteTabviewHref = "#credit-debit-note-tabview-tab";
                 this.housebillRoleToggle = "tab";
+                console.log(this.myForm.controls.estimatedTimeofDepature);
+                if(this.isImport){
+                    this.submitted = false;
+                    this.isImport = false;
+                }
             }
         });
         this.getContainerTypes();
@@ -272,9 +275,10 @@ export class SeaFclExportCreateComponent implements OnInit {
 
         if (this.myForm.valid && this.shipment.pol != null) {
             console.log('abc');
-            this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
+            if(this.lstMasterContainers.find(x => x.isNew == false) != null){
+                this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
+            }
             await this.saveJob();
-            this.activeTab();
         }
     }
     
@@ -291,24 +295,54 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async saveJob(){
         if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
-            var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, false);
-            if(response != null){
-                if(response.result.success){
-                    this.shipment = response.model;
-                    this.shipment.csMawbcontainers = this.lstMasterContainers;
-                }
-            }
-            this.housebillTabviewHref = "#housebill-tabview-tab";
-            this.housebillRoleToggle = "tab";
+            this.addShipment();
         }
         else{
-            var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsTransaction.update, this.shipment, true, false);
-            if(response != null){
-                if(response.status){
-                    this.shipment.csMawbcontainers = this.lstMasterContainers;
-                }
+            if(this.inEditing == false){
+                this.importShipment();
+            }
+            else{
+                this.updateShipment();
             }
         }
+    }
+    async importShipment(){
+        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.import, this.shipment, true, true);
+        if(response != null){
+            if(response.result.success){
+                this.shipment = response.model;
+                this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
+                this.isLoaded = false;
+                setTimeout(() => {
+                    this.isLoaded = true;
+                  }, 300);
+            }
+        }
+    }
+    async updateShipment(){
+        var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsTransaction.update, this.shipment, true, true);
+        if(response != null){
+            if(response.status){
+                this.shipment.csMawbcontainers = this.lstMasterContainers;
+            }
+        }
+    }
+    async addShipment(){
+        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, true);
+        if(response != null){
+            if(response.result.success){
+                // this.shipment = response.model;
+                // this.shipment.csMawbcontainers = this.lstMasterContainers;
+                this.shipment = response.model;
+                this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
+                if(this.inEditing == false){
+                    this.activeTab();
+                }
+                this.inEditing = true;
+            }
+        }
+        this.housebillTabviewHref = "#housebill-tabview-tab";
+        this.housebillRoleToggle = "tab";
     }
     cancelSaveJob() {
         $('#confirm-create-job-modal').modal('hide');
@@ -418,7 +452,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.baseServices.errorToast("Current container must be save!!!");
             }
             
-            if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            if(this.shipment.id != "00000000-0000-0000-0000-000000000000" && this.isImport == false){
                 var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.shipment.csMawbcontainers, masterId: this.shipment.id}, true, false);
                 let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: this.shipment.id}, false, false);
             }
@@ -474,6 +508,24 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.shipment.desOfGoods = this.shipment.desOfGoods + (this.shipment.csMawbcontainers[i].description== null?"": (this.shipment.csMawbcontainers[i].description + ", "));
         }
     }
+    async showShipment(event){
+        await this.getShipmentDetail(event);
+        this.isLoaded = false;
+        this.shipment.jobNo = null;
+        this.shipment.mawb = null;
+        this.isImport = true;
+        await this.getShipmentContainer(event);
+        this.getHouseBillList(event);
+        setTimeout(() => {
+            this.isLoaded = true;
+          }, 300);
+          this.inEditing = false;
+        console.log(this.shipment);
+    }
+    async getHouseBillList(jobId: string){
+        var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
+        this.shipment.csTransactionDetails = responses;
+    }
     /**
      * Daterange picker
      */
@@ -519,7 +571,8 @@ export class SeaFclExportCreateComponent implements OnInit {
   public typed(value: any): void {
     console.log('New search input: ', value);
   }
-
+  public refreshValue(value: any): void {
+  }
 
 
 

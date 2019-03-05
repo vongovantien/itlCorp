@@ -22,6 +22,9 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper) : base(repository, mapper)
         {
+            SetChildren<CsTransaction>("Id", "ColoaderId");
+            SetChildren<CsTransaction>("Id", "AgentId");
+            SetChildren<SysUser>("Id", "PersonIncharge");
         }
         public List<DepartmentPartner> GetDepartments()
         {

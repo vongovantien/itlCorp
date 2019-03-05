@@ -36,7 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     x.Hblid = detail.Id;
                     x.Id = Guid.NewGuid();
-                    x.Mblid = model.JobId;
+                    //x.Mblid = model.JobId;
                     ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);
 
                  }
@@ -56,7 +56,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var results = Query(criteria).ToList();
             var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer
-                .Where(x => x.Mblid == criteria.JobId).Join(((eFMSDataContext)DataContext.DC).CatUnit,
+                .Join(((eFMSDataContext)DataContext.DC).CatUnit,
                     container => container.ContainerTypeId,
                     unit => unit.Id, (container, unit) => new { container, unit })
                     .ToList();
@@ -67,16 +67,21 @@ namespace eFMS.API.Documentation.DL.Services
                 detail.PackageTypes = string.Empty;
                 detail.CBM = 0;
                 var containerHouses = containers.Where(x => x.container.Hblid == detail.Id);
-                foreach(var item in containerHouses)
+                if(containerHouses != null)
                 {
-                    detail.ContainerNames = detail.ContainerNames + item.container.Quantity + "x" + item.unit.Code + ((item.container.ContainerNo.Length > 0) ? ";": "");
-                    if(item.container.PackageQuantity != null && item.container.PackageTypeId != null)
+                    detail.CsMawbcontainers = new List<CsMawbcontainerModel>();
+                    foreach (var item in containerHouses)
                     {
-                        detail.PackageTypes = detail.PackageTypes + item.container.PackageQuantity != null ? (item.container.PackageQuantity
-                            + item.container.PackageTypeId != null ? ("x" + item.container.PackageTypeId) : string.Empty + item.container.PackageQuantity != null ? "; " : string.Empty) : string.Empty;
+                        detail.ContainerNames = detail.ContainerNames + item.container.Quantity + "x" + item.unit.Code + ((item.container.ContainerNo.Length > 0) ? ";" : "");
+                        if (item.container.PackageQuantity != null && item.container.PackageTypeId != null)
+                        {
+                            detail.PackageTypes = detail.PackageTypes + item.container.PackageQuantity != null ? (item.container.PackageQuantity
+                                + item.container.PackageTypeId != null ? ("x" + item.container.PackageTypeId) : string.Empty + item.container.PackageQuantity != null ? "; " : string.Empty) : string.Empty;
 
+                        }
+                        detail.CBM = detail.CBM + item.container.Cbm != null ? item.container.Cbm : 0;
+                        detail.CsMawbcontainers.DefaultIfEmpty(item.container);
                     }
-                    detail.CBM = detail.CBM + item.container.Cbm != null? item.container.Cbm: 0;
                 }
                 if(detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length-1) == ';')
                 {

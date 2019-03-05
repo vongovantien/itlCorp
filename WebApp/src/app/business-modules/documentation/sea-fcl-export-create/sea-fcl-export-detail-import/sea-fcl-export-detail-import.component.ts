@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+declare var $: any;
 
 @Component({
   selector: 'app-sea-fcl-export-detail-import',
@@ -15,8 +17,10 @@ export class SeaFclExportDetailImportComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = {
   };
+  shipment: CsTransaction;
   selectFilter: string = 'Job ID';
   searchString: string = '';
+  @Output() shipmentId = new EventEmitter<any>();
   
   constructor(private baseServices: BaseService,
     private api_menu: API_MENU) { 
@@ -26,6 +30,7 @@ export class SeaFclExportDetailImportComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.pager.totalItems = 0;
     this.criteria.fromDate = this.selectedRange.startDate;
     this.criteria.toDate = this.selectedRange.endDate;
     await this.getShipments();
@@ -47,8 +52,19 @@ export class SeaFclExportDetailImportComponent implements OnInit {
     if(this.selectFilter === 'Supplier'){
         this.criteria.supplierName = this.searchString;
     }
+    if(this.selectFilter === null){
+      this.criteria.all = this.searchString;
+    }
     this.getShipments();
-}
+  }
+  async resetSearchShipment(){
+    this.selectFilter = 'Job ID';
+    this.searchString = null;
+    this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+    this.criteria.fromDate = this.selectedRange.startDate;
+    this.criteria.toDate = this.selectedRange.endDate;
+    await this.getShipments();
+  }
   async getShipments(){
     let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
     this.shipments = responses.data;
@@ -59,6 +75,23 @@ export class SeaFclExportDetailImportComponent implements OnInit {
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
     await this.getShipments();
+  }
+  cancelImport(){
+    this.resetSearchShipment();
+  }
+  importShipment(){
+    if(this.shipment != null){
+      this.shipmentId.emit(this.shipment.id);
+      $('#import-job-detail-modal').modal('hide');
+    }
+    else{
+      this.baseServices.errorToast("Please choose a shipment");
+    }
+  }
+  closeImport(){
+    this.shipment = null;
+    this.resetSearchShipment();
+    $('#import-job-detail-modal').modal('hide');
   }
   /**
      * Daterange picker

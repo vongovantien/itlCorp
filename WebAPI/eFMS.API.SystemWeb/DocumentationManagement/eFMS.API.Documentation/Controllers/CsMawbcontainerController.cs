@@ -8,6 +8,7 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -23,10 +24,12 @@ namespace eFMS.API.Documentation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsMawbcontainerService csContainerService;
-        public CsMawbcontainerController(IStringLocalizer<LanguageSub> localizer, ICsMawbcontainerService service)
+        private readonly ICurrentUser currentUser;
+        public CsMawbcontainerController(IStringLocalizer<LanguageSub> localizer, ICsMawbcontainerService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             csContainerService = service;
+            currentUser = user;
         }
 
         [HttpPost]

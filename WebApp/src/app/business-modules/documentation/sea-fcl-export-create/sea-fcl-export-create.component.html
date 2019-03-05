@@ -15,7 +15,7 @@
                 <!--end:: breadcrumbs-->
             </div>
             <div class="c-button-actions">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" *ngIf="inEditing == false"
                     data-toggle="modal" data-target="#import-job-detail-modal">
                     <span>
                         <i class="la la-search"></i>
@@ -27,7 +27,10 @@
                 <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCreateJob()">
                     <span>
                         <i class="la la-save"></i>
-                        <span>
+                        <span *ngIf="inEditing == false">
+                            Create
+                        </span>
+                        <span  *ngIf="inEditing == true">
                             save
                         </span>
                     </span>
@@ -82,9 +85,9 @@
                             House Bill List
                         </a>
                     </li> -->
-                    <li class="nav-item m-tabs__item">
+                    <li class="nav-item m-tabs__item" *ngIf="inEditing">
                         <a class="nav-link m-tabs__link" id="creditdebit-tablink" 
-                            href="{{creditdebitnoteTabviewHref}}" [attr.data-toggle] ="housebillRoleToggle" [attr.role]="housebillRoleToggle" (click)="switchTab()">
+                            href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
                             Credit Note & Debit Note
                         </a>
                     </li>
@@ -99,7 +102,7 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <app-master-bill [shipment]="shipment" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment"></app-master-bill>
+                <app-master-bill [shipment]="shipment" [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment && isLoaded"></app-master-bill>
                 <!--begin:: m-portlet-->
                 <div class="m-portlet">
                     <div class="m-portlet__head">
@@ -826,7 +829,10 @@
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>
-                            <span>
+                            <span *ngIf="inEditing == false">
+                                Create
+                            </span>
+                            <span  *ngIf="inEditing == true">
                                 save
                             </span>
                         </span>
@@ -851,7 +857,7 @@
 <!--begin::import-job-detail-modal-->
 <div class="modal fade" id="import-job-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
-    <app-sea-fcl-export-detail-import></app-sea-fcl-export-detail-import>
+    <app-sea-fcl-export-detail-import (shipmentId)="showShipment($event)"></app-sea-fcl-export-detail-import>
 </div>
 <!--end::import-job-detail-modal-->
 
