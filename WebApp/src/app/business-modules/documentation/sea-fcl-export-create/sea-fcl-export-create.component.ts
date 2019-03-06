@@ -197,38 +197,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             desOfGoods: new FormControl('')
         });
     }
-    initNewContainer() {
-        var container = {
-            mawb: this.shipment.id,
-            containerTypeId: null,
-            containerTypeName: '',
-            containerTypeActive: [],
-            quantity: null,
-            containerNo: '',
-            sealNo: '',
-            markNo: '',
-            unitOfMeasureId: null,
-            unitOfMeasureName: '',
-            unitOfMeasureActive: [],
-            commodityId: null,
-            commodityName: '',
-            packageTypeId: null,
-            packageTypeName: '',
-            packageTypeActive: [],
-            packageQuantity: null,
-            description: null,
-            gw: null,
-            nw: null,
-            chargeAbleWeight: null,
-            cbm: null,
-            packageContainer: '',
-            //desOfGoods: '',
-            allowEdit: true,
-            isNew: true,
-            verifying: false
-        };
-        return container;
-    }
     async getContainerTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
         if (responses != null) {
@@ -348,6 +316,60 @@ export class SeaFclExportCreateComponent implements OnInit {
     cancelSaveJob() {
         $('#confirm-create-job-modal').modal('hide');
     }
+    async showShipment(event){
+        await this.getShipmentDetail(event);
+        this.isLoaded = false;
+        this.shipment.jobNo = null;
+        this.shipment.mawb = null;
+        this.isImport = true;
+        await this.getShipmentContainer(event);
+        this.getHouseBillList(event);
+        setTimeout(() => {
+            this.isLoaded = true;
+          }, 300);
+          this.inEditing = false;
+        console.log(this.shipment);
+    }
+    async getHouseBillList(jobId: string){
+        var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
+        this.shipment.csTransactionDetails = responses;
+    }
+    /**
+     * Container
+     */
+    
+    initNewContainer() {
+        var container = {
+            mawb: this.shipment.id,
+            containerTypeId: null,
+            containerTypeName: '',
+            containerTypeActive: [],
+            quantity: null,
+            containerNo: '',
+            sealNo: '',
+            markNo: '',
+            unitOfMeasureId: null,
+            unitOfMeasureName: '',
+            unitOfMeasureActive: [],
+            commodityId: null,
+            commodityName: '',
+            packageTypeId: null,
+            packageTypeName: '',
+            packageTypeActive: [],
+            packageQuantity: null,
+            description: null,
+            gw: null,
+            nw: null,
+            chargeAbleWeight: null,
+            cbm: null,
+            packageContainer: '',
+            allowEdit: true,
+            isNew: true,
+            verifying: false
+        };
+        return container;
+    }
+    
     addNewContainer() {
         let hasItemEdited = false;
         for (let i = 0; i < this.lstMasterContainers.length; i++) {
@@ -427,17 +449,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.lstMasterContainers[i].verifying = true;
         }
         if (this.containerMasterForm.valid) {
-            if (this.numberOfTimeSaveContainer == 1) {
-                this.totalGrossWeight = 0;
-                this.totalNetWeight = 0;
-                this.totalCharWeight = 0;
-                this.totalCBM = 0;
-                this.shipment.commodity = '';
-                this.shipment.desOfGoods = '';
-                this.shipment.packageContainer = '';
-            }
-            this.getShipmentContainerDescription(this.lstMasterContainers);
-            this.shipment.csMawbcontainers = this.lstMasterContainers;
 
             let hasItemEdited = false;
             for(let i=0; i< this.lstMasterContainers.length; i++){
@@ -447,13 +458,24 @@ export class SeaFclExportCreateComponent implements OnInit {
                 }
             }
             if(hasItemEdited == false){
+                this.totalGrossWeight = 0;
+                this.totalNetWeight = 0;
+                this.totalCharWeight = 0;
+                this.totalCBM = 0;
+                if (this.numberOfTimeSaveContainer == 1 && this.inEditing == false) {
+                    this.shipment.commodity = '';
+                    this.shipment.desOfGoods = '';
+                    this.shipment.packageContainer = '';
+                }
+                this.getShipmentContainerDescription(this.lstMasterContainers);
+                this.shipment.csMawbcontainers = this.lstMasterContainers;
                 $('#container-list-of-job-modal-master').modal('hide');
             }
             else{
                 this.baseServices.errorToast("Current container must be save!!!");
             }
             
-            if(this.shipment.id != "00000000-0000-0000-0000-000000000000" && this.isImport == false){
+            if(this.shipment.id != "00000000-0000-0000-0000-000000000000" && this.isImport == false && this.inEditing == true){
                 var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.shipment.csMawbcontainers, masterId: this.shipment.id}, true, false);
                 let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: this.shipment.id}, false, false);
             }
@@ -509,24 +531,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.shipment.desOfGoods = this.shipment.desOfGoods + (this.shipment.csMawbcontainers[i].description== null?"": (this.shipment.csMawbcontainers[i].description + ", "));
         }
     }
-    async showShipment(event){
-        await this.getShipmentDetail(event);
-        this.isLoaded = false;
-        this.shipment.jobNo = null;
-        this.shipment.mawb = null;
-        this.isImport = true;
-        await this.getShipmentContainer(event);
-        this.getHouseBillList(event);
-        setTimeout(() => {
-            this.isLoaded = true;
-          }, 300);
-          this.inEditing = false;
-        console.log(this.shipment);
-    }
-    async getHouseBillList(jobId: string){
-        var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
-        this.shipment.csTransactionDetails = responses;
-    }
+
     /**
      * Daterange picker
      */

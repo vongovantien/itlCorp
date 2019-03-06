@@ -108,34 +108,49 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         container.Id = Guid.NewGuid();
                         container.Mblid = transaction.Id;
-                        container.UserModified = transaction.UserModified;
+                        container.UserModified = transaction.UserCreated;
                         container.DatetimeModified = DateTime.Now;
                         dc.CsMawbcontainer.Add(container);
                     }
                 }
-                if (model.CsTransactionDetails != null)
+                var detailTrans = dc.CsTransactionDetail.Where(x => x.JobId == model.Id);
+                if (detailTrans != null)
                 {
                     int countDetail = 0;
-                    foreach (var item in model.CsTransactionDetails)
+                    foreach (var item in detailTrans)
                     {
-                        var transDetail = mapper.Map<CsTransactionDetail>(item);
-                        transDetail.Id = Guid.NewGuid();
-                        transDetail.JobId = transaction.Id;
-                        transDetail.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
+                        var houseId = item.Id;
+                        item.Id = Guid.NewGuid();
+                        item.JobId = transaction.Id;
+                        item.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
                         countDetail = countDetail + 1;
-                        transDetail.Inactive = false;
-                        transDetail.UserCreated = transaction.UserModified;  //ChangeTrackerHelper.currentUser;
-                        transDetail.DatetimeCreated = DateTime.Now;
-                        dc.CsTransactionDetail.Add(transDetail);
-                        if (item.CsMawbcontainers == null) continue;
-                        else
-                        {
-                            foreach (var x in item.CsMawbcontainers)
+                        item.Inactive = false;
+                        item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
+                        item.DatetimeCreated = DateTime.Now;
+                        dc.CsTransactionDetail.Add(item);
+                        var houseContainers = dc.CsMawbcontainer.Where(x => x.Hblid == houseId);
+                        if(houseContainers != null) { 
+                            foreach (var x in houseContainers)
                             {
-                                var houseCont = mapper.Map<CsMawbcontainer>(x);
-                                x.Hblid = x.Id;
+                                x.Id = Guid.NewGuid();
+                                x.Hblid = item.Id;
+                                x.UserModified = transaction.UserCreated;
+                                x.DatetimeModified = DateTime.Now;
                                 x.Id = Guid.NewGuid();
                                 dc.CsMawbcontainer.Add(x);
+                            }
+                        }
+                        var charges = dc.CsShipmentSurcharge.Where(x => x.Hblid == houseId);
+                        if(charges != null)
+                        {
+                            foreach(var charge in charges)
+                            {
+                                charge.Id = Guid.NewGuid();
+                                charge.UserCreated = transaction.UserCreated;
+                                charge.DatetimeCreated = DateTime.Now;
+                                charge.Hblid = item.Id;
+                                charge.DocNo = null;
+                                dc.CsShipmentSurcharge.Add(charge);
                             }
                         }
                     }

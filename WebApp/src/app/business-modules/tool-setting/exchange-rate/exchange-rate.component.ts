@@ -24,6 +24,7 @@ export class ExchangeRateComponent implements OnInit {
   exchangeRates: any[];
   exchangeRatesOfDay: any[];
   exchangeRateNewest: any = {};
+  currencyRateToDelete: any;
   pager: PagerSetting = PAGINGSETTING;
   localCurrency = "VND";
   rate: any;
@@ -72,6 +73,8 @@ export class ExchangeRateComponent implements OnInit {
   /**
    * Daterange picker
    */
+  
+  maxDate: moment.Moment = moment();
   ranges: any = {
     Today: [moment(), moment()],
     Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -228,7 +231,7 @@ export class ExchangeRateComponent implements OnInit {
     form.onReset();
   }
   confirmDeleteRate(item){
-
+    this.currencyRateToDelete = item;
   }
   removeNewRate(index){
     const currency = this.exchangeRateToAdd.CatCurrencyExchangeRates[index];
@@ -369,8 +372,11 @@ export class ExchangeRateComponent implements OnInit {
     this.value = value;
   }
 
-  onDelete(event){
-    
+  async onDelete(event){
+    if(event == true){
+      await this.baseService.deleteAsync(this.api_menu.ToolSetting.ExchangeRate.delete + this.currencyRateToDelete.id, true, true);
+      this.getExchangeNewest();
+    }
   }
 
 }

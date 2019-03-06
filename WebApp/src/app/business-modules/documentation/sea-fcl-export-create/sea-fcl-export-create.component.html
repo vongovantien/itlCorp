@@ -216,7 +216,10 @@
             <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCreateJob()">
                 <span>
                     <i class="la la-save"></i>
-                    <span>
+                    <span *ngIf="inEditing == false">
+                        Create
+                    </span>
+                    <span  *ngIf="inEditing == true">
                         save
                     </span>
                 </span>
@@ -829,10 +832,7 @@
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>
-                            <span *ngIf="inEditing == false">
-                                Create
-                            </span>
-                            <span  *ngIf="inEditing == true">
+                            <span>
                                 save
                             </span>
                         </span>
