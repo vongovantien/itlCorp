@@ -215,7 +215,8 @@ export class API_MENU {
             getBy: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetExchangeRatesBy",
             updateRate: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/UpdateRate",
             getCurrencies: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetCurrencies",
-            convertRate: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/ConvertRate"
+            convertRate: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/ConvertRate",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/"
         },
         CatalogueLogViewer: {
             getCategory: this.getUrlMainPath(SystemConstants.MODULE_NAME.LOG) + "CategoryLog/GetCategory",
@@ -229,15 +230,18 @@ export class API_MENU {
         },
         CsTransaction: {
             post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Paging",
-            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/"
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Import"
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob",
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/addNew"
         },
         CsMawbcontainer: {
-            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query"
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Update"
         },
         CsShipmentSurcharge:{
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Add",

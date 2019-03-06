@@ -18,6 +18,7 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 export class MasterBillComponent implements OnInit{
 
     @Input()shipment: CsTransaction;
+    @Input()isImport: boolean;
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
     terms: any[];
@@ -51,8 +52,10 @@ export class MasterBillComponent implements OnInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             this.inEditing = true;
             console.log(this.shipment.etd);
-            this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
-            this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
+            if(this.isImport == false){
+                this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
+                this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
+            }
             let index = this.billOfLadingTypes.findIndex(x => x.id == this.shipment.mbltype);
             if(index > -1) this.billOfLadingTypeActive = [this.billOfLadingTypes[index]];
             index = this.serviceTypes.findIndex(x => x.id == this.shipment.typeOfService);

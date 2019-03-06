@@ -31,7 +31,7 @@ namespace eFMS.API.Catalogue.DL.Services
             
             return new vw_catCurrencyExchangeNewest
             {
-                CurrencyFromId = data.CurrencyFromId,
+                CurrencyFromID = data.CurrencyFromId,
                 Rate = data.Rate,
                 DatetimeCreated = data.DatetimeModified ?? data.DatetimeCreated
             }; ;
@@ -77,7 +77,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var rate = new vw_catCurrencyExchangeNewest
                 {
-                    CurrencyFromId = item.CurrencyFromId,
+                    CurrencyFromID = item.CurrencyFromId,
                     Rate = item.Rate,
                     //DatetimeModifield = item.DatetimeModified ==null?item.DatetimeCreated : item.DatetimeModified,
                 };

@@ -15,7 +15,7 @@
                 <!--end:: breadcrumbs-->
             </div>
             <div class="c-button-actions">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" *ngIf="inEditing == false"
                     data-toggle="modal" data-target="#import-job-detail-modal">
                     <span>
                         <i class="la la-search"></i>
@@ -27,7 +27,10 @@
                 <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCreateJob()">
                     <span>
                         <i class="la la-save"></i>
-                        <span>
+                        <span *ngIf="inEditing == false">
+                            Create
+                        </span>
+                        <span  *ngIf="inEditing == true">
                             save
                         </span>
                     </span>
@@ -70,30 +73,36 @@
                             Shipment detail
                         </a>
                     </li>
-                    <!-- <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" id="housebill-tablink" [attr.data-toggle] ="housebillRoleToggle"
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" [attr.data-toggle] ="housebillRoleToggle" type=""
                             href="{{housebillTabviewHref}}" [attr.role]="housebillRoleToggle" (click)="switchTab()">
                             House Bill List
                         </a>
-                    </li> -->
-                    <li class="nav-item m-tabs__item">
+                    </li>
+                    <!-- <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link" id="housebill-tablink" 
                             href="#housebill-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
                             House Bill List
                         </a>
-                    </li>
-                    <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" id="housebill-tablink" 
+                    </li> -->
+                    <li class="nav-item m-tabs__item" *ngIf="inEditing">
+                        <a class="nav-link m-tabs__link" id="creditdebit-tablink" 
                             href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
                             Credit Note & Debit Note
                         </a>
                     </li>
+                    <!-- <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" id="housebill-tablink" 
+                            href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
+                            Credit Note & Debit Note
+                        </a>
+                    </li> -->
                 </ul>
             </div>
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <app-master-bill [shipment]="shipment" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment"></app-master-bill>
+                <app-master-bill [shipment]="shipment" [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment && isLoaded"></app-master-bill>
                 <!--begin:: m-portlet-->
                 <div class="m-portlet">
                     <div class="m-portlet__head">
@@ -136,7 +145,7 @@
                                                 Detail container & packages:
                                             </label>
                                             <textarea class="form-control m-input--square" name="packageContainer" id=""
-                                                rows="3"
+                                                rows="3" disabled
                                                 (change)="shipment.packageContainer = shipment.packageContainer.trim()"
                                                 formControlName="packageContainer"
                                                 [(ngModel)]="shipment.packageContainer"></textarea>
@@ -200,14 +209,17 @@
             </div>
             <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="">
                 <app-credit-and-debit-note></app-credit-and-debit-note>
-            </div>
+        </div>
         </div>
 
         <div class="form-actions m--align-right">
             <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCreateJob()">
                 <span>
                     <i class="la la-save"></i>
-                    <span>
+                    <span *ngIf="inEditing == false">
+                        Create
+                    </span>
+                    <span  *ngIf="inEditing == true">
                         save
                     </span>
                 </span>
@@ -266,6 +278,69 @@
         </div>
     </div>
     <!--end::confirm-create-job-modal-->
+
+    <!--begin::confirm-can-not-create-job-modal-->
+    <div class="modal fade" id="confirm-can-not-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cannot Create Job</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-text-block">
+                        <span>Oops, It's look like you missed something, Please recheck the highlighted field below.</span>
+                    </div>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="submitted = true;">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                OK
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::confirm-can-not-create-job-modal-->
+
+    
+    <!--begin::confirm-not-create-job-misscont-modal-->
+    <div class="modal fade" id="confirm-not-create-job-misscont-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cannot Create Job</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-text-block">
+                        <span>You need to enter container data to create a job. Please recheck and try again!</span>
+                    </div>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="submitted = true;">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                OK
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::confirm-not-create-job-misscont-modal-->
 </form>
 
 <!--begin::container-list-of-job-modal-master-->
@@ -404,9 +479,9 @@
                                 </thead>
                                 <tbody *ngIf="lstMasterContainers">
                                     <ng-container *ngFor="let container of lstMasterContainers; let i= index">
-                                        <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
+                                        <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit" [ngClass]="{ 'invalid-row': container.inValidRow }">
                                             <td class="table-actions-col fixed-side">
-                                                <div class="table-actions content-editable" style="width: 70px">
+                                                <!-- <div class="table-actions content-editable" style="width: 70px">
                                                     <button type="button"
                                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Edit">
@@ -417,7 +492,7 @@
                                                         title="Remove">
                                                         <i class="la la-trash"></i>
                                                     </button>
-                                                </div>
+                                                </div> -->
                                                 <div class="table-actions control-editable" style="width: 70px">
                                                     <button type=""
                                                         class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -432,9 +507,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Cont Type
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
                                                     <ng-select [allowClear]="true" [items]="containerTypes"
@@ -449,11 +524,16 @@
                                                         Container type is required.
                                                     </div>
                                                 </div>
+                                                <div class="has-danger row-control-feedback" *ngIf="container.inValidRow">
+                                                    <div class="form-control-feedback">
+                                                        Duplicate container detail
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Cont Q'ty
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid && container.verifying}">
                                                     <input type="number" class="form-control m-input m-input--square"
@@ -467,9 +547,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Cont No.
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -478,9 +558,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Seal No.
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -488,9 +568,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Mark No.
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -498,9 +578,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Commodity
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <div class="dropdown e--combogrid" #selectedCommodity>
                                                         <input
@@ -556,9 +636,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Package Type
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="packageTypes"
                                                         [disabled]="disabled" (data)="refreshValue($event)"
@@ -570,9 +650,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Package Q'ty
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         min="1" [(ngModel)]="container.packageQuantity"
@@ -582,9 +662,9 @@
                                                 </div>
                                             </td>
                                             <td class="" style="width: 130px">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Description of Good dài thiệt là dài đó nha Tem Tem
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         autocomplete="nope" [(ngModel)]="container.description"
@@ -593,9 +673,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     N.W
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -604,9 +684,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     G.W
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -615,9 +695,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     C.W
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -627,9 +707,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     Unit
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="weightMesurements"
                                                         [disabled]="disabled" (data)="refreshValue($event)"
@@ -641,9 +721,9 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <span class="content-editable">
+                                                <!-- <span class="content-editable">
                                                     CBM
-                                                </span>
+                                                </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
@@ -662,7 +742,8 @@
                                                     </button>
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" (click)=removeAContainer(i)>
+                                                        title="Remove" data-toggle="modal"
+                                                        data-target="#confirm-accept-delete-container-modal" (click)="removeAContainer(i)" >
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
@@ -747,7 +828,7 @@
                     </div>
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button type="button" (click)="onSubmitContainer()"
+                    <button type="" (click)="onSubmitContainer()"
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>
@@ -776,262 +857,7 @@
 <!--begin::import-job-detail-modal-->
 <div class="modal fade" id="import-job-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Search Job Detail</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="bg-secondary m--padding-10 m--margin-bottom-10">
-                    <!--begin::Form-->
-                    <div class="m-form m-form--state">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Search text
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Search text">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Select filter
-                                    </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                        (data)="refreshValue($event)" (selected)="selected($event)"
-                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                                    </ng-select>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Create date: From - To
-                                    </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true" name="daterange"
-                                            placeholder="From date - to date" readonly />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <div class="row">
-                                <div class="col-lg-6"></div>
-                                <div class="col-lg-6 m--align-right">
-                                    <button type="button"
-                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span>
-                                                Search
-                                            </span>
-                                        </span>
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-refresh"></i>
-                                            <span>
-                                                Reset
-                                            </span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Form-->
-                </div>
-                <!--begin: Datatable-->
-                <div class="table-wrapper" id="">
-                    <table class="table table-striped table-secondary dataTable">
-                        <thead class="">
-                            <tr class="">
-                                <th class=""></th>
-                                <th class="">
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Customer
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Destination
-                                    </span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="1">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Customer
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class="">
-                                    <div class="">
-                                        <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                            <input type="radio" name="example-1" value="2">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>
-                                        Job ID
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        M-B/L
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Customer
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Saleman
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Nomination Party
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Destination
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!--end: Datatable-->
-                <!--begin::pagination-->
-                <div class="pagination-nav">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="tatable__pager-size">
-                                <div class="select-box">
-                                    <select class="form-control m-input m-input--square" id="" aria-label="">
-                                        <option value="1">15 line/screen</option>
-                                        <option value="2">30 line/screen</option>
-                                        <option value="3">50 line/screen</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <nav aria-label="">
-                                <ul class="pagination justify-content-end">
-                                    <li class="page-item"><a class="page-link" href="#">First</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-                <!--end::pagination-->
-            </div>
-            <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            import
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <app-sea-fcl-export-detail-import (shipmentId)="showShipment($event)"></app-sea-fcl-export-detail-import>
 </div>
 <!--end::import-job-detail-modal-->
 
@@ -1054,6 +880,46 @@
             <div class="modal-footer m--align-center c-button-actions">
                 <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                     data-dismiss="modal" routerLink="/home/documentation/sea-fcl-export">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-cancel-create-job-modal-->
+
+<!--begin::confirm-cancel-create-job-modal-->
+<div class="modal fade" id="confirm-accept-delete-container-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Container</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure you want to delete the selected container?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)=removeContainer()>
                     <span>
                         <i class="la la-save"></i>
                         <span>

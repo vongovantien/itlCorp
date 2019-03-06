@@ -5,10 +5,6 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
-        //public CsTransaction()
-        //{
-        //    CsTransactionDetail = new HashSet<CsTransactionDetail>();
-        //}
 
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }

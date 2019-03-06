@@ -293,43 +293,56 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col no-sorting"></th>
-                            <th class="sorting_asc">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo'), 'sorting': sortKey != 'jobNo' }"
+                                (click)="sortShipment('jobNo')">
                                 <span>Job Id</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mawb'), 'sorting_desc': (!isDesc && sortKey == 'mawb'), 'sorting': sortKey != 'mawb' }"
+                                (click)="sortShipment('mawb')">
                                 <span>M/B/L No.</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'etd'), 'sorting_desc': (!isDesc && sortKey == 'etd'), 'sorting': sortKey != 'etd' }"
+                                (click)="sortShipment('etd')">
                                 <span>ETD</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'eta'), 'sorting_desc': (!isDesc && sortKey == 'eta'), 'sorting': sortKey != 'eta' }"
+                                (click)="sortShipment('eta')">
                                 <span>ETA</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'supplierName'), 'sorting_desc': (!isDesc && sortKey == 'supplierName'), 'sorting': sortKey != 'supplierName' }"
+                                (click)="sortShipment('supplierName')">
                                 <span>Supplier</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'agentName'), 'sorting_desc': (!isDesc && sortKey == 'agentName'), 'sorting': sortKey != 'agentName' }"
+                                (click)="sortShipment('agentName')">
                                 <span>Agent</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'polName'), 'sorting_desc': (!isDesc && sortKey == 'polName'), 'sorting': sortKey != 'polName' }"
+                                (click)="sortShipment('polName')">
                                 <span>POL</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'podName'), 'sorting_desc': (!isDesc && sortKey == 'podName'), 'sorting': sortKey != 'podName' }"
+                                (click)="sortShipment('podName')">
                                 <span>POD</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumCont'), 'sorting_desc': (!isDesc && sortKey == 'sumCont'), 'sorting': sortKey != 'sumCont' }"
+                                (click)="sortShipment('sumCont')">
                                 <span>Total Cont</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumCBM'), 'sorting_desc': (!isDesc && sortKey == 'sumCBM'), 'sorting': sortKey != 'sumCBM' }"
+                                (click)="sortShipment('sumCBM')">
                                 <span>CBM</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'creatorName'), 'sorting_desc': (!isDesc && sortKey == 'creatorName'), 'sorting': sortKey != 'creatorName' }"
+                                (click)="sortShipment('creatorName')">
                                 <span>Creator</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'createdDate'), 'sorting_desc': (!isDesc && sortKey == 'createdDate'), 'sorting': sortKey != 'createdDate' }"
+                                (click)="sortShipment('createdDate')">
                                 <span>Created Date</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modifiedDate'), 'sorting_desc': (!isDesc && sortKey == 'modifiedDate'), 'sorting': sortKey != 'modifiedDate' }"
+                                (click)="sortShipment('modifiedDate')">
                                 <span>Modified Date</span>
                             </th>
                         </tr>
@@ -345,7 +358,7 @@
                                             <i class="la la-angle-up"></i>
                                         </button>
                                         <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                            title="Edit" routerLink="/home/documentation/sea-fcl-export-create" (click)="showDetail(item)">
                                             <i class="la la-edit"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -408,28 +421,36 @@
                                                 <table class="table table-secondary dataTable">
                                                     <thead>
                                                         <tr>
-                                                            <th class="sorting_asc">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hwbno'), 'sorting_desc': (!isDesc && sortKey == 'hwbno'), 'sorting': sortKey != 'hwbno' }"
+                                                                (click)="sortShipmentDetail('hwbno')">
                                                                 <span>H-B/L No.</span>
                                                             </th>
-                                                            <th class="sorting">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName'), 'sorting': sortKey != 'customerName' }"
+                                                                (click)="sortShipmentDetail('customerName')">
                                                                 <span>Customer</span>
                                                             </th>
-                                                            <th class="sorting">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'saleManName'), 'sorting_desc': (!isDesc && sortKey == 'saleManName'), 'sorting': sortKey != 'saleManName' }"
+                                                                (click)="sortShipmentDetail('saleManName')">
                                                                 <span>Sale Man</span>
                                                             </th>
-                                                            <th class="sorting">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'notifyParty'), 'sorting_desc': (!isDesc && sortKey == 'notifyParty'), 'sorting': sortKey != 'notifyParty' }"
+                                                                (click)="sortShipmentDetail('notifyParty')">
                                                                 <span>Nomination Party</span>
                                                             </th>
-                                                            <th class="sorting">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'finalDestinationPlace'), 'sorting_desc': (!isDesc && sortKey == 'finalDestinationPlace'), 'sorting': sortKey != 'finalDestinationPlace' }"
+                                                                (click)="sortShipmentDetail('finalDestinationPlace')">
                                                                 <span>Destination</span>
                                                             </th>
-                                                            <th class="no-sorting">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerNames'), 'sorting_desc': (!isDesc && sortKey == 'containerNames'), 'sorting': sortKey != 'containerNames' }"
+                                                                (click)="sortShipmentDetail('containerNames')">
                                                                 <span>Containers</span>
                                                             </th>
-                                                            <th class="no-sorting">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'packageTypes'), 'sorting_desc': (!isDesc && sortKey == 'packageTypes'), 'sorting': sortKey != 'packageTypes' }"
+                                                                (click)="sortShipmentDetail('packageTypes')">
                                                                 <span>Packages</span>
                                                             </th>
-                                                            <th class="no-sorting">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbm'), 'sorting_desc': (!isDesc && sortKey == 'cbm'), 'sorting': sortKey != 'cbm' }"
+                                                                (click)="sortShipmentDetail('cbm')">
                                                                 <span>CBM</span>
                                                             </th>
                                                         </tr>

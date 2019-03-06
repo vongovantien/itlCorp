@@ -6,6 +6,8 @@ import { BaseService } from 'src/services-base/base.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { Router } from '@angular/router';
+import { timeout } from 'q';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
     selector: 'app-sea-fcl-export',
@@ -27,13 +29,15 @@ export class SeaFCLExportComponent implements OnInit {
 
     constructor(private baseServices: BaseService,
         private router:Router,
-        private api_menu: API_MENU) {
+        private api_menu: API_MENU,
+        private sortService: SortService) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
 
     async ngOnInit() {
+        this.pager.totalItems = 0;
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;
         await this.getShipments();
@@ -74,6 +78,11 @@ export class SeaFCLExportComponent implements OnInit {
         this.pager.totalItems = responses.totalItems;
     }
     searchShipment(){
+        this.criteria.jobNo ='';
+        this.criteria.mawb = '';
+        this.criteria.supplierName = '';
+        this.criteria.agentName = '';
+        this.criteria.hwbNo = '';
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;
         if(this.selectFilter === 'Job ID'){
@@ -117,6 +126,12 @@ export class SeaFCLExportComponent implements OnInit {
         this.searchString = null;
         this.pager.currentPage = 1;
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.criteria.fromDate = this.selectedRange.startDate;
+        this.criteria.toDate = this.selectedRange.endDate;
+        this.isReset = false;
+        setTimeout(() => {
+            this.isReset = true;
+          }, 100);
         this.getShipments();
     }
     async setPage(pager: PagerSetting) {
@@ -128,6 +143,19 @@ export class SeaFCLExportComponent implements OnInit {
     showDetail(item: { id: any; }){
         this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: item.id }]);
     }
+    isDesc = false;
+    sortKey: string = "jobNo";
+    sortShipment(property: string) {
+      this.isDesc = !this.isDesc;
+      this.sortKey = property;
+      this.shipments = this.sortService.sort(this.shipments, property, this.isDesc);
+    }
+    sortShipmentDetail(property: string){
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.shipmentDetails = this.sortService.sort(this.shipmentDetails, property, this.isDesc);
+    }
+  
     /**
        * Daterange picker
        */

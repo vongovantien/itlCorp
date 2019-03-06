@@ -21,6 +21,7 @@ import { HousebillListComponent } from './sea-fcl-export-create/housebill-list/h
 import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addnew/housebill-addnew.component';
 import { TwoDigitDecimaNumberDirective } from 'src/app/shared/directives/two-digit-decima-number.directive';
 import { CreditAndDebitNoteComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note.component';
+import { SeaFclExportDetailImportComponent } from './sea-fcl-export-create/sea-fcl-export-detail-import/sea-fcl-export-detail-import.component';
 
 @NgModule({
   imports: [
@@ -43,6 +44,6 @@ import { CreditAndDebitNoteComponent } from './sea-fcl-export-create/credit-and-
     SeaFCLImportComponent, 
     SeaLCLImportComponent, 
     SeaConsolImportComponent, 
-    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent, CreditAndDebitNoteComponent]
+    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent, CreditAndDebitNoteComponent, SeaFclExportDetailImportComponent]
 })
 export class DocumentationModule { }

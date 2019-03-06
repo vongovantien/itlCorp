@@ -164,7 +164,7 @@
                                     <span class="m--font-danger" *ngIf="item.modeOfTransport.split('|').length > 1">{{ item.modeOfTransport.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span>Active</span>
+                                    <span>{{ item.status }}</span>
                                 </td>
                             </tr>
                         </ng-container>

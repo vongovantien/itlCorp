@@ -18,6 +18,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
         CsTransactionModel GetById(Guid id);
         object AddCSTransaction(CsTransactionEditModel model);
+        object ImportCSTransaction(CsTransactionEditModel model);
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
     }
 }
