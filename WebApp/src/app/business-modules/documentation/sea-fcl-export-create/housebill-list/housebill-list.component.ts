@@ -26,6 +26,8 @@ export class HousebillListComponent implements OnInit {
     this.MasterBillData = _masterBilData;
   }
   BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+  SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+  OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
 
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
@@ -67,11 +69,19 @@ export class HousebillListComponent implements OnInit {
   /**
    * Calculate 'total' base on 'quantity' , 'unit price', 'VAT'
    */
-  calculateTotal() {
+  calculateTotalBuying() {
     if (this.BuyingRateChargeToAdd.vatrate >= 0) {
       this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
     } else {
       this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + this.BuyingRateChargeToAdd.vatrate;
+    }
+  }
+
+  calculateTotalSelling() {
+    if (this.SellingRateChargeToAdd.vatrate >= 0) {
+      this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
+    } else {
+      this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + this.SellingRateChargeToAdd.vatrate;
     }
   }
 
@@ -110,10 +120,10 @@ export class HousebillListComponent implements OnInit {
 
   getListBuyingRateCharges(search_key: string = null) {
     var key = "";
-    if (search_key !== null && search_key.length < 3) {
-      return;
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
+      return
     } else {
-      key = search_key;
+      key = search_key == null ? "" : search_key.trim();
     }
 
     this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
@@ -123,23 +133,22 @@ export class HousebillListComponent implements OnInit {
 
   getListSellingRateCharges(search_key: string = null) {
     var key = "";
-    if (search_key !== null && search_key.length < 3) {
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
       return;
     } else {
-      key = search_key;
+      key = search_key == null ? "" : search_key.trim();
     }
     this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstSellingRateChargesComboBox = res['data'];
-      console.log({ "lstSellingRateCharges": this.lstSellingRateChargesComboBox });
     });
   }
 
   getListOBHCharges(search_key: string = null) {
     var key = "";
-    if (search_key !== null && search_key.length < 3) {
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
       return;
     } else {
-      key = search_key;
+      key = search_key == null ? "" : search_key.trim();
     }
     this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstOBHChargesComboBox = res['data'];
@@ -148,10 +157,10 @@ export class HousebillListComponent implements OnInit {
 
   getListPartner(search_key: string = null) {
     var key = "";
-    if (search_key !== null && search_key.length < 3) {
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
       return;
     } else {
-      key = search_key;
+      key = search_key == null ? "" : search_key.trim();
     }
     this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
       var data = res['data']
@@ -166,7 +175,7 @@ export class HousebillListComponent implements OnInit {
       this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
       this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
       var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
-      this.getChargesOfHouseBill(this.houseBillSelected);
+      this.getBuyingChargesOfHouseBill(this.houseBillSelected);
       if (IsContinue && res.status) {
         this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
       } else if (res.status) {
@@ -177,8 +186,30 @@ export class HousebillListComponent implements OnInit {
       }
 
     }
-    console.log(this.BuyingRateChargeToAdd);
   }
+
+  async saveNewSellingRateCharge(form: NgForm, IsContinue: boolean = false) {
+
+
+    if (form.valid) {
+      this.SellingRateChargeToAdd.type = SurchargeTypeEnum.SELLING_RATE;
+      this.SellingRateChargeToAdd.hblid = this.houseBillSelected.id;
+      var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.SellingRateChargeToAdd);
+      this.getSellingChargesOfHouseBill(this.houseBillSelected);
+      if (IsContinue && res.status) {
+        this.SellingRateChargeToAdd = new CsShipmentSurcharge();
+      } else if (res.status) {
+        this.SellingRateChargeToAdd = new CsShipmentSurcharge();
+        $('#add-selling-rate-modal').modal('hide');
+      } else {
+
+      }
+
+    }
+  }
+
+
+
 
   viewdata() {
     console.log({ "HB L": this.HouseBillListData });
@@ -204,7 +235,7 @@ export class HousebillListComponent implements OnInit {
     }
   }
 
-  
+
 
 
 
@@ -214,13 +245,30 @@ export class HousebillListComponent implements OnInit {
     });
   }
 
-  getChargesOfHouseBill(hb: any) {
-    this.houseBillSelected = hb;
-    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id).subscribe((res: any) => {
+  // async getChargesOfHouseBill(hb: any,type:'BUY' | 'SELL' | 'OBH') {
+  //   this.houseBillSelected = hb;
+  //   this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id).subscribe((res: any) => {
+  //     this.ListBuyingRateCharges = res;
+  //     this.ConstListBuyingRateCharges = res;
+  //   })
+  //   return await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId+"?hbId="+this.houseBillSelected.id+"&type="+type);
+
+  // }
+
+  getBuyingChargesOfHouseBill(currentlyHB: any) {
+    this.houseBillSelected = currentlyHB;
+    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id + "&type=BUY").subscribe((res: any) => {
       this.ListBuyingRateCharges = res;
       this.ConstListBuyingRateCharges = res;
     })
+  }
 
+  getSellingChargesOfHouseBill(currentlyHB: any) {
+    this.houseBillSelected = currentlyHB;
+    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id + "&type=SELL").subscribe((res: any) => {
+      this.ListSellingRateCharges = res;
+      this.ConstListSellingRateCharges = res;
+    })
   }
 
 
@@ -229,7 +277,7 @@ export class HousebillListComponent implements OnInit {
 
   currencies: any[] = [];
   addChargeClick() {
-    this.currencies = prepareNg2SelectData(this.comboBoxData.lstCurrency, "id", "currencyName");
+    // this.currencies = prepareNg2SelectData(this.comboBoxData.lstCurrency, "id", "currencyName");
   }
   getListCurrency(key: string) {
     // this.baseServices.post(this.api_menu.Catalogue.Currency.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }).subscribe(res => {
