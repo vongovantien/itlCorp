@@ -398,7 +398,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 item.Code = string.Format("Code is not allow empty!|wrong");
                 item.IsValid = false;
             }
-            else if (newList.Any(x => (x.Code ?? "").ToLower() == (item.Code ?? "").ToLower()))
+            else if (newList.Count(x => (x.Code ?? "").ToLower() == (item.Code ?? "").ToLower()) > 1)
             {
                 item.Code = string.Format("Code {0} is existed!|wrong", item.Code);
                 item.IsValid = false;
