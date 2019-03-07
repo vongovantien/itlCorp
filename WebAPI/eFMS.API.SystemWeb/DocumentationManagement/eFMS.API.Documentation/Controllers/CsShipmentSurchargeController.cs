@@ -31,10 +31,10 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpGet]
         [Route("GetByHB")]
-        public IActionResult GetByHouseBill(Guid hbId)
+        public IActionResult GetByHouseBill(Guid hbId,string type)
         {
 
-            return Ok(csShipmentSurchargeService.GetByHB(hbId));
+            return Ok(csShipmentSurchargeService.GetByHB(hbId,type));
         }
 
 

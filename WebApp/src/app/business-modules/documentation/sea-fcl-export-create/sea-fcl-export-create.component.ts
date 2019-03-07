@@ -13,6 +13,7 @@ declare var $: any;
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { prepareNg2SelectData } from 'src/helper/data.helper';
 
 
 export class FirstLoadData {
@@ -603,11 +604,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         });
     }
     getListCurrency(){
-        // this.baseServices.post(this.api_menu.Catalogue.Currency.paging+"?page="+1+"&size="+20,{inactive:false,all:""}).subscribe(res=>{
-        //     this._firstLoadData.lstCurrency = res['data'];
-        // });
         this.baseServices.get(this.api_menu.Catalogue.Currency.getAll).subscribe((res:any)=>{
-            this._firstLoadData.lstCurrency = res;
+            this._firstLoadData.lstCurrency = prepareNg2SelectData(res, "id", "currencyName");
         });
     }
 

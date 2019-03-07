@@ -296,17 +296,17 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   isDisplay = true;
-  ListHouseBill:any[]=[];
+  ListHouseBill: any[] = [];
   async save(form: NgForm) {
 
     if (form.valid) {
       this.HouseBillToAdd.csMawbcontainers = this.lstHouseBillContainers;
       const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillToAdd);
       if (res.status) {
-        var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob+"?jobId="+this.MasterBillData.id);
+        var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
 
-       // this.ListHouseBill.push({ data: Object.assign({},this.HouseBillToAdd), extend_data: Object.assign({},this.extend_data) });
-       // this.houseBillComing.emit(this.ListHouseBill);
+        // this.ListHouseBill.push({ data: Object.assign({},this.HouseBillToAdd), extend_data: Object.assign({},this.extend_data) });
+        // this.houseBillComing.emit(this.ListHouseBill);
         this.houseBillComing.emit(latestListHouseBill);
         $('#add-house-bill-modal').modal('hide');
       }
