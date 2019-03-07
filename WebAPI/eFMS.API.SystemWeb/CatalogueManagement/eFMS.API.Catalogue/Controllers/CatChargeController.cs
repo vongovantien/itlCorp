@@ -50,7 +50,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Paging")]
         public IActionResult Get(CatChargeCriteria criteria,int pageNumber,int pageSize)
         {
-            var data = catChargeService.GetCharges(criteria, pageNumber, pageSize, out int rowCount);
+          var data = catChargeService.GetCharges(criteria, pageNumber, pageSize, out int rowCount);
             var result = new { data, totalItems = rowCount, pageNumber, pageSize };
             return Ok(result);
         }
