@@ -456,6 +456,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (string.IsNullOrEmpty(item.ModeOfTransport))
                 {
                     result.ModeOfTransport = string.Format("Mode of transport is not allow empty!|wrong");
+                    result.IsValid = false;
                 }
                 else
                 {
@@ -465,6 +466,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     else
                     {
                         result.ModeOfTransport = string.Format("Mode of transport {0} is not found!|wrong", item.ModeOfTransport);
+                        result.IsValid = false;
                     }
                 }
                 if (!string.IsNullOrEmpty(item.AreaName))
@@ -577,7 +579,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
-                    bool inactive = string.IsNullOrEmpty(item.Status) ? false : (item.Status == "inactive" ? true : false);
+                    bool inactive = string.IsNullOrEmpty(item.Status) ? false : (item.Status.Trim().ToLower() == "inactive" ? true : false);
                     DateTime? inactiveDate = inactive == false ? null : (DateTime?)DateTime.Now;
                     var catPlace = new CatPlace
                     {   Id = Guid.NewGuid(),
