@@ -443,13 +443,11 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
     }
     async onSubmitContainer() {
-        this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
         
         for(let i=0; i< this.lstMasterContainers.length; i++){
             this.lstMasterContainers[i].verifying = true;
         }
         if (this.containerMasterForm.valid) {
-
             let hasItemEdited = false;
             for(let i=0; i< this.lstMasterContainers.length; i++){
                 if(this.lstMasterContainers[i].allowEdit == true){
@@ -458,6 +456,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 }
             }
             if(hasItemEdited == false){
+                this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
                 this.totalGrossWeight = 0;
                 this.totalNetWeight = 0;
                 this.totalCharWeight = 0;
@@ -469,15 +468,15 @@ export class SeaFclExportCreateComponent implements OnInit {
                 }
                 this.getShipmentContainerDescription(this.lstMasterContainers);
                 this.shipment.csMawbcontainers = this.lstMasterContainers;
+            
+                if(this.shipment.id != "00000000-0000-0000-0000-000000000000" && this.isImport == false && this.inEditing == true){
+                    var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.shipment.csMawbcontainers, masterId: this.shipment.id}, true, false);
+                    let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: this.shipment.id}, false, false);
+                }
                 $('#container-list-of-job-modal-master').modal('hide');
             }
             else{
                 this.baseServices.errorToast("Current container must be save!!!");
-            }
-            
-            if(this.shipment.id != "00000000-0000-0000-0000-000000000000" && this.isImport == false && this.inEditing == true){
-                var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.shipment.csMawbcontainers, masterId: this.shipment.id}, true, false);
-                let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: this.shipment.id}, false, false);
             }
         }
     }
