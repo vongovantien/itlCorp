@@ -557,8 +557,12 @@ namespace eFMS.API.Catalogue.DL.Services
                                 var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
                                 if (district == null)
                                 {
-                                    result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                    result.DistrictName = string.Format("District name '{0}' is not found!|wrong", item.DistrictName);
                                     result.IsValid = false;
+                                }
+                                else
+                                {
+                                    result.DistrictId = district.Id;
                                 }
                             }
                         }
