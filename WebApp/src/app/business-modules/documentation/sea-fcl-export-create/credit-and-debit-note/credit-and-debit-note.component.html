@@ -32,199 +32,219 @@
         </div>
         <!--end: Search Form -->
         <!--begin: Datatable-->
-        <div class="table-wrapper" id="">
-            <table class="table table-striped table-brand dataTable">
+        <div class="table-wrapper table-scrollable" id="">
+            <table class="table table-striped table-brand table-collapse-group dataTable">
                 <thead>
                     <tr>
                         <th class="table-actions-col no-sorting">
                             <span>Action</span>
                         </th>
                         <th class="sorting">
-                            <span>Port Code</span>
+                            <span>Type</span>
                         </th>
                         <th class="sorting">
-                            <span>Name(EN)</span>
+                            <span>Note No</span>
                         </th>
                         <th class="sorting">
-                            <span>Name(VI)</span>
+                            <span>Charges Count</span>
                         </th>
                         <th class="sorting">
-                            <span>Country</span>
+                            <span>Grant Total(Local)</span>
                         </th>
                         <th class="sorting">
-                            <span>Zone</span>
+                            <span>Creator</span>
                         </th>
                         <th class="sorting">
-                            <span>Mode</span>
+                            <span>Create Date</span>
                         </th>
-                        <th>
-                            <span>Status</span>
+                        <th class="sorting">
+                            <span>SOA No</span>
                         </th>
                     </tr>
                 </thead>
                 <tbody class="tbody-group">
                     <!-- begin collapse-toggle-row -->
-                    <tr class="collapse-toggle-row group" style="background-color: #f2dedf">
+                    <tr class="collapse-toggle-row tgroup">
                         <td colspan="8">
-                            <!-- <a class="m--font-danger collapsed" href="javascript:void(0)" title="" data-toggle="collapse" data-target="#id-001" >
-                                <i class="la la-plus-square"></i>
-                            </a> -->
-                            <strong>No 1</strong>
+                            <label class="btn-toggle-collapse m--font-danger" title="view more"  data-toggle="collapse" data-target="#id-001">
+                                <i class="la la-minus-square"></i>
+                            </label> 
+                            <span class="tgroup-title">No-1</span>
                         </td>
                     </tr>
                     <!-- end of collapse-toggle-row -->
                     <!-- begin collapse-panel-row -->
-                    <tr class="">
-                        <td class="table-actions-col">
-                            <div class="table-actions">
-                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Edit">
-                                    <i class="la la-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                    <i class="la la-trash"></i>
-                                </button>
+                    <tr class="collapse-panel-row">
+                        <td colspan="8">
+                            <div class="collapse show" id="id-001">
+                                <table class="table">
+                                    <tbody>
+                                        <tr class="">
+                                            <td class="table-actions-col" >
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit" data-toggle="modal" data-target="#edit-credit-debit-modal">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>Active</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="table-actions-col"  width="70">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit" data-toggle="modal" data-target="#edit-credit-debit-modal">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>Active</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>Active</span>
-                        </td>
-                    </tr>
-                    <tr class="">
-                        <td class="table-actions-col">
-                            <div class="table-actions">
-                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Edit">
-                                    <i class="la la-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                    <i class="la la-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>Active</span>
                         </td>
                     </tr>
                     <!--end of collapse-panel-row -->
 
                     <!-- begin collapse-toggle-row -->
-                    <tr class="collapse-toggle-row group" style="background-color: #f2dedf">
+                    <tr class="collapse-toggle-row tgroup">
                         <td colspan="8">
-                            <!-- <a class="m--font-danger collapsed" href="javascript:void(0)" title="" data-toggle="collapse" data-target="#id-001" >
-                                <i class="la la-plus-square"></i>
-                            </a> -->
-                            <strong>No 2</strong>
+                            <label class="btn-toggle-collapse m--font-danger" title="view more" data-toggle="collapse" data-target="#id-002">
+                                <i class="la la-minus-square"></i>
+                            </label> 
+                            <span class="tgroup-title">No-2</span>
                         </td>
                     </tr>
                     <!-- end of collapse-toggle-row -->
                     <!-- begin collapse-panel-row -->
-                    <tr class="">
-                        <td class="table-actions-col">
-                            <div class="table-actions">
-                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Edit">
-                                    <i class="la la-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                    <i class="la la-trash"></i>
-                                </button>
+                    <tr class="collapse-panel-row">
+                        <td colspan="8">
+                            <div class="collapse show" id="id-002">
+                                <table class="table">
+                                    <tbody>
+                                        <tr class="">
+                                            <td class="table-actions-col"  width="70">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit" data-toggle="modal" data-target="#edit-credit-debit-modal">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>Active</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="table-actions-col"  width="70">
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit" data-toggle="modal" data-target="#edit-credit-debit-modal">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>text</span>
+                                            </td>
+                                            <td>
+                                                <span>Active</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>Active</span>
-                        </td>
-                    </tr>
-                    <tr class="">
-                        <td class="table-actions-col">
-                            <div class="table-actions">
-                                <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Edit">
-                                    <i class="la la-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                    <i class="la la-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>text</span>
-                        </td>
-                        <td>
-                            <span>Active</span>
                         </td>
                     </tr>
                     <!--end of collapse-panel-row -->
@@ -628,7 +648,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="createCDNote()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1280,7 +1300,7 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#edit-debit-note-modal">
+                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="editCDNote()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1302,8 +1322,8 @@
 </div>
 <!--end:: detail-credit-debit-note-modal-->
 
-<!--begin:: edit-debit-note-modal-->
-<div class="modal fade" id="edit-debit-note-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<!--begin:: edit-credit-debit-note-modal-->
+<div class="modal fade" id="edit-credit-debit-note-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
@@ -1632,7 +1652,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="viewDetailCDNote()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -1652,4 +1672,4 @@
         </div>
     </div>
 </div>
-<!--end:: edit-debit-note-modal-->
+<!--end:: edit-credit-debit-note-modal-->
