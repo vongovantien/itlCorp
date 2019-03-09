@@ -718,7 +718,7 @@
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
-                                        add new
+                                        add new OBH hehehe
                                     </span>
                                 </span>
                             </button>
@@ -2692,7 +2692,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="Enter text" #OBHQuantityName="ngModel"
-                                    [(ngModel)]="OBHChargeToAdd.quantity" required
+                                    [(ngModel)]="OBHChargeToAdd.quantity" required (keyup)="calculateTotalOBH()"
                                     name="OBHQuantityName">
                                 <div class="form-control-feedback"
                                     *ngIf="addOBHChargeForm.submitted && OBHQuantityName.invalid">
@@ -2763,7 +2763,7 @@
                                 <input type="text" class="form-control m-input m-input--square"
                                     [(ngModel)]="OBHChargeToAdd.unitPrice" placeholder="Enter text" required
                                     name="OBHUnitPriceName" #OBHUnitPriceName="ngModel"
-                                    (keyup)="calculateTotalSelling()">
+                                    (keyup)="calculateTotalOBH()">
                                 <div class="form-control-feedback"
                                     *ngIf="addOBHChargeForm.submitted &&(OBHUnitPriceName.invalid || (0 >= OBHChargeToAdd.unitPrice))">
                                     Unit Price is required and must be larger than 0 !
@@ -2799,7 +2799,7 @@
                                 <input type="number" max="100" name="OBHChargeVATName" required
                                     #OBHChargeVATName="ngModel" [(ngModel)]="OBHChargeToAdd.vatrate"
                                     class="form-control m-input m-input--square" placeholder="Enter text"
-                                    (keyup)="calculateTotalSelling()">
+                                    (keyup)="calculateTotalOBH()">
                                 <div class="form-control-feedback"
                                     *ngIf="addOBHChargeForm.submitted && OBHChargeVATName.invalid">
                                     VAT is required
@@ -2812,8 +2812,8 @@
                                     Total
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" disabled
-                                    placeholder="Enter text" name="BuyingRateChargeTotalName"
-                                    [(ngModel)]="SellingRateChargeToAdd.total">
+                                    placeholder="Enter text" name="OBHChargeTotalName"
+                                    [(ngModel)]="OBHChargeToAdd.total">
                             </div>
                         </div>
                     </div>
@@ -2844,7 +2844,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="saveNewSellingRateCharge(addSellingRateChargeForm,true)">
+                    (click)="saveNewOBHCharge(addOBHChargeForm,true)">
                     <span>
                         <i class="la la-plus"></i>
                         <span>
@@ -2853,7 +2853,7 @@
                     </span>
                 </button>
                 <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="saveNewSellingRateCharge(addSellingRateChargeForm)">
+                    (click)="saveNewOBHCharge(addOBHChargeForm)">
                     <span>
                         <i class="la la-save"></i>
                         <span>
