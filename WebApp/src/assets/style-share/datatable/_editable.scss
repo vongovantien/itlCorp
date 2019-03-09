@@ -33,3 +33,42 @@
         }
     }
 }
+//collapse-table by group
+.table {
+    thead,
+    tbody {
+        tr {
+            &.tgroup {
+                background-color: #f2dedf;
+            }
+        }
+    }
+}
+.tgroup-title {
+    vertical-align: middle;
+}
+.btn-toggle-collapse {
+    height: 20px;
+    vertical-align: middle;
+    margin: 0 5px 0 0;
+    &.collapsed {
+        i {
+            &:before {
+                content: "\f2c4";
+            }
+        }
+    }
+}
+.table-wrapper {
+    .table-collapse-group {
+        thead,
+        tbody {
+            tr {
+                th,
+                td {
+                    width: 130px;
+                }
+            }
+        }
+    }
+}
