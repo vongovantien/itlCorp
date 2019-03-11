@@ -23,4 +23,6 @@ export class Container {
   userModified: string = null;
   datetimeModified: Date = null;
   allowEdit: boolean = false;
+  containerTypeName: string = null;
+  commodityName: string = null;
 }

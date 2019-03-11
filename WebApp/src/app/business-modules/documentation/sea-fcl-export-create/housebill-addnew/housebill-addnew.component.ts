@@ -1,13 +1,9 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, AfterViewChecked, Input } from '@angular/core';
-import { Partner } from 'src/app/shared/models/catalogue/partner.model';
+import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { SortService } from 'src/app/shared/services/sort.service';
-import { SystemConstants } from 'src/constants/system.const';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import * as lodash from 'lodash';
@@ -28,7 +24,7 @@ export class HousebillAddnewComponent implements OnInit {
   MasterBillData: CsTransaction = null;
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
-    this.HouseBillToAdd.jobId = this.MasterBillData.jobNo;
+    this.HouseBillToAdd.jobId = this.MasterBillData.id;
   }
 
   pager: PagerSetting = PAGINGSETTING;
@@ -57,16 +53,15 @@ export class HousebillAddnewComponent implements OnInit {
    */
 
   HouseBillToAdd: CsTransactionDetail = new CsTransactionDetail();
-  ListHouseBill: any = ["gggg"];
+  // ListHouseBill: any = ["gggg"];
   ListContainers: Array<Container> = [new Container()];
-  @Output() houseBillComing = new EventEmitter<{ data: CsTransactionDetail, extend_data: any }>();
+  //@Output() houseBillComing = new EventEmitter<{ data: CsTransactionDetail, extend_data: any }>();
+  @Output() houseBillComing = new EventEmitter<any>();
 
 
   constructor(
     private baseServices: BaseService,
-    private api_menu: API_MENU,
-    private sortService: SortService,
-    private cdr: ChangeDetectorRef
+    private api_menu: API_MENU
   ) { }
 
   ngOnInit() {
@@ -99,7 +94,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   public getListCustomers(search_key: string = null) {
     var key = "";
-    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
+    if (search_key !== null && search_key.length < 3) {
       return 0;
     } else {
       key = search_key;
@@ -301,18 +296,26 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   isDisplay = true;
-  save(form: NgForm) {
+  ListHouseBill: any[] = [];
+  async save(form: NgForm) {
+
     if (form.valid) {
-      this.houseBillComing.emit({ data: this.HouseBillToAdd, extend_data: this.extend_data });
-      this.ListHouseBill.push(Object.assign({}, this.HouseBillToAdd));
-      this.resetForm();
-      $('#add-house-bill-modal').modal('hide');
+      this.HouseBillToAdd.csMawbcontainers = this.lstHouseBillContainers;
+      const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillToAdd);
+      if (res.status) {
+        var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+
+        // this.ListHouseBill.push({ data: Object.assign({},this.HouseBillToAdd), extend_data: Object.assign({},this.extend_data) });
+        // this.houseBillComing.emit(this.ListHouseBill);
+        this.houseBillComing.emit(latestListHouseBill);
+        $('#add-house-bill-modal').modal('hide');
+      }
     }
   }
 
   resetForm() {
     this.HouseBillToAdd = new CsTransactionDetail();
-    this.HouseBillToAdd.jobId = this.MasterBillData.jobNo;
+    this.HouseBillToAdd.jobId = this.MasterBillData.id;
     this.customerSaleman = null;
     this.isDisplay = false;
     setTimeout(() => {
@@ -320,8 +323,6 @@ export class HousebillAddnewComponent implements OnInit {
     }, 300);
     $('#add-house-bill-modal').modal('hide');
   }
-
-
 
   /**
    * ADD CONTAINER LIST
@@ -382,7 +383,7 @@ export class HousebillAddnewComponent implements OnInit {
     this.lstHouseBillContainers[index].verifying = true;
     if (this.containerListForm.invalid) return;
 
-    if(this.compareContainerList(this.lstHouseBillContainers[index],this.MasterBillData.csMawbcontainers)!=true){
+    if (this.compareContainerList(this.lstHouseBillContainers[index], this.MasterBillData.csMawbcontainers) != true) {
 
       this.baseServices.errorToast(
         "The Cont qty value you entered will make the Total Container number of all HBL exceeded the Container number of Shipment detail. Please recheck and try again !",
@@ -417,13 +418,13 @@ export class HousebillAddnewComponent implements OnInit {
     masterBillContainerList = lodash.filter(masterBillContainerList, function (o: Container) {
       return o.containerTypeId == currentContainer.containerTypeId;
     });
-    
-    const listHBWithCurrentContainerType = lodash.filter(this.lstHouseBillContainers,function(o:Container){
+
+    const listHBWithCurrentContainerType = lodash.filter(this.lstHouseBillContainers, function (o: Container) {
       return o.containerTypeId == currentContainer.containerTypeId;
     });
 
-    const totalHBContainer = listHBWithCurrentContainerType.length==0 ? 0 : listHBWithCurrentContainerType.map(x=>x.quantity).reduce((a,c)=>a+c);
-    const totalMasterContainer = masterBillContainerList.length==0 ? 0: masterBillContainerList.map(x => x.quantity).reduce((a, c) => a + c);
+    const totalHBContainer = listHBWithCurrentContainerType.length == 0 ? 0 : listHBWithCurrentContainerType.map(x => x.quantity).reduce((a, c) => a + c);
+    const totalMasterContainer = masterBillContainerList.length == 0 ? 0 : masterBillContainerList.map(x => x.quantity).reduce((a, c) => a + c);
     if (totalHBContainer > totalMasterContainer) {
       return false;
     } else {

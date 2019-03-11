@@ -71,7 +71,7 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
  * @param idField 
  * @param textField 
  */
-export function prepareNg2SelectData(dataSource:[],idField:any,textField:any){
+export function prepareNg2SelectData(dataSource:any[],idField:any,textField:any){
     var returnData = lodash.map(dataSource,function(o){
         return {id:o[idField],text:o[textField]}
     });

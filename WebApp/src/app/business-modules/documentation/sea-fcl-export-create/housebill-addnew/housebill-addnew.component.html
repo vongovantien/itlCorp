@@ -87,8 +87,7 @@
                                                     <tbody>
                                                         <!-- HouseBillToAdd.customerId=item.partnerID -->
                                                         <ng-container *ngFor="let item of listCustomers;let i = index">
-                                                            <tr class="data-row" attr.data-id="{{i}}"
-                                                                (click)="
+                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="
                                                                 HouseBillToAdd.customerId=item.id;
                                                                 selectedCustomer.value=item.partnerNameEn;
                                                                 getCustomerSaleman(item.salePersonId);
@@ -121,12 +120,11 @@
                                     Saleman in charge
                                 </label>
                                 <ng-select [allowClear]="true" [items]="listSaleMan" [disabled]="disabled"
-                                    (data)="refreshValue($event)" *ngIf="listSaleMan.length>0"
-                                    (selected)="
+                                    (data)="refreshValue($event)" *ngIf="listSaleMan.length>0" (selected)="
                                     HouseBillToAdd.saleManId=$event.id;
-                                    extend_data.saleman_nameEn=$event.text"
-                                    (removed)="HouseBillToAdd.saleManId=null" [active]="customerSaleman"
-                                    (typed)="getListSaleman($event.text)" placeholder="Select option">
+                                    extend_data.saleman_nameEn=$event.text" (removed)="HouseBillToAdd.saleManId=null"
+                                    [active]="customerSaleman" (typed)="getListSaleman($event.text)"
+                                    placeholder="Select option">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="addHouseBillForm.submitted && HouseBillToAdd.saleManId==null">
@@ -668,7 +666,7 @@
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [(ngModel)]="HouseBillToAdd.closingDate" [ranges]="ranges"
                                             [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            name="daterange" placeholder="Select date" readonly />
+                                            name="closingDateName" placeholder="Select date" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
@@ -678,7 +676,8 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && sailingDateName.invalid}">
                                     <label class="form-control-label" for="">
                                         Sailling date
                                     </label>
@@ -686,14 +685,19 @@
                                         <input type="text" class="form-control m-input m-input--square"
                                             (change)="HouseBillToAdd.sailingDate= $event.startDate" ngxDaterangepickerMd
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
-                                            [(ngModel)]="HouseBillToAdd.sailingDate" [ranges]="ranges"
+                                            [(ngModel)]="HouseBillToAdd.sailingDate" [ranges]="ranges" required
                                             [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            name="daterange" placeholder="Select date" readonly />
+                                            name="sailingDateName" #sailingDateName="ngModel" placeholder="Select date"
+                                            readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
+                                        <div class="form-control-feedback"
+                                            *ngIf="addHouseBillForm.submitted && sailingDateName.invalid">
+                                            Sailing date is required
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -759,7 +763,10 @@
                                                             <ng-container
                                                                 *ngFor="let item of listFowardingAgent;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.forwardingAgentId=item.id;selectedForwardingAgent.value=item.partnerNameEn;getForwardingAgentDescription(item)"
+                                                                    (click)="HouseBillToAdd.forwardingAgentId=item.id;
+                                                                             selectedForwardingAgent.value=item.partnerNameEn;
+                                                                             extend_data.forwarding_agent_nameEn=item.partnerNameEn;
+                                                                             getForwardingAgentDescription(item)"
                                                                     [ngClass]="{ 'data-selected': HouseBillToAdd.forwardingAgentId!==null && HouseBillToAdd.forwardingAgentId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-5">{{item.shortName}}</td>
@@ -962,7 +969,8 @@
                                             <label class="form-control-label" for="">
                                                 Commodities:
                                             </label>
-                                            <textarea class="form-control m-input--square" name="commodityHB" id="" [(ngModel)]="HouseBillToAdd.commodity"
+                                            <textarea class="form-control m-input--square" name="commodityHB" id=""
+                                                [(ngModel)]="HouseBillToAdd.commodity"
                                                 rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
                                         </div>
                                     </div>
@@ -971,7 +979,8 @@
                                             <label class="form-control-label" for="">
                                                 Detail container & packages:
                                             </label>
-                                            <textarea class="form-control m-input--square" name="packageContainerHB" id="" [(ngModel)]="HouseBillToAdd.packageContainer"
+                                            <textarea class="form-control m-input--square" name="packageContainerHB"
+                                                id="" [(ngModel)]="HouseBillToAdd.packageContainer"
                                                 rows="3">container-1, container-2, container-3</textarea>
                                         </div>
                                     </div>
@@ -980,7 +989,8 @@
                                     <label class="form-control-label" for="">
                                         Description of good:
                                     </label>
-                                    <textarea class="form-control m-input--square" name="desOfGoodsHB" id="" [(ngModel)]="HouseBillToAdd.desOfGoods"
+                                    <textarea class="form-control m-input--square" name="desOfGoodsHB" id=""
+                                        [(ngModel)]="HouseBillToAdd.desOfGoods"
                                         rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
                                 </div>
                             </div>
@@ -1072,7 +1082,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="resetForm()">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="resetForm()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -1100,462 +1111,462 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                  
-                        <div class="container-list-table">
-                            <!--begin: Search Form -->
-                            <div class="m-form m-form--label-align-right m--margin-bottom-10">
-                                <div class="row align-items-center">
-                                    <div class="col-lg-4 order-2 order-lg-1">
-                                        <div class="form-group">
-                                            <div class="m-input-icon m-input-icon--left">
-                                                <input type="text" class="form-control m-input m-input--square"
-                                                    placeholder="Search...">
-                                                <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                    <span>
-                                                        <i class="la la-search"></i>
-                                                    </span>
+
+                    <div class="container-list-table">
+                        <!--begin: Search Form -->
+                        <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                            <div class="row align-items-center">
+                                <div class="col-lg-4 order-2 order-lg-1">
+                                    <div class="form-group">
+                                        <div class="m-input-icon m-input-icon--left">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                placeholder="Search...">
+                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                <span>
+                                                    <i class="la la-search"></i>
                                                 </span>
-                                            </div>
+                                            </span>
                                         </div>
                                     </div>
-                                    <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                                        <button type="button"
-                                            class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                </div>
+                                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                                    <button type="button"
+                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                        <span>
+                                            <i class="la la-download"></i>
                                             <span>
-                                                <i class="la la-download"></i>
-                                                <span>
-                                                    import
-                                                </span>
+                                                import
                                             </span>
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                            (click)="addNewContainer()">
+                                        </span>
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                        (click)="addNewContainer()">
+                                        <span>
+                                            <i class="la la-plus"></i>
                                             <span>
-                                                <i class="la la-plus"></i>
-                                                <span>
-                                                    add container
-                                                </span>
+                                                add container
                                             </span>
-                                        </button>
-                                    </div>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
-                            <!--end: Search Form -->
-                            <!--begin: Datatable -->
-                            <div class="table-wrapper" id="" style="min-height: 300px">
-                                <table class="table table-striped table-brand table-editable">
-                                    <thead class="">
-                                        <tr class="">
-                                            <th class="fixed-side"></th>
-                                            <th class="">
-                                                <span>
+                        </div>
+                        <!--end: Search Form -->
+                        <!--begin: Datatable -->
+                        <div class="table-wrapper" id="" style="min-height: 300px">
+                            <table class="table table-striped table-brand table-editable">
+                                <thead class="">
+                                    <tr class="">
+                                        <th class="fixed-side"></th>
+                                        <th class="">
+                                            <span>
+                                                Cont Type
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Cont Q'ty
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Cont No.
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Seal No.
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Mark No.
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Commodity
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Package Type
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Package Q'ty
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Description of Good
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                N.W
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                G.W
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                C.W
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Unit
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                CBM
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+
+
+                                <tbody *ngIf="lstHouseBillContainers">
+                                    <ng-container *ngFor="let container of lstHouseBillContainers; let i= index">
+                                        <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
+                                            <td class="table-actions-col fixed-side">
+                                                <div class="table-actions control-editable" style="width: 70px">
+                                                    <button type="submit"
+                                                        class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Save" (click)="saveNewContainer(i,containerListForm)">
+                                                        <i class="la la-save"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Cancel" (click)="cancelNewContainer(i)">
+                                                        <i class="la la-ban"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
                                                     Cont Type
                                                 </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
+                                                <div class="control-editable"
+                                                    [ngClass]="{ 'has-danger': containerListForm.submitted && container.containerTypeId == null && container.verifying}">
+                                                    <ng-select [allowClear]="true" [items]="containerTypes"
+                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
+                                                        (removed)="container.containerTypeId = null;container.containerTypeName = null"
+                                                        (typed)="typed($event)" [active]="container.containerTypeActive"
+                                                        placeholder="Select filter">
+                                                    </ng-select>
+                                                    <div class="form-control-feedback"
+                                                        *ngIf="containerListForm.submitted && container.containerTypeId == null && container.verifying">
+                                                        Container type is required.
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
                                                     Cont Q'ty
                                                 </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
+                                                <div class="control-editable"
+                                                    [ngClass]="{ 'has-danger': containerListForm.submitted && conQuantity.invalid && container.verifying}">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        min="1" value="1" oninput="validity.valid||(value='');"
+                                                        placeholder="Please enter" [(ngModel)]="container.quantity"
+                                                        name="conQuantity" #conQuantity="ngModel" required>
+                                                    <div class="form-control-feedback"
+                                                        *ngIf="containerListForm.submitted && conQuantity.invalid && container.verifying">
+                                                        Cont Q'ty must be a number
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
                                                     Cont No.
                                                 </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        [(ngModel)]="container.containerNo" name="containerNo"
+                                                        #containerNo="ngModel">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
                                                     Seal No.
                                                 </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        [(ngModel)]="container.sealNo" name="sealNo" #sealNo="ngModel">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
                                                     Mark No.
                                                 </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        [(ngModel)]="container.markNo" name="markNo" #markNo="ngModel">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
                                                     Commodity
                                                 </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    Package Type
-                                                </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    Package Q'ty
-                                                </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    Description of Good
-                                                </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    N.W
-                                                </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    G.W
-                                                </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    C.W
-                                                </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    Unit
-                                                </span>
-                                            </th>
-                                            <th class="">
-                                                <span>
-                                                    CBM
-                                                </span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-
-
-                                    <tbody *ngIf="lstHouseBillContainers">
-                                        <ng-container *ngFor="let container of lstHouseBillContainers; let i= index">
-                                            <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
-                                                <td class="table-actions-col fixed-side">
-                                                    <div class="table-actions control-editable" style="width: 70px">
-                                                        <button type="submit"
-                                                            class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Save" (click)="saveNewContainer(i,containerListForm)">
-                                                            <i class="la la-save"></i>
-                                                        </button>
-                                                        <button type="button"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Cancel" (click)="cancelNewContainer(i)">
-                                                            <i class="la la-ban"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Cont Type
-                                                    </span>
-                                                    <div class="control-editable"
-                                                        [ngClass]="{ 'has-danger': containerListForm.submitted && container.containerTypeId == null && container.verifying}">
-                                                        <ng-select [allowClear]="true" [items]="containerTypes"
-                                                            [disabled]="disabled" (data)="refreshValue($event)"
-                                                            (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
-                                                            (removed)="container.containerTypeId = null;container.containerTypeName = null"
-                                                            (typed)="typed($event)" [active]="container.containerTypeActive"
-                                                            placeholder="Select filter">
-                                                        </ng-select>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="containerListForm.submitted && container.containerTypeId == null && container.verifying">
-                                                            Container type is required.
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Cont Q'ty
-                                                    </span>
-                                                    <div class="control-editable"
-                                                        [ngClass]="{ 'has-danger': containerListForm.submitted && conQuantity.invalid && container.verifying}">
-                                                        <input type="number" class="form-control m-input m-input--square"
-                                                            min="1" value="1" oninput="validity.valid||(value='');"
-                                                            placeholder="Please enter" [(ngModel)]="container.quantity"
-                                                            name="conQuantity" #conQuantity="ngModel" required>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="containerListForm.submitted && conQuantity.invalid && container.verifying">
-                                                            Cont Q'ty must be a number
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Cont No.
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="text" class="form-control m-input m-input--square"
-                                                            placeholder="Please enter" autocomplete="nope"
-                                                            [(ngModel)]="container.containerNo" name="containerNo"
-                                                            #containerNo="ngModel">
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Seal No.
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="text" class="form-control m-input m-input--square"
-                                                            placeholder="Please enter" autocomplete="nope"
-                                                            [(ngModel)]="container.sealNo" name="sealNo" #sealNo="ngModel">
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Mark No.
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="text" class="form-control m-input m-input--square"
-                                                            placeholder="Please enter" autocomplete="nope"
-                                                            [(ngModel)]="container.markNo" name="markNo" #markNo="ngModel">
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Commodity
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <div class="dropdown e--combogrid" #selectedCommodity>
-                                                            <input
-                                                                class="form-control m-input m-input--square dropdown-toggle"
-                                                                type="text" readonly data-toggle="dropdown"
-                                                                placeholder="Please selected"
-                                                                [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value"
-                                                                [(ngModel)]="selectedCommodityValue"
-                                                                name="selectedCommodityValue">
-                                                            <div
-                                                                class="dropdown-menu  dropdown-menu-right e--combogrid-content">
-                                                                <div class="tabel-wrapper table-fixed">
-                                                                    <div class="table-head-fixed">
-                                                                        <div class="table-filter-block">
-                                                                            <div class="search-field">
-                                                                                <input
-                                                                                    class="form-control m-input m-input--square"
-                                                                                    type="text" placeholder="Search...">
-                                                                                <i class="icon-search"></i>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="table-header">
-                                                                            <table class="table table-hover">
-                                                                                <thead>
-                                                                                    <tr>
-                                                                                        <th>Name EN</th>
-                                                                                        <th>Name VN</th>
-                                                                                        <th>Group</th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                            </table>
+                                                <div class="control-editable">
+                                                    <div class="dropdown e--combogrid" #selectedCommodity>
+                                                        <input
+                                                            class="form-control m-input m-input--square dropdown-toggle"
+                                                            type="text" readonly data-toggle="dropdown"
+                                                            placeholder="Please selected"
+                                                            [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value"
+                                                            [(ngModel)]="selectedCommodityValue"
+                                                            name="selectedCommodityValue">
+                                                        <div
+                                                            class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                                            <div class="tabel-wrapper table-fixed">
+                                                                <div class="table-head-fixed">
+                                                                    <div class="table-filter-block">
+                                                                        <div class="search-field">
+                                                                            <input
+                                                                                class="form-control m-input m-input--square"
+                                                                                type="text" placeholder="Search...">
+                                                                            <i class="icon-search"></i>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="table-body-scroll">
+                                                                    <div class="table-header">
                                                                         <table class="table table-hover">
-                                                                            <tbody *ngIf="commodities">
-                                                                                <tr class="data-row "
-                                                                                    *ngFor="let commodity of commodities; let i= index"
-                                                                                    data-id="{{(i+1)}}"
-                                                                                    (click)="container.commodityId=commodity.id; container.commodityName = commodity.commodityNameEn; selectedCommodity.value= commodity.commodityNameEn"
-                                                                                    [class.data-selected]="container.commodityId !==null && container.commodityId===commodity.id">
-                                                                                    <td>{{ commodity.commodityNameEn }}</td>
-                                                                                    <td>{{ commodity.commodityNameVn }}</td>
-                                                                                    <td>{{ commodity.commonityGroupNameEn }}
-                                                                                    </td>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Name EN</th>
+                                                                                    <th>Name VN</th>
+                                                                                    <th>Group</th>
                                                                                 </tr>
-                                                                            </tbody>
+                                                                            </thead>
                                                                         </table>
                                                                     </div>
+                                                                </div>
+                                                                <div class="table-body-scroll">
+                                                                    <table class="table table-hover">
+                                                                        <tbody *ngIf="commodities">
+                                                                            <tr class="data-row "
+                                                                                *ngFor="let commodity of commodities; let i= index"
+                                                                                data-id="{{(i+1)}}"
+                                                                                (click)="container.commodityId=commodity.id; container.commodityName = commodity.commodityNameEn; selectedCommodity.value= commodity.commodityNameEn"
+                                                                                [class.data-selected]="container.commodityId !==null && container.commodityId===commodity.id">
+                                                                                <td>{{ commodity.commodityNameEn }}</td>
+                                                                                <td>{{ commodity.commodityNameVn }}</td>
+                                                                                <td>{{ commodity.commonityGroupNameEn }}
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Package Type
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <ng-select [allowClear]="true" [items]="packageTypes"
-                                                            [disabled]="disabled" (data)="refreshValue($event)"
-                                                            (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
-                                                            (removed)="container.packageTypeId = null; container.packageTypeName = null"
-                                                            (typed)="typed($event)" [active]="container.packageTypeActive"
-                                                            placeholder="Select filter">
-                                                        </ng-select>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Package Q'ty
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="number" class="form-control m-input m-input--square"
-                                                            min="1" [(ngModel)]="container.packageQuantity"
-                                                            name="packageQuantity" #packageQuantity="ngModel"
-                                                            oninput="validity.valid||(value='');" placeholder="Please enter"
-                                                            autocomplete="nope">
-                                                    </div>
-                                                </td>
-                                                <td class="" style="width: 130px">
-                                                    <span class="content-editable">
-                                                        Description of Good dài thiệt là dài đó nha Tem Tem
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="text" class="form-control m-input m-input--square"
-                                                            autocomplete="nope" [(ngModel)]="container.description"
-                                                            name="descriptionOfGood" #descriptionOfGood="ngModel"
-                                                            placeholder="Please enter">
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        N.W
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="number" class="form-control m-input m-input--square"
-                                                            placeholder="Please enter" autocomplete="nope"
-                                                            [(ngModel)]="container.nw" name="containerNW" min="0.01"
-                                                            appTwoDigitDecimaNumber #containerNW="ngModel">
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        G.W
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="number" class="form-control m-input m-input--square"
-                                                            placeholder="Please enter" autocomplete="nope"
-                                                            [(ngModel)]="container.gw" name="containerGW" min="0.01"
-                                                            appTwoDigitDecimaNumber #containerGW="ngModel">
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        C.W
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="number" class="form-control m-input m-input--square"
-                                                            placeholder="Please enter" autocomplete="nope"
-                                                            [(ngModel)]="container.chargeAbleWeight"
-                                                            name="containerchargeAbleWeight" min="0.01"
-                                                            appTwoDigitDecimaNumber #containerchargeAbleWeight="ngModel">
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        Unit
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <ng-select [allowClear]="true" [items]="weightMesurements"
-                                                            [disabled]="disabled" (data)="refreshValue($event)"
-                                                            (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
-                                                            (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
-                                                            (typed)="typed($event)" [active]="container.unitOfMeasureActive"
-                                                            placeholder="Select filter">
-                                                        </ng-select>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        CBM
-                                                    </span>
-                                                    <div class="control-editable">
-                                                        <input type="number" class="form-control m-input m-input--square"
-                                                            placeholder="Please enter" autocomplete="nope"
-                                                            [(ngModel)]="container.cbm" name="containerCBM" min="0.01"
-                                                            appTwoDigitDecimaNumber #containerCBM="ngModel">
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="" *ngIf="!container.allowEdit">
-                                                <td class="table-actions-col fixed-side">
-                                                    <div class="table-actions" style="width: 70px">
-                                                        <button type="button"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit" (click)="changeEditStatus(i)">
-                                                            <i class="la la-edit"></i>
-                                                        </button>
-                                                        <button type="button"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" (click)=removeAContainer(i)>
-                                                            <i class="la la-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.containerTypeName }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.quantity }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.containerNo }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.sealNo }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.markNo }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.commodityName }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.packageTypeName }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.packageQuantity }}
-                                                    </span>
-                                                </td>
-                                                <td class="" style="width: 130px">
-                                                    <span class="content-editable">
-                                                        {{ container.description }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.nw | number: '1.2-2' }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.gw | number: '1.2-2' }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.chargeAbleWeight | number: '1.2-2' }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.unitOfMeasureName }}
-                                                    </span>
-                                                </td>
-                                                <td class="">
-                                                    <span class="content-editable">
-                                                        {{ container.cbm }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-    
-                                        </ng-container>
-                                    </tbody>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Package Type
+                                                </span>
+                                                <div class="control-editable">
+                                                    <ng-select [allowClear]="true" [items]="packageTypes"
+                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
+                                                        (removed)="container.packageTypeId = null; container.packageTypeName = null"
+                                                        (typed)="typed($event)" [active]="container.packageTypeActive"
+                                                        placeholder="Select filter">
+                                                    </ng-select>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Package Q'ty
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        min="1" [(ngModel)]="container.packageQuantity"
+                                                        name="packageQuantity" #packageQuantity="ngModel"
+                                                        oninput="validity.valid||(value='');" placeholder="Please enter"
+                                                        autocomplete="nope">
+                                                </div>
+                                            </td>
+                                            <td class="" style="width: 130px">
+                                                <span class="content-editable">
+                                                    Description of Good dài thiệt là dài đó nha Tem Tem
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        autocomplete="nope" [(ngModel)]="container.description"
+                                                        name="descriptionOfGood" #descriptionOfGood="ngModel"
+                                                        placeholder="Please enter">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    N.W
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        [(ngModel)]="container.nw" name="containerNW" min="0.01"
+                                                        appTwoDigitDecimaNumber #containerNW="ngModel">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    G.W
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        [(ngModel)]="container.gw" name="containerGW" min="0.01"
+                                                        appTwoDigitDecimaNumber #containerGW="ngModel">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    C.W
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        [(ngModel)]="container.chargeAbleWeight"
+                                                        name="containerchargeAbleWeight" min="0.01"
+                                                        appTwoDigitDecimaNumber #containerchargeAbleWeight="ngModel">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Unit
+                                                </span>
+                                                <div class="control-editable">
+                                                    <ng-select [allowClear]="true" [items]="weightMesurements"
+                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
+                                                        (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
+                                                        (typed)="typed($event)" [active]="container.unitOfMeasureActive"
+                                                        placeholder="Select filter">
+                                                    </ng-select>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    CBM
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        [(ngModel)]="container.cbm" name="containerCBM" min="0.01"
+                                                        appTwoDigitDecimaNumber #containerCBM="ngModel">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="" *ngIf="!container.allowEdit">
+                                            <td class="table-actions-col fixed-side">
+                                                <div class="table-actions" style="width: 70px">
+                                                    <button type="button"
+                                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit" (click)="changeEditStatus(i)">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" (click)=removeAContainer(i)>
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.containerTypeName }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.quantity }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.containerNo }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.sealNo }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.markNo }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.commodityName }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.packageTypeName }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.packageQuantity }}
+                                                </span>
+                                            </td>
+                                            <td class="" style="width: 130px">
+                                                <span class="content-editable">
+                                                    {{ container.description }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.nw | number: '1.2-2' }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.gw | number: '1.2-2' }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.chargeAbleWeight | number: '1.2-2' }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.unitOfMeasureName }}
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    {{ container.cbm }}
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </ng-container>
+                                </tbody>
 
 
-                                </table>
-                            </div>
-                            <!--end: Datatable -->
+                            </table>
                         </div>
-                   
+                        <!--end: Datatable -->
+                    </div>
+
                 </div>
                 <div class="modal-footer m--align-center">
                     <button type="submit" (click)="onSubmitContainer()"

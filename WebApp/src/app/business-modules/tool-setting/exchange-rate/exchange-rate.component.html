@@ -48,7 +48,7 @@
                                 <tbody *ngIf="exchangeRateNewest">
                                     <tr *ngFor="let item of exchangeRateNewest.exchangeRates; let i = index">
                                         <td style="width: 30%">
-                                            <span>{{ item.currencyFromId }}</span>
+                                            <span>{{ item.currencyFromID }}</span>
                                         </td>
                                         <td style="width: 30%">
                                             <!-- <span>23.280,000</span> -->
@@ -118,9 +118,13 @@
                                         Select range date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right daterange-rtl">
-                                        <input type="text" #convertDate="ngModel" class="form-control m-input" ngxDaterangepickerMd [(ngModel)]="convert.selectedRangeDate" 
-                                        [singleDatePicker]="true" name="convertDate"  [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                         required readonly [ngClass]="{ 'm-input--square': formConvertRate.submitted && convertDate.invalid }" />
+                                        <input type="text" #convertDate="ngModel" class="form-control m-input" 
+                                            ngxDaterangepickerMd [(ngModel)]="convert.selectedRangeDate" 
+                                            [singleDatePicker]="true" name="convertDate"  
+                                            [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            required readonly 
+                                            [maxDate]="maxDate"
+                                            [ngClass]="{ 'm-input--square': formConvertRate.submitted && convertDate.invalid }" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
@@ -323,13 +327,13 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
                                             <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDeleteRate()">
+                                                title="" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDeleteRate(item)">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                     <td>
-                                        <span>{{ item.currencyFromId }}</span>
+                                        <span>{{ item.currencyFromID }}</span>
                                     </td>
                                 </tr>
                             </ng-container>
@@ -428,7 +432,7 @@
                         <tbody *ngIf="exchangeRatesOfDay.exchangeRates">
                             <tr *ngFor="let item of exchangeRatesOfDay.exchangeRates; let i = index">
                                 <td style="width: 50%">
-                                    <span>{{ item.currencyFromId }}</span>
+                                    <span>{{ item.currencyFromID }}</span>
                                 </td>
                                 <td style="width: 50%">
                                     <span>{{ item.rate | currency : "" : '' }}</span>

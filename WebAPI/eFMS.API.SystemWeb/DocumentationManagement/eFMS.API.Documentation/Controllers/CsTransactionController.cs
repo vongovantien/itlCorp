@@ -8,6 +8,8 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -25,10 +27,12 @@ namespace eFMS.API.Documentation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionService csTransactionService;
-        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service)
+        private readonly ICurrentUser currentUser;
+        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
+            currentUser = user;
         }
 
         [HttpGet("CountJobByDate/{{date}}")]
@@ -56,30 +60,48 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
-            var data = csTransactionService.Get(x => x.Id == id).FirstOrDefault();
+            var data = csTransactionService.GetById(id);
             return Ok(data);
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model.Id, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+            model.UserCreated = currentUser.UserID;
             var result = csTransactionService.AddCSTransaction(model);
-            //var message = HandleError.GetMessage(hs, Crud.Insert);
-            //ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            //if (!hs.Success)
-            //{
-            //    return BadRequest(result);
-            //}
-            //return Ok(result);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("Import")]
+        public IActionResult Import(CsTransactionEditModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model.Id, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+            model.UserCreated = currentUser.UserID;
+            var result = csTransactionService.ImportCSTransaction(model);
             return Ok(result);
         }
 
         [HttpPut]
+        [Authorize]
         public IActionResult Put(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             var hs = csTransactionService.UpdateCSTransaction(model);
+            model.UserCreated = currentUser.UserID;
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -87,6 +109,25 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+        private string CheckExist(Guid id, CsTransactionEditModel model)
+        {
+            string message = string.Empty;
+            if (id == Guid.Empty)
+            {
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                }
+            }
+            else
+            {
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                }
+            }
+            return message;
         }
     }
 }

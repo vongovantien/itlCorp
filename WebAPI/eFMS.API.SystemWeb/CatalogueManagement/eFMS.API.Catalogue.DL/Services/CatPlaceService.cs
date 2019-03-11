@@ -29,6 +29,8 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatCountry>("Id", "CountryId");
             SetChildren<CatPlace>("Id", "ProvinceId");
             SetChildren<CatPlace>("Id", "DistrictId");
+            SetChildren<CatPlace>("Id", "Pol");
+            SetChildren<CatPlace>("Id", "Pod");
         }
 
         public List<vw_catProvince> GetProvinces(short? countryId)
@@ -454,15 +456,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (string.IsNullOrEmpty(item.ModeOfTransport))
                 {
                     result.ModeOfTransport = string.Format("Mode of transport is not allow empty!|wrong");
+                    result.IsValid = false;
                 }
                 else
                 {
-                    if(DataEnums.ModeOfTransportData.Any(x => x.Id == item.ModeOfTransport)){
-                        result.ModeOfTransport = item.ModeOfTransport;
+                    if(DataEnums.ModeOfTransportData.Any(x => x.Id == item.ModeOfTransport.ToUpper())){
+                        result.ModeOfTransport = item.ModeOfTransport.ToUpper();
                     }
                     else
                     {
                         result.ModeOfTransport = string.Format("Mode of transport {0} is not found!|wrong", item.ModeOfTransport);
+                        result.IsValid = false;
                     }
                 }
                 if (!string.IsNullOrEmpty(item.AreaName))
@@ -575,7 +579,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
-                    DateTime? inactive = null;
+                    bool inactive = string.IsNullOrEmpty(item.Status) ? false : (item.Status.Trim().ToLower() == "inactive" ? true : false);
+                    DateTime? inactiveDate = inactive == false ? null : (DateTime?)DateTime.Now;
                     var catPlace = new CatPlace
                     {   Id = Guid.NewGuid(),
                         Code = item.Code,
@@ -588,8 +593,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = DateTime.Now,
                         UserCreated = ChangeTrackerHelper.currentUser,
                         PlaceTypeId = item.PlaceTypeId,
-                        Inactive = false,
-                        InactiveOn = item.Status != null ? DateTime.Now : inactive,
+                        Inactive = inactive,
+                        InactiveOn = inactiveDate,
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId
                     };

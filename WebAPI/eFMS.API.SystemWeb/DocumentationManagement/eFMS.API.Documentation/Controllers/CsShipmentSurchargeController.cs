@@ -8,7 +8,6 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -20,30 +19,47 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CsMawbcontainerController : ControllerBase
+    public class CsShipmentSurchargeController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICsMawbcontainerService csContainerService;
-        private readonly ICurrentUser currentUser;
-        public CsMawbcontainerController(IStringLocalizer<LanguageSub> localizer, ICsMawbcontainerService service, ICurrentUser user)
+        private readonly ICsShipmentSurchargeService csShipmentSurchargeService;
+        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer,ICsShipmentSurchargeService service)
         {
             stringLocalizer = localizer;
-            csContainerService = service;
-            currentUser = user;
+            csShipmentSurchargeService = service;
         }
 
-        [HttpPost]
-        [Route("Query")]
-        public IActionResult Query(CsMawbcontainerCriteria criteria)
+        [HttpGet]
+        [Route("GetByHB")]
+        public IActionResult GetByHouseBill(Guid hbId,string type)
         {
-            return Ok(csContainerService.Query(criteria));
+
+            return Ok(csShipmentSurchargeService.GetByHB(hbId,type));
         }
+
+
+        [HttpPost]
+        [Route("Add")]
+        public IActionResult AddNew(CsShipmentSurchargeModel model)
+        {
+            model.Id = Guid.NewGuid();
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csShipmentSurchargeService.Add(model);           
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpPut]
         [Route("Update")]
-        public IActionResult Update(CsMawbcontainerEdit model)
+        public IActionResult Update(CsShipmentSurchargeModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var hs = csContainerService.Update(model.CsMawbcontainerModels, model.MasterId, model.HousebillId);
+            var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -51,6 +67,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+
         }
     }
 }
