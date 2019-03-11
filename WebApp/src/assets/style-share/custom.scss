@@ -280,8 +280,10 @@ a {
             }
         }
     }
+    thead,
     tbody {
         tr {
+            th,
             td {
                 padding: 8px 4px;
                 &:first-child {
