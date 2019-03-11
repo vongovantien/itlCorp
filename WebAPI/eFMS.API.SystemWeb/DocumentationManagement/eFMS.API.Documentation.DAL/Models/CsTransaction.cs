@@ -5,6 +5,7 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
+      
 
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
@@ -53,7 +54,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        //public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
+                
     }
 }

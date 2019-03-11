@@ -718,7 +718,7 @@
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
-                                        add new
+                                        add new OBH hehehe
                                     </span>
                                 </span>
                             </button>
@@ -1170,6 +1170,7 @@
                                                             <tr class="data-row" attr.data-id="{{i}}" (click)="BuyingRateChargeToAdd.chargeId=item.charge.id;
                                                                      BuyingRateChargeToAdd.unitId=item.charge.unitId;
                                                                      BuyingRateChargeToAdd.unitPrice=item.charge.unitPrice;
+                                                                     BuyingRateChargeToAdd.vatrate=item.charge.vatrate;
                                                                      selectedBuyingChargeCode.value=item.charge.code;
                                                                      selectedBuyingCharge.value=item.charge.chargeNameEn;
                                                                      selectedBuyingUnit.value=item.unit;"
@@ -1871,6 +1872,7 @@
                                                                 attr.data-id={{i}} (click)="SellingRateChargeToAdd.chargeId=item.charge.id;
                                                             SellingRateChargeToAdd.unitId=item.charge.unitId;
                                                             SellingRateChargeToAdd.unitPrice=item.charge.unitPrice;
+                                                            SellingRateChargeToAdd.vatrate = item.charge.vatrate;
                                                             selectedSellingChargeCode.value=item.charge.code;
                                                             selectedSellingCharge.value=item.charge.chargeNameEn;
                                                             selectedSellingUnit.value=item.unit;">
@@ -2054,7 +2056,7 @@
                                         Unit price
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
-                                        [(ngModel)]="BuyingRateChargeToAdd.unitPrice" placeholder="Enter text" required
+                                        [(ngModel)]="SellingRateChargeToAdd.unitPrice" placeholder="Enter text" required
                                         name="SellingRateChargeUnitPriceName" #SellingRateChargeUnitPriceName="ngModel"
                                         (keyup)="calculateTotalSelling()">
                                     <div class="form-control-feedback"
@@ -2479,13 +2481,14 @@
 <!--end:: Edit-selling-rate-modal-->
 
 <!--begin:: add-obh-charge-modal-->
-<div class="modal fade" id="add-obh-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<form novalidate #addOBHChargeForm="ngForm" name="addOBHChargeForm" (ngSubmit)="addOBHChargeForm.form.valid">
+    <div class="modal fade" id="add-obh-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add OBH charge</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">    
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -2494,21 +2497,25 @@
                 <div class="m-form m-form--state">
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Charge <small class="m--margin-left-5 m--font-primary">chargecode1234567</small>
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null}">
+                                <label class="form-control-label" for="" #selectedOBHChargeCode>
+                                    Charge <small
+                                        class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
                                 </label>
-                                <div class="dropdown e--combogrid">
+                                <div class="dropdown e--combogrid" #selectedOBHCharge>
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value=""
-                                        title="Đây là một charge name dài thật là dài luôn nạ Thor">
+                                        readonly data-toggle="dropdown" placeholder="Please selected"
+                                        [value]="selectedOBHCharge.value==null?null:selectedOBHCharge.value"
+                                        title="">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
                                                 <div class="table-filter-block">
                                                     <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
+                                                        <input class="form-control m-input m-input--square"
+                                                            (keyup)="getListSellingRateCharges($event.target.value)"
+                                                            type="text" placeholder="Search...">
                                                         <i class="icon-search"></i>
                                                     </div>
                                                 </div>
@@ -2516,7 +2523,7 @@
                                                     <table class="table table-hover">
                                                         <thead>
                                                             <tr>
-                                                                <th>Charge code</th>
+                                                                <th>Charge code22</th>
                                                                 <th>Name EN</th>
                                                                 <th>Name VN</th>
                                                             </tr>
@@ -2525,46 +2532,53 @@
                                                 </div>
                                             </div>
                                             <div class="table-body-scroll">
-                                                <table class="table table-hover">
+                                                <table class="table table-hover"
+                                                    *ngIf="lstOBHChargesComboBox!=null && lstOBHChargesComboBox.length>0">
                                                     <tbody>
-                                                        <tr class="data-row data-selected" data-id="1">
-                                                            <td>chargecode1234567</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="2">
-                                                            <td>chargecode1234567</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="3">
-                                                            <td>chargecode1234567</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                        <tr class="data-row"
+                                                            *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
+                                                            attr.data-id={{i}} (click)="OBHChargeToAdd.chargeId=item.charge.id;
+                                                            OBHChargeToAdd.unitId=item.charge.unitId;
+                                                            OBHChargeToAdd.unitPrice=item.charge.unitPrice;
+                                                            OBHChargeToAdd.vatrate = item.charge.vatrate;
+                                                            selectedOBHChargeCode.value=item.charge.code;
+                                                            selectedOBHCharge.value=item.charge.chargeNameEn;
+                                                            selectedOBHUnit.value=item.unit;">
+                                                            <td>{{item.charge.code}}</td>
+                                                            <td>{{item.charge.chargeNameEn}}</td>
+                                                            <td>{{item.charge.chargeNameVn}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
+                                        Charge is required
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.receiverId==null}">
                                 <label class="form-control-label" for="">
                                     Receiver
                                 </label>
-                                <div class="dropdown e--combogrid">
-                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                <div class="dropdown e--combogrid" #selectedOBHReceiver>
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                        data-toggle="dropdown" placeholder="Please selected"
+                                        [value]="selectedOBHReceiver.value==null?null:selectedOBHReceiver.value"
+                                        title="">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
                                                 <div class="table-filter-block">
                                                     <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search...">
                                                         <i class="icon-search"></i>
                                                     </div>
                                                 </div>
@@ -2582,49 +2596,50 @@
                                                 </div>
                                             </div>
                                             <div class="table-body-scroll">
-                                                <table class="table table-hover">
+                                                <table class="table table-hover"
+                                                    *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
                                                     <tbody>
-                                                        <tr class="data-row data-selected" data-id="1">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="2">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="3">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
+                                                        <tr class="data-row" data-id="1"
+                                                            *ngFor="let item of comboBoxData.lstPartner;let i = index;"
+                                                            [ngClass]="{'data-selected':OBHChargeToAdd.receiverId!==null && OBHChargeToAdd.receiverId===item.id}"
+                                                            (click)="OBHChargeToAdd.receiverId = item.id;
+                                                            selectedOBHReceiver.value=item.shortName;">
+                                                            <td>{{item.id}}</td>
+                                                            <td>{{item.shortName}}</td>
+                                                            <td>{{item.partnerNameEn}}</td>
+                                                            <td>{{item.taxCode}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.receiverId==null">
+                                        Receiver name is required !
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.payerId==null}">
                                 <label class="form-control-label" for="">
                                     Payer
                                 </label>
-                                <div class="dropdown e--combogrid">
-                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
+                                <div class="dropdown e--combogrid" #selectedOBHPayer>
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                        data-toggle="dropdown" placeholder="Please selected"
+                                        [value]="selectedOBHPayer.value==null?null:selectedOBHPayer.value"
+                                        title="">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
                                                 <div class="table-filter-block">
                                                     <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search...">
                                                         <i class="icon-search"></i>
                                                     </div>
                                                 </div>
@@ -2642,30 +2657,27 @@
                                                 </div>
                                             </div>
                                             <div class="table-body-scroll">
-                                                <table class="table table-hover">
+                                                <table class="table table-hover"
+                                                    *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
                                                     <tbody>
-                                                        <tr class="data-row data-selected" data-id="1">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="2">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="3">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
+                                                        <tr class="data-row" data-id="1"
+                                                            *ngFor="let item of comboBoxData.lstPartner;let i = index;"
+                                                            [ngClass]="{'data-selected':OBHChargeToAdd.payerId!==null && OBHChargeToAdd.payerId===item.id}"
+                                                            (click)="OBHChargeToAdd.payerId = item.id;
+                                                            selectedOBHPayer.value=item.shortName;">
+                                                            <td>{{item.id}}</td>
+                                                            <td>{{item.shortName}}</td>
+                                                            <td>{{item.partnerNameEn}}</td>
+                                                            <td>{{item.taxCode}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.payerId==null">
+                                        Receiver name is required !
                                     </div>
                                 </div>
                             </div>
@@ -2673,29 +2685,38 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHQuantityName.invalid }">
                                 <label class="form-control-label" for="">
                                     Quantity
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    placeholder="Enter text" #OBHQuantityName="ngModel"
+                                    [(ngModel)]="OBHChargeToAdd.quantity" required (keyup)="calculateTotalOBH()"
+                                    name="OBHQuantityName">
+                                <div class="form-control-feedback"
+                                    *ngIf="addOBHChargeForm.submitted && OBHQuantityName.invalid">
+                                    Quantity is required !
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.unitId==null}">
                                 <label class="form-control-label" for="">
                                     Unit
                                 </label>
-                                <div class="dropdown e--combogrid">
+                                <div class="dropdown e--combogrid" #selectedOBHUnit>
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                        readonly data-toggle="dropdown" placeholder="Please selected"
+                                        [value]="selectedOBHUnit.value==null?null:selectedOBHUnit.value">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
                                                 <div class="table-filter-block">
                                                     <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search...">
                                                         <i class="icon-search"></i>
                                                     </div>
                                                 </div>
@@ -2711,22 +2732,22 @@
                                                 </div>
                                             </div>
                                             <div class="table-body-scroll">
-                                                <table class="table table-hover">
-                                                    <tbody>
-                                                        <tr class="data-row data-selected" data-id="1">
-                                                            <td>Kgs</td>
-                                                            <td>Weight Measurement</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="2">
-                                                            <td>Kgs</td>
-                                                            <td>Weight Measurement</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="3">
-                                                            <td>Kgs</td>
-                                                            <td>Weight Measurement</td>
+                                                <table class="table table-hover"
+                                                    *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
+                                                    <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
+                                                        <tr class="data-row data-selected" attr.data-id="{{i}}"
+                                                            (click)="OBHChargeToAdd.unitId=item.id;
+                                                            selectedOBHUnit.value=item.unitNameEn"
+                                                            [ngClass]="{'data-selected':OBHChargeToAdd.unitId!==null && OBHChargeToAdd.unitId==item.id}">
+                                                            <td>{{item.unitNameEn}}</td>
+                                                            <td>{{item.unitType}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                            </div>
+                                            <div class="form-control-feedback"
+                                                *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
+                                                Unit is required
                                             </div>
                                         </div>
                                     </div>
@@ -2734,34 +2755,55 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted &&(OBHUnitPriceName.invalid || (0 >= OBHChargeToAdd.unitPrice)) }">
                                 <label class="form-control-label" for="">
                                     Unit price
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    [(ngModel)]="OBHChargeToAdd.unitPrice" placeholder="Enter text" required
+                                    name="OBHUnitPriceName" #OBHUnitPriceName="ngModel"
+                                    (keyup)="calculateTotalOBH()">
+                                <div class="form-control-feedback"
+                                    *ngIf="addOBHChargeForm.submitted &&(OBHUnitPriceName.invalid || (0 >= OBHChargeToAdd.unitPrice))">
+                                    Unit Price is required and must be larger than 0 !
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.currencyId===null }">
                                 <label class="form-control-label" for="">
                                     Currency
                                 </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                    (data)="refreshValue($event)" (selected)="selected($event)"
-                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
+                                    [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="OBHChargeToAdd.currencyId=$event.id"
+                                    (removed)="OBHChargeToAdd.currencyId=null"
+                                    (typed)="getListCurrency($event)" placeholder="Select filter">
                                 </ng-select>
+                                <div class="form-control-feedback"
+                                    *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.currencyId===null ">
+                                    Currency is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeVATName.invalid }">
                                 <label class="form-control-label" for="">
                                     VAT
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
+                                <input type="number" max="100" name="OBHChargeVATName" required
+                                    #OBHChargeVATName="ngModel" [(ngModel)]="OBHChargeToAdd.vatrate"
+                                    class="form-control m-input m-input--square" placeholder="Enter text"
+                                    (keyup)="calculateTotalOBH()">
+                                <div class="form-control-feedback"
+                                    *ngIf="addOBHChargeForm.submitted && OBHChargeVATName.invalid">
+                                    VAT is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -2769,8 +2811,9 @@
                                 <label class="form-control-label" for="">
                                     Total
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
+                                <input type="text" class="form-control m-input m-input--square" disabled
+                                    placeholder="Enter text" name="OBHChargeTotalName"
+                                    [(ngModel)]="OBHChargeToAdd.total">
                             </div>
                         </div>
                     </div>
@@ -2780,8 +2823,9 @@
                                 <label class="form-control-label" for="">
                                     Doc no
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
+                                <input type="text" [(ngModel)]="SellingRateChargeToAdd.docNo"
+                                    class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="SellingRateChargeDocName">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -2789,8 +2833,9 @@
                                 <label class="form-control-label" for="">
                                     Note
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
+                                <input type="text" [(ngModel)]="SellingRateChargeToAdd.notes"
+                                    class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="SellingRateChargeNoteName">
                             </div>
                         </div>
                     </div>
@@ -2798,7 +2843,8 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="saveNewOBHCharge(addOBHChargeForm,true)">
                     <span>
                         <i class="la la-plus"></i>
                         <span>
@@ -2806,7 +2852,8 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="saveNewOBHCharge(addOBHChargeForm)">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -2826,6 +2873,7 @@
         </div>
     </div>
 </div>
+</form>
 <!--end:: add-obh-charge-modal-->
 <!--begin:: edit-obh-charge-modal-->
 <div class="modal fade" id="edit-obh-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""

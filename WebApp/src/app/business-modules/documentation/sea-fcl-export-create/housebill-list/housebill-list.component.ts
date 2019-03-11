@@ -69,6 +69,7 @@ export class HousebillListComponent implements OnInit {
   /**
    * Calculate 'total' base on 'quantity' , 'unit price', 'VAT'
    */
+
   calculateTotalBuying() {
     if (this.BuyingRateChargeToAdd.vatrate >= 0) {
       this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
@@ -84,6 +85,16 @@ export class HousebillListComponent implements OnInit {
       this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + this.SellingRateChargeToAdd.vatrate;
     }
   }
+
+  calculateTotalOBH(){
+    if (this.OBHChargeToAdd.vatrate >= 0) {
+      this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
+    } else {
+      this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + this.OBHChargeToAdd.vatrate;
+    }
+  }
+
+
 
 
   partnerTypes = [
@@ -207,6 +218,29 @@ export class HousebillListComponent implements OnInit {
 
     }
   }
+
+  async saveNewOBHCharge(form: NgForm, IsContinue: boolean = false) {
+
+
+    if (form.valid) {
+      this.OBHChargeToAdd.type = SurchargeTypeEnum.OBH;
+      this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
+      var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
+      this.getSellingChargesOfHouseBill(this.houseBillSelected);
+      if (IsContinue && res.status) {
+        this.OBHChargeToAdd = new CsShipmentSurcharge();
+      } else if (res.status) {
+        this.OBHChargeToAdd = new CsShipmentSurcharge();
+        $('#add-obh-charge-modal').modal('hide');
+      } else {
+
+      }
+
+    }
+  }
+
+
+
 
 
 
