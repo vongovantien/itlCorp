@@ -305,14 +305,20 @@ export class HousebillListComponent implements OnInit {
     })
   }
 
+  getOBHChargesOfHouseBill(currentlyHB: any) {
+    this.houseBillSelected = currentlyHB;
+    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id + "&type=OBH").subscribe((res: any) => {
+      this.ListOBHCharges = res;
+      this.ConstListOBHCharges = res;
+    })
+  }
+
 
 
 
 
   currencies: any[] = [];
-  addChargeClick() {
-    // this.currencies = prepareNg2SelectData(this.comboBoxData.lstCurrency, "id", "currencyName");
-  }
+ 
   getListCurrency(key: string) {
     // this.baseServices.post(this.api_menu.Catalogue.Currency.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }).subscribe(res => {
     //   this.currencies = prepareNg2SelectData(res['data'], "id", "currencyName");

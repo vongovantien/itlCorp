@@ -173,7 +173,7 @@
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
                         <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
                             (click)="$event.path[0].closest('tbody').querySelector('tr.selected-row')==null?return:$event.path[0].closest('tbody').querySelector('tr.selected-row').classList.remove('selected-row');$event.path[0].closest('tr').classList.add('selected-row');
-                                    getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb)">
+                                    getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb)">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
@@ -304,7 +304,7 @@
                         </div>
                         <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                (click)="addChargeClick()" data-toggle="modal" data-target="#add-buying-rate-modal">
+                               data-toggle="modal" data-target="#add-buying-rate-modal">
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
@@ -507,7 +507,7 @@
                         </div>
                         <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                (click)="addChargeClick()" data-toggle="modal" data-target="#add-selling-rate-modal">
+                                 data-toggle="modal" data-target="#add-selling-rate-modal">
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
@@ -718,7 +718,7 @@
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
-                                        add new OBH hehehe
+                                        add new
                                     </span>
                                 </span>
                             </button>
@@ -815,7 +815,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="">
+                            <tr class="" *ngFor="let charge of ListOBHCharges;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
                                         <button type="button"

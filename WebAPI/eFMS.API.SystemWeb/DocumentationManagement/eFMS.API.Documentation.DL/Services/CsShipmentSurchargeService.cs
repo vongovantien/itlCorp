@@ -22,34 +22,31 @@ namespace eFMS.API.Documentation.DL.Services
         {
 
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            
-
-
-            //var query = (from charge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge
-            //             where charge.Hblid == HbID && charge.Type == type
-            //             join chargeDetail in ((eFMSDataContext)DataContext.DC).CatCharge on charge.ChargeId equals chargeDetail.Id
-            //             join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id
-            //             join unit in ((eFMSDataContext)DataContext.DC).CatUnit on charge.UnitId equals unit.Id
-            //             join currency in ((eFMSDataContext)DataContext.DC).CatCurrency on charge.CurrencyId equals currency.Id
-            //             select new { charge, partner.PartnerNameEn, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn }
-            //             ).ToList();
+          
             var query = (from charge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge
                          where charge.Hblid == HbID && charge.Type == type
                          join chargeDetail in ((eFMSDataContext)DataContext.DC).CatCharge on charge.ChargeId equals chargeDetail.Id
-                         join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id
-                         join receiver in ((eFMSDataContext)DataContext.DC).CatPartner on charge.ReceiverId equals receiver.Id
-                         join payer in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PayerId equals payer.Id
+
+                         join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id into partnerGroup
+                         from p in partnerGroup.DefaultIfEmpty() 
+
+                         join receiver in ((eFMSDataContext)DataContext.DC).CatPartner on charge.ReceiverId equals receiver.Id into receiverGroup
+                         from r in receiverGroup.DefaultIfEmpty()
+                       
+                         join payer in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PayerId equals payer.Id into payerGroup
+                         from pay in payerGroup.DefaultIfEmpty()
+
                          join unit in ((eFMSDataContext)DataContext.DC).CatUnit on charge.UnitId equals unit.Id
                          join currency in ((eFMSDataContext)DataContext.DC).CatCurrency on charge.CurrencyId equals currency.Id
-                         select new { charge,partner.PartnerNameEn,receiver,payer, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn, }
+                         select new { charge,p,r,pay, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn, }
                         ).ToList();
             foreach (var item in query)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item.charge);
-                charge.PartnerName = item.PartnerNameEn;
-                charge.NameEn = item.ChargeNameEn;
-                charge.ReceiverName = item.receiver.PartnerNameEn;
-                charge.PayerName = item.payer.PartnerNameEn;
+                charge.PartnerName = item.p?.PartnerNameEn;
+                charge.NameEn = item?.ChargeNameEn;
+                charge.ReceiverName = item.r?.PartnerNameEn;
+                charge.PayerName = item.pay?.PartnerNameEn;
                 charge.Unit = item.UnitNameEn;
                 charge.Currency = item.CurrencyName;
                 listCharges.Add(charge);

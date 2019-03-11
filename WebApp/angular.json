@@ -126,7 +126,14 @@
                   "with": "src/environments/environment.test.ts"
                 }
               ],
-              "serviceWorker": true
+              "serviceWorker": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
             },
             "production": {
               "fileReplacements": [
