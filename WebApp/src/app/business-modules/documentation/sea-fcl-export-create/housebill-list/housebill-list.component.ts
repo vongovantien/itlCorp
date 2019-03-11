@@ -226,7 +226,7 @@ export class HousebillListComponent implements OnInit {
       this.OBHChargeToAdd.type = SurchargeTypeEnum.OBH;
       this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
       var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
-      this.getSellingChargesOfHouseBill(this.houseBillSelected);
+      this.getOBHChargesOfHouseBill(this.houseBillSelected);
       if (IsContinue && res.status) {
         this.OBHChargeToAdd = new CsShipmentSurcharge();
       } else if (res.status) {
@@ -267,6 +267,63 @@ export class HousebillListComponent implements OnInit {
     if (lodash.findIndex(this.HouseBillListData, function (o) { return o.id === idSelectedHB }) < 0) {
       this.ListBuyingRateCharges = [];
     }
+  }
+
+  searchBuyingRate(key:string){
+    const search_key = key.toString().toLowerCase();
+    this.ListBuyingRateCharges = lodash.filter(this.ConstListBuyingRateCharges, function(x:any){
+      return (
+        ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
+        (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||      
+        (x.unit==null?"":x.unit.toLowerCase().includes(search_key)) ||
+        (x.currency==null?"":x.currency.toLowerCase().includes(search_key)) ||
+        (x.notes==null?"":x.notes.toLowerCase().includes(search_key)) ||
+        (x.docNo==null?"":x.docNo.toLowerCase().includes(search_key)) ||
+        (x.quantity==null?"":x.quantity.toString().toLowerCase().includes(search_key)) ||
+        (x.unitPrice==null?"":x.unitPrice.toString().toLowerCase().includes(search_key)) ||
+        (x.vatrate==null?"":x.vatrate.toString().toLowerCase().includes(search_key)) ||
+        (x.total==null?"":x.total.toString().toLowerCase().includes(search_key))) 
+      )
+    });
+  }
+
+  
+  searchSellingRate(key:string){
+    const search_key = key.toString().toLowerCase();
+    this.ListSellingRateCharges = lodash.filter(this.ConstListSellingRateCharges, function(x:any){
+      return (
+        ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
+        (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||      
+        (x.unit==null?"":x.unit.toLowerCase().includes(search_key)) ||
+        (x.currency==null?"":x.currency.toLowerCase().includes(search_key)) ||
+        (x.notes==null?"":x.notes.toLowerCase().includes(search_key)) ||
+        (x.docNo==null?"":x.docNo.toLowerCase().includes(search_key)) ||
+        (x.quantity==null?"":x.quantity.toString().toLowerCase().includes(search_key)) ||
+        (x.unitPrice==null?"":x.unitPrice.toString().toLowerCase().includes(search_key)) ||
+        (x.vatrate==null?"":x.vatrate.toString().toLowerCase().includes(search_key)) ||
+        (x.total==null?"":x.total.toString().toLowerCase().includes(search_key))) 
+      )
+    });
+  }
+
+  searchOBH(key:string){
+    const search_key = key.toString().toLowerCase();
+    this.ListOBHCharges = lodash.filter(this.ConstListOBHCharges, function(x:any){
+      return (
+        ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
+        (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||   
+        (x.receiverName==null?"":x.receiverName.toLowerCase().includes(search_key)) ||     
+        (x.payerName==null?"":x.payerName.toLowerCase().includes(search_key)) ||     
+        (x.unit==null?"":x.unit.toLowerCase().includes(search_key)) ||
+        (x.currency==null?"":x.currency.toLowerCase().includes(search_key)) ||
+        (x.notes==null?"":x.notes.toLowerCase().includes(search_key)) ||
+        (x.docNo==null?"":x.docNo.toLowerCase().includes(search_key)) ||
+        (x.quantity==null?"":x.quantity.toString().toLowerCase().includes(search_key)) ||
+        (x.unitPrice==null?"":x.unitPrice.toString().toLowerCase().includes(search_key)) ||
+        (x.vatrate==null?"":x.vatrate.toString().toLowerCase().includes(search_key)) ||
+        (x.total==null?"":x.total.toString().toLowerCase().includes(search_key))) 
+      )
+    });
   }
 
 

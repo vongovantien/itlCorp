@@ -293,7 +293,7 @@
                             <div class="form-group">
                                 <div class="m-input-icon m-input-icon--left">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Search...">
+                                        placeholder="Search..." (keyup)="searchBuyingRate($event.target.value)">
                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                         <span>
                                             <i class="la la-search"></i>
@@ -496,7 +496,7 @@
                             <div class="form-group">
                                 <div class="m-input-icon m-input-icon--left">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Search...">
+                                        placeholder="Search..." (keyup)="searchSellingRate($event.target.value)">
                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                         <span>
                                             <i class="la la-search"></i>
@@ -703,7 +703,7 @@
                             <div class="form-group">
                                 <div class="m-input-icon m-input-icon--left">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Search...">
+                                        placeholder="Search..." (keyup)="searchOBH($event.target.value)">
                                     <span class="m-input-icon__icon m-input-icon__icon--left">
                                         <span>
                                             <i class="la la-search"></i>
@@ -761,12 +761,7 @@
                                     <span>
                                         Unit price
                                     </span>
-                                </th>
-                                <th class="sorting">
-                                    <span>
-                                        Unit Price
-                                    </span>
-                                </th>
+                                </th>                              
                                 <th class="sorting">
                                     <span>
                                         Currency
@@ -832,62 +827,58 @@
                                 </td>
                                 <td>
                                     <span>
-                                        Receiver
+                                        {{charge.receiverName}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Payer
+                                        {{charge.payerName}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Name EN
+                                        {{charge.nameEn}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Quantity
+                                        {{charge.quantity}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Unit
+                                        {{charge.unit}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Unit price
+                                        {{charge.unitPrice}}
+                                    </span>
+                                </td>
+                               
+                                <td>
+                                    <span>
+                                        {{charge.currency}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Unit Price
+                                        {{charge.vatrate}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Currency
+                                        {{charge.total}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        VAT
+                                        {{charge.notes}}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        Total
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Note
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>
-                                        Docs
+                                        {{charge.docNo}}
                                     </span>
                                 </td>
                                 <td>
@@ -2823,9 +2814,9 @@
                                 <label class="form-control-label" for="">
                                     Doc no
                                 </label>
-                                <input type="text" [(ngModel)]="SellingRateChargeToAdd.docNo"
+                                <input type="text" [(ngModel)]="OBHChargeToAdd.docNo"
                                     class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="SellingRateChargeDocName">
+                                    name="OBHChargeDocName">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -2833,9 +2824,9 @@
                                 <label class="form-control-label" for="">
                                     Note
                                 </label>
-                                <input type="text" [(ngModel)]="SellingRateChargeToAdd.notes"
+                                <input type="text" [(ngModel)]="OBHChargeToAdd.notes"
                                     class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="SellingRateChargeNoteName">
+                                    name="OBHChargeNoteName">
                             </div>
                         </div>
                     </div>

@@ -22,9 +22,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
 
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-          
+
             var query = (from charge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge
-                         where charge.Hblid == HbID && charge.Type == type
+                         where charge.Hblid == HbID && charge.Type.ToLower() == type.ToLower()
                          join chargeDetail in ((eFMSDataContext)DataContext.DC).CatCharge on charge.ChargeId equals chargeDetail.Id
 
                          join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id into partnerGroup
