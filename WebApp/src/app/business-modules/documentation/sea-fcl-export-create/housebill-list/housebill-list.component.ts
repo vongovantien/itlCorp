@@ -25,9 +25,16 @@ export class HousebillListComponent implements OnInit {
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
   }
+
+
   BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
   SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
   OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+
+  
+  BuyingRateChargeToEdit: any = null;
+  SellingRateChargeToEdit: any = null
+  OBHChargeToEdit: any = null;
 
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
@@ -98,16 +105,16 @@ export class HousebillListComponent implements OnInit {
 
 
   partnerTypes = [
-    { text: "Agent", id: "AGENT" },
-    { text: "Customer", id: "CUSTOMER" },
-    { text: "Other", id: "OTHER" }
+    { text: "AGENT", id: "AGENT" },
+    { text: "CUSTOMER", id: "CUSTOMER" },
+    { text: "OTHER", id: "OTHER" }
 
   ]
 
-  selectPartnerType() {
-    console.log(this.BuyingRateChargeToAdd);
-    console.log(this.houseBillSelected);
-  }
+  // selectPartnerType() {
+  //   console.log(this.BuyingRateChargeToAdd);
+  //   console.log(this.houseBillSelected);
+  // }
 
 
   constructor(

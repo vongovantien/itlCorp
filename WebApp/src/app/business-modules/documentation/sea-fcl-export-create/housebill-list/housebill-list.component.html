@@ -285,6 +285,9 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
         <div class="tab-content" id="">
+
+
+
             <div class="tab-pane fade show active" id="buying-rate" role="tabpanel">
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
@@ -399,9 +402,9 @@
                             <tr class="" *ngFor="let charge of ListBuyingRateCharges;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <button type="button"
+                                        <button type="button" (click)="BuyingRateChargeToEdit=charge"
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Edit" data-toggle="modal" data-target="#edit-buying-rate-modal">
+                                            title="Edit" data-toggle="modal" data-target="#edit-buying-rate-modal" >
                                             <i class="la la-edit"></i>
                                         </button>
                                         <button type="button"
@@ -488,6 +491,8 @@
                 </div>
                 <!--end: Datatable-->
             </div>
+
+
             <div class="tab-pane fade" id="selling-rate" role="tabpanel">
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
@@ -695,6 +700,8 @@
                 </div>
                 <!--end: Datatable-->
             </div>
+
+
             <div class="tab-pane fade" id="obh-charge" role="tabpanel">
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
@@ -907,6 +914,8 @@
                 </div>
                 <!--end: Datatable-->
             </div>
+
+
             <div class="tab-pane fade" id="logistic-charge" role="tabpanel">
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
@@ -957,11 +966,7 @@
                                         Unit price
                                     </span>
                                 </th>
-                                <th class="sorting">
-                                    <span>
-                                        Unit Price
-                                    </span>
-                                </th>
+                            
                                 <th class="sorting">
                                     <span>
                                         Currency
@@ -1092,6 +1097,9 @@
                 </div>
                 <!--end: Datatable-->
             </div>
+
+
+
         </div>
     </div>
 </div>
@@ -1481,7 +1489,8 @@
 </form>
 
 <!--begin:: edit-buying-rate-modal-->
-<div class="modal fade" id="edit-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<form novalidate #editBuyingRateChargeForm="ngForm" name="editBuyingRateChargeForm" *ngIf="BuyingRateChargeToEdit!=null">
+    <div class="modal fade" id="edit-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
@@ -1496,21 +1505,26 @@
                 <div class="m-form m-form--state">
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null}">
                                 <label class="form-control-label" for="">
-                                    Charge <small class="m--margin-left-5 m--font-primary">chargecode1234567</small>
+                                    Charge <small
+                                        class="m--margin-left-5 m--font-primary">{{BuyingRateChargeToEdit.chargeCode}}
+                                        &nbsp;</small>
                                 </label>
-                                <div class="dropdown e--combogrid">
+                                <div class="dropdown e--combogrid" #selectedBuyingChargeEdt>
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value=""
-                                        title="Đây là một charge name dài thật là dài luôn nạ Thor">
+                                        readonly data-toggle="dropdown" placeholder="Please selected"
+                                        [value]="BuyingRateChargeToEdit.nameEn"
+                                        title="charge">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
                                                 <div class="table-filter-block">
                                                     <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search..."
+                                                            (keyup)="getListBuyingRateCharges($event.target.value)">
                                                         <i class="icon-search"></i>
                                                     </div>
                                                 </div>
@@ -1527,22 +1541,21 @@
                                                 </div>
                                             </div>
                                             <div class="table-body-scroll">
-                                                <table class="table table-hover">
-                                                    <tbody>
-                                                        <tr class="data-row data-selected" data-id="1">
-                                                            <td>chargecode1234567</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="2">
-                                                            <td>chargecode1234567</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="3">
-                                                            <td>chargecode1234567</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
+                                                <table class="table table-hover"
+                                                    *ngIf="lstBuyingRateChargesComboBox!==null && lstBuyingRateChargesComboBox.length>0">
+                                                    <tbody
+                                                        *ngFor="let item of lstBuyingRateChargesComboBox;let i = index;">
+                                                        <tr class="data-row" attr.data-id="{{i}}" (click)="BuyingRateChargeToEdit.chargeId=item.charge.id;
+                                                                 BuyingRateChargeToEdit.unitId=item.charge.unitId;
+                                                                 BuyingRateChargeToEdit.unitPrice=item.charge.unitPrice;
+                                                                 BuyingRateChargeToEdit.vatrate=item.charge.vatrate;                                                                 
+                                                                 BuyingRateChargeToEdit.nameEn=item.charge.chargeNameEn;
+                                                                 BuyingRateChargeToEdit.chargeCode=item.charge.code;
+                                                                 selectedBuyingUnitEdt.value=item.unit;"
+                                                            [ngClass]="{'data-selected':BuyingRateChargeToEdit.chargeId!==null && BuyingRateChargeToEdit.chargeId==item.charge.id}">
+                                                            <td>{{item.charge.code}}</td>
+                                                            <td>{{item.charge.chargeNameEn}}</td>
+                                                            <td>{{item.charge.chargeNameVn}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1550,202 +1563,253 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.chargeId==null">
+                                    Charge is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Partner type
-                                </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                    (data)="refreshValue($event)" (selected)="selected($event)"
-                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                                </ng-select>
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.objectBePaid==null }">
+                                    <label class="form-control-label" for="">
+                                        Partner type
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="partnerTypes" [disabled]="disabled" [active]="[{'text':BuyingRateChargeToEdit.objectBePaid,'id':BuyingRateChargeToEdit.objectBePaid}]"
+                                        (data)="refreshValue($event)"
+                                        (selected)="BuyingRateChargeToEdit.objectBePaid=$event.id;
+                                                    BuyingRateChargeToEdit.objectBePaid==='AGENT'? BuyingRateChargeToEdit.paymentObjectId=houseBillSelected.forwardingAgentId:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='CUSTOMER'? BuyingRateChargeToEdit.paymentObjectId=houseBillSelected.customerId:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='CUSTOMER'? BuyingRateChargeToEdit.partnerName=houseBillSelected.customerName:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='AGENT'? BuyingRateChargeToEdit.partnerName=houseBillSelected.forwardingAgentName:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='OTHER'? BuyingRateChargeToEdit.partnerName=null:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='OTHER'? BuyingRateChargeToEdit.paymentObjectId=null:null;selectPartnerType();"
+                                        (removed)="BuyingRateChargeToAdd.objectBePaid=null;BuyingRateChargeToEdit.paymentObjectId=null;selectedBuyingRatePartnerEdt.value=null"
+                                        (typed)="typed($event)" placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback"
+                                        *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.objectBePaid==null ">
+                                        Partner type is required !
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Partner name
-                                </label>
-                                <div class="dropdown e--combogrid">
-                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value="" title="">
-                                    <div class="dropdown-menu e--combogrid-content">
-                                        <div class="tabel-wrapper table-fixed">
-                                            <div class="table-head-fixed">
-                                                <div class="table-filter-block">
-                                                    <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
-                                                        <i class="icon-search"></i>
+                            <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{ 'm-form__group has-danger': editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null}">
+                                        <label class="form-control-label" for="">
+                                            Partner name
+                                        </label>
+                                        <div class="dropdown e--combogrid" #selectedBuyingRatePartnerEdt>
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                                [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER'" readonly
+                                                data-toggle="dropdown" placeholder="Please selected"
+                                                [value]="BuyingRateChargeToEdit.partnerName"
+                                                title="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square"
+                                                                    type="text" placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner ID</th>
+                                                                        <th>Name ABBR</th>
+                                                                        <th>Name EN</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover"
+                                                            *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
+                                                            <tbody>
+                                                                <tr class="data-row" data-id="1"
+                                                                    *ngFor="let item of comboBoxData.lstPartner;let i = index;"
+                                                                    [ngClass]="{'data-selected':BuyingRateChargeToEdit.paymentObjectId!==null && BuyingRateChargeToEdit.paymentObjectId===item.id}"
+                                                                    (click)="BuyingRateChargeToEdit.paymentObjectId = item.id;
+                                                                    BuyingRateChargeToEdit.partnerName=item.shortName;">
+                                                                    <td>{{item.id}}</td>
+                                                                    <td>{{item.shortName}}</td>
+                                                                    <td>{{item.partnerNameEn}}</td>
+                                                                    <td>{{item.taxCode}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
-                                                <div class="table-header">
-                                                    <table class="table table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Partner name</th>
-                                                                <th>Name ABBR</th>
-                                                                <th>Name EN</th>
-                                                                <th>Tax code</th>
-                                                            </tr>
-                                                        </thead>
-                                                    </table>
-                                                </div>
                                             </div>
-                                            <div class="table-body-scroll">
-                                                <table class="table table-hover">
-                                                    <tbody>
-                                                        <tr class="data-row data-selected" data-id="1">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="2">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="3">
-                                                            <td>partner name 1234567</td>
-                                                            <td>Đây là một charge name viết tắt</td>
-                                                            <td>Đây là một charge name dài thật là dài luôn nạ Thor</td>
-                                                            <td>090xxxxxxxxxx</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                            <div class="form-control-feedback"
+                                                *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null">
+                                                Partner name is required !
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Quantity
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Unit
-                                </label>
-                                <div class="dropdown e--combogrid">
-                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please selected" value="">
-                                    <div class="dropdown-menu e--combogrid-content">
-                                        <div class="tabel-wrapper table-fixed">
-                                            <div class="table-head-fixed">
-                                                <div class="table-filter-block">
-                                                    <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
-                                                        <i class="icon-search"></i>
+                            <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{ 'm-form__group has-danger': editBuyingRateChargeForm.submitted && buyingRateChangeQuantityNameEdt.invalid }">
+                                        <label class="form-control-label" for="">
+                                            Quantity
+                                        </label>
+                                        <input type="text" required #buyingRateChangeQuantityNameEdt="ngModel" required
+                                            class="form-control m-input m-input--square" appIntergerInputCheck
+                                            [(ngModel)]="BuyingRateChargeToEdit.quantity" placeholder="Enter text"
+                                            name="buyingRateChangeQuantityNameEdt" (keyup)="calculateTotalBuying()">
+                                        <div class="form-control-feedback"
+                                            *ngIf="editBuyingRateChargeForm.submitted && buyingRateChangeQuantityNameEdt.invalid">
+                                            Quantity is required !
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                        <div class="form-group"
+                                            [ngClass]="{ 'm-form__group has-danger': addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.unitId==null}">
+                                            <label class="form-control-label" for="">
+                                                Unit
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                                    readonly data-toggle="dropdown" placeholder="Please selected"
+                                                    [value]="BuyingRateChargeToEdit.unit">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Name EN</th>
+                                                                            <th>Unit type</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-body-scroll">
+                                                            <table class="table table-hover"
+                                                                *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
+                                                                <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
+                                                                    <tr class="data-row data-selected" attr.data-id="{{i}}"
+                                                                        (click)="BuyingRateChargeToEdit.unitId=item.id;
+                                                                        BuyingRateChargeToEdit.unit=item.unitNameEn"
+                                                                        [ngClass]="{'data-selected':BuyingRateChargeToEdit.unitId!==null && BuyingRateChargeToEdit.unitId==item.id}">
+                                                                        <td>{{item.unitNameEn}}</td>
+                                                                        <td>{{item.unitType}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="form-control-feedback"
+                                                            *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.chargeId==null">
+                                                            Unit is required
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="table-header">
-                                                    <table class="table table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Name EN</th>
-                                                                <th>Unit type</th>
-                                                            </tr>
-                                                        </thead>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <div class="table-body-scroll">
-                                                <table class="table table-hover">
-                                                    <tbody>
-                                                        <tr class="data-row data-selected" data-id="1">
-                                                            <td>Kgs</td>
-                                                            <td>Weight Measurement</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="2">
-                                                            <td>Kgs</td>
-                                                            <td>Weight Measurement</td>
-                                                        </tr>
-                                                        <tr class="data-row" data-id="3">
-                                                            <td>Kgs</td>
-                                                            <td>Weight Measurement</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-lg-4">
+                                            <div class="form-group"
+                                                [ngClass]="{ 'm-form__group has-danger': editBuyingRateChargeForm.submitted &&(BuyingRateChargeUnitPriceNameEdt.invalid || (0 >= BuyingRateChargeToEdit.unitPrice)) }">
+                                                <label class="form-control-label" for="">
+                                                    Unit price
+                                                </label>
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    [(ngModel)]="BuyingRateChargeToEdit.unitPrice" placeholder="Enter text" required
+                                                    name="BuyingRateChargeUnitPriceNameEdt" #BuyingRateChargeUnitPriceNameEdt="ngModel"
+                                                    (keyup)="calculateTotalBuying()">
+                                                <div class="form-control-feedback"
+                                                    *ngIf="editBuyingRateChargeForm.submitted &&(BuyingRateChargeUnitPriceNameEdt.invalid || (0 >= BuyingRateChargeToEdit.unitPrice))">
+                                                    Unit Price is required and must be larger than 0 !
+                                                </div>
+                                            </div>
+                                        </div>
+                    </div>
+                    <div class="row">
+                            <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{ 'm-form__group has-danger': addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.currencyId===null }">
+                                        <label class="form-control-label" for="">
+                                            Currency
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency" [active]="[{'text':BuyingRateChargeToEdit.currency,'id':BuyingRateChargeToEdit.currencyId}]"
+                                            [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="BuyingRateChargeToEdit.currencyId=$event.id"
+                                            (removed)="BuyingRateChargeToEdit.currencyId=null"
+                                            (typed)="getListCurrency($event)" placeholder="Select filter">
+                                        </ng-select>
+                                        <div class="form-control-feedback"
+                                            *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.currencyId===null ">
+                                            Currency is required
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Unit price
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
-                            </div>
-                        </div>
+                                <div class="col-lg-4">
+                                        <div class="form-group"
+                                            [ngClass]="{ 'm-form__group has-danger': editBuyingRateChargeForm.submitted && BuyingRateChargeVATNameEdt.invalid }">
+                                            <label class="form-control-label" for="">
+                                                VAT
+                                            </label>
+                                            <input type="number" max="100" name="BuyingRateChargeVATNameEdt" required
+                                                #BuyingRateChargeVATNameEdt="ngModel" [(ngModel)]="BuyingRateChargeToEdit.vatrate"
+                                                class="form-control m-input m-input--square" placeholder="Enter text"
+                                                (keyup)="calculateTotalBuying()">
+                                            <div class="form-control-feedback"
+                                                *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeVATNameEdt.invalid">
+                                                VAT is required
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Total
+                                                </label>
+                                                <input type="text" class="form-control m-input m-input--square" disabled
+                                                    placeholder="Enter text" name="BuyingRateChargeTotalNameEdt"
+                                                    [(ngModel)]="BuyingRateChargeToEdit.total">
+                                            </div>
+                                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Currency
-                                </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                    (data)="refreshValue($event)" (selected)="selected($event)"
-                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                                </ng-select>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    VAT
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Total
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Doc no
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Note
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="">
-                            </div>
-                        </div>
+                            <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Doc no
+                                        </label>
+                                        <input type="text" [(ngModel)]="BuyingRateChargeToEdit.docNo"
+                                            class="form-control m-input m-input--square" placeholder="Enter text"
+                                            name="BuyingRateChargeDocNameEdt">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Note
+                                            </label>
+                                            <input type="text" [(ngModel)]="BuyingRateChargeToEdit.notes"
+                                                class="form-control m-input m-input--square" placeholder="Enter text"
+                                                name="BuyingRateChargeNoteNameEdt">
+                                        </div>
+                                    </div>
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
@@ -1799,6 +1863,8 @@
         </div>
     </div>
 </div>
+</form>
+
 <!--end:: Edit-buying-rate-modal-->
 
 <!--begin:: add-selling-rate-modal-->

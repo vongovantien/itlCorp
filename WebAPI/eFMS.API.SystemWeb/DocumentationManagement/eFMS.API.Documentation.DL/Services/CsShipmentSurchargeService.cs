@@ -38,7 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                          join unit in ((eFMSDataContext)DataContext.DC).CatUnit on charge.UnitId equals unit.Id
                          join currency in ((eFMSDataContext)DataContext.DC).CatCurrency on charge.CurrencyId equals currency.Id
-                         select new { charge,p,r,pay, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn, }
+                         select new { charge,p,r,pay, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn,chargeDetail.Code }
                         ).ToList();
             foreach (var item in query)
             {
@@ -49,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.PayerName = item.pay?.PartnerNameEn;
                 charge.Unit = item.UnitNameEn;
                 charge.Currency = item.CurrencyName;
+                charge.ChargeCode = item.Code;
                 listCharges.Add(charge);
             }
             return listCharges;
