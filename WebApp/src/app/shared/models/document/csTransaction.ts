@@ -10,11 +10,11 @@ export class CsTransaction {
   etd: Date = null;
   eta: Date = null;
   mbltype: String = null;
-  coloaderId: String = null;
+  coloaderId: String = null; // supplier
   coloaderName: String = null;
   bookingNo: String = null;
   shippingServiceType: String = null;
-  agentId: String = null;
+  agentId: String = null; // agent 
   agentName: String = null;
   pol: String = null;
   polName: String = null;

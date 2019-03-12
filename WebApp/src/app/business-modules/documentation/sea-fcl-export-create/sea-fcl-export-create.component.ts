@@ -609,4 +609,10 @@ export class SeaFclExportCreateComponent implements OnInit {
         });
     }
 
+
+    shipmentDetails:any = null;
+    shipmentDetailCatcher(shipmentDetails:any){
+        this.shipmentDetails = shipmentDetails;
+    }
+
 }

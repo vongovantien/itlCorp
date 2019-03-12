@@ -21,6 +21,7 @@ export class MasterBillComponent implements OnInit{
     @Input()isImport: boolean;
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
+    @Output() shipmentDetails = new EventEmitter<any>();
     terms: any[];
     shipmentTypes: any[];
     serviceTypes: any[];
@@ -89,6 +90,7 @@ export class MasterBillComponent implements OnInit{
                 if(index > -1) this.shipment.personInChargeName = this.userInCharges[index].username;
                 else this.shipment.personInChargeName = '';
             }
+            this.shipmentDetails.emit(Object.assign({},this.shipment));
         }
     }
     changePort(keySearch: any) {

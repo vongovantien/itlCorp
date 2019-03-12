@@ -102,7 +102,7 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <app-master-bill [shipment]="shipment" [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment && isLoaded"></app-master-bill>
+                <app-master-bill (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment" [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment && isLoaded"></app-master-bill>
                 <!--begin:: m-portlet-->
                 <div class="m-portlet">
                     <div class="m-portlet__head">
@@ -205,7 +205,7 @@
                 <!--end:: m-portlet-->
             </div>
             <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
-                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipment"></app-housebill-list>
+                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails"></app-housebill-list>
             </div>
             <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="">
                 <app-credit-and-debit-note></app-credit-and-debit-note>
