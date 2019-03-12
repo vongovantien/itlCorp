@@ -12,5 +12,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string PayerName { get; set; }
         public string Unit { get; set; }
         public string Currency { get; set; }
+        public string ChargeCode { get; set; }
     }
 }

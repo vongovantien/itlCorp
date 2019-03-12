@@ -25,9 +25,16 @@ export class HousebillListComponent implements OnInit {
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
   }
+
+
   BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
   SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
   OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+
+  
+  BuyingRateChargeToEdit: any = null;
+  SellingRateChargeToEdit: any = null
+  OBHChargeToEdit: any = null;
 
   HouseBillListData: any[] = [];
   ConstHouseBillListData: any[] = [];
@@ -98,16 +105,16 @@ export class HousebillListComponent implements OnInit {
 
 
   partnerTypes = [
-    { text: "Agent", id: "AGENT" },
-    { text: "Customer", id: "CUSTOMER" },
-    { text: "Other", id: "OTHER" }
+    { text: "AGENT", id: "AGENT" },
+    { text: "CUSTOMER", id: "CUSTOMER" },
+    { text: "OTHER", id: "OTHER" }
 
   ]
 
-  selectPartnerType() {
-    console.log(this.BuyingRateChargeToAdd);
-    console.log(this.houseBillSelected);
-  }
+  // selectPartnerType() {
+  //   console.log(this.BuyingRateChargeToAdd);
+  //   console.log(this.houseBillSelected);
+  // }
 
 
   constructor(
@@ -226,7 +233,7 @@ export class HousebillListComponent implements OnInit {
       this.OBHChargeToAdd.type = SurchargeTypeEnum.OBH;
       this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
       var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
-      this.getSellingChargesOfHouseBill(this.houseBillSelected);
+      this.getOBHChargesOfHouseBill(this.houseBillSelected);
       if (IsContinue && res.status) {
         this.OBHChargeToAdd = new CsShipmentSurcharge();
       } else if (res.status) {
@@ -269,6 +276,63 @@ export class HousebillListComponent implements OnInit {
     }
   }
 
+  searchBuyingRate(key:string){
+    const search_key = key.toString().toLowerCase();
+    this.ListBuyingRateCharges = lodash.filter(this.ConstListBuyingRateCharges, function(x:any){
+      return (
+        ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
+        (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||      
+        (x.unit==null?"":x.unit.toLowerCase().includes(search_key)) ||
+        (x.currency==null?"":x.currency.toLowerCase().includes(search_key)) ||
+        (x.notes==null?"":x.notes.toLowerCase().includes(search_key)) ||
+        (x.docNo==null?"":x.docNo.toLowerCase().includes(search_key)) ||
+        (x.quantity==null?"":x.quantity.toString().toLowerCase().includes(search_key)) ||
+        (x.unitPrice==null?"":x.unitPrice.toString().toLowerCase().includes(search_key)) ||
+        (x.vatrate==null?"":x.vatrate.toString().toLowerCase().includes(search_key)) ||
+        (x.total==null?"":x.total.toString().toLowerCase().includes(search_key))) 
+      )
+    });
+  }
+
+  
+  searchSellingRate(key:string){
+    const search_key = key.toString().toLowerCase();
+    this.ListSellingRateCharges = lodash.filter(this.ConstListSellingRateCharges, function(x:any){
+      return (
+        ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
+        (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||      
+        (x.unit==null?"":x.unit.toLowerCase().includes(search_key)) ||
+        (x.currency==null?"":x.currency.toLowerCase().includes(search_key)) ||
+        (x.notes==null?"":x.notes.toLowerCase().includes(search_key)) ||
+        (x.docNo==null?"":x.docNo.toLowerCase().includes(search_key)) ||
+        (x.quantity==null?"":x.quantity.toString().toLowerCase().includes(search_key)) ||
+        (x.unitPrice==null?"":x.unitPrice.toString().toLowerCase().includes(search_key)) ||
+        (x.vatrate==null?"":x.vatrate.toString().toLowerCase().includes(search_key)) ||
+        (x.total==null?"":x.total.toString().toLowerCase().includes(search_key))) 
+      )
+    });
+  }
+
+  searchOBH(key:string){
+    const search_key = key.toString().toLowerCase();
+    this.ListOBHCharges = lodash.filter(this.ConstListOBHCharges, function(x:any){
+      return (
+        ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
+        (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||   
+        (x.receiverName==null?"":x.receiverName.toLowerCase().includes(search_key)) ||     
+        (x.payerName==null?"":x.payerName.toLowerCase().includes(search_key)) ||     
+        (x.unit==null?"":x.unit.toLowerCase().includes(search_key)) ||
+        (x.currency==null?"":x.currency.toLowerCase().includes(search_key)) ||
+        (x.notes==null?"":x.notes.toLowerCase().includes(search_key)) ||
+        (x.docNo==null?"":x.docNo.toLowerCase().includes(search_key)) ||
+        (x.quantity==null?"":x.quantity.toString().toLowerCase().includes(search_key)) ||
+        (x.unitPrice==null?"":x.unitPrice.toString().toLowerCase().includes(search_key)) ||
+        (x.vatrate==null?"":x.vatrate.toString().toLowerCase().includes(search_key)) ||
+        (x.total==null?"":x.total.toString().toLowerCase().includes(search_key))) 
+      )
+    });
+  }
+
 
 
 
@@ -305,14 +369,20 @@ export class HousebillListComponent implements OnInit {
     })
   }
 
+  getOBHChargesOfHouseBill(currentlyHB: any) {
+    this.houseBillSelected = currentlyHB;
+    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id + "&type=OBH").subscribe((res: any) => {
+      this.ListOBHCharges = res;
+      this.ConstListOBHCharges = res;
+    })
+  }
+
 
 
 
 
   currencies: any[] = [];
-  addChargeClick() {
-    // this.currencies = prepareNg2SelectData(this.comboBoxData.lstCurrency, "id", "currencyName");
-  }
+ 
   getListCurrency(key: string) {
     // this.baseServices.post(this.api_menu.Catalogue.Currency.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }).subscribe(res => {
     //   this.currencies = prepareNg2SelectData(res['data'], "id", "currencyName");
