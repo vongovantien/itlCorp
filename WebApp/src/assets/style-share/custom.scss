@@ -257,7 +257,7 @@ a {
     -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 .table {
-    font-size: 13px;
+    font-size: 12px;
     margin-bottom: 0;
     thead {
         th {
@@ -281,11 +281,14 @@ a {
         }
     }
     thead,
-    tbody {
+    tbody,
+    tfoot {
         tr {
             th,
             td {
                 padding: 8px 4px;
+                border-top-color: #fff;
+                vertical-align: middle;
                 &:first-child {
                     padding-left: 10px
                 }
@@ -329,6 +332,14 @@ a {
                 > .collapse-toggle-row {
                     background-color: #fff;
                 }
+            }
+        }
+    }
+    tfoot {
+        tr {
+            th,
+            td {
+                background-color: #f2dedf;
             }
         }
     }
@@ -397,6 +408,13 @@ a {
     .btn {
         & + .btn {
             margin-left: 5px;
+        }
+        &.m-btn--icon.m-btn--icon-only {
+            width: 25px;
+            height: 25px;
+            i {
+                font-size: 1.35rem;
+            }
         }
     }
 }

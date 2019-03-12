@@ -33,6 +33,19 @@
         }
     }
 }
+.table {
+    thead,
+    tbody {
+        tr {
+            th,
+            td {  
+                &.control-editable {
+                    vertical-align: top;
+                }
+            }
+        }
+    }
+}
 //collapse-table by group
 .table {
     thead,
