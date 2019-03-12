@@ -118,7 +118,7 @@ export class MasterBillComponent implements OnInit{
     }
     async getPorIndexs(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
-        if(this.inEditing == false){
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
         }
         //let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
@@ -132,6 +132,9 @@ export class MasterBillComponent implements OnInit{
 
     async getColoaders(searchText: any) {
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CARRIER, modeOfTransport: 'SEA', all: searchText, inactive: false };
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            criteriaSearchColoader.inactive = null;
+        }
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchColoader, false, false);
         if (partners != null) {
             this.coloaders = partners.data;
@@ -140,6 +143,9 @@ export class MasterBillComponent implements OnInit{
     }
     async getAgents(searchText: any) {
         let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            criteriaSearchAgent.inactive = null;
+        }
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
         if (partners != null) {
             this.agents = partners.data;
@@ -150,6 +156,16 @@ export class MasterBillComponent implements OnInit{
         const users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll, false, false);
         if (users != null) {
             this.userInCharges = users;
+            if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
+
+                let claim = localStorage.getItem('id_token_claims_obj');
+                let index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
+                if(index > -1) {
+                    this.shipment.personInChargeName = this.userInCharges[index].username;
+                    this.shipment.personIncharge = JSON.parse(claim)["id"];
+                }
+                else this.shipment.personInChargeName = '';
+            }
         }
     }
     /**

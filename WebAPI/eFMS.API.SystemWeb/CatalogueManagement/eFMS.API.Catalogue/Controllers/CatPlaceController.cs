@@ -293,7 +293,7 @@ namespace eFMS.API.Catalogue.Controllers
             List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
             for (int row = 2; row <= rowCount; row++)
             {
-                var warehouse = new CatPlaceImportModel
+                var district = new CatPlaceImportModel
                 {
                     IsValid = true,
                     Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
@@ -303,7 +303,7 @@ namespace eFMS.API.Catalogue.Controllers
                     ProvinceName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
                     Status = worksheet.Cells[row, 6].Value?.ToString().Trim()
                 };
-                list.Add(warehouse);
+                list.Add(district);
             }
             return list;
         }
