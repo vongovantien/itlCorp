@@ -28,7 +28,6 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { AuthGuardService } from 'src/services-base/auth-guard.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { TwoDigitDecimaNumberDirective } from 'src/app/shared/directives/two-digit-decima-number.directive';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };

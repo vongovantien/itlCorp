@@ -418,7 +418,7 @@
                                         <table class="table table-hover" *ngIf="userInCharges">
                                             <tbody *ngFor="let user of userInCharges;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
-                                                    (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.employeeNameVn">
+                                                    (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.username">
                                                     <td>{{ user.username }}</td>
                                                     <td>{{ user.employeeNameVn }}</td>
                                                     <td>{{ user.employeeNameVn }}</td>
