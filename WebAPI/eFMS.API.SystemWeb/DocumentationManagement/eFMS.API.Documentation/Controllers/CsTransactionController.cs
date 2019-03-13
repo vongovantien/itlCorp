@@ -100,8 +100,8 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Put(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            model.UserModified = currentUser.UserID;
             var hs = csTransactionService.UpdateCSTransaction(model);
-            model.UserCreated = currentUser.UserID;
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

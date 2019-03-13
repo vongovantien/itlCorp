@@ -135,5 +135,19 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        [HttpDelete("RemoveExchangeCurrency")]
+        [Authorize]
+        public IActionResult RemoveExchangeCurrency(string currencyFrom)
+        {
+            var hs = catCurrencyExchangeService.RemoveExchangeCurrency(currencyFrom, currentUser.UserID);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
