@@ -11,6 +11,7 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
+import * as moment from 'moment';
 declare var $: any;
 
 @Component({
@@ -21,9 +22,13 @@ declare var $: any;
 export class HousebillListComponent implements OnInit {
 
 
-  MasterBillData: CsTransaction = null;
+  MasterBillData: any = null;
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
+    if(this.MasterBillData!=null && this.MasterBillData.id!=null){
+      this.getHouseBillsOfMaster();
+    }    
+    console.log({"MASTER_DETAILS":this.MasterBillData});
   }
 
 
@@ -77,28 +82,56 @@ export class HousebillListComponent implements OnInit {
    * Calculate 'total' base on 'quantity' , 'unit price', 'VAT'
    */
 
-  calculateTotalBuying() {
-    if (this.BuyingRateChargeToAdd.vatrate >= 0) {
-      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
-    } else {
-      this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + this.BuyingRateChargeToAdd.vatrate;
+  calculateTotalBuying(isEdit:boolean=false) {   
+    if(isEdit){
+      if (this.BuyingRateChargeToEdit.vatrate >= 0) {
+        this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
+      } else {
+        this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + this.BuyingRateChargeToEdit.vatrate;
+      }
+    }
+    else{
+      if (this.BuyingRateChargeToAdd.vatrate >= 0) {
+        this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
+      } else {
+        this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + this.BuyingRateChargeToAdd.vatrate;
+      }
     }
   }
 
-  calculateTotalSelling() {
-    if (this.SellingRateChargeToAdd.vatrate >= 0) {
-      this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
-    } else {
-      this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + this.SellingRateChargeToAdd.vatrate;
-    }
+  calculateTotalSelling(isEdit:boolean=false) {
+    if(isEdit){
+      if (this.SellingRateChargeToEdit.vatrate >= 0) {
+        this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
+      } else {
+        this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + this.SellingRateChargeToEdit.vatrate;
+      }
+    }else{
+      if (this.SellingRateChargeToAdd.vatrate >= 0) {
+        this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
+      } else {
+        this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + this.SellingRateChargeToAdd.vatrate;
+      }
+    }    
   }
 
-  calculateTotalOBH(){
-    if (this.OBHChargeToAdd.vatrate >= 0) {
-      this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
-    } else {
-      this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + this.OBHChargeToAdd.vatrate;
+
+  calculateTotalOBH(isEdit:boolean=false){
+    if(isEdit){
+      if (this.OBHChargeToEdit.vatrate >= 0) {
+        this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
+      } else {
+        this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + this.OBHChargeToEdit.vatrate;
+      }
+    }else{
+      if (this.OBHChargeToAdd.vatrate >= 0) {
+        this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
+      } else {
+        this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + this.OBHChargeToAdd.vatrate;
+      }
     }
+
+   
   }
 
 
@@ -111,10 +144,10 @@ export class HousebillListComponent implements OnInit {
 
   ]
 
-  // selectPartnerType() {
-  //   console.log(this.BuyingRateChargeToAdd);
-  //   console.log(this.houseBillSelected);
-  // }
+  selectPartnerType() {
+    console.log(this.BuyingRateChargeToAdd);
+    console.log(this.houseBillSelected);
+  }
 
 
   constructor(
@@ -125,8 +158,7 @@ export class HousebillListComponent implements OnInit {
   async ngOnInit() {
     this.getListBuyingRateCharges();
     this.getListSellingRateCharges();
-    this.getListOBHCharges();
-    this.getHouseBillsOfMaster();
+    this.getListOBHCharges();    
   }
 
   getHouseBillsOfMaster() {
@@ -245,6 +277,27 @@ export class HousebillListComponent implements OnInit {
 
     }
   }
+
+  async editBuyingRateCharge(form:NgForm){
+      if(form.valid){
+        var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update,this.BuyingRateChargeToEdit);
+        if(res.status){
+          $('#edit-buying-rate-modal').modal('hide');
+          this.getBuyingChargesOfHouseBill(this.houseBillSelected);
+        }
+      }
+  }
+
+  async editSellingRateCharge(form:NgForm){
+    console.log(this.SellingRateChargeToEdit);
+    if(form.valid){
+      var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update,this.SellingRateChargeToEdit);
+      if(res.status){
+        $('#edit-selling-rate-modal').modal('hide');
+        this.getSellingChargesOfHouseBill(this.houseBillSelected);
+      }
+    }
+}
 
 
 
@@ -375,6 +428,18 @@ export class HousebillListComponent implements OnInit {
       this.ListOBHCharges = res;
       this.ConstListOBHCharges = res;
     })
+  }
+
+  demo:'đề mô';
+
+  prepareEdit(type:string){
+
+    /**
+     * format exchangeDate to binding to ngx-daterangepicker-material  
+     */
+    if(type==="buy"){
+      this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+    }
   }
 
 

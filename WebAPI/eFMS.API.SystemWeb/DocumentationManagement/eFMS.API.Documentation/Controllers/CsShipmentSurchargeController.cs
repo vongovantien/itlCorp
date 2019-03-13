@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult AddNew(CsShipmentSurchargeModel model)
         {
             model.Id = Guid.NewGuid();
+            model.ExchangeDate = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
             var hs = csShipmentSurchargeService.Add(model);           
             var message = HandleError.GetMessage(hs, Crud.Insert);
