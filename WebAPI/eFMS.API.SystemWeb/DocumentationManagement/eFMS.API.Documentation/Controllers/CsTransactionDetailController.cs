@@ -12,6 +12,7 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.API.Shipment.Service.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -46,7 +47,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost]
         [Route("addNew")]
-      //  [Authorize]
+        [Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
       //      ChangeTrackerHelper.currentUser = currentUser.UserID;
@@ -57,6 +58,8 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            model.UserCreated = currentUser.UserID;
+            model.DatetimeCreated = DateTime.Now;
             var hs = csTransactionDetailService.AddTransactionDetail(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

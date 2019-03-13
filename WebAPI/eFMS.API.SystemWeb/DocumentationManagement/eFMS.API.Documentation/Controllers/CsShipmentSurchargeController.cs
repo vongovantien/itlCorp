@@ -8,6 +8,8 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -23,6 +25,7 @@ namespace eFMS.API.Documentation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeService;
+        private readonly ICurrentUser currentUser;
         public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer,ICsShipmentSurchargeService service)
         {
             stringLocalizer = localizer;
@@ -40,11 +43,14 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult AddNew(CsShipmentSurchargeModel model)
         {
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
+            model.UserCreated = currentUser.UserID;
+            model.DatetimeCreated = DateTime.Now;
             var hs = csShipmentSurchargeService.Add(model);           
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -57,10 +63,13 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut]
         [Route("Update")]
+        [Authorize]
         public IActionResult Update(CsShipmentSurchargeModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);
+            model.UserModified = currentUser.UserID;
+            model.DatetimeModified = DateTime.Now;
+            var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);            
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
