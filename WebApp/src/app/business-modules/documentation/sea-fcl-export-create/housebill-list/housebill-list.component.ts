@@ -299,6 +299,17 @@ export class HousebillListComponent implements OnInit {
     }
 }
 
+async editOBHCharge(form:NgForm){
+  console.log(this.OBHChargeToEdit);
+  if(form.valid){
+    var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update,this.OBHChargeToEdit);
+    if(res.status){
+      $('#edit-selling-rate-modal').modal('hide');
+      this.getOBHChargesOfHouseBill(this.houseBillSelected);
+    }
+  }
+}
+
 
 
 
@@ -452,6 +463,10 @@ export class HousebillListComponent implements OnInit {
     // this.baseServices.post(this.api_menu.Catalogue.Currency.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }).subscribe(res => {
     //   this.currencies = prepareNg2SelectData(res['data'], "id", "currencyName");
     // });
+  }
+
+  searchPartner(key:string){
+    
   }
 
 
