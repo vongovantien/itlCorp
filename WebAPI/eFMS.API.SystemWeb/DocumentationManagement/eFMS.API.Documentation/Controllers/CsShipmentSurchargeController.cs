@@ -26,10 +26,11 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeService;
         private readonly ICurrentUser currentUser;
-        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer,ICsShipmentSurchargeService service)
+        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer,ICsShipmentSurchargeService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             csShipmentSurchargeService = service;
+            currentUser = user;
         }
 
         [HttpGet]

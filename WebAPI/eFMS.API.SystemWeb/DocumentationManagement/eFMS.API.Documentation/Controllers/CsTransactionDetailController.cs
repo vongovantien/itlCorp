@@ -31,10 +31,11 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionDetailService csTransactionDetailService;
         private readonly ICurrentUser currentUser;
-        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service)
+        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             csTransactionDetailService = service;
+            currentUser = user;
         }
 
         [HttpGet]
