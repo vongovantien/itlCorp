@@ -5,7 +5,7 @@ import { Directive, ElementRef, HostListener } from '@angular/core';
 })
 export class ThreeDigitDecimaNumberDirective {
   // Allow decimal numbers and negative values
-  private regex: RegExp = new RegExp(/^\d*\.?\d{0,3}$/g);
+  private regex: RegExp = new RegExp(/^[1-9][\.\d]*(,\d+)?$/g);
   // Allow key codes for special events. Reflect :
   // Backspace, tab, end, home
   private specialKeys: Array<string> = ['Backspace', 'Tab', 'End', 'Home'];
