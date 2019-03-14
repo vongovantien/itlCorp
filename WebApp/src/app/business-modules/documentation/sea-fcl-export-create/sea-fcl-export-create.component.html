@@ -942,6 +942,12 @@
 </div>
 <!--end::import-job-detail-modal-->
 
+<!--begin::import-housebill-detail-modal-->
+<div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <app-housebill-import-detail></app-housebill-import-detail>
+</div>
+<!--end::import-housebill-detail-modal-->
+
 <!--begin::confirm-cancel-create-job-modal-->
 <div class="modal fade" id="confirm-cancel-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
@@ -1021,3 +1027,14 @@
     </div>
 </div>
 <!--end::confirm-cancel-create-job-modal-->
+
+<!--begin::shipment-sidebar-->
+<ul class="m-nav-sticky" *ngIf="inEditing">
+    <li class="m-nav-sticky__item">
+        <a href="javascript:void(0)" title="Preview Manifest">MNF</a>
+    </li>
+    <li class="m-nav-sticky__item">
+        <a href="javascript:void(0)" title="Preview Shipping Instruction">S.I</a>
+    </li>
+</ul>
+<!--end::shipment-sidebar-->
