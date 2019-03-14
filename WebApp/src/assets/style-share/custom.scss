@@ -259,34 +259,13 @@ a {
 .table {
     font-size: 12px;
     margin-bottom: 0;
-    thead {
-        th {
-            padding-left: 4px;
-            padding-right: 4px;
-            font-weight: 500;
-            vertical-align: middle;
-            background-color: #f2dedf;
-            &:first-child {
-                padding-left: 10px
-            }
-        }
-        .table-filter-row {
-            td {
-                background-color: #dde9f5;
-                padding: 0;
-            }
-            .form-control {
-                background-color: transparent;
-            }
-        }
-    }
     thead,
     tbody,
     tfoot {
         tr {
             th,
             td {
-                padding: 8px 4px;
+                padding: 4px;
                 border-top-color: #fff;
                 vertical-align: middle;
                 &:first-child {
@@ -332,6 +311,28 @@ a {
                 > .collapse-toggle-row {
                     background-color: #fff;
                 }
+            }
+        }
+    }
+    thead {
+        tr {
+            th {
+                padding: 8px 4px;
+                font-weight: 500;
+                vertical-align: middle;
+                background-color: #f2dedf;
+                &:first-child {
+                    padding-left: 10px
+                }
+            }
+        }
+        .table-filter-row {
+            td {
+                background-color: #dde9f5;
+                padding: 0;
+            }
+            .form-control {
+                background-color: transparent;
             }
         }
     }
