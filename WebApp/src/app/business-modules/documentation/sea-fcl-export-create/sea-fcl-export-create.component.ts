@@ -166,7 +166,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
-        console.log(this.shipment);
+        console.log({"THIS":this.shipment});
     }
     initNewShipmentForm() {
         this.myForm = this.fb.group({
@@ -612,7 +612,7 @@ export class SeaFclExportCreateComponent implements OnInit {
 
     shipmentDetails:any = null;
     shipmentDetailCatcher(shipmentDetails:any){
-        this.shipmentDetails = shipmentDetails;
+        this.shipmentDetails =  shipmentDetails;
     }
 
 }

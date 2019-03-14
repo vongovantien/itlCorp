@@ -178,8 +178,8 @@
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        (click)="viewdata()" title="Edit" data-toggle="modal"
-                                        data-target="#edit-stage-management-modal">
+                                        (click)="viewdata();" title="Edit" data-toggle="modal"
+                                        data-target="#add-house-bill-modal">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button"
@@ -1101,7 +1101,7 @@
 <!--end:: m-portlet-->
 
 <!--begin:: m-portlet-->
-<div class="m-portlet">
+<div class="m-portlet" *ngIf="ListBuyingRateCharges.length > 0 || ListSellingRateCharges.length > 0 || ListOBHCharges.length > 0">
     <div class="m-portlet__head">
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title">
@@ -1117,7 +1117,7 @@
             <table class="table table-striped table-brand">
                 <thead>
                     <tr>
-                        <th></th>
+                        <th>Type</th>
                         <th>
                             <span>USD</span>
                         </th>
@@ -1132,10 +1132,10 @@
                             <span>Buying rate</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalBuyingUSD | number : '1.3-3'}}</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalBuyingLocal | number : '1.3-3'}}</span>
                         </td>
                     </tr>
                     <tr>
@@ -1143,10 +1143,10 @@
                             <span>Selling rate</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalSellingUSD | number : '1.3-3'}}</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalSellingLocal | number : '1.3-3'}}</span>
                         </td>
                     </tr>
                     <tr>
@@ -1154,10 +1154,10 @@
                             <span>OBH</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalOBHUSD | number : '1.3-3'}}</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalOBHLocal | number : '1.3-3'}}</span>
                         </td>
                     </tr>
                     <tr>
@@ -1165,10 +1165,10 @@
                             <span>Logictis charge</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalLogisticChargeUSD | number : '1.3-3'}}</span>
                         </td>
                         <td>
-                            <span>500.000,000</span>
+                            <span>{{totalLogisticChargeLocal | number : '1.3-3'}}</span>
                         </td>
                     </tr>
                 </tbody>
@@ -1178,10 +1178,10 @@
                             <span>Total</span>
                         </th>
                         <th>
-                            <span>500.000,000</span>
+                            <span>{{totalProfitUSD | number : '1.3-3'}}</span>
                         </th>
                         <th>
-                            <span>500.000,000</span>
+                            <span>{{totalProfitLocal | number : '1.3-3'}}</span>
                         </th>
                     </tr>
                 </tfoot>
@@ -1378,7 +1378,7 @@
                                     <input type="text" required #buyingRateChangeQuantityName="ngModel" required
                                         class="form-control m-input m-input--square" appIntergerInputCheck
                                         [(ngModel)]="BuyingRateChargeToAdd.quantity" placeholder="Enter text"
-                                        name="buyingRateChangeQuantityName" (keyup)="calculateTotalBuying()">
+                                        name="buyingRateChangeQuantityName" (keyup)="calculateTotalEachBuying()">
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && buyingRateChangeQuantityName.invalid">
                                         Quantity is required !
@@ -1448,7 +1448,7 @@
                                     <input type="text" class="form-control m-input m-input--square"
                                         [(ngModel)]="BuyingRateChargeToAdd.unitPrice" placeholder="Enter text" required
                                         name="BuyingRateChargeUnitPriceName" #BuyingRateChargeUnitPriceName="ngModel"
-                                        (keyup)="calculateTotalBuying()">
+                                        (keyup)="calculateTotalEachBuying()">
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted &&(BuyingRateChargeUnitPriceName.invalid || (0 >= BuyingRateChargeToAdd.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -1484,7 +1484,7 @@
                                     <input type="number" max="100" name="BuyingRateChargeVATName" required
                                         #BuyingRateChargeVATName="ngModel" [(ngModel)]="BuyingRateChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        (keyup)="calculateTotalBuying()">
+                                        (keyup)="calculateTotalEachBuying()">
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeVATName.invalid ">
                                         VAT is required and must be less than or equal 100
@@ -1758,7 +1758,7 @@
                                     <input type="text" required #buyingRateChangeQuantityNameEdt="ngModel" required
                                         class="form-control m-input m-input--square" appIntergerInputCheck
                                         [(ngModel)]="BuyingRateChargeToEdit.quantity" placeholder="Enter text"
-                                        name="buyingRateChangeQuantityNameEdt" (keyup)="calculateTotalBuying(true)">
+                                        name="buyingRateChangeQuantityNameEdt" (keyup)="calculateTotalEachBuying(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && buyingRateChangeQuantityNameEdt.invalid">
                                         Quantity is required !
@@ -1829,7 +1829,7 @@
                                         [(ngModel)]="BuyingRateChargeToEdit.unitPrice" placeholder="Enter text" required
                                         name="BuyingRateChargeUnitPriceNameEdt"
                                         #BuyingRateChargeUnitPriceNameEdt="ngModel"
-                                        (keyup)="calculateTotalBuying(true)">
+                                        (keyup)="calculateTotalEachBuying(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted &&(BuyingRateChargeUnitPriceNameEdt.invalid || (0 >= BuyingRateChargeToEdit.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -1867,7 +1867,7 @@
                                         #BuyingRateChargeVATNameEdt="ngModel"
                                         [(ngModel)]="BuyingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        (keyup)="calculateTotalBuying(true)">
+                                        (keyup)="calculateTotalEachBuying(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeVATNameEdt.invalid">
                                         VAT is required and must be less than or equal 100
@@ -2143,7 +2143,7 @@
                                         Quantity
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Enter text" #sellingRateChangeQuantityName="ngModel"
+                                        placeholder="Enter text" #sellingRateChangeQuantityName="ngModel" (keyup)="calculateTotalEachSelling()"
                                         appIntergerInputCheck [(ngModel)]="SellingRateChargeToAdd.quantity" required
                                         name="sellingRateChangeQuantityName">
                                     <div class="form-control-feedback"
@@ -2215,7 +2215,7 @@
                                     <input type="text" class="form-control m-input m-input--square"
                                         [(ngModel)]="SellingRateChargeToAdd.unitPrice" placeholder="Enter text" required
                                         name="SellingRateChargeUnitPriceName" #SellingRateChargeUnitPriceName="ngModel"
-                                        (keyup)="calculateTotalSelling()">
+                                        (keyup)="calculateTotalEachSelling()">
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted &&(SellingRateChargeUnitPriceName.invalid || (0 >= SellingRateChargeToAdd.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -2251,7 +2251,7 @@
                                     <input type="number" max="100" name="BuyingRateChargeVATName" required
                                         #SellingRateChargeVATName="ngModel" [(ngModel)]="SellingRateChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        (keyup)="calculateTotalSelling()">
+                                        (keyup)="calculateTotalEachSelling()">
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeVATName.invalid">
                                         VAT is required and must be less than or equal 100
@@ -2507,7 +2507,7 @@
                                     <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required
                                         class="form-control m-input m-input--square" appIntergerInputCheck
                                         [(ngModel)]="SellingRateChargeToEdit.quantity" placeholder="Enter text"
-                                        name="sellingRateChangeQuantityNameEdt" (keyup)="calculateTotalBuying(true)">
+                                        name="sellingRateChangeQuantityNameEdt" (keyup)="calculateTotalEachSelling(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && sellingRateChangeQuantityNameEdt.invalid">
                                         Quantity is required !
@@ -2578,7 +2578,7 @@
                                         [(ngModel)]="SellingRateChargeToEdit.unitPrice" placeholder="Enter text"
                                         required name="SellingRateChargeUnitPriceNameEdt"
                                         #SellingRateChargeUnitPriceNameEdt="ngModel"
-                                        (keyup)="calculateTotalBuying(true)">
+                                        (keyup)="calculateTotalEachSelling(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted &&(SellingRateChargeUnitPriceNameEdt.invalid || (0 >= SellingRateChargeToEdit.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -2616,7 +2616,7 @@
                                         #SellingRateChargeVATNameEdt="ngModel"
                                         [(ngModel)]="SellingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        (keyup)="calculateTotalBuying(true)">
+                                        (keyup)="calculateTotalEachSelling(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeVATNameEdt.invalid">
                                         VAT is required and must be less than or equal 100
@@ -2702,22 +2702,6 @@
     </div>
     <!--end:: Edit-selling-rate-modal-->
 </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!--begin:: add-obh-charge-modal-->
 <form novalidate #addOBHChargeForm="ngForm" name="addOBHChargeForm" (ngSubmit)="addOBHChargeForm.form.valid">
@@ -2930,7 +2914,7 @@
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
                                         placeholder="Enter text" #OBHQuantityName="ngModel" appIntergerInputCheck
-                                        [(ngModel)]="OBHChargeToAdd.quantity" required (keyup)="calculateTotalOBH()"
+                                        [(ngModel)]="OBHChargeToAdd.quantity" required (keyup)="calculateTotalEachOBH()"
                                         name="OBHQuantityName">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted && OBHQuantityName.invalid">
@@ -3001,7 +2985,7 @@
                                     <input type="text" class="form-control m-input m-input--square"
                                         [(ngModel)]="OBHChargeToAdd.unitPrice" placeholder="Enter text" required
                                         name="OBHUnitPriceName" #OBHUnitPriceName="ngModel"
-                                        (keyup)="calculateTotalOBH()">
+                                        (keyup)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted &&(OBHUnitPriceName.invalid || (0 >= OBHChargeToAdd.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -3037,7 +3021,7 @@
                                     <input type="number" max="100" name="OBHChargeVATName" required
                                         #OBHChargeVATName="ngModel" [(ngModel)]="OBHChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        (keyup)="calculateTotalOBH()">
+                                        (keyup)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted && OBHChargeVATName.invalid">
                                         VAT is required and must be less than or equal 100
@@ -3323,7 +3307,7 @@
                                     <input type="text" class="form-control m-input m-input--square"
                                         placeholder="Enter text" #OBHQuantityNameEdt="ngModel" appIntergerInputCheck
                                         [(ngModel)]="OBHChargeToEdit.quantity" required
-                                        (keyup)="calculateTotalOBH(true)" name="OBHQuantityNameEdt">
+                                        (keyup)="calculateTotalEachOBH(true)" name="OBHQuantityNameEdt">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeForm.submitted && OBHQuantityNameEdt.invalid">
                                         Quantity is required !
@@ -3393,7 +3377,7 @@
                                     <input type="text" class="form-control m-input m-input--square"
                                         [(ngModel)]="OBHChargeToEdit.unitPrice" placeholder="Enter text" required
                                         name="OBHUnitPriceNameEdt" #OBHUnitPriceNameEdt="ngModel"
-                                        (keyup)="calculateTotalOBH(true)">
+                                        (keyup)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeForm.submitted &&(OBHUnitPriceNameEdt.invalid || (0 >= OBHChargeToEdit.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -3430,7 +3414,7 @@
                                     <input type="number" max="100" name="OBHChargeVATNameEdt" required
                                         #OBHChargeVATNameEdt="ngModel" [(ngModel)]="OBHChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        (keyup)="calculateTotalOBH(true)">
+                                        (keyup)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeForm.submitted && OBHChargeVATNameEdt.invalid">
                                         VAT is required and must be less than or equal 100

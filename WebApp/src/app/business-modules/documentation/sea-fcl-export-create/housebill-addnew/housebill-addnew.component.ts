@@ -388,18 +388,16 @@ export class HousebillAddnewComponent implements OnInit {
       this.baseServices.errorToast(
         "The Cont qty value you entered will make the Total Container number of all HBL exceeded the Container number of Shipment detail. Please recheck and try again !",
         "Cannot save container detail");
-      return;
+      return false;
     }
-
     //Cont Type, Cont Q'ty, Container No, Package Type
     let existedItem = this.lstHouseBillContainers.filter(x => x.containerTypeId == this.lstHouseBillContainers[index].containerTypeId
       && x.quantity == this.lstHouseBillContainers[index].quantity
       && x.containerNo == this.lstHouseBillContainers[index].containerNo
       && x.packageTypeId == this.lstHouseBillContainers[index].packageTypeId);
-    console.log(existedItem)
     if (existedItem.length > 1) {
       this.baseServices.errorToast("This container has been existed");
-      return;
+      return false;
     }
     else {
       if (this.lstHouseBillContainers[index].isNew == true) this.lstHouseBillContainers[index].isNew = false;
@@ -408,9 +406,49 @@ export class HousebillAddnewComponent implements OnInit {
       this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null ? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }] : [];
       this.lstHouseBillContainers[index].packageTypeActive = this.lstHouseBillContainers[index].packageTypeId != null ? [{ id: this.lstHouseBillContainers[index].packageTypeId, text: this.lstHouseBillContainers[index].packageTypeName }] : [];
       this.lstHouseBillContainers[index].unitOfMeasureActive = this.lstHouseBillContainers[index].unitOfMeasureId != null ? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }] : [];
-
+      return true;
     }
     // this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
+  }
+
+  totalGrossWeight: number;
+  totalNetWeight: number;
+  totalCharWeight: number;
+  totalCBM: number;
+  numberOfTimeSaveContainer: number = 0;
+  onSubmitContainer(form:NgForm) {
+
+
+    if(!this.saveNewContainer(this.lstHouseBillContainers.length-1,form)){
+      return ;
+    }
+
+
+
+
+    this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
+    if (this.containerListForm.valid) {
+      this.totalGrossWeight = 0;
+      this.totalNetWeight = 0;
+      this.totalCharWeight = 0;
+      this.totalCBM = 0;
+      this.HouseBillToAdd.commodity = '';
+      this.HouseBillToAdd.desOfGoods = '';
+      this.HouseBillToAdd.packageContainer = '';
+      for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+        this.lstHouseBillContainers[i].isSave = true;
+        this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
+        this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
+        this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
+        this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
+        this.HouseBillToAdd.packageContainer = this.HouseBillToAdd.packageContainer + (this.lstHouseBillContainers[i].quantity == "" ? "" : this.lstHouseBillContainers[i].quantity + "x" + this.lstHouseBillContainers[i].containerTypeName + ", ");
+        if (this.numberOfTimeSaveContainer == 1) {
+          this.HouseBillToAdd.commodity = this.HouseBillToAdd.commodity + (this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ", ");
+          this.HouseBillToAdd.desOfGoods = this.HouseBillToAdd.desOfGoods + (this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ", ");
+        }
+      }
+      $('#container-list-of-job-modal-house').modal('hide');
+    }
   }
 
 
@@ -433,38 +471,7 @@ export class HousebillAddnewComponent implements OnInit {
 
   }
 
-  totalGrossWeight: number;
-  totalNetWeight: number;
-  totalCharWeight: number;
-  totalCBM: number;
-  numberOfTimeSaveContainer: number = 0;
-  onSubmitContainer() {
-    console.log(this.MasterBillData)
-    this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
-    if (this.containerListForm.valid) {
-      this.totalGrossWeight = 0;
-      this.totalNetWeight = 0;
-      this.totalCharWeight = 0;
-      this.totalCBM = 0;
-      this.HouseBillToAdd.commodity = '';
-      this.HouseBillToAdd.desOfGoods = '';
-      this.HouseBillToAdd.packageContainer = '';
-      for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
-        this.lstHouseBillContainers[i].isSave = true;
-        this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
-        this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
-        this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
-        this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
-        this.HouseBillToAdd.packageContainer = this.HouseBillToAdd.packageContainer + (this.lstHouseBillContainers[i].quantity == "" ? "" : this.lstHouseBillContainers[i].quantity + "x" + this.lstHouseBillContainers[i].containerTypeName + ", ");
-        if (this.numberOfTimeSaveContainer == 1) {
-          this.HouseBillToAdd.commodity = this.HouseBillToAdd.commodity + (this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ", ");
-          this.HouseBillToAdd.desOfGoods = this.HouseBillToAdd.desOfGoods + (this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ", ");
-        }
-      }
-      //this.shipment.csMawbcontainers = this.lstMasterContainers;
-      $('#container-list-of-job-modal-house').modal('hide');
-    }
-  }
+
 
   removeAContainer(index: number) {
     this.lstHouseBillContainers.splice(index, 1);
