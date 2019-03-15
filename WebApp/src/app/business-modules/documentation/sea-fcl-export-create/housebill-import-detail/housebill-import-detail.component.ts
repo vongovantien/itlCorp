@@ -57,4 +57,23 @@ export class HousebillImportDetailComponent implements OnInit {
      */
     searchFilters: Array<string> = ['HBL', 'MBL', 'Customer', 'Saleman'];
     searchFilterActive = ['HBL'];
+    selectFilter:any= null;
+
+    public value: any = {};
+    public _disabledV: string = '0';
+    public disabled: boolean = false;
+  
+    private set disabledV(value: string) {
+      this._disabledV = value;
+      this.disabled = this._disabledV === '1';
+    }
+  
+    public typed(value: any): void {
+      console.log('New search input: ', value);
+    }
+  
+    public refreshValue(value: any): void {
+      this.value = value;
+    }
+
 }
