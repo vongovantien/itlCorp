@@ -69,13 +69,13 @@
                 <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
                     <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link active" id="masterbill-tablink" data-toggle="tab"
-                            href="#masterbill-tabview-tab" role="tab" (click)="switchTab()">
+                            href="#masterbill-tabview-tab" role="tab" (click)="switchTab('shipment')">
                             Shipment detail
                         </a>
                     </li>
                     <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link" id="housebill-tablink" [attr.data-toggle] ="housebillRoleToggle" type=""
-                            href="{{housebillTabviewHref}}" [attr.role]="housebillRoleToggle" (click)="switchTab()">
+                            href="{{housebillTabviewHref}}" [attr.role]="housebillRoleToggle" (click)="switchTab('housebilllist')">
                             House Bill List
                         </a>
                     </li>
@@ -87,7 +87,7 @@
                     </li> -->
                     <li class="nav-item m-tabs__item" *ngIf="inEditing">
                         <a class="nav-link m-tabs__link" id="creditdebit-tablink" 
-                            href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
+                            href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab('cdnote')">
                             Credit Note & Debit Note
                         </a>
                     </li>
@@ -102,7 +102,7 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <app-master-bill (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment" [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment && isLoaded"></app-master-bill>
+                <app-master-bill  (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment" [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment && isLoaded && isShipment"></app-master-bill>
                 <!--begin:: m-portlet-->
                 <div class="m-portlet">
                     <div class="m-portlet__head">
@@ -286,10 +286,10 @@
                 <!--end:: m-portlet-->
             </div>
             <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
-                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails"></app-housebill-list>
+                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails" *ngIf="isHouseBill"></app-housebill-list>
             </div>
             <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="">
-                <app-credit-and-debit-note></app-credit-and-debit-note>
+                <app-credit-and-debit-note *ngIf="isCDnote"></app-credit-and-debit-note>
         </div>
         </div>
 

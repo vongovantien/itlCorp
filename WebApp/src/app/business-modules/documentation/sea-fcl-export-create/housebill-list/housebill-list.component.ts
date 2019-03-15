@@ -21,6 +21,10 @@ declare var $: any;
 })
 export class HousebillListComponent implements OnInit {
 
+ openCD :boolean = false;
+ open_CD(){
+     this.openCD = true;
+ }
 
   MasterBillData: any = null;
   @Input() set masterBillData(_masterBilData: CsTransaction) {
