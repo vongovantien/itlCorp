@@ -73,6 +73,6 @@
     "source-map-explorer": "^1.7.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
-    "typescript": "~3.1.6"
+    "typescript": "^3.1.6"
   }
 }

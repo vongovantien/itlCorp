@@ -20,5 +20,6 @@ namespace eFMS.API.Catalogue.DL.IService
         vw_catCurrencyExchangeNewest ConvertRate(DateTime date, string localCurrency, string fromCurrency);
         HandleState UpdateRate(CatCurrencyExchangeEditModel model);
         object GetCurrency();
+        HandleState RemoveExchangeCurrency(string currencyFrom, string currentUser);
     }
 }

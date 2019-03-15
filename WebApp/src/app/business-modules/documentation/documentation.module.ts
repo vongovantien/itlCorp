@@ -19,7 +19,6 @@ import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-exp
 import { MasterBillComponent } from './sea-fcl-export-create/master-bill/master-bill.component';
 import { HousebillListComponent } from './sea-fcl-export-create/housebill-list/housebill-list.component';
 import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addnew/housebill-addnew.component';
-import { TwoDigitDecimaNumberDirective } from 'src/app/shared/directives/two-digit-decima-number.directive';
 import { CreditAndDebitNoteComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note.component';
 import { SeaFclExportDetailImportComponent } from './sea-fcl-export-create/sea-fcl-export-detail-import/sea-fcl-export-detail-import.component';
 import { HousebillImportDetailComponent } from './sea-fcl-export-create/housebill-import-detail/housebill-import-detail.component';

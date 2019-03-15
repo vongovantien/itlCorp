@@ -166,7 +166,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
-        console.log(this.shipment);
+        console.log({"THIS":this.shipment});
     }
     initNewShipmentForm() {
         this.myForm = this.fb.group({
@@ -607,6 +607,12 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.baseServices.get(this.api_menu.Catalogue.Currency.getAll).subscribe((res:any)=>{
             this._firstLoadData.lstCurrency = prepareNg2SelectData(res, "id", "currencyName");
         });
+    }
+
+
+    shipmentDetails:any = null;
+    shipmentDetailCatcher(shipmentDetails:any){
+        this.shipmentDetails =  shipmentDetails;
     }
 
 }

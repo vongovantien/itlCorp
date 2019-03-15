@@ -418,7 +418,7 @@
                                         <table class="table table-hover" *ngIf="userInCharges">
                                             <tbody *ngFor="let user of userInCharges;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
-                                                    (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.employeeNameVn">
+                                                    (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.username">
                                                     <td>{{ user.username }}</td>
                                                     <td>{{ user.employeeNameVn }}</td>
                                                     <td>{{ user.employeeNameVn }}</td>
@@ -441,18 +441,18 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" *ngIf="this.inEditing">
                 <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                     <span class="m--font-bolder">Create:</span>
-                    <span class="m--font-brand m--margin-left-5">dd/mm/yyy/ hh:mm:ss</span>
+                    <span class="m--font-brand m--margin-left-5">{{ shipment.createdDate | date :'dd/MM/yyyy h:mm:ss'}}</span>
                     <span class="m--font-bolder m--margin-left-5">by</span>
-                    <span class="m--font-brand m--margin-left-5">user.name</span>
+                    <span class="m--font-brand m--margin-left-5">{{ shipment.userCreated }}</span>
                 </div>
                 <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                     <span class="m--font-bolder">Modified:</span>
-                    <span class="m--font-brand m--margin-left-5">dd/mm/yyy/ hh:mm:ss</span>
+                    <span class="m--font-brand m--margin-left-5">{{ shipment.modifiedDate | date :'dd/MM/yyyy h:mm:ss'}}</span>
                     <span class="m--font-bolder m--margin-left-5">by</span>
-                    <span class="m--font-brand m--margin-left-5">user.name</span>
+                    <span class="m--font-brand m--margin-left-5">{{ shipment.userModified }}</span>
                 </div>
             </div>
         </div>
