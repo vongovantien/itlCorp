@@ -21,6 +21,7 @@ import { HousebillListComponent } from './sea-fcl-export-create/housebill-list/h
 import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addnew/housebill-addnew.component';
 import { CreditAndDebitNoteComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note.component';
 import { SeaFclExportDetailImportComponent } from './sea-fcl-export-create/sea-fcl-export-detail-import/sea-fcl-export-detail-import.component';
+import { HousebillImportDetailComponent } from './sea-fcl-export-create/housebill-import-detail/housebill-import-detail.component';
 
 @NgModule({
   imports: [
@@ -43,6 +44,6 @@ import { SeaFclExportDetailImportComponent } from './sea-fcl-export-create/sea-f
     SeaFCLImportComponent, 
     SeaLCLImportComponent, 
     SeaConsolImportComponent, 
-    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent, CreditAndDebitNoteComponent, SeaFclExportDetailImportComponent]
+    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent, CreditAndDebitNoteComponent, SeaFclExportDetailImportComponent, HousebillImportDetailComponent]
 })
 export class DocumentationModule { }

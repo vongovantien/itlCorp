@@ -18,7 +18,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        data-toggle="modal" data-target="#search-job-detail-modal">
+                        data-toggle="modal" data-target="#import-housebill-detail-modal">
                         <span>
                             <i class="la la-search"></i>
                             <span>
@@ -93,7 +93,9 @@
                                                                 getCustomerSaleman(item.salePersonId);
                                                                 extend_data.customer_nameEn=item.partnerNameEn;
                                                                 extend_data.customer_nameVn=item.partnerNameVn;
-                                                                "
+                                                                HouseBillToAdd.shipperId=item.id;
+                                                                selectedShipper.value=item.partnerNameEn;
+                                                                getShipperDescription(item)"
                                                                 [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.id }">
                                                                 <td class="col-xs-2">{{item.id}}</td>
                                                                 <td class="col-xs-3">{{item.shortName}}</td>
@@ -1569,7 +1571,7 @@
 
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button type="submit" (click)="onSubmitContainer()"
+                    <button type="submit" (click)="onSubmitContainer(containerListForm)"
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>

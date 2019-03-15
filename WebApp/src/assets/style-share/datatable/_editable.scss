@@ -37,9 +37,9 @@
     thead,
     tbody {
         tr {
-            th,
-            td {  
-                &.control-editable {
+            &.row-editing {
+                th,
+                td {  
                     vertical-align: top;
                 }
             }

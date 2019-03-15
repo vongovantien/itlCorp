@@ -90,6 +90,7 @@ export class MasterBillComponent implements OnInit{
                 if(index > -1) this.shipment.personInChargeName = this.userInCharges[index].username;
                 else this.shipment.personInChargeName = '';
             }
+            console.log({"HERE":this.shipment});
             this.shipmentDetails.emit(Object.assign({},this.shipment));
         }
     }

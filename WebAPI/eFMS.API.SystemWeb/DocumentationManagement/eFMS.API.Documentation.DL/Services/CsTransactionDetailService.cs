@@ -24,11 +24,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = mapper.Map<CsTransactionDetail>(model);
             detail.Id = Guid.NewGuid();
-            detail.Inactive = false;
-            detail.UserCreated = "thor";  //ChangeTrackerHelper.currentUser;
-            detail.DatetimeCreated = DateTime.Now;
-
-
+            detail.Inactive = false;           
             try
             {
                 DataContext.Add(detail);
@@ -37,7 +33,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     x.Hblid = detail.Id;
                     x.Id = Guid.NewGuid();
-                    //x.Mblid = model.JobId;
                     ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);
 
                  }
