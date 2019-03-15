@@ -30,10 +30,13 @@
 
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
-      <HintPath>..\..\..\..\bin\netcoreapp2.1\eFMS.API.Common.dll</HintPath>
+      <HintPath>..\..\..\..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Documentation.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.Domain.Report">
+      <HintPath>..\..\..\..\bin\eFMS.Domain.Report.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>

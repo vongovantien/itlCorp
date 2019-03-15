@@ -11,6 +11,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.API.Shipment.Service.Helpers;
+using eFMS.Domain.Report;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -74,6 +75,13 @@ namespace eFMS.API.Documentation.Controllers
                 message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
             }           
             return message;
+        }
+
+        [HttpGet("GetReport")]
+        public CsTransactionDetailReport GetReport(Guid jobId)
+        {
+            var result = csTransactionDetailService.GetReportBy(jobId);
+            return result;
         }
     }
 }

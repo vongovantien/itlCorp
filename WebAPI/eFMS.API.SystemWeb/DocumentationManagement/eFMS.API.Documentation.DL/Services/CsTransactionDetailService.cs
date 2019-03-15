@@ -4,6 +4,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Shipment.Service.Helpers;
+using eFMS.Domain.Report;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -124,6 +125,31 @@ namespace eFMS.API.Documentation.DL.Services
                 results.Add(detail);
             }
             return results.AsQueryable();
+        }
+
+        public CsTransactionDetailReport GetReportBy(Guid jobId)
+        {
+            var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == jobId);
+            var data = (from transDetail in details
+                         join customer in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.CustomerId equals customer.Id into detailCustomers
+                         from y in detailCustomers.DefaultIfEmpty()
+                         join noti in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.NotifyPartyId equals noti.Id into detailNotis
+                         from noti in detailNotis.DefaultIfEmpty()
+                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.ForwardingAgentId equals fwd.Id into forwarding
+                         from f in forwarding.DefaultIfEmpty()
+                         join saleman in ((eFMSDataContext)DataContext.DC).SysUser on transDetail.SaleManId equals saleman.Id into prods
+                         from x in prods.DefaultIfEmpty()
+                             //where detail.JobId == criteria.JobId
+                         select new { transDetail, customer = y, notiParty = noti, saleman = x, agent = f }
+                          ).FirstOrDefault();
+            if (data == null) return null;
+            var detail = mapper.Map<CsTransactionDetailReport>(data.transDetail);
+            //detail.CustomerName = data.customer?.PartnerNameEn;
+            //detail.CustomerNameVn = data.customer?.PartnerNameVn;
+            //detail.SaleManName = data.saleman?.Username;
+            //detail.NotifyParty = data.notiParty?.PartnerNameEn;
+            //detail.ForwardingAgentName = data.agent?.PartnerNameEn;
+            return detail;
         }
     }
 }

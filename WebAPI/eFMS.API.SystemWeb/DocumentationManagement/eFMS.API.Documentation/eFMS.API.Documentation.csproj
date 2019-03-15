@@ -56,6 +56,9 @@
     <Reference Include="eFMS.API.Documentation.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.Service.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.Domain.Report">
+      <HintPath>..\..\..\..\bin\eFMS.Domain.Report.dll</HintPath>
+    </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
       <HintPath>..\..\IdentityServer\bin\netcoreapp2.1\eFMS.IdentityServer.DL.dll</HintPath>
     </Reference>
