@@ -287,9 +287,12 @@ export class HousebillAddnewComponent implements OnInit {
       $('#import-housebill-detail-modal').modal('show');
     }
   }
+  isImporting = false;
   async showShipmentDetail(event){
-    this.HouseBillToAdd = event;
-    console.log(this.HouseBillToAdd);
+    this.HouseBillWorking = event;
+    this.isImporting = true;
+    this.HouseBillWorking.jobId = this.MasterBillData.id;
+    this.HouseBillWorking.hwbno = null;
   }
 
   /**
@@ -348,14 +351,26 @@ export class HousebillAddnewComponent implements OnInit {
 
     if (form.valid) {
       this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
-      const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillWorking);
-      if (res.status) {
-        var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
-
-        // this.ListHouseBill.push({ data: Object.assign({},this.HouseBillWorking), extend_data: Object.assign({},this.extend_data) });
-        // this.houseBillComing.emit(this.ListHouseBill);
-        this.houseBillComing.emit(latestListHouseBill);
-        $('#add-house-bill-modal').modal('hide');
+      if(this.isImporting == false){
+        const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillWorking);
+        if (res.status) {
+          var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+  
+          // this.ListHouseBill.push({ data: Object.assign({},this.HouseBillWorking), extend_data: Object.assign({},this.extend_data) });
+          // this.houseBillComing.emit(this.ListHouseBill);
+          this.houseBillComing.emit(latestListHouseBill);
+          $('#add-house-bill-modal').modal('hide');
+        }
+      }
+      else{
+        let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.import, this.HouseBillWorking);
+        if(response != null){
+          if(response.result.success){
+            var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+            this.houseBillComing.emit(latestListHouseBill);
+            $('#add-house-bill-modal').modal('hide');
+          }
+        }
       }
     }
   }

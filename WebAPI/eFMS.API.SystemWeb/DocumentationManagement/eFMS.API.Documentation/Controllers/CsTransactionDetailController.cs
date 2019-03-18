@@ -71,13 +71,39 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+        [HttpPost]
+        [Authorize]
+        [Route("Import")]
+        public IActionResult Import(CsTransactionDetailModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+            model.UserCreated = currentUser.UserID;
+            var result = csTransactionDetailService.ImportCSTransactionDetail(model);
+            return Ok(result);
+        }
         private string CheckExist(CsTransactionDetailModel model)
         {
             string message = string.Empty;
-            if (csTransactionDetailService.Any(x => (x.Hwbno.ToLower() == model.Hwbno.ToLower())))
+            if(model.Id == Guid.Empty)
+            { 
+                if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+            }
+            else
             {
-                message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
-            }           
+                if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+            }
+            
             return message;
         }
 

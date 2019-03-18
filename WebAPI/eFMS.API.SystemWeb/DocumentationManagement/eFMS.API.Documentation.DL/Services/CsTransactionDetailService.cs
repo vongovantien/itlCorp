@@ -217,11 +217,14 @@ namespace eFMS.API.Documentation.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var detail = mapper.Map<CsTransactionDetail>(model);
                 detail.Id = Guid.NewGuid();
-                int countDetail = dc.CsTransactionDetail.Count(x => x.JobId == model.JobId);
-                detail.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
+                //int countDetail = dc.CsTransactionDetail.Count(x => x.JobId == model.JobId);
+                //detail.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
                 detail.Inactive = false;
                 detail.UserCreated = model.UserCreated;  //ChangeTrackerHelper.currentUser;
                 detail.DatetimeCreated = DateTime.Now;
+                detail.DesOfGoods = null;
+                detail.Commodity = null;
+                detail.PackageContainer = null;
                 dc.CsTransactionDetail.Add(detail);
                 foreach (var x in model.CsMawbcontainers)
                 {

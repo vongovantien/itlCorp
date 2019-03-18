@@ -39,6 +39,7 @@ export class CsTransaction {
   unit: Number = null;
   grossWeight: Number = null;
   chargeWeight: Number = null;
+  netWeight: Number = null;
   cbm: Number = null;
   containerSize: String = null;
   dimension: String = null;
