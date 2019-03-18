@@ -87,5 +87,14 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.GetReportBy(jobId);
             return result;
         }
+
+        [HttpPost]
+        [Route("Paging")]
+        public IActionResult Paging(CsTransactionDetailCriteria criteria, int page, int size)
+        {
+            var data = csTransactionDetailService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
     }
 }

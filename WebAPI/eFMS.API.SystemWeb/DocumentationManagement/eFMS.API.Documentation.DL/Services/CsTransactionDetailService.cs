@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -50,7 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
         {
-            var results = Query(criteria).ToList();
+            var results = QueryDetail(criteria).ToList();
             var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer
                 .Join(((eFMSDataContext)DataContext.DC).CatUnit,
                     container => container.ContainerTypeId,
@@ -91,9 +92,8 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
-        public IQueryable<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
+        public IQueryable<CsTransactionDetailModel> QueryDetail(CsTransactionDetailCriteria criteria)
         {
-            //var results = Get(x => x.JobId == criteria.JobId);
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == criteria.JobId);
             var query = (from detail in details
@@ -105,7 +105,6 @@ namespace eFMS.API.Documentation.DL.Services
                          from f in forwarding.DefaultIfEmpty()
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         //where detail.JobId == criteria.JobId
                          select new { detail, customer = y, notiParty = noti, saleman = x ,agent = f}
                           );
             if (query == null) return null;
@@ -145,6 +144,115 @@ namespace eFMS.API.Documentation.DL.Services
             //detail.NotifyParty = data.notiParty?.PartnerNameEn;
             //detail.ForwardingAgentName = data.agent?.PartnerNameEn;
             return detail;
+        }
+        public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
+        {
+            var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
+                         join tran in ((eFMSDataContext)DataContext.DC).CsTransaction on detail.JobId equals tran.Id
+                         join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into customers
+                         from cus in customers.DefaultIfEmpty()
+                         join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into salemans
+                         from sale in salemans.DefaultIfEmpty()
+                         select new { detail, tran, cus, sale });
+            if (criteria.All == null)
+            {
+                query = query.Where(x => x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                      && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                      && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                      && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
+                                      && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
+                                      && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    );
+            }
+            else
+            {
+                query = query.Where(x => (x.tran.Mawb.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                      || (x.detail.Hwbno.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                      || (x.cus.PartnerNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                      || (x.sale.Username.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
+                                       && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
+                                    );
+            }
+            List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
+            foreach (var item in query)
+            {
+                var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
+                detail.CustomerName = item.cus?.PartnerNameEn;
+                detail.SaleManName = item.sale?.Username;
+                detail.Etd = item.tran.Etd;
+                detail.Mawb = item.tran.Mawb;
+                results.Add(detail);
+            }
+            return results;
+        }
+        public List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount)
+        {
+            var data = Query(criteria).AsQueryable();
+            rowsCount = data.Count();
+            List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
+            if (size > 1)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+            foreach (var item  in data)
+            {
+                var detail = mapper.Map<CsTransactionDetailModel>(item);
+                detail.CustomerName = item.CustomerName;
+                detail.SaleManName = item.SaleManName;
+                detail.Etd = item.Etd;
+                detail.Mawb = item.Mawb;
+                results.Add(detail);
+            }
+            return results;
+        }
+
+        public object ImportCSTransactionDetail(CsTransactionDetailModel model)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var detail = mapper.Map<CsTransactionDetail>(model);
+                detail.Id = Guid.NewGuid();
+                int countDetail = dc.CsTransactionDetail.Count(x => x.JobId == model.JobId);
+                detail.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
+                detail.Inactive = false;
+                detail.UserCreated = model.UserCreated;  //ChangeTrackerHelper.currentUser;
+                detail.DatetimeCreated = DateTime.Now;
+                dc.CsTransactionDetail.Add(detail);
+                foreach (var x in model.CsMawbcontainers)
+                {
+                    x.Id = Guid.NewGuid();
+                    x.Hblid = detail.Id;
+                    x.UserModified = model.UserCreated;
+                    x.DatetimeModified = DateTime.Now;
+                    dc.CsMawbcontainer.Add(x);
+                }
+                var charges = dc.CsShipmentSurcharge.Where(x => x.Hblid == model.Id);
+                if (charges != null)
+                {
+                    foreach (var charge in charges)
+                    {
+                        charge.Id = Guid.NewGuid();
+                        charge.UserCreated = model.UserCreated;
+                        charge.DatetimeCreated = DateTime.Now;
+                        charge.Hblid = detail.Id;
+                        charge.DocNo = null;
+                        dc.CsShipmentSurcharge.Add(charge);
+                    }
+                }
+                dc.SaveChanges();
+                var result = new HandleState();
+                return new { model = detail, result };
+            }
+            catch (Exception ex)
+            {
+                var result = new HandleState(ex.Message);
+                return new { model = new object { }, result };
+            }
         }
     }
 }

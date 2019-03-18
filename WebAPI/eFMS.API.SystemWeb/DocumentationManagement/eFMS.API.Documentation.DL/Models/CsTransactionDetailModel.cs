@@ -18,5 +18,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string ContainerNames { get; set; }
         public string PackageTypes { get; set; }
         public decimal? CBM { get; set; }
+        public DateTime? Etd { get; set; }
+        public string Mawb { get; set; }
     }
 }

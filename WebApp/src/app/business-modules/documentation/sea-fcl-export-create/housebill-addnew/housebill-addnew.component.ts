@@ -241,9 +241,19 @@ export class HousebillAddnewComponent implements OnInit {
     });
   }
 
-
-
-
+  listShipmentDetails: any[] = [];
+  async showImportHouseBill(){
+    let criteria = { fromDate: moment().startOf('month'), toDate: moment().endOf('month') };
+    let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, criteria, true, true);
+    this.listShipmentDetails = responses.data;
+    this.pager.totalItems = responses.totalItems;
+    if(this.pager.totalItems > 0){
+      $('#import-housebill-detail-modal').modal('show');
+    }
+  }
+  async showShipmentDetail(event){
+    this.HouseBillToAdd.id = event;
+  }
 
   /**
     * Daterange picker

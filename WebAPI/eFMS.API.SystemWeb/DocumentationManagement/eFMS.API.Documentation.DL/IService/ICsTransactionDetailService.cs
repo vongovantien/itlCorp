@@ -12,10 +12,12 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsTransactionDetailService : IRepositoryBase<CsTransactionDetail, CsTransactionDetailModel>
     {
-        IQueryable<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
+        IQueryable<CsTransactionDetailModel> QueryDetail(CsTransactionDetailCriteria criteria);
 
         List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria);
         HandleState AddTransactionDetail(CsTransactionDetailModel model);
         CsTransactionDetailReport GetReportBy(Guid jobId);
+        List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount);
+        object ImportCSTransactionDetail(CsTransactionDetailModel model);
     }
 }

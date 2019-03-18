@@ -17,8 +17,16 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                         data-toggle="modal" data-target="#import-housebill-detail-modal">
+                        <span>
+                            <i class="la la-search"></i>
+                            <span>
+                                import house bill detail
+                            </span>
+                        </span>
+                    </button> -->
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="showImportHouseBill()">
                         <span>
                             <i class="la la-search"></i>
                             <span>
@@ -1595,3 +1603,9 @@
     </div>
 </div>
 <!--end::container-list-of-job-modal-house-->
+
+<!--begin::import-housebill-detail-modal-->
+<div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <app-housebill-import-detail [shipmentDetails]="listShipmentDetails" [pager]="pager" (shipmentId)="showShipmentDetail($event)"></app-housebill-import-detail>
+</div>
+<!--end::import-housebill-detail-modal-->
