@@ -252,7 +252,8 @@ export class HousebillAddnewComponent implements OnInit {
     }
   }
   async showShipmentDetail(event){
-    this.HouseBillToAdd.id = event;
+    this.HouseBillToAdd = event;
+    console.log(this.HouseBillToAdd);
   }
 
   /**

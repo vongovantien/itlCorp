@@ -61,6 +61,7 @@ export class SeaFclExportDetailImportComponent implements OnInit {
     this.getShipments();
   }
   async resetSearchShipment(){
+    this.pager.currentPage = 1;
     this.selectFilter = 'Job ID';
     this.searchString = null;
     this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };

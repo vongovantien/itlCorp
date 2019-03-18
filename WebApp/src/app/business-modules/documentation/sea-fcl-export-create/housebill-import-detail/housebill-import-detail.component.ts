@@ -13,7 +13,7 @@ declare var $: any;
     styleUrls: ['./housebill-import-detail.component.scss']
 })
 export class HousebillImportDetailComponent implements OnInit {
-    @Output() shipmentDetailId = new EventEmitter<any>();
+    @Output() shipmentImport = new EventEmitter<any>();
     @Input()shipmentDetails: any[];
     @Input()pager: PagerSetting = PAGINGSETTING;
     shipmentDetail: any;
@@ -47,7 +47,7 @@ export class HousebillImportDetailComponent implements OnInit {
       }
     importHousebillDetail() {
         if(this.shipmentDetail != null){
-            this.shipmentDetailId.emit(this.shipmentDetail.id);
+            this.shipmentImport.emit(this.shipmentDetail);
             $('#import-housebill-detail-modal').modal('hide');
           }
           else{
@@ -85,6 +85,7 @@ export class HousebillImportDetailComponent implements OnInit {
         this.getShipmentDetails();
     }
     async resetSearchShipmentDetail(){
+        this.pager.currentPage = 1;
         this.selectFilter = 'HBL No';
         this.searchString = null;
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
