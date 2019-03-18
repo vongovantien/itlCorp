@@ -16,5 +16,6 @@ namespace eFMS.API.Documentation.DL.IService
 
         List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria);
         HandleState AddTransactionDetail(CsTransactionDetailModel model);
+        HandleState UpdateTransactionDetail(CsTransactionDetailModel model);
     }
 }

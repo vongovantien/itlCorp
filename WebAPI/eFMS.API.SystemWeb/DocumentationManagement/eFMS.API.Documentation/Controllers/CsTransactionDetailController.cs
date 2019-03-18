@@ -70,6 +70,29 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPut]
+        [Route("update")]
+        public IActionResult Update(CsTransactionDetailModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var checkExistMessage = CheckExist(model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            var hs = csTransactionDetailService.UpdateTransactionDetail(model);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
         private string CheckExist(CsTransactionDetailModel model)
         {
             string message = string.Empty;

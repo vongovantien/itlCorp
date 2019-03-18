@@ -21,48 +21,59 @@ declare var $: any;
 })
 export class HousebillAddnewComponent implements OnInit {
 
-  MasterBillData: CsTransaction = null;  
-  EditingHouseBill:any = null;
-  isEditing : boolean = false;  
-  activeOriginCountry : string = null;
-  activePortOfLoading : string = null;
-  activePortOfDischarge : string = null;
-  
+  MasterBillData: CsTransaction = null;
+  EditingHouseBill: any = null;
+  isEditing: boolean = false;
+  activeOriginCountry: string = null;
+  activePortOfLoading: string = null;
+  activePortOfDischarge: string = null;
+
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
     this.HouseBillWorking.jobId = this.MasterBillData.id;
   }
 
-  @Input() set currentHouseBill(_currentHouseBill:any){
-    if(_currentHouseBill!=null){
+  @Input() set currentHouseBill(_currentHouseBill: any) {
+    if (_currentHouseBill != null) {
       this.isEditing = true;
       this.EditingHouseBill = _currentHouseBill;
       this.HouseBillWorking = this.EditingHouseBill;
       this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
+      this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
       this.getActiveOriginCountry();
       this.getActivePortOfLoading();
       this.getActivePortOfDischarge();
-      
-    }else{
+      this.getHouseBillContainers(this.HouseBillWorking.id);
+      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
+      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
+    } else {
       this.isEditing = false;
       this.HouseBillWorking = new CsTransactionDetail();
       this.HouseBillWorking.jobId = this.MasterBillData.id;
+      this.customerSaleman = null;
     }
   }
 
 
-  getActiveOriginCountry(){
-    const index = this.listCountryOrigin.map(function(e:any) { return e.id; }).indexOf(this.HouseBillWorking.originCountryId);
+
+  getHouseBillContainers(hblid: String) {
+    this.baseServices.post(this.api_menu.Documentation.CsMawbcontainer.query, { "hblid": hblid }).subscribe((res:any)=>{
+      this.lstHouseBillContainers = res;
+    })
+  }
+
+  getActiveOriginCountry() {
+    const index = this.listCountryOrigin.map(function (e: any) { return e.id; }).indexOf(this.HouseBillWorking.originCountryId);
     this.activeOriginCountry = index === -1 ? null : this.listCountryOrigin[index].nameEn;
   }
 
-  getActivePortOfLoading(){
-    const index = this.listPort.map(function(e:any){return e.id}).indexOf(this.HouseBillWorking.pol);
+  getActivePortOfLoading() {
+    const index = this.listPort.map(function (e: any) { return e.id }).indexOf(this.HouseBillWorking.pol);
     this.activePortOfLoading = index === -1 ? null : this.listPort[index].nameEN;
   }
 
-  getActivePortOfDischarge(){
-    const index = this.listPort.map(function(e:any){return e.id}).indexOf(this.HouseBillWorking.pod);
+  getActivePortOfDischarge() {
+    const index = this.listPort.map(function (e: any) { return e.id }).indexOf(this.HouseBillWorking.pod);
     this.activePortOfDischarge = index === -1 ? null : this.listPort[index].nameEN;
   }
 
@@ -255,12 +266,12 @@ export class HousebillAddnewComponent implements OnInit {
 
   public async getCustomerSaleman(idSaleMan: string) {
 
-      var saleMan = await this.baseServices.getAsync(this.api_menu.System.User_Management.getUserByID + idSaleMan);
-      this.customerSaleman = [{ id: saleMan['id'], text: saleMan["employeeNameEn"] }];   
-      this.HouseBillWorking.saleManId = saleMan['id'];
-      // this.extend_data.saleman_nameEn = saleMan['employeeNameEn'];
-    
-   
+    var saleMan = await this.baseServices.getAsync(this.api_menu.System.User_Management.getUserByID + idSaleMan);
+    this.customerSaleman = [{ id: saleMan['id'], text: saleMan["employeeNameEn"] }];
+    this.HouseBillWorking.saleManId = saleMan['id'];
+    // this.extend_data.saleman_nameEn = saleMan['employeeNameEn'];
+
+
 
   }
 
@@ -336,16 +347,30 @@ export class HousebillAddnewComponent implements OnInit {
   async save(form: NgForm) {
 
     if (form.valid) {
-      this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
-      const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillWorking);
-      if (res.status) {
-        var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
 
-        // this.ListHouseBill.push({ data: Object.assign({},this.HouseBillWorking), extend_data: Object.assign({},this.extend_data) });
-        // this.houseBillComing.emit(this.ListHouseBill);
-        this.houseBillComing.emit(latestListHouseBill);
-        $('#add-house-bill-modal').modal('hide');
+      if (this.isEditing) {
+        this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
+        const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.update, this.HouseBillWorking);
+        if (res.status) {
+          var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+          this.houseBillComing.emit(latestListHouseBill);
+          this.resetForm();
+         // $('#add-house-bill-modal').modal('hide');
+        }
+      } 
+      
+      else {
+        this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
+        const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillWorking);
+        if (res.status) {
+          var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+          this.houseBillComing.emit(latestListHouseBill);
+          this.resetForm();
+        //  $('#add-house-bill-modal').modal('hide');
+        }
       }
+
+
     }
   }
 
@@ -452,11 +477,11 @@ export class HousebillAddnewComponent implements OnInit {
   totalCharWeight: number;
   totalCBM: number;
   numberOfTimeSaveContainer: number = 0;
-  onSubmitContainer(form:NgForm) {
+  onSubmitContainer(form: NgForm) {
 
 
-    if(!this.saveNewContainer(this.lstHouseBillContainers.length-1,form)){
-      return ;
+    if (!this.saveNewContainer(this.lstHouseBillContainers.length - 1, form)) {
+      return;
     }
 
 

@@ -24,13 +24,13 @@ export class CsTransactionDetail {
   finalDestinationPlace: String = null;
   freightPayment: String = null;
   placeFreightPay: String = null;
-  closingDate: Date = null;
-  sailingDate: Date = null;
+  closingDate: any = null;
+  sailingDate: any = null;
   forwardingAgentDescription:String= null;
   forwardingAgentId: String = null;
   goodsDeliveryDescription:String = null;
   goodsDeliveryId: String = null;
-  originBlNumber: Number = null;
+  originBlnumber: Number = null;
   issueHblplaceAndDate: String = null;
   referenceNo: String = null;
   exportReferenceNo: String = null;
