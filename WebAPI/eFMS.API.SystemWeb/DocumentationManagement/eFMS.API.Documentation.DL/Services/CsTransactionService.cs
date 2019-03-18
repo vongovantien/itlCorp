@@ -136,7 +136,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 x.Hblid = item.Id;
                                 x.UserModified = transaction.UserCreated;
                                 x.DatetimeModified = DateTime.Now;
-                                x.Id = Guid.NewGuid();
                                 dc.CsMawbcontainer.Add(x);
                             }
                         }
@@ -302,7 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                query = query.ToList();
+                //query = query.ToList();
                 query = query.Where(x => ((x.transaction.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.MAWB ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                              || (x.transaction.HWBNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0

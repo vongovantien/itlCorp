@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.Domain.Report;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -12,6 +13,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsTransactionDetail, CsTransactionDetailModel>();
             CreateMap<CsMawbcontainer, CsMawbcontainerModel>();
             CreateMap<CsTransaction, CsTransactionModel>();
+            CreateMap<CsTransactionDetail, CsTransactionDetailReport>();
 
 
             CreateMap<CsTransactionEditModel, CsTransaction>();

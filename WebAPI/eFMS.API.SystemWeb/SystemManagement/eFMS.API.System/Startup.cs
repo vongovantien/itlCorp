@@ -270,7 +270,7 @@ namespace SystemManagementAPI
             {
                 config.ReportApiVersions = true;
                 config.AssumeDefaultVersionWhenUnspecified = true;
-                config.DefaultApiVersion = new ApiVersion(1, 0);
+                config.DefaultApiVersion = new ApiVersion(1, 0); 
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
             return services;

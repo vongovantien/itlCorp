@@ -57,7 +57,7 @@ export class HousebillAddnewComponent implements OnInit {
 
 
   getHouseBillContainers(hblid: String) {
-    this.baseServices.post(this.api_menu.Documentation.CsMawbcontainer.query, { "hblid": hblid }).subscribe((res:any)=>{
+    this.baseServices.post(this.api_menu.Documentation.CsMawbcontainer.query, { "hblid": hblid }).subscribe((res: any) => {
       this.lstHouseBillContainers = res;
     })
   }
@@ -288,9 +288,23 @@ export class HousebillAddnewComponent implements OnInit {
     });
   }
 
-
-
-
+  listShipmentDetails: any[] = [];
+  async showImportHouseBill() {
+    let criteria = { fromDate: moment().startOf('month'), toDate: moment().endOf('month') };
+    let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, criteria, true, true);
+    this.listShipmentDetails = responses.data;
+    this.pager.totalItems = responses.totalItems;
+    if (this.pager.totalItems > 0) {
+      $('#import-housebill-detail-modal').modal('show');
+    }
+  }
+  isImporting = false;
+  async showShipmentDetail(event) {
+    this.HouseBillWorking = event;
+    this.isImporting = true;
+    this.HouseBillWorking.jobId = this.MasterBillData.id;
+    this.HouseBillWorking.hwbno = null;
+  }
 
   /**
     * Daterange picker
@@ -345,28 +359,41 @@ export class HousebillAddnewComponent implements OnInit {
   isDisplay = true;
   ListHouseBill: any[] = [];
   async save(form: NgForm) {
-
+    console.log(this.HouseBillWorking)
     if (form.valid) {
-
-      if (this.isEditing) {
-        this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
-        const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.update, this.HouseBillWorking);
-        if (res.status) {
-          var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
-          this.houseBillComing.emit(latestListHouseBill);
-          this.resetForm();
-         // $('#add-house-bill-modal').modal('hide');
-        }
-      } 
+      this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
+      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? null : this.HouseBillWorking.sailingDate.startDate;
+      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? null : this.HouseBillWorking.closingDate.startDate;
+      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate['_d'];
+      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate['_d'];
       
+      if (this.isImporting == false) {
+        if (this.isEditing) {
+          const res = await this.baseServices.putAsync(this.api_menu.Documentation.CsTransactionDetail.update, this.HouseBillWorking);
+          if (res.status) {
+            var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+            this.houseBillComing.emit(latestListHouseBill);
+            this.resetForm();
+            // $('#add-house-bill-modal').modal('hide');
+          }
+        }
+        else {
+          const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillWorking);
+          if (res.status) {
+            var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+            this.houseBillComing.emit(latestListHouseBill);
+            this.resetForm();
+          }
+        }
+      }
       else {
-        this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
-        const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.addNew, this.HouseBillWorking);
-        if (res.status) {
-          var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
-          this.houseBillComing.emit(latestListHouseBill);
-          this.resetForm();
-        //  $('#add-house-bill-modal').modal('hide');
+        let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransactionDetail.import, this.HouseBillWorking);
+        if (response != null) {
+          if (response.result.success) {
+            var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+            this.houseBillComing.emit(latestListHouseBill);
+            $('#add-house-bill-modal').modal('hide');
+          }
         }
       }
 

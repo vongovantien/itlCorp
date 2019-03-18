@@ -329,8 +329,12 @@
                                     <tr>
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
-                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     title="" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDeleteRate(item)">
+                                                    <i class="la la-trash"></i>
+                                                </button> -->
+                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="" (click)="confirmDeleteRate(item)">
                                                     <i class="la la-trash"></i>
                                                 </button>
                                             </div>
@@ -350,7 +354,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <span [ngClass]="{ 'm-form__group has-danger': formSettingRate.submitted && item.currencyFromID == null }">
+                                        <span [ngClass]="{ 'm-form__group has-danger': isSubmitted && item.currencyFromID == null }">
                                             <ng-select #currencyRateSelect [allowClear]="true" [items]="catCurrencies" [disabled]="disabled" (data)="refreshValue($event)"
                                                 (selected)="selected($event, selectTypeName.rateSetting)" (removed)="removed($event, selectTypeName.rateSetting)" (typed)="typed($event)"
                                                 placeholder="Select currency">

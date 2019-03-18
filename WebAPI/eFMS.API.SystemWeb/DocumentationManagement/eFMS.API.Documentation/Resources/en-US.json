@@ -13,5 +13,6 @@
   "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",
   "FILE_NOT_FOUND": "File not found!",
   "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
-  "MSG_MAWB_EXISTED": "MAWB has existed"
+  "MSG_MAWB_EXISTED": "MAWB has existed",
+  "MSG_HBNO_EXISTED": "MAWB has existed"
 }

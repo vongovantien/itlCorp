@@ -158,7 +158,9 @@ export class ExchangeRateComponent implements OnInit {
       }
     }
   }
+  isSubmitted: boolean = false;
   async saveNewRate(){
+    this.isSubmitted = true;
     console.log(this.exchangeRateToAdd.CatCurrencyExchangeRates);
     let index = this.exchangeRateToAdd.CatCurrencyExchangeRates.findIndex(x => x.currencyFromId == null);
     if(index < 0){
@@ -246,6 +248,14 @@ export class ExchangeRateComponent implements OnInit {
   }
   confirmDeleteRate(item){
     this.currencyRateToDelete = item;
+    this.isSubmitted = true;
+    let index = this.exchangeRateToAdd.CatCurrencyExchangeRates.findIndex(x => x.currencyFromID == null);
+    if(index < 0){
+      $('#confirm-delete-modal').modal('show');
+    }
+    else{
+      this.baseService.warningToast("Please save current exchange rate");
+    }
   }
   removeNewRate(index){
     const currency = this.exchangeRateToAdd.CatCurrencyExchangeRates[index];
@@ -387,8 +397,11 @@ export class ExchangeRateComponent implements OnInit {
   }
 
   async onDelete(event){
+    this.isSubmitted = true;
     if(event == true){
       await this.baseService.deleteAsync(this.api_menu.ToolSetting.ExchangeRate.removeExchangeCurrency + "?currencyFrom=" + this.currencyRateToDelete.currencyFromID, true, true);
+      $('#confirm-delete-modal').modal('hide');
+      this.catCurrencies.push({"text": this.currencyRateToDelete.currencyFromID,"id": this.currencyRateToDelete.currencyFromID });
       this.getExchangeNewest();
     }
   }

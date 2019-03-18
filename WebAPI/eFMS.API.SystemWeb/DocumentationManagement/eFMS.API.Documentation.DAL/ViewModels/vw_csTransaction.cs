@@ -62,5 +62,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string CreatorName { get; set; }
         public Nullable<int> SumCont { get; set; }
         public Nullable<decimal> SumCBM { get; set; }
+        public Nullable<decimal> NetWeight { get; set; }
     }
 }

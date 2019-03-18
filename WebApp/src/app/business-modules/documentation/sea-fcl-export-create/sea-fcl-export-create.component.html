@@ -165,25 +165,29 @@
                             <div class="col-xl-4">
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total gross weight: {{ totalGrossWeight }} kgs
+                                        <!-- Total gross weight: {{ totalGrossWeight }} kgs -->
+                                        Total gross weight: {{ shipment.grossWeight }} kgs
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total net weight: {{ totalNetWeight }} kgs
+                                        <!-- Total net weight: {{ totalNetWeight }} kgs -->
+                                        Total net weight: {{ shipment.netWeight }}
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total chargeable weight: {{ totalCharWeight }} kgs
+                                        <!-- Total chargeable weight: {{ totalCharWeight }} kgs -->
+                                        Total chargeable weight: {{ shipment.chargeWeight }}
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total CBM: {{ totalCBM }}
+                                        <!-- Total CBM: {{ totalCBM }} -->
+                                        Total CBM: {{ shipment.cbm }}
                                     </span>
                                     <span></span>
                                 </div>
@@ -406,7 +410,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="confirm-text-block">
-                        <span>New shipment details will be save, are you sure they are correct?</span>
+                        <span>You need to enter container data to create a job. Please recheck and try again</span>
                     </div>
                 </div>
                 <div class="modal-footer m--align-center c-button-actions">
@@ -944,9 +948,9 @@
 <!--end::import-job-detail-modal-->
 
 <!--begin::import-housebill-detail-modal-->
-<div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!-- <div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <app-housebill-import-detail></app-housebill-import-detail>
-</div>
+</div> -->
 <!--end::import-housebill-detail-modal-->
 
 <!--begin::confirm-cancel-create-job-modal-->

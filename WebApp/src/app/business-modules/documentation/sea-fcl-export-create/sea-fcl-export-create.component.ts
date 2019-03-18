@@ -323,8 +323,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.shipment.jobNo = null;
         this.shipment.mawb = null;
         this.isImport = true;
-        await this.getShipmentContainer(event);
-        this.getHouseBillList(event);
+        // await this.getShipmentContainer(event);
+        // this.getHouseBillList(event);
         setTimeout(() => {
             this.isLoaded = true;
           }, 300);
