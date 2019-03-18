@@ -54,6 +54,7 @@
     <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="shipment"
         aria-hidden="true">
         <app-housebill-addnew 
+        [currentHouseBill]="currentHouseBill"
         (houseBillComing)="houseBillCatcher($event)" 
         [masterBillData]="shipment">
 
@@ -286,7 +287,7 @@
                 <!--end:: m-portlet-->
             </div>
             <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
-                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails"></app-housebill-list>
+                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails" (currentHouseBill)="currentHouseBillCatcher($event)"></app-housebill-list>
             </div>
             <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="">
                 <app-credit-and-debit-note></app-credit-and-debit-note>

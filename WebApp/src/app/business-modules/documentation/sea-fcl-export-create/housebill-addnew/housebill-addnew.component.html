@@ -33,13 +33,12 @@
                 <div class="m-form m-form--state">
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && MasterBillOfLadingName.invalid }">
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && MasterBillOfLadingName.invalid }">
                                 <label class="form-control-label" for="">
                                     Master bill of lading
                                 </label>
-                                <input type="text" (change)="HouseBillToAdd.jobId=HouseBillToAdd.jobId.trim()"
-                                    [(ngModel)]="HouseBillToAdd.jobId" required
+                                <input type="text" disabled
+                                    [(ngModel)]="MasterBillData.jobNo" required
                                     class="form-control m-input m-input--square" placeholder="Enter text"
                                     #MasterBillOfLadingName="ngModel" name="MasterBillOfLadingName">
                                 <div class="form-control-feedback"
@@ -50,14 +49,14 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.customerId==null }">
+                                [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.customerId==null }">
                                 <label class="form-control-label" for="">
                                     Customer (Payer)
                                 </label>
                                 <div class="dropdown e--combogrid" #selectedCustomer *ngIf="listCustomers.length>0">
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                         readonly data-toggle="dropdown" placeholder="combogrid"
-                                        [value]="selectedCustomer.value==null?'Please select customer':selectedCustomer.value">
+                                        [value]="HouseBillWorking.customerName==null?'Please select customer':HouseBillWorking.customerName">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
@@ -85,18 +84,18 @@
                                             <div class="table-body-scroll">
                                                 <table class="table table-hover">
                                                     <tbody>
-                                                        <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                        <!-- HouseBillWorking.customerId=item.partnerID -->
                                                         <ng-container *ngFor="let item of listCustomers;let i = index">
                                                             <tr class="data-row" attr.data-id="{{i}}" (click)="
-                                                                HouseBillToAdd.customerId=item.id;
-                                                                selectedCustomer.value=item.partnerNameEn;
+                                                                HouseBillWorking.customerId=item.id;
+                                                                HouseBillWorking.customerName=item.partnerNameEn;
                                                                 getCustomerSaleman(item.salePersonId);
                                                                 extend_data.customer_nameEn=item.partnerNameEn;
                                                                 extend_data.customer_nameVn=item.partnerNameVn;
-                                                                HouseBillToAdd.shipperId=item.id;
+                                                                HouseBillWorking.shipperId=item.id;
                                                                 selectedShipper.value=item.partnerNameEn;
                                                                 getShipperDescription(item)"
-                                                                [ngClass]="{ 'data-selected': HouseBillToAdd.customerId!==null && HouseBillToAdd.customerId===item.id }">
+                                                                [ngClass]="{ 'data-selected': HouseBillWorking.customerId!==null && HouseBillWorking.customerId===item.id }">
                                                                 <td class="col-xs-2">{{item.id}}</td>
                                                                 <td class="col-xs-3">{{item.shortName}}</td>
                                                                 <td class="col-xs-5">{{item.partnerNameEn}}</td>
@@ -110,26 +109,26 @@
                                     </div>
                                 </div>
                                 <div class="form-control-feedback"
-                                    *ngIf="addHouseBillForm.submitted && HouseBillToAdd.customerId==null">
+                                    *ngIf="addHouseBillForm.submitted && HouseBillWorking.customerId==null">
                                     Customer is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.saleManId==null }">
+                                [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.saleManId==null }">
                                 <label class="form-control-label" for="">
                                     Saleman in charge
                                 </label>
                                 <ng-select [allowClear]="true" [items]="listSaleMan" [disabled]="disabled"
                                     (data)="refreshValue($event)" *ngIf="listSaleMan.length>0" (selected)="
-                                    HouseBillToAdd.saleManId=$event.id;
-                                    extend_data.saleman_nameEn=$event.text" (removed)="HouseBillToAdd.saleManId=null"
+                                    HouseBillWorking.saleManId=$event.id;
+                                    extend_data.saleman_nameEn=$event.text" (removed)="HouseBillWorking.saleManId=null"
                                     [active]="customerSaleman" (typed)="getListSaleman($event.text)"
                                     placeholder="Select option">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="addHouseBillForm.submitted && HouseBillToAdd.saleManId==null">
+                                    *ngIf="addHouseBillForm.submitted && HouseBillWorking.saleManId==null">
                                     Saleman is required
                                 </div>
                             </div>
@@ -139,7 +138,7 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.shipperId==null }">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.shipperId==null }">
                                     <label class="form-control-label" for="">
                                         Shipper
                                     </label>
@@ -174,14 +173,14 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listShipper;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}" (click)="
-                                                                HouseBillToAdd.shipperId=item.id;
+                                                                HouseBillWorking.shipperId=item.id;
                                                                 selectedShipper.value=item.partnerNameEn;
                                                                 getShipperDescription(item)"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.shipperId!==null && HouseBillToAdd.shipperId===item.id }">
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.shipperId!==null && HouseBillWorking.shipperId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-3">{{item.shortName}}</td>
                                                                     <td class="col-xs-5">{{item.partnerNameEn}}</td>
@@ -195,16 +194,16 @@
                                         </div>
                                     </div>
                                     <textarea class="form-control m-input--square" id="" name="shipperDescription"
-                                        rows="3" [(ngModel)]="HouseBillToAdd.shipperDescription"></textarea>
+                                        rows="3" [(ngModel)]="HouseBillWorking.shipperDescription"></textarea>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.shipperId==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.shipperId==null">
                                         Shipper is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.consigneeId==null }">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.consigneeId==null }">
                                     <label class="form-control-label" for="">
                                         Consignee
                                     </label>
@@ -239,12 +238,12 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listConsignee;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.consigneeId=item.id;selectedConsignee.value=item.partnerNameEn;getConsigneeDescription(item)"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.consigneeId!==null && HouseBillToAdd.consigneeId===item.id }">
+                                                                    (click)="HouseBillWorking.consigneeId=item.id;selectedConsignee.value=item.partnerNameEn;getConsigneeDescription(item)"
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.consigneeId!==null && HouseBillWorking.consigneeId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-3">{{item.shortName}}</td>
                                                                     <td class="col-xs-5">{{item.partnerNameEn}}</td>
@@ -258,16 +257,16 @@
                                         </div>
                                     </div>
                                     <textarea class="form-control m-input--square" id="" name="consigneeDescription"
-                                        [(ngModel)]="HouseBillToAdd.consigneeDescription" rows="3"></textarea>
+                                        [(ngModel)]="HouseBillWorking.consigneeDescription" rows="3"></textarea>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.consigneeId==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.consigneeId==null">
                                         Consignee is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.notifyPartyId==null }">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.notifyPartyId==null }">
                                     <label class="form-control-label" for="">
                                         Notify party
                                     </label>
@@ -302,17 +301,17 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listConsignee;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
                                                                     (click)="
-                                                                    HouseBillToAdd.notifyPartyId=item.id;
+                                                                    HouseBillWorking.notifyPartyId=item.id;
                                                                     selectedPartner.value=item.partnerNameEn;
                                                                     getNotifyPartyDescription(item);
                                                                     extend_data.notify_party_nameEn=item.partnerNameEn;
                                                                     extend_data.notify_party_nameVn=item.partnerNameVn;"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.notifyPartyId!==null && HouseBillToAdd.notifyPartyId===item.id }">
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.notifyPartyId!==null && HouseBillWorking.notifyPartyId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-3">{{item.shortName}}</td>
                                                                     <td class="col-xs-5">{{item.partnerNameEn}}</td>
@@ -326,9 +325,9 @@
                                         </div>
                                     </div>
                                     <textarea class="form-control m-input--square" id="" name="notifyPartyDescription"
-                                        [(ngModel)]="HouseBillToAdd.notifyPartyDescription" rows="3"></textarea>
+                                        [(ngModel)]="HouseBillWorking.notifyPartyDescription" rows="3"></textarea>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.notifyPartyId==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.notifyPartyId==null">
                                         NotifyParty is required
                                     </div>
                                 </div>
@@ -341,9 +340,9 @@
                                     <label class="form-control-label" for="">
                                         House bill of lading no.
                                     </label>
-                                    <input type="text" (change)="HouseBillToAdd.hwbno=HouseBillToAdd.hwbno.trim()"
+                                    <input type="text" (change)="HouseBillWorking.hwbno=HouseBillWorking.hwbno.trim()"
                                         required name="HouseBillLadingNoName" #HouseBillLadingNoName="ngModel"
-                                        [(ngModel)]="HouseBillToAdd.hwbno" class="form-control m-input m-input--square"
+                                        [(ngModel)]="HouseBillWorking.hwbno" class="form-control m-input m-input--square"
                                         placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addHouseBillForm.submitted && HouseBillLadingNoName.invalid">
@@ -353,18 +352,18 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.hbltype==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.hbltype==null}">
                                     <label class="form-control-label" for="">
                                         House bill of lading type
                                     </label>
                                     <ng-select [allowClear]="true" [items]="listHouseBillLadingType"
-                                        [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="HouseBillToAdd.hbltype=$event.id"
-                                        (removed)="HouseBillToAdd.hbltype=null" (typed)="typed($event)"
+                                        [disabled]="disabled" (data)="refreshValue($event)" [active]="[{'text':HouseBillWorking.hbltype,'id':HouseBillWorking.hbltype}]"
+                                        (selected)="HouseBillWorking.hbltype=$event.id"
+                                        (removed)="HouseBillWorking.hbltype=null" (typed)="typed($event)"
                                         placeholder="Select option">
                                     </ng-select>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.hbltype==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.hbltype==null">
                                         House bill of lading type is required
                                     </div>
                                 </div>
@@ -376,8 +375,8 @@
                                         Booking no.
                                     </label>
                                     <input type="text" required name="BookingNoName" #BookingNoName="ngModel"
-                                        (change)="HouseBillToAdd.customsBookingNo=HouseBillToAdd.customsBookingNo.trim()"
-                                        [(ngModel)]="HouseBillToAdd.customsBookingNo"
+                                        (change)="HouseBillWorking.customsBookingNo=HouseBillWorking.customsBookingNo.trim()"
+                                        [(ngModel)]="HouseBillWorking.customsBookingNo"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addHouseBillForm.submitted && BookingNoName.invalid">
@@ -393,8 +392,8 @@
                                         Local vessel & voy no.
                                     </label>
                                     <input type="text" name="LocalVesselAndVoyNoName" #LocalVesselAndVoyNoName="ngModel"
-                                        [(ngModel)]="HouseBillToAdd.localVoyNo"
-                                        (change)="HouseBillToAdd.localVoyNo=HouseBillToAdd.localVoyNo.trim()"
+                                        [(ngModel)]="HouseBillWorking.localVoyNo"
+                                        (change)="HouseBillWorking.localVoyNo=HouseBillWorking.localVoyNo.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>
@@ -405,8 +404,8 @@
                                         Ocean vessel & voy no.
                                     </label>
                                     <input type="text" required name="OceanVesselAndVoyNoName" #OceanVesselAndVoyNoName
-                                        [(ngModel)]="HouseBillToAdd.oceanVoyNo"
-                                        (change)="HouseBillToAdd.oceanVoyNo=HouseBillToAdd.oceanVoyNo.trim()"
+                                        [(ngModel)]="HouseBillWorking.oceanVoyNo"
+                                        (change)="HouseBillWorking.oceanVoyNo=HouseBillWorking.oceanVoyNo.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addHouseBillForm.submitted && OceanVesselAndVoyNoName.invalid">
@@ -416,7 +415,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.originCountryId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.originCountryId==null}">
                                     <label class="form-control-label" for="">
                                         Point of country origin
                                     </label>
@@ -424,7 +423,7 @@
                                     <div class="dropdown e--combogrid" #selectedCountry>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
-                                            [value]="selectedCountry.value==null?'Please select country':selectedCountry.value">
+                                            [value]="activeOriginCountry==null?'Please select country':activeOriginCountry">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
@@ -450,12 +449,12 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listCountryOrigin;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.originCountryId=item.id;selectedCountry.value=item.nameEn;"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.originCountryId!==null && HouseBillToAdd.originCountryId===item.id }">
+                                                                    (click)="HouseBillWorking.originCountryId=item.id;activeOriginCountry=item.nameEn;"
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.originCountryId!==null && HouseBillWorking.originCountryId===item.id }">
                                                                     <td class="col-xs-2">{{item.code}}</td>
                                                                     <td class="col-xs-5">{{item.nameEn}}</td>
                                                                 </tr>
@@ -468,7 +467,7 @@
                                     </div>
 
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.originCountryId==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.originCountryId==null">
                                         Point of country origin is required
                                     </div>
                                 </div>
@@ -477,36 +476,31 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.pickupPlace==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.pickupPlace==null}">
                                     <label class="form-control-label" for="">
                                         Place of receipt
                                     </label>
 
                                     <input type="text" name="PlaceOfReceipt" #PlaceOfReceipt="ngModel"
-                                        [(ngModel)]="HouseBillToAdd.pickupPlace"
-                                        (change)="HouseBillToAdd.pickupPlace=HouseBillToAdd.pickupPlace.trim()"
+                                        [(ngModel)]="HouseBillWorking.pickupPlace"
+                                        (change)="HouseBillWorking.pickupPlace=HouseBillWorking.pickupPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.pickupPlace==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.pickupPlace==null">
                                         Place of receipt is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.pol==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.pol==null}">
                                     <label class="form-control-label" for="">
                                         Port of loading
                                     </label>
-                                    <!-- <ng-select [allowClear]="true" [items]="listPort" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="HouseBillToAdd.pol=$event.id" (removed)="HouseBillToAdd.pol=null"
-                                        (typed)="getListPorts($event.text)" placeholder="Select option">
-                                    </ng-select> -->
-
                                     <div class="dropdown e--combogrid" #selectedPortOfLoading>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
-                                            [value]="selectedPortOfLoading.value==null?'Please select port of loading':selectedPortOfLoading.value">
+                                            [value]="activePortOfLoading==null?'Please select port of loading':activePortOfLoading">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
@@ -533,11 +527,11 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container *ngFor="let item of listPort;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.pol=item.id;selectedPortOfLoading.value=item.nameEN;"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.pol!==null && HouseBillToAdd.pol===item.id }">
+                                                                    (click)="HouseBillWorking.pol=item.id;activePortOfLoading=item.nameEN;"
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.pol!==null && HouseBillWorking.pol===item.id }">
                                                                     <td class="col-xs-2">{{item.code}}</td>
                                                                     <td class="col-xs-5">{{item.nameEN}}</td>
                                                                     <td class="col-xs-5">{{item.countryName}}</td>
@@ -550,14 +544,14 @@
                                         </div>
                                     </div>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.pol==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.pol==null">
                                         Port of loading is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.pod==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.pod==null}">
                                     <label class="form-control-label" for="">
                                         Port of discharge
                                     </label>
@@ -565,7 +559,7 @@
                                     <div class="dropdown e--combogrid" #selectedPortOfDischarge>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
-                                            [value]="selectedPortOfDischarge.value==null?'Please select port of discharge':selectedPortOfDischarge.value">
+                                            [value]="activePortOfDischarge==null?'Please select port of discharge':activePortOfDischarge">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
@@ -592,11 +586,11 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container *ngFor="let item of listPort;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.pod=item.id;selectedPortOfDischarge.value=item.nameEN;"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.pol!==null && HouseBillToAdd.pod===item.id }">
+                                                                    (click)="HouseBillWorking.pod=item.id;activePortOfDischarge=item.nameEN;"
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.pol!==null && HouseBillWorking.pod===item.id }">
                                                                     <td class="col-xs-2">{{item.code}}</td>
                                                                     <td class="col-xs-5">{{item.nameEN}}</td>
                                                                     <td class="col-xs-5">{{item.countryName}}</td>
@@ -609,7 +603,7 @@
                                         </div>
                                     </div>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.pod==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.pod==null">
                                         Port of discharge is required
                                     </div>
                                 </div>
@@ -621,8 +615,8 @@
                                     <label class="form-control-label" for="">
                                         Place of delivery
                                     </label>
-                                    <input type="text" name="PlaceOfDelivery" [(ngModel)]="HouseBillToAdd.deliveryPlace"
-                                        (change)="HouseBillToAdd.deliveryPlace=HouseBillToAdd.deliveryPlace.trim()"
+                                    <input type="text" name="PlaceOfDelivery" [(ngModel)]="HouseBillWorking.deliveryPlace"
+                                        (change)="HouseBillWorking.deliveryPlace=HouseBillWorking.deliveryPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>
@@ -632,25 +626,25 @@
                                         Final destination
                                     </label>
                                     <input type="text" name="FinalDestination"
-                                        [(ngModel)]="HouseBillToAdd.finalDestinationPlace"
-                                        (change)="HouseBillToAdd.finalDestinationPlace=HouseBillToAdd.finalDestinationPlace.trim()"
+                                        [(ngModel)]="HouseBillWorking.finalDestinationPlace"
+                                        (change)="HouseBillWorking.finalDestinationPlace=HouseBillWorking.finalDestinationPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillToAdd.freightPayment==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.freightPayment==null}">
                                     <label class="form-control-label" for="">
                                         Freight payment
                                     </label>
                                     <ng-select [allowClear]="true" [items]="listFreightPayment" [disabled]="disabled"
                                         (data)="refreshValue($event)"
-                                        (selected)="HouseBillToAdd.freightPayment=$event.id; HouseBillToAdd.placeFreightPay = $event.id==='Prepaid'?'Origin':'Destination'"
-                                        (removed)="HouseBillToAdd.freightPayment=null" (typed)="typed($event)"
+                                        (selected)="HouseBillWorking.freightPayment=$event.id; HouseBillWorking.placeFreightPay = $event.id==='Prepaid'?'Origin':'Destination'"
+                                        (removed)="HouseBillWorking.freightPayment=null" (typed)="typed($event)"
                                         placeholder="Select option">
                                     </ng-select>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillToAdd.freightPayment==null">
+                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.freightPayment==null">
                                         Freight payment is required
                                     </div>
                                 </div>
@@ -664,9 +658,9 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            (change)="HouseBillToAdd.closingDate= $event.startDate" ngxDaterangepickerMd
+                                            (change)="HouseBillWorking.closingDate= $event.startDate" ngxDaterangepickerMd
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
-                                            [(ngModel)]="HouseBillToAdd.closingDate" [ranges]="ranges"
+                                            [(ngModel)]="HouseBillWorking.closingDate" [ranges]="ranges"
                                             [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                             name="closingDateName" placeholder="Select date" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -685,9 +679,9 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            (change)="HouseBillToAdd.sailingDate= $event.startDate" ngxDaterangepickerMd
+                                            (change)="HouseBillWorking.sailingDate= $event.startDate" ngxDaterangepickerMd
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
-                                            [(ngModel)]="HouseBillToAdd.sailingDate" [ranges]="ranges" required
+                                            [(ngModel)]="HouseBillWorking.sailingDate" [ranges]="ranges" required
                                             [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                             name="sailingDateName" #sailingDateName="ngModel" placeholder="Select date"
                                             readonly />
@@ -710,9 +704,9 @@
                                         Freight payable at
                                     </label>
                                     <input type="text" required name="FreightPayableAtName"
-                                        (change)="HouseBillToAdd.placeFreightPay=HouseBillToAdd.placeFreightPay.trim()"
-                                        #FreightPayableAtName="ngModel" [(ngModel)]="HouseBillToAdd.placeFreightPay"
-                                        (change)="HouseBillToAdd.placeFreightPay=HouseBillToAdd.placeFreightPay.trim()"
+                                        (change)="HouseBillWorking.placeFreightPay=HouseBillWorking.placeFreightPay.trim()"
+                                        #FreightPayableAtName="ngModel" [(ngModel)]="HouseBillWorking.placeFreightPay"
+                                        (change)="HouseBillWorking.placeFreightPay=HouseBillWorking.placeFreightPay.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addHouseBillForm.submitted && FreightPayableAtName.invalid">
@@ -761,15 +755,15 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listFowardingAgent;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.forwardingAgentId=item.id;
+                                                                    (click)="HouseBillWorking.forwardingAgentId=item.id;
                                                                              selectedForwardingAgent.value=item.partnerNameEn;
                                                                              extend_data.forwarding_agent_nameEn=item.partnerNameEn;
                                                                              getForwardingAgentDescription(item)"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.forwardingAgentId!==null && HouseBillToAdd.forwardingAgentId===item.id }">
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.forwardingAgentId!==null && HouseBillWorking.forwardingAgentId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-5">{{item.shortName}}</td>
                                                                     <td class="col-xs-5">{{item.partnerNameEn}}</td>
@@ -782,7 +776,7 @@
                                             </div>
                                         </div>
                                         <textarea class="form-control m-input--square" id="" name="forwardingAgent"
-                                            [(ngModel)]="HouseBillToAdd.forwardingAgentDescription" rows="3"></textarea>
+                                            [(ngModel)]="HouseBillWorking.forwardingAgentDescription" rows="3"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -795,8 +789,8 @@
                                             </label>
                                             <ng-select [allowClear]="true" [items]="listNumberOfOriginBL"
                                                 [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="HouseBillToAdd.originBlNumber=$event.id"
-                                                (removed)="HouseBillToAdd.originBlNumber=null" (typed)="typed($event)"
+                                                (selected)="HouseBillWorking.originBlNumber=$event.id"
+                                                (removed)="HouseBillWorking.originBlNumber=null" (typed)="typed($event)"
                                                 placeholder="Select option">
                                             </ng-select>
                                         </div>
@@ -807,8 +801,8 @@
                                                 Place and date of issue H-B/L
                                             </label>
                                             <input type="text" name="ReferenceNo"
-                                                [(ngModel)]="HouseBillToAdd.issueHblplaceAndDate"
-                                                (change)="HouseBillToAdd.issueHblplaceAndDate=HouseBillToAdd.issueHblplaceAndDate.trim()"
+                                                [(ngModel)]="HouseBillWorking.issueHblplaceAndDate"
+                                                (change)="HouseBillWorking.issueHblplaceAndDate=HouseBillWorking.issueHblplaceAndDate.trim()"
                                                 class="form-control m-input m-input--square" placeholder="Enter text">
                                         </div>
                                     </div>
@@ -820,8 +814,8 @@
                                                 Reference no.
                                             </label>
                                             <input type="text" name="ReferenceNo"
-                                                [(ngModel)]="HouseBillToAdd.referenceNo"
-                                                (change)="HouseBillToAdd.referenceNo=HouseBillToAdd.referenceNo.trim()"
+                                                [(ngModel)]="HouseBillWorking.referenceNo"
+                                                (change)="HouseBillWorking.referenceNo=HouseBillWorking.referenceNo.trim()"
                                                 class="form-control m-input m-input--square" placeholder="Enter text">
                                         </div>
                                     </div>
@@ -831,8 +825,8 @@
                                                 Export reference no.
                                             </label>
                                             <input type="text" name="ExportReferenceNo"
-                                                [(ngModel)]="HouseBillToAdd.exportReferenceNo"
-                                                (change)="HouseBillToAdd.exportReferenceNo=HouseBillToAdd.exportReferenceNo.trim()"
+                                                [(ngModel)]="HouseBillWorking.exportReferenceNo"
+                                                (change)="HouseBillWorking.exportReferenceNo=HouseBillWorking.exportReferenceNo.trim()"
                                                 class="form-control m-input m-input--square" placeholder="Enter text">
                                         </div>
                                     </div>
@@ -876,12 +870,12 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillToAdd.customerId=item.partnerID -->
+                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listFowardingAgent;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
-                                                                    (click)="HouseBillToAdd.goodsDeliveryId=item.id;selectedDeliveryOfGood.value=item.partnerNameEn;getGoodDeliveryDescription(item)"
-                                                                    [ngClass]="{ 'data-selected': HouseBillToAdd.goodsDeliveryId!==null && HouseBillToAdd.goodsDeliveryId===item.id }">
+                                                                    (click)="HouseBillWorking.goodsDeliveryId=item.id;selectedDeliveryOfGood.value=item.partnerNameEn;getGoodDeliveryDescription(item)"
+                                                                    [ngClass]="{ 'data-selected': HouseBillWorking.goodsDeliveryId!==null && HouseBillWorking.goodsDeliveryId===item.id }">
                                                                     <td class="col-xs-2">{{item.id}}</td>
                                                                     <td class="col-xs-5">{{item.shortName}}</td>
                                                                     <td class="col-xs-5">{{item.partnerNameEn}}</td>
@@ -895,7 +889,7 @@
                                         </div>
                                     </div>
                                     <textarea class="form-control m-input--square" id="" name="goodsDeliveryDescription"
-                                        [(ngModel)]="HouseBillToAdd.goodsDeliveryDescription" rows="3"></textarea>
+                                        [(ngModel)]="HouseBillWorking.goodsDeliveryDescription" rows="3"></textarea>
                                 </div>
                             </div>
                             <div class="col-lg-8">
@@ -907,8 +901,8 @@
                                             </label>
                                             <ng-select [allowClear]="true" [items]="listTypeOfMove"
                                                 [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="HouseBillToAdd.moveType=$event.id"
-                                                (removed)="HouseBillToAdd.moveType=null" (typed)="typed($event)"
+                                                (selected)="HouseBillWorking.moveType=$event.id"
+                                                (removed)="HouseBillWorking.moveType=null" (typed)="typed($event)"
                                                 placeholder="Select option">
                                             </ng-select>
                                         </div>
@@ -919,8 +913,8 @@
                                                 Purchase order no.
                                             </label>
                                             <input type="text" name="PurchaseOrderNo"
-                                                [(ngModel)]="HouseBillToAdd.purchaseOrderNo"
-                                                (change)="HouseBillToAdd.purchaseOrderNo=HouseBillToAdd.purchaseOrderNo.trim()"
+                                                [(ngModel)]="HouseBillWorking.purchaseOrderNo"
+                                                (change)="HouseBillWorking.purchaseOrderNo=HouseBillWorking.purchaseOrderNo.trim()"
                                                 class="form-control m-input m-input--square" placeholder="Enter text">
                                         </div>
                                     </div>
@@ -933,8 +927,8 @@
                                             </label>
                                             <ng-select [allowClear]="true" [items]="listTypeOfService"
                                                 [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="HouseBillToAdd.serviceType=$event.id"
-                                                (removed)="HouseBillToAdd.serviceType=null" (typed)="typed($event)"
+                                                (selected)="HouseBillWorking.serviceType=$event.id"
+                                                (removed)="HouseBillWorking.serviceType=null" (typed)="typed($event)"
                                                 placeholder="Select option">
                                             </ng-select>
                                         </div>
@@ -972,7 +966,7 @@
                                                 Commodities:
                                             </label>
                                             <textarea class="form-control m-input--square" name="commodityHB" id=""
-                                                [(ngModel)]="HouseBillToAdd.commodity"
+                                                [(ngModel)]="HouseBillWorking.commodity"
                                                 rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
                                         </div>
                                     </div>
@@ -982,7 +976,7 @@
                                                 Detail container & packages:
                                             </label>
                                             <textarea class="form-control m-input--square" name="packageContainerHB"
-                                                id="" [(ngModel)]="HouseBillToAdd.packageContainer"
+                                                id="" [(ngModel)]="HouseBillWorking.packageContainer"
                                                 rows="3">container-1, container-2, container-3</textarea>
                                         </div>
                                     </div>
@@ -992,7 +986,7 @@
                                         Description of good:
                                     </label>
                                     <textarea class="form-control m-input--square" name="desOfGoodsHB" id=""
-                                        [(ngModel)]="HouseBillToAdd.desOfGoods"
+                                        [(ngModel)]="HouseBillWorking.desOfGoods"
                                         rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
                                 </div>
                             </div>
@@ -1043,9 +1037,9 @@
                                     <label class="form-control-label" for="">
                                         Shipping mark
                                     </label>
-                                    <input type="text" name="ShippingMark" [(ngModel)]="HouseBillToAdd.shippingMark"
+                                    <input type="text" name="ShippingMark" [(ngModel)]="HouseBillWorking.shippingMark"
                                         class="form-control m-input m-input--square"
-                                        (change)="HouseBillToAdd.shippingMark=HouseBillToAdd.shippingMark.trim()"
+                                        (change)="HouseBillWorking.shippingMark=HouseBillWorking.shippingMark.trim()"
                                         placeholder="Enter text">
                                 </div>
                             </div>
@@ -1054,8 +1048,8 @@
                                     <label class="form-control-label" for="">
                                         In word
                                     </label>
-                                    <input type="text" name="InWord" [(ngModel)]="HouseBillToAdd.inWord"
-                                        (change)="HouseBillToAdd.inWord=HouseBillToAdd.inWord.trim()"
+                                    <input type="text" name="InWord" [(ngModel)]="HouseBillWorking.inWord"
+                                        (change)="HouseBillWorking.inWord=HouseBillWorking.inWord.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>
@@ -1064,8 +1058,8 @@
                                     <label class="form-control-label" for="">
                                         On board status
                                     </label>
-                                    <input type="text" name="OnBoardStatus" [(ngModel)]="HouseBillToAdd.onBoardStatus"
-                                        (change)="HouseBillToAdd.onBoardStatus=HouseBillToAdd.onBoardStatus.trim()"
+                                    <input type="text" name="OnBoardStatus" [(ngModel)]="HouseBillWorking.onBoardStatus"
+                                        (change)="HouseBillWorking.onBoardStatus=HouseBillWorking.onBoardStatus.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
                             </div>

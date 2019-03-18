@@ -47,5 +47,15 @@ export class CsTransactionDetail {
   packageContainer: string = null;
   desOfGoods: string =  null;
   commodity: String = null;
-  csMawbcontainers:Container[]=[] ; // list containers 
+  csMawbcontainers:Container[]=[] ;
+  customerName:String = null;
+  saleManName:String = null;
+  customerNameVn:String = null;
+  saleManNameVn:String = null;
+  forwardingAgentName:String = null;
+  notifyParty:String = null;
+  podName:String = null;
+  containerNames:String = null;
+  packageTypes:String = null;
+  cbm:Number = 0;
 }

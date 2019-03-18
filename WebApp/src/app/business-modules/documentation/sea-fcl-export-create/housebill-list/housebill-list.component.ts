@@ -1,5 +1,5 @@
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as lodash from 'lodash';
@@ -12,6 +12,7 @@ import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import * as moment from 'moment';
+
 declare var $: any;
 
 @Component({
@@ -30,6 +31,7 @@ export class HousebillListComponent implements OnInit {
     }    
     console.log({"MASTER_DETAILS":this.MasterBillData});
   }
+   @Output() currentHouseBill = new EventEmitter<any>();
 
 
   BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
@@ -241,6 +243,9 @@ export class HousebillListComponent implements OnInit {
     this.baseServices.get(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id).subscribe((res: any) => {
       this.HouseBillListData = res;
       this.ConstHouseBillListData = res;
+      this.getBuyingChargesOfHouseBill(this.HouseBillListData[0]);
+      this.getSellingChargesOfHouseBill(this.HouseBillListData[0]);
+      this.getOBHChargesOfHouseBill(this.HouseBillListData[0]);
       console.log({"LIST_HB":this.HouseBillListData});
     });
   }
@@ -521,8 +526,10 @@ async editOBHCharge(form:NgForm){
     })
   }
 
-  demo:'đề mô';
 
+  emitSelectedHB(hb:any){
+    this.currentHouseBill.emit(hb);
+  }
   prepareEdit(type:string){
 
     /**
