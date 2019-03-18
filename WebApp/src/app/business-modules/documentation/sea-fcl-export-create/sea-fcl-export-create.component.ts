@@ -615,4 +615,10 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.shipmentDetails =  shipmentDetails;
     }
 
+    currentHouseBill:any = null;
+    currentHouseBillCatcher(currentHouseBill:any){
+        this.currentHouseBill = currentHouseBill;
+        console.log({"Current_HouseBill":this.currentHouseBill});
+    }
+
 }

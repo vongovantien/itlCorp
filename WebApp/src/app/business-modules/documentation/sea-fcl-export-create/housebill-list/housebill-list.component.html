@@ -94,6 +94,7 @@
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="emitSelectedHB(null)"
                             data-toggle="modal" data-target="#add-house-bill-modal">
                             <span>
                                 <i class="la la-plus"></i>
@@ -171,9 +172,9 @@
                     </thead>
 
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
-                        <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
+                        <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;" [ngClass]="{'selected-row':i==0}"
                             (click)="$event.path[0].closest('tbody').querySelector('tr.selected-row')==null?return:$event.path[0].closest('tbody').querySelector('tr.selected-row').classList.remove('selected-row');$event.path[0].closest('tr').classList.add('selected-row');
-                                    getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb)">
+                                    getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb)">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
