@@ -86,21 +86,44 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.ImportCSTransactionDetail(model);
             return Ok(result);
         }
+
+        [HttpPut]
+        [Route("update")]
+        public IActionResult Update(CsTransactionDetailModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var checkExistMessage = CheckExist(model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            var hs = csTransactionDetailService.UpdateTransactionDetail(model);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
         private string CheckExist(CsTransactionDetailModel model)
         {
             string message = string.Empty;
             if(model.Id == Guid.Empty)
             { 
                 if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
-                {
-                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+            {
+                message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
                 if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
                 {
-                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                    message = "Housebill of Lading No is existed !";
                 }
             }
             
@@ -112,7 +135,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             var result = csTransactionDetailService.GetReportBy(jobId);
             return result;
-        }
+    }
 
         [HttpPost]
         [Route("Paging")]

@@ -124,8 +124,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\eFMS.API.Common\obj\Debug\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
-    <Reference Include="eFMS.Domain.Report">
-      <HintPath>..\eFMS.Domain.Report\bin\Debug\eFMS.Domain.Report.dll</HintPath>
+    <Reference Include="eFMS.Domain.Report, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\eFMS.Domain.Report.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>

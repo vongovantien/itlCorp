@@ -132,7 +132,7 @@
                                     (data)="refreshValue($event)" *ngIf="listSaleMan.length>0" (selected)="
                                     HouseBillWorking.saleManId=$event.id;
                                     extend_data.saleman_nameEn=$event.text" (removed)="HouseBillWorking.saleManId=null"
-                                    [active]="customerSaleman" (typed)="getListSaleman($event.text)"
+                                    [active]="customerSaleman==null?'':customerSaleman" (typed)="getListSaleman($event.text)"
                                     placeholder="Select option">
                                 </ng-select>
                                 <div class="form-control-feedback"
@@ -365,7 +365,7 @@
                                         House bill of lading type
                                     </label>
                                     <ng-select [allowClear]="true" [items]="listHouseBillLadingType"
-                                        [disabled]="disabled" (data)="refreshValue($event)" [active]="[{'text':HouseBillWorking.hbltype,'id':HouseBillWorking.hbltype}]"
+                                        [disabled]="disabled" (data)="refreshValue($event)" [active]="HouseBillWorking.hbltype==null?'':[{'text':HouseBillWorking.hbltype,'id':HouseBillWorking.hbltype}]"
                                         (selected)="HouseBillWorking.hbltype=$event.id"
                                         (removed)="HouseBillWorking.hbltype=null" (typed)="typed($event)"
                                         placeholder="Select option">
@@ -638,7 +638,7 @@
                                         (change)="HouseBillWorking.finalDestinationPlace=HouseBillWorking.finalDestinationPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
-                            </div>
+                            </div>   
                             <div class="col-lg-4">
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.freightPayment==null}">
@@ -646,6 +646,7 @@
                                         Freight payment
                                     </label>
                                     <ng-select [allowClear]="true" [items]="listFreightPayment" [disabled]="disabled"
+                                        [active]="HouseBillWorking.freightPayment==null?'':[{'text':HouseBillWorking.freightPayment,'id':HouseBillWorking.freightPayment}]"
                                         (data)="refreshValue($event)"
                                         (selected)="HouseBillWorking.freightPayment=$event.id; HouseBillWorking.placeFreightPay = $event.id==='Prepaid'?'Origin':'Destination'"
                                         (removed)="HouseBillWorking.freightPayment=null" (typed)="typed($event)"
@@ -665,8 +666,8 @@
                                         Closing date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            (change)="HouseBillWorking.closingDate= $event.startDate" ngxDaterangepickerMd
+                                        <input type="text" class="form-control m-input m-input--square"                                            
+                                             ngxDaterangepickerMd
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [(ngModel)]="HouseBillWorking.closingDate" [ranges]="ranges"
                                             [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
@@ -687,7 +688,7 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            (change)="HouseBillWorking.sailingDate= $event.startDate" ngxDaterangepickerMd
+                                            ngxDaterangepickerMd
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [(ngModel)]="HouseBillWorking.sailingDate" [ranges]="ranges" required
                                             [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
@@ -796,9 +797,10 @@
                                                 Number of origin B/L
                                             </label>
                                             <ng-select [allowClear]="true" [items]="listNumberOfOriginBL"
+                                                [active]="HouseBillWorking.originBlnumber==null?'':[{'text':HouseBillWorking.originBlnumber,'id':HouseBillWorking.originBlnumber}]"
                                                 [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="HouseBillWorking.originBlNumber=$event.id"
-                                                (removed)="HouseBillWorking.originBlNumber=null" (typed)="typed($event)"
+                                                (selected)="HouseBillWorking.originBlnumber=$event.id"
+                                                (removed)="HouseBillWorking.originBlnumber=null" (typed)="typed($event)"
                                                 placeholder="Select option">
                                             </ng-select>
                                         </div>
@@ -908,6 +910,7 @@
                                                 Type of move
                                             </label>
                                             <ng-select [allowClear]="true" [items]="listTypeOfMove"
+                                                 [active]="HouseBillWorking.moveType==null?'':[{'text':HouseBillWorking.moveType,'id':HouseBillWorking.moveType}]"
                                                 [disabled]="disabled" (data)="refreshValue($event)"
                                                 (selected)="HouseBillWorking.moveType=$event.id"
                                                 (removed)="HouseBillWorking.moveType=null" (typed)="typed($event)"
@@ -934,6 +937,7 @@
                                                 Type of sevice
                                             </label>
                                             <ng-select [allowClear]="true" [items]="listTypeOfService"
+                                                 [active]="HouseBillWorking.serviceType==null?'':[{'text':HouseBillWorking.serviceType,'id':HouseBillWorking.serviceType}]"
                                                 [disabled]="disabled" (data)="refreshValue($event)"
                                                 (selected)="HouseBillWorking.serviceType=$event.id"
                                                 (removed)="HouseBillWorking.serviceType=null" (typed)="typed($event)"
@@ -1078,7 +1082,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="save(addHouseBillForm)">
+                    (click)="save(addHouseBillForm);">
                     <span>
                         <i class="la la-save"></i>
                         <span>

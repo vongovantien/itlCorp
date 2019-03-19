@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Documentation.DL.Common;
+using eFMS.API.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -48,6 +49,45 @@ namespace eFMS.API.Documentation.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        public HandleState UpdateTransactionDetail(CsTransactionDetailModel model)
+        {
+            try
+            {
+                var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
+                if (hb == null)
+                {
+                    new HandleState("Housebill not found !");
+                }
+                hb.UserModified = ChangeTrackerHelper.currentUser;
+                hb.DatetimeModified = DateTime.Now;
+                hb = mapper.Map<CsTransactionDetail>(model);
+                DataContext.Update(hb, x => x.Id == hb.Id);
+                foreach(var item in model.CsMawbcontainers)
+                {
+                    var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();
+                    if (cont != null)
+                    {
+                        cont.UserModified = ChangeTrackerHelper.currentUser;
+                        cont.DatetimeModified = DateTime.Now;
+                        ((eFMSDataContext)DataContext.DC).SaveChanges();
+                    }
+                }
+                var hs = new HandleState();
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }       
+
+        }
+
+        private HandleState BadRequest(ResultHandle resultHandle)
+        {
+            throw new NotImplementedException();
         }
 
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
@@ -145,7 +185,7 @@ namespace eFMS.API.Documentation.DL.Services
             //detail.NotifyParty = data.notiParty?.PartnerNameEn;
             //detail.ForwardingAgentName = data.agent?.PartnerNameEn;
             return detail;
-        }
+    }
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
             var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
