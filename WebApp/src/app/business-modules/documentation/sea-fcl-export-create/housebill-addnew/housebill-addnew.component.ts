@@ -364,8 +364,6 @@ export class HousebillAddnewComponent implements OnInit {
       this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
       this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? null : this.HouseBillWorking.sailingDate.startDate;
       this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? null : this.HouseBillWorking.closingDate.startDate;
-      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate['_d'];
-      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate['_d'];
       
       if (this.isImporting == false) {
         if (this.isEditing) {
