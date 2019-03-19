@@ -65,6 +65,7 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 var houseCont = mapper.Map<CsMawbcontainer>(x);
                                 x.Hblid = x.Id;
+                                x.Mblid = Guid.Empty;
                                 x.Id = Guid.NewGuid();
                                 dc.CsMawbcontainer.Add(x);
                             }
@@ -101,11 +102,25 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.CreatedDate = DateTime.Now;
                 transaction.Inactive = false;
                 var hsTrans = dc.CsTransaction.Add(transaction);
-                var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+                List<CsMawbcontainer> containers = null;
+                if (model.CsMawbcontainers.Count > 0)
+                {
+                    containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+                }
+                else
+                {
+                    containers = dc.CsMawbcontainer.Where(x => x.Mblid == model.Id).ToList();
+                }
                 if (containers != null)
                 {
                     foreach (var container in containers)
                     {
+                        if(container.Id != Guid.Empty)
+                        {
+                            container.ContainerNo = string.Empty;
+                            container.SealNo = string.Empty;
+                            container.MarkNo = string.Empty;
+                        }
                         container.Id = Guid.NewGuid();
                         container.Mblid = transaction.Id;
                         container.UserModified = transaction.UserCreated;
@@ -134,6 +149,10 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 x.Id = Guid.NewGuid();
                                 x.Hblid = item.Id;
+                                x.Mblid = Guid.Empty;
+                                x.ContainerNo = string.Empty;
+                                x.SealNo = string.Empty;
+                                x.MarkNo = string.Empty;
                                 x.UserModified = transaction.UserCreated;
                                 x.DatetimeModified = DateTime.Now;
                                 dc.CsMawbcontainer.Add(x);

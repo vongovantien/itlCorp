@@ -33,6 +33,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var x in model.CsMawbcontainers)
                 {
                     x.Hblid = detail.Id;
+                    x.Mblid = Guid.Empty;
                     x.Id = Guid.NewGuid();
                     ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);
 
@@ -226,13 +227,33 @@ namespace eFMS.API.Documentation.DL.Services
                 detail.Commodity = null;
                 detail.PackageContainer = null;
                 dc.CsTransactionDetail.Add(detail);
-                foreach (var x in model.CsMawbcontainers)
+                
+                List<CsMawbcontainer> containers = null;
+                if (model.CsMawbcontainers.Count > 0)
                 {
-                    x.Id = Guid.NewGuid();
-                    x.Hblid = detail.Id;
-                    x.UserModified = model.UserCreated;
-                    x.DatetimeModified = DateTime.Now;
-                    dc.CsMawbcontainer.Add(x);
+                    containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+                }
+                else
+                {
+                    containers = dc.CsMawbcontainer.Where(y => y.Hblid == model.Id).ToList();
+                }
+                if (containers != null)
+                {
+                    foreach (var x in containers)
+                    {
+                        if (x.Id != Guid.Empty)
+                        {
+                            x.ContainerNo = string.Empty;
+                            x.SealNo = string.Empty;
+                            x.MarkNo = string.Empty;
+                        }
+                        x.Id = Guid.NewGuid();
+                        x.Hblid = detail.Id;
+                        x.Mblid = Guid.Empty;
+                        x.UserModified = model.UserCreated;
+                        x.DatetimeModified = DateTime.Now;
+                        dc.CsMawbcontainer.Add(x);
+                    }
                 }
                 var charges = dc.CsShipmentSurcharge.Where(x => x.Hblid == model.Id);
                 if (charges != null)
