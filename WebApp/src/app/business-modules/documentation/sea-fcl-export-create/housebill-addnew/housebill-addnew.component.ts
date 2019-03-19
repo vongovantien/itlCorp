@@ -362,11 +362,10 @@ export class HousebillAddnewComponent implements OnInit {
     console.log(this.HouseBillWorking)
     if (form.valid) {
       this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
-      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? null : this.HouseBillWorking.sailingDate.startDate;
-      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? null : this.HouseBillWorking.closingDate.startDate;
-      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate['_d'];
-      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate['_d'];
+      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.sailingDate.startDate);
+      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.closingDate.startDate);
       
+
       if (this.isImporting == false) {
         if (this.isEditing) {
           const res = await this.baseServices.putAsync(this.api_menu.Documentation.CsTransactionDetail.update, this.HouseBillWorking);
