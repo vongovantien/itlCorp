@@ -461,7 +461,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.shipment.grossWeight = 0;
                 this.shipment.netWeight = 0;
                 this.shipment.chargeWeight = 0;
-                this.totalCBM = 0;
+                this.shipment.cbm = 0;
                 if (this.numberOfTimeSaveContainer == 1 && this.inEditing == false) {
                     this.shipment.commodity = '';
                     this.shipment.desOfGoods = '';
