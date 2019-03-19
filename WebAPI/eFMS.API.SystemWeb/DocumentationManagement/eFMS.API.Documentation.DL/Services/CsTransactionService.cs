@@ -319,7 +319,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.transaction.ETD ?? null) >= (criteria.FromDate ?? null))
                     && ((x.transaction.ETD ?? null) <= (criteria.ToDate ?? null))
-                    ).OrderByDescending(x => x.transaction.CreatedDate).ThenByDescending(x => x.transaction.ModifiedDate);
+                    ).OrderByDescending(x => x.transaction.ModifiedDate).ThenByDescending(x => x.transaction.CreatedDate);
             }
             else
             {
@@ -336,7 +336,7 @@ namespace eFMS.API.Documentation.DL.Services
                              || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                              && ((x.transaction.ETD ?? null) >= (criteria.FromDate ?? null) && (x.transaction.ETD ?? null) <= (criteria.ToDate ?? null))
                     );
-                query = query.OrderByDescending(x => x.transaction.CreatedDate).ThenByDescending(x => x.transaction.ModifiedDate).AsQueryable();
+                query = query.OrderByDescending(x => x.transaction.ModifiedDate).ThenByDescending(x => x.transaction.CreatedDate).AsQueryable();
             }
             return results = query.Select(x => x.transaction).Distinct().AsQueryable();
         }

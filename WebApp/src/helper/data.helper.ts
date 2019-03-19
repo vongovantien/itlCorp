@@ -87,6 +87,10 @@ export function checkSpecialCharacters(str:String){
     return reg.test(str.toLowerCase());
 }
 
+/**
+ * Return UTC datetime
+ * @param dateTime 
+ */
 export function dateTimeToUTC(dateTime:any){
     try {
         const date = new Date(dateTime.toString()+" UTC");

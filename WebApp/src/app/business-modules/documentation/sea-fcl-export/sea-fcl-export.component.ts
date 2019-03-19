@@ -48,6 +48,10 @@ export class SeaFCLExportComponent implements OnInit {
     async getShipmentDetails(jobId: any){
         const responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob+"?jobId=" + jobId, false, false);
         this.shipmentDetails = responses;
+        console.log(this.shipmentDetails);
+        if(this.shipmentDetails != null){
+            this.shipmentDetails = this.sortService.sort(this.shipmentDetails, 'hwbno', true);
+        }
     }
     async getCustomers(searchText: any){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, modeOfTransport : 'SEA', all: searchText };

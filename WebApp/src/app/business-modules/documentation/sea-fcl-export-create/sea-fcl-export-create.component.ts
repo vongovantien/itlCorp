@@ -83,16 +83,13 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(this.inEditing == false){
             if(this.myForm.invalid){
                 this.housebillTabviewHref = "#confirm-can-not-create-job-modal";
-                //$('#confirm-can-not-create-job-modal').modal('show');
             }
             else{
                 if(this.shipment.csMawbcontainers != null){
                     this.housebillTabviewHref = "#confirm-create-job-modal";
-                    //$('#confirm-create-job-modal').modal('show');
                 }
                 else{
                     this.housebillTabviewHref = "#confirm-not-create-job-misscont-modal";
-                    //$('#confirm-not-create-job-misscont-modal').modal('show');
                 }
             }
         }
@@ -259,11 +256,12 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async onSubmit() {
         this.submitted = true;
-        //this.shipment = this.myForm.value;
-        this.shipment.etd = this.myForm.value.estimatedTimeofDepature != null ? this.myForm.value.estimatedTimeofDepature["startDate"] : null;
-        this.shipment.eta = this.myForm.value.estimatedTimeofArrived != null ? this.myForm.value.estimatedTimeofArrived["startDate"] : null;
-        console.log(this.shipment);
-
+        if(this.myForm.value.estimatedTimeofDepature != null){
+            this.shipment.etd = dataHelper.dateTimeToUTC(this.myForm.value.estimatedTimeofDepature["startDate"]);
+        }
+        if(this.myForm.value.estimatedTimeofArrived != null){
+            this.shipment.eta = dataHelper.dateTimeToUTC(this.myForm.value.estimatedTimeofArrived["startDate"]);
+        }
         if (this.myForm.valid && this.shipment.pol != null) {
             console.log('abc');
             if(this.lstMasterContainers.find(x => x.isNew == false) != null){
@@ -322,8 +320,6 @@ export class SeaFclExportCreateComponent implements OnInit {
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, true);
         if(response != null){
             if(response.result.success){
-                // this.shipment = response.model;
-                // this.shipment.csMawbcontainers = this.lstMasterContainers;
                 this.shipment = response.model;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 if(this.inEditing == false){
@@ -345,7 +341,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.shipment.mawb = null;
         this.isImport = true;
         await this.getShipmentContainer(event);
-        // this.getHouseBillList(event);
+        this.getHouseBillList(event);
         setTimeout(() => {
             this.isLoaded = true;
           }, 300);

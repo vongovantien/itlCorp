@@ -145,7 +145,7 @@ export class MasterBillComponent implements OnInit{
         }
     }
     async getAgents(searchText: any) {
-        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: searchText };
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchAgent.inactive = null;
         }
