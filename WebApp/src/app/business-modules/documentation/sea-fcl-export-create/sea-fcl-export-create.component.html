@@ -166,28 +166,28 @@
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
                                         <!-- Total gross weight: {{ totalGrossWeight }} kgs -->
-                                        Total gross weight: {{ shipment.grossWeight }} kgs
+                                        Total gross weight: {{ shipment.grossWeight | number: '1.2-2' }} kgs
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
                                         <!-- Total net weight: {{ totalNetWeight }} kgs -->
-                                        Total net weight: {{ shipment.netWeight }}
+                                        Total net weight: {{ shipment.netWeight | number: '1.2-2' }} kgs
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
                                         <!-- Total chargeable weight: {{ totalCharWeight }} kgs -->
-                                        Total chargeable weight: {{ shipment.chargeWeight }}
+                                        Total chargeable weight: {{ shipment.chargeWeight | number: '1.2-2' }} kgs
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
                                         <!-- Total CBM: {{ totalCBM }} -->
-                                        Total CBM: {{ shipment.cbm }}
+                                        Total CBM: {{ shipment.cbm | number: '1.2-2' }}
                                     </span>
                                     <span></span>
                                 </div>
@@ -901,7 +901,7 @@
                                             </td>
                                             <td class="">
                                                 <span class="content-editable">
-                                                    {{ container.cbm }}
+                                                    {{ container.cbm | number: '1.2-2' }}
                                                 </span>
                                             </td>
                                         </tr>

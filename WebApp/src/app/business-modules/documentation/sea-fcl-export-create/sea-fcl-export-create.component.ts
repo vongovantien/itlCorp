@@ -44,10 +44,10 @@ export class SeaFclExportCreateComponent implements OnInit {
     packageTypes: any[] = [];
     commodities: any[] = [];
     weightMesurements: any[] = [];
-    totalGrossWeight: number = 0;
-    totalNetWeight: number = 0;
-    totalCharWeight: number = 0;
-    totalCBM: number = 0;
+    // totalGrossWeight: number = 0;
+    // totalNetWeight: number = 0;
+    // totalCharWeight: number = 0;
+    // totalCBM: number = 0;
     myForm: FormGroup;
     submitted = false;
     searchcontainer: string = '';
@@ -151,11 +151,11 @@ export class SeaFclExportCreateComponent implements OnInit {
     getShipmentContainerDescription(listContainers: any[]){
         for (var i = 0; i < listContainers.length; i++) {
             listContainers[i].isSave = true;
-            this.totalGrossWeight = this.totalGrossWeight + listContainers[i].gw;
-            this.totalNetWeight = this.totalNetWeight + listContainers[i].nw;
-            this.totalCharWeight = this.totalCharWeight + listContainers[i].chargeAbleWeight;
-            this.totalCBM = this.totalCBM + listContainers[i].cbm;
             if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
+                this.shipment.grossWeight = this.shipment.grossWeight + listContainers[i].gw;
+                this.shipment.netWeight = this.shipment.netWeight + listContainers[i].nw;
+                this.shipment.chargeWeight = this.shipment.chargeWeight + listContainers[i].chargeAbleWeight;
+                this.shipment.cbm = this.shipment.cbm + listContainers[i].cbm;
                 if(this.numberOfTimeSaveContainer == 1){
                     this.shipment.packageContainer = this.shipment.packageContainer + ((listContainers[i].quantity == null && listContainers[i].containerTypeName==null)?"": (listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", "));
                     this.shipment.commodity = this.shipment.commodity + (listContainers[i].commodityName== ""?"": (listContainers[i].commodityName + ", "));
@@ -323,7 +323,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.shipment.jobNo = null;
         this.shipment.mawb = null;
         this.isImport = true;
-        // await this.getShipmentContainer(event);
+        await this.getShipmentContainer(event);
         // this.getHouseBillList(event);
         setTimeout(() => {
             this.isLoaded = true;
@@ -458,9 +458,9 @@ export class SeaFclExportCreateComponent implements OnInit {
             }
             if(hasItemEdited == false){
                 this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
-                this.totalGrossWeight = 0;
-                this.totalNetWeight = 0;
-                this.totalCharWeight = 0;
+                this.shipment.grossWeight = 0;
+                this.shipment.netWeight = 0;
+                this.shipment.chargeWeight = 0;
                 this.totalCBM = 0;
                 if (this.numberOfTimeSaveContainer == 1 && this.inEditing == false) {
                     this.shipment.commodity = '';
@@ -513,19 +513,37 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
     }
     resetSumContainer(){
-        this.totalGrossWeight = 0;
-        this.totalNetWeight = 0;
-        this.totalCharWeight = 0;
-        this.totalCBM = 0;
+        // this.totalGrossWeight = 0;
+        // this.totalNetWeight = 0;
+        // this.totalCharWeight = 0;
+        // this.totalCBM = 0;
+        // this.shipment.packageContainer = '';
+        // this.shipment.commodity = '';
+        // this.shipment.desOfGoods = '';
+        // if(this.shipment.csMawbcontainers == null) return;
+        // for (var i = 0; i < this.shipment.csMawbcontainers.length; i++) {
+        //     this.totalGrossWeight = this.totalGrossWeight + this.shipment.csMawbcontainers[i].gw;
+        //     this.totalNetWeight = this.totalNetWeight + this.shipment.csMawbcontainers[i].nw;
+        //     this.totalCharWeight = this.totalCharWeight + this.shipment.csMawbcontainers[i].chargeAbleWeight;
+        //     this.totalCBM = this.totalCBM + this.shipment.csMawbcontainers[i].cbm;
+        //     this.shipment.packageContainer = this.shipment.packageContainer + ((this.shipment.csMawbcontainers[i].quantity == null && this.shipment.csMawbcontainers[i].containerTypeName == "")?"": (this.shipment.csMawbcontainers[i].quantity + "x" + this.shipment.csMawbcontainers[i].containerTypeName + ", "));
+        //     this.shipment.commodity = this.shipment.commodity + (this.shipment.csMawbcontainers[i].commodityName== ""?"": (this.shipment.csMawbcontainers[i].commodityName + ", "));
+        //     this.shipment.desOfGoods = this.shipment.desOfGoods + (this.shipment.csMawbcontainers[i].description== null?"": (this.shipment.csMawbcontainers[i].description + ", "));
+        // }
+
+        this.shipment.grossWeight = 0;
+        this.shipment.netWeight = 0;
+        this.shipment.chargeWeight = 0;
+        this.shipment.cbm = 0;
         this.shipment.packageContainer = '';
         this.shipment.commodity = '';
         this.shipment.desOfGoods = '';
         if(this.shipment.csMawbcontainers == null) return;
         for (var i = 0; i < this.shipment.csMawbcontainers.length; i++) {
-            this.totalGrossWeight = this.totalGrossWeight + this.shipment.csMawbcontainers[i].gw;
-            this.totalNetWeight = this.totalNetWeight + this.shipment.csMawbcontainers[i].nw;
-            this.totalCharWeight = this.totalCharWeight + this.shipment.csMawbcontainers[i].chargeAbleWeight;
-            this.totalCBM = this.totalCBM + this.shipment.csMawbcontainers[i].cbm;
+            this.shipment.grossWeight = this.shipment.grossWeight + this.shipment.csMawbcontainers[i].gw;
+            this.shipment.netWeight = this.shipment.netWeight + this.shipment.csMawbcontainers[i].nw;
+            this.shipment.chargeWeight = this.shipment.chargeWeight + this.shipment.csMawbcontainers[i].chargeAbleWeight;
+            this.shipment.cbm = this.shipment.cbm + this.shipment.csMawbcontainers[i].cbm;
             this.shipment.packageContainer = this.shipment.packageContainer + ((this.shipment.csMawbcontainers[i].quantity == null && this.shipment.csMawbcontainers[i].containerTypeName == "")?"": (this.shipment.csMawbcontainers[i].quantity + "x" + this.shipment.csMawbcontainers[i].containerTypeName + ", "));
             this.shipment.commodity = this.shipment.commodity + (this.shipment.csMawbcontainers[i].commodityName== ""?"": (this.shipment.csMawbcontainers[i].commodityName + ", "));
             this.shipment.desOfGoods = this.shipment.desOfGoods + (this.shipment.csMawbcontainers[i].description== null?"": (this.shipment.csMawbcontainers[i].description + ", "));
