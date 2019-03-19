@@ -106,21 +106,24 @@ namespace eFMS.API.Documentation.DL.Services
                 if (model.CsMawbcontainers.Count > 0)
                 {
                     containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+
+                    foreach (var container in containers)
+                    {
+                        container.Id = Guid.NewGuid();
+                        container.Mblid = transaction.Id;
+                        container.UserModified = transaction.UserCreated;
+                        container.DatetimeModified = DateTime.Now;
+                        dc.CsMawbcontainer.Add(container);
+                    }
                 }
                 else
                 {
                     containers = dc.CsMawbcontainer.Where(x => x.Mblid == model.Id).ToList();
-                }
-                if (containers != null)
-                {
                     foreach (var container in containers)
                     {
-                        if(container.Id != Guid.Empty)
-                        {
-                            container.ContainerNo = string.Empty;
-                            container.SealNo = string.Empty;
-                            container.MarkNo = string.Empty;
-                        }
+                        container.ContainerNo = string.Empty;
+                        container.SealNo = string.Empty;
+                        container.MarkNo = string.Empty;
                         container.Id = Guid.NewGuid();
                         container.Mblid = transaction.Id;
                         container.UserModified = transaction.UserCreated;
@@ -137,7 +140,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var houseId = item.Id;
                         item.Id = Guid.NewGuid();
                         item.JobId = transaction.Id;
-                        item.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
+                        item.Hwbno = "HBL" + GenerateID.GenerateJobID(transaction.Mawb, countDetail);
                         countDetail = countDetail + 1;
                         item.Inactive = false;
                         item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
