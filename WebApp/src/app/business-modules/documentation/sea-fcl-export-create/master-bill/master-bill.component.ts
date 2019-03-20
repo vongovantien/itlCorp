@@ -124,7 +124,6 @@ export class MasterBillComponent implements OnInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
         }
-        //let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
         const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
         if (portIndexs != null) {
             this.portOfLadings = portIndexs.data;
@@ -145,7 +144,7 @@ export class MasterBillComponent implements OnInit{
         }
     }
     async getAgents(searchText: any) {
-        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: searchText };
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchAgent.inactive = null;
         }

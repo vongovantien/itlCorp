@@ -465,7 +465,7 @@
                                 <label class="col-lg-2 col-form-label form-control-label">Public</label>
                                 <div class="col-lg-10">
                                     <div class="m-checkbox-inline">
-                                        <label class="m-checkbox"><input type="checkbox" checked="checked" [checked]="partner.public" (change)="partner.public = !partner.public"><span></span></label> 
+                                        <label class="m-checkbox"><input type="checkbox" name="publicCheckbox" checked="checked" [checked]="partner.public" (change)="partner.public = !partner.public"><span></span></label> 
                                     </div>
                                 </div>
                             <!-- <div class="col-lg-6">
@@ -490,7 +490,7 @@
                             <label class="col-lg-2 col-form-label form-control-label">Inactive</label>
                             <div class="col-lg-10">
                                 <div class="m-checkbox-inline">
-                                    <label class="m-checkbox"><input type="checkbox" checked="checked" [checked]="partner.inactive" (change)="partner.public = !partner.public"><span></span></label> 
+                                    <label class="m-checkbox"><input type="checkbox" name="inactiveCheckbox" checked="checked" [checked]="partner.inactive" (change)="partner.inactive = !partner.inactive"><span></span></label> 
                                 </div>
                             </div>
                         </div>

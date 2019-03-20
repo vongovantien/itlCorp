@@ -99,7 +99,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
-            var query = (from partner in ((eFMSDataContext)DataContext.DC).CatPartner
+            string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
+            var partners = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            var query = (from partner in partners
                          join user in ((eFMSDataContext)DataContext.DC).SysUser on partner.UserCreated equals user.Id into userPartners
                          from y in userPartners.DefaultIfEmpty()
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on partner.SalePersonId equals saleman.Id into prods
@@ -107,7 +109,6 @@ namespace eFMS.API.Catalogue.DL.Services
                          select new { user = y, partner, saleman = x }
                           );
             IQueryable<CatPartnerViewModel> results = null;
-            string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
             if (criteria.All == null)
             {
                 results = query.Where(x => ((x.partner.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -119,7 +120,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.Tel ?? "").IndexOf(criteria.Tel ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           //&& (x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null)
                            )).Select(x => new CatPartnerViewModel {
@@ -186,7 +187,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            ) 
-                           && (x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           //&& (x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null))
                            .Select(x => new CatPartnerViewModel {
                                Id = x.partner.Id,
