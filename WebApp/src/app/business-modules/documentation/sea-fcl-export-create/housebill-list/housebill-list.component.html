@@ -287,8 +287,6 @@
     <div class="m-portlet__body">
         <div class="tab-content" id="">
 
-
-
             <div class="tab-pane fade show active" id="buying-rate" role="tabpanel">
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
@@ -472,9 +470,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal" (click)="open_CD()">
                                         Credit/ Debit note
-                                    </span>
+                                    </a>
                                 </td>
                                 <td>
                                     <span>
@@ -676,9 +674,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
                                         Credit/ Debit note
-                                    </span>
+                                    </a>
                                 </td>
                                 <td>
                                     <span>
@@ -890,9 +888,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
                                         Credit/ Debit note
-                                    </span>
+                                    </a>
                                 </td>
                                 <td>
                                     <span>
@@ -1073,9 +1071,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
                                         Credit/ Debit note
-                                    </span>
+                                    </a>
                                 </td>
                                 <td>
                                     <span>
@@ -3501,3 +3499,19 @@
     </div>
     <!--end:: Edit-obh-charge-modal-->
 </form>
+
+<!--begin:: add-credit-debit-note-modal-->
+<app-credit-and-debit-note-addnew></app-credit-and-debit-note-addnew>
+<!--end:: add-credit-debit-note-modal-->
+
+<!--begin:: detail-credit-debit-note-modal-->
+<app-credit-and-debit-note-detail></app-credit-and-debit-note-detail>
+<!--end:: detail-credit-debit-note-modal-->
+
+<!--begin:: edit-credit-debit-note-modal-->
+<app-credit-and-debit-note-edit></app-credit-and-debit-note-edit>
+<!--end:: edit-credit-debit-note-modal-->
+
+<!--begin:: add-remaining-charge-modal-->
+<app-credit-and-debit-note-remaining-charge></app-credit-and-debit-note-remaining-charge>
+<!--end:: add-remaining-charge-modal-->

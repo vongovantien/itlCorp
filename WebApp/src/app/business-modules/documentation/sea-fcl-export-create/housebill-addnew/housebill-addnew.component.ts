@@ -6,7 +6,8 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
-import * as lodash from 'lodash';
+// import * as lodash from 'lodash';
+import {filter} from 'lodash';
 import * as moment from 'moment';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { NgForm } from '@angular/forms';
@@ -540,11 +541,11 @@ export class HousebillAddnewComponent implements OnInit {
 
 
   compareContainerList(currentContainer: Container, masterBillContainerList: Container[]): Boolean {
-    masterBillContainerList = lodash.filter(masterBillContainerList, function (o: Container) {
+    masterBillContainerList = filter(masterBillContainerList, function (o: Container) {
       return o.containerTypeId == currentContainer.containerTypeId;
     });
 
-    const listHBWithCurrentContainerType = lodash.filter(this.lstHouseBillContainers, function (o: Container) {
+    const listHBWithCurrentContainerType = filter(this.lstHouseBillContainers, function (o: Container) {
       return o.containerTypeId == currentContainer.containerTypeId;
     });
 

@@ -2,12 +2,10 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import * as lodash from 'lodash';
-import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
+import {filter,findIndex} from 'lodash';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { FirstLoadData } from '../sea-fcl-export-create.component';
-import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
@@ -22,6 +20,10 @@ declare var $: any;
 })
 export class HousebillListComponent implements OnInit {
 
+ openCD :boolean = false;
+ open_CD(){
+     this.openCD = true;
+ }
 
   MasterBillData: any = null;
   @Input() set masterBillData(_masterBilData: CsTransaction) {
@@ -405,7 +407,7 @@ async editOBHCharge(form:NgForm){
 
   searchHouseBill(key: any) {
     const search_key = key.toLowerCase();
-    this.HouseBillListData = lodash.filter(this.ConstHouseBillListData, function (x: any) {
+    this.HouseBillListData = filter(this.ConstHouseBillListData, function (x: any) {
 
       return (
         x.hwbno.toLowerCase().includes(search_key) ||
@@ -417,14 +419,14 @@ async editOBHCharge(form:NgForm){
       )
     });
     const idSelectedHB = this.houseBillSelected.id;
-    if (lodash.findIndex(this.HouseBillListData, function (o) { return o.id === idSelectedHB }) < 0) {
+    if (findIndex(this.HouseBillListData, function (o) { return o.id === idSelectedHB }) < 0) {
       this.ListBuyingRateCharges = [];
     }
   }
 
   searchBuyingRate(key:string){
     const search_key = key.toString().toLowerCase();
-    this.ListBuyingRateCharges = lodash.filter(this.ConstListBuyingRateCharges, function(x:any){
+    this.ListBuyingRateCharges = filter(this.ConstListBuyingRateCharges, function(x:any){
       return (
         ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
         (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||      
@@ -443,7 +445,7 @@ async editOBHCharge(form:NgForm){
   
   searchSellingRate(key:string){
     const search_key = key.toString().toLowerCase();
-    this.ListSellingRateCharges = lodash.filter(this.ConstListSellingRateCharges, function(x:any){
+    this.ListSellingRateCharges = filter(this.ConstListSellingRateCharges, function(x:any){
       return (
         ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
         (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||      
@@ -461,7 +463,7 @@ async editOBHCharge(form:NgForm){
 
   searchOBH(key:string){
     const search_key = key.toString().toLowerCase();
-    this.ListOBHCharges = lodash.filter(this.ConstListOBHCharges, function(x:any){
+    this.ListOBHCharges = filter(this.ConstListOBHCharges, function(x:any){
       return (
         ((x.partnerName==null?"":x.partnerName.toLowerCase().includes(search_key)) ||
         (x.nameEn==null?"":x.nameEn.toLowerCase().includes(search_key)) ||   

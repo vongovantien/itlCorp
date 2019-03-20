@@ -13,13 +13,8 @@ export class CreditAndDebitNoteComponent implements OnInit {
     ngOnInit() {
     }
 
-    editCDNote() {
-        $('#detail-credit-debit-note-modal').modal('hide');
-        $('#edit-credit-debit-note-modal').modal('show');
-    }
-    viewDetailCDNote() {
-        $('#edit-credit-debit-note-modal').modal('hide');
-        $('#detail-credit-debit-note-modal').modal('show');
+    deleteCharge(){
+        
     }
 
     /**
@@ -31,11 +26,11 @@ export class CreditAndDebitNoteComponent implements OnInit {
     private _disabledV: string = '0';
     public disabled: boolean = false;
 
-    private get disabledV(): string {
+    public get disabledV(): string {
         return this._disabledV;
     }
 
-    private set disabledV(value: string) {
+    public set disabledV(value: string) {
         this._disabledV = value;
         this.disabled = this._disabledV === '1';
     }
@@ -54,6 +49,10 @@ export class CreditAndDebitNoteComponent implements OnInit {
 
     public refreshValue(value: any): void {
         this.value = value;
+    }
+
+    open(id:string){
+        $(id).modal('show');
     }
 
 }

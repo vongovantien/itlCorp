@@ -73,13 +73,27 @@ export class SeaFclExportCreateComponent implements OnInit {
         *
       */
     
-    switchTab(){
-        // this.cdr.detach();
-        // setTimeout(() => {
-        //     this.cdr.reattach();
-        //     this.cdr.checkNoChanges();
-        // }, 1000);
-        //if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
+    isShipment:boolean = true;
+    isHouseBill:boolean = false;
+    isCDnote:boolean = false;
+    switchTab(tab:string){
+
+        if(tab==="shipment"){
+            this.isShipment = true;
+            this.isHouseBill = false;
+            this.isCDnote = false;
+        }
+        if(tab==="housebilllist"){
+            this.isShipment = false;
+            this.isHouseBill = true;
+            this.isCDnote = false;
+        }
+        if(tab==="cdnote"){
+            this.isShipment = false;
+            this.isHouseBill = false;
+            this.isCDnote = true;
+        }
+
         if(this.inEditing == false){
             if(this.myForm.invalid){
                 this.housebillTabviewHref = "#confirm-can-not-create-job-modal";
