@@ -7,6 +7,7 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { Router } from '@angular/router';
 import { timeout } from 'q';
+import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
@@ -46,6 +47,7 @@ export class SeaFCLExportComponent implements OnInit {
         this.getUserInCharges(null);
     }
     async getShipmentDetails(jobId: any){
+        ExtendData.currentJobID = jobId;
         const responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob+"?jobId=" + jobId, false, false);
         this.shipmentDetails = responses;
         console.log(this.shipmentDetails);

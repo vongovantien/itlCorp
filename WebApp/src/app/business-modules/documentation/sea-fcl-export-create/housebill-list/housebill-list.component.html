@@ -94,8 +94,7 @@
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="emitSelectedHB(null)"
-                            data-toggle="modal" data-target="#add-house-bill-modal">
+                            (click)="emitSelectedHB(null)" data-toggle="modal" data-target="#add-house-bill-modal">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -172,7 +171,8 @@
                     </thead>
 
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
-                        <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;" [ngClass]="{'selected-row':i==0}"
+                        <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
+                            [ngClass]="{'selected-row':i==0}"
                             (click)="$event.path[0].closest('tbody').querySelector('tr.selected-row')==null?return:$event.path[0].closest('tbody').querySelector('tr.selected-row').classList.remove('selected-row');$event.path[0].closest('tr').classList.add('selected-row');
                                     getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb)">
                             <td class="table-actions-col">
@@ -470,7 +470,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal" (click)="open_CD()">
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal" (click)="open_CD()">
                                         Credit/ Debit note
                                     </a>
                                 </td>
@@ -674,7 +675,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal">
                                         Credit/ Debit note
                                     </a>
                                 </td>
@@ -888,7 +890,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal">
                                         Credit/ Debit note
                                     </a>
                                 </td>
@@ -1071,7 +1074,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal">
                                         Credit/ Debit note
                                     </a>
                                 </td>
@@ -1100,7 +1104,8 @@
 <!--end:: m-portlet-->
 
 <!--begin:: m-portlet-->
-<div class="m-portlet" *ngIf="ListBuyingRateCharges.length > 0 || ListSellingRateCharges.length > 0 || ListOBHCharges.length > 0">
+<div class="m-portlet"
+    *ngIf="ListBuyingRateCharges.length > 0 || ListSellingRateCharges.length > 0 || ListOBHCharges.length > 0">
     <div class="m-portlet__head">
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title">
@@ -1561,7 +1566,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-buying-rate-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -1950,7 +1955,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-buying-rate-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2142,8 +2147,9 @@
                                         Quantity
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Enter text" #sellingRateChangeQuantityName="ngModel" (keyup)="calculateTotalEachSelling()"
-                                        appIntergerInputCheck [(ngModel)]="SellingRateChargeToAdd.quantity" required
+                                        placeholder="Enter text" #sellingRateChangeQuantityName="ngModel"
+                                        (keyup)="calculateTotalEachSelling()" appIntergerInputCheck
+                                        [(ngModel)]="SellingRateChargeToAdd.quantity" required
                                         name="sellingRateChangeQuantityName">
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && sellingRateChangeQuantityName.invalid">
@@ -2312,7 +2318,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-selling-rate-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2506,7 +2512,8 @@
                                     <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required
                                         class="form-control m-input m-input--square" appIntergerInputCheck
                                         [(ngModel)]="SellingRateChargeToEdit.quantity" placeholder="Enter text"
-                                        name="sellingRateChangeQuantityNameEdt" (keyup)="calculateTotalEachSelling(true)">
+                                        name="sellingRateChangeQuantityNameEdt"
+                                        (keyup)="calculateTotalEachSelling(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && sellingRateChangeQuantityNameEdt.invalid">
                                         Quantity is required !
@@ -2687,7 +2694,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-selling-rate-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2785,7 +2792,7 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.receiverId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && (OBHChargeToAdd.receiverId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)}">
                                     <label class="form-control-label" for="">
                                         Receiver
                                     </label>
@@ -2837,8 +2844,8 @@
                                             </div>
                                         </div>
                                         <div class="form-control-feedback"
-                                            *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.receiverId==null">
-                                            Receiver name is required !
+                                            *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.receiverId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
+                                            Receiver name is required and do not same with payer!
                                         </div>
                                     </div>
                                 </div>
@@ -2846,7 +2853,7 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.payerId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && (OBHChargeToAdd.payerId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)}">
                                     <label class="form-control-label" for="">
                                         Payer
                                     </label>
@@ -2897,8 +2904,8 @@
                                             </div>
                                         </div>
                                         <div class="form-control-feedback"
-                                            *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.payerId==null">
-                                            Receiver name is required !
+                                            *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.payerId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
+                                            Payer name is required and do not same with receiver!
                                         </div>
                                     </div>
                                 </div>
@@ -3082,7 +3089,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-rate-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -3485,7 +3492,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-obh-rate-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

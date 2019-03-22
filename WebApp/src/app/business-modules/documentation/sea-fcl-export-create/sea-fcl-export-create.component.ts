@@ -14,6 +14,7 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
+import {ExtendData} from '../extend-data';
 
 
 export class FirstLoadData {
@@ -128,7 +129,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         await this.route.params.subscribe(async prams => {
             if(prams.id != undefined){
                 this.inEditing = true;
-                this.shipment.id = prams.id;
+                this.shipment.id = prams.id;               
                 await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
@@ -198,6 +199,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
+        ExtendData.currentJobID = this.shipment.id;
         console.log({"THIS":this.shipment});
     }
     initNewShipmentForm() {
