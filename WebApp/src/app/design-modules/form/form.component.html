@@ -173,6 +173,17 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
+                                Disble Select single
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="true" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
                                 Date picker
                             </label>
                             <div class="m-input-icon m-input-icon--right down">
