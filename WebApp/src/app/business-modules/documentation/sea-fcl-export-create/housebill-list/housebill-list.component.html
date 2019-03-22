@@ -255,7 +255,7 @@
 </div>
 <!--end:: m-portlet-->
 
-<div class="row">
+<div class="row" *ngIf="HouseBillListData.length>0">
     <div class="col-12">
         <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
             <li class="nav-item m-tabs__item">
@@ -283,7 +283,7 @@
 </div>
 
 <!--begin:: m-portlet-->
-<div class="m-portlet">
+<div class="m-portlet" *ngIf="HouseBillListData.length>0">
     <div class="m-portlet__body">
         <div class="tab-content" id="">
 
