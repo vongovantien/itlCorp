@@ -43,7 +43,7 @@
                                 Select filter
                             </label>
                             <ng-select [allowClear]="true" [items]="searchFilters" [active]="searchFilterActive" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selectFilter = $event.id" (removed)="removed($event)"
+                                (selected)="selectFilter = $event.id" (removed)="selectFilter = null"
                                 placeholder="Select filter">
                             </ng-select>
                         </div>
@@ -80,7 +80,7 @@
                                     <label class="form-control-label" for="">
                                         HBL No.
                                     </label>
-                                    <input type="text" [(ngModel)]="criteria.hwbno" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                    <input type="text" [(ngModel)]="criteria.hwbNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
                                 </div>
                             </div>
                             <div class="col-lg-4">

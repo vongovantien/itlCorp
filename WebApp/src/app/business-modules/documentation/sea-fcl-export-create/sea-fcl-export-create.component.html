@@ -191,10 +191,21 @@
                                     </span>
                                     <span></span>
                                 </div>
-                                <div class="m--margin-top-10">
+                                <!-- <div class="m--margin-top-10">
                                     <button type="button" (click)="showListContainer()"
                                         class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                         data-toggle="modal" data-target="#container-list-of-job-modal-master">
+                                        <span>
+                                            <i class="la la-list"></i>
+                                            <span>
+                                                container list
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div> -->
+                                <div class="m--margin-top-10">
+                                    <button type="button" (click)="showListContainer()"
+                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                         <span>
                                             <i class="la la-list"></i>
                                             <span>
@@ -598,7 +609,7 @@
                                                 </span> -->
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
-                                                    <ng-select [allowClear]="true" [items]="containerTypes"
+                                                    <ng-select [allowClear]="true" [items]="containerTypes" *ngIf="visible" #containerSelect id="containerSelect"
                                                         [disabled]="disabled" (data)="refreshValue($event)"
                                                         (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
                                                         (removed)="container.containerTypeId = null;container.containerTypeName = null"
@@ -639,7 +650,7 @@
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
-                                                        [(ngModel)]="container.containerNo" name="containerNo"
+                                                        [(ngModel)]="container.containerNo" (change)="container.containerNo = container.containerNo.trim()" name="containerNo"
                                                         #containerNo="ngModel">
                                                 </div>
                                             </td>
@@ -650,7 +661,7 @@
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
-                                                        [(ngModel)]="container.sealNo" name="sealNo" #sealNo="ngModel">
+                                                        [(ngModel)]="container.sealNo" name="sealNo" (change)="container.sealNo = container.sealNo.trim()" #sealNo="ngModel">
                                                 </div>
                                             </td>
                                             <td class="">
@@ -660,7 +671,7 @@
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
-                                                        [(ngModel)]="container.markNo" name="markNo" #markNo="ngModel">
+                                                        [(ngModel)]="container.markNo" name="markNo" (change)="container.markNo = container.markNo.trim()" #markNo="ngModel">
                                                 </div>
                                             </td>
                                             <td class="">
@@ -755,6 +766,7 @@
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         autocomplete="nope" [(ngModel)]="container.description"
                                                         name="descriptionOfGood" #descriptionOfGood="ngModel"
+                                                        (change)="container.description = container.description.trim()"
                                                         placeholder="Please enter">
                                                 </div>
                                             </td>
@@ -798,7 +810,7 @@
                                                 </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="weightMesurements"
-                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        [disabled]="true" (data)="refreshValue($event)"
                                                         (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
                                                         (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
                                                         (typed)="typed($event)" [active]="container.unitOfMeasureActive"

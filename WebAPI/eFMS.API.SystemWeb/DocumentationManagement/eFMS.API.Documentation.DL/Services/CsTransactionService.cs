@@ -134,13 +134,21 @@ namespace eFMS.API.Documentation.DL.Services
                 var detailTrans = dc.CsTransactionDetail.Where(x => x.JobId == model.Id);
                 if (detailTrans != null)
                 {
-                    int countDetail = 0;
+                    int countDetail = dc.CsTransactionDetail.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month 
+                                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                                        && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
+                    string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
+
+                    if(dc.CsTransactionDetail.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
+                    {
+                        generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
+                    }
                     foreach (var item in detailTrans)
                     {
                         var houseId = item.Id;
                         item.Id = Guid.NewGuid();
                         item.JobId = transaction.Id;
-                        item.Hwbno = "HBL" + GenerateID.GenerateJobID(transaction.Mawb, countDetail);
+                        item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
                         countDetail = countDetail + 1;
                         item.Inactive = false;
                         item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
