@@ -14,6 +14,7 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
+import { ShipmentOverviewComponent } from '../../report/shipment-overview/shipment-overview.component';
 
 
 export class FirstLoadData {
@@ -371,6 +372,32 @@ export class SeaFclExportCreateComponent implements OnInit {
     async getHouseBillList(jobId: string){
         var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
         this.shipment.csTransactionDetails = responses;
+    }
+    duplicateJob(){
+        let id = this.shipment.id;
+        this.shipment.jobNo = null;
+        this.shipment.mawb = null;
+        this.isImport = true;
+        this.shipment.createdDate = null;
+        this.shipment.userCreated = null;
+        this.shipment.modifiedDate = null;
+        this.shipment.userModified = null;
+        this.housebillTabviewHref = '#';//'#confirm-create-job-modal';
+        this.housebillRoleToggle = 'modal';
+        this.isLoaded = false;
+        setTimeout(() => {
+            this.isLoaded = true;
+            this.inEditing = false;
+          }, 300);
+        this.myForm.patchValue({
+            estimatedTimeofDepature: null,
+            estimatedTimeofArrived: null,
+            polName: this.shipment.pol,
+            podName: this.shipment.podName,
+            coloaderName: this.shipment.coloaderName,
+            agentName: this.shipment.agentName,
+            personInChargeName: this.shipment.personInChargeName
+          });
     }
     /**
      * Container

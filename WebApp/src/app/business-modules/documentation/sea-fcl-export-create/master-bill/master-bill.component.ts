@@ -59,6 +59,10 @@ export class MasterBillComponent implements OnInit{
                 this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
                 this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
             }
+            else{
+                this.etaSelected = null;
+                this.etaSelected = null;
+            }
             index = this.billOfLadingTypes.findIndex(x => x.id == this.shipment.mbltype);
             if(index > -1) this.billOfLadingTypeActive = [this.billOfLadingTypes[index]];
             index = this.serviceTypes.findIndex(x => x.id == this.shipment.typeOfService);

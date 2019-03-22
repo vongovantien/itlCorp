@@ -445,13 +445,13 @@
                 </div>
             </div>
             <div class="row" *ngIf="this.inEditing">
-                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5" *ngIf="this.shipment.createdDate != null">
                     <span class="m--font-bolder">Create:</span>
                     <span class="m--font-brand m--margin-left-5">{{ shipment.createdDate | date :'dd/MM/yyyy h:mm:ss'}}</span>
                     <span class="m--font-bolder m--margin-left-5">by</span>
                     <span class="m--font-brand m--margin-left-5">{{ shipment.userCreated }}</span>
                 </div>
-                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5" *ngIf="this.shipment.modifiedDate != null">
                     <span class="m--font-bolder">Modified:</span>
                     <span class="m--font-brand m--margin-left-5">{{ shipment.modifiedDate | date :'dd/MM/yyyy h:mm:ss'}}</span>
                     <span class="m--font-bolder m--margin-left-5">by</span>

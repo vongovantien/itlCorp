@@ -26,6 +26,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = mapper.Map<CsTransactionDetail>(model);
             detail.Id = Guid.NewGuid();
+            detail.UserModified = detail.UserCreated;
+            detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
             detail.Inactive = false;           
             try
             {

@@ -368,7 +368,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a class="btn-link" routerLink="/home/documentation/sea-fcl-export-create" (click)="showDetail(item)">
+                                    <a class="btn-link" [routerLink]="['/home/documentation/sea-fcl-export-create/', { id: item.id }]"  (click)="showDetail(item)">
                                         <span>
                                             {{ item.jobNo }}
                                         </span>

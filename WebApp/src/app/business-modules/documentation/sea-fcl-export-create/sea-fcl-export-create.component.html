@@ -15,12 +15,25 @@
                 <!--end:: breadcrumbs-->
             </div>
             <div class="c-button-actions">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" *ngIf="inEditing == false"
-                    data-toggle="modal" data-target="#import-job-detail-modal">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    data-toggle="modal"
+                    [attr.data-target]="inEditing == false? '#import-job-detail-modal': '#confirm-duplicate-job-modal'">
                     <span>
                         <i class="la la-search"></i>
-                        <span>
+                        <span  *ngIf="inEditing == false">
                             import job detail
+                        </span>
+                        <span  *ngIf="inEditing == true">
+                            duplicate job detail
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10" data-toggle="modal"
+                    *ngIf="inEditing == true" data-target="#delete-shipment-detail-modal">
+                    <span>
+                        <i class="la la-trash"></i>
+                        <span>
+                            delete
                         </span>
                     </span>
                 </button>
@@ -37,7 +50,7 @@
                 </button>
                 <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
                 <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                    data-target="#confirm-cancel-create-job-modal">
+                    [attr.data-target]="inEditing == false? '#confirm-cancel-create-job-modal': '#confirm-cancel-edit-job-modal'">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -323,14 +336,14 @@
             </button>
             <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
             <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                data-target="#confirm-cancel-create-job-modal">
-                <span>
-                    <i class="la la-ban"></i>
+                    [attr.data-target]="inEditing == false? '#confirm-cancel-create-job-modal': '#confirm-cancel-edit-job-modal'">
                     <span>
-                        cancel
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
         </div>
     </div>
     <!--end::m-content-->
@@ -375,6 +388,47 @@
         </div>
     </div>
     <!--end::confirm-create-job-modal-->
+
+<!--begin::confirm-duplicate-job-modal-->
+<div class="modal fade" id="confirm-duplicate-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+aria-hidden="true">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Duplicate Job Detail</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-text-block">
+                <span>The system will open the Job Create Screen. Are you sure you want to leave?</span>
+            </div>
+        </div>
+        <div class="modal-footer m--align-center c-button-actions">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                data-dismiss="modal" (click)="duplicateJob()">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        Yes
+                    </span>
+                </span>
+            </button>
+            <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                >
+                <span>
+                    <i class="la la-ban"></i>
+                    <span>
+                        No
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<!--end::confirm-duplicate-job-modal-->
 
     <!--begin::confirm-can-not-create-job-modal-->
     <div class="modal fade" id="confirm-can-not-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -1004,6 +1058,46 @@
     </div>
 </div>
 <!--end::confirm-cancel-create-job-modal-->
+
+<!--begin::confirm-cancel-edit-job-modal-->
+<div class="modal fade" id="confirm-cancel-edit-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Unsaved data will be lost. <br> Are you sure you want to leave?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" routerLink="/home/documentation/sea-fcl-export">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-cancel-edit-job-modal-->
 
 <!--begin::confirm-cancel-create-job-modal-->
 <div class="modal fade" id="confirm-accept-delete-container-modal" data-backdrop="static" role="dialog" aria-labelledby=""

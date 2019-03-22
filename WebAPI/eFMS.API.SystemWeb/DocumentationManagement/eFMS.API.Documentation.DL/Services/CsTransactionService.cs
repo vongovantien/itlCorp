@@ -32,8 +32,10 @@ namespace eFMS.API.Documentation.DL.Services
                 int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
                 transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
                 //transaction.UserCreated = "01";
-                transaction.CreatedDate = DateTime.Now;
+                transaction.CreatedDate = transaction.ModifiedDate= DateTime.Now;
                 transaction.Inactive = false;
+                transaction.UserModified = transaction.UserCreated;
+
                 var hsTrans = dc.CsTransaction.Add(transaction);
                 var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
                 if(containers != null)
@@ -55,8 +57,8 @@ namespace eFMS.API.Documentation.DL.Services
                         transDetail.Id = Guid.NewGuid();
                         transDetail.JobId = transaction.Id;
                         transDetail.Inactive = false;
-                        transDetail.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
-                        transDetail.DatetimeCreated = DateTime.Now;
+                        transDetail.UserCreated = transaction.UserModified = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
+                        transDetail.DatetimeCreated = transaction.ModifiedDate = DateTime.Now;
                         dc.CsTransactionDetail.Add(transDetail);
                         if (item.CsMawbcontainers == null) continue;
                         else
@@ -99,7 +101,8 @@ namespace eFMS.API.Documentation.DL.Services
                 int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
                 transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
                 //transaction.UserCreated = "01";
-                transaction.CreatedDate = DateTime.Now;
+                transaction.CreatedDate = transaction.ModifiedDate = DateTime.Now;
+                transaction.UserModified = model.UserCreated;
                 transaction.Inactive = false;
                 var hsTrans = dc.CsTransaction.Add(transaction);
                 List<CsMawbcontainer> containers = null;
