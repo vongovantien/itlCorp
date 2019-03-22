@@ -74,5 +74,4 @@ export class ManifestComponent implements OnInit {
         this.value = value;
     }
 
-
 }
