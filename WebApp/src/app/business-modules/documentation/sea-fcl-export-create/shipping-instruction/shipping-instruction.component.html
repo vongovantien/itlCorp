@@ -1,0 +1,778 @@
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <app-breadcrumb></app-breadcrumb>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                    Preview & Print
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Export excel</a>
+                    <a class="dropdown-item" href="#">Export pdf</a>
+                    <a class="dropdown-item" href="#">USD report</a>
+                    <a class="dropdown-item" href="#">Local currency report</a>
+                </div>
+            </div>
+            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-refresh"></i>
+                    <span>
+                        Refresh
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        save
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-ban"></i>
+                    <span>
+                        cancel
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<!--begin::m-content-->
+<div class="m-content">
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link active" id="bill-instruction-tablink" href="#bill-instruction-tabview" data-toggle="tab" role="tab">
+                        Bill Instruction
+                    </a>
+                </li>
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" id="bill-detail-tablink" href="#bill-detail-tabview" data-toggle="tab" role="tab">
+                        Bill detail
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content" id="">
+        <div class="tab-pane fade show active"  id="bill-instruction-tabview" role="tabpanel" aria-labelledby="">
+            <div class="m-form m-form--state">
+                <!--begin:: m-portlet-->
+                <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                    <div class="alert-block__heading">
+                        <h3 class="alert-block__title">General Info</h3>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-form m-form--state">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Reference No <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Booking No
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Date <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="m-input-icon m-input-icon--right">
+                                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Issue By <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                                data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>User Name</th>
+                                                                        <th>Full Name</th>
+                                                                        <th>Role</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <tr class="data-row data-selected" data-id="1">
+                                                                    <td>Tâm</td>
+                                                                    <td>Tâm Tâm Full Name</td>
+                                                                    <td>Cs</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="2">
+                                                                    <td>Thor</td>
+                                                                    <td>Thor Thế Full Name</td>
+                                                                    <td>Cs</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Supplier <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner name</th>
+                                                                        <th>Name ABBR</th>
+                                                                        <th>Partner name</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <tr class="data-row data-selected" data-id="1">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="2">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="3">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Attention
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Shipper <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Consignee <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner name</th>
+                                                                        <th>Name ABBR</th>
+                                                                        <th>Partner name</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <tr class="data-row data-selected" data-id="1">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="2">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="3">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Notify Party
+                                        </label>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Real Shipper
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner name</th>
+                                                                        <th>Name ABBR</th>
+                                                                        <th>Partner name</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <tr class="data-row data-selected" data-id="1">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="2">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="3">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Real Consignee
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner name</th>
+                                                                        <th>Name ABBR</th>
+                                                                        <th>Partner name</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <tr class="data-row data-selected" data-id="1">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="2">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="3">
+                                                                    <td>partner name 1234567</td>
+                                                                    <td>Name viết tắt</td>
+                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
+                                                                    <td>090xxxxxxxxxx</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Payment Type <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="paymentTypes"  [disabled]="disabled"
+                                            (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                                            (typed)="typed($event)" placeholder="Please selected">
+                                        </ng-select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Remark
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlet-->
+                <!--begin:: m-portlet-->
+                <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                    <div class="alert-block__heading">
+                        <h3 class="alert-block__title">Route Info</h3>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-form m-form--state">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Port of Loading <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                                data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Port Code</th>
+                                                                        <th>Port Name</th>
+                                                                        <th>Country</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <tr class="data-row data-selected" data-id="1">
+                                                                    <td>AAC</td>
+                                                                    <td>Bà Rịa - Vũng Tàu</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="2">
+                                                                    <td>AAB</td>
+                                                                    <td>Hồ Chí Minh</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="3">
+                                                                    <td>AAA</td>
+                                                                    <td>Bà Rịa - Vũng Tàu</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="4">
+                                                                    <td>AAD</td>
+                                                                    <td>Hồ Chí Minh</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Port of Discharge <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                                data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Port Code</th>
+                                                                        <th>Port Name</th>
+                                                                        <th>Country</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <tr class="data-row data-selected" data-id="1">
+                                                                    <td>AAC</td>
+                                                                    <td>Bà Rịa - Vũng Tàu</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="2">
+                                                                    <td>AAB</td>
+                                                                    <td>Hồ Chí Minh</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="3">
+                                                                    <td>AAA</td>
+                                                                    <td>Bà Rịa - Vũng Tàu</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                                <tr class="data-row" data-id="4">
+                                                                    <td>AAD</td>
+                                                                    <td>Hồ Chí Minh</td>
+                                                                    <td>Việt Nam</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Place of Delivery <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Vessel & Voy <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Loading Date <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="m-input-icon m-input-icon--right">
+                                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlet-->
+                <!--begin:: m-portlet-->
+                <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                    <div class="alert-block__heading">
+                        <h3 class="alert-block__title">Goods Info</h3>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-form m-form--state">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Container & Seal No
+                                        </label>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Description of Goods
+                                        </label>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Containers
+                                        </label>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Packages
+                                        </label>
+                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Gross Weight
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            CBM
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end:: m-portlet-->
+            </div>
+        </div>
+        <div class="tab-pane fade" id="bill-detail-tabview" role="tabpanel" aria-labelledby="">
+            <!--begin:: m-portlet-->
+            <div class="m-portlet">
+                <div class="m-portlet__body">
+                    <!--begin: Datatable-->
+                    <div class="table-wrapper table-scrollable">
+                        <table class="table table-striped table-brand dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="no-sorting">
+                                        <span>HBL No</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Description</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Shipping Marks</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Containers</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Packages</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>G.W</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>CBM</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-group">
+                                <tr class="">
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable-->
+                </div>
+            </div>
+            <!--end:: m-portlet-->
+        </div>
+    </div>
+
+</div>
+<!--end::m-content-->
