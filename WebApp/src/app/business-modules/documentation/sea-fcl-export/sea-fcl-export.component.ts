@@ -7,6 +7,7 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { Router } from '@angular/router';
 import { timeout } from 'q';
+import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
@@ -46,8 +47,13 @@ export class SeaFCLExportComponent implements OnInit {
         this.getUserInCharges(null);
     }
     async getShipmentDetails(jobId: any){
+        ExtendData.currentJobID = jobId;
         const responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob+"?jobId=" + jobId, false, false);
         this.shipmentDetails = responses;
+        console.log(this.shipmentDetails);
+        if(this.shipmentDetails != null){
+            this.shipmentDetails = this.sortService.sort(this.shipmentDetails, 'hwbno', true);
+        }
     }
     async getCustomers(searchText: any){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, modeOfTransport : 'SEA', all: searchText };
@@ -58,7 +64,7 @@ export class SeaFCLExportComponent implements OnInit {
         }
     }
     async getNotifyPartries(searchText: any){
-        let criteriaSearchColoader = { modeOfTransport : 'SEA', all: searchText };
+        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CONSIGNEE, modeOfTransport : 'SEA', all: searchText };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
         if(partners != null){
             this.notifyPartries = partners.data;
@@ -82,7 +88,7 @@ export class SeaFCLExportComponent implements OnInit {
         this.criteria.mawb = '';
         this.criteria.supplierName = '';
         this.criteria.agentName = '';
-        this.criteria.hwbNo = '';
+        //this.criteria.hwbNo = '';
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;
         if(this.selectFilter === 'Job ID'){

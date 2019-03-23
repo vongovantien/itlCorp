@@ -15,12 +15,25 @@
                 <!--end:: breadcrumbs-->
             </div>
             <div class="c-button-actions">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" *ngIf="inEditing == false"
-                    data-toggle="modal" data-target="#import-job-detail-modal">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    data-toggle="modal"
+                    [attr.data-target]="inEditing == false? '#import-job-detail-modal': '#confirm-duplicate-job-modal'">
                     <span>
                         <i class="la la-search"></i>
-                        <span>
+                        <span  *ngIf="inEditing == false">
                             import job detail
+                        </span>
+                        <span  *ngIf="inEditing == true">
+                            duplicate job detail
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10" data-toggle="modal"
+                    *ngIf="inEditing == true" data-target="#delete-shipment-detail-modal">
+                    <span>
+                        <i class="la la-trash"></i>
+                        <span>
+                            delete
                         </span>
                     </span>
                 </button>
@@ -37,7 +50,7 @@
                 </button>
                 <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
                 <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                    data-target="#confirm-cancel-create-job-modal">
+                    [attr.data-target]="inEditing == false? '#confirm-cancel-create-job-modal': '#confirm-cancel-edit-job-modal'">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -54,6 +67,7 @@
     <div class="modal fade" id="add-house-bill-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="shipment"
         aria-hidden="true">
         <app-housebill-addnew 
+        [currentHouseBill]="currentHouseBill"
         (houseBillComing)="houseBillCatcher($event)" 
         [masterBillData]="shipment">
 
@@ -164,32 +178,47 @@
                             <div class="col-xl-4">
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total gross weight: {{ totalGrossWeight }} kgs
+                                        <!-- Total gross weight: {{ totalGrossWeight }} kgs -->
+                                        Total gross weight: {{ shipment.grossWeight | number: '1.2-2' }} kgs
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total net weight: {{ totalNetWeight }} kgs
+                                        <!-- Total net weight: {{ totalNetWeight }} kgs -->
+                                        Total net weight: {{ shipment.netWeight | number: '1.2-2' }} kgs
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total chargeable weight: {{ totalCharWeight }} kgs
+                                        <!-- Total chargeable weight: {{ totalCharWeight }} kgs -->
+                                        Total chargeable weight: {{ shipment.chargeWeight | number: '1.2-2' }} kgs
                                     </span>
                                     <span></span>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        Total CBM: {{ totalCBM }}
+                                        <!-- Total CBM: {{ totalCBM }} -->
+                                        Total CBM: {{ shipment.cbm | number: '1.2-2' }}
                                     </span>
                                     <span></span>
                                 </div>
-                                <div class="m--margin-top-10">
+                                <!-- <div class="m--margin-top-10">
                                     <button type="button" (click)="showListContainer()"
                                         class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                         data-toggle="modal" data-target="#container-list-of-job-modal-master">
+                                        <span>
+                                            <i class="la la-list"></i>
+                                            <span>
+                                                container list
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div> -->
+                                <div class="m--margin-top-10">
+                                    <button type="button" (click)="showListContainer()"
+                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                         <span>
                                             <i class="la la-list"></i>
                                             <span>
@@ -286,7 +315,7 @@
                 <!--end:: m-portlet-->
             </div>
             <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
-                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails" *ngIf="isHouseBill"></app-housebill-list>
+                <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails" (currentHouseBill)="currentHouseBillCatcher($event)" *ngIf="isHouseBill"></app-housebill-list>
             </div>
             <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="">
                 <app-credit-and-debit-note *ngIf="isCDnote"></app-credit-and-debit-note>
@@ -307,14 +336,14 @@
             </button>
             <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
             <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                data-target="#confirm-cancel-create-job-modal">
-                <span>
-                    <i class="la la-ban"></i>
+                    [attr.data-target]="inEditing == false? '#confirm-cancel-create-job-modal': '#confirm-cancel-edit-job-modal'">
                     <span>
-                        cancel
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
         </div>
     </div>
     <!--end::m-content-->
@@ -359,6 +388,47 @@
         </div>
     </div>
     <!--end::confirm-create-job-modal-->
+
+<!--begin::confirm-duplicate-job-modal-->
+<div class="modal fade" id="confirm-duplicate-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+aria-hidden="true">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Duplicate Job Detail</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-text-block">
+                <span>The system will open the Job Create Screen. Are you sure you want to leave?</span>
+            </div>
+        </div>
+        <div class="modal-footer m--align-center c-button-actions">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                data-dismiss="modal" (click)="duplicateJob()">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        Yes
+                    </span>
+                </span>
+            </button>
+            <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                >
+                <span>
+                    <i class="la la-ban"></i>
+                    <span>
+                        No
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<!--end::confirm-duplicate-job-modal-->
 
     <!--begin::confirm-can-not-create-job-modal-->
     <div class="modal fade" id="confirm-can-not-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -405,7 +475,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="confirm-text-block">
-                        <span>New shipment details will be save, are you sure they are correct?</span>
+                        <span>You need to enter container data to create a job. Please recheck and try again</span>
                     </div>
                 </div>
                 <div class="modal-footer m--align-center c-button-actions">
@@ -593,7 +663,7 @@
                                                 </span> -->
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
-                                                    <ng-select [allowClear]="true" [items]="containerTypes"
+                                                    <ng-select [allowClear]="true" [items]="containerTypes" *ngIf="visible" #containerSelect id="containerSelect"
                                                         [disabled]="disabled" (data)="refreshValue($event)"
                                                         (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
                                                         (removed)="container.containerTypeId = null;container.containerTypeName = null"
@@ -634,7 +704,7 @@
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
-                                                        [(ngModel)]="container.containerNo" name="containerNo"
+                                                        [(ngModel)]="container.containerNo" (change)="container.containerNo = container.containerNo.trim()" name="containerNo"
                                                         #containerNo="ngModel">
                                                 </div>
                                             </td>
@@ -645,7 +715,7 @@
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
-                                                        [(ngModel)]="container.sealNo" name="sealNo" #sealNo="ngModel">
+                                                        [(ngModel)]="container.sealNo" name="sealNo" (change)="container.sealNo = container.sealNo.trim()" #sealNo="ngModel">
                                                 </div>
                                             </td>
                                             <td class="">
@@ -655,7 +725,7 @@
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         placeholder="Please enter" autocomplete="nope"
-                                                        [(ngModel)]="container.markNo" name="markNo" #markNo="ngModel">
+                                                        [(ngModel)]="container.markNo" name="markNo" (change)="container.markNo = container.markNo.trim()" #markNo="ngModel">
                                                 </div>
                                             </td>
                                             <td class="">
@@ -750,6 +820,7 @@
                                                     <input type="text" class="form-control m-input m-input--square"
                                                         autocomplete="nope" [(ngModel)]="container.description"
                                                         name="descriptionOfGood" #descriptionOfGood="ngModel"
+                                                        (change)="container.description = container.description.trim()"
                                                         placeholder="Please enter">
                                                 </div>
                                             </td>
@@ -793,7 +864,7 @@
                                                 </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="weightMesurements"
-                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        [disabled]="true" (data)="refreshValue($event)"
                                                         (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
                                                         (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
                                                         (typed)="typed($event)" [active]="container.unitOfMeasureActive"
@@ -896,7 +967,7 @@
                                             </td>
                                             <td class="">
                                                 <span class="content-editable">
-                                                    {{ container.cbm }}
+                                                    {{ container.cbm | number: '1.2-2' }}
                                                 </span>
                                             </td>
                                         </tr>
@@ -943,9 +1014,9 @@
 <!--end::import-job-detail-modal-->
 
 <!--begin::import-housebill-detail-modal-->
-<div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!-- <div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <app-housebill-import-detail></app-housebill-import-detail>
-</div>
+</div> -->
 <!--end::import-housebill-detail-modal-->
 
 <!--begin::confirm-cancel-create-job-modal-->
@@ -987,6 +1058,46 @@
     </div>
 </div>
 <!--end::confirm-cancel-create-job-modal-->
+
+<!--begin::confirm-cancel-edit-job-modal-->
+<div class="modal fade" id="confirm-cancel-edit-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Unsaved data will be lost. <br> Are you sure you want to leave?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" routerLink="/home/documentation/sea-fcl-export">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-cancel-edit-job-modal-->
 
 <!--begin::confirm-cancel-create-job-modal-->
 <div class="modal fade" id="confirm-accept-delete-container-modal" data-backdrop="static" role="dialog" aria-labelledby=""

@@ -13,6 +13,10 @@ export class CreditAndDebitNoteComponent implements OnInit {
     ngOnInit() {
     }
 
+    deleteCharge(){
+        
+    }
+
     /**
       * ng2-select
       */

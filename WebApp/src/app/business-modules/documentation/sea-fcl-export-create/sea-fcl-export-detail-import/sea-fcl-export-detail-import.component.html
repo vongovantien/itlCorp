@@ -1,7 +1,7 @@
 <div class="modal-dialog modal-lg" role="document">
   <div class="modal-content">
       <div class="modal-header">
-          <h5 class="modal-title">Search Job Detail</h5>
+          <h5 class="modal-title">Import Job Detail</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeImport()">
               <span aria-hidden="true">&times;</span>
           </button>
@@ -34,7 +34,7 @@
                       <div class="col-lg-4">
                           <div class="form-group">
                               <label class="form-control-label" for="">
-                                  Create date: From - To
+                                  shipment date: From - To
                               </label>
                               <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                   <input type="text" class="form-control m-input m-input--square"
@@ -86,22 +86,26 @@
                   <thead class="">
                       <tr class="">
                           <th class=""></th>
-                          <th class="">
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo'), 'sorting': sortKey != 'jobNo' }"
+                            (click)="sort('jobNo')">
                               <span>
                                   Job ID
                               </span>
                           </th>
-                          <th class="sorting">
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mawb'), 'sorting_desc': (!isDesc && sortKey == 'mawb'), 'sorting': sortKey != 'sorting' }"
+                            (click)="sort('mawb')">
                               <span>
                                   MBL No
                               </span>
                           </th>
-                          <th class="sorting">
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'supplierName'), 'sorting_desc': (!isDesc && sortKey == 'supplierName'), 'sorting': sortKey != 'supplierName' }"
+                            (click)="sort('supplierName')">
                               <span>
                                   Supplier
                               </span>
                           </th>
-                          <th class="sorting">
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'etd'), 'sorting_desc': (!isDesc && sortKey == 'etd'), 'sorting': sortKey != 'etd' }"
+                            (click)="sort('etd')">
                               <span>
                                   Shipment Date
                               </span>
@@ -113,7 +117,7 @@
                           <td class="">
                               <div class="">
                                   <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                      <input type="radio" name="example-1" [value]="item.id" (click)="shipment = item" 
+                                      <input type="radio" name="example-{{i}}" [value]="item.id" (click)="shipment = item" 
                                         [checked]="item === shipment">
                                       <span></span>
                                   </label>

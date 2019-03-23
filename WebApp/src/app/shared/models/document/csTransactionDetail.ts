@@ -24,13 +24,13 @@ export class CsTransactionDetail {
   finalDestinationPlace: String = null;
   freightPayment: String = null;
   placeFreightPay: String = null;
-  closingDate: Date = null;
-  sailingDate: Date = null;
+  closingDate: any = null;
+  sailingDate: any = null;
   forwardingAgentDescription:String= null;
   forwardingAgentId: String = null;
   goodsDeliveryDescription:String = null;
   goodsDeliveryId: String = null;
-  originBlNumber: Number = null;
+  originBlnumber: Number = null;
   issueHblplaceAndDate: String = null;
   referenceNo: String = null;
   exportReferenceNo: String = null;
@@ -47,5 +47,15 @@ export class CsTransactionDetail {
   packageContainer: string = null;
   desOfGoods: string =  null;
   commodity: String = null;
-  csMawbcontainers:Container[]=[] ; // list containers 
+  csMawbcontainers:Container[]=[] ;
+  customerName:String = null;
+  saleManName:String = null;
+  customerNameVn:String = null;
+  saleManNameVn:String = null;
+  forwardingAgentName:String = null;
+  notifyParty:String = null;
+  podName:String = null;
+  containerNames:String = null;
+  packageTypes:String = null;
+  cbm:Number = 0;
 }

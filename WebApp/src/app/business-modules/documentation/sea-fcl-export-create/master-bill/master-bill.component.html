@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': etaSelected && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) > (etaSelected != null?etaSelected.startDate: null)}">
+                      <div class="form-group" [ngClass]="{ 'has-danger': etaSelected && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
                         <label class="form-control-label" for="">
                             Estimated time of Arrival
                         </label>
@@ -61,7 +61,7 @@
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                              <div class="form-control-feedback" *ngIf="etaSelected != null && (etdSelected != null?etdSelected.startDate: null) > (etaSelected != null?etaSelected.startDate: null)">
+                              <div class="form-control-feedback" *ngIf="etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
                                 Estimated time of Arrival must more or equal estimated time of departure
                             </div>
                         </div>
@@ -276,7 +276,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{ 'has-danger': submitted && shipment.pol == shipment.pod && shipment.pod != null}">
                         <label class="form-control-label" for="">
                             Port of destination
                         </label>
@@ -320,6 +320,9 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="form-control-feedback" *ngIf="submitted && shipment.pol == shipment.pod && shipment.pod != null">
+                            Port of loading is not allow same value
                         </div>
                     </div>
                 </div>
@@ -398,7 +401,7 @@
                                         <div class="table-filter-block">
                                             <div class="search-field">
                                                   <input class="form-control m-input m-input--square" type="text"
-                                                      placeholder="Search..." (keyup)="changePort($event.target.value)">
+                                                      placeholder="Search..." (keyup)="changePersonInCharge($event.target.value)">
                                                 <i class="icon-search"></i>
                                             </div>
                                         </div>
@@ -442,13 +445,13 @@
                 </div>
             </div>
             <div class="row" *ngIf="this.inEditing">
-                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5" *ngIf="this.shipment.createdDate != null">
                     <span class="m--font-bolder">Create:</span>
                     <span class="m--font-brand m--margin-left-5">{{ shipment.createdDate | date :'dd/MM/yyyy h:mm:ss'}}</span>
                     <span class="m--font-bolder m--margin-left-5">by</span>
                     <span class="m--font-brand m--margin-left-5">{{ shipment.userCreated }}</span>
                 </div>
-                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5" *ngIf="this.shipment.modifiedDate != null">
                     <span class="m--font-bolder">Modified:</span>
                     <span class="m--font-brand m--margin-left-5">{{ shipment.modifiedDate | date :'dd/MM/yyyy h:mm:ss'}}</span>
                     <span class="m--font-bolder m--margin-left-5">by</span>

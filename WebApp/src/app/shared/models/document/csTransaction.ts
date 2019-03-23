@@ -37,9 +37,10 @@ export class CsTransaction {
   routeShipment: String = null;
   quantity: Number = null;
   unit: Number = null;
-  grossWeight: Number = null;
-  chargeWeight: Number = null;
-  cbm: Number = null;
+  grossWeight: number = 0;
+  chargeWeight: number = 0;
+  netWeight: number = 0;
+  cbm: number = 0;
   containerSize: String = null;
   dimension: String = null;
   wareHouseId: String = null;
@@ -52,8 +53,8 @@ export class CsTransaction {
   modifiedDate: Date = null;
   inactive: Boolean = null;
   inactiveOn: Date = null;
-  packageContainer: string = '';
-  desOfGoods: string = '';
+  packageContainer: String = '';
+  desOfGoods: String = '';
   csMawbcontainers: Container[] = null;
   csTransactionDetails: CsTransactionDetail[] = null;
 }

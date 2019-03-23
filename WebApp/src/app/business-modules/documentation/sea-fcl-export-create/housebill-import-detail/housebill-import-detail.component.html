@@ -2,7 +2,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">Import house bill detail</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeImport()">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeImportHousebillDetail()">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -16,8 +16,8 @@
                                 <label class="form-control-label" for="">
                                     Search text
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
-                                    class="form-control m-input m-input--square" autocomplete="nope" name="searchString"
+                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                                    name="searchString" (change)="searchString = searchString.trim()"
                                     placeholder="Search text">
                             </div>
                         </div>
@@ -58,7 +58,7 @@
                         <div class="row">
                             <div class="col-lg-6"></div>
                             <div class="col-lg-6 m--align-right">
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon" (click)="searchShipmentDetail()">
                                     <span>
                                         <i class="la la-search"></i>
                                         <span>
@@ -66,7 +66,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button type="button" class="btn btn-default m-btn--square m-btn--icon">
+                                <button type="button" class="btn btn-default m-btn--square m-btn--icon" (click)="resetSearchShipmentDetail()">
                                     <span>
                                         <i class="la la-refresh"></i>
                                         <span>
@@ -113,74 +113,40 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="">
+                    <tbody *ngIf="shipmentDetails">
+                        <tr class="" *ngFor="let item of shipmentDetails;let i=index;" >
                             <td class="">
                                 <div class="">
                                     <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                        <input type="radio" name="hbl-detail-1">
+                                        <input type="radio" [value]="item.id" name="hbl-detail-{{i}}" (click)="shipmentDetail = item" 
+                                        [checked]="item === shipmentDetail">
                                         <span></span>
                                     </label>
                                 </div>
                             </td>
                             <td>
                                 <span>
-                                    text
+                                    {{ item.hwbno }}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    text
+                                    {{ item.mawb }}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    text
+                                    {{ item.customerName }}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    text
+                                    {{ item.saleManName }}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    dd/mm/yyyy
-                                </span>
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class="">
-                                <div class="">
-                                    <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
-                                        <input type="radio" name="hbl-detail-1">
-                                        <span></span>
-                                    </label>
-                                </div>
-                            </td>
-                            <td>
-                                <span>
-                                    text
-                                </span>
-                            </td>
-                            <td>
-                                <span>
-                                    text
-                                </span>
-                            </td>
-                            <td>
-                                <span>
-                                    text
-                                </span>
-                            </td>
-                            <td>
-                                <span>
-                                    text
-                                </span>
-                            </td>
-                            <td>
-                                <span>
-                                    dd/mm/yyyy
+                                    {{ item.etd | date: 'dd/MM/yyyy'}}
                                 </span>
                             </td>
                         </tr>

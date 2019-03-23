@@ -45,11 +45,13 @@ export class MasterBillComponent implements OnInit{
         private api_menu: API_MENU) { }
 
     async ngOnInit() {
+        this.baseServices.spinnerShow();
         await this.getPorIndexs(null);
         await this.getColoaders(null);
         await this.getAgents(null);
         await this.getUserInCharges(null);
         await this.getShipmentCommonData();
+        let index = -1;
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             this.inEditing = true;
             console.log(this.shipment.etd);
@@ -57,7 +59,17 @@ export class MasterBillComponent implements OnInit{
                 this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
                 this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
             }
-            let index = this.billOfLadingTypes.findIndex(x => x.id == this.shipment.mbltype);
+            else{
+                this.etaSelected = null;
+                this.etaSelected = null;
+                let claim = localStorage.getItem('id_token_claims_obj');
+                let index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
+                if(index > -1) {
+                    this.shipment.personInChargeName = this.userInCharges[index].username;
+                    this.shipment.personIncharge = JSON.parse(claim)["id"];
+                }
+            }
+            index = this.billOfLadingTypes.findIndex(x => x.id == this.shipment.mbltype);
             if(index > -1) this.billOfLadingTypeActive = [this.billOfLadingTypes[index]];
             index = this.serviceTypes.findIndex(x => x.id == this.shipment.typeOfService);
             if(index > -1) this.servicetypeActive = [this.serviceTypes[index]];
@@ -93,6 +105,19 @@ export class MasterBillComponent implements OnInit{
             console.log({"HERE":this.shipment});
             this.shipmentDetails.emit(Object.assign({},this.shipment));
         }
+        else{
+            index = this.terms.findIndex(x => x.id == "Prepaid");
+            if(index > -1){
+                this.shipment.paymentTerm = this.terms[index].id;
+                this.paymentTermActive = [this.terms[index]];
+            } 
+            index = this.shipmentTypes.findIndex(x => x.id == "Freehand");
+            if(index > -1){
+                this.shimentTypeActive = [this.shipmentTypes[index]];
+                this.shipment.shipmentType = this.shipmentTypes[index].id;
+            } 
+        }
+        this.baseServices.spinnerHide();
     }
     changePort(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
@@ -112,6 +137,12 @@ export class MasterBillComponent implements OnInit{
         }
         this.getColoaders(keySearch);
     }
+    changePersonInCharge(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getUserInCharges(keySearch);
+    }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getShipmentCommonData(this.baseServices, this.api_menu);
         this.billOfLadingTypes = dataHelper.prepareNg2SelectData(data.billOfLadings, 'value', 'displayName');
@@ -124,7 +155,6 @@ export class MasterBillComponent implements OnInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
         }
-        //let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
         const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
         if (portIndexs != null) {
             this.portOfLadings = portIndexs.data;
@@ -145,7 +175,7 @@ export class MasterBillComponent implements OnInit{
         }
     }
     async getAgents(searchText: any) {
-        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: searchText };
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchAgent.inactive = null;
         }
