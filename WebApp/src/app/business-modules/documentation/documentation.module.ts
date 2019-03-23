@@ -22,6 +22,10 @@ import { HousebillAddnewComponent } from './sea-fcl-export-create/housebill-addn
 import { CreditAndDebitNoteComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note.component';
 import { SeaFclExportDetailImportComponent } from './sea-fcl-export-create/sea-fcl-export-detail-import/sea-fcl-export-detail-import.component';
 import { HousebillImportDetailComponent } from './sea-fcl-export-create/housebill-import-detail/housebill-import-detail.component';
+import { CreditAndDebitNoteAddnewComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note-addnew/credit-and-debit-note-addnew.component';
+import { CreditAndDebitNoteDetailComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note-detail/credit-and-debit-note-detail.component';
+import { CreditAndDebitNoteEditComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note-edit/credit-and-debit-note-edit.component';
+import { CreditAndDebitNoteRemainingChargeComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note-remaining-charge/credit-and-debit-note-remaining-charge.component';
 
 @NgModule({
   imports: [
@@ -44,6 +48,6 @@ import { HousebillImportDetailComponent } from './sea-fcl-export-create/housebil
     SeaFCLImportComponent, 
     SeaLCLImportComponent, 
     SeaConsolImportComponent, 
-    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent, CreditAndDebitNoteComponent, SeaFclExportDetailImportComponent, HousebillImportDetailComponent]
+    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent, CreditAndDebitNoteComponent, SeaFclExportDetailImportComponent, HousebillImportDetailComponent, CreditAndDebitNoteAddnewComponent, CreditAndDebitNoteDetailComponent, CreditAndDebitNoteEditComponent, CreditAndDebitNoteRemainingChargeComponent]
 })
 export class DocumentationModule { }

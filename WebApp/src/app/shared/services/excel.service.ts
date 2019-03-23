@@ -1,6 +1,7 @@
 import { Injectable, } from '@angular/core';
-import { Workbook } from 'exceljs';
-import * as fs from 'file-saver';
+// import { Workbook } from 'exceljs'
+import * as  fs from 'file-saver';
+import {Workbook} from "exceljs/dist/exceljs.min.js";
 import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
 @Injectable({
   providedIn: 'root'

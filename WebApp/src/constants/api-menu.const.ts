@@ -251,6 +251,8 @@ export class API_MENU {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Update",
             getByHBId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetByHB",
+            getPartnerByJobId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetPartnersByJob",
+            getChargesByPartner: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GroupByListHB",
         }
     }
 }

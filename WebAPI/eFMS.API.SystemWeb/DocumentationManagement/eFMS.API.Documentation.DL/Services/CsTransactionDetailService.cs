@@ -307,6 +307,15 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.DatetimeCreated = DateTime.Now;
                         charge.Hblid = detail.Id;
                         charge.DocNo = null;
+                        charge.Soano = null;
+                        charge.Soaclosed = null;
+                        charge.SoaadjustmentRequestor = null;
+                        charge.SoaadjustmentRequestedDate = null;
+                        charge.SoaadjustmentReason = null;
+                        charge.UnlockedSoadirector = null;
+                        charge.UnlockedSoadirectorDate = null;
+                        charge.UnlockedSoadirectorStatus = null;
+                        charge.UnlockedSoasaleMan = null;
                         dc.CsShipmentSurcharge.Add(charge);
                     }
                 }

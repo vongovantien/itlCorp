@@ -15,6 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { ShipmentOverviewComponent } from '../../report/shipment-overview/shipment-overview.component';
+import {ExtendData} from '../extend-data';
 
 
 export class FirstLoadData {
@@ -72,13 +73,27 @@ export class SeaFclExportCreateComponent implements OnInit {
         *
       */
     
-    switchTab(){
-        // this.cdr.detach();
-        // setTimeout(() => {
-        //     this.cdr.reattach();
-        //     this.cdr.checkNoChanges();
-        // }, 1000);
-        //if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
+    isShipment:boolean = true;
+    isHouseBill:boolean = false;
+    isCDnote:boolean = false;
+    switchTab(tab:string){
+
+        if(tab==="shipment"){
+            this.isShipment = true;
+            this.isHouseBill = false;
+            this.isCDnote = false;
+        }
+        if(tab==="housebilllist"){
+            this.isShipment = false;
+            this.isHouseBill = true;
+            this.isCDnote = false;
+        }
+        if(tab==="cdnote"){
+            this.isShipment = false;
+            this.isHouseBill = false;
+            this.isCDnote = true;
+        }
+
         if(this.inEditing == false){
             this.validateShipmentForm();
         }
@@ -103,7 +118,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         await this.route.params.subscribe(async prams => {
             if(prams.id != undefined){
                 this.inEditing = true;
-                this.shipment.id = prams.id;
+                this.shipment.id = prams.id;               
                 await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
@@ -170,6 +185,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
+        ExtendData.currentJobID = this.shipment.id;
         console.log({"THIS":this.shipment});
     }
     initNewShipmentForm() {
