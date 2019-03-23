@@ -5,6 +5,8 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CatUnit
     {
+
+
         public short Id { get; set; }
         public string Code { get; set; }
         public string UnitNameVn { get; set; }

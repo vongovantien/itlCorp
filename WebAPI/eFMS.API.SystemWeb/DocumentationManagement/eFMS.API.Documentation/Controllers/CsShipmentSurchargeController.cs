@@ -7,6 +7,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +40,22 @@ namespace eFMS.API.Documentation.Controllers
         {
 
             return Ok(csShipmentSurchargeService.GetByHB(hbId,type));
+        }
+
+        [HttpGet]
+        [Route("GroupByListHB")]
+        public List<object> GetByListHouseBill(Guid JobId,string partnerID)
+        {
+
+            return csShipmentSurchargeService.GroupChargeByHB(JobId, partnerID);
+        }
+
+        [HttpGet]
+        [Route("GetPartnersByJob")]
+        public List<CatPartner> GetPartnersByListHB(Guid JobId)
+        {
+
+            return csShipmentSurchargeService.GetAllParnerByJob(JobId);
         }
 
 
