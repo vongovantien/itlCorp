@@ -57,13 +57,13 @@ export class MasterBillComponent implements OnInit{
             console.log(this.shipment.etd);
             if(this.isImport == false){
                 this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
-                this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
+                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
             }
             else{
                 this.etaSelected = null;
                 this.etaSelected = null;
                 let claim = localStorage.getItem('id_token_claims_obj');
-                let index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
+                index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
                 if(index > -1) {
                     this.shipment.personInChargeName = this.userInCharges[index].username;
                     this.shipment.personIncharge = JSON.parse(claim)["id"];
@@ -161,6 +161,10 @@ export class MasterBillComponent implements OnInit{
             this.portOfDestinations = portIndexs.data;
             console.log(this.portOfLadings);
         }
+        else{
+            this.portOfLadings = [];
+            this.portOfDestinations = [];
+        }
     }
 
     async getColoaders(searchText: any) {
@@ -173,6 +177,9 @@ export class MasterBillComponent implements OnInit{
             this.coloaders = partners.data;
             console.log(this.coloaders);
         }
+        else{
+            this.coloaders = [];
+        }
     }
     async getAgents(searchText: any) {
         let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: searchText };
@@ -182,6 +189,9 @@ export class MasterBillComponent implements OnInit{
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
         if (partners != null) {
             this.agents = partners.data;
+        }
+        else{
+            this.agents = [];
         }
     }
 
@@ -199,6 +209,9 @@ export class MasterBillComponent implements OnInit{
                 }
                 else this.shipment.personInChargeName = '';
             }
+        }
+        else{
+            this.userInCharges = [];
         }
     }
     /**
