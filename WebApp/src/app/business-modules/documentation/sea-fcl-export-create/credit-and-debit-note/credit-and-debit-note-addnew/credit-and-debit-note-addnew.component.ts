@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
-import { filter, map, findIndex, find } from 'lodash';
+import { filter, map, findIndex, find,concat } from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../../extend-data';
@@ -42,7 +42,12 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   async getListCharges(partnerId: String) {
     this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?JobId=" + ExtendData.currentJobID + "&partnerID=" + partnerId);
-    console.log(this.listChargeOfPartner);
+    this.CDNoteWorking.listShipmentSurcharge = [];
+    this.listChargeOfPartner.forEach(element => {
+      this.CDNoteWorking.listShipmentSurcharge = concat(this.CDNoteWorking.listShipmentSurcharge,element.listCharges);
+    });
+    this.totalCreditDebitCalculate();
+    console.log(this.CDNoteWorking);
   }
 
   SearchPartner(key_search: string) {
@@ -54,6 +59,25 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     console.log({ "CURRENT_JOB_ID": ExtendData.currentJobID });
   }
 
+  
+  totalCredit:number=0;
+  totalDebit:number=0;
+  totalCreditDebitCalculate(){
+    this.totalCredit = 0;
+    this.totalDebit = 0;
+    for(var i = 0; i < this.CDNoteWorking.listShipmentSurcharge.length;i++){
+      const c = this.CDNoteWorking.listShipmentSurcharge[i];
+      if(c.type=="BUY"|| c.type=="LOGISTIC" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.receiverId)){
+        // calculate total credit
+        this.totalCredit += c.total;
+      }
+      if(c.type=="SELL" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.payerId)){
+        //calculate total debit 
+        this.totalDebit += c.total;
+      }
+    }
+
+  }
 
 
 
