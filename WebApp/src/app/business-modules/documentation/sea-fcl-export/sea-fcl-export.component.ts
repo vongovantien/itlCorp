@@ -88,7 +88,7 @@ export class SeaFCLExportComponent implements OnInit {
         this.criteria.mawb = '';
         this.criteria.supplierName = '';
         this.criteria.agentName = '';
-        this.criteria.hwbNo = '';
+        //this.criteria.hwbNo = '';
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;
         if(this.selectFilter === 'Job ID'){

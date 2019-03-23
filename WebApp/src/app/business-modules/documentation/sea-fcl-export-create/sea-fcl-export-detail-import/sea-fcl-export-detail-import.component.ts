@@ -27,8 +27,8 @@ export class SeaFclExportDetailImportComponent implements OnInit {
     private sortService: SortService,
     private api_menu: API_MENU) { 
     this.keepCalendarOpeningWithRange = true;
-    this.selectedDate = Date.now();
-    this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+    //this.selectedDate = Date.now();
+    this.selectedRange = { startDate: moment().startOf('month'), endDate: moment(Date.now()) };
   }
 
   async ngOnInit() {
@@ -38,6 +38,7 @@ export class SeaFclExportDetailImportComponent implements OnInit {
     await this.getShipments();
   }
   searchShipment(){
+    this.pager.totalItems = 0;
     this.criteria.jobNo ='';
     this.criteria.mawb = '';
     this.criteria.supplierName = '';
@@ -61,7 +62,6 @@ export class SeaFclExportDetailImportComponent implements OnInit {
     this.getShipments();
   }
   async resetSearchShipment(){
-    this.pager.currentPage = 1;
     this.selectFilter = 'Job ID';
     this.searchString = null;
     this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -106,7 +106,7 @@ export class SeaFclExportDetailImportComponent implements OnInit {
      * Daterange picker
      */
     selectedRange: any;
-    selectedDate: any;
+    //selectedDate: any;
     keepCalendarOpeningWithRange: true;
     maxDate: moment.Moment = moment();
     ranges: any = {
