@@ -25,4 +25,5 @@ export class Container {
   allowEdit: boolean = false;
   containerTypeName: string = null;
   commodityName: string = null;
+  packageTypeName: string;
 }
