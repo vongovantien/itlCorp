@@ -101,6 +101,11 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
+            string checkExistMessage = CheckExist(model.Id, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
             var hs = csTransactionService.UpdateCSTransaction(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

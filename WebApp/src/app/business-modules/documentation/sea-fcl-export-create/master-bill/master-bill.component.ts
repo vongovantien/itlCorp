@@ -62,6 +62,12 @@ export class MasterBillComponent implements OnInit{
             else{
                 this.etaSelected = null;
                 this.etaSelected = null;
+                let claim = localStorage.getItem('id_token_claims_obj');
+                let index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
+                if(index > -1) {
+                    this.shipment.personInChargeName = this.userInCharges[index].username;
+                    this.shipment.personIncharge = JSON.parse(claim)["id"];
+                }
             }
             index = this.billOfLadingTypes.findIndex(x => x.id == this.shipment.mbltype);
             if(index > -1) this.billOfLadingTypeActive = [this.billOfLadingTypes[index]];

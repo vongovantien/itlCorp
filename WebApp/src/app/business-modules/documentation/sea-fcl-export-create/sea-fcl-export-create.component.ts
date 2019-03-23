@@ -14,8 +14,8 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
-import {ExtendData} from '../extend-data';
 import { ShipmentOverviewComponent } from '../../report/shipment-overview/shipment-overview.component';
+import {ExtendData} from '../extend-data';
 
 
 export class FirstLoadData {
