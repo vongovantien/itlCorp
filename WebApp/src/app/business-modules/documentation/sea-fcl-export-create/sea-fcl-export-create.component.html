@@ -517,6 +517,7 @@ aria-hidden="true">
                                         <div class="m-input-icon m-input-icon--left">
                                             <input type="text" class="form-control m-input m-input--square"
                                                 placeholder="Search..." autocomplete="nope" [ngModel]="searchcontainer"
+                                                (change)="searchcontainer = searchcontainer.trim()"
                                                 (ngModelChange)="searchContainer($event)" name="searchcontainer">
                                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                                 <span>
