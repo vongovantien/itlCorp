@@ -38,7 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
                 body[i] = allowedChars[rd.Next(0, allowedChars.Length)];
             }
 
-            return new string(head+"-"+body).ToUpper();
+            return (new string(head)  +"-"+ new string(body)).ToUpper();
         }
 
         public HandleState AddNewSOA(AcctSOAModel model)
@@ -51,7 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
                 soa.Code = RandomCode();
                 DataContext.Add(soa);
 
-                foreach (var c in model.listCharges)
+                foreach (var c in model.listShipmentSurcharge)
                 {
                     var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == c.Id).FirstOrDefault();
                     if (charge != null)

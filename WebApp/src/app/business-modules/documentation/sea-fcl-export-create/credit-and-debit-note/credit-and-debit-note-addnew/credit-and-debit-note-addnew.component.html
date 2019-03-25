@@ -1,7 +1,7 @@
-<form novalidate #addCDNoteForm="ngForm"  (ngSubmit)="addCDNoteForm.form.valid">
+<form novalidate #addCDNoteForm="ngForm"  (ngSubmit)="addCDNoteForm.form.valid" *ngIf="isDisplayAddSoaForm">
 
     <div class="modal fade" id="add-credit-debit-note-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-        aria-hidden="true">
+        aria-hidden="true" >
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -32,7 +32,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-8">
+                                <div class="col-lg-8" [ngClass]="{ 'm-form__group has-danger': addCDNoteForm.submitted && CDNoteWorking.partnerId==null }">
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
                                             Subject to Partner
@@ -88,6 +88,10 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="form-control-feedback"
+                                        *ngIf="addCDNoteForm.submitted && CDNoteWorking.partnerId==null">
+                                            Partner is required !
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -261,8 +265,8 @@
                     <!--end::Form-->
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
-                        (click)="CreateCDNote()">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" 
+                        (click)="CreateCDNote(addCDNoteForm)">
                         <span>
                             <i class="la la-save"></i>
                             <span>
