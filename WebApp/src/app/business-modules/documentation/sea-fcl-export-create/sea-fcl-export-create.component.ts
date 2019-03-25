@@ -80,20 +80,20 @@ export class SeaFclExportCreateComponent implements OnInit {
     switchTab(tab:string){
 
         if(tab==="shipment"){
-            if(this.inEditing == true){
-                this.isLoaded = false;
-                    setTimeout(() => {
-                        this.isLoaded = true;
-                        this.inEditing = true;
-                    }, 300);
-                    this.myForm.patchValue({
-                    polName: this.shipment.pol,
-                    podName: this.shipment.podName,
-                    coloaderName: this.shipment.coloaderName,
-                    agentName: this.shipment.agentName,
-                    personInChargeName: this.shipment.personInChargeName
-                });
-            }
+            // if(this.inEditing == true){
+            //     this.isLoaded = false;
+            //         setTimeout(() => {
+            //             this.isLoaded = true;
+            //             this.inEditing = true;
+            //         }, 300);
+            //         this.myForm.patchValue({
+            //         polName: this.shipment.pol,
+            //         podName: this.shipment.podName,
+            //         coloaderName: this.shipment.coloaderName,
+            //         agentName: this.shipment.agentName,
+            //         personInChargeName: this.shipment.personInChargeName
+            //     });
+            // }
             this.isShipment = true;
             this.isHouseBill = false;
             this.isCDnote = false;
