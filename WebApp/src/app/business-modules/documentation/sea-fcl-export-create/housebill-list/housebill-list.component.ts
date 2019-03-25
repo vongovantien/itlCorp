@@ -248,9 +248,11 @@ export class HousebillListComponent implements OnInit {
     this.baseServices.get(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id).subscribe((res: any[]) => {
       this.HouseBillListData = res;
       this.ConstHouseBillListData = res;
-      this.getBuyingChargesOfHouseBill(this.HouseBillListData[0]);
-      this.getSellingChargesOfHouseBill(this.HouseBillListData[0]);
-      this.getOBHChargesOfHouseBill(this.HouseBillListData[0]);
+      if(this.HouseBillListData.length>0){
+        this.getBuyingChargesOfHouseBill(this.HouseBillListData[0]);
+        this.getSellingChargesOfHouseBill(this.HouseBillListData[0]);
+        this.getOBHChargesOfHouseBill(this.HouseBillListData[0]);
+      }
       console.log({ "LIST_HB": this.HouseBillListData });
     });
   }

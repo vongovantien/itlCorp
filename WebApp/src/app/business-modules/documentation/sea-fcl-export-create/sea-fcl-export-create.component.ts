@@ -409,6 +409,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
+                this.isHouseBill = true;
+                this.isCDnote = false;
+                this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 this.isLoaded = false;
                 setTimeout(() => {
@@ -430,6 +433,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
+                this.isHouseBill = true;
+                this.isCDnote = false;
+                this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 if(this.inEditing == false){
                     this.activeTab();
