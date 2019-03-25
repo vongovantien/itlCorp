@@ -113,6 +113,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.isHouseBill = false;
             this.isCDnote = true;
         }
+        this.cdr.detectChanges(); 
 
         // if(this.inEditing == false){
         //     this.validateShipmentForm();

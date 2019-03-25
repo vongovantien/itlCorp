@@ -7,6 +7,6 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class AcctSOAModel : AcctSoa
     {
-        public List<CsShipmentSurcharge> listCharges { get; set; }
+        public List<CsShipmentSurcharge> listShipmentSurcharge { get; set; }
     }
 }

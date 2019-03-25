@@ -5,8 +5,9 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../../extend-data';
 import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
 
-// declare var $: any;
-import * as $ from 'jquery';
+declare var $: any;
+// import * as $ from 'jquery';
+import { NgForm } from '@angular/forms';
 @Component({
   selector: 'app-credit-and-debit-note-addnew',
   templateUrl: './credit-and-debit-note-addnew.component.html',
@@ -15,6 +16,7 @@ import * as $ from 'jquery';
 export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   CDNoteWorking: AcctSOA = new AcctSOA();
+  isDisplayAddSoaForm:boolean = true;
   noteTypes = [
     { text: 'CREDIT', id: 'CREDIT' },
     { text: 'DEBIT', id: 'DEBIT' },
@@ -55,8 +57,29 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   }
 
-  CreateCDNote() {
-    console.log({ "CURRENT_JOB_ID": ExtendData.currentJobID });
+  async CreateCDNote(form:NgForm) {
+    if(form.submitted){
+      var errors = $('#add-credit-debit-note-modal').find('div.has-danger');
+      if (errors.length == 0) {
+        console.log({ "CURRENT_JOB_ID": ExtendData.currentJobID });
+        this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
+        this.CDNoteWorking.currencyId = "USD" // in the future , this id must be local currency of each country
+         var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew,this.CDNoteWorking);
+         if(res.status){
+          $('#add-credit-debit-note-modal').modal('hide');
+            this.CDNoteWorking = new AcctSOA();
+            this.resetAddSOAForm();
+            
+         }
+      }     
+    }
+  }
+
+  resetAddSOAForm(){
+    this.isDisplayAddSoaForm = false;
+    setTimeout(() => {
+      this.isDisplayAddSoaForm = true;
+    }, 300);
   }
 
   

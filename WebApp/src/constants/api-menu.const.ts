@@ -253,6 +253,9 @@ export class API_MENU {
             getByHBId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetByHB",
             getPartnerByJobId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetPartnersByJob",
             getChargesByPartner: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GroupByListHB",
+        },
+        AcctSOA: {
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Add",
         }
     }
 }
