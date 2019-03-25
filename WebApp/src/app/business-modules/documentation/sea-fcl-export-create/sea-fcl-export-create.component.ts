@@ -80,14 +80,33 @@ export class SeaFclExportCreateComponent implements OnInit {
     switchTab(tab:string){
 
         if(tab==="shipment"){
+            if(this.inEditing == true){
+                this.isLoaded = false;
+                    setTimeout(() => {
+                        this.isLoaded = true;
+                        this.inEditing = true;
+                    }, 300);
+                    this.myForm.patchValue({
+                    polName: this.shipment.pol,
+                    podName: this.shipment.podName,
+                    coloaderName: this.shipment.coloaderName,
+                    agentName: this.shipment.agentName,
+                    personInChargeName: this.shipment.personInChargeName
+                });
+            }
             this.isShipment = true;
             this.isHouseBill = false;
             this.isCDnote = false;
         }
         if(tab==="housebilllist"){
-            this.isShipment = false;
-            this.isHouseBill = true;
-            this.isCDnote = false;
+            if(this.inEditing == false){
+                this.validateShipmentForm();
+            }
+            else{
+                this.isShipment = false;
+                this.isHouseBill = true;
+                this.isCDnote = false;
+            }
         }
         if(tab==="cdnote"){
             this.isShipment = false;
@@ -95,23 +114,23 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.isCDnote = true;
         }
 
-        if(this.inEditing == false){
-            this.validateShipmentForm();
-        }
-        else{
-            this.isLoaded = false;
-            setTimeout(() => {
-                this.isLoaded = true;
-                this.inEditing = true;
-            }, 300);
-            this.myForm.patchValue({
-            polName: this.shipment.pol,
-            podName: this.shipment.podName,
-            coloaderName: this.shipment.coloaderName,
-            agentName: this.shipment.agentName,
-            personInChargeName: this.shipment.personInChargeName
-          });
-        }
+        // if(this.inEditing == false){
+        //     this.validateShipmentForm();
+        // }
+        // else{
+        //     this.isLoaded = false;
+        //     setTimeout(() => {
+        //         this.isLoaded = true;
+        //         this.inEditing = true;
+        //     }, 300);
+        //     this.myForm.patchValue({
+        //     polName: this.shipment.pol,
+        //     podName: this.shipment.podName,
+        //     coloaderName: this.shipment.coloaderName,
+        //     agentName: this.shipment.agentName,
+        //     personInChargeName: this.shipment.personInChargeName
+        //   });
+        // }
     }
 
     //open tab by link
@@ -198,7 +217,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                     }
                     if(listContainers[i].description != null){
                         if(!this.shipment.desOfGoods.includes(listContainers[i].description)){
-                            this.shipment.desOfGoods = this.shipment.desOfGoods + listContainers[i].description + ", ";
+                            this.shipment.desOfGoods = this.shipment.desOfGoods + listContainers[i].description + "\n";
                         }
                     }
                     //this.shipment.commodity = this.shipment.commodity + ((listContainers[i].commodityName== "" || listContainers[i].commodityName == null)?"": (listContainers[i].commodityName + ", "));
@@ -215,7 +234,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
     subStringComma(textString: String){
         if(textString.length <= 0) textString = '';
-        if(textString.includes(',')){
+        if(textString[textString.length -2] == ','){
             textString = textString.substring(0, (textString.length-2));
         }
         return textString;
@@ -482,9 +501,9 @@ export class SeaFclExportCreateComponent implements OnInit {
             containerNo: '',
             sealNo: '',
             markNo: '',
-            unitOfMeasureId: null,
-            unitOfMeasureName: '',
-            unitOfMeasureActive: [],
+            unitOfMeasureId: 37,
+            unitOfMeasureName: 'Kilogam',
+            unitOfMeasureActive: [{ "id": 37, "text": "Kilogam"}],
             commodityId: null,
             commodityName: '',
             packageTypeId: null,
@@ -669,8 +688,8 @@ export class SeaFclExportCreateComponent implements OnInit {
                 if (this.numberOfTimeSaveContainer == 1 && this.inEditing == false) {
                     this.shipment.commodity = '';
                     this.shipment.desOfGoods = '';
-                    this.shipment.packageContainer = '';
                 }
+                this.shipment.packageContainer = '';
                 this.getShipmentContainerDescription(this.lstMasterContainers);
                 this.shipment.csMawbcontainers = this.lstMasterContainers;
             
@@ -751,7 +770,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             }
             if(this.shipment.csMawbcontainers[i].description!= null){
                 if(!this.shipment.desOfGoods.includes(this.shipment.csMawbcontainers[i].description)){
-                    this.shipment.desOfGoods = this.shipment.desOfGoods + this.shipment.csMawbcontainers[i].description + ", ";
+                    this.shipment.desOfGoods = this.shipment.desOfGoods + this.shipment.csMawbcontainers[i].description + "\n";
                 }
             }
         }
