@@ -369,27 +369,30 @@ namespace eFMS.API.Documentation.DL.Services
                 var transaction = mapper.Map<CsTransaction>(model);
                 //transaction.UserModified = "01";
                 transaction.ModifiedDate = DateTime.Now;
-                var hsTrans = dc.CsTransaction.Update(transaction);
-                foreach (var container in model.CsMawbcontainers)
+                var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
+                if (hsTrans.Success)
                 {
-                    if(container.Id == Guid.Empty)
+                    foreach (var container in model.CsMawbcontainers)
                     {
-                        container.Id = Guid.NewGuid();
-                        container.Mblid = transaction.Id;
-                        container.UserModified = transaction.UserModified;
-                        container.DatetimeModified = DateTime.Now;
-                        dc.CsMawbcontainer.Add(container);
+                        if (container.Id == Guid.Empty)
+                        {
+                            container.Id = Guid.NewGuid();
+                            container.Mblid = transaction.Id;
+                            container.UserModified = transaction.UserModified;
+                            container.DatetimeModified = DateTime.Now;
+                            dc.CsMawbcontainer.Add(container);
+                        }
+                        else
+                        {
+                            container.Mblid = transaction.Id;
+                            container.UserModified = transaction.UserModified;
+                            container.DatetimeModified = DateTime.Now;
+                            dc.CsMawbcontainer.Update(container);
+                        }
                     }
-                    else
-                    {
-                        container.Mblid = transaction.Id;
-                        container.UserModified = transaction.UserModified;
-                        container.DatetimeModified = DateTime.Now;
-                        dc.CsMawbcontainer.Update(container);
-                    }
+                    dc.SaveChanges();
                 }
-                dc.SaveChanges();
-                return new HandleState();
+                return hsTrans;
             }
             catch (Exception ex)
             {

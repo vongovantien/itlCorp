@@ -24,7 +24,7 @@ namespace eFMS.API.Shipment.Infrastructure
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ITerminologyService, TerminologyService>();
-            services.AddTransient<ICsTransactionService, CsTransactionService>();
+            services.AddScoped<ICsTransactionService, CsTransactionService>();
             services.AddTransient<ICsTransactionDetailService, CsTransactionDetailService>();
             services.AddTransient<ICsMawbcontainerService, CsMawbcontainerService>();
             services.AddTransient<ICsShipmentSurchargeService, CsShipmentSurchargeService>();
