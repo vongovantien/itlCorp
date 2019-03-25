@@ -57,4 +57,5 @@ export class CsTransaction {
   desOfGoods: String = '';
   csMawbcontainers: Container[] = null;
   csTransactionDetails: CsTransactionDetail[] = null;
+
 }
