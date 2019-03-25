@@ -9,16 +9,23 @@
         <div class="c-button-actions">
             <div class="dropdown m-dropdown m-dropdown--inline">
                 <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-                    Preview & Print
+                    Preview SI
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#">Export pdf</a>
-                    <a class="dropdown-item" href="#">USD report</a>
-                    <a class="dropdown-item" href="#">Local currency report</a>
+                    <a class="dropdown-item" href="#">Crystal Report</a>
                 </div>
             </div>
-            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                    Preview OCL
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Export excel</a>
+                    <a class="dropdown-item" href="#">Crystal Report</a>
+                </div>
+            </div>
+            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#confirm-refresh-shipping-instruction-modal">
                 <span>
                     <i class="la la-refresh"></i>
                     <span>
@@ -776,3 +783,41 @@
 
 </div>
 <!--end::m-content-->
+
+<!--begin::confirm-refresh-shipping-instruction-modal-->
+<div class="modal fade" id="confirm-refresh-shipping-instruction-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alert</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>All manually entered data will be refresh. Are you sure you want to perform this action?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-refresh-shipping-instruction-modal-->
