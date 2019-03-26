@@ -120,6 +120,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
                         detail.CBM = detail.CBM + item.container.Cbm != null ? item.container.Cbm : 0;
+                        detail.CW = detail.CW + item.container.ChargeAbleWeight != null ? item.container.ChargeAbleWeight : 0;
+                        detail.GW = detail.GW + item.container.Gw != null ? item.container.Gw : 0;
                         detail.CsMawbcontainers.DefaultIfEmpty(item.container);
                     }
                 }
