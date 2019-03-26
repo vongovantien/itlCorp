@@ -82,12 +82,13 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(tab==="shipment"){
             if(this.inEditing == true){
                 this.isLoaded = false;
-                    setTimeout(() => {
-                        this.isLoaded = true;
-                        this.inEditing = true;
-                    }, 300);
-                    this.myForm.patchValue({
-                    polName: this.shipment.pol,
+                setTimeout(() => {
+                    this.isLoaded = true;
+                    this.inEditing = true;
+                }, 400);
+                this.myForm.patchValue({
+                    estimatedTimeofDepature: { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) },
+                    polName: this.shipment.polName,
                     podName: this.shipment.podName,
                     coloaderName: this.shipment.coloaderName,
                     agentName: this.shipment.agentName,

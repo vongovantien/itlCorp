@@ -1,9 +1,11 @@
+<form name="formManifest" #formManifest="ngForm" novalidate (ngSubmit)="formManifest.form.valid" *ngIf="isLoad"> 
+
 <!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <app-breadcrumb></app-breadcrumb>
+            <!-- <app-breadcrumb></app-breadcrumb> -->
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
@@ -13,12 +15,10 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#">Export pdf</a>
-                    <a class="dropdown-item" href="#">USD report</a>
-                    <a class="dropdown-item" href="#">Local currency report</a>
+                    <a class="dropdown-item" href="#">Crystal Report</a>
                 </div>
             </div>
-            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" >
+            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#confirm-refresh-manifest-modal">
                 <span>
                     <i class="la la-refresh"></i>
                     <span> 
@@ -26,7 +26,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveManifest()">
                 <span>
                     <i class="la la-save"></i>
                     <span>
@@ -34,7 +34,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/documentation/sea-fcl-export-create/', { id: shipment.id }]">
                 <span>
                     <i class="la la-ban"></i>
                     <span>
@@ -54,19 +54,30 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && referenceNo.invalid }">
                             <label class="form-control-label" for="">
-                                Reference No <span class="m--font-danger">(*)</span>
+                                Reference No <span class="m--font-danger" *ngIf="formManifest.submitted && referenceNo.invalid">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="referenceNo" [(ngModel)]="manifest.referenceNo" #referenceNo="ngModel"
+                                (change)="manifest.referenceNo = manifest.referenceNo.trim()" required disabled>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && referenceNo.invalid">
+                                Reference No is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && supplierName.invalid }">
                             <label class="form-control-label" for="">
                                 Supplier <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter master bill of lading no"
+                              autocomplete="nope" [(ngModel)]="manifest.supplierName" name="supplierName" #supplierName="ngModel"
+                              (change)="manifest.supplierName = manifest.supplierName.trim()" required>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && supplierName.invalid">
+                                Supplier is required
+                            </div>
+                            <!-- <input type="text" class="form-control m-input m-input--square" placeholder=""> -->
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -74,54 +85,69 @@
                             <label class="form-control-label" for="">
                                 Attention
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                name="attention" [(ngModel)]="manifest.attention" #attention="ngModel"
+                                (change)="manifest.attention = manifest.attention.trim()">
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && markOfNationality.invalid }">
                             <label class="form-control-label" for="">
                                 Marks of Nationality & Registration <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                name="markOfNationality" [(ngModel)]="manifest.markOfNationality" #markOfNationality="ngModel"
+                                (change)="manifest.markOfNationality = manifest.markOfNationality.trim()" required>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && markOfNationality.invalid">
+                                Marks of Nationality & Registration is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && vesselNo.invalid }">
                             <label class="form-control-label" for="">
                                 Vessel No <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="vesselNo" [(ngModel)]="manifest.vesselNo" #vesselNo="ngModel" autocomplete="nope"
+                                (change)="manifest.vesselNo = manifest.vesselNo.trim()" required >
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && vesselNo.invalid">
+                                Vessel No is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && etdSelected == null }">
                             <label class="form-control-label" for="">
                                 Date <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="m-input-icon m-input-icon--right">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                    [(ngModel)]="etdSelected" [singleDatePicker]="true" name="singledater" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
                                     </span>
                                 </span>
                             </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && etdSelected == null">
+                                Vessel No is required
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.pol == null }">
                             <label class="form-control-label" for="">
                                 Port of Loading <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                    data-toggle="dropdown" placeholder="Please selected" value="">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
+                                    data-toggle="dropdown" [value]="shipment.polName == null?'Please selected port of loading':shipment.polName" value="">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
@@ -145,27 +171,13 @@
                                             </div>
                                         </div>
                                         <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected" data-id="1">
-                                                        <td>AAC</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="2">
-                                                        <td>AAB</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="3">
-                                                        <td>AAA</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="4">
-                                                        <td>AAD</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
+                                            <table class="table table-hover" *ngIf="portOfLadings">
+                                                <tbody *ngFor="let pol of portOfLadings;let i = index;">
+                                                    <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{pol.id}}" 
+                                                        (click)="shipment.pol = pol.id; manifest.pol = pol.id; shipment.polName= pol.nameEN">
+                                                        <td>{{ pol.code }}</td>
+                                                        <td>{{ pol.nameEN }}</td>
+                                                        <td>{{ pol.countryName }}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -173,16 +185,19 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == null">
+                                Port of Loading is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.pod == null }">
                             <label class="form-control-label" for="">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                    data-toggle="dropdown" placeholder="Please selected" value="">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
+                                    data-toggle="dropdown" placeholder="Please selected"  [value]="shipment.podName == null?'Please selected port of loading':shipment.podName">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
@@ -206,27 +221,13 @@
                                             </div>
                                         </div>
                                         <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected" data-id="1">
-                                                        <td>AAC</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="2">
-                                                        <td>AAB</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="3">
-                                                        <td>AAA</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="4">
-                                                        <td>AAD</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
+                                            <table class="table table-hover" *ngIf="portOfDestinations">
+                                                <tbody *ngFor="let pod of portOfDestinations;let i = index;">
+                                                    <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
+                                                        (click)="shipment.pod = pod.id; manifest.pod=pod.id; shipment.podName= pod.nameEN">
+                                                        <td>{{ pod.code }}</td>
+                                                        <td>{{ pod.nameEN }}</td>
+                                                        <td>{{ pod.countryName }}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -234,17 +235,27 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == null">
+                                Port of Discharge is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.freigtCharge == null }">
                             <label class="form-control-label" for="">
                                 Freight Charge <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select [allowClear]="true" [items]="items"  [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                            <ng-select [allowClear]="true" 
+                                [items]="freigtCharges" 
+                                [disabled]="disabled"
+                                [active]="paymentTermActive"
+                                (data)="refreshValue($event)" (selected)="manifest.freigtCharge = $event.id" 
+                                (removed)="manifest.freigtCharge = null"
                                 (typed)="typed($event)" placeholder="Please selected">
                             </ng-select>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.freigtCharge == null">
+                                Freight Charge is required
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -256,7 +267,9 @@
                                     <label class="form-control-label" for="">
                                         Consolidator
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                        name="consolidator" [(ngModel)]="manifest.consolidator" #consolidator="ngModel"
+                                        (change)="manifest.consolidator = manifest.consolidator.trim()">
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -264,7 +277,9 @@
                                     <label class="form-control-label" for="">
                                         De-Consolidator
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                        name="deconsolidator" [(ngModel)]="manifest.deconsolidator" #deconsolidator="ngModel"
+                                        (change)="manifest.deconsolidator = manifest.deconsolidator.trim()">
                                 </div>
                             </div>
                         </div>
@@ -274,7 +289,9 @@
                                     <label class="form-control-label" for="">
                                         Weight (Kgs)
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="number" class="form-control m-input m-input--square" placeholder="" readonly
+                                        name="weight" [(ngModel)]="manifest.weight" #weight="ngModel"
+                                        (change)="manifest.weight = manifest.weight.trim()">
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -282,17 +299,25 @@
                                     <label class="form-control-label" for="">
                                         Volume (CBM)
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" readonly
+                                        name="volume" [(ngModel)]="manifest.volume" #weight="ngModel"
+                                        (change)="volume.volume = manifest.volume.trim()">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && agentAssembled.invalid }">
                             <label class="form-control-label" for="">
                                 Agent who assembled this manifest <span class="m--font-danger">(*)</span>
                             </label>
-                            <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                            <textarea class="form-control m-input--square" id="" name="" rows="5" autocomplete="nope"
+                                name="agentAssembled" [(ngModel)]="manifest.agentAssembled" #agentAssembled="ngModel"
+                                (change)="manifest.agentAssembled = manifest.agentAssembled.trim()" required>
+                            </textarea>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && agentAssembled.invalid">
+                                Agent who assembled this manifest is required
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -383,18 +408,19 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="tbody-group">
-                        <tr class="">
+                    <tbody class="tbody-group" *ngIf="this.shipment.csTransactionDetails">
+                        <tr class="" *ngFor="let detail of this.shipment.csTransactionDetails; let i=index">
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" name="">
+                                        <input type="checkbox" name="" [checked]="detail.isRemove" 
+                                            (change)="detail.isRemove=!detail.isRemove">
                                         <span></span>
                                     </label>
                                 </div>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.hwbno }}</span>
                             </td>
                             <td>
                                 <span>text</span>
@@ -468,6 +494,8 @@
 </div>
 <!--end::m-content-->
 
+</form>
+<!--begin::add-remaining-HBL-modal-->
 <div class="modal fade" id="add-remaining-HBL-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
@@ -640,3 +668,42 @@
         </div>
     </div>
 </div>
+<!--end::add-remaining-HBL-modal-->
+
+<!--begin::confirm-refresh-manifest-modal-->
+<div class="modal fade" id="confirm-refresh-manifest-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alert</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>All manually entered data will be refresh. Are you sure you want to perform this action?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="refreshManifest()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-refresh-manifest-modal-->

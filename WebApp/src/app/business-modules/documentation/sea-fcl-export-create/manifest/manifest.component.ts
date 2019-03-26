@@ -1,5 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
+import { ActivatedRoute } from '@angular/router';
+import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import * as shipmentHelper from 'src/helper/shipment.helper';
+import * as dataHelper from 'src/helper/data.helper';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 
 @Component({
     selector: 'app-manifest',
@@ -7,14 +15,98 @@ import * as moment from 'moment';
     styleUrls: ['./manifest.component.scss']
 })
 export class ManifestComponent implements OnInit {
+    shipment: CsTransaction = new CsTransaction();
+    manifest: any = {};
+    freigtCharges: any[] = [];
+    paymentTermActive: any[] = [];
+    etdSelected: any;
+    coloaders: any[] = [];
+    portOfLadings: any[] = [];
+    portOfDestinations: any[] = [];
+    isLoad = false;
 
-    constructor() {
+    constructor(private baseServices: BaseService,
+        private route: ActivatedRoute,
+        private api_menu: API_MENU) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
 
-    ngOnInit() {
+    async ngOnInit() {
+        await this.getShipmentCommonData();
+        await this.getPorIndexs(null);
+        await this.route.params.subscribe(async prams => {
+            if(prams.id != undefined){          
+                await this.getShipmentDetail(prams.id);
+                this.getManifest();
+                await this.getHouseBillList(prams.id);
+                this.isLoad = true;
+            }
+        });
+    }
+    getManifest(){
+        this.manifest["supplierName"] = this.shipment["supplierName"];
+        let index = this.freigtCharges.findIndex(x => x.id == this.shipment.paymentTerm);
+        if(index > -1){
+            this.paymentTermActive = [this.freigtCharges[index]];
+            this.manifest["freigtCharge"] = this.freigtCharges[index].id;
+        } 
+        this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
+        index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
+        if(index > -1) this.manifest["pol"] = this.portOfLadings[index].id;
+        index = this.portOfDestinations.findIndex(x => x.id == this.shipment.pod);
+        if(index > -1) this.manifest["pod"] = this.portOfDestinations[index].id;
+    }
+    refreshManifest(){
+        this.manifest["referenceNo"] = null;
+        this.manifest["supplierName"] = null;
+        this.manifest["attention"] = null;
+        this.manifest["markOfNationality"] = null;
+        this.manifest["vesselNo"] = null;
+        this.manifest["consolidator"] = null;
+        this.manifest["deconsolidator"] = null;
+        this.manifest["weight"] = null;
+        this.manifest["volume"] = null;
+        this.manifest["agentAssembled"] = null;
+        this.getManifest();
+    }
+    saveManifest(){
+        console.log(this.manifest);
+    }
+    async getShipmentDetail(id: String) {
+        this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
+        console.log({"THIS":this.shipment});
+    }
+    async getShipmentCommonData() {
+        const data = await shipmentHelper.getShipmentCommonData(this.baseServices, this.api_menu);
+        this.freigtCharges = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
+    }
+    async getPorIndexs(searchText: any) {
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        if (portIndexs != null) {
+            this.portOfLadings = portIndexs.data;
+            this.portOfDestinations = portIndexs.data;
+            console.log(this.portOfLadings);
+        }
+        else{
+            this.portOfLadings = [];
+            this.portOfDestinations = [];
+        }
+    }
+    async getHouseBillList(jobId: String){
+        var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
+        if(responses != null){
+            responses.forEach((element: { isRemove: boolean; }) => {
+                element.isRemove = false;
+            });
+            this.shipment.csTransactionDetails = responses;
+        }
+        else{
+            this.shipment.csTransactionDetails = [];
+        }
+        console.log(this.shipment.csTransactionDetails);
     }
 
     /**
@@ -43,7 +135,7 @@ export class ManifestComponent implements OnInit {
     /**
       * ng2-select
       */
-    public items: Array<string> = ['Prepaid', 'Collect'];
+    //public items: Array<string> = ['Prepaid', 'Collect'];
 
     private value: any = {};
     private _disabledV: string = '0';

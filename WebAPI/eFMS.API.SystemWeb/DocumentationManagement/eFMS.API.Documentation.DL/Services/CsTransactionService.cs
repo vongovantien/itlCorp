@@ -88,7 +88,16 @@ namespace eFMS.API.Documentation.DL.Services
         public CsTransactionModel GetById(Guid id)
         {
             var data = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault(x => x.Id == id);
-            return data != null ? mapper.Map<CsTransactionModel>(data): null;
+            if (data == null) return null;
+            else
+            {
+                var result = mapper.Map<CsTransactionModel>(data);
+                if (result.ColoaderId != null) result.SupplierName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.ColoaderId).PartnerNameEn;
+                if (result.AgentId != null) result.AgentName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.AgentId).PartnerNameEn;
+                if (result.Pod != null) result.PODName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pod).NameEn;
+                if (result.Pol != null) result.POLName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pol).NameEn;
+                return result;
+            }
         }
 
         public object ImportCSTransaction(CsTransactionEditModel model)
@@ -369,27 +378,30 @@ namespace eFMS.API.Documentation.DL.Services
                 var transaction = mapper.Map<CsTransaction>(model);
                 //transaction.UserModified = "01";
                 transaction.ModifiedDate = DateTime.Now;
-                var hsTrans = dc.CsTransaction.Update(transaction);
-                foreach (var container in model.CsMawbcontainers)
+                var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
+                if (hsTrans.Success)
                 {
-                    if(container.Id == Guid.Empty)
+                    foreach (var container in model.CsMawbcontainers)
                     {
-                        container.Id = Guid.NewGuid();
-                        container.Mblid = transaction.Id;
-                        container.UserModified = transaction.UserModified;
-                        container.DatetimeModified = DateTime.Now;
-                        dc.CsMawbcontainer.Add(container);
+                        if (container.Id == Guid.Empty)
+                        {
+                            container.Id = Guid.NewGuid();
+                            container.Mblid = transaction.Id;
+                            container.UserModified = transaction.UserModified;
+                            container.DatetimeModified = DateTime.Now;
+                            dc.CsMawbcontainer.Add(container);
+                        }
+                        else
+                        {
+                            container.Mblid = transaction.Id;
+                            container.UserModified = transaction.UserModified;
+                            container.DatetimeModified = DateTime.Now;
+                            dc.CsMawbcontainer.Update(container);
+                        }
                     }
-                    else
-                    {
-                        container.Mblid = transaction.Id;
-                        container.UserModified = transaction.UserModified;
-                        container.DatetimeModified = DateTime.Now;
-                        dc.CsMawbcontainer.Update(container);
-                    }
+                    dc.SaveChanges();
                 }
-                dc.SaveChanges();
-                return new HandleState();
+                return hsTrans;
             }
             catch (Exception ex)
             {

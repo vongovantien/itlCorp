@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && !formAddEdit.controls.estimatedTimeofDepature.valid }">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && etdSelected == null }">
                         <label class="form-control-label" for="">
                             Estimated time of departure <span class="m--font-danger">(*)</span>
                         </label>
@@ -39,7 +39,7 @@
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                              <div class="form-control-feedback" *ngIf="submitted && !formAddEdit.controls.estimatedTimeofDepature.valid">
+                              <div class="form-control-feedback" *ngIf="submitted && etdSelected == null">
                                 Estimated time of departure is required
                             </div>
                         </div>
