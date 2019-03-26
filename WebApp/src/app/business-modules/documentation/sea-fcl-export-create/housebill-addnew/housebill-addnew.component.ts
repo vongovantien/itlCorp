@@ -616,5 +616,10 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
 
+  closeAddContainerForm(){
+    $('#container-list-of-job-modal-house').modal('hide');
+  }
+
+
 
 }

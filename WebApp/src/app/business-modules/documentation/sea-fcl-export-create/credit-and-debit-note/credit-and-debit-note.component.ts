@@ -55,4 +55,15 @@ export class CreditAndDebitNoteComponent implements OnInit {
         $(id).modal('show');
     }
 
+
+    ListRemainingCharges:any[]=[];
+    addNewRemainingChargesCatcher(event:any){
+        this.ListRemainingCharges = event;
+    }
+
+    currentPartnerId:string = null;
+    currentPartnerIdCatcher(event:any){
+        this.currentPartnerId = event;
+    }
+
 }

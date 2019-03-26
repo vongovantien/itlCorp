@@ -257,7 +257,7 @@
 <!--end:: m-portlet-->
 
 <!--begin:: add-credit-debit-note-modal-->
-<app-credit-and-debit-note-addnew></app-credit-and-debit-note-addnew>
+<app-credit-and-debit-note-addnew (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
 <!--end:: add-credit-debit-note-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->
@@ -269,7 +269,7 @@
 <!--end:: edit-credit-debit-note-modal-->
 
 <!--begin:: add-remaining-charge-modal-->
-<app-credit-and-debit-note-remaining-charge></app-credit-and-debit-note-remaining-charge>
+<app-credit-and-debit-note-remaining-charge [listRemainingCharges]="ListRemainingCharges" [partnerId]="currentPartnerId"></app-credit-and-debit-note-remaining-charge>
 <!--end:: add-remaining-charge-modal-->
 
 <!--begin::confirm-delete-modal-->

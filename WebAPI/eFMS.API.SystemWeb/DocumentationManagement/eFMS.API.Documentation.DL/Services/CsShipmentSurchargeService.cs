@@ -99,8 +99,10 @@ namespace eFMS.API.Documentation.DL.Services
                     listCharges = Query(houseBill.Id, null);
                     listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.ReceiverId == PartnerId || x.PaymentObjectId == PartnerId)).ToList();
                 }
+
+                listCharges = listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
                 if (listCharges.Count > 0)
-                {
+                {                    
                     var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
                     returnList.Add(returnObj);
                 }            
