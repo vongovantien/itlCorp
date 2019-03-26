@@ -88,7 +88,16 @@ namespace eFMS.API.Documentation.DL.Services
         public CsTransactionModel GetById(Guid id)
         {
             var data = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault(x => x.Id == id);
-            return data != null ? mapper.Map<CsTransactionModel>(data): null;
+            if (data == null) return null;
+            else
+            {
+                var result = mapper.Map<CsTransactionModel>(data);
+                if (result.ColoaderId != null) result.SupplierName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.ColoaderId).PartnerNameEn;
+                if (result.AgentId != null) result.AgentName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.AgentId).PartnerNameEn;
+                if (result.Pod != null) result.PODName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pod).NameEn;
+                if (result.Pol != null) result.POLName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pol).NameEn;
+                return result;
+            }
         }
 
         public object ImportCSTransaction(CsTransactionEditModel model)

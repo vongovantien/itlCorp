@@ -1141,12 +1141,12 @@ aria-hidden="true">
 <!--end::confirm-cancel-create-job-modal-->
 
 <!--begin::shipment-sidebar-->
-<ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="inEditing">
+<ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="inEditing && shipment != null">
     <li class="m-nav-sticky__item">
-        <a href="javascript:void(0)" title="Preview Manifest" routerLink="/home/documentation/manifest">MNF</a>
+        <a href="javascript:void(0)" title="Preview Manifest" [routerLink]="['/home/documentation/manifest', { id: shipment.id }]">MNF</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a href="javascript:void(0)" title="Preview Shipping Instruction" routerLink="/home/documentation/shipping-instruction">S.I</a>
+        <a href="javascript:void(0)" title="Preview Shipping Instruction" [routerLink]="['//home/documentation/shipping-instruction', { id: shipment.id }]">S.I</a>
     </li>
 </ul>
 <!--end::shipment-sidebar-->
