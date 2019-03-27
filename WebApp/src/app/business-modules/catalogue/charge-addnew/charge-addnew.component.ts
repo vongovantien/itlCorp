@@ -1,5 +1,5 @@
 import { Component, OnInit,ElementRef } from '@angular/core';
-import * as lodash from 'lodash';
+import findIndex from 'lodash/findIndex';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { NgForm } from '@angular/forms';
@@ -157,7 +157,7 @@ export class ChargeAddnewComponent implements OnInit {
 
   selectedTypeDefault(value:any,index:number){
     var listAcc = this.ChargeToAdd.listChargeDefaultAccount;
-    if(lodash.findIndex(listAcc,function(o){return o.type===value.text})!=-1){
+    if(findIndex(listAcc,function(o){return o.type===value.text})!=-1){
       this.isSameVoucherType =  true;
     }
     else{

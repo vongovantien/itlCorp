@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment/moment';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { Router } from '@angular/router';
-import { timeout } from 'q';
+// import { timeout } from 'q';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
 

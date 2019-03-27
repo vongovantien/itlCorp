@@ -55,4 +55,10 @@ export class CreditAndDebitNoteRemainingChargeComponent implements OnInit {
     $(groupCheck).prop('checked',allcheck?true:false); 
   }
 
+
+  checkToDisplay(item:any){
+    var s = item.listCharges.map((x:any)=>x.isRemaining).indexOf(true)  !=-1;
+    return s;
+  }
+
 }

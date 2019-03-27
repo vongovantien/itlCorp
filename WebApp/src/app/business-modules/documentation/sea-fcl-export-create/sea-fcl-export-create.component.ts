@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import moment from 'moment/moment';
 import { Component, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter, ElementRef } from '@angular/core';
 // import { PaginationComponent } from 'ngx-bootstrap';
 import { BaseService } from 'src/services-base/base.service';
@@ -10,11 +10,9 @@ import { MasterBillComponent } from './master-bill/master-bill.component';
 import * as dataHelper from 'src/helper/data.helper';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 declare var $: any;
-import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
-import { ShipmentOverviewComponent } from '../../report/shipment-overview/shipment-overview.component';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
 
