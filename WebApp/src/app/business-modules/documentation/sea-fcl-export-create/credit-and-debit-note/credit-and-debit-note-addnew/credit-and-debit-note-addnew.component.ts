@@ -1,5 +1,7 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
-import { filter, map, findIndex, find,concat,slice,cloneDeep } from 'lodash';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import filter from 'lodash/filter';
+import map from 'lodash/map';
+import concat from 'lodash/concat'
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../../extend-data';
@@ -225,6 +227,11 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
         this.setChargesForCDNote()
         this.checkSttAllNode();
         this.addNewRemainingCharges.emit(this.listChargeOfPartner);
+  }
+
+  checkToDisplay(item:any){
+    var s = item.listCharges.map((x:any)=>x.isRemaining).indexOf(false)  !=-1;
+    return s;
   }
 
 

@@ -105,13 +105,13 @@
               "extractCss": true,
               "baseHref": "/en/",
               "lazyModules": [
-                "src/app/business-modules/catalogue/catalogue.module.ts",
-                "src/app/business-modules/accounting/accounting.module.ts",
-                "src/app/business-modules/documentation/documentation.module.ts",
-                "src/app/business-modules/operation/operation.module.ts",
-                "src/app/business-modules/report/report.module.ts",
-                "src/app/business-modules/tool-setting/tool.module.ts",
-                "src/app/business-modules/support/support.module.ts"
+                "src/app/business-modules/catalogue/catalogue.module",
+                "src/app/business-modules/accounting/accounting.module",
+                "src/app/business-modules/documentation/documentation.module",
+                "src/app/business-modules/operation/operation.module",
+                "src/app/business-modules/report/report.module",
+                "src/app/business-modules/tool-setting/tool.module",
+                "src/app/business-modules/support/support.module"
               ],
               "namedChunks": true,
               "aot": true,
@@ -129,7 +129,8 @@
               "serviceWorker": true,
               "budgets": [
                 {
-                  "type": "initial",
+                  "type": "bundle",
+                  "name": "vendor",
                   "maximumWarning": "2mb",
                   "maximumError": "5mb"
                 }

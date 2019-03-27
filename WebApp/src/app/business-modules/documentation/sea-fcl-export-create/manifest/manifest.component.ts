@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { BaseService } from 'src/services-base/base.service';

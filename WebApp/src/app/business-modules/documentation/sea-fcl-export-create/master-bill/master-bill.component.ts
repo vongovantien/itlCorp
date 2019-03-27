@@ -1,10 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit, AfterContentChecked, AfterViewChecked } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment/moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as shipmentHelper from 'src/helper/shipment.helper';
-import * as lodash from 'lodash';
-import { NgForm, FormGroup } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';

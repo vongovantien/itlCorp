@@ -2,15 +2,16 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { filter, findIndex } from 'lodash';
+// import { filter, findIndex } from 'lodash';
+import filter from 'lodash/filter';
+import findIndex from 'lodash/findIndex';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { FirstLoadData } from '../sea-fcl-export-create.component';
 import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
-import * as moment from 'moment';
-import { async } from '@angular/core/testing';
+import moment from 'moment/moment';
 
 declare var $: any;
 // import * as $ from 'jquery';

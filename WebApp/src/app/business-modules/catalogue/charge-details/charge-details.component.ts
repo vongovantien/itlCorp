@@ -1,5 +1,5 @@
 import { Component, OnInit} from '@angular/core';
-import * as lodash from 'lodash';
+import findIndex from 'lodash/findIndex';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -82,9 +82,9 @@ export class ChargeDetailsComponent implements OnInit {
         const idCurrency = this.Charge.charge.currencyId;
         const type = this.Charge.charge.type;
 
-        var indexCurrentUnit = lodash.findIndex(this.ngDataUnit,function(o){return o['id']===idUnit});
-        var indexCurrentCurrency = lodash.findIndex(this.ngDataCurrency,function(o){return o['id']===idCurrency});
-        var indexType = lodash.findIndex(this.ngDataType,function(o){return o.id===type});
+        var indexCurrentUnit = findIndex(this.ngDataUnit,function(o){return o['id']===idUnit});
+        var indexCurrentCurrency = findIndex(this.ngDataCurrency,function(o){return o['id']===idCurrency});
+        var indexType = findIndex(this.ngDataType,function(o){return o.id===type});
 
         this.activeUnit = [this.ngDataUnit[indexCurrentUnit]];
         this.activeType = [this.ngDataType[indexType]];
@@ -100,7 +100,7 @@ export class ChargeDetailsComponent implements OnInit {
     var listService = ChargeService.split(";");
     var activeServiceList :any = [];
     listService.forEach(item => {
-        const index = lodash.findIndex(this.ngDataService,function(o){return o.id===item});
+        const index = findIndex(this.ngDataService,function(o){return o.id===item});
         if(index!=-1){
           const activeService = this.ngDataService[index];
           activeServiceList.push(activeService);
@@ -164,7 +164,7 @@ export class ChargeDetailsComponent implements OnInit {
     if(voucherType===null || voucherType===undefined){
       return [];
     }else{
-      const indexCurrenVoucher = lodash.findIndex(this.ngDataTypeChargeDefault,function(o){return o.text===voucherType});
+      const indexCurrenVoucher = findIndex(this.ngDataTypeChargeDefault,function(o){return o.text===voucherType});
       const aciveVoucherType = [this.ngDataTypeChargeDefault[indexCurrenVoucher]];
       // console.log(aciveVoucherType);
       return aciveVoucherType;
@@ -212,7 +212,7 @@ export class ChargeDetailsComponent implements OnInit {
 
   selectedTypeDefault(value:any,index:number){
     var listAcc = this.Charge.listChargeDefaultAccount;
-    if(lodash.findIndex(listAcc,function(o){return o.type===value.text})!=-1){
+    if(findIndex(listAcc,function(o){return o.type===value.text})!=-1){
       this.isSameVoucherType =  true;
     }
     else{

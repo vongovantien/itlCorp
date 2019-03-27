@@ -186,7 +186,7 @@
                                 </thead>
                                 <tbody class="tbody-group" *ngFor="let item of listChargeOfPartner;let i = index;">
 
-                                    <tr class="collapse-toggle-row tgroup">
+                                    <tr class="collapse-toggle-row tgroup" *ngIf="checkToDisplay(item)">
                                         <td colspan="12">
                                             <label class="m-checkbox">
                                                 <input type="checkbox" name=""  attr.data-id="{{i}}" class="group-charge-hb-select" (change)="selectAllChargeInGroup($event,i)">
@@ -196,7 +196,7 @@
                                         </td>
                                     </tr>
                                     <ng-container *ngFor="let charge of item.listCharges;let k = index;">
-                                        <tr class="" *ngIf="!charge.isRemaining">
+                                        <tr class="child" *ngIf="!charge.isRemaining" >
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <label class="m-checkbox">

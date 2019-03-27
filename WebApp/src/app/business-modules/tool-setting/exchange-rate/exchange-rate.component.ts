@@ -13,7 +13,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 //import { moment } from 'ngx-bootstrap/chronos/test/chain';
 declare var $:any;
-import * as moment from 'moment';
+import moment from 'moment/moment';
 
 @Component({
   selector: 'app-exchange-rate',
