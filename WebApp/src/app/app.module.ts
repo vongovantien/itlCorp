@@ -28,6 +28,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { AuthGuardService } from 'src/services-base/auth-guard.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { DashboardComponent } from './dashboard/dashboard.component';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -40,7 +41,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     HeaderComponent,
     FooterComponent,
     PageSidebarComponent,
-    SubheaderComponent
+    SubheaderComponent,
+    DashboardComponent
     // TwoDigitDecimaNumberDirective
   ],
   imports: [    
