@@ -345,7 +345,7 @@
                         </div>
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="remove()">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -374,7 +374,7 @@
                             <th class="table-actions-col no-sorting">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" name="">
+                                        <input type="checkbox" name="" [checked]="checkAll" (change)="checkAll=!checkAll; checkAllChange()">
                                         <span></span>
                                     </label>
                                 </div>
@@ -408,13 +408,16 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="tbody-group" *ngIf="this.shipment.csTransactionDetails">
-                        <tr class="" *ngFor="let detail of this.shipment.csTransactionDetails; let i=index">
+                    <tbody class="tbody-group" *ngIf="housebills">
+                        <tr class="" *ngFor="let detail of housebills; let i=index">
+                            <ng-container *ngIf="detail.isRemove == false">
+
+                            </ng-container>
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" name="" [checked]="detail.isRemove" 
-                                            (change)="detail.isRemove=!detail.isRemove">
+                                        <input type="checkbox" name="" [checked]="detail.isChecked" 
+                                            (change)="detail.isChecked=!detail.isChecked; removeChecked();">
                                         <span></span>
                                     </label>
                                 </div>
@@ -423,65 +426,28 @@
                                 <span>{{ detail.hwbno }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.containerNames }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.gw }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.cbm }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.podName }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.shipperDescription }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.consigneeDescription }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ detail.desOfGoods }}</span>
                             </td>
                             <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class="table-actions-col">
-                                <div class="table-actions">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" name="">
-                                        <span></span>
-                                    </label>
-                                </div>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
+                                <span>{{ detail.freightPayment }}</span>
                             </td>
                         </tr>
                     </tbody>

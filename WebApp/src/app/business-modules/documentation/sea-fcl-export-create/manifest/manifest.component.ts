@@ -23,7 +23,9 @@ export class ManifestComponent implements OnInit {
     coloaders: any[] = [];
     portOfLadings: any[] = [];
     portOfDestinations: any[] = [];
+    housebills: any[] = [];
     isLoad = false;
+    checkAll = false;
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
@@ -32,7 +34,22 @@ export class ManifestComponent implements OnInit {
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-
+    checkAllChange(){
+        if(this.checkAll){
+            this.housebills.forEach(x =>{
+                x.isChecked = true;
+            });
+        }
+        else{
+            this.housebills.forEach(x =>{
+                x.isChecked = false;
+            });
+        }
+    }
+    removeChecked(){
+        this.checkAll = false;
+        this.checkAllChange();
+    }
     async ngOnInit() {
         await this.getShipmentCommonData();
         await this.getPorIndexs(null);
@@ -74,6 +91,14 @@ export class ManifestComponent implements OnInit {
     saveManifest(){
         console.log(this.manifest);
     }
+    remove(){
+        console.log('move');
+        this.housebills.forEach(x => {
+            if(x.isChecked){
+                x.isRemove = true;
+            }
+        });
+    }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
         console.log({"THIS":this.shipment});
@@ -98,13 +123,14 @@ export class ManifestComponent implements OnInit {
     async getHouseBillList(jobId: String){
         var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
         if(responses != null){
-            responses.forEach((element: { isRemove: boolean; }) => {
+            responses.forEach((element: { isChecked: boolean; isRemove: boolean }) => {
+                element.isChecked = false;
                 element.isRemove = false;
             });
-            this.shipment.csTransactionDetails = responses;
+            this.housebills = responses;
         }
         else{
-            this.shipment.csTransactionDetails = [];
+            this.housebills = [];
         }
         console.log(this.shipment.csTransactionDetails);
     }

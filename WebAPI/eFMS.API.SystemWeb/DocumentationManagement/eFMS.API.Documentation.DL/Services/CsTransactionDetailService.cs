@@ -146,11 +146,13 @@ namespace eFMS.API.Documentation.DL.Services
                          from y in detailCustomers.DefaultIfEmpty()
                          join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
                          from noti in detailNotis.DefaultIfEmpty()
+                         join port in ((eFMSDataContext)DataContext.DC).CatPlace on detail.Pod equals port.Id into portDetail
+                         from pod in portDetail.DefaultIfEmpty()
                          join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on  detail.ForwardingAgentId equals fwd.Id into forwarding
                          from f in forwarding.DefaultIfEmpty()
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { detail, customer = y, notiParty = noti, saleman = x ,agent = f}
+                         select new { detail, customer = y, notiParty = noti, saleman = x ,agent = f, pod}
                           );
             if (query == null) return null;
             foreach(var item in query)
@@ -161,6 +163,7 @@ namespace eFMS.API.Documentation.DL.Services
                 detail.SaleManName = item.saleman?.Username;
                 detail.NotifyParty = item.notiParty?.PartnerNameEn;
                 detail.ForwardingAgentName = item.agent?.PartnerNameEn;
+                detail.PODName = item.pod?.NameEn;
                 results.Add(detail);
             }
             return results.AsQueryable();
