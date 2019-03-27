@@ -118,10 +118,10 @@
                                             <span>{{charge.vatrate}}</span>
                                         </td>
                                         <td>
-                                            <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && partnerId===charge.receiverId)">{{charge.total | number:'1.3-3'}}</span>                                           
+                                            <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && partnerId===charge.receiverId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>                                           
                                         </td>
                                         <td>
-                                            <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && partnerId===charge.payerId)">{{charge.total | number:'1.3-3'}}</span>                                           
+                                            <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && partnerId===charge.payerId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>                                           
                                         </td>
                                         <td>
                                             <span>{{charge.notes}}</span>

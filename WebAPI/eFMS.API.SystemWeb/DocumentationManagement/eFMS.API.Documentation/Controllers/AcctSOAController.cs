@@ -54,6 +54,14 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("Get")]
+        //[Authorize]
+        public List<object> Get(Guid JobId)
+        {
+            return acctSOAServices.GroupSOAByPartner(JobId);
+        }
+
 
     }
 }

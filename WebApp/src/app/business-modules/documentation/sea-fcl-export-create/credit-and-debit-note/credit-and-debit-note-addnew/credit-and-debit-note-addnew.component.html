@@ -174,10 +174,10 @@
                                             <span>VAT</span>
                                         </th>
                                         <th class="no-sorting">
-                                            <span>Credit value</span>
+                                            <span>Credit value (Local)</span>
                                         </th>
                                         <th class="no-sorting">
-                                            <span>Debit value</span>
+                                            <span>Debit value (Local)</span>
                                         </th>
                                         <th class="no-sorting">
                                             <span>Note</span>
@@ -230,10 +230,12 @@
                                                 <span>{{charge.vatrate}}</span>
                                             </td>
                                             <td>
-                                                <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.receiverId)">{{charge.total | number:'1.3-3'}}</span>                                           
+                                                <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.receiverId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>         
+                                                <!-- <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.receiverId)">{{charge.total | number:'1.3-3'}}</span>                                                                              -->
                                             </td>
                                             <td>
-                                                <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.payerId)">{{charge.total | number:'1.3-3'}}</span>                                           
+                                                    <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.payerId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>       
+                                                <!-- <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.payerId)">{{charge.total | number:'1.3-3'}}</span>                                            -->
                                             </td>
                                             <td>
                                                 <span>{{charge.notes}}</span>
@@ -251,15 +253,15 @@
                             <div class="m-alert m-alert--square alert alert-info m--align-right m--marginless">
                                 <div class="row">
                                     <div class="col">
-                                        <strong>Total Credit:</strong><span class="m--margin-left-5">{{totalCredit | number:'1.3-3'}}</span>
+                                        <!-- <strong>Total Credit:</strong><span class="m--margin-left-5">{{totalCredit | number:'1.3-3'}}</span> -->
                                     </div>
                                     <div class="col-md-auto">
-                                        <strong>Total Dedit:</strong> <span class="m--margin-left-5">{{totalDebit | number:'1.3-3'}}</span>
+                                        <!-- <strong>Total Dedit:</strong> <span class="m--margin-left-5">{{totalDebit | number:'1.3-3'}}</span> -->
                                     </div>
                                 </div>
                             </div>
                             <div class="m-alert m-alert--square alert alert-brand m--align-right m--marginless">
-                                <strong>Balance Amount:</strong><span class="m--margin-left-5">{{totalDebit - totalCredit | number:'1.3-3'}}</span>
+                                <!-- <strong>Balance Amount:</strong><span class="m--margin-left-5">{{totalCreditDebitCalculate() | number:'1.3-3'}}</span> -->
                             </div>
                         </div>
                         <!--end::m-portlet -->

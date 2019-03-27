@@ -8,7 +8,7 @@
                     <div class="form-group">
                         <div class="m-input-icon m-input-icon--left">
                             <input type="text" class="form-control m-input m-input--square"
-                                placeholder="Search...">
+                                placeholder="Search..." (keyup)="SearchCDNotes($event.target.value)">
                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                 <span>
                                     <i class="la la-search"></i>
@@ -62,14 +62,14 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="tbody-group">
+                <tbody class="tbody-group" *ngFor="let item of listCDNotes;let i = index;">
                     <!-- begin collapse-toggle-row -->
                     <tr class="collapse-toggle-row tgroup">
                         <td colspan="8">
                             <label class="btn-toggle-collapse m--font-danger" title="view more"  data-toggle="collapse" data-target="#id-cd-001">
                                 <i class="la la-minus-square"></i>
                             </label> 
-                            <span class="tgroup-title m--margin-right-10">No-1</span>&nbsp;<span class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">Tâm Tâm</span>
+                            <span class="tgroup-title m--margin-right-10">No-1</span>&nbsp;<span class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">{{item.partnerNameEn}}</span>
                         </td>
                     </tr>
                     <!-- end of collapse-toggle-row -->
@@ -78,7 +78,7 @@
                         <td colspan="8">
                             <div class="collapse show" id="id-cd-001">
                                 <table class="table">
-                                    <tbody>
+                                    <tbody *ngFor="let s of item.listSOA;let k = index;">
                                         <tr class="">
                                             <td class="table-actions-col" >
                                                 <div class="table-actions">
@@ -93,60 +93,25 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span>text</span>
+                                                <span>{{s.soa.type}}</span>
                                             </td>
                                             <td>
                                                 <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
                                             </td>
                                             <td>
-                                                <span>text</span>
+                                                <span>{{s.total_charge}}</span>
                                             </td>
                                             <td>
-                                                <span>text</span>
+                                                <span>{{s.soa.total}}</span>
                                             </td>
                                             <td>
-                                                <span>text</span>
+                                                <span>{{s.soa.userCreated}}</span>
                                             </td>
                                             <td>
-                                                <span>text</span>
+                                                <span>{{s.soa.datetimeCreated | date:'dd/MM/yyyy'}}</span>
                                             </td>
                                             <td>
-                                                <span>Active</span>
-                                            </td>
-                                        </tr>
-                                        <tr class="">
-                                            <td class="table-actions-col"  width="70">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
-                                                        <i class="la la-list"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>Active</span>
+                                                <span>{{s.soa.code}}</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -156,98 +121,7 @@
                     </tr>
                     <!--end of collapse-panel-row -->
 
-                    <!-- begin collapse-toggle-row -->
-                    <tr class="collapse-toggle-row tgroup">
-                        <td colspan="8">
-                            <label class="btn-toggle-collapse m--font-danger" title="view more" data-toggle="collapse" data-target="#id-cd-002">
-                                <i class="la la-minus-square"></i>
-                            </label> 
-                            <span class="tgroup-title m--margin-right-10">No-2</span>&nbsp;<span class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">Thor Thế</span>
-                        </td>
-                    </tr>
-                    <!-- end of collapse-toggle-row -->
-                    <!-- begin collapse-panel-row -->
-                    <tr class="collapse-panel-row">
-                        <td colspan="8">
-                            <div class="collapse show" id="id-cd-002">
-                                <table class="table">
-                                    <tbody>
-                                        <tr class="">
-                                            <td class="table-actions-col"  width="70">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
-                                                        <i class="la la-list"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>Active</span>
-                                            </td>
-                                        </tr>
-                                        <tr class="">
-                                            <td class="table-actions-col"  width="70">
-                                                <div class="table-actions">
-                                                    <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
-                                                        <i class="la la-list"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>Active</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                    <!--end of collapse-panel-row -->
+    
                 </tbody>
             </table>
         </div>

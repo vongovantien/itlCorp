@@ -28,10 +28,6 @@ export class BaseService implements ErrorHandler {
     this.showError = true;
   }
 
-  public setBaseUrl(url) {
-    this.baseUrl = url;
-  }
-
   /**
    * GET request without handle error and state, 
    * you must handle error or state by yourself

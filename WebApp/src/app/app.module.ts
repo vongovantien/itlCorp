@@ -26,8 +26,8 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { AuthGuardService } from 'src/services-base/auth-guard.service';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
+// import { ServiceWorkerModule } from '@angular/service-worker';
+// import { environment } from '../environments/environment';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };

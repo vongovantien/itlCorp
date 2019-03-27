@@ -13,5 +13,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string Unit { get; set; }
         public string Currency { get; set; }
         public string ChargeCode { get; set; }
+        public decimal? ExchangeRate { get; set; }
     }
 }
