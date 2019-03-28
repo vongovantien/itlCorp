@@ -38,4 +38,5 @@ export class CsShipmentSurcharge{
     datetimeCreated: Date = null;
     userModified: String = null;
     datetimeModified: Date = null;
+    exchangeRate:number = null;
 }

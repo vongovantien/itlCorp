@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import concat from 'lodash/concat'
+import cloneDeep from 'lodash/cloneDeep'
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../../extend-data';
@@ -26,9 +27,11 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     { text: 'INVOICE', id: 'INVOICE' }
   ];
   listSubjectPartner: any[] = []; // data for combobox Subject to Partner 
+  constListSubjectPartner: any[] = [];
   listChargeOfPartner: any[] = []; // charges list group by housebill when choose a partner 
   listRemainingCharges: any[] = []; 
   constListChargeOfPartner: any[] = [];
+
   @Output() addNewRemainingCharges = new EventEmitter<any>();
   @Output() currentPartnerIdEmit = new EventEmitter<string>();
 
@@ -41,9 +44,11 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     this.getListSubjectPartner();
   }
 
+
   getListSubjectPartner() {
     this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartnerByJobId + "?JobId=" + ExtendData.currentJobID).subscribe((data: any[]) => {
-      this.listSubjectPartner = data;
+      this.listSubjectPartner = cloneDeep(data);
+      this.constListSubjectPartner = cloneDeep(data);
       console.log(this.listSubjectPartner);
     });
   }
@@ -75,8 +80,15 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     });
   }
 
-  SearchPartner(key_search: string) {   
-
+  SearchPartner(search_key: string) {   
+    this.listSubjectPartner = filter(this.constListSubjectPartner,function(x:any){
+      return (
+          ((x.id == null ? "" : x.id.toLowerCase().includes(search_key)) ||
+          (x.shortName == null ? "" : x.shortName.toLowerCase().includes(search_key)) ||
+          (x.partnerNameEn == null ? "" : x.partnerNameEn.toLowerCase().includes(search_key)) ||
+          (x.taxCode == null ? "" : x.taxCode.toLowerCase().includes(search_key)))
+      )
+    });
   }
 
   async CreateCDNote(form:NgForm) {
@@ -109,20 +121,24 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
   
   totalCredit:number=0;
   totalDebit:number=0;
-  totalCreditDebitCalculate(){
+  totalCreditDebitCalculate():number{
     this.totalCredit = 0;
     this.totalDebit = 0;
     for(var i = 0; i < this.CDNoteWorking.listShipmentSurcharge.length;i++){
       const c = this.CDNoteWorking.listShipmentSurcharge[i];
-      if(c.type=="BUY"|| c.type=="LOGISTIC" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.receiverId)){
-        // calculate total credit
-        this.totalCredit += c.total;
+      if(!c["isRemaining"]){
+        if(c.type=="BUY"|| c.type=="LOGISTIC" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.receiverId)){
+          // calculate total credit
+          this.totalCredit += (c.total*c.exchangeRate);
+        }
+        if(c.type=="SELL" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.payerId)){
+          //calculate total debit 
+          this.totalDebit += (c.total*c.exchangeRate);
+        }
       }
-      if(c.type=="SELL" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.payerId)){
-        //calculate total debit 
-        this.totalDebit += c.total;
-      }
+  
     }
+    return this.totalDebit- this.totalCredit;
 
   }
 
@@ -227,12 +243,16 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
         this.setChargesForCDNote()
         this.checkSttAllNode();
         this.addNewRemainingCharges.emit(this.listChargeOfPartner);
+        this.totalCreditDebitCalculate()
   }
 
   checkToDisplay(item:any){
     var s = item.listCharges.map((x:any)=>x.isRemaining).indexOf(false)  !=-1;
     return s;
   }
+
+
+  
 
 
 

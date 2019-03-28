@@ -58,6 +58,8 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         charge.Soano = soa.Code;
                         charge.Soaclosed = true;
+                        charge.DatetimeModified = DateTime.Now;
+                        charge.UserModified = "admin";
                     }
                 }
                 ((eFMSDataContext)DataContext.DC).SaveChanges();
@@ -76,5 +78,111 @@ namespace eFMS.API.Documentation.DL.Services
         {
             throw new NotImplementedException();
         }
+
+        public List<object> GroupSOAByPartner(Guid JobId)
+        {
+            try
+            {
+                List<object> returnList = new List<object>();
+                List<CatPartner> listPartners = new List<CatPartner>();
+                List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList().Select(x => x.Id).ToList();
+                foreach (var id in lst_Hbid)
+                {
+                    var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
+                    List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+                    if (houseBill != null)
+                    {
+                        listCharges = Query(houseBill.Id, null);
+
+                        foreach (var c in listCharges)
+                        {
+                            if (c.PaymentObjectId != null)
+                            {
+                                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                                if (partner != null) listPartners.Add(partner);
+                            }
+                            if (c.ReceiverId != null)
+                            {
+                                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
+                                if (partner != null) listPartners.Add(partner);
+                            }
+                            if (c.PayerId != null)
+                            {
+                                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                                if (partner != null) listPartners.Add(partner);
+                            }
+                        }
+                    }
+
+                }
+                listPartners = listPartners.Distinct().ToList();
+                foreach(var item in listPartners)
+                {
+                    var SOA = DataContext.Where(x => x.PartnerId == item.Id).ToList();
+                    List<object> listSOA = new List<object>();
+                    foreach(var soa in SOA)
+                    {
+                        var chargesOfSOA = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == soa.Code).ToList();
+                        listSOA.Add(new { soa, total_charge= chargesOfSOA.Count });                      
+
+                    }
+
+                    var obj = new { item.PartnerNameEn, item.PartnerNameVn, item.Id, listSOA };
+                    if (listSOA.Count > 0)
+                    {
+                        returnList.Add(obj);
+                    }
+                   
+
+                }
+                return returnList;
+              
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private List<CsShipmentSurchargeDetailsModel> Query(Guid HbID, string type)
+        {
+            List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == HbID);
+           
+            var query = (from charge in charges
+                         where charge.Hblid == HbID
+                         join chargeDetail in ((eFMSDataContext)DataContext.DC).CatCharge on charge.ChargeId equals chargeDetail.Id
+
+                         join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id into partnerGroup
+                         from p in partnerGroup.DefaultIfEmpty()
+
+                         join receiver in ((eFMSDataContext)DataContext.DC).CatPartner on charge.ReceiverId equals receiver.Id into receiverGroup
+                         from r in receiverGroup.DefaultIfEmpty()
+
+                         join payer in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PayerId equals payer.Id into payerGroup
+                         from pay in payerGroup.DefaultIfEmpty()
+
+                         join unit in ((eFMSDataContext)DataContext.DC).CatUnit on charge.UnitId equals unit.Id
+                         join currency in ((eFMSDataContext)DataContext.DC).CatCurrency on charge.CurrencyId equals currency.Id
+                         select new { charge, p, r, pay, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn, chargeDetail.Code }
+                        ).ToList();
+            foreach (var item in query)
+            {
+                var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item.charge);
+                charge.PartnerName = item.p?.PartnerNameEn;
+                charge.NameEn = item?.ChargeNameEn;
+                charge.ReceiverName = item.r?.PartnerNameEn;
+                charge.PayerName = item.pay?.PartnerNameEn;
+                charge.Unit = item.UnitNameEn;
+                charge.Currency = item.CurrencyName;
+                charge.ChargeCode = item.Code;
+                listCharges.Add(charge);
+            }
+            return listCharges;
+        }
+
+
+
+
     }
 }

@@ -1,10 +1,9 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import * as lodash from 'lodash';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import lodash from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-declare var jquery: any;
 declare var $: any;
 
 
