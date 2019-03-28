@@ -15,7 +15,7 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#">Crystal Report</a>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#preview-modal">Crystal Report</a>
                 </div>
             </div>
             <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#confirm-refresh-manifest-modal">
@@ -154,6 +154,7 @@
                                             <div class="table-filter-block">
                                                 <div class="search-field">
                                                     <input class="form-control m-input m-input--square" type="text"
+                                                        (keyup)="changePortLoading($event.target.value)"
                                                         placeholder="Search...">
                                                     <i class="icon-search"></i>
                                                 </div>
@@ -204,6 +205,7 @@
                                             <div class="table-filter-block">
                                                 <div class="search-field">
                                                     <input class="form-control m-input m-input--square" type="text"
+                                                        (keyup)="changePortDestination($event.target.value)"
                                                         placeholder="Search...">
                                                     <i class="icon-search"></i>
                                                 </div>
@@ -335,7 +337,10 @@
                     <div class="col-lg-4 order-2 order-lg-1">
                         <div class="form-group">
                             <div class="m-input-icon m-input-icon--left">
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Search..." autocomplete="nope"
+                                    [ngModel]="searchHouse"
+                                    (change)="searchHouse = searchHouse.trim()"
+                                    (ngModelChange)="searchHouseBill($event)" name="searchHouse">
                                 <span class="m-input-icon__icon m-input-icon__icon--left">
                                     <span>
                                         <i class="la la-search"></i>
@@ -379,31 +384,40 @@
                                     </label>
                                 </div>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hwbno'), 'sorting_desc': (!isDesc && sortKey == 'hwbno'), 'sorting': sortKey != 'hwbno' }"
+                                (click)="sort('hwbno')">
                                 <span>HBL No</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerNames'), 'sorting_desc': (!isDesc && sortKey == 'containerNames'), 'sorting': sortKey != 'containerNames' }"
+                                (click)="sort('containerNames')">
                                 <span>No of Pieces</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gw'), 'sorting_desc': (!isDesc && sortKey == 'gw'), 'sorting': sortKey != 'gw' }"
+                                (click)="sort('gw')">
                                 <span>G.W</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbm'), 'sorting_desc': (!isDesc && sortKey == 'cbm'), 'sorting': sortKey != 'cbm' }"
+                                (click)="sort('cbm')">
                                 <span>CBM</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'podName'), 'sorting_desc': (!isDesc && sortKey == 'podName'), 'sorting': sortKey != 'podName' }"
+                                (click)="sort('podName')">
                                 <span>Destination</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'shipperDescription'), 'sorting_desc': (!isDesc && sortKey == 'shipperDescription'), 'sorting': sortKey != 'shipperDescription' }"
+                                (click)="sort('shipperDescription')">
                                 <span>Shipper</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'consigneeDescription'), 'sorting_desc': (!isDesc && sortKey == 'consigneeDescription'), 'sorting': sortKey != 'consigneeDescription' }"
+                                (click)="sort('consigneeDescription')">
                                 <span>Consignee</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'desOfGoods'), 'sorting_desc': (!isDesc && sortKey == 'desOfGoods'), 'sorting': sortKey != 'desOfGoods' }"
+                                (click)="sort('desOfGoods')">
                                 <span>Description</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'freightPayment'), 'sorting_desc': (!isDesc && sortKey == 'freightPayment'), 'sorting': sortKey != 'freightPayment' }"
+                                (click)="sort('freightPayment')">
                                 <span>Freight Charge</span>
                             </th>
                         </tr>
@@ -411,44 +425,44 @@
                     <tbody class="tbody-group" *ngIf="housebills">
                         <tr class="" *ngFor="let detail of housebills; let i=index">
                             <ng-container *ngIf="detail.isRemove == false">
-
+                                <td class="table-actions-col">
+                                    <div class="table-actions">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" [checked]="detail.isChecked" 
+                                                (change)="detail.isChecked=!detail.isChecked; removeAllChecked();">
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>{{ detail.hwbno }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.containerNames }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.gw }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.cbm }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.podName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.shipperDescription }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.consigneeDescription }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.desOfGoods }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.freightPayment }}</span>
+                                </td>
                             </ng-container>
-                            <td class="table-actions-col">
-                                <div class="table-actions">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" name="" [checked]="detail.isChecked" 
-                                            (change)="detail.isChecked=!detail.isChecked; removeChecked();">
-                                        <span></span>
-                                    </label>
-                                </div>
-                            </td>
-                            <td>
-                                <span>{{ detail.hwbno }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.containerNames }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.gw }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.cbm }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.podName }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.shipperDescription }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.consigneeDescription }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.desOfGoods }}</span>
-                            </td>
-                            <td>
-                                <span>{{ detail.freightPayment }}</span>
-                            </td>
+                            
                         </tr>
                     </tbody>
                 </table>
@@ -482,7 +496,10 @@
                             <div class="col-lg-4 order-2 order-lg-1">
                                 <div class="form-group">
                                     <div class="m-input-icon m-input-icon--left">
-                                        <input type="text" class="form-control m-input m-input--square"
+                                        <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                        [ngModel]="searchHouseRemoved"
+                                        (change)="searchHouseRemoved = searchHouseRemoved.trim()"
+                                        (ngModelChange)="searchHouseBillRemoved($event)" name="searchHouseRemoved"
                                             placeholder="Search...">
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
                                             <span>
@@ -530,80 +547,47 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="tbody-group">
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
+                            <tbody class="tbody-group" *ngIf="housebillsRemoved">
+                                <tr class="" *ngFor="let detail of housebillsRemoved; let i=index">
+                                    <ng-container>
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" name="" [checked]="detail.isChecked" 
+                                                        (change)="detail.isChecked=!detail.isChecked; removeChecked();">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.hwbno }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.containerNames }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.gw }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.cbm }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.podName }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.shipperDescription }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.consigneeDescription }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.desOfGoods }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.freightPayment }}</span>
+                                        </td>
+                                    </ng-container>
+                                    
                                 </tr>
                             </tbody>
                         </table>
@@ -614,7 +598,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="addHouse()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -673,3 +657,40 @@
     </div>
 </div>
 <!--end::confirm-refresh-manifest-modal-->
+
+<!--begin::preview-modal-->
+<div class="modal fade" id="preview-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe src="http://localhost:57587/api/CsTransaction?apiUrl=" height="500" width="100%"></iframe>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="addHouse()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            add HBL
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::preview-modal-->

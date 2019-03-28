@@ -150,15 +150,11 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>Tâm</td>
-                                                                    <td>Tâm Tâm Full Name</td>
-                                                                    <td>Cs</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>Thor</td>
-                                                                    <td>Thor Thế Full Name</td>
+                                                            <tbody *ngIf="userInCharges">
+                                                                <tr *ngFor="let user of userInCharges;let i = index;" class="data-row data-selected" 
+                                                                    data-id="{{i}}">
+                                                                    <td>{{ user.username }}</td>
+                                                                    <td>{{ user.employeeNameVn }}</td>
                                                                     <td>Cs</td>
                                                                 </tr>
                                                             </tbody>
@@ -173,6 +169,63 @@
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
                                             Supplier <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="dropdown e--combogrid">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-filter-block">
+                                                            <div class="search-field">
+                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                    placeholder="Search...">
+                                                                <i class="icon-search"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Partner name</th>
+                                                                        <th>Name ABBR</th>
+                                                                        <th>Partner name</th>
+                                                                        <th>Tax code</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody *ngIf="suppliers">
+                                                                <tr class="data-row data-selected" *ngFor="let supplier of suppliers;let i = index;" data-id="{{i}}">
+                                                                    <td>{{ supplier.accountNo }}</td>
+                                                                    <td>{{ supplier.shortName }}</td>
+                                                                    <td>{{ supplier.partnerNameEn }}</td>
+                                                                    <td>{{ supplier.taxCode }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Attention
+                                        </label>
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Shipper <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
@@ -226,23 +279,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Attention
-                                        </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Shipper <span class="m--font-danger">(*)</span>
-                                        </label>
                                         <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
                                     </div>
                                 </div>

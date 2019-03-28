@@ -8,6 +8,7 @@ import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
     selector: 'app-manifest',
@@ -24,15 +25,36 @@ export class ManifestComponent implements OnInit {
     portOfLadings: any[] = [];
     portOfDestinations: any[] = [];
     housebills: any[] = [];
+    housebillsRemoved: any[] = [];
     isLoad = false;
     checkAll = false;
+    totalGW = 0;
+    totalCBM = 0;
+    searchHouse = '';
+    searchHouseRemoved = '';
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
-        private api_menu: API_MENU) {
+        private api_menu: API_MENU,
+        private sortService: SortService) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+    }
+    
+    async ngOnInit() {
+        await this.getShipmentCommonData();
+        await this.getPortOfLading(null);
+        await this.getPortOfDestination(null);
+        await this.route.params.subscribe(async prams => {
+            if(prams.id != undefined){          
+                await this.getShipmentDetail(prams.id);
+                this.getManifest();
+                await this.getHouseBillList(prams.id);
+                this.getTotalWeight();
+                this.isLoad = true;
+            }
+        });
     }
     checkAllChange(){
         if(this.checkAll){
@@ -46,23 +68,38 @@ export class ManifestComponent implements OnInit {
             });
         }
     }
-    removeChecked(){
+    removeAllChecked(){
         this.checkAll = false;
-        this.checkAllChange();
     }
-    async ngOnInit() {
-        await this.getShipmentCommonData();
-        await this.getPorIndexs(null);
-        await this.route.params.subscribe(async prams => {
-            if(prams.id != undefined){          
-                await this.getShipmentDetail(prams.id);
-                this.getManifest();
-                await this.getHouseBillList(prams.id);
-                this.isLoad = true;
+    getTotalWeight(){
+        this.totalCBM = 0;
+        this.totalGW = 0;
+        this.housebills.forEach(x =>{
+            if(x.isRemove == false){
+                this.totalGW = this.totalGW + x.gw;
+                this.totalCBM = this.totalCBM + x.cbm;
             }
         });
+        this.manifest["weight"] = this.totalGW;
+        this.manifest["volume"]= this.totalCBM;
+    }
+    changePortLoading(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getPortOfLading(keySearch);
+    }
+    changePortDestination(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getPortOfDestination(keySearch);
     }
     getManifest(){
+        //MSEYYMM/#####: YYYY-MM-DDTHH:mm:ss.sssZ
+        let date = new Date().toISOString().substr(0, 19);
+        let jobNo = this.shipment.jobNo;
+        this.manifest["referenceNo"] = "MSE" + date.substring(2, 4) + date.substring(5,7) + jobNo.substring(jobNo.length-5, jobNo.length);
         this.manifest["supplierName"] = this.shipment["supplierName"];
         let index = this.freigtCharges.findIndex(x => x.id == this.shipment.paymentTerm);
         if(index > -1){
@@ -87,6 +124,7 @@ export class ManifestComponent implements OnInit {
         this.manifest["volume"] = null;
         this.manifest["agentAssembled"] = null;
         this.getManifest();
+        this.getHouseBillList(this.shipment.id);
     }
     saveManifest(){
         console.log(this.manifest);
@@ -96,8 +134,22 @@ export class ManifestComponent implements OnInit {
         this.housebills.forEach(x => {
             if(x.isChecked){
                 x.isRemove = true;
+                x.isChecked = false;
             }
         });
+        this.housebillsRemoved = this.housebills.filter(x => x.isRemove == true);
+        this.checkAll = false;
+        this.getTotalWeight();
+    }
+    addHouse(){
+        this.housebills.forEach(x => {
+            if(x.isChecked){
+                x.isRemove = false;
+                x.isChecked = false;
+            }
+        });
+        this.housebillsRemoved = this.housebills.filter(x => x.isRemove == true);
+        this.getTotalWeight();
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
@@ -107,19 +159,29 @@ export class ManifestComponent implements OnInit {
         const data = await shipmentHelper.getShipmentCommonData(this.baseServices, this.api_menu);
         this.freigtCharges = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
     }
-    async getPorIndexs(searchText: any) {
+    async getPortOfLading(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
         const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
         if (portIndexs != null) {
             this.portOfLadings = portIndexs.data;
-            this.portOfDestinations = portIndexs.data;
             console.log(this.portOfLadings);
         }
         else{
             this.portOfLadings = [];
+        }
+    }
+    async getPortOfDestination(searchText: any) {
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        if (portIndexs != null) {
+            this.portOfDestinations = portIndexs.data;
+            console.log(this.portOfLadings);
+        }
+        else{
             this.portOfDestinations = [];
         }
     }
+    housebillsTemp: any[];
     async getHouseBillList(jobId: String){
         var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
         if(responses != null){
@@ -128,13 +190,56 @@ export class ManifestComponent implements OnInit {
                 element.isRemove = false;
             });
             this.housebills = responses;
+            this.housebillsTemp = Object.assign([], this.housebills);
+            this.housebillsRemoved = this.housebills.filter(x => x.isRemove == true);
         }
         else{
             this.housebills = [];
+            this.housebillsRemoved = [];
+            this.housebillsTemp = [];
         }
         console.log(this.shipment.csTransactionDetails);
     }
 
+    isDesc = false;
+    sortKey: string = "jobNo";
+    sort(property: string) {
+      this.isDesc = !this.isDesc;
+      this.sortKey = property;
+      this.housebills = this.sortService.sort(this.housebills, property, this.isDesc);
+    }
+    searchHouseBill(keySearch: any){
+        keySearch = keySearch != null ? keySearch.trim().toLowerCase() : "";
+        this.housebills = Object.assign([], this.housebillsTemp).filter(
+            item => ((item.hwbno.toLowerCase().includes(keySearch)
+                || (item.containerNames != null ? item.containerNames.toLowerCase() : "").includes(keySearch)
+                || (item.gw != null ? item.gw.toString().toLowerCase() : "").includes(keySearch)
+                || (item.cbm != null ? item.cbm.toString().toLowerCase() : "").includes(keySearch)
+                || (item.podName != null ? item.podName.toLowerCase() : "").includes(keySearch)
+                || (item.shipperDescription != null ? item.shipperDescription.toLowerCase() : "").includes(keySearch)
+                || (item.consigneeDescription != null ? item.consigneeDescription.toLowerCase() : "").includes(keySearch)
+                || (item.desOfGoods != null ? item.desOfGoods.toLowerCase() : "").includes(keySearch)
+                || (item.freightPayment != null ? item.freightPayment.toLowerCase() : "").includes(keySearch))
+                && item.isRemove == false
+            )
+        );
+    }
+    searchHouseBillRemoved(keySearch: any){
+        keySearch = keySearch != null ? keySearch.trim().toLowerCase() : "";
+        this.housebillsRemoved = Object.assign([], this.housebillsTemp).filter(
+            item => ((item.hwbno.toLowerCase().includes(keySearch)
+                || (item.containerNames != null ? item.containerNames.toLowerCase() : "").includes(keySearch)
+                || (item.gw != null ? item.gw.toString().toLowerCase() : "").includes(keySearch)
+                || (item.cbm != null ? item.cbm.toString().toLowerCase() : "").includes(keySearch)
+                || (item.podName != null ? item.podName.toLowerCase() : "").includes(keySearch)
+                || (item.shipperDescription != null ? item.shipperDescription.toLowerCase() : "").includes(keySearch)
+                || (item.consigneeDescription != null ? item.consigneeDescription.toLowerCase() : "").includes(keySearch)
+                || (item.desOfGoods != null ? item.desOfGoods.toLowerCase() : "").includes(keySearch)
+                || (item.freightPayment != null ? item.freightPayment.toLowerCase() : "").includes(keySearch))
+                && item.isRemove == true
+            )
+        );
+    }
     /**
      * Daterange picker
      */
