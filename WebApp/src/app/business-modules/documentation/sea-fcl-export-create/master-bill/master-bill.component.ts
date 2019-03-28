@@ -45,7 +45,8 @@ export class MasterBillComponent implements OnInit{
 
     async ngOnInit() {
         this.baseServices.spinnerShow();
-        await this.getPorIndexs(null);
+        await this.getPortLoading(null);
+        await this.changePortDestination(null);
         await this.getColoaders(null);
         await this.getAgents(null);
         await this.getUserInCharges(null);
@@ -118,11 +119,17 @@ export class MasterBillComponent implements OnInit{
         }
         this.baseServices.spinnerHide();
     }
-    changePort(keySearch: any) {
+    changePortLoading(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
             return 0;
         }
-        this.getPorIndexs(keySearch);
+        this.getPortLoading(keySearch);
+    }
+    changePortDestination(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getDestinations(keySearch);
     }
     changeAgent(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
@@ -149,7 +156,8 @@ export class MasterBillComponent implements OnInit{
         this.terms = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
         this.shipmentTypes = dataHelper.prepareNg2SelectData(data.shipmentTypes, 'value', 'displayName');
     }
-    async getPorIndexs(searchText: any) {
+    
+    async getPortLoading(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
@@ -157,11 +165,23 @@ export class MasterBillComponent implements OnInit{
         const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
         if (portIndexs != null) {
             this.portOfLadings = portIndexs.data;
-            this.portOfDestinations = portIndexs.data;
             console.log(this.portOfLadings);
         }
         else{
             this.portOfLadings = [];
+        }
+    }
+    async getDestinations(searchText: any) {
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            portSearchIndex.inactive = null;
+        }
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        if (portIndexs != null) {
+            this.portOfDestinations = portIndexs.data;
+            console.log(this.portOfLadings);
+        }
+        else{
             this.portOfDestinations = [];
         }
     }

@@ -195,8 +195,11 @@ namespace eFMS.API.Catalogue.DL.Services
                             CurrencyFromId = item.CurrencyFromId,
                             CurrencyToId = model.CurrencyToId,
                             Rate = item.Rate,
+                            Inactive = false,
                             UserCreated = model.UserModified,
-                            DatetimeCreated = DateTime.Now
+                            DatetimeCreated = DateTime.Now,
+                            UserModified = model.UserModified,
+                            DatetimeModified = DateTime.Now
                         };
                         ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Add(rate);
                     }
