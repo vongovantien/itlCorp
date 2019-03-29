@@ -123,9 +123,13 @@ export class CreditAndDebitNoteComponent implements OnInit {
     }
 
 
-    ListRemainingCharges: any[] = [];
+    ListChargesFromAdd: any[] = [];
     addNewRemainingChargesCatcher(event: any) {
-        this.ListRemainingCharges = event;
+        this.ListChargesFromAdd = cloneDeep(event);
+    }
+    ListChargesFromRemaining: any[] = [];
+    chargesFromRemainingCatcher(event:any){
+       this.ListChargesFromRemaining = cloneDeep(event);
     }
 
     currentPartnerId: string = null;

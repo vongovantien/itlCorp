@@ -16,6 +16,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState AddNewSOA(AcctSOAModel model);
         HandleState UpdateSOA(AcctSOAModel model);
         List<object> GroupSOAByPartner(Guid JobId);
+        object GetSOADetails(Guid JobId, string SOACode);
         
     }
 }

@@ -181,8 +181,57 @@ namespace eFMS.API.Documentation.DL.Services
             return listCharges;
         }
 
+        public object GetSOADetails(Guid JobId, string SOACode)
+        {
+            var Shipment = ((eFMSDataContext)DataContext.DC).CsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
+            var Soa = DataContext.Where(x => x.Code == SOACode).FirstOrDefault();
+            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == Soa.PartnerId).FirstOrDefault();
+
+            var pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment.Pol).FirstOrDefault();
+            var pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment.Pod).FirstOrDefault();
+
+            if (Shipment==null || Soa == null || partner==null)
+            {
+                return null;
+            }
+            
+            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == SOACode).ToList();
+            List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
+            foreach(var item in charges)
+            {
+                var hb = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == item.Hblid).FirstOrDefault();
+                HBList.Add(hb);
+                HBList = HBList.Distinct().ToList().OrderBy(x => x.Hwbno).ToList();
+            }
+
+            var hbOfLadingNo = string.Empty;
+            foreach(var item in HBList)
+            {
+                hbOfLadingNo += (item.Hwbno + ", ");
+
+            }
 
 
 
+            var returnObj = new
+            {
+                partnerNameEn = partner.PartnerNameEn,
+                partnerShippingAddress = partner.AddressShippingEn,
+                partnerTel = partner.Tel,
+                partnerTaxcode = partner.TaxCode,
+                hbLadingNo = hbOfLadingNo,
+                jobId = Shipment.Id,
+                pol = pol.NameEn,
+                polCountry = ((eFMSDataContext)DataContext.DC).CatCountry.Where(x => x.Id == pol.CountryId).FirstOrDefault().NameEn,
+
+                pod = pod.NameEn,
+                podCountry = ((eFMSDataContext)DataContext.DC).CatCountry.Where(x => x.Id == pod.CountryId).FirstOrDefault().NameEn,
+
+                vessel = Shipment.FlightVesselName,
+                containersQty =  Shipment.PackageContainer
+
+            };
+
+        }
     }
 }

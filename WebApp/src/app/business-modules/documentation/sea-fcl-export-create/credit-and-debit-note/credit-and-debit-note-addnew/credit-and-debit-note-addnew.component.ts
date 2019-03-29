@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import concat from 'lodash/concat'
@@ -34,6 +34,10 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   @Output() addNewRemainingCharges = new EventEmitter<any>();
   @Output() currentPartnerIdEmit = new EventEmitter<string>();
+  @Input() set chargesFromRemaining(listCharges:any){
+    this.listChargeOfPartner = cloneDeep(listCharges);
+    this.constListChargeOfPartner = cloneDeep(listCharges);
+  }
 
   constructor(
     private baseServices: BaseService,
@@ -285,16 +289,20 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
         const indexParent = parseInt($(parentElement).attr("data-id"));
         $(parentElement).prop("checked", false);
 
-
-        // problem ? 
         this.listChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = true;
-        this.constListChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = true;
+        const hbId = this.listChargeOfPartner[indexParent].id;
+        const chargeId = this.listChargeOfPartner[indexParent].listCharges[indexSingle].id;
+        const constParentInx = this.constListChargeOfPartner.map(x=>x.id).indexOf(hbId);
+        const constChargeInx = this.constListChargeOfPartner[constParentInx].listCharges.map((x:any)=>x.id).indexOf(chargeId);
+        this.constListChargeOfPartner[constParentInx].listCharges[constChargeInx].isRemaining = true;
+       
       }
     }
 
     this.setChargesForCDNote()
     this.checkSttAllNode();
-    this.addNewRemainingCharges.emit(this.listChargeOfPartner);
+    this.listChargeOfPartner = this.constListChargeOfPartner;
+    this.addNewRemainingCharges.emit(this.constListChargeOfPartner);
     this.totalCreditDebitCalculate()
   }
 
