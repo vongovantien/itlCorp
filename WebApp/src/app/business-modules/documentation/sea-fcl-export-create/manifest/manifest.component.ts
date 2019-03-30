@@ -9,6 +9,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 
 @Component({
     selector: 'app-manifest',
@@ -17,8 +18,8 @@ import { SortService } from 'src/app/shared/services/sort.service';
 })
 export class ManifestComponent implements OnInit {
     shipment: CsTransaction = new CsTransaction();
-    manifest: any = {};
-    freigtCharges: any[] = [];
+    manifest: CsManifest = new CsManifest();
+    paymentTerms: any[] = [];
     paymentTermActive: any[] = [];
     etdSelected: any;
     coloaders: any[] = [];
@@ -49,7 +50,7 @@ export class ManifestComponent implements OnInit {
         await this.route.params.subscribe(async prams => {
             if(prams.id != undefined){          
                 await this.getShipmentDetail(prams.id);
-                this.getManifest();
+                this.getNewManifest();
                 await this.getHouseBillList(prams.id);
                 this.getTotalWeight();
                 this.isLoad = true;
@@ -80,8 +81,8 @@ export class ManifestComponent implements OnInit {
                 this.totalCBM = this.totalCBM + x.cbm;
             }
         });
-        this.manifest["weight"] = this.totalGW;
-        this.manifest["volume"]= this.totalCBM;
+        this.manifest.weight = this.totalGW;
+        this.manifest.volume= this.totalCBM;
     }
     changePortLoading(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
@@ -95,16 +96,16 @@ export class ManifestComponent implements OnInit {
         }
         this.getPortOfDestination(keySearch);
     }
-    getManifest(){
+    getNewManifest(){
         //MSEYYMM/#####: YYYY-MM-DDTHH:mm:ss.sssZ
         let date = new Date().toISOString().substr(0, 19);
         let jobNo = this.shipment.jobNo;
-        this.manifest["referenceNo"] = "MSE" + date.substring(2, 4) + date.substring(5,7) + jobNo.substring(jobNo.length-5, jobNo.length);
-        this.manifest["supplierName"] = this.shipment["supplierName"];
-        let index = this.freigtCharges.findIndex(x => x.id == this.shipment.paymentTerm);
+        this.manifest.refNo = "MSE" + date.substring(2, 4) + date.substring(5,7) + jobNo.substring(jobNo.length-5, jobNo.length);
+        this.manifest.supplier = this.shipment["supplierName"];
+        let index = this.paymentTerms.findIndex(x => x.id == this.shipment.paymentTerm);
         if(index > -1){
-            this.paymentTermActive = [this.freigtCharges[index]];
-            this.manifest["freigtCharge"] = this.freigtCharges[index].id;
+            this.paymentTermActive = [this.paymentTerms[index]];
+            this.manifest.paymentTerm = this.paymentTerms[index].id;
         } 
         this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
         index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
@@ -113,17 +114,17 @@ export class ManifestComponent implements OnInit {
         if(index > -1) this.manifest["pod"] = this.portOfDestinations[index].id;
     }
     refreshManifest(){
-        this.manifest["referenceNo"] = null;
-        this.manifest["supplierName"] = null;
-        this.manifest["attention"] = null;
-        this.manifest["markOfNationality"] = null;
-        this.manifest["vesselNo"] = null;
-        this.manifest["consolidator"] = null;
-        this.manifest["deconsolidator"] = null;
-        this.manifest["weight"] = null;
-        this.manifest["volume"] = null;
-        this.manifest["agentAssembled"] = null;
-        this.getManifest();
+        this.manifest.refNo = null;
+        this.manifest.supplier = null;
+        this.manifest.attention = null;
+        this.manifest.masksOfRegistration = null;
+        this.manifest.voyNo = null;
+        this.manifest.consolidator = null;
+        this.manifest.deConsolidator = null;
+        this.manifest.weight = null;
+        this.manifest.volume = null;
+        this.manifest.manifestIssuer = null;
+        this.getNewManifest();
         this.getHouseBillList(this.shipment.id);
     }
     saveManifest(){
@@ -157,7 +158,7 @@ export class ManifestComponent implements OnInit {
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getShipmentCommonData(this.baseServices, this.api_menu);
-        this.freigtCharges = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
+        this.paymentTerms = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
     }
     async getPortOfLading(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };

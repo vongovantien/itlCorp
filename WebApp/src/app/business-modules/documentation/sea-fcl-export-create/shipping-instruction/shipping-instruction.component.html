@@ -254,24 +254,12 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="shippers">
+                                                                <tr class="data-row data-selected" *ngFor="let shipper of shippers;let i = index;" data-id="{{i}}">
+                                                                    <td>{{ shipper.accountNo }}</td>
+                                                                    <td>{{ shipper.shortName }}</td>
+                                                                    <td>{{ shipper.partnerNameEn }}</td>
+                                                                    <td>{{ shipper.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -314,24 +302,12 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="consignees">
+                                                                <tr class="data-row data-selected" *ngFor="let consignee of consignees;let i = index;" data-id="{{i}}">
+                                                                    <td>{{ consignee.accountNo }}</td>
+                                                                    <td>{{ consignee.shortName }}</td>
+                                                                    <td>{{ consignee.partnerNameEn }}</td>
+                                                                    <td>{{ consignee.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -384,24 +360,12 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="realShippers">
+                                                                <tr class="data-row data-selected" *ngFor="let realShipper of realShippers;let i = index;" data-id="{{i}}">
+                                                                    <td>{{ realShipper.accountNo }}</td>
+                                                                    <td>{{ realShipper.shortName }}</td>
+                                                                    <td>{{ realShipper.partnerNameEn }}</td>
+                                                                    <td>{{ realShipper.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -444,24 +408,12 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="realConsignees">
+                                                                <tr class="data-row data-selected" *ngFor="let realConsignee of realConsignees;let i = index;" data-id="{{i}}">
+                                                                    <td>{{ realConsignee.accountNo }}</td>
+                                                                    <td>{{ realConsignee.shortName }}</td>
+                                                                    <td>{{ realConsignee.partnerNameEn }}</td>
+                                                                    <td>{{ realConsignee.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -478,7 +430,7 @@
                                         <label class="form-control-label" for="">
                                             Payment Type <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="paymentTypes"  [disabled]="disabled"
+                                        <ng-select [allowClear]="true" [items]="paymentTerms"  [disabled]="disabled"
                                             (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                             (typed)="typed($event)" placeholder="Please selected">
                                         </ng-select>

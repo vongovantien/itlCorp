@@ -54,27 +54,27 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && referenceNo.invalid }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && refNo.invalid }">
                             <label class="form-control-label" for="">
-                                Reference No <span class="m--font-danger" *ngIf="formManifest.submitted && referenceNo.invalid">(*)</span>
+                                Reference No <span class="m--font-danger" *ngIf="formManifest.submitted && refNo.invalid">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="referenceNo" [(ngModel)]="manifest.referenceNo" #referenceNo="ngModel"
-                                (change)="manifest.referenceNo = manifest.referenceNo.trim()" required disabled>
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && referenceNo.invalid">
+                                name="refNo" [(ngModel)]="manifest.refNo" #refNo="ngModel"
+                                (change)="manifest.refNo = manifest.refNo.trim()" required disabled>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && refNo.invalid">
                                 Reference No is required
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && supplierName.invalid }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && supplier.invalid }">
                             <label class="form-control-label" for="">
                                 Supplier <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="Enter master bill of lading no"
-                              autocomplete="nope" [(ngModel)]="manifest.supplierName" name="supplierName" #supplierName="ngModel"
-                              (change)="manifest.supplierName = manifest.supplierName.trim()" required>
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && supplierName.invalid">
+                              autocomplete="nope" [(ngModel)]="manifest.supplier" name="supplier" #supplier="ngModel"
+                              (change)="manifest.supplier = manifest.supplier.trim()" required>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && supplier.invalid">
                                 Supplier is required
                             </div>
                             <!-- <input type="text" class="form-control m-input m-input--square" placeholder=""> -->
@@ -93,27 +93,27 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && markOfNationality.invalid }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && masksOfRegistration.invalid }">
                             <label class="form-control-label" for="">
                                 Marks of Nationality & Registration <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
-                                name="markOfNationality" [(ngModel)]="manifest.markOfNationality" #markOfNationality="ngModel"
-                                (change)="manifest.markOfNationality = manifest.markOfNationality.trim()" required>
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && markOfNationality.invalid">
+                                name="masksOfRegistration" [(ngModel)]="manifest.masksOfRegistration" #masksOfRegistration="ngModel"
+                                (change)="manifest.masksOfRegistration = manifest.masksOfRegistration.trim()" required>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && masksOfRegistration.invalid">
                                 Marks of Nationality & Registration is required
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && vesselNo.invalid }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && voyNo.invalid }">
                             <label class="form-control-label" for="">
                                 Vessel No <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="vesselNo" [(ngModel)]="manifest.vesselNo" #vesselNo="ngModel" autocomplete="nope"
-                                (change)="manifest.vesselNo = manifest.vesselNo.trim()" required >
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && vesselNo.invalid">
+                                name="voyNo" [(ngModel)]="manifest.voyNo" #voyNo="ngModel" autocomplete="nope"
+                                (change)="manifest.voyNo = manifest.voyNo.trim()" required >
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && voyNo.invalid">
                                 Vessel No is required
                             </div>
                         </div>
@@ -243,19 +243,19 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.freigtCharge == null }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.paymentTerm == null }">
                             <label class="form-control-label" for="">
                                 Freight Charge <span class="m--font-danger">(*)</span>
                             </label>
                             <ng-select [allowClear]="true" 
-                                [items]="freigtCharges" 
+                                [items]="paymentTerms" 
                                 [disabled]="disabled"
                                 [active]="paymentTermActive"
-                                (data)="refreshValue($event)" (selected)="manifest.freigtCharge = $event.id" 
-                                (removed)="manifest.freigtCharge = null"
+                                (data)="refreshValue($event)" (selected)="manifest.paymentTerm = $event.id" 
+                                (removed)="manifest.paymentTerm = null"
                                 (typed)="typed($event)" placeholder="Please selected">
                             </ng-select>
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.freigtCharge == null">
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.paymentTerm == null">
                                 Freight Charge is required
                             </div>
                         </div>
@@ -280,8 +280,8 @@
                                         De-Consolidator
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
-                                        name="deconsolidator" [(ngModel)]="manifest.deconsolidator" #deconsolidator="ngModel"
-                                        (change)="manifest.deconsolidator = manifest.deconsolidator.trim()">
+                                        name="deConsolidator" [(ngModel)]="manifest.deConsolidator" #deConsolidator="ngModel"
+                                        (change)="manifest.deConsolidator = manifest.deConsolidator.trim()">
                                 </div>
                             </div>
                         </div>
@@ -309,15 +309,15 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && agentAssembled.invalid }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifestIssuer.invalid }">
                             <label class="form-control-label" for="">
                                 Agent who assembled this manifest <span class="m--font-danger">(*)</span>
                             </label>
                             <textarea class="form-control m-input--square" id="" name="" rows="5" autocomplete="nope"
-                                name="agentAssembled" [(ngModel)]="manifest.agentAssembled" #agentAssembled="ngModel"
-                                (change)="manifest.agentAssembled = manifest.agentAssembled.trim()" required>
+                                name="manifestIssuer" [(ngModel)]="manifest.manifestIssuer" #manifestIssuer="ngModel"
+                                (change)="manifest.manifestIssuer = manifest.manifestIssuer.trim()" required>
                             </textarea>
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && agentAssembled.invalid">
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifestIssuer.invalid">
                                 Agent who assembled this manifest is required
                             </div>
                         </div>
