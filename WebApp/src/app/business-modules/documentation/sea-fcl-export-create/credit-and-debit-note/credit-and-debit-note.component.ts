@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output,EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../extend-data';
 import cloneDeep from 'lodash/cloneDeep'
 import filter from 'lodash/filter';
 import moment from 'moment/moment';
+
 
 declare var $: any;
 
@@ -135,6 +136,12 @@ export class CreditAndDebitNoteComponent implements OnInit {
     currentPartnerId: string = null;
     currentPartnerIdCatcher(event: any) {
         this.currentPartnerId = event;
+    }
+
+
+    EditingCDNote:string = null;
+    openEdit(soaNo:string){
+        this.EditingCDNote = soaNo;
     }
 
 }

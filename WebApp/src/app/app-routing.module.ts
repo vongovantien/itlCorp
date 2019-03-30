@@ -4,12 +4,14 @@ import { LoginComponent } from './login/login.component';
 import { MasterPageComponent } from './master-page/master-page.component';
 import { NotfoundPageComponent } from './notfound-page/notfound-page.component';
 import { AuthGuardService } from 'src/services-base/auth-guard.service';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
     {
         path: 'login',
         component: LoginComponent
     },
+
     {
         path: '',
         redirectTo: 'login', 
@@ -25,6 +27,10 @@ const routes: Routes = [
         canActivate:[AuthGuardService],
         component: MasterPageComponent,
         children: [
+            {
+                path:'dashboard',
+                component:DashboardComponent
+            },
             {
                 path: 'system',
                 loadChildren: './business-modules/system/system.module#SystemModule'

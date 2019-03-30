@@ -31,6 +31,8 @@
     "crypto-js": "^3.1.9-1",
     "exceljs": "^1.7.0",
     "file-saver": "^2.0.0",
+    "highcharts": "^7.0.3",
+    "highcharts-angular": "^2.4.0",
     "i18n": "^0.8.3",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",
@@ -49,9 +51,9 @@
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.12.2",
+    "@angular-devkit/build-angular": "^0.13.7",
     "@angular/cli": "^7.1.0",
-    "@angular/compiler-cli": "^7.2.5",
+    "@angular/compiler-cli": "^7.2.11",
     "@angular/language-service": "^7.1.4",
     "@babel/cli": "^7.2.3",
     "@babel/preset-env": "^7.4.2",
