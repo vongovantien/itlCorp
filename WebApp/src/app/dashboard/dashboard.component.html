@@ -25,7 +25,14 @@
                 <div class="row">
                     <div class="col">
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                            <input type="text" class="form-control m-input m-input--square"  placeholder="From date - to date" readonly/>
+                            <input type="text" class="form-control m-input m-input--square"
+                                ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                [(ngModel)]="selectedRange"
+                                [ranges]="ranges"
+                                [maxDate]="maxDate"
+                                [alwaysShowCalendars]="true"
+                                name="daterange" 
+                                placeholder="From date - to date" readonly/>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
@@ -61,23 +68,18 @@
     <div class="row m-row--no-padding m-row--col-separator-xl m--margin-bottom-20" style="background: #fff">
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Volume-->
-            <div class="m-widget24">
+            <div class="m-widget24 bg-primary">
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Volume
                     </h6>
                     <br>
                     <span class="m-widget24__desc">
-                        All Customs Value
+                        2000 SHIPT
                     </span>
-                    <span class="m-widget24__stats m--font-brand">
-                        $18M
-                    </span>
+                    <br>
                     <span class="m-widget24__change">
-                        Change
-                    </span>
-                    <span class="m-widget24__number">
-                        78%
+                        4000 HBL
                     </span>
                 </div>
             </div>
@@ -85,23 +87,18 @@
         </div>
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Weight-->
-            <div class="m-widget24">
+            <div class="m-widget24 bg-success">
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Weight
                     </h6>
                     <br>
                     <span class="m-widget24__desc">
-                        Customer Review
+                        2000 KG
                     </span>
-                    <span class="m-widget24__stats m--font-info">
-                        1349
-                    </span>
+                    <br>
                     <span class="m-widget24__change">
-                        Change
-                    </span>
-                    <span class="m-widget24__number">
-                        84%
+                        4000 CBM
                     </span>
                 </div>
             </div>
@@ -109,23 +106,18 @@
         </div>
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Revenue-->
-            <div class="m-widget24">
+            <div class="m-widget24 bg-warning">
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Revenue
                     </h6>
                     <br>
                     <span class="m-widget24__desc">
-                        Fresh Order Amount
+                        2000 USD
                     </span>
-                    <span class="m-widget24__stats m--font-danger">
-                        567
-                    </span>
+                    <br>
                     <span class="m-widget24__change">
-                        Change
-                    </span>
-                    <span class="m-widget24__number">
-                        69%
+                        4000 VND
                     </span>
                 </div>
             </div>
@@ -133,23 +125,18 @@
         </div>
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Customer-->
-            <div class="m-widget24">
+            <div class="m-widget24 bg-danger">
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Customer
                     </h6>
                     <br>
                     <span class="m-widget24__desc">
-                        Joined New User
+                        2000 CUST
                     </span>
-                    <span class="m-widget24__stats m--font-success">
-                        276
-                    </span>
+                    <br>
                     <span class="m-widget24__change">
-                        Change
-                    </span>
-                    <span class="m-widget24__number">
-                        90%
+                        &nbsp;
                     </span>
                 </div>
             </div>
@@ -164,7 +151,7 @@
                 <div class="col-lg-9">
                     <div class="chart-wrapper">
                         <div class="pull-right">
-                            <div class="btn-group btn-group" role="group" aria-label="...">
+                            <div class="btn-group btn-group fms-btn-group" role="group" aria-label="...">
                                 <button type="button" class="btn btn-secondary">Day</button>
                                 <button type="button" class="btn btn-secondary active">Month</button>
                                 <button type="button" class="btn btn-secondary">Quater</button>
@@ -220,7 +207,7 @@
                 <div class="col-lg-9">
                     <div class="chart-wrapper">
                         <div class="pull-right">
-                            <div class="btn-group btn-group" role="group" aria-label="...">
+                            <div class="btn-group btn-group fms-btn-group" role="group" aria-label="...">
                                 <button type="button" class="btn btn-secondary">Day</button>
                                 <button type="button" class="btn btn-secondary active">Month</button>
                                 <button type="button" class="btn btn-secondary">Quater</button>
@@ -276,7 +263,7 @@
                 <div class="col-lg-9">
                     <div class="chart-wrapper">
                         <div class="pull-right">
-                            <div class="btn-group btn-group" role="group" aria-label="...">
+                            <div class="btn-group btn-group fms-btn-group" role="group" aria-label="...">
                                 <button type="button" class="btn btn-secondary">Day</button>
                                 <button type="button" class="btn btn-secondary active">Month</button>
                                 <button type="button" class="btn btn-secondary">Quater</button>

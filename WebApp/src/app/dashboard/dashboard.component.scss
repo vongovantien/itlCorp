@@ -1,0 +1,21 @@
+.m-widget24  {
+    .m-widget24__item {
+        .m-widget24__title,
+        .m-widget24__desc,
+        .m-widget24__change {
+            color: #fff;
+            font-weight: inherit;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+    }
+}
+.fms-btn-group {
+    .btn {
+        &.active {
+            color: #fff;
+            background-color: #3966b6;
+            border-color: #3966b6;
+        }
+    }
+}

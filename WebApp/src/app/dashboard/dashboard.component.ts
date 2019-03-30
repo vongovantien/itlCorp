@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as moment from 'moment';
 import * as Highcharts from 'highcharts';
 
 @Component({
@@ -7,6 +8,37 @@ import * as Highcharts from 'highcharts';
     styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+    constructor() {
+        this.keepCalendarOpeningWithRange = true;
+        this.selectedDate = Date.now();
+        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+    }
+
+    ngOnInit() {
+    }
+
+    /**
+     * Daterange picker
+     */
+    selectedRange: any;
+    selectedDate: any;
+    keepCalendarOpeningWithRange: true;
+    maxDate: moment.Moment = moment();
+    ranges: any = {
+        Today: [moment(), moment()],
+        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [
+            moment()
+                .subtract(1, 'month')
+                .startOf('month'),
+            moment()
+                .subtract(1, 'month')
+                .endOf('month')
+        ]
+    };
     
     // highchart
     // https://www.npmjs.com/package/highcharts-angular
@@ -267,11 +299,5 @@ export class DashboardComponent implements OnInit {
             }
         ]
     };
-
-    constructor() { }
-
-    ngOnInit() {
-    }
-
-
+    
 }
