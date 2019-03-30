@@ -40,10 +40,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string ChiefAccountantStatus { get; set; }
         public string ChiefAccountantNote { get; set; }
         public string Status { get; set; }
-        public string UserCreated { get; set; }
-        public DateTime? DatetimeCreated { get; set; }
-        public string UserModified { get; set; }
-        public DateTime? DatetimeModified { get; set; }
         public string SoaadjustmentRequestor { get; set; }
         public DateTime? SoaadjustmentRequestedDate { get; set; }
         public string SoaadjustmentReason { get; set; }
@@ -55,5 +51,10 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? UnlockedSoadirectorDate { get; set; }
         public bool? Soaclosed { get; set; }
         public string Soano { get; set; }
+        public string OtherSoa { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }

@@ -29,6 +29,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsMawbcontainerService, CsMawbcontainerService>();
             services.AddTransient<ICsShipmentSurchargeService, CsShipmentSurchargeService>();
             services.AddTransient<IAcctSOAServices, AcctSOAServices>();
+            services.AddTransient<ICsManifestService, CsManifestService>();
         }
     }
 }

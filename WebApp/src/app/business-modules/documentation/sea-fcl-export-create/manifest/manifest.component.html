@@ -106,14 +106,14 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && vesselNo.invalid }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && voyNo.invalid }">
                             <label class="form-control-label" for="">
                                 Vessel No <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="vesselNo" [(ngModel)]="manifest.vesselNo" #vesselNo="ngModel" autocomplete="nope"
-                                (change)="manifest.vesselNo = manifest.vesselNo.trim()" required >
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && vesselNo.invalid">
+                                name="voyNo" [(ngModel)]="manifest.voyNo" #voyNo="ngModel" autocomplete="nope"
+                                (change)="manifest.voyNo = manifest.voyNo.trim()" required >
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && voyNo.invalid">
                                 Vessel No is required
                             </div>
                         </div>
@@ -280,8 +280,8 @@
                                         De-Consolidator
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
-                                        name="deconsolidator" [(ngModel)]="manifest.deconsolidator" #deconsolidator="ngModel"
-                                        (change)="manifest.deconsolidator = manifest.deconsolidator.trim()">
+                                        name="deConsolidator" [(ngModel)]="manifest.deConsolidator" #deConsolidator="ngModel"
+                                        (change)="manifest.deConsolidator = manifest.deConsolidator.trim()">
                                 </div>
                             </div>
                         </div>
@@ -309,15 +309,15 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && agentAssembled.invalid }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifestIssuer.invalid }">
                             <label class="form-control-label" for="">
                                 Agent who assembled this manifest <span class="m--font-danger">(*)</span>
                             </label>
                             <textarea class="form-control m-input--square" id="" name="" rows="5" autocomplete="nope"
-                                name="agentAssembled" [(ngModel)]="manifest.agentAssembled" #agentAssembled="ngModel"
-                                (change)="manifest.agentAssembled = manifest.agentAssembled.trim()" required>
+                                name="manifestIssuer" [(ngModel)]="manifest.manifestIssuer" #manifestIssuer="ngModel"
+                                (change)="manifest.manifestIssuer = manifest.manifestIssuer.trim()" required>
                             </textarea>
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && agentAssembled.invalid">
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifestIssuer.invalid">
                                 Agent who assembled this manifest is required
                             </div>
                         </div>

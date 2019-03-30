@@ -1739,6 +1739,11 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.OtherSoa)
+                    .HasColumnName("OtherSOA")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")
                     .HasMaxLength(50)

@@ -115,15 +115,15 @@ export class ManifestComponent implements OnInit {
     }
     refreshManifest(){
         this.manifest.refNo = null;
-        this.manifest["supplierName"] = null;
-        this.manifest["attention"] = null;
+        this.manifest.supplier = null;
+        this.manifest.attention = null;
         this.manifest.masksOfRegistration = null;
-        this.manifest["vesselNo"] = null;
-        this.manifest["consolidator"] = null;
-        this.manifest["deconsolidator"] = null;
-        this.manifest["weight"] = null;
-        this.manifest["volume"] = null;
-        this.manifest["agentAssembled"] = null;
+        this.manifest.voyNo = null;
+        this.manifest.consolidator = null;
+        this.manifest.deConsolidator = null;
+        this.manifest.weight = null;
+        this.manifest.volume = null;
+        this.manifest.manifestIssuer = null;
         this.getNewManifest();
         this.getHouseBillList(this.shipment.id);
     }
