@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 declare var $: any; 
 @Component({
   selector: 'app-credit-and-debit-note-remaining-charge',
@@ -13,7 +13,10 @@ export class CreditAndDebitNoteRemainingChargeComponent implements OnInit {
     console.log({"LIST_REMAINING_CHARGES":this.ListRemainingCharges});
   }
 
+
+
   @Input() partnerId:string = null;
+  @Output() chargesFromRemaining = new EventEmitter<any>();
   constructor() { }
 
   ngOnInit() {
@@ -32,6 +35,8 @@ export class CreditAndDebitNoteRemainingChargeComponent implements OnInit {
         this.ListRemainingCharges[indexParent].listCharges[indexSingle].isRemaining = false;
       }          
     }
+    this.chargesFromRemaining.emit(this.ListRemainingCharges);
+
   }
 
   selectAllChargeInGroup(event: any, indexGroup: number) {

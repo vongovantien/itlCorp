@@ -96,7 +96,7 @@
                                                 <span>{{s.soa.type}}</span>
                                             </td>
                                             <td>
-                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
+                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">{{s.soa.code}}</a>
                                             </td>
                                             <td>
                                                 <span>{{s.total_charge}}</span>
@@ -111,7 +111,7 @@
                                                 <span>{{s.soa.datetimeCreated | date:'dd/MM/yyyy'}}</span>
                                             </td>
                                             <td>
-                                                <span>{{s.soa.code}}</span>
+                                                <span>Other SOA No</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -131,7 +131,7 @@
 <!--end:: m-portlet-->
 
 <!--begin:: add-credit-debit-note-modal-->
-<app-credit-and-debit-note-addnew (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
+<app-credit-and-debit-note-addnew [chargesFromRemaining]="ListChargesFromRemaining" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
 <!--end:: add-credit-debit-note-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->
@@ -143,7 +143,7 @@
 <!--end:: edit-credit-debit-note-modal-->
 
 <!--begin:: add-remaining-charge-modal-->
-<app-credit-and-debit-note-remaining-charge [listRemainingCharges]="ListRemainingCharges" [partnerId]="currentPartnerId"></app-credit-and-debit-note-remaining-charge>
+<app-credit-and-debit-note-remaining-charge [listRemainingCharges]="ListChargesFromAdd" [partnerId]="currentPartnerId" (chargesFromRemaining)="chargesFromRemainingCatcher($event)"></app-credit-and-debit-note-remaining-charge>
 <!--end:: add-remaining-charge-modal-->
 
 <!--begin::confirm-delete-modal-->

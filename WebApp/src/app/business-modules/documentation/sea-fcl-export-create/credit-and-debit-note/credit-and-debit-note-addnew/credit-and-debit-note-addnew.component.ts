@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import concat from 'lodash/concat'
@@ -20,7 +20,7 @@ import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSu
 export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   CDNoteWorking: AcctSOA = new AcctSOA();
-  isDisplayAddSoaForm:boolean = true;
+  isDisplayAddSoaForm: boolean = true;
   noteTypes = [
     { text: 'CREDIT', id: 'CREDIT' },
     { text: 'DEBIT', id: 'DEBIT' },
@@ -29,11 +29,15 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
   listSubjectPartner: any[] = []; // data for combobox Subject to Partner 
   constListSubjectPartner: any[] = [];
   listChargeOfPartner: any[] = []; // charges list group by housebill when choose a partner 
-  listRemainingCharges: any[] = []; 
+  listRemainingCharges: any[] = [];
   constListChargeOfPartner: any[] = [];
 
   @Output() addNewRemainingCharges = new EventEmitter<any>();
   @Output() currentPartnerIdEmit = new EventEmitter<string>();
+  @Input() set chargesFromRemaining(listCharges:any){
+    this.listChargeOfPartner = cloneDeep(listCharges);
+    this.constListChargeOfPartner = cloneDeep(listCharges);
+  }
 
   constructor(
     private baseServices: BaseService,
@@ -54,13 +58,14 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
   }
   async getListCharges(partnerId: string) {
     this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?JobId=" + ExtendData.currentJobID + "&partnerID=" + partnerId);
-    this.CDNoteWorking.listShipmentSurcharge = [];
-    this.listChargeOfPartner = map(this.listChargeOfPartner,function(o){
-      for(var i = 0; i< o.listCharges.length;i++){
+    this.CDNoteWorking.listShipmentSurcharge = [];    
+    this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
+      for (var i = 0; i < o.listCharges.length; i++) {
         o.listCharges[i].isRemaining = false;
       }
       return o;
     });
+    this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
     this.setChargesForCDNote();
     this.totalCreditDebitCalculate();
     this.addNewRemainingCharges.emit(this.listChargeOfPartner);
@@ -68,22 +73,22 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     setTimeout(() => {
       this.checkSttAllNode();
     }, 100);
-    
+
 
   }
 
 
-  setChargesForCDNote(){
+  setChargesForCDNote() {
     this.CDNoteWorking.listShipmentSurcharge = [];
-    this.listChargeOfPartner.forEach(element => { 
-      this.CDNoteWorking.listShipmentSurcharge = concat(this.CDNoteWorking.listShipmentSurcharge,element.listCharges);
+    this.listChargeOfPartner.forEach(element => {
+      this.CDNoteWorking.listShipmentSurcharge = concat(this.CDNoteWorking.listShipmentSurcharge, element.listCharges);
     });
   }
 
-  SearchPartner(search_key: string) {   
-    this.listSubjectPartner = filter(this.constListSubjectPartner,function(x:any){
+  SearchPartner(search_key: string) {
+    this.listSubjectPartner = filter(this.constListSubjectPartner, function (x: any) {
       return (
-          ((x.id == null ? "" : x.id.toLowerCase().includes(search_key)) ||
+        ((x.id == null ? "" : x.id.toLowerCase().includes(search_key)) ||
           (x.shortName == null ? "" : x.shortName.toLowerCase().includes(search_key)) ||
           (x.partnerNameEn == null ? "" : x.partnerNameEn.toLowerCase().includes(search_key)) ||
           (x.taxCode == null ? "" : x.taxCode.toLowerCase().includes(search_key)))
@@ -91,54 +96,100 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     });
   }
 
-  async CreateCDNote(form:NgForm) {
-    if(form.submitted){
+  SearchCharge(search_key: string) {
+    // listChargeOfPartner
+    this.listChargeOfPartner = cloneDeep(this.constListChargeOfPartner);
+    search_key = search_key.trim().toLowerCase();
+    var listBranch: any[] = [];
+    this.listChargeOfPartner = filter(cloneDeep(this.constListChargeOfPartner), function (x: any) {
+      var root = false;
+      var branch = false;
+      if (x.hwbno == null ? "" : x.hwbno.toLowerCase().includes(search_key)) {
+        root = true;
+      }
+      var listCharges: any[] = [];
+      for (var i = 0; i < x.listCharges.length; i++) {
+        if (x.listCharges[i].chargeCode.toLowerCase().includes(search_key) ||
+          x.listCharges[i].quantity.toString().toLowerCase() === search_key ||
+          x.listCharges[i].nameEn.toString().toLowerCase().includes(search_key) ||
+          x.listCharges[i].chargeCode.toLowerCase().includes(search_key) ||
+          x.listCharges[i].unit.toLowerCase().includes(search_key) ||
+          x.listCharges[i].currency.toLowerCase().includes(search_key)) {
+          listCharges.push(x.listCharges[i]);
+          branch = true;
+        }
+      }
+      if (listCharges.length > 0) {
+        listBranch.push({
+          hbId: x.id,
+          list: listCharges
+        });
+      };
+
+      return (root || branch);
+
+    });
+
+    for (var i = 0; i < this.listChargeOfPartner.length; i++) {
+      for (var k = 0; k < listBranch.length; k++) {
+        if (this.listChargeOfPartner[i].id === listBranch[k].hbId) {
+          this.listChargeOfPartner[i].listCharges = listBranch[k].list;
+        }
+      }
+    }
+
+    console.log(this.listChargeOfPartner);
+
+  }
+
+  async CreateCDNote(form: NgForm) {
+    if (form.submitted) {
       var errors = $('#add-credit-debit-note-modal').find('div.has-danger');
       if (errors.length == 0) {
         console.log({ "CURRENT_JOB_ID": ExtendData.currentJobID });
         this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
         this.CDNoteWorking.currencyId = "USD" // in the future , this id must be local currency of each country
-        this.CDNoteWorking.listShipmentSurcharge = filter(this.CDNoteWorking.listShipmentSurcharge,function(o:any){
+        this.CDNoteWorking.listShipmentSurcharge = filter(this.CDNoteWorking.listShipmentSurcharge, function (o: any) {
           return !o.isRemaining;
         });
-         var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew,this.CDNoteWorking);
-         if(res.status){
+        var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
+        if (res.status) {
           $('#add-credit-debit-note-modal').modal('hide');
-            this.CDNoteWorking = new AcctSOA();
-            this.resetAddSOAForm();            
-         }
-      }     
+          this.CDNoteWorking = new AcctSOA();
+          this.resetAddSOAForm();
+        }
+      }
     }
   }
 
-  resetAddSOAForm(){
+  resetAddSOAForm() {
     this.isDisplayAddSoaForm = false;
     setTimeout(() => {
       this.isDisplayAddSoaForm = true;
     }, 300);
   }
 
-  
-  totalCredit:number=0;
-  totalDebit:number=0;
-  totalCreditDebitCalculate():number{
+
+  totalCredit: number = 0;
+  totalDebit: number = 0;
+  totalCreditDebitCalculate(): number {
     this.totalCredit = 0;
     this.totalDebit = 0;
-    for(var i = 0; i < this.CDNoteWorking.listShipmentSurcharge.length;i++){
+    for (var i = 0; i < this.CDNoteWorking.listShipmentSurcharge.length; i++) {
       const c = this.CDNoteWorking.listShipmentSurcharge[i];
-      if(!c["isRemaining"]){
-        if(c.type=="BUY"|| c.type=="LOGISTIC" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.receiverId)){
+      if (!c["isRemaining"]) {
+        if (c.type == "BUY" || c.type == "LOGISTIC" || (c.type == "OBH" && this.CDNoteWorking.partnerId == c.receiverId)) {
           // calculate total credit
-          this.totalCredit += (c.total*c.exchangeRate);
+          this.totalCredit += (c.total * c.exchangeRate);
         }
-        if(c.type=="SELL" || (c.type=="OBH" && this.CDNoteWorking.partnerId==c.payerId)){
+        if (c.type == "SELL" || (c.type == "OBH" && this.CDNoteWorking.partnerId == c.payerId)) {
           //calculate total debit 
-          this.totalDebit += (c.total*c.exchangeRate);
+          this.totalDebit += (c.total * c.exchangeRate);
         }
       }
-  
+
     }
-    return this.totalDebit- this.totalCredit;
+    return this.totalDebit - this.totalCredit;
 
   }
 
@@ -198,61 +249,70 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     var groupCheck = $(event.target).closest('tbody').find('input.group-charge-hb-select').first();
     var charges = $(event.target).closest('tbody').find('input.single-charge-select');
     var allcheck = true;
-    for (var i = 0; i < charges.length; i++) {   
-      if($(charges[i]).prop('checked')!=true){
+    for (var i = 0; i < charges.length; i++) {
+      if ($(charges[i]).prop('checked') != true) {
         allcheck = false;
-      }     
+      }
     }
-    $(groupCheck).prop('checked',allcheck?true:false);     
+    $(groupCheck).prop('checked', allcheck ? true : false);
     this.checkSttAllNode();
   }
 
-  checkSttAllNode(){
+  checkSttAllNode() {
     var allNodes = $('#add-credit-debit-note-modal').find('input.group-charge-hb-select');
-    var allcheck : boolean = true;
-    for(var i =0 ; i< allNodes.length;i++){
-      if($(allNodes[i]).prop('checked')!=true){
+    var allcheck: boolean = true;
+    for (var i = 0; i < allNodes.length; i++) {
+      if ($(allNodes[i]).prop('checked') != true) {
         allcheck = false;
-      }  
+      }
     }
     var rootCheck = $('#add-credit-debit-note-modal').find('input.all-charges-select');
-    rootCheck.prop("checked",allcheck?true:false);
+    rootCheck.prop("checked", allcheck ? true : false);
   }
 
-  selectAllCharges(event:any){
-     const currentStt =  event.target.checked;
-     var nodes = $(event.target).closest('table').find('input').attr('type',"checkbox");
-    for(var i = 0 ; i < nodes.length;i++){
-      $(nodes[i]).prop("checked",currentStt?true:false);
+  selectAllCharges(event: any) {
+    const currentStt = event.target.checked;
+    var nodes = $(event.target).closest('table').find('input').attr('type', "checkbox");
+    for (var i = 0; i < nodes.length; i++) {
+      $(nodes[i]).prop("checked", currentStt ? true : false);
     }
   }
 
-  removeSelectedCharges(){  
-        const chargesElements = $('.single-charge-select');       
-        for(var i = 0; i < chargesElements.length;i ++){
-          const selected : boolean = $(chargesElements[i]).prop("checked");
-          if(selected){
-            const indexSingle = parseInt($(chargesElements[i]).attr("data-id"));     
-            var parentElement = $(chargesElements[i]).closest('tbody').find('input.group-charge-hb-select')[0];
+  removeSelectedCharges() {
+    const chargesElements = $('.single-charge-select');
+    for (var i = 0; i < chargesElements.length; i++) {
+      const selected: boolean = $(chargesElements[i]).prop("checked");
+      if (selected) {
+        const indexSingle = parseInt($(chargesElements[i]).attr("data-id"));
+        var parentElement = $(chargesElements[i]).closest('tbody').find('input.group-charge-hb-select')[0];
 
-            const indexParent = parseInt($(parentElement).attr("data-id"));
-            $(parentElement).prop("checked",false);
-            this.listChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = true;
-          }          
-        }
-        this.setChargesForCDNote()
-        this.checkSttAllNode();
-        this.addNewRemainingCharges.emit(this.listChargeOfPartner);
-        this.totalCreditDebitCalculate()
+        const indexParent = parseInt($(parentElement).attr("data-id"));
+        $(parentElement).prop("checked", false);
+
+        this.listChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = true;
+        const hbId = this.listChargeOfPartner[indexParent].id;
+        const chargeId = this.listChargeOfPartner[indexParent].listCharges[indexSingle].id;
+        const constParentInx = this.constListChargeOfPartner.map(x=>x.id).indexOf(hbId);
+        const constChargeInx = this.constListChargeOfPartner[constParentInx].listCharges.map((x:any)=>x.id).indexOf(chargeId);
+        this.constListChargeOfPartner[constParentInx].listCharges[constChargeInx].isRemaining = true;
+       
+      }
+    }
+
+    this.setChargesForCDNote()
+    this.checkSttAllNode();
+    this.listChargeOfPartner = this.constListChargeOfPartner;
+    this.addNewRemainingCharges.emit(this.constListChargeOfPartner);
+    this.totalCreditDebitCalculate()
   }
 
-  checkToDisplay(item:any){
-    var s = item.listCharges.map((x:any)=>x.isRemaining).indexOf(false)  !=-1;
+  checkToDisplay(item: any) {
+    var s = item.listCharges.map((x: any) => x.isRemaining).indexOf(false) != -1;
     return s;
   }
 
 
-  
+
 
 
 
