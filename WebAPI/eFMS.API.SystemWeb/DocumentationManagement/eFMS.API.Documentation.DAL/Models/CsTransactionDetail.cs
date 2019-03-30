@@ -49,6 +49,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? InactiveOn { get; set; }
         public string InWord { get; set; }
         public string OnBoardStatus { get; set; }
+        public string ManifestRefNo { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
