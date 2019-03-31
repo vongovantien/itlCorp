@@ -58,4 +58,5 @@ export class CsTransactionDetail {
   containerNames:String = null;
   packageTypes:String = null;
   cbm:Number = 0;
+  manifestRefNo: string = null;
 }

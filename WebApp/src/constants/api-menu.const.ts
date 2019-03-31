@@ -257,6 +257,10 @@ export class API_MENU {
         AcctSOA: {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Add",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Get",
+        },
+        CsManifest: {
+            get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest"
         }
     }
 }

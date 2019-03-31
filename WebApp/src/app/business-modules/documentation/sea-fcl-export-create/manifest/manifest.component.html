@@ -26,7 +26,7 @@
                     </span>
                 </span>
             </button>
-            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveManifest()">
+            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveManifest(formManifest)">
                 <span>
                     <i class="la la-save"></i>
                     <span>
@@ -125,8 +125,10 @@
                             </label>
                             <div class="m-input-icon m-input-icon--right">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="etdSelected" [singleDatePicker]="true" name="singledater" readonly />
+                                    [autoApply]="true" 
+                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                    [(ngModel)]="etdSelected" 
+                                    [singleDatePicker]="true" name="singledater" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -134,7 +136,7 @@
                                 </span>
                             </div>
                             <div class="form-control-feedback" *ngIf="formManifest.submitted && etdSelected == null">
-                                Vessel No is required
+                                Date is required
                             </div>
                         </div>
                     </div>
@@ -147,7 +149,7 @@
                             </label>
                             <div class="dropdown e--combogrid">
                                 <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
-                                    data-toggle="dropdown" [value]="shipment.polName == null?'Please selected port of loading':shipment.polName" value="">
+                                    data-toggle="dropdown" [value]="manifest.polName == null?'Please selected port of loading':manifest.polName" value="">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
@@ -174,8 +176,8 @@
                                         <div class="table-body-scroll">
                                             <table class="table table-hover" *ngIf="portOfLadings">
                                                 <tbody *ngFor="let pol of portOfLadings;let i = index;">
-                                                    <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{pol.id}}" 
-                                                        (click)="shipment.pol = pol.id; manifest.pol = pol.id; shipment.polName= pol.nameEN">
+                                                    <tr class="data-row" [ngClass]="{ 'data-selected': manifest.pol!==null && manifest.pol===pol.id }" data-id="{{pol.id}}" 
+                                                        (click)="manifest.pol = pol.id; manifest.pol = pol.id; manifest.polName= pol.nameEN">
                                                         <td>{{ pol.code }}</td>
                                                         <td>{{ pol.nameEN }}</td>
                                                         <td>{{ pol.countryName }}</td>
@@ -198,7 +200,7 @@
                             </label>
                             <div class="dropdown e--combogrid">
                                 <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
-                                    data-toggle="dropdown" placeholder="Please selected"  [value]="shipment.podName == null?'Please selected port of loading':shipment.podName">
+                                    data-toggle="dropdown" placeholder="Please selected"  [value]="manifest.podName == null?'Please selected port of loading':manifest.podName">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
@@ -225,8 +227,8 @@
                                         <div class="table-body-scroll">
                                             <table class="table table-hover" *ngIf="portOfDestinations">
                                                 <tbody *ngFor="let pod of portOfDestinations;let i = index;">
-                                                    <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
-                                                        (click)="shipment.pod = pod.id; manifest.pod=pod.id; shipment.podName= pod.nameEN">
+                                                    <tr class="data-row" [ngClass]="{ 'data-selected': manifest.pod!==null && manifest.pod===pod.id }" data-id="{{i}}" 
+                                                        (click)="manifest.pod = pod.id; manifest.pod=pod.id; manifest.podName= pod.nameEN">
                                                         <td>{{ pod.code }}</td>
                                                         <td>{{ pod.nameEN }}</td>
                                                         <td>{{ pod.countryName }}</td>
@@ -424,7 +426,7 @@
                     </thead>
                     <tbody class="tbody-group" *ngIf="housebills">
                         <tr class="" *ngFor="let detail of housebills; let i=index">
-                            <ng-container *ngIf="detail.isRemove == false">
+                            <ng-container *ngIf="detail.isRemoved == false">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <label class="m-checkbox">

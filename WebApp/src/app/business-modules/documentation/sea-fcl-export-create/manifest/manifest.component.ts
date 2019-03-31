@@ -10,6 +10,7 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
+import { NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-manifest',
@@ -48,14 +49,33 @@ export class ManifestComponent implements OnInit {
         await this.getPortOfLading(null);
         await this.getPortOfDestination(null);
         await this.route.params.subscribe(async prams => {
-            if(prams.id != undefined){          
-                await this.getShipmentDetail(prams.id);
-                this.getNewManifest();
+            if(prams.id != undefined){      
+                this.shipment.id = prams.id;    
+                await this.getManifest(prams.id);
                 await this.getHouseBillList(prams.id);
-                this.getTotalWeight();
+                if(this.manifest == null){
+                    await this.getShipmentDetail(prams.id);
+                    this.getNewManifest();
+                    this.getTotalWeight();
+                }
+                else{
+                    let index = this.paymentTerms.findIndex(x => x.id == this.manifest.paymentTerm);
+                    if(index > -1){
+                        this.paymentTermActive = [this.paymentTerms[index]];
+                        this.manifest.paymentTerm = this.paymentTerms[index].id;
+                    } 
+                    this.etdSelected = this.manifest.invoiceDate == null? null: { startDate: moment(this.manifest.invoiceDate), endDate: moment(this.manifest.invoiceDate) };
+                    index = this.portOfLadings.findIndex(x => x.id == this.manifest.pol);
+                    if(index > -1) this.manifest.pol = this.portOfLadings[index].id;
+                    index = this.portOfDestinations.findIndex(x => x.id == this.manifest.pod);
+                    if(index > -1) this.manifest.pod = this.portOfDestinations[index].id;
+                }
                 this.isLoad = true;
             }
         });
+    }
+    async getManifest(id: any) {
+        this.manifest = await this.baseServices.getAsync(this.api_menu.Documentation.CsManifest.get + "?jobId=" + id, false, true);
     }
     checkAllChange(){
         if(this.checkAll){
@@ -76,7 +96,7 @@ export class ManifestComponent implements OnInit {
         this.totalCBM = 0;
         this.totalGW = 0;
         this.housebills.forEach(x =>{
-            if(x.isRemove == false){
+            if(x.isRemoved == false){
                 this.totalGW = this.totalGW + x.gw;
                 this.totalCBM = this.totalCBM + x.cbm;
             }
@@ -98,6 +118,8 @@ export class ManifestComponent implements OnInit {
     }
     getNewManifest(){
         //MSEYYMM/#####: YYYY-MM-DDTHH:mm:ss.sssZ
+        this.manifest = new CsManifest();
+        this.manifest.jobId = this.shipment.id;
         let date = new Date().toISOString().substr(0, 19);
         let jobNo = this.shipment.jobNo;
         this.manifest.refNo = "MSE" + date.substring(2, 4) + date.substring(5,7) + jobNo.substring(jobNo.length-5, jobNo.length);
@@ -109,9 +131,16 @@ export class ManifestComponent implements OnInit {
         } 
         this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
         index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
-        if(index > -1) this.manifest["pol"] = this.portOfLadings[index].id;
+        if(index > -1){
+            this.manifest.pol = this.portOfLadings[index].id;
+            this.manifest.polName = this.portOfLadings[index].nameEN;
+        } 
         index = this.portOfDestinations.findIndex(x => x.id == this.shipment.pod);
-        if(index > -1) this.manifest["pod"] = this.portOfDestinations[index].id;
+        if(index > -1)
+        {
+            this.manifest.pod = this.portOfDestinations[index].id;
+            this.manifest.podName = this.portOfDestinations[index].nameEN;
+        }
     }
     refreshManifest(){
         this.manifest.refNo = null;
@@ -127,29 +156,34 @@ export class ManifestComponent implements OnInit {
         this.getNewManifest();
         this.getHouseBillList(this.shipment.id);
     }
-    saveManifest(){
+    async saveManifest(form: NgForm){
+        this.manifest.csTransactionDetails = this.housebills;
+        this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        if(form.valid){
+            let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.addNew, this.manifest, true, true);
+        }
         console.log(this.manifest);
     }
     remove(){
         console.log('move');
         this.housebills.forEach(x => {
             if(x.isChecked){
-                x.isRemove = true;
+                x.isRemoved = true;
                 x.isChecked = false;
             }
         });
-        this.housebillsRemoved = this.housebills.filter(x => x.isRemove == true);
+        this.housebillsRemoved = this.housebills.filter(x => x.isRemoved == true);
         this.checkAll = false;
         this.getTotalWeight();
     }
     addHouse(){
         this.housebills.forEach(x => {
             if(x.isChecked){
-                x.isRemove = false;
+                x.isRemoved = false;
                 x.isChecked = false;
             }
         });
-        this.housebillsRemoved = this.housebills.filter(x => x.isRemove == true);
+        this.housebillsRemoved = this.housebills.filter(x => x.isRemoved == true);
         this.getTotalWeight();
     }
     async getShipmentDetail(id: String) {
@@ -186,13 +220,18 @@ export class ManifestComponent implements OnInit {
     async getHouseBillList(jobId: String){
         var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
         if(responses != null){
-            responses.forEach((element: { isChecked: boolean; isRemove: boolean }) => {
+            responses.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
                 element.isChecked = false;
-                element.isRemove = false;
+                if(element["manifestRefNo"] != null){
+                    element.isRemoved = false;
+                }
+                else{
+                    element.isRemoved = true;
+                }
             });
             this.housebills = responses;
             this.housebillsTemp = Object.assign([], this.housebills);
-            this.housebillsRemoved = this.housebills.filter(x => x.isRemove == true);
+            this.housebillsRemoved = this.housebills.filter(x => x.isRemoved == true);
         }
         else{
             this.housebills = [];
@@ -221,7 +260,7 @@ export class ManifestComponent implements OnInit {
                 || (item.consigneeDescription != null ? item.consigneeDescription.toLowerCase() : "").includes(keySearch)
                 || (item.desOfGoods != null ? item.desOfGoods.toLowerCase() : "").includes(keySearch)
                 || (item.freightPayment != null ? item.freightPayment.toLowerCase() : "").includes(keySearch))
-                && item.isRemove == false
+                && item.isRemoved == false
             )
         );
     }
@@ -237,7 +276,7 @@ export class ManifestComponent implements OnInit {
                 || (item.consigneeDescription != null ? item.consigneeDescription.toLowerCase() : "").includes(keySearch)
                 || (item.desOfGoods != null ? item.desOfGoods.toLowerCase() : "").includes(keySearch)
                 || (item.freightPayment != null ? item.freightPayment.toLowerCase() : "").includes(keySearch))
-                && item.isRemove == true
+                && item.isRemoved == true
             )
         );
     }

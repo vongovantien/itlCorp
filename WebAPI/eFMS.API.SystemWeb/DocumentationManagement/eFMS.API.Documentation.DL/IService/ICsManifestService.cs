@@ -10,6 +10,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsManifestService : IRepositoryBase<CsManifest, CsManifestModel>
     {
-        HandleState AddNewManifest(CsManifestEditModel model);
+        HandleState AddOrUpdateManifest(CsManifestEditModel model);
+        CsManifestModel GetById(Guid jobId);
     }
 }

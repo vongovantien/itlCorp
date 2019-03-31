@@ -34,22 +34,22 @@ namespace eFMS.API.Documentation.Controllers
             currentUser = user;
         }
 
-        [HttpGet("id")]
-        public IActionResult Get(Guid id)
+        [HttpGet]
+        public IActionResult Get(Guid jobId)
         {
-            var result = manifestService.Get(x => x.JobId == id).FirstOrDefault();
+            var result = manifestService.GetById(jobId);
             return Ok(result);
         }
 
         [HttpPost]
-        [Route("Add")]
+        [Route("AddOrUpdateManifest")]
         //[Authorize]
-        public IActionResult AddManifest(CsManifestEditModel model)
+        public IActionResult AddOrUpdateManifest(CsManifestEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             //model.CsManifest.UserCreated = currentUser.UserID;
             //model.CsManifest.CreatedDate = DateTime.Now;
-            var hs = manifestService.AddNewManifest(model);
+            var hs = manifestService.AddOrUpdateManifest(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
