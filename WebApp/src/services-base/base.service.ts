@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { language } from 'src/languages/language.en';
+
 @Injectable({
   providedIn: 'root'
 })
