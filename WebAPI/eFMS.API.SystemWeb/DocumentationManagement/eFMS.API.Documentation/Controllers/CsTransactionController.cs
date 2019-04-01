@@ -28,11 +28,14 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionService csTransactionService;
         private readonly ICurrentUser currentUser;
-        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service, ICurrentUser user)
+        private ICsShipmentSurchargeService surchargeService;
+        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service, ICurrentUser user,
+            ICsShipmentSurchargeService serviceSurcharge)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
             currentUser = user;
+            surchargeService = serviceSurcharge;
         }
 
         [HttpGet("CountJobByDate/{{date}}")]
@@ -115,6 +118,30 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+        [HttpDelete("{id}")]
+        [Authorize]
+        public IActionResult Delete(Guid id)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            if (csTransactionService.CheckAllowDelete(id) == false) {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+            }
+            var hs = csTransactionService.DeleteCSTransaction(id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpGet("CheckAllowDelete/{id}")]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            return Ok(csTransactionService.CheckAllowDelete(id));
+        }
+
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
             string message = string.Empty;

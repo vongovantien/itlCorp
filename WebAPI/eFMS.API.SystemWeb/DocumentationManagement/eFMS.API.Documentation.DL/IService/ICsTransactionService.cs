@@ -20,5 +20,7 @@ namespace eFMS.API.Documentation.DL.IService
         object AddCSTransaction(CsTransactionEditModel model);
         object ImportCSTransaction(CsTransactionEditModel model);
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
+        bool CheckAllowDelete(Guid jobId);
+        HandleState DeleteCSTransaction(Guid jobId);
     }
 }

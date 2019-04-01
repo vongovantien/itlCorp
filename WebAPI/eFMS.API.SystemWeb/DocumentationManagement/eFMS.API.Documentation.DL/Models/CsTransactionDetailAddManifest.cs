@@ -5,9 +5,8 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class CsManifestModel: CsManifest
+    public class CsTransactionDetailAddManifest: CsTransactionDetail
     {
-        public string PolName { get; set; }
-        public string PodName { get; set; }
+        public bool IsRemoved { get; set; }
     }
 }

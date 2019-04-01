@@ -85,6 +85,50 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public bool CheckAllowDelete(Guid jobId)
+        {
+            var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
+                         where detail.JobId == jobId
+                         join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
+                         where surcharge.Soano != null
+                         select detail);
+            if (query.Any())
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public HandleState DeleteCSTransaction(Guid jobId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                var itemToDelete = ((eFMSDataContext)DataContext.DC).CsTransaction.Find(jobId);
+                ((eFMSDataContext)DataContext.DC).CsTransaction.Remove(itemToDelete);
+                var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Mblid == jobId);
+                ((eFMSDataContext)DataContext.DC).CsMawbcontainer.RemoveRange(containers);
+                var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == jobId);
+                foreach(var item in details)
+                {
+                    var houseContainers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id);
+                    ((eFMSDataContext)DataContext.DC).CsMawbcontainer.RemoveRange(houseContainers);
+                    var surcharges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == item.Id);
+                    ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.RemoveRange(surcharges);
+                }
+                ((eFMSDataContext)DataContext.DC).CsTransactionDetail.RemoveRange(details);
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
+
         public CsTransactionModel GetById(Guid id)
         {
             var data = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault(x => x.Id == id);

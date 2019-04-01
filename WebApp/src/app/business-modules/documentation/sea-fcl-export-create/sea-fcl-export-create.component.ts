@@ -782,7 +782,21 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
         this.removeEndComma();
     }
-
+    shipmentTodelete: any = null;
+    async confirmDeleteShipment(item){
+        this.shipmentTodelete = item;
+        let respone = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.checkAllowDelete + item.id, false, true);
+        if(respone == true){
+            $('#confirm-delete-job-modal').modal('show');
+        }
+        else{
+            $('#confirm-can-not-delete-job-modal').modal('show');
+        }
+    }
+    async deleteJob(){
+        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsTransaction.delete + this.shipmentTodelete.id, false, true);
+        this.router.navigate(["/home/documentation/sea-fcl-export"]);
+    }
     /**
      * Daterange picker
      */

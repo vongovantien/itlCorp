@@ -1857,9 +1857,13 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("JobID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.ActualConsigneeDescription).HasMaxLength(1000);
+
                 entity.Property(e => e.ActualConsigneeId)
                     .HasColumnName("ActualConsigneeID")
                     .HasMaxLength(250);
+
+                entity.Property(e => e.ActualShipperDescription).HasMaxLength(1000);
 
                 entity.Property(e => e.ActualShipperId)
                     .HasColumnName("ActualShipperID")
@@ -1868,6 +1872,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.BookingNo).HasMaxLength(250);
 
                 entity.Property(e => e.CargoNoticeRecevier).HasMaxLength(250);
+
+                entity.Property(e => e.ConsigneeDescription).HasMaxLength(1000);
 
                 entity.Property(e => e.ConsigneeId)
                     .HasColumnName("ConsigneeID")

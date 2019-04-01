@@ -14,5 +14,6 @@
   "FILE_NOT_FOUND": "File not found!",
   "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
   "MSG_MAWB_EXISTED": "MAWB has existed",
-  "MSG_HBNO_EXISTED": "MAWB has existed"
+  "MSG_HBNO_EXISTED": "MAWB has existed",
+  "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted"
 }

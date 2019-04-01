@@ -1,3 +1,4 @@
+import { CsTransactionDetail } from "./csTransactionDetail";
 
 export class CsManifest {
     jobId: string = "00000000-0000-0000-0000-000000000000";
@@ -21,5 +22,8 @@ export class CsManifest {
     modifiedDate: Date = null;
     inactive: boolean = null;
     inactiveOn: Date = null;
+    csTransactionDetails: CsTransactionDetail [] = null;
+    polName: string = null;
+    podName: string = null;
   }
   

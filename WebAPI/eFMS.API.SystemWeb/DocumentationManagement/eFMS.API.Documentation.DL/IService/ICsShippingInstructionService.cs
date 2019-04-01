@@ -8,9 +8,9 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.IService
 {
-    public interface ICsManifestService : IRepositoryBase<CsManifest, CsManifestModel>
+    public interface ICsShippingInstructionService : IRepositoryBase<CsShippingInstruction, CsShippingInstructionModel>
     {
-        HandleState AddOrUpdateManifest(CsManifestEditModel model);
-        CsManifestModel GetById(Guid jobId);
+        CsShippingInstructionModel GetById(Guid jobId);
+        HandleState AddOrUpdate(CsShippingInstructionModel model);
     }
 }

@@ -5,9 +5,8 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class CsManifestEditModel
+    public class CsManifestEditModel: CsManifestModel
     {
-        public CsManifestModel CsManifest { get; set; }
-        public List<CsTransactionDetail> CsTransactionDetails { get; set; }
+        public List<CsTransactionDetailAddManifest> CsTransactionDetails { get; set; }
     }
 }
