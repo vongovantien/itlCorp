@@ -147,7 +147,9 @@ export class DashboardComponent implements OnInit {
             enabled: false
         },
         legend: {
-            enabled: false
+            enabled: true,
+            verticalAlign: 'top',
+            y: 0
         },
         xAxis: {
             // crosshair: true,
@@ -232,7 +234,9 @@ export class DashboardComponent implements OnInit {
             enabled: false
         },
         legend: {
-            enabled: false
+            enabled: true,
+            verticalAlign: 'top',
+            y: 0
         },
         xAxis: {
             // crosshair: true,
