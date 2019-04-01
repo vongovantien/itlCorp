@@ -29,7 +29,7 @@
                     </span>
                 </button>
                 <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10" data-toggle="modal"
-                    *ngIf="inEditing == true" data-target="#delete-shipment-detail-modal">
+                    *ngIf="inEditing == true && shipment" (click)="confirmDeleteShipment(shipment)">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -1150,3 +1150,75 @@ aria-hidden="true">
     </li>
 </ul>
 <!--end::shipment-sidebar-->
+
+
+<!--begin::confirm-delete-job-modal-->
+<div class="modal fade" id="confirm-delete-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure want to delete this job?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="deleteJob()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-job-modal-->
+
+<!--begin::confirm-can-not-delete-job-modal-->
+<div class="modal fade" id="confirm-can-not-delete-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+aria-hidden="true">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Notification</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-text-block">
+                <span>You are not allow to delete this job</span>
+            </div>
+        </div>
+        <div class="modal-footer m--align-center c-button-actions">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        OK
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<!--end::confirm-can-not-delete-job-modal-->

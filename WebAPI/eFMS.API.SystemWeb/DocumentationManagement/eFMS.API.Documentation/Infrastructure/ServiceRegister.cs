@@ -24,12 +24,13 @@ namespace eFMS.API.Shipment.Infrastructure
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ITerminologyService, TerminologyService>();
-            services.AddScoped<ICsTransactionService, CsTransactionService>();
+            services.AddTransient<ICsTransactionService, CsTransactionService>();
             services.AddTransient<ICsTransactionDetailService, CsTransactionDetailService>();
             services.AddTransient<ICsMawbcontainerService, CsMawbcontainerService>();
             services.AddTransient<ICsShipmentSurchargeService, CsShipmentSurchargeService>();
             services.AddTransient<IAcctSOAServices, AcctSOAServices>();
             services.AddTransient<ICsManifestService, CsManifestService>();
+            services.AddTransient<ICsShippingInstructionService, CsShippingInstructionService>();
         }
     }
 }

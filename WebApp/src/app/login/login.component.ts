@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   ngOnInit() {
     this.setupLocalInfo();
     if(this.baseService.checkLoginSession(false)){
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/home/dashboard');
     }
   }
 
@@ -67,7 +67,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
           
           this.rememberMe();
           this.toastr.info("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "Login Success", { positionClass: 'toast-bottom-right' });
-          this.router.navigateByUrl('/home');       
+          this.router.navigateByUrl('/home/dashboard');       
           this.baseService.spinnerHide();
         }
       }).catch((err) => {

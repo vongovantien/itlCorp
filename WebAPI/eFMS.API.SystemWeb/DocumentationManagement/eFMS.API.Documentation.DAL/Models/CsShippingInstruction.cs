@@ -13,9 +13,12 @@ namespace eFMS.API.Documentation.Service.Models
         public string InvoiceNoticeRecevier { get; set; }
         public string Shipper { get; set; }
         public string ConsigneeId { get; set; }
+        public string ConsigneeDescription { get; set; }
         public string CargoNoticeRecevier { get; set; }
         public string ActualShipperId { get; set; }
+        public string ActualShipperDescription { get; set; }
         public string ActualConsigneeId { get; set; }
+        public string ActualConsigneeDescription { get; set; }
         public string PaymenType { get; set; }
         public string Remark { get; set; }
         public string RouteInfo { get; set; }

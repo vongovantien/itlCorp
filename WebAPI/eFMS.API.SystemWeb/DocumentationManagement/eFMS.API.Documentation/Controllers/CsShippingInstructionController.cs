@@ -8,13 +8,11 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
-using Microsoft.AspNetCore.Authorization;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace eFMS.API.Documentation.Controllers
 {
@@ -22,34 +20,32 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CsManifestController : ControllerBase
+    public class CsShippingInstructionController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICsManifestService manifestService;
+        private readonly ICsShippingInstructionService shippingInstructionService;
         private readonly ICurrentUser currentUser;
-        public CsManifestController(IStringLocalizer<LanguageSub> localizer, ICsManifestService service, ICurrentUser user)
+
+        public CsShippingInstructionController(IStringLocalizer<LanguageSub> localizer, ICsShippingInstructionService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
-            manifestService = service;
+            shippingInstructionService = service;
             currentUser = user;
         }
-
-        [HttpGet]
-        public IActionResult Get(Guid jobId)
+        [HttpGet("{id}")]
+        public IActionResult Get(Guid id)
         {
-            var result = manifestService.GetById(jobId);
-            return Ok(result);
+            return Ok(shippingInstructionService.GetById(id));
         }
 
+        // POST api/<controller>
         [HttpPost]
-        [Route("AddOrUpdateManifest")]
-        [Authorize]
-        public IActionResult AddOrUpdateManifest(CsManifestEditModel model)
+        public IActionResult AddOrUpdate(CsShippingInstructionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             model.UserCreated = currentUser.UserID;
             model.CreatedDate = DateTime.Now;
-            var hs = manifestService.AddOrUpdateManifest(model);
+            var hs = shippingInstructionService.AddOrUpdate(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

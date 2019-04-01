@@ -234,7 +234,9 @@ export class API_MENU {
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
-            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Import"
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Import",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
+            checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/CheckAllowDelete/"
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob",
@@ -257,10 +259,15 @@ export class API_MENU {
         AcctSOA: {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Add",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Get",
+            getDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/GetDetails",
         },
         CsManifest: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/",
-            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest"
+        },
+        CsShippingInstruction: {
+            get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction"
         }
     }
 }

@@ -34,5 +34,6 @@ namespace SystemManagementAPI.Resources
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
         public static readonly string MSG_MAWB_EXISTED = "MSG_MAWB_EXISTED";
         public static readonly string MSG_HBNO_EXISTED = "MSG_HBNO_EXISTED";
+        public static readonly string MSG_NOT_ALLOW_DELETED = "MSG_NOT_ALLOW_DELETED";
     }
 }

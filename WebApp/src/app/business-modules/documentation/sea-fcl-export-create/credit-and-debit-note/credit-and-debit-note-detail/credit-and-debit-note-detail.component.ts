@@ -1,4 +1,7 @@
-import { Component, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, Input } from '@angular/core';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { ExtendData } from '../../../extend-data';
 declare var $: any;
 
 @Component({
@@ -10,8 +13,20 @@ export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecke
     ngAfterViewChecked(): void {
         this.open = true;
     }
+    SOAEditing:any = null;
 
-    constructor() { }
+    @Input() set EditingCDNote(soaNo:string){
+         this.getSOADetails(soaNo);
+      }
+
+    async getSOADetails(soaNo:string){
+        this.SOAEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails+"?JobId="+ExtendData.currentJobID+"&soaNo="+soaNo);
+        console.log(this.SOAEditing);
+    }
+    constructor(
+        private baseServices: BaseService,
+        private api_menu: API_MENU
+      ) { }
 
     ngOnInit() {
     }

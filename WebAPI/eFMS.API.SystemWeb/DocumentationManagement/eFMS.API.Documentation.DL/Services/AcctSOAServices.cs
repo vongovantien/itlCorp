@@ -205,9 +205,18 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var hbOfLadingNo = string.Empty;
+            var hbConstainers = string.Empty;
+            decimal? volum = 0;
             foreach(var item in HBList)
             {
                 hbOfLadingNo += (item.Hwbno + ", ");
+                var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
+                foreach(var cont in conts)
+                {
+                    volum += cont.Cbm == null ? 0 : cont.Cbm;
+                    var contUnit = ((eFMSDataContext)DataContext.DC).CatUnit.Where(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
+                    hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ",");
+                }
 
             }
 
@@ -228,10 +237,18 @@ namespace eFMS.API.Documentation.DL.Services
                 podCountry = ((eFMSDataContext)DataContext.DC).CatCountry.Where(x => x.Id == pod.CountryId).FirstOrDefault().NameEn,
 
                 vessel = Shipment.FlightVesselName,
-                containersQty =  Shipment.PackageContainer
+                hbConstainers,
+                etd= Shipment.Etd,
+                eta= Shipment.Eta,
+                soaNo = Soa.Code,
+                isLocked = false, // need update later 
+                volum,
+                charges
 
             };
+
             return returnObj;
+
         }
     }
 }

@@ -160,7 +160,7 @@ export class ManifestComponent implements OnInit {
         this.manifest.csTransactionDetails = this.housebills;
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
         if(form.valid){
-            let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.addNew, this.manifest, true, true);
+            let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.update, this.manifest, true, true);
         }
         console.log(this.manifest);
     }
