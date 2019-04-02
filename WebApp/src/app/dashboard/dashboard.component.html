@@ -23,8 +23,8 @@
             <!--begin::Form-->
             <div class="m-form">
                 <div class="row">
-                    <div class="col">
-                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                    <div class="col col-lg-5">
+                        <div class="m-input-icon m-input-icon--right down">
                             <input type="text" class="form-control m-input m-input--square"
                                 ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                 [(ngModel)]="selectedRange"
@@ -65,10 +65,13 @@
     </div>
     <!--end::m-portlet of search-form-->
 
-    <div class="row m-row--no-padding m-row--col-separator-xl m--margin-bottom-20" style="background: #fff">
+    <div class="row m--margin-bottom-20">
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Volume-->
-            <div class="m-widget24 bg-primary">
+            <div class="m-widget24 bg-gradient-primary">
+                <div class="fms-widget-icon">
+                    <i class="la la-list"></i>
+                </div>
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Volume
@@ -87,7 +90,10 @@
         </div>
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Weight-->
-            <div class="m-widget24 bg-success">
+            <div class="m-widget24 bg-gradient-success">
+                <div class="fms-widget-icon">
+                    <i class="la la-balance-scale"></i>
+                </div>
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Weight
@@ -106,7 +112,10 @@
         </div>
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Revenue-->
-            <div class="m-widget24 bg-warning">
+            <div class="m-widget24 bg-gradient-warning">
+                <div class="fms-widget-icon">
+                    <i class="la la-money"></i>
+                </div>
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Revenue
@@ -125,7 +134,10 @@
         </div>
         <div class="col-md-12 col-lg-6 col-xl-3">
             <!--begin::Customer-->
-            <div class="m-widget24 bg-danger">
+            <div class="m-widget24 bg-gradient-danger">
+                <div class="fms-widget-icon">
+                    <i class="la la-user-plus"></i>
+                </div>
                 <div class="m-widget24__item">
                     <h6 class="m-widget24__title">
                         Customer
@@ -166,17 +178,17 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <div class="m--padding-20 border">
+                    <div class="fms-chart-detail-block m--padding-20 border">
                         <div class="m--margin-bottom-20">
                             <h6>Per day</h6>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--warning"></span>
-                                <span class="m--margin-left-15">USD:</span>
+                                <span class="m--margin-left-15 detail-title">USD:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--secondary"></span>
-                                <span class="m--margin-left-15">VND:</span>
+                                <span class="m--margin-left-15 detail-title">VND:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                         </div>
@@ -184,12 +196,12 @@
                             <h6>Per month</h6>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--warning"></span>
-                                <span class="m--margin-left-15">USD:</span>
+                                <span class="m--margin-left-15 detail-title">USD:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--secondary"></span>
-                                <span class="m--margin-left-15">VND:</span>
+                                <span class="m--margin-left-15 detail-title">VND:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                         </div>
@@ -222,17 +234,17 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <div class="m--padding-20 border">
+                    <div class="fms-chart-detail-block  m--padding-20 border">
                         <div class="m--margin-bottom-20">
                             <h6>Per day</h6>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--brand"></span>
-                                <span class="m--margin-left-15">USD:</span>
+                                <span class="m--margin-left-15 detail-title">Shipt:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--secondary"></span>
-                                <span class="m--margin-left-15">VND:</span>
+                                <span class="m--margin-left-15 detail-title">HBL:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                         </div>
@@ -240,12 +252,12 @@
                             <h6>Per month</h6>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--brand"></span>
-                                <span class="m--margin-left-15">USD:</span>
+                                <span class="m--margin-left-15 detail-title">Shipt:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--secondary"></span>
-                                <span class="m--margin-left-15">VND:</span>
+                                <span class="m--margin-left-15 detail-title">HBL:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                         </div>
@@ -278,17 +290,17 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <div class="m--padding-20 border">
+                    <div class="fms-chart-detail-block m--padding-20 border">
                         <div class="m--margin-bottom-20">
                             <h6>Per day</h6>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--success"></span>
-                                <span class="m--margin-left-15">USD:</span>
+                                <span class="m--margin-left-15 detail-title">KG:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--secondary"></span>
-                                <span class="m--margin-left-15">VND:</span>
+                                <span class="m--margin-left-15 detail-title">CBM:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                         </div>
@@ -296,12 +308,12 @@
                             <h6>Per month</h6>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--success"></span>
-                                <span class="m--margin-left-15">USD:</span>
+                                <span class="m--margin-left-15 detail-title">KG:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                             <div class="m--margin-bottom-10">
                                 <span class="m-badge m-badge--secondary"></span>
-                                <span class="m--margin-left-15">VND:</span>
+                                <span class="m--margin-left-15 detail-title">CBM:</span>
                                 <span class="m--margin-left-10">200</span>
                             </div>
                         </div>
