@@ -139,9 +139,14 @@ export class CreditAndDebitNoteComponent implements OnInit {
     }
 
 
-    EditingCDNote:string = null;
+    EditingCDNoteNo:string = null;
     openEdit(soaNo:string){
-        this.EditingCDNote = soaNo;
+        this.EditingCDNoteNo = soaNo;
+    }
+
+    EditingCDNote:any = null;
+    CdNoteEditingCatcher(cdNote:any){
+        this.EditingCDNote = cdNote;
     }
 
 }

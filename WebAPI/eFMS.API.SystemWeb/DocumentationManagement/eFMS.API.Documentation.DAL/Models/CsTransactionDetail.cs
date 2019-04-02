@@ -7,6 +7,7 @@ namespace eFMS.API.Documentation.Service.Models
     {
         public Guid Id { get; set; }
         public Guid JobId { get; set; }
+        public string JobNo { get; set; }
         public string Hwbno { get; set; }
         public string Hbltype { get; set; }
         public string CustomerId { get; set; }
@@ -54,5 +55,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        
     }
 }

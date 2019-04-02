@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, Input } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../../extend-data';
@@ -12,20 +12,25 @@ declare var $: any;
 export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecked {
     ngAfterViewChecked(): void {
         this.open = true;
+        this.cdr.detectChanges();
     }
-    SOAEditing:any = null;
+    CDNoteEditing:any = null;
 
-    @Input() set EditingCDNote(soaNo:string){
-         this.getSOADetails(soaNo);
+    @Output() CdNoteEditingEmiter = new EventEmitter<any>();
+    @Input() set EditingCDNoteNo(soaNo:string){
+        if(soaNo!=null){
+            this.getSOADetails(soaNo);
+        }
       }
 
     async getSOADetails(soaNo:string){
-        this.SOAEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails+"?JobId="+ExtendData.currentJobID+"&soaNo="+soaNo);
-        console.log(this.SOAEditing);
+        this.CDNoteEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails+"?JobId="+ExtendData.currentJobID+"&soaNo="+soaNo);
+        console.log(this.CDNoteEditing);
     }
     constructor(
         private baseServices: BaseService,
-        private api_menu: API_MENU
+        private api_menu: API_MENU,
+        private cdr: ChangeDetectorRef
       ) { }
 
     ngOnInit() {
@@ -34,6 +39,7 @@ export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecke
     editCDNote() {
         $('#detail-credit-debit-note-modal').modal('hide');
         $('#edit-credit-debit-note-modal').modal('show');
+        this.CdNoteEditingEmiter.emit(this.CDNoteEditing);
     }
 
     open:boolean = false;

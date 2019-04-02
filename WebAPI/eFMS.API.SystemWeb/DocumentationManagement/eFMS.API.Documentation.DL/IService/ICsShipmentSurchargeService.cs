@@ -10,7 +10,7 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICsShipmentSurchargeService : IRepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>
     {
         List<CsShipmentSurchargeDetailsModel> GetByHB(Guid HbID,string type);
-        List<object> GroupChargeByHB(Guid JobId,string PartnerId);
+        List<object> GroupChargeByHB(Guid JobId,string PartnerId,bool getAll=false);
         List<CatPartner> GetAllParnerByJob(Guid JobId);
 
     }

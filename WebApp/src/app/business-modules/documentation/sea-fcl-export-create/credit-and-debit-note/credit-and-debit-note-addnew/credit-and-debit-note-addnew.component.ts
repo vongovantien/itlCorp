@@ -74,7 +74,6 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
       this.checkSttAllNode();
     }, 100);
 
-
   }
 
 

@@ -135,11 +135,11 @@
 <!--end:: add-credit-debit-note-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->
-<app-credit-and-debit-note-detail [EditingCDNote]="EditingCDNote"></app-credit-and-debit-note-detail>
+<app-credit-and-debit-note-detail [EditingCDNoteNo]="EditingCDNoteNo" (CdNoteEditingEmiter)="CdNoteEditingCatcher($event)"></app-credit-and-debit-note-detail>
 <!--end:: detail-credit-debit-note-modal-->
 
 <!--begin:: edit-credit-debit-note-modal-->
-<app-credit-and-debit-note-edit></app-credit-and-debit-note-edit>
+<app-credit-and-debit-note-edit [editingCdNote]="EditingCDNote"></app-credit-and-debit-note-edit>
 <!--end:: edit-credit-debit-note-modal-->
 
 <!--begin:: add-remaining-charge-modal-->

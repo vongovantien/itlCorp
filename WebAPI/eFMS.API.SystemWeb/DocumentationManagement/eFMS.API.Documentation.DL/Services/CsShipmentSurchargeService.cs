@@ -86,7 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
             return returnList;
         }
 
-        public List<object> GroupChargeByHB(Guid JobId, string PartnerId)
+        public List<object> GroupChargeByHB(Guid JobId, string PartnerId,bool getAll=false)
         {
             List<object> returnList = new List<object>();
             List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList().Select(x => x.Id).ToList();
@@ -99,8 +99,8 @@ namespace eFMS.API.Documentation.DL.Services
                     listCharges = Query(houseBill.Id, null);
                     listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.ReceiverId == PartnerId || x.PaymentObjectId == PartnerId)).ToList();
                 }
-
-                listCharges = listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
+                
+                listCharges = getAll==true?listCharges : listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
                 if (listCharges.Count > 0)
                 {               
                     foreach(var item in listCharges)

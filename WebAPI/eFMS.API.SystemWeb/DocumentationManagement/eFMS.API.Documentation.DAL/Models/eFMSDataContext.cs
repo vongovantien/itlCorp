@@ -78,7 +78,11 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
+                    options =>
+                    {
+                        options.UseRowNumberForPaging();
+                    });
             }
         }
 
@@ -1433,6 +1437,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2147,6 +2153,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
+                entity.Property(e => e.JobNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LocalVoyNo).HasMaxLength(800);
 
                 entity.Property(e => e.ManifestRefNo)
@@ -2213,6 +2223,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<SysAuthorization>(entity =>

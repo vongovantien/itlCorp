@@ -1,6 +1,6 @@
 import { Injectable, } from '@angular/core';
 import fs from 'file-saver';
-import {Workbook} from "exceljs";
+import {Workbook} from "exceljs/dist/exceljs.min.js";
 
 import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
 @Injectable({
