@@ -10,6 +10,7 @@ import { CsShippingInstruction } from 'src/app/shared/models/document/shippingIn
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import moment from 'moment/moment';
 import { NgForm } from '@angular/forms';
+import { embeddedViewEnd } from '@angular/core/src/render3';
 
 @Component({
     selector: 'app-shipping-instruction',
@@ -19,12 +20,12 @@ import { NgForm } from '@angular/forms';
 export class ShippingInstructionComponent implements OnInit {
     shipment: CsTransaction = new CsTransaction();
     shippingIns: CsShippingInstruction = new CsShippingInstruction();
-    userInCharges: any[] = [];
+    userIssues: any[] = [];
     suppliers: any[] = [];
-    listConsignees: any[] = [];
+    //listConsignees: any[] = [];
     consignees: any[] = [];
     realConsignees: any[] = [];
-    listShippers: any[] = [];
+    //listShippers: any[] = [];
     shippers: any[] = [];
     realShippers: any [] = [];
     paymentTerms: any[] = [];
@@ -45,28 +46,17 @@ export class ShippingInstructionComponent implements OnInit {
          }
 
     async ngOnInit() {
-        await this.getUserInCharges(null);
-        await this.getSuppliers(null);
-        await this.getConsignees(null);
-        await this.getShippers(null);
-        await this.getPortOfLading(null);
-        await this.getPortOfDestination(null);
-        await this.getShipmentCommonData();
-        if(this.listConsignees != null){
-            this.consignees = this.listConsignees;
-            this.realConsignees = this.listConsignees;
-        }
-        if(this.listShippers != null){
-            this.shippers = this.listShippers;
-            this.realShippers = this.listShippers;
-        }
+        await this.loadReferenceData();
         await this.route.params.subscribe(async prams => {
             if(prams.id != undefined){         
                 await this.getShipmentDetail(prams.id); 
-                this.shippingIns.jobId = this.shipment.id;
                 await this.getShippingInstruction(prams.id);
                 if(this.shippingIns == null){
+                    this.shippingIns = new CsShippingInstruction();
                     this.getNewInstructionDetail();
+                }
+                else{
+                    this.getInstructionDetail();
                 }
                 await this.getHouseBillList(prams.id);
                 this.getContainerInfos();
@@ -76,10 +66,30 @@ export class ShippingInstructionComponent implements OnInit {
             }
         });
     }
+    async loadReferenceData() {
+        await this.getUserInCharges(null);
+        await this.getSuppliers(null);
+        await this.getConsignees(null);
+        await this.getShippers(null);
+        await this.getPortOfLading(null);
+        await this.getPortOfDestination(null);
+        await this.getRealConsignees(null);
+        await this.getRealShippers(null);
+        await this.getShipmentCommonData();
+    }
+    getInstructionDetail(): any {
+        let index = this.paymentTerms.findIndex(x => x.id == this.shippingIns.paymenType);
+        if(index > -1){
+            this.paymentTermActive = [this.paymentTerms[index]];
+        }
+        this.issueDate = { startDate: moment(this.shippingIns.invoiceDate), endDate: moment(this.shippingIns.invoiceDate) };
+        this.loadingDate = { startDate: moment(this.shippingIns.invoiceDate), endDate: moment(this.shippingIns.loadingDate) };
+    }
     async getShippingInstruction(id: any){
         this.shippingIns = await this.baseServices.getAsync(this.api_menu.Documentation.CsShippingInstruction.get + id, false, true);
         console.log(this.shippingIns);
     }
+    
     getContainerInfos(){
         this.totalCBM = 0;
         this.totalGW = 0;
@@ -97,11 +107,19 @@ export class ShippingInstructionComponent implements OnInit {
         this.shippingIns.volume= this.totalCBM;
     }
     async save(form: NgForm){
+        this.shippingIns.jobId = this.shipment.id;
         this.shippingIns.invoiceDate = dataHelper.dateTimeToUTC(this.issueDate["startDate"]);
-        if(form.valid){
+        this.shippingIns.loadingDate = dataHelper.dateTimeToUTC(this.loadingDate["startDate"]);
+        console.log(this.shippingIns);
+        if(form.valid && this.shippingIns.supplier != null 
+                      && this.shippingIns.issuedUser != null 
+                      && this.shippingIns.consigneeId != null
+                      && this.shippingIns.paymenType != null
+                      && this.shippingIns.pol != null
+                      && this.shippingIns.pod != null
+                      && this.loadingDate != null
+                      && this.issueDate != null){
             let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsShippingInstruction.update, this.shippingIns, true, true);
-            await this.getShippingInstruction(this.shipment.id);
-            this.shippingIns.refNo = this.shipment.jobNo;
         }
     }
     getConsigneeDescription(consignee: any) {
@@ -132,6 +150,23 @@ export class ShippingInstructionComponent implements OnInit {
         }
         console.log(this.shipment.csTransactionDetails);
     }
+    refreshShippingInstruction(){
+        this.shippingIns.invoiceNoticeRecevier = null;
+        this.shippingIns.shipper = null;
+        this.shippingIns.invoiceNoticeRecevier = null;
+        this.shippingIns.actualShipperId = null;
+        this.shippingIns.actualShipperName = null;
+        this.shippingIns.actualConsigneeName = null;
+        this.shippingIns.actualShipperDescription = null;
+        this.shippingIns.actualConsigneeId = null;
+        this.shippingIns.actualConsigneeName = null;
+        this.shippingIns.actualConsigneeDescription = null;
+        this.shippingIns.cargoNoticeRecevier = null;
+        this.shippingIns.remark = null;
+        this.shippingIns.poDelivery = null;
+        this.getNewInstructionDetail();
+        this.getContainerInfos();
+    }
     getNewInstructionDetail(): any {
         this.shippingIns.bookingNo = this.shipment.bookingNo;
         let index = this.suppliers.findIndex(x => x.id == this.shipment.coloaderId);
@@ -140,9 +175,9 @@ export class ShippingInstructionComponent implements OnInit {
             this.shippingIns.supplierName = this.suppliers[index].partnerNameEn;
         }
         let claim = localStorage.getItem('id_token_claims_obj');
-        index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
+        index = this.userIssues.findIndex(x => x.id == JSON.parse(claim)["id"]);
         if(index > -1) {
-            this.shippingIns.issuedUserName = this.userInCharges[index].username;
+            this.shippingIns.issuedUserName = this.userIssues[index].username;
             this.shippingIns.issuedUser = JSON.parse(claim)["id"];
         }
         index = this.consignees.findIndex(x => x.id == this.shipment.agentId);
@@ -150,6 +185,7 @@ export class ShippingInstructionComponent implements OnInit {
         {
             this.shippingIns.consigneeId = this.consignees[index].id;
             this.shippingIns.consigneeName = this.consignees[index].partnerNameEn;
+            this.shippingIns.consigneeDescription = this.consignees[index].partnerNameEn;
         }
         index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
         if(index > -1)
@@ -161,10 +197,12 @@ export class ShippingInstructionComponent implements OnInit {
         if(index > -1){
             this.shippingIns.pod = this.portOfDestinations[index].id;
             this.shippingIns.podName = this.portOfDestinations[index].nameEN;
+            this.shippingIns.poDelivery = this.portOfDestinations[index].nameEN;
         }
         this.paymentTermActive = ["Prepaid"];
-        this.shippingIns.paymenType = "Prepaid";
+        this.shippingIns.paymenType = this.paymentTermActive[0];
         this.loadingDate = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
+        this.shippingIns.voyNo = this.shipment.flightVesselName + " & " + this.shipment.voyNo;
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
@@ -177,12 +215,40 @@ export class ShippingInstructionComponent implements OnInit {
     async getUserInCharges(searchText: any) {
         const users = await this.baseServices.getAsync(this.api_menu.System.User_Management.getAll, false, false);
         if (users != null) {
-            this.userInCharges = users;
-            console.log(this.userInCharges);
+            this.userIssues = users;
+            console.log(this.userIssues);
         }
         else{
-            this.userInCharges = [];
+            this.userIssues = [];
         }
+    }
+    changeSupplier(keySearch: string) {
+        keySearch = keySearch != null?keySearch.trim(): null;
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getSuppliers(keySearch);
+    }
+    changeConsignee(keySearch: string) {
+        keySearch = keySearch != null?keySearch.trim(): null;
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getConsignees(keySearch);
+    }
+    changeRealShipper(keySearch: string) {
+        keySearch = keySearch != null?keySearch.trim(): null;
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getRealShippers(keySearch);
+    }
+    changeRealConsignee(keySearch: string) {
+        keySearch = keySearch != null?keySearch.trim(): null;
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getRealConsignees(keySearch);
     }
     async getSuppliers(searchText: any) {
         let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: searchText };
@@ -199,17 +265,30 @@ export class ShippingInstructionComponent implements OnInit {
         }
     }
     async getConsignees(searchText: any) {
-        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: searchText };
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: searchText };
         // if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
         //     criteriaSearchAgent.inactive = null;
         // }
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
         if (partners != null) {
-            this.listConsignees = partners.data;
-            console.log(this.listConsignees);
+            this.consignees = partners.data;
         }
         else{
-            this.listConsignees = [];
+            this.consignees = [];
+        }
+    }
+    async getRealConsignees(searchText: any) {
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: searchText };
+        // if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+        //     criteriaSearchAgent.inactive = null;
+        // }
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
+        if (partners != null) {
+            this.realConsignees = partners.data;
+            console.log(this.realConsignees);
+        }
+        else{
+            this.realConsignees = [];
         }
     }
     async getShippers(searchText: any) {
@@ -219,11 +298,25 @@ export class ShippingInstructionComponent implements OnInit {
         // }
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
         if (partners != null) {
-            this.listShippers = partners.data;
-            console.log(this.listShippers);
+            this.shippers = partners.data;
+            console.log(this.shippers);
         }
         else{
-            this.listShippers = [];
+            this.shippers = [];
+        }
+    }
+    async getRealShippers(searchText: any) {
+        let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.SHIPPER, inactive: false, all: searchText };
+        // if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+        //     criteriaSearchAgent.inactive = null;
+        // }
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
+        if (partners != null) {
+            this.realShippers = partners.data;
+            console.log(this.realShippers);
+        }
+        else{
+            this.realShippers = [];
         }
     }
     async getPortOfLading(searchText: any) {

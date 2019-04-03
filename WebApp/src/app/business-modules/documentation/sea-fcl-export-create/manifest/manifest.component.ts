@@ -11,6 +11,8 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { NgForm } from '@angular/forms';
+declare var $: any;
+import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 @Component({
     selector: 'app-manifest',
@@ -34,11 +36,14 @@ export class ManifestComponent implements OnInit {
     totalCBM = 0;
     searchHouse = '';
     searchHouseRemoved = '';
+    previewReportLink = '';
+    dataLocalUrl = null;
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
         private api_menu: API_MENU,
-        private sortService: SortService) {
+        private sortService: SortService,
+        private sanitizer: DomSanitizer) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -89,6 +94,15 @@ export class ManifestComponent implements OnInit {
             });
         }
     }
+    async previewReport(){
+        this.previewReportLink = "http://localhost:57587/api/CsTransactionDetail";
+        this.manifest.jobId = this.shipment.id;
+        this.manifest.csTransactionDetails = this.housebills;
+        this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        let res = await this.baseServices.previewfile(this.previewReportLink, this.manifest);
+        this.dataLocalUrl = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(res));
+        $('#preview-modal').modal('show');
+    }
     removeAllChecked(){
         this.checkAll = false;
     }
@@ -119,11 +133,11 @@ export class ManifestComponent implements OnInit {
     getNewManifest(){
         //MSEYYMM/#####: YYYY-MM-DDTHH:mm:ss.sssZ
         this.manifest = new CsManifest();
-        this.manifest.jobId = this.shipment.id;
         let date = new Date().toISOString().substr(0, 19);
         let jobNo = this.shipment.jobNo;
         this.manifest.refNo = "MSE" + date.substring(2, 4) + date.substring(5,7) + jobNo.substring(jobNo.length-5, jobNo.length);
         this.manifest.supplier = this.shipment["supplierName"];
+        this.manifest.voyNo = this.shipment.flightVesselName;
         let index = this.paymentTerms.findIndex(x => x.id == this.shipment.paymentTerm);
         if(index > -1){
             this.paymentTermActive = [this.paymentTerms[index]];
@@ -157,9 +171,12 @@ export class ManifestComponent implements OnInit {
         this.getHouseBillList(this.shipment.id);
     }
     async saveManifest(form: NgForm){
+        this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills;
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
-        if(form.valid){
+        if(form.valid 
+            && this.manifest.pod != null
+            && this.manifest.paymentTerm != null){
             let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.update, this.manifest, true, true);
         }
         console.log(this.manifest);

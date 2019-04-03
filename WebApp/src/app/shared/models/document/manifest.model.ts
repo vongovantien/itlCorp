@@ -6,7 +6,7 @@ export class CsManifest {
     supplier: string = null;
     attention: string = null;
     masksOfRegistration: string = null;
-    voyNo: string = null;
+    voyNo: String = null;
     pol: string = null;
     pod: string = null;
     invoiceDate: Date = null;
