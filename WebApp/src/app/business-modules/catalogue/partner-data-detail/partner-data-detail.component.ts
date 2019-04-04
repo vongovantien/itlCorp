@@ -171,14 +171,19 @@ export class PartnerDataDetailComponent implements OnInit {
     });
   }
   onSubmit(){
+    if(this.partner.countryId == null || this.partner.provinceId == null || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null){
+      return;
+    }
     if(this.form.valid){
       this.partner.accountNo = this.partner.id= this.partner.taxCode;
       if(this.isRequiredSaleman && this.partner.salePersonId != null){
         this.update();
       }
       else{
-        this.partner.accountNo = this.partner.id= this.partner.taxCode;
-        this.update();
+        if(this.isRequiredSaleman == false){
+          this.partner.accountNo = this.partner.id= this.partner.taxCode;
+          this.update();
+        }
       }
     }
   }
@@ -317,10 +322,7 @@ export class PartnerDataDetailComponent implements OnInit {
         this.partnerGroupActives.splice(index, 1);
       }
       this.partner.partnerGroup = '';
-      if(value.id=="ALL"){
-        this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
-      }
-      else{
+      if(value.id!="ALL"){
         this.partnerGroupActives.forEach(element => {
           this.partner.partnerGroup = element.text + ';' + this.partner.partnerGroup;
         });

@@ -1,6 +1,4 @@
-export class ExportExcel  {
-
-    
+export class ExportExcel  {   
 
     title:string;
     titleFontStyle:CellStyle =new CellStyle();

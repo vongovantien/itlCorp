@@ -4,8 +4,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { language } from 'src/languages/language.en';
-import { ResponseType } from '@angular/http';
-import { lang } from 'moment';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -28,10 +27,6 @@ export class BaseService implements ErrorHandler {
     });
     this.baseUrl = "";
     this.showError = true;
-  }
-
-  public setBaseUrl(url) {
-    this.baseUrl = url;
   }
 
   /**

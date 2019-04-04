@@ -9,6 +9,11 @@
             color: #fff;
             background-color: #3966b6;
         }
+        .ui-select-match  {
+            .ui-select-toggle {
+                padding-right: 30px;
+            }
+        }
     }
     ng-select .ui-select-multiple,
     .ui-select-multiple {

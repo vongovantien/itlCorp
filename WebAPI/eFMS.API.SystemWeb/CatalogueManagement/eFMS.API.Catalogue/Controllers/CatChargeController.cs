@@ -50,7 +50,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Paging")]
         public IActionResult Get(CatChargeCriteria criteria,int pageNumber,int pageSize)
         {
-            var data = catChargeService.GetCharges(criteria, pageNumber, pageSize, out int rowCount);
+          var data = catChargeService.GetCharges(criteria, pageNumber, pageSize, out int rowCount);
             var result = new { data, totalItems = rowCount, pageNumber, pageSize };
             return Ok(result);
         }
@@ -224,9 +224,9 @@ namespace eFMS.API.Catalogue.Controllers
                         ChargeNameEn = worksheet.Cells[row, 2].Value?.ToString(),
                         ChargeNameVn = worksheet.Cells[row, 3].Value?.ToString(),
                         UnitId = worksheet.Cells[row, 4].Value == null ? (short)(-1) : Convert.ToInt16(worksheet.Cells[row, 4].Value),
-                        UnitPrice = worksheet.Cells[row,5].Value == null? -1: Convert.ToDouble(worksheet.Cells[row, 5].Value),
+                        UnitPrice = worksheet.Cells[row,5].Value == null? -1: Convert.ToDecimal(worksheet.Cells[row, 5].Value),
                         CurrencyId = worksheet.Cells[row,6].Value?.ToString(),
-                        Vat = worksheet.Cells[row,7].Value == null ? -1 : Convert.ToDouble(worksheet.Cells[row, 7].Value),
+                        Vatrate = worksheet.Cells[row,7].Value == null ? -1 : Convert.ToDecimal(worksheet.Cells[row, 7].Value),
                         Type = worksheet.Cells[row, 8].Value?.ToString(),
                         ServiceTypeId = worksheet.Cells[row, 9].Value?.ToString(),
                         Status = worksheet.Cells[row, 10].Value?.ToString(),

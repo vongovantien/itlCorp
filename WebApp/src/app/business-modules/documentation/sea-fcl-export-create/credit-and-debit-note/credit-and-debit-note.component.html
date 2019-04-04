@@ -1,0 +1,186 @@
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <!--begin: Search Form -->
+        <div class="m-form m-form--label-align-right m--margin-bottom-10">
+            <div class="row align-items-center">
+                <div class="col-lg-4 order-2 order-lg-1">
+                    <div class="form-group">
+                        <div class="m-input-icon m-input-icon--left">
+                            <input type="text" class="form-control m-input m-input--square"
+                                placeholder="Search..." (keyup)="SearchCDNotes($event.target.value)">
+                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                <span>
+                                    <i class="la la-search"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        data-toggle="modal" data-target="#add-credit-debit-note-modal">
+                        <span>
+                            <i class="la la-plus"></i>
+                            <span>
+                                add credit/debit note
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--end: Search Form -->
+        <!--begin: Datatable-->
+        <div class="table-wrapper table-scrollable" id="">
+            <table class="table table-striped table-brand table-collapse-group dataTable">
+                <thead>
+                    <tr>
+                        <th class="table-actions-col no-sorting">
+                            <span>Action</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Type</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Note No</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Charges Count</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Balance Amount</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Creator</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Create Date</span>
+                        </th>
+                        <th class="sorting">
+                            <span>SOA No</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="tbody-group" *ngFor="let item of listCDNotes;let i = index;">
+                    <!-- begin collapse-toggle-row -->
+                    <tr class="collapse-toggle-row tgroup">
+                        <td colspan="8">
+                            <label class="btn-toggle-collapse m--font-danger" title="view more"  data-toggle="collapse" data-target="#id-cd-001">
+                                <i class="la la-minus-square"></i>
+                            </label> 
+                            <span class="tgroup-title m--margin-right-10">No-1</span>&nbsp;<span class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">{{item.partnerNameEn}}</span>
+                        </td>
+                    </tr>
+                    <!-- end of collapse-toggle-row -->
+                    <!-- begin collapse-panel-row -->
+                    <tr class="collapse-panel-row">
+                        <td colspan="8">
+                            <div class="collapse show" id="id-cd-001">
+                                <table class="table">
+                                    <tbody *ngFor="let s of item.listSOA;let k = index;">
+                                        <tr class="">
+                                            <td class="table-actions-col" >
+                                                <div class="table-actions">
+                                                    <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal" (click)="openEdit(s.soa.code)">
+                                                        <i class="la la-list"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span>{{s.soa.type}}</span>
+                                            </td>
+                                            <td>
+                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal" (click)="openEdit(s.soa.code)">{{s.soa.code}}</a>
+                                            </td>
+                                            <td>
+                                                <span>{{s.total_charge}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{s.soa.total}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{s.soa.userCreated}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{s.soa.datetimeCreated | date:'dd/MM/yyyy'}}</span>
+                                            </td>
+                                            <td>
+                                                <span>Other SOA No</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    <!--end of collapse-panel-row -->
+
+    
+                </tbody>
+            </table>
+        </div>
+        <!--end: Datatable-->   
+    </div>
+</div>
+<!--end:: m-portlet-->
+
+<!--begin:: add-credit-debit-note-modal-->
+<app-credit-and-debit-note-addnew [chargesFromRemaining]="ListChargesFromRemaining" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
+<!--end:: add-credit-debit-note-modal-->
+
+<!--begin:: detail-credit-debit-note-modal-->
+<app-credit-and-debit-note-detail [updateStatus]="UpdateStatus" [EditingCDNoteNo]="EditingCDNoteNo" (CdNoteEditingEmiter)="CdNoteEditingCatcher($event)"></app-credit-and-debit-note-detail>
+<!--end:: detail-credit-debit-note-modal-->
+
+<!--begin:: edit-credit-debit-note-modal-->
+<app-credit-and-debit-note-edit (updated)="updateSttCatcher($event)" [chargesFromRemaining]="ListChargesFromRemaining" [editingCdNote]="EditingCDNote" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)"></app-credit-and-debit-note-edit>
+<!--end:: edit-credit-debit-note-modal-->
+
+<!--begin:: add-remaining-charge-modal-->
+<app-credit-and-debit-note-remaining-charge [listRemainingCharges]="ListChargesFromAdd" [partnerId]="currentPartnerId" (chargesFromRemaining)="chargesFromRemainingCatcher($event)"></app-credit-and-debit-note-remaining-charge>
+<!--end:: add-remaining-charge-modal-->
+
+<!--begin::confirm-delete-modal-->
+<div class="modal fade" id="confirm-delete-CDnote-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete house bill</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>All relate infomation will be lost. Are you sure you want to delete this Credit/Debit Note?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="deleteCharge()"> 
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-modal-->
+

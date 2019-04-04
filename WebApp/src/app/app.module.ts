@@ -26,8 +26,13 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { AuthGuardService } from 'src/services-base/auth-guard.service';
+// import { ServiceWorkerModule } from '@angular/service-worker';
+// import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { HighchartsChartModule } from "highcharts-angular";
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -40,10 +45,12 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     HeaderComponent,
     FooterComponent,
     PageSidebarComponent,
-    SubheaderComponent
+    SubheaderComponent,
+    DashboardComponent
+    // TwoDigitDecimaNumberDirective
   ],
   imports: [    
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
+   // ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
     SharedModule,
     CommonModule,
     BrowserModule,
@@ -57,7 +64,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     NgProgressModule,
     PerfectScrollbarModule,
     SelectModule, // Scrollbar
-    OAuthModule.forRoot()
+    OAuthModule.forRoot(),
+    NgxDaterangepickerMd,
+    HighchartsChartModule
   ],
   providers: [
     AuthGuardService,

@@ -19,6 +19,9 @@ import { TableDetailComponent } from './common/table-detail/table-detail.compone
 import { CloseModalButtonComponent } from './common/close-modal-button/close-modal-button.component';
 import { ExcelService } from './services/excel.service';
 import { NgProgressModule } from '@ngx-progressbar/core';
+import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-number.directive';
+import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima-number.directive';
+import { IntergerInputDirective } from './directives/interger-input.directive';
 @NgModule({
   imports: [CommonModule, FormsModule,SelectModule],
   declarations: [
@@ -32,12 +35,16 @@ import { NgProgressModule } from '@ngx-progressbar/core';
     SearchOptionsComponent, 
     InputFormComponent, 
     TableDetailComponent, 
-    CloseModalButtonComponent
-    
+    CloseModalButtonComponent,
+    TwoDigitDecimaNumberDirective,
+    ThreeDigitDecimaNumberDirective,
+    IntergerInputDirective
   ],
   exports: [
     CommonModule,
-    // ModalModule,
+    TwoDigitDecimaNumberDirective,
+    ThreeDigitDecimaNumberDirective,
+    IntergerInputDirective,
     TableLayoutComponent,
     BreadcrumbComponent,
     DefaultButtonComponent,

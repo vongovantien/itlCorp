@@ -1,0 +1,175 @@
+<div class="modal-dialog modal-lg" role="document">
+  <div class="modal-content">
+      <div class="modal-header">
+          <h5 class="modal-title">Import Job Detail</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeImport()">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+          <div class="bg-secondary m--padding-10 m--margin-bottom-10">
+              <!--begin::Form-->
+              <div class="m-form m-form--state">
+                  <div class="row">
+                      <div class="col-lg-4">
+                          <div class="form-group">
+                              <label class="form-control-label" for="">
+                                  Search text
+                              </label>
+                              <input type="text" class="form-control m-input m-input--square" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                              name="searchString" (change)="searchString = searchString.trim()"
+                                  placeholder="Search text">
+                          </div>
+                      </div>
+                      <div class="col-lg-4">
+                          <div class="form-group">
+                              <label class="form-control-label" for="">
+                                  Select filter
+                              </label>
+                              <ng-select [allowClear]="true" [items]="searchFilters" [disabled]="disabled" [active]="searchFilterActive"
+                                  (data)="refreshValue($event)" (selected)="selectFilter = $event.id" (removed)="selectFilter = null" (typed)="typed($event)" placeholder="Select filter">
+                              </ng-select>
+                          </div>
+                      </div>
+                      <div class="col-lg-4">
+                          <div class="form-group">
+                              <label class="form-control-label" for="">
+                                  shipment date: From - To
+                              </label>
+                              <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                  <input type="text" class="form-control m-input m-input--square"
+                                      ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                      [(ngModel)]="selectedRange" [ranges]="ranges"
+                                      [alwaysShowCalendars]="true" name="daterange"
+                                      placeholder="From date - to date" readonly />
+                                  <span class="m-input-icon__icon m-input-icon__icon--right">
+                                      <span>
+                                          <i class="la la-calendar"></i>
+                                      </span>
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="form-actions">
+                      <div class="row">
+                          <div class="col-lg-6"></div>
+                          <div class="col-lg-6 m--align-right">
+                              <button type="button"
+                                  class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
+                                  <span>
+                                      <i class="la la-search"></i>
+                                      <span>
+                                          Search
+                                      </span>
+                                  </span>
+                              </button>
+                              <button type="button" (click)="resetSearchShipment()"
+                                  class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                  <span>
+                                      <i class="la la-refresh"></i>
+                                      <span>
+                                          Reset
+                                      </span>
+                                  </span>
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <!--end::Form-->
+          </div>
+          <!--begin: Datatable-->
+          <div class="table-wrapper" id="">
+              <table class="table table-striped table-secondary dataTable">
+                  <thead class="">
+                      <tr class="">
+                          <th class=""></th>
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo'), 'sorting': sortKey != 'jobNo' }"
+                            (click)="sort('jobNo')">
+                              <span>
+                                  Job ID
+                              </span>
+                          </th>
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mawb'), 'sorting_desc': (!isDesc && sortKey == 'mawb'), 'sorting': sortKey != 'sorting' }"
+                            (click)="sort('mawb')">
+                              <span>
+                                  MBL No
+                              </span>
+                          </th>
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'supplierName'), 'sorting_desc': (!isDesc && sortKey == 'supplierName'), 'sorting': sortKey != 'supplierName' }"
+                            (click)="sort('supplierName')">
+                              <span>
+                                  Supplier
+                              </span>
+                          </th>
+                          <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'etd'), 'sorting_desc': (!isDesc && sortKey == 'etd'), 'sorting': sortKey != 'etd' }"
+                            (click)="sort('etd')">
+                              <span>
+                                  Shipment Date
+                              </span>
+                          </th>
+                      </tr>
+                  </thead>
+                  <tbody *ngIf="shipments">
+                      <tr class="" *ngFor="let item of shipments; let i=index">
+                          <td class="">
+                              <div class="">
+                                  <label class="m-radio m-radio--single m-radio--solid m-radio--brand">
+                                      <input type="radio" name="example-{{i}}" [value]="item.id" (click)="shipment = item" 
+                                        [checked]="item === shipment">
+                                      <span></span>
+                                  </label>
+                              </div>
+                          </td>
+                          <td>
+                              <span>
+                                {{ item.jobNo }}
+                              </span>
+                          </td>
+                          <td>
+                              <span>
+                                {{ item.mawb }}
+                              </span>
+                          </td>
+                          <td>
+                              <span>
+                                {{ item.supplierName }}
+                              </span>
+                          </td>
+                          <td>
+                              <span>
+                                {{ item.etd | date: 'dd/MM/yyyy'}}
+                              </span>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+          <!--end: Datatable-->
+          <!--begin::pagination-->
+          <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+            (pagerObject)="setPage($event)"></app-pagination>
+          <!--end::pagination-->
+      </div>
+      <div class="modal-footer m--align-center">
+          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="importShipment()">
+              <span>
+                  <i class="la la-save"></i>
+                  <span>
+                      import
+                  </span>
+              </span>
+          </button>
+          <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="cancelImport()">
+              <span>
+                  <i class="la la-ban"></i>
+                  <span>
+                      cancel
+                  </span>
+              </span>
+          </button>
+      </div>
+  </div>
+</div>

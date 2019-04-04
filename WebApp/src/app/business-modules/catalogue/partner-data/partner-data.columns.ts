@@ -69,7 +69,8 @@ export const PARTNERDATACOLUMNSETTING: ColumnSetting[] =
     required: true,
     dataType: 'Date',
     allowSearch: false,
-    lookup: 'provinces'
+    lookup: 'provinces',
+    format: undefined
   },
   {
     primaryKey: 'inactive',

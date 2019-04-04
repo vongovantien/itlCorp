@@ -23,8 +23,8 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public ICollection<SysRoleMenu> SysRoleMenu { get; set; }
-        public ICollection<SysRolePermission> SysRolePermission { get; set; }
-        public ICollection<SysUserRole> SysUserRole { get; set; }
+        public virtual ICollection<SysRoleMenu> SysRoleMenu { get; set; }
+        public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
+        public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

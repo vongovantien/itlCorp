@@ -9,7 +9,7 @@
     .m-nav-sticky {
         width: 40px;
         position: fixed;
-        top: 35%;
+        top: 25%;
         right: 0;
         list-style: none;
         padding: 5px 0;
@@ -17,7 +17,7 @@
         z-index: array-get($layout, self, z-index);
 
         @include rounded {
-            @include border-radius(8px 0 0 8px);
+            @include border-radius(3px 0 0 3px);
         }
 
         .m-nav-sticky__item {

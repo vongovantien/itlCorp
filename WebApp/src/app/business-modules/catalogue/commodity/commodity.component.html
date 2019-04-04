@@ -140,7 +140,7 @@
                                     <div class="col-lg-8">
                                         <input type="text" [(ngModel)]="commodity.code" (change)="commodity.code = commodity.code.trim()"
                                             class="form-control m-input m-input-group--square" #commodityCode="ngModel" name="commodityCode"
-                                            required placeholder="Please enter group name">
+                                            required placeholder="Please enter group name" maxlength="25" [attr.disabled]="commodity.id ? '' : null">
                                         <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityCode.invalid">
                                             Code is required
                                         </div>
@@ -154,7 +154,7 @@
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="commodity.commodityNameEn" (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()"
                                     class="form-control m-input m-input-group--square" #commodityNameEn="ngModel" name="commodityNameEn"
-                                    required placeholder="Please enter group name">
+                                    required placeholder="Please enter group name" maxlength="100">
                                 <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameEn.invalid">
                                     Name(EN) is required
                                 </div>
@@ -167,7 +167,7 @@
                             <div class="col-lg-8">
                                 <input type="text" [(ngModel)]="commodity.commodityNameVn" (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()"
                                     class="form-control m-input m-input-group--square" #commodityNameVn="ngModel" name="commodityNameVn"
-                                    required placeholder="Please enter group name">
+                                    required placeholder="Please enter group name" maxlength="100">
                                 <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameVn.invalid">
                                     Name (Local) is required
                                 </div>

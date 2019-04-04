@@ -12,11 +12,16 @@ namespace eFMS.API.Documentation.Service.Models
         public int? Quantity { get; set; }
         public string ContainerNo { get; set; }
         public string SealNo { get; set; }
+        public string MarkNo { get; set; }
         public short? UnitOfMeasureId { get; set; }
-        public int? UnitQuantity { get; set; }
+        public int? CommodityId { get; set; }
+        public short? PackageTypeId { get; set; }
+        public short? PackageQuantity { get; set; }
         public string Description { get; set; }
         public decimal? Gw { get; set; }
+        public decimal? Nw { get; set; }
         public decimal? Cbm { get; set; }
+        public decimal? ChargeAbleWeight { get; set; }
         public bool? Partof { get; set; }
         public string OwnerId { get; set; }
         public string OffHireDepot { get; set; }
@@ -24,8 +29,5 @@ namespace eFMS.API.Documentation.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
 
-        public virtual CatUnit ContainerType { get; set; }
-        public virtual CsTransaction Mbl { get; set; }
-        public virtual CatUnit UnitOfMeasure { get; set; }
     }
 }

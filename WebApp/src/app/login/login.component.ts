@@ -4,7 +4,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { Router } from '@angular/router';
 import { OAuthService, JwksValidationHandler} from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
-import * as crypto_js from 'crypto-js';
+import crypto_js from 'crypto-js';
 import { NgForm } from '@angular/forms';
 import { authConfig } from '../shared/authenticate/authConfig';
 import { BaseService } from 'src/services-base/base.service';
@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   ngOnInit() {
     this.setupLocalInfo();
     if(this.baseService.checkLoginSession(false)){
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/home/dashboard');
     }
   }
 
@@ -67,7 +67,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
           
           this.rememberMe();
           this.toastr.info("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "Login Success", { positionClass: 'toast-bottom-right' });
-          this.router.navigateByUrl('/home');       
+          this.router.navigateByUrl('/home/dashboard');       
           this.baseService.spinnerHide();
         }
       }).catch((err) => {

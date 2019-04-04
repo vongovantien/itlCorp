@@ -8,6 +8,8 @@ using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Infrastructure.Common;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Http;
@@ -41,6 +43,20 @@ namespace eFMS.API.System.Controllers
             return Ok(results);
         }
 
+        [HttpGet]
+        [Route("GetById/{id}")]
+        public SysUserViewModel GetUserById(string id)
+        {
+            return sysUserService.GetUserById(id);
+        }
+        [HttpPost]
+        [Route("Paging")]
+        public IActionResult Paging(SysUserCriteria criteria, int page, int size)
+        {
+            var data = sysUserService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
         [HttpPost]
         public IActionResult Post(SysUserAddModel model)
         {

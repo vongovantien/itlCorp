@@ -69,6 +69,15 @@
             </div>
         </div>
         <div class="m-portlet__body">
+            <div class="form-group m-form__group m--margin-top-10">
+                <div class="alert m-alert m-alert--default" role="alert">
+                    Add
+                    <code>invalid-row</code>
+                    class to the tr element with Error state,
+                    <code>selected-row</code>
+                    class to the tr element with selected state.
+                </div>
+            </div>
             <!--begin: table -->
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand">
@@ -99,15 +108,50 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr class="invalid-row">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>LH001</span>
+                            </td>
+                            <td>
+                                <span>Customer services</span>
+                            </td>
+                            <td>
+                                <span>ABBR</span>
+                            </td>
+                            <td>
+                                <span>Ký kết hợp đồng ngoại thương</span>
+                            </td>
+                            <td>
+                                <span>Shipping Schedule</span>
+                            </td>
+                            <td>
+                                <span>Đây là mô tả bằng tiếng Việt</span>
+                            </td>
+                            <td>
+                                <span>This is description by EN</span>
+                            </td>
+                        </tr>
+                        <tr class="selected-row">
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -138,46 +182,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <span>LH001</span>
-                            </td>
-                            <td>
-                                <span>Customer services</span>
-                            </td>
-                            <td>
-                                <span>ABBR</span>
-                            </td>
-                            <td>
-                                <span>Ký kết hợp đồng ngoại thương</span>
-                            </td>
-                            <td>
-                                <span>Shipping Schedule</span>
-                            </td>
-                            <td>
-                                <span>Đây là mô tả bằng tiếng Việt</span>
-                            </td>
-                            <td>
-                                <span>This is description by EN</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -267,11 +276,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -302,11 +311,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -337,11 +346,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -681,6 +690,640 @@
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title">
                     <h3 class="m-portlet__head-text">
+                        Data editable with fix left side
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <!--begin: Datatable -->
+            <div class="table-wrapper" id="" style="min-height: 300px">
+                <table class="table table-striped table-brand table-editable">
+                    <thead class="">
+                        <tr class="">
+                            <th class="fixed-side"></th>
+                            <th class="">
+                                <span>
+                                    Cont Type
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Cont Q'ty
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Cont No.
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Seal No.
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Mark No.
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Commodity
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Package Type
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Package Q'ty
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Description of Good
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    N.W
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    G.W
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    C.W
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Unit
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    CBM
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="m-form m-form--state invalid-row row-editing">
+                            <td class="table-actions-col fixed-side">
+                                <div class="table-actions content-editable" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="table-actions control-editable" style="width: 70px">
+                                    <button type="button" class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Save">
+                                        <i class="la la-save"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Cancel">
+                                        <i class="la la-ban"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont Type
+                                </span>
+                                <div class="control-editable">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                                <div class="has-danger row-control-feedback">
+                                    <div class="form-control-feedback">
+                                        Duplicate container detail
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont Q'ty
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                                <!-- <div class="control-editable has-danger">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <div class="form-control-feedback">
+                                        Sorry, that's not correct. Try another?
+                                    </div>
+                                </div> -->
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Seal No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Mark No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Commodity
+                                </span>
+                                <div class="control-editable">
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="Vũng Tàu, Bà Rịa, Việt">
+                                        <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                    <th>Group</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row data-selected" data-id="1">
+                                                                <td>Option EN 1</td>
+                                                                <td>Option VN 1</td>
+                                                                <td>Group 1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>Option EN 2</td>
+                                                                <td>Option VN 2</td>
+                                                                <td>Group 2</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="3">
+                                                                <td>Option EN 3</td>
+                                                                <td>Option VN 3</td>
+                                                                <td>Group 3</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="4">
+                                                                <td>Option EN 4</td>
+                                                                <td>Option VN 4</td>
+                                                                <td>Group 4</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Package Type
+                                </span>
+                                <div class="control-editable">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Package Q'ty
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="" style="width: 130px">
+                                <span class="content-editable">
+                                    Description of Good dài thiệt là dài đó nha Tem Tem
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    N.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    G.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    C.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Unit
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    CBM
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="m-form m-form--state invalid-row row-editing">
+                            <td class="table-actions-col fixed-side">
+                                <div class="table-actions content-editable" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="table-actions control-editable" style="width: 70px">
+                                    <button type="button" class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Save">
+                                        <i class="la la-save"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Cancel">
+                                        <i class="la la-ban"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont Type
+                                </span>
+                                <div class="control-editable">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont Q'ty
+                                </span>
+                                <div class="control-editable has-danger">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <div class="form-control-feedback">
+                                        Sorry, that's not correct. Try another?
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Seal No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Mark No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Commodity
+                                </span>
+                                <div class="control-editable">
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="Vũng Tàu, Bà Rịa, Việt">
+                                        <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                    <th>Group</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row data-selected" data-id="1">
+                                                                <td>Option EN 1</td>
+                                                                <td>Option VN 1</td>
+                                                                <td>Group 1</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="2">
+                                                                <td>Option EN 2</td>
+                                                                <td>Option VN 2</td>
+                                                                <td>Group 2</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="3">
+                                                                <td>Option EN 3</td>
+                                                                <td>Option VN 3</td>
+                                                                <td>Group 3</td>
+                                                            </tr>
+                                                            <tr class="data-row" data-id="4">
+                                                                <td>Option EN 4</td>
+                                                                <td>Option VN 4</td>
+                                                                <td>Group 4</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Package Type
+                                </span>
+                                <div class="control-editable">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Package Q'ty
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="" style="width: 130px">
+                                <span class="content-editable">
+                                    Description of Good dài thiệt là dài đó nha Tem Tem
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    N.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    G.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    C.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Unit
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    CBM
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="">
+                            <td class="table-actions-col fixed-side">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont Type
+                                </span>
+                                <div class="control-editable">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont Q'ty
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Cont No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Seal No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Mark No.
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Commodity
+                                </span>
+                                <div class="control-editable">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Package Type
+                                </span>
+                                <div class="control-editable">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Package Q'ty
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="" style="width: 130px">
+                                <span class="content-editable">
+                                    Description of Good dài thiệt là dài đó nha Tem Tem
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    N.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    G.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    C.W
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    Unit
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                            <td class="">
+                                <span class="content-editable">
+                                    CBM
+                                </span>
+                                <div class="control-editable">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--end: Datatable -->
+        </div>
+    </div>
+    <!--end::  m-portlet-->
+
+    <!--begin:: m-portlet-->
+    <div class="m-portlet">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">
                         Data table with scroll
                     </h3>
                 </div>
@@ -729,11 +1372,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -764,11 +1407,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -799,11 +1442,11 @@
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit stage" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -889,7 +1532,7 @@
                                         <i class="la la-angle-up"></i>
                                     </button>
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -994,7 +1637,7 @@
                                         <i class="la la-angle-up"></i>
                                     </button>
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -1099,7 +1742,7 @@
                                         <i class="la la-angle-up"></i>
                                     </button>
                                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
+                                        title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"

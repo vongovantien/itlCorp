@@ -59,22 +59,28 @@ body {
 }
 body {
     overflow-y: scroll;
-    &.body-fixed {
-        width: 100%;
-        position: fixed;
-        top: 0;
-    }
+    // &.body-fixed {
+    //     width: 100%;
+    //     position: fixed;
+    //     top: 0;
+    // }
 }
 //element
-label {
+label, strong {
     font-weight: 500;
 }
 ul {
     margin-bottom: 0;
     padding-left: 15px;
 }
+a {
+    &:hover {
+        text-decoration: none;
+    }
+}
 .form-control-label {
     text-transform: capitalize;
+    margin-bottom: 0.25rem;
 }
 .form-control {
     &[readonly] {
@@ -252,33 +258,16 @@ ul {
     -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 .table {
-    font-size: 13px;
+    font-size: 12px;
     margin-bottom: 0;
-    thead {
-        th {
-            padding-left: 4px;
-            padding-right: 4px;
-            font-weight: 500;
-            vertical-align: middle;
-            background-color: #f2dedf;
-            &:first-child {
-                padding-left: 10px
-            }
-        }
-        .table-filter-row {
-            td {
-                background-color: #dde9f5;
-                padding: 0;
-            }
-            .form-control {
-                background-color: transparent;
-            }
-        }
-    }
-    tbody {
+    thead,
+    tbody,
+    tfoot {
         tr {
+            th,
             td {
-                padding: 8px 4px;
+                padding: 4px;
+                border-top-color: #fff;
                 vertical-align: middle;
                 &:first-child {
                     padding-left: 10px
@@ -290,6 +279,9 @@ ul {
             }
             &.invalid-row {
                 background-color: #ffe3e4;
+            }
+            &.selected-row {
+                background-color: #aaf9a5;
             }
             .collapsed .la-angle-up:before {
                 content: "\f110";
@@ -304,6 +296,13 @@ ul {
                      border: 1px solid #d0312c;
                 }
             }
+            
+            &.tgroup {
+                td {
+                    font-weight: 500;
+                    background-color: #f2dedf;
+                }
+            }
         }
         & + tbody {
             border-top: 0;
@@ -313,6 +312,36 @@ ul {
                 > .collapse-toggle-row {
                     background-color: #fff;
                 }
+            }
+        }
+    }
+    thead {
+        tr {
+            th {
+                padding: 8px 4px;
+                font-weight: 500;
+                vertical-align: middle;
+                background-color: #f2dedf;
+                &:first-child {
+                    padding-left: 10px
+                }
+            }
+        }
+        .table-filter-row {
+            td {
+                background-color: #dde9f5;
+                padding: 0;
+            }
+            .form-control {
+                background-color: transparent;
+            }
+        }
+    }
+    tfoot {
+        tr {
+            th,
+            td {
+                background-color: #f2dedf;
             }
         }
     }
@@ -337,7 +366,7 @@ ul {
         text-align: center;
         font-size: 16px;
         i {
-            font-size: 2rem;
+            font-size: 3rem;
             line-height: 0;
             vertical-align: middle;
             margin-right: 10px;
@@ -353,7 +382,7 @@ ul {
     }
     .m-radio,
     .m-checkbox {
-        width: 18px;
+        // width: 18px;
         height: 18px;
         span {
             top: 0;
@@ -381,6 +410,13 @@ ul {
     .btn {
         & + .btn {
             margin-left: 5px;
+        }
+        &.m-btn--icon.m-btn--icon-only {
+            width: 25px;
+            height: 25px;
+            i {
+                font-size: 1.35rem;
+            }
         }
     }
 }
@@ -898,5 +934,54 @@ table.dataTable {
         height: 5px;
         margin-top: 8px;
         background-color: #d9dadb;
+    }
+}
+#container-list-of-job-modal-master {
+    .table-wrapper {
+        min-height: 400px;
+    }
+}
+//modal fixed height
+// .modal-scrollable {
+//     .modal-content {
+//         height: auto;
+//         padding: 55px 0 65px;
+//         position: absolute;
+//         top: 0;
+//         bottom: 0;
+//     }
+//     .modal-header,
+//     .modal-footer {
+//         width: 100%;
+//         position: absolute;
+//         z-index: 99;
+//     }
+//     .modal-header {
+//         top: 0;
+//     }
+//     .modal-footer {
+//         bottom: 0;
+//     }
+// }
+.fit-height-div {
+    max-height: 250px;
+    overflow: auto;
+}
+.alert {
+    padding: 0.65rem 1.5rem;
+}
+.fms-shipment-sidebar {
+    li.m-nav-sticky__item {
+        padding: 0;
+        a {
+            width: 100%;
+            display: block;
+            padding: 6px 5px;
+            &:hover {
+                color: #fff;
+                background-color: #3966b6;
+                border-color: #3966b6;
+            }
+        }
     }
 }

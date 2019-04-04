@@ -62,8 +62,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     ((x.department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0
                     || (x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0
                     || (x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0
-                    || (x.stage.Code ?? "").IndexOf(criteria.Code ?? "")>=0)
-                    && (x.stage.Id == criteria.Id || criteria.Inactive == null))
+                    || (x.stage.Code ?? "").IndexOf(criteria.Code ?? "")>=0
+                    || (x.stage.Id == criteria.Id)))
                     .Select(x => x.stage).ToList();              
             }
 

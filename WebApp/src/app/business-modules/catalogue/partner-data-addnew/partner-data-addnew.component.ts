@@ -52,7 +52,7 @@ export class PartnerDataAddnewComponent implements OnInit {
     });
 
     this.getComboboxData();
-    
+    this.partner.departmentId = "Head Office";
   }
   getComboboxData(): any {
     this.getPartnerGroups();
@@ -63,10 +63,12 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.getparentCustomers();
     this.getDepartments();
   }
+  departmentActive: any[] = [];
   getDepartments(): any { 
     this.baseService.get(this.api_menu.Catalogue.PartnerData.getDepartments).subscribe((response: any) => {     
       if(response != null){
         this.departments = response.map(x=>({"text":x.name,"id":x.id}));      }
+        this.departmentActive = ["Head Office"];
      },err=>{     
        this.baseService.handleError(err);
      });
@@ -186,13 +188,18 @@ export class PartnerDataAddnewComponent implements OnInit {
   }
 
   onSubmit(){
+    if(this.partner.countryId == null || this.partner.provinceId == null || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null){
+      return;
+    }
     if(this.form.valid){
       this.partner.accountNo = this.partner.id= this.partner.taxCode;
       if(this.isRequiredSaleman && this.partner.salePersonId != null){
         this.addNew();
       }
       else{
-        this.addNew();
+        if(this.isRequiredSaleman == false){
+          this.addNew();
+        }
       }
     }
   }
@@ -215,7 +222,7 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.partner.provinceId = null;
     this.partner.countryShippingId = null;
     this.partner.provinceShippingId = null;
-    this.partner.departmentId = null;
+    this.partner.departmentId = "Head Office";
     //this.partner.partnerGroup = '';
     this.partner.salePersonId = null;
     this.partner.workPlaceId = null;
@@ -343,11 +350,8 @@ export class PartnerDataAddnewComponent implements OnInit {
       if (index > -1) {
         this.partnerGroupActives.splice(index, 1);
       }
-      this.partner.partnerGroup = '';
-      if(value.id=="ALL"){
-        this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
-      }
-      else{
+      this.partner.partnerGroup = null;
+      if(value.id!="ALL"){
         this.partnerGroupActives.forEach(element => {
           this.partner.partnerGroup = element.text + ';' + this.partner.partnerGroup;
         });
@@ -387,5 +391,7 @@ export class PartnerDataAddnewComponent implements OnInit {
   public refreshValue(value: any): void {
     this.value = value;
   }
+
+
 
 }

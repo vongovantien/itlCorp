@@ -24,9 +24,9 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public SysMenu Parent { get; set; }
-        public ICollection<SysMenu> InverseParent { get; set; }
-        public ICollection<SysRoleMenu> SysRoleMenu { get; set; }
-        public ICollection<SysRolePermission> SysRolePermission { get; set; }
+        public virtual SysMenu Parent { get; set; }
+        public virtual ICollection<SysMenu> InverseParent { get; set; }
+        public virtual ICollection<SysRoleMenu> SysRoleMenu { get; set; }
+        public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
     }
 }

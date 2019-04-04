@@ -26,14 +26,15 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Form-->
-            <div class="m-form m-form--state">
+            <div class="m-form m-form--state" >
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Search text
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                            <input type="text" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                                name="searchString" (change)="searchString = searchString.trim()" placeholder="Search text">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -41,8 +42,8 @@
                             <label class="form-control-label" for="">
                                 Select filter
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)"
+                            <ng-select [allowClear]="true" [items]="searchFilters" [active]="searchFilterActive" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selectFilter = $event.id" (removed)="selectFilter = null"
                                 placeholder="Select filter">
                             </ng-select>
                         </div>
@@ -50,7 +51,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Create date: From - To
+                                Shipment date: From - To
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square"
@@ -79,7 +80,7 @@
                                     <label class="form-control-label" for="">
                                         HBL No.
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                    <input type="text" [(ngModel)]="criteria.hwbNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -87,7 +88,7 @@
                                     <label class="form-control-label" for="">
                                         Cont No.
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                    <input type="text" [(ngModel)]="criteria.containerNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -95,31 +96,107 @@
                                     <label class="form-control-label" for="">
                                         Seal No.
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search text">
+                                    <input type="text" [(ngModel)]="criteria.sealNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" *ngIf="isReset">
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Shipper
+                                        Customer
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid" #selectedCustomer>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" 
+                                            [value]="selectedCustomer.value == null?'Please selected customer':selectedCustomer.value">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeCustomer($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Abbr Name</th>
+                                                                    <th style="width: 200px">Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody *ngIf="customers">
+                                                            <tr class="data-row" [ngClass]="{ 'data-selected': criteria.customerId!==null && criteria.customerId===item.id }"
+                                                            (click)="criteria.customerId = item.id; selectedCustomer.value= item.partnerNameEn" 
+                                                                data-id="{{item.id}}" *ngFor="let item of customers; let i = index">
+                                                                <td>{{ item.accountNo }}</td>
+                                                                <td>{{ item.shortName }}</td>
+                                                                <td style="width: 200px">{{ item.partnerNameEn }}</td>
+                                                                <td>{{ item.taxCode }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Supplier (Co-Loader)
+                                        Notify party
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid" #selectedNotifyPartry>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select"
+                                            [value]="selectedNotifyPartry.value == null?'Please selected notify party':selectedNotifyPartry.value">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeNotifyparty($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Abbr Name</th>
+                                                                    <th style="width: 200px">Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody *ngIf="notifyPartries">
+                                                            <tr class="data-row" [ngClass]="{ 'data-selected': criteria.notifyPartyId!==null && criteria.notifyPartyId===item.id }"
+                                                                (click)="criteria.notifyPartyId = item.id; selectedNotifyPartry.value= item.partnerNameEn" 
+                                                                data-id="{{item.id}}" *ngFor="let item of notifyPartries; let i = index">
+                                                                <td>{{ item.accountNo }}</td>
+                                                                <td>{{ item.shortName }}</td>
+                                                                <td style="width: 200px">{{ item.partnerNameEn }}</td>
+                                                                <td>{{ item.taxCode }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -127,17 +204,51 @@
                                     <label class="form-control-label" for="">
                                         Saleman
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        placeholder="Select filter">
-                                    </ng-select>
+                                    <div class="dropdown e--combogrid" #selectedSaleman>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
+                                            [value]="selectedSaleman.value == null?'Please selected a saleman':selectedSaleman.value" autocomplete="nope">
+                                        <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search..." (keyup)="changeSaleman($event.target.value)">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>User Name</th>
+                                                                    <th>Full Name</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody *ngIf="salemans">
+                                                            <tr class="data-row" [class.data-selected] = "criteria.saleManID !==null && criteria.saleManID===user.id"
+                                                                data-id="{{user.id}}" *ngFor="let user of salemans;let i = index;" 
+                                                                (click)="criteria.saleManID=user.id; selectedSaleman.value= user.employeeNameVn">
+                                                                <td>{{ user.username }}</td>
+                                                                <td>{{ user.employeeNameVn}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!--end::Advance-search-->
-                <div class="form-actions">
+                <div class="form-actions" >
                     <div class="row">
                         <div class="col-lg-6">
                             <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
@@ -149,7 +260,7 @@
                             </a>
                         </div>
                         <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
                                 <span>
                                     <i class="la la-search"></i>
                                     <span>
@@ -157,7 +268,7 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
                                 <span>
                                     <i class="la la-refresh"></i>
                                     <span>
@@ -182,838 +293,221 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col no-sorting"></th>
-                            <th class="sorting_asc">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo'), 'sorting': sortKey != 'jobNo' }"
+                                (click)="sortShipment('jobNo')">
                                 <span>Job Id</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mawb'), 'sorting_desc': (!isDesc && sortKey == 'mawb'), 'sorting': sortKey != 'mawb' }"
+                                (click)="sortShipment('mawb')">
                                 <span>M/B/L No.</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'etd'), 'sorting_desc': (!isDesc && sortKey == 'etd'), 'sorting': sortKey != 'etd' }"
+                                (click)="sortShipment('etd')">
                                 <span>ETD</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'eta'), 'sorting_desc': (!isDesc && sortKey == 'eta'), 'sorting': sortKey != 'eta' }"
+                                (click)="sortShipment('eta')">
                                 <span>ETA</span>
                             </th>
-                            <th class="sorting">
-                                <span>Shipping Line</span>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'supplierName'), 'sorting_desc': (!isDesc && sortKey == 'supplierName'), 'sorting': sortKey != 'supplierName' }"
+                                (click)="sortShipment('supplierName')">
+                                <span>Supplier</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'agentName'), 'sorting_desc': (!isDesc && sortKey == 'agentName'), 'sorting': sortKey != 'agentName' }"
+                                (click)="sortShipment('agentName')">
                                 <span>Agent</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'polName'), 'sorting_desc': (!isDesc && sortKey == 'polName'), 'sorting': sortKey != 'polName' }"
+                                (click)="sortShipment('polName')">
                                 <span>POL</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'podName'), 'sorting_desc': (!isDesc && sortKey == 'podName'), 'sorting': sortKey != 'podName' }"
+                                (click)="sortShipment('podName')">
                                 <span>POD</span>
                             </th>
-                            <th class="no-sorting">
-                                <span>Gross Weight</span>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumCont'), 'sorting_desc': (!isDesc && sortKey == 'sumCont'), 'sorting': sortKey != 'sumCont' }"
+                                (click)="sortShipment('sumCont')">
+                                <span>Total Cont</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumCBM'), 'sorting_desc': (!isDesc && sortKey == 'sumCBM'), 'sorting': sortKey != 'sumCBM' }"
+                                (click)="sortShipment('sumCBM')">
                                 <span>CBM</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'creatorName'), 'sorting_desc': (!isDesc && sortKey == 'creatorName'), 'sorting': sortKey != 'creatorName' }"
+                                (click)="sortShipment('creatorName')">
                                 <span>Creator</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'createdDate'), 'sorting_desc': (!isDesc && sortKey == 'createdDate'), 'sorting': sortKey != 'createdDate' }"
+                                (click)="sortShipment('createdDate')">
+                                <span>Created Date</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modifiedDate'), 'sorting_desc': (!isDesc && sortKey == 'modifiedDate'), 'sorting': sortKey != 'modifiedDate' }"
+                                (click)="sortShipment('modifiedDate')">
+                                <span>Modified Date</span>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
-                        <tr class="collapse-toggle-row">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 100px">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-001"
-                                        title="Collapse">
-                                        <i class="la la-angle-up"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
-                                    <span>
-                                        job-id
-                                    </span>
-                                </a>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
-                        <tr class="collapse-panel-row">
-                            <td colspan="12">
-                                <div class="detail-panel-block collapse" id="id-001" data-parent="#sea-fcl-export-table">
-                                    <div class="table-inside-block">
-                                        <perfect-scrollbar style="max-height: 180px">
-                                            <table class="table table-secondary dataTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="sorting_asc">
-                                                            <span>H-B/L No.</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Customer</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Sale Man</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Nomination Party</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Destination</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Containers</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Qty</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Unit</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>G.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>C.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>CBM</span>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </perfect-scrollbar>
+                    <tbody class="tbody-group" *ngIf="shipments">
+                        <ng-container *ngFor="let item of shipments; let i=index">
+                            <!-- begin collapse-toggle-row -->
+                            <tr class="collapse-toggle-row">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 100px">
+                                        <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
+                                            title="Collapse" (click)="getShipmentDetails(item.id)">
+                                            <i class="la la-angle-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" routerLink="/home/documentation/sea-fcl-export-create" (click)="showDetail(item)">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" (click)="confirmDelete(item)">
+                                            <i class="la la-trash"></i>
+                                        </button>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <!--end of collapse-panel-row -->
+                                </td>
+                                <td>
+                                    <a class="btn-link" [routerLink]="['/home/documentation/sea-fcl-export-create/', { id: item.id }]"  (click)="showDetail(item)">
+                                        <span>
+                                            {{ item.jobNo }}
+                                        </span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span>{{ item.mawb }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.etd | date: 'dd/MM/yyyy'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.eta | date: 'dd/MM/yyyy'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.supplierName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.agentName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.polName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.podName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.sumCont }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.sumCBM }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.creatorName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.createdDate | date: 'dd/MM/yyyy'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.modifiedDate | date: 'dd/MM/yyyy'}}</span>
+                                </td>
+                            </tr>
+                            <!-- end of collapse-toggle-row -->
+                            <!-- begin collapse-panel-row -->
+                            <tr class="collapse-panel-row">
+                                <td colspan="14">
+                                    <div class="detail-panel-block collapse" id="id-00{{(i+1)}}" data-parent="#sea-fcl-export-table">
+                                        <div class="table-inside-block">
+                                            <perfect-scrollbar style="max-height: 180px">
+                                                <table class="table table-secondary dataTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hwbno'), 'sorting_desc': (!isDesc && sortKey == 'hwbno'), 'sorting': sortKey != 'hwbno' }"
+                                                                (click)="sortShipmentDetail('hwbno')">
+                                                                <span>H-B/L No.</span>
+                                                            </th>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName'), 'sorting': sortKey != 'customerName' }"
+                                                                (click)="sortShipmentDetail('customerName')">
+                                                                <span>Customer</span>
+                                                            </th>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'saleManName'), 'sorting_desc': (!isDesc && sortKey == 'saleManName'), 'sorting': sortKey != 'saleManName' }"
+                                                                (click)="sortShipmentDetail('saleManName')">
+                                                                <span>Sale Man</span>
+                                                            </th>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'notifyParty'), 'sorting_desc': (!isDesc && sortKey == 'notifyParty'), 'sorting': sortKey != 'notifyParty' }"
+                                                                (click)="sortShipmentDetail('notifyParty')">
+                                                                <span>Nomination Party</span>
+                                                            </th>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'finalDestinationPlace'), 'sorting_desc': (!isDesc && sortKey == 'finalDestinationPlace'), 'sorting': sortKey != 'finalDestinationPlace' }"
+                                                                (click)="sortShipmentDetail('finalDestinationPlace')">
+                                                                <span>Destination</span>
+                                                            </th>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerNames'), 'sorting_desc': (!isDesc && sortKey == 'containerNames'), 'sorting': sortKey != 'containerNames' }"
+                                                                (click)="sortShipmentDetail('containerNames')">
+                                                                <span>Containers</span>
+                                                            </th>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'packageTypes'), 'sorting_desc': (!isDesc && sortKey == 'packageTypes'), 'sorting': sortKey != 'packageTypes' }"
+                                                                (click)="sortShipmentDetail('packageTypes')">
+                                                                <span>Packages</span>
+                                                            </th>
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbm'), 'sorting_desc': (!isDesc && sortKey == 'cbm'), 'sorting': sortKey != 'cbm' }"
+                                                                (click)="sortShipmentDetail('cbm')">
+                                                                <span>CBM</span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody *ngIf="shipmentDetails">
+                                                        <tr *ngFor="let detail of shipmentDetails">
+                                                            <td>
+                                                                <span>{{ detail.hwbno }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.customerName }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.saleManName }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.notifyParty }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.podName }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.containerNames }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.packageTypes }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{ detail.cbm }}</span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </perfect-scrollbar>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--end of collapse-panel-row -->
+                        </ng-container>
                     </tbody>
-                    <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
-                        <tr class="collapse-toggle-row">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 100px">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-002"
-                                        title="Collapse">
-                                        <i class="la la-angle-up"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
-                                    <span>
-                                        job-id
-                                    </span>
-                                </a>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
-                        <tr class="collapse-panel-row">
-                            <td colspan="12">
-                                <div class="detail-panel-block collapse" id="id-002" data-parent="#sea-fcl-export-table">
-                                    <div class="table-inside-block">
-                                        <perfect-scrollbar style="max-height: 180px">
-                                            <table class="table table-secondary dataTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="sorting_asc">
-                                                            <span>H-B/L No.</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Customer</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Sale Man</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Nomination Party</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Destination</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Containers</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Qty</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Unit</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>G.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>C.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>CBM</span>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </perfect-scrollbar>
-                                    </div>
+                    <tbody *ngIf="shipments == null">
+                        <tr>
+                            <td colspan="14">
+                                <div class="no-data">
+                                    <i class="flaticon-coins"></i>
+                                    <span class="no-data-text">No records found</span>
                                 </div>
                             </td>
                         </tr>
-                        <!--end of collapse-panel-row -->
-                    </tbody>
-                    <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
-                        <tr class="collapse-toggle-row">
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 100px">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-003"
-                                        title="Collapse">
-                                        <i class="la la-angle-up"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-stage-management-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                <a  class="btn-link" href="javascript: void(0)" routerLink="/home/documentation/sea-fcl-export-create">
-                                    <span>
-                                        job-id
-                                    </span>
-                                </a>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
-                        <tr class="collapse-panel-row">
-                            <td colspan="12">
-                                <div class="detail-panel-block collapse" id="id-003" data-parent="#sea-fcl-export-table">
-                                    <div class="table-inside-block">
-                                        <perfect-scrollbar style="max-height: 180px">
-                                            <table class="table table-secondary dataTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="sorting_asc">
-                                                            <span>H-B/L No.</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Customer</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Sale Man</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Nomination Party</span>
-                                                        </th>
-                                                        <th class="sorting">
-                                                            <span>Destination</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Containers</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Qty</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>Unit</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>G.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>C.W</span>
-                                                        </th>
-                                                        <th class="no-sorting">
-                                                            <span>CBM</span>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>Text</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </perfect-scrollbar>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <!--end of collapse-panel-row -->
                     </tbody>
                 </table>
             </div>
             <!--end: Datatable -->
 
             <!--begin::pagination-->
-            <div class="pagination-nav">
+            <!-- <div class="pagination-nav">
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="tatable__pager-size" style="max-width: 190px">
@@ -1040,10 +534,84 @@
                         </nav>
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
         </div>
     </div>
     <!--end:: m-portlet-->
 </div>
 <!--end::m-content-->
+
+<!--begin::confirm-delete-job-modal-->
+<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure want to delete this job?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="deleteJob()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-job-modal-->
+
+<!--begin::confirm-can-not-delete-job-modal-->
+<div class="modal fade" id="confirm-can-not-delete-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+aria-hidden="true">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Notification</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-text-block">
+                <span>You are not allow to delete this job</span>
+            </div>
+        </div>
+        <div class="modal-footer m--align-center c-button-actions">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        OK
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<!--end::confirm-can-not-delete-job-modal-->
+

@@ -13,7 +13,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 //import { moment } from 'ngx-bootstrap/chronos/test/chain';
 declare var $:any;
-import * as moment from 'moment';
+import moment from 'moment/moment';
 
 @Component({
   selector: 'app-exchange-rate',
@@ -24,6 +24,7 @@ export class ExchangeRateComponent implements OnInit {
   exchangeRates: any[];
   exchangeRatesOfDay: any[];
   exchangeRateNewest: any = {};
+  currencyRateToDelete: any;
   pager: PagerSetting = PAGINGSETTING;
   localCurrency = "VND";
   rate: any;
@@ -68,10 +69,13 @@ export class ExchangeRateComponent implements OnInit {
     toCurrency: null
   }
   isAllowUpdateRate: boolean = false;
+  inValid: boolean = false;
    /**
   /**
    * Daterange picker
    */
+  
+  maxDate: moment.Moment = moment();
   ranges: any = {
     Today: [moment(), moment()],
     Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -154,28 +158,43 @@ export class ExchangeRateComponent implements OnInit {
       }
     }
   }
+  isSubmitted: boolean = false;
   async saveNewRate(){
+    this.isSubmitted = true;
+    console.log(this.exchangeRateToAdd.CatCurrencyExchangeRates);
     let index = this.exchangeRateToAdd.CatCurrencyExchangeRates.findIndex(x => x.currencyFromId == null);
     if(index < 0){
+      this.inValid = false;
       if(this.exchangeRateToAdd.CatCurrencyExchangeRates.length > 0){
-        this.exchangeRateNewest.exchangeRates.forEach(element => {
-          this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.rate, isUpdate : false });
+        let isExist = false;
+        this.exchangeRateToAdd.CatCurrencyExchangeRates.forEach(element => {
+          let index = this.exchangeRateNewest.exchangeRates.findIndex(x => x.currencyFromID == element.currencyFromId);
+          if(index > -1){
+            isExist = true;
+            return;
+          }
         });
-       var res = await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
-       if(res){
-        $('#setting-exchange-rate-modal').modal('hide');
-        this.ngSelectCurrencyRate.active = [];
-        this.getExchangeNewest();
-        this.getExchangeRates(this.pager);
-        this.exchangeRateToAdd = {
-          currencyToId: this.localCurrency,
-          CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
-          userModified: ''
-        };
-       }    
+        if(isExist){
+          this.toastr.warning("This currency has been added");
+        }
+        else{
+          var res = await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
+          if(res){
+           $('#setting-exchange-rate-modal').modal('hide');
+           this.ngSelectCurrencyRate.active = [];
+           this.getExchangeNewest();
+           this.getExchangeRates(this.pager);
+           this.exchangeRateToAdd = {
+             currencyToId: this.localCurrency,
+             CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
+             userModified: ''
+           };
+          }    
+        }
       }
     }
     else{
+      this.inValid = true;
       this.toastr.warning("Please select currency to add new Rate");
     }
   }
@@ -187,11 +206,11 @@ export class ExchangeRateComponent implements OnInit {
     };
     this.exchangeRateNewest.exchangeRates.forEach(element => {
       if(element.newRate != undefined){
-        this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.newRate, isUpdate : true });
+        this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromID, rate: element.newRate, isUpdate : true });
       }
       else{
         
-        this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromId, rate: element.rate });
+        this.exchangeRateToAdd.CatCurrencyExchangeRates.push({currencyFromId: element.currencyFromID, rate: element.rate });
       }
     });
     var res = await this.baseService.putAsync(this.api_menu.ToolSetting.ExchangeRate.updateRate, this.exchangeRateToAdd, true, false);
@@ -228,7 +247,15 @@ export class ExchangeRateComponent implements OnInit {
     form.onReset();
   }
   confirmDeleteRate(item){
-
+    this.currencyRateToDelete = item;
+    this.isSubmitted = true;
+    let index = this.exchangeRateToAdd.CatCurrencyExchangeRates.findIndex(x => x.currencyFromID == null);
+    if(index < 0){
+      $('#confirm-delete-modal').modal('show');
+    }
+    else{
+      this.baseService.warningToast("Please save current exchange rate");
+    }
   }
   removeNewRate(index){
     const currency = this.exchangeRateToAdd.CatCurrencyExchangeRates[index];
@@ -254,17 +281,17 @@ export class ExchangeRateComponent implements OnInit {
   getCatCurrencies(){
     
     this.baseService.get(this.api_menu.Catalogue.Currency.getAll).subscribe((response: any) =>{
+      this.catCurrencies = [];
       if(response != null){
-        this.catCurrencies = response.map(x=>({"text":x.id,"id":x.id}));
-        if(this.catCurrencies.length > 0){
-          this.catCurrencies.splice(this.catCurrencies.indexOf({"text":this.localCurrency,"id": this.localCurrency}), 1 );
-        }
-        this.exchangeRateNewest.exchangeRates.forEach(element => {
-          let index = this.catCurrencies.findIndex(x => x.id == element.currencyFromId);
-          this.catCurrencies.splice(index, 1 );
+        response.forEach(element => {
+          if(element.id == this.localCurrency) return;
+          else{
+            let indexCurrency = this.exchangeRateNewest.exchangeRates.findIndex(x => x.currencyFromID == element.id);
+            if(indexCurrency == -1){
+              this.catCurrencies.push({"text": element.id,"id": element.id});
+            }
+          }
         });
-      }else{
-        this.catCurrencies = [];
       }
     });
   }
@@ -369,8 +396,14 @@ export class ExchangeRateComponent implements OnInit {
     this.value = value;
   }
 
-  onDelete(event){
-    
+  async onDelete(event){
+    this.isSubmitted = true;
+    if(event == true){
+      await this.baseService.deleteAsync(this.api_menu.ToolSetting.ExchangeRate.removeExchangeCurrency + "?currencyFrom=" + this.currencyRateToDelete.currencyFromID, true, true);
+      $('#confirm-delete-modal').modal('hide');
+      this.catCurrencies.push({"text": this.currencyRateToDelete.currencyFromID,"id": this.currencyRateToDelete.currencyFromID });
+      this.getExchangeNewest();
+    }
   }
 
 }

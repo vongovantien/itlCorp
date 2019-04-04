@@ -77,6 +77,9 @@ namespace eFMS.API.Catalogue.DL.Common
                     result = "SHIPPER";
                     break;
                 case CatPartnerGroupEnum.SHIPPINGLINE:
+                    result = "SHIPPINGLINE";
+                    break;
+                case CatPartnerGroupEnum.SUPPLIER:
                     result = "SUPPLIER";
                     break;
                 case CatPartnerGroupEnum.SUPPLIERMATERIAL:

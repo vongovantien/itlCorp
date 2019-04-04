@@ -1,24 +1,30 @@
+import { Container } from "src/app/shared/models/document/container.model";
+import { CsTransactionDetail } from "src/app/shared/models/document/csTransactionDetail";
 
 export class CsTransaction {
-  id: String = null;
-  branchId: String = null;
+  id: string = "00000000-0000-0000-0000-000000000000";
+  branchId: String = "00000000-0000-0000-0000-000000000000";
   jobNo: String = null;
   mawb: String = null;
   typeOfService: String = null;
   etd: Date = null;
   eta: Date = null;
   mbltype: String = null;
-  coloaderId: String = null;
+  coloaderId: String = null; // supplier
+  coloaderName: String = null;
   bookingNo: String = null;
   shippingServiceType: String = null;
-  agentId: String = null;
+  agentId: String = null; // agent 
+  agentName: String = null;
   pol: String = null;
+  polName: String = null;
   pod: String = null;
+  podName: String = null;
   paymentTerm: String = null;
   loadingDate: Date = null;
   requestedDate: Date = null;
   flightVesselName: String = null;
-  flightVoyNo: String = null;
+  voyNo: String = null;
   flightVesselConfirmedDate: Date = null;
   shipmentType: String = null;
   serviceMode: String = null;
@@ -26,13 +32,15 @@ export class CsTransaction {
   invoiceNo: String = null;
   pono: String = null;
   personIncharge: String = null;
+  personInChargeName: String = null;
   deliveryPoint: String = null;
   routeShipment: String = null;
   quantity: Number = null;
   unit: Number = null;
-  grossWeight: Number = null;
-  chargeWeight: Number = null;
-  cbm: Number = null;
+  grossWeight: number = 0;
+  chargeWeight: number = 0;
+  netWeight: number = 0;
+  cbm: number = 0;
   containerSize: String = null;
   dimension: String = null;
   wareHouseId: String = null;
@@ -45,4 +53,9 @@ export class CsTransaction {
   modifiedDate: Date = null;
   inactive: Boolean = null;
   inactiveOn: Date = null;
+  packageContainer: String = '';
+  desOfGoods: String = '';
+  csMawbcontainers: Container[] = null;
+  csTransactionDetails: CsTransactionDetail[] = null;
+
 }

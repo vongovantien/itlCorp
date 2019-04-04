@@ -66,12 +66,10 @@
                     <div class="form-group">
                         <label class="form-control-label" for="">Button with only icon</label>
                         <div class="c-btn-form-group">
-                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                title="Edit stage" data-toggle="modal" data-target="#edit-port-index-modal">
+                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
-                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only m--margin-left-10"
-                                title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal">
+                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only m--margin-left-10" title="Remove">
                                 <i class="la la-trash"></i>
                             </button>
                             <button class="btn btn-default btn-sm m-btn--square m-btn--icon m-btn--icon-only  m--margin-left-10">
@@ -175,6 +173,17 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
+                                Disble Select single
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="true" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
                                 Date picker
                             </label>
                             <div class="m-input-icon m-input-icon--right down">
@@ -215,15 +224,18 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4">
-                        <label for="">Multi select</label>
-                        <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select type">
-                        </ng-select>
+                        <div class="form-group">
+                            <label for="">Multi select</label>
+                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select type">
+                            </ng-select>
+                        </div>
                     </div>
+                </div>
+
+                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
@@ -239,6 +251,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="form-actions m--align-right">
                     <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
@@ -261,6 +274,85 @@
         </div>
     </div>
     <!--end:: m-portlet of form-control-->
+
+    <!--begin:: m-portlet of combogrid-->
+    <div class="m-portlet">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">
+                        Combogrid
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <div class="m-form m-form--state">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Combogrib basic
+                            </label>
+                            <div class="dropdown e--combogrid">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="Vũng Tàu, Bà Rịa, Việt">
+                                <div class="dropdown-menu e--combogrid-content">
+                                    <div class="tabel-wrapper table-fixed">
+                                        <div class="table-head-fixed">
+                                            <div class="table-filter-block">
+                                                <div class="search-field">
+                                                    <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                    <i class="icon-search"></i>
+                                                </div>
+                                            </div>
+                                            <div class="table-header">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>District</th>
+                                                            <th>Province/City</th>
+                                                            <th>Country</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="table-body-scroll">
+                                            <table class="table table-hover">
+                                                <tbody>
+                                                    <tr class="data-row data-selected" data-id="1">
+                                                        <td>Vũng Tàu</td>
+                                                        <td>Bà Rịa - Vũng Tàu</td>
+                                                        <td>Việt Nam</td>
+                                                    </tr>
+                                                    <tr class="data-row" data-id="2">
+                                                        <td>Quận 1</td>
+                                                        <td>Hồ Chí Minh</td>
+                                                        <td>Việt Nam</td>
+                                                    </tr>
+                                                    <tr class="data-row" data-id="1">
+                                                        <td>Vũng Tàu</td>
+                                                        <td>Bà Rịa - Vũng Tàu</td>
+                                                        <td>Việt Nam</td>
+                                                    </tr>
+                                                    <tr class="data-row" data-id="2">
+                                                        <td>Quận 1</td>
+                                                        <td>Hồ Chí Minh</td>
+                                                        <td>Việt Nam</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end:: m-portlet of combogrid-->
 
     <!--begin:: m-portlet of Checkbox - Radio-->
     <div class="m-portlet">
@@ -446,6 +538,20 @@
                                     </span>
                                 </span>
                             </div>
+                            <div class="form-control-feedback">
+                                Please enter the detail!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group has-danger">
+                            <label class="form-control-label" for="">
+                                select with error <span class="m--font-danger">(*)</span>
+                            </label>
+                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
                             <div class="form-control-feedback">
                                 Please enter the detail!
                             </div>

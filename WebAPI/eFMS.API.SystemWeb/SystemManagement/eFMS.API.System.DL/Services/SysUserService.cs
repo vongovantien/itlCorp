@@ -15,7 +15,7 @@ using ITL.NetCore.Common;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-
+using eFMS.API.System.DL.Models.Criteria;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -55,9 +55,32 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysUserViewModel> GetAll()
         {
-            var data = Get().ToList();
-            var results = mapper.Map<List<SysUserViewModel>>(data);
+            var data = ((eFMSDataContext)DataContext.DC).SysUser.Join(((eFMSDataContext)DataContext.DC).SysEmployee, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.x);
+                model.EmployeeNameEn = item.y.EmployeeNameEn;
+                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                results.Add(model);
+            }
             return results;
+        }
+
+        public SysUserViewModel GetUserById(string Id)
+        {
+            var query = (from user in ((eFMSDataContext)DataContext.DC).SysUser 
+                         join employee in ((eFMSDataContext)DataContext.DC).SysEmployee on user.EmployeeId equals employee.Id
+                         where user.Id == Id
+                         select new { user,employee}).FirstOrDefault();
+            if (query == null)
+            {
+                return null;
+            }
+            var result = mapper.Map<SysUserViewModel>(query.user);
+            result.EmployeeNameEn = query.employee.EmployeeNameEn;
+            result.EmployeeNameVn = query.employee.EmployeeNameVn;
+            return result;
         }
 
         public List<vw_sysUser> GetUserWorkplace()
@@ -113,6 +136,61 @@ namespace eFMS.API.System.DL.Services
                 userInfo.message = ex.Message;
                 return userInfo;
             }
+        }
+
+        public IQueryable<SysUserViewModel> Paging(SysUserCriteria criteria, int page, int size, out int rowsCount)
+        {
+            var data = ((eFMSDataContext)DataContext.DC).SysUser.Join(((eFMSDataContext)DataContext.DC).SysEmployee, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            if (criteria.All == null)
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            else
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            
+            rowsCount = data.Count();
+            if (size > 1)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.x);
+                model.EmployeeNameEn = item.y.EmployeeNameEn;
+                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                results.Add(model);
+            }
+            return results.AsQueryable();
+        }
+
+        public IQueryable<SysUserViewModel> Query(SysUserCriteria criteria)
+        {
+            var data = ((eFMSDataContext)DataContext.DC).SysUser.Join(((eFMSDataContext)DataContext.DC).SysEmployee, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            if (criteria.All == null)
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            else
+            {
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.x);
+                model.EmployeeNameEn = item.y.EmployeeNameEn;
+                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                results.Add(model);
+            }
+            return results.AsQueryable();
         }
     }
 }

@@ -137,14 +137,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == 0)
             {
-                if (catComonityService.Any(x => x.CommodityNameEn == model.CommodityNameEn || x.CommodityNameVn == model.CommodityNameVn))
+                if (catComonityService.Any(x => x.Code == model.Code))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }
             }
             else
             {
-                if (catComonityService.Any(x => (x.CommodityNameEn == model.CommodityNameEn || x.CommodityNameVn == model.CommodityNameVn) && x.Id != id))
+                if (catComonityService.Any(x => (x.Code == model.Code) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }

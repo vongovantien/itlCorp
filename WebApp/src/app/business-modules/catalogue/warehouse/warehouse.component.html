@@ -117,8 +117,8 @@
                                     <label class="form-control-label">
                                         Country <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshCountryValue($event)"
-                                        (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="onChange($event, 'country')" (removed)="removed($event, 'country')" (typed)="typed($event)"
                                         placeholder="Select country">
                                     </ng-select>
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.countryID == null" >
@@ -131,8 +131,8 @@
                                     <label class="form-control-label">
                                         City/ Province <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshProvinceValue($event)"
-                                        (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        (selected)="onChange($event, 'province')" (removed)="removed($event, 'province')" (typed)="typed($event)"
                                         placeholder="Select province">
                                     </ng-select>
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.provinceID == null" >
@@ -145,8 +145,8 @@
                                     <label class="form-control-label">
                                         District <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshDistrictValue($event)"
-                                        (removed)="removed($event)" (typed)="typed($event)" (selected)="onDistrictchange($event)" 
+                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        (removed)="removed($event, 'district')" (typed)="typed($event)" (selected)="onChange($event, 'district')" 
                                         placeholder="Select district">
                                     </ng-select>
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.districtID == null" >
@@ -252,8 +252,8 @@
                                         <label class="form-control-label">
                                             Country <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive==null?[]:[countryActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
-                                            (selected)="onCountrychange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="onChange($event, 'country')" (removed)="removed($event, 'country')" (typed)="typed($event)"
                                             placeholder="Select country">
                                         </ng-select>
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.countryID == null" >
@@ -266,8 +266,8 @@
                                         <label class="form-control-label">
                                             City/ Province <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive==null?[]:[provinceActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
-                                            (selected)="onProvincechange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="onChange($event, 'province')" (removed)="removed($event, 'province')" (typed)="typed($event)"
                                             placeholder="Select province">
                                         </ng-select>
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.provinceID == null" >
@@ -280,8 +280,8 @@
                                         <label class="form-control-label">
                                             District <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive==null?[]:[districtActive]"  [disabled]="disabled" (data)="refreshCountryValue($event)"
-                                            (selected)="onDistrictchange($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="onChange($event, 'district')" (removed)="removed($event, 'district')" (typed)="typed($event)"
                                             placeholder="Select district">
                                         </ng-select>
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouse.districtID == null" >

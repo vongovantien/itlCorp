@@ -35,7 +35,7 @@
       <HintPath>..\..\..\..\bin\netcoreapp2.1\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.System.Service">
-      <HintPath>..\bin\netcoreapp2.1\eFMS.API.System.Service.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.System.Service.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>

@@ -6,8 +6,9 @@ namespace eFMS.API.Catalogue.Service.ViewModels
 {
     public partial class vw_catCurrencyExchangeNewest
     {
-        public string CurrencyFromId { get; set; }
+        public int ID { get; set; }
+        public string CurrencyFromID { get; set; }
         public decimal Rate { get; set; }
-        public DateTime? DatetimeCreated { get; set; }
+        public Nullable<DateTime> DatetimeCreated { get; set; }
     }
 }

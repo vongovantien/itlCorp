@@ -78,3 +78,11 @@ bin
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/eFMS.API.Documentation.DL/obj
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/.vs
+/WebAPI/eFMS.API.SystemWeb/IdentityServer/eFMS.IdentityServer/Properties/PublishProfiles/*.pubxml
+/WebAPI/eFMS.API.SystemWeb/IdentityServer/eFMS.IdentityServer/Properties/PublishProfiles/*.user
+/WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/APIReport/obj
+/WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/APIReport/bin
+/WebAPI/eFMS.API.SystemWeb/Reportmanagement/eFMS.Domain.Report/obj
+/WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/.vs
+/WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/packages/Autofac.WebApi2.4.2.0
+/WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/packages/Autofac.4.9.1

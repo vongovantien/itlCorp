@@ -237,14 +237,14 @@ namespace eFMS.API.Catalogue.Controllers
                 var warehouse = new CatPlaceImportModel
                 {
                     IsValid = true,
-                    Code = worksheet.Cells[row, 1].Value?.ToString(),
-                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
-                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                    Address = worksheet.Cells[row, 4].Value?.ToString(),
-                    CountryName = worksheet.Cells[row, 5].Value?.ToString(),
-                    ProvinceName = worksheet.Cells[row, 6].Value?.ToString(),
-                    DistrictName = worksheet.Cells[row, 7].Value?.ToString(),
-                    //Status = worksheet.Cells[row, 8].Value?.ToString()
+                    Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    Address = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    CountryName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                    ProvinceName = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                    DistrictName = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                    Status = worksheet.Cells[row, 8].Value?.ToString()
                 };
                 list.Add(warehouse);
             }
@@ -258,13 +258,13 @@ namespace eFMS.API.Catalogue.Controllers
                 var warehouse = new CatPlaceImportModel
                 {
                     IsValid = true,
-                    Code = worksheet.Cells[row, 1].Value?.ToString(),
-                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
-                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
-                    AreaName = worksheet.Cells[row, 5].Value?.ToString(),
-                    ModeOfTransport = worksheet.Cells[row, 6].Value?.ToString(),
-                    //Status = worksheet.Cells[row, 7].Value?.ToString()
+                    Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    AreaName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                    ModeOfTransport = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                    Status = worksheet.Cells[row, 7].Value?.ToString().Trim()
                 };
                 list.Add(warehouse);
             }
@@ -278,11 +278,11 @@ namespace eFMS.API.Catalogue.Controllers
                 var warehouse = new CatPlaceImportModel
                 {
                     IsValid = true,
-                    Code = worksheet.Cells[row, 1].Value?.ToString(),
-                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
-                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
-                    Status = worksheet.Cells[row, 5].Value?.ToString()
+                    Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    Status = worksheet.Cells[row, 5].Value?.ToString().Trim()
                 };
                 list.Add(warehouse);
             }
@@ -293,17 +293,17 @@ namespace eFMS.API.Catalogue.Controllers
             List<CatPlaceImportModel> list = new List<CatPlaceImportModel>();
             for (int row = 2; row <= rowCount; row++)
             {
-                var warehouse = new CatPlaceImportModel
+                var district = new CatPlaceImportModel
                 {
                     IsValid = true,
-                    Code = worksheet.Cells[row, 1].Value?.ToString(),
-                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
-                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
-                    ProvinceName = worksheet.Cells[row, 5].Value?.ToString(),
-                    Status = worksheet.Cells[row, 6].Value?.ToString()
+                    Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    ProvinceName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                    Status = worksheet.Cells[row, 6].Value?.ToString().Trim()
                 };
-                list.Add(warehouse);
+                list.Add(district);
             }
             return list;
         }
@@ -316,13 +316,13 @@ namespace eFMS.API.Catalogue.Controllers
                 var warehouse = new CatPlaceImportModel
                 {
                     IsValid = true,
-                    Code = worksheet.Cells[row, 1].Value?.ToString(),
-                    NameEn = worksheet.Cells[row, 2].Value?.ToString(),
-                    NameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                    CountryName = worksheet.Cells[row, 4].Value?.ToString(),
-                    ProvinceName = worksheet.Cells[row, 5].Value?.ToString(),
-                    DistrictName = worksheet.Cells[row, 6].Value?.ToString(),
-                    Status = worksheet.Cells[row, 7].Value?.ToString()
+                    Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                    NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                    NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    CountryName = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    ProvinceName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                    DistrictName = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                    Status = worksheet.Cells[row, 7].Value?.ToString().Trim()
                 };
                 list.Add(warehouse);
             }

@@ -12,6 +12,8 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string PartnerNameEn { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
+        public string AddressShippingVn { get; set; }
+        public string AddressShippingEn { get; set; }
         public string ShortName { get; set; }
         public short? CountryId { get; set; }
         public string AccountNo { get; set; }

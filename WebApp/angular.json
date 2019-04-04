@@ -62,27 +62,29 @@
                 }
               ]
             },
-            "vi": {
+            "test-vi": {
               "optimization": true,
-              "outputHashing": "all",
+              "outputHashing": "none",
               "sourceMap": false,
               "extractCss": true,
-              "namedChunks": false,
+              "namedChunks": true,
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
               "baseHref": "/vi/",
               "lazyModules": [
-                "src/app/business-modules/catalogue/catalogue.module.ts",
-                "src/app/business-modules/accounting/accounting.module.ts",
-                "src/app/business-modules/documentation/documentation.module.ts",
-                "src/app/business-modules/operation/operation.module.ts",
-                "src/app/business-modules/report/report.module.ts",
-                "src/app/business-modules/tool-setting/tool.module.ts",
-                "src/app/business-modules/support/support.module.ts"
+                "src/app/business-modules/system/system.module",
+                "src/app/business-modules/catalogue/catalogue.module",
+                "src/app/business-modules/accounting/accounting.module",
+                "src/app/business-modules/documentation/documentation.module",
+                "src/app/business-modules/operation/operation.module",
+                "src/app/business-modules/report/report.module",
+                "src/app/business-modules/support/support.module",
+                "src/app/business-modules/tool-setting/tool.module",
+                "src/app/design-modules/design-modules.module"
               ],
-              "outputPath": "dist/eFMS-vi/",
+              "outputPath": "dist/test/eFMS-vi/",
               "i18nFile": "src/src/locale/messages.vi.xlf",
               "i18nFormat": "xlf",
               "i18nLocale": "vi",
@@ -98,35 +100,121 @@
               ],
               "serviceWorker": true
             },
-            "en": {
+            "staging-vi": {
               "optimization": true,
-              "outputHashing": "all",
+              "outputHashing": "none",
               "sourceMap": false,
               "extractCss": true,
-              "baseHref": "/en/",
-              "lazyModules": [
-                "src/app/business-modules/catalogue/catalogue.module.ts",
-                "src/app/business-modules/accounting/accounting.module.ts",
-                "src/app/business-modules/documentation/documentation.module.ts",
-                "src/app/business-modules/operation/operation.module.ts",
-                "src/app/business-modules/report/report.module.ts",
-                "src/app/business-modules/tool-setting/tool.module.ts",
-                "src/app/business-modules/support/support.module.ts"
-              ],
-              "namedChunks": false,
+              "namedChunks": true,
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "progress": true,
-              "outputPath": "dist/eFMS-en/",
+              "baseHref": "/vi/",
+              "lazyModules": [
+                "src/app/business-modules/system/system.module",
+                "src/app/business-modules/catalogue/catalogue.module",
+                "src/app/business-modules/accounting/accounting.module",
+                "src/app/business-modules/documentation/documentation.module",
+                "src/app/business-modules/operation/operation.module",
+                "src/app/business-modules/report/report.module",
+                "src/app/business-modules/support/support.module",
+                "src/app/business-modules/tool-setting/tool.module",
+                "src/app/design-modules/design-modules.module"
+              ],
+              "outputPath": "dist/staging/eFMS-vi/",
+              "i18nFile": "src/src/locale/messages.vi.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "vi",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                },
+                {
+                  "replace": "src/languages/language.en.ts",
+                  "with": "src/languages/language.vi.ts"
+                }
+              ],
+              "serviceWorker": true
+            },
+            "test-en": {
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "extractCss": true,
+              "baseHref": "/en/",
+              "lazyModules": [
+                "src/app/business-modules/system/system.module",
+                "src/app/business-modules/catalogue/catalogue.module",
+                "src/app/business-modules/accounting/accounting.module",
+                "src/app/business-modules/documentation/documentation.module",
+                "src/app/business-modules/operation/operation.module",
+                "src/app/business-modules/report/report.module",
+                "src/app/business-modules/support/support.module",
+                "src/app/business-modules/tool-setting/tool.module",
+                "src/app/design-modules/design-modules.module"
+              ],
+              "namedChunks": true,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "outputPath": "dist/test/eFMS-en/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.test.ts"
                 }
               ],
-              "serviceWorker": true
+              "serviceWorker": false,
+              "budgets": [
+                {
+                  "type": "bundle",
+                  "name": "vendor",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            },
+            "staging-en": {
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "extractCss": true,
+              "baseHref": "/en/",
+              "lazyModules": [
+                "src/app/business-modules/system/system.module",
+                "src/app/business-modules/catalogue/catalogue.module",
+                "src/app/business-modules/accounting/accounting.module",
+                "src/app/business-modules/documentation/documentation.module",
+                "src/app/business-modules/operation/operation.module",
+                "src/app/business-modules/report/report.module",
+                "src/app/business-modules/support/support.module",
+                "src/app/business-modules/tool-setting/tool.module",
+                "src/app/design-modules/design-modules.module"
+              ],
+              "namedChunks": true,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "outputPath": "dist/staging/eFMS-en/",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ],
+              "serviceWorker": false,
+              "budgets": [
+                {
+                  "type": "bundle",
+                  "name": "vendor",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
             },
             "production": {
               "fileReplacements": [

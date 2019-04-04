@@ -56,13 +56,13 @@
             }
             
             @include desktop() {
-                &:first-child {
-                    padding-top: 0;
-                }
+                // &:first-child {
+                //     padding-top: 0;
+                // }
 
-                &:last-child {
-                    padding-bottom: 0;
-                }
+                // &:last-child {
+                //     padding-bottom: 0;
+                // }
             }
 
             &.m-form__group--inline {

@@ -17,5 +17,6 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserGroupModel> Query(string searchText, string orderByProperty, bool isAscendingOrder);
         IQueryable<SysUserGroupModel> Paging(UserGroupCriteria criteria, int page, int size, string orderByProperty, bool isAscendingOrder, out int rowsCount);
         IQueryable<SysUserGroupModel> Paging(string searchText, int page, int size, string orderByProperty, bool isAscendingOrder, out int rowsCount);
+
     }
 }
