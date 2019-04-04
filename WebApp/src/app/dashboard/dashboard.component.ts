@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import * as Highcharts from 'highcharts';
-import { Chart } from 'angular-highcharts';
 
 @Component({
     selector: 'app-dashboard',
