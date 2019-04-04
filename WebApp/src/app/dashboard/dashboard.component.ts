@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import * as Highcharts from 'highcharts';
+import { Chart } from 'angular-highcharts';
 
 @Component({
     selector: 'app-dashboard',
@@ -15,7 +16,7 @@ export class DashboardComponent implements OnInit {
     }
 
     ngOnInit() {
-        // this.init();
+        this.init();
     }
 
     /**
@@ -59,7 +60,68 @@ export class DashboardComponent implements OnInit {
     }
     //angular-highchart
     //https://www.npmjs.com/package/angular-highcharts
-    
+    chart: Chart;
+
+    //draw chart by month
+    init() {
+        let chart = new Chart({
+            chart: {
+                marginLeft: 40, // Keep all charts left aligned
+                spacingTop: 20,
+                spacingBottom: 20,
+                className: 'chart-sync-revenue'
+            },
+            title: {
+                text: 'Revenue',
+                align: 'left',
+                margin: 0,
+                x: 30
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: true,
+                verticalAlign: 'top',
+                y: 0
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: null
+                }
+            },
+            series: [
+                {
+                    type: 'line',
+                    color: '#ffb822',
+                    data: [
+                        [Date.UTC(2010, 0, 1), 29.9],
+                        [Date.UTC(2010, 2, 1), 71.5],
+                        [Date.UTC(2010, 3, 1), 106.4]
+                    ],
+                    name: "USD"
+                },
+                {
+                    type: 'line',
+                    color: "#c9cdd4",
+                    data: [
+                        [Date.UTC(2010, 0, 1), 29.9],
+                        [Date.UTC(2010, 2, 1), 71.5],
+                        [Date.UTC(2010, 3, 1), 106.4]
+                    ],
+                    name: "VND"
+                }
+            ]
+        });
+        this.chart = chart;
+    }
+    //draw chart by day
+    chartPerDay() {
+        this.chart.removeSeries(this.chart.ref.series.length - 1);
+    }
 
 
     // highchart

@@ -41,7 +41,7 @@ export class SeaLCLExportComponent implements OnInit {
      */
     searchFilters: Array<string> = ['Job ID', 'MBL No', 'Supplier', 'Agent', 'HBL No'];
     searchFilterActive = ['Job ID'];
-    private value: any = ['Athens'];
+    private value: any = {};
     private _disabledV: string = '0';
     public disabled: boolean = false;
 
