@@ -244,7 +244,6 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
 
   selectSingleCharge(event: any, indexCharge: number) {
-    const currentStt = event.target.checked;
     var groupCheck = $(event.target).closest('tbody').find('input.group-charge-hb-select').first();
     var charges = $(event.target).closest('tbody').find('input.single-charge-select');
     var allcheck = true;

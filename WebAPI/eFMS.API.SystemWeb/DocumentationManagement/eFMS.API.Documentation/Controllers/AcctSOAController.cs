@@ -54,6 +54,25 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+
+        [HttpPut]
+        [Route("Update")]
+        //[Authorize]
+        public IActionResult Update(AcctSOAModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            model.UserCreated = currentUser.UserID;
+            model.DatetimeCreated = DateTime.Now;
+            var hs = acctSOAServices.UpdateSOA(model);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpGet]
         [Route("Get")]
         //[Authorize]

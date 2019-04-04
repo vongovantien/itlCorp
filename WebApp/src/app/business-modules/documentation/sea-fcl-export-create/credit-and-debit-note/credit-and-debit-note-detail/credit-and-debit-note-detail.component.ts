@@ -10,18 +10,26 @@ declare var $: any;
     styleUrls: ['./credit-and-debit-note-detail.component.scss']
 })
 export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecked {
+  
     ngAfterViewChecked(): void {
         this.open = true;
         this.cdr.detectChanges();
     }
     CDNoteEditing:any = null;
-
+    currentSOANo : string = null;
     @Output() CdNoteEditingEmiter = new EventEmitter<any>();
     @Input() set EditingCDNoteNo(soaNo:string){
         if(soaNo!=null){
-            this.getSOADetails(soaNo);
+            this.currentSOANo = soaNo;
+            this.getSOADetails(this.currentSOANo);
         }
       }
+
+    @Input() set updateStatus(updated:boolean){
+        if(updated){
+            this.getSOADetails(this.currentSOANo);
+        }
+    }
 
     async getSOADetails(soaNo:string){
         this.CDNoteEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails+"?JobId="+ExtendData.currentJobID+"&soaNo="+soaNo);
@@ -47,4 +55,8 @@ export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecke
     close(){
         this.open = false;
     }
+
+
+
+ 
 }
