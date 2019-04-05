@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment/moment';
 
 @Component({
     selector: 'app-sea-lcl-export',
@@ -54,6 +54,7 @@ export class SeaLCLExportComponent implements OnInit {
         this.disabled = this._disabledV === '1';
     }
 
+    selectFilter : []
     public selected(value: any): void {
         console.log('Selected value is: ', value);
         //this.selectFilter = value.id;

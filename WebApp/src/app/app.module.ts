@@ -26,12 +26,14 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { AuthGuardService } from 'src/services-base/auth-guard.service';
+// import { ServiceWorkerModule } from '@angular/service-worker';
+// import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HighchartsChartModule } from "highcharts-angular";
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { ChartModule } from 'angular-highcharts';
+// import { ChartModule } from 'angular-highcharts';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -66,7 +68,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     OAuthModule.forRoot(),
     NgxDaterangepickerMd,
     HighchartsChartModule,
-    ChartModule // add ChartModule to your imports
+    // ChartModule // add ChartModule to your imports
   ],
   providers: [
     AuthGuardService,

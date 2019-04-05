@@ -3,7 +3,7 @@ import { CsShipmentSurcharge } from "./csShipmentSurcharge";
 export class AcctSOA {
     id: String = "00000000-0000-0000-0000-000000000000" ;
     code: String = null ;
-    branchId: String = null ;
+    branchId: String = "00000000-0000-0000-0000-000000000000" ;
     partnerId: String = null ;
     partnerName: String = null ;
     type: String = null ;
@@ -39,4 +39,5 @@ export class AcctSOA {
     trackingTransportBill: String = null ;
     trackingTransportDate: Date = null ;
     listShipmentSurcharge : CsShipmentSurcharge[]= [];
+
   }

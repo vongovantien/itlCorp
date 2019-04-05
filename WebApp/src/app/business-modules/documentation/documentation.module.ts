@@ -50,6 +50,19 @@ import { ShippingInstructionComponent } from './sea-fcl-export-create/shipping-i
     SeaFCLImportComponent, 
     SeaLCLImportComponent, 
     SeaConsolImportComponent, 
-    InlandTruckingComponent, SeaFclExportCreateComponent, MasterBillComponent, HousebillListComponent, HousebillAddnewComponent, CreditAndDebitNoteComponent, SeaFclExportDetailImportComponent, HousebillImportDetailComponent, CreditAndDebitNoteAddnewComponent, CreditAndDebitNoteDetailComponent, CreditAndDebitNoteEditComponent, CreditAndDebitNoteRemainingChargeComponent, ManifestComponent, ShippingInstructionComponent]
+    InlandTruckingComponent, 
+    SeaFclExportCreateComponent, 
+    MasterBillComponent, 
+    HousebillListComponent, 
+    HousebillAddnewComponent,     
+    CreditAndDebitNoteComponent, 
+    SeaFclExportDetailImportComponent, 
+    HousebillImportDetailComponent, 
+    CreditAndDebitNoteAddnewComponent, 
+    CreditAndDebitNoteDetailComponent, 
+    CreditAndDebitNoteEditComponent, 
+    CreditAndDebitNoteRemainingChargeComponent, 
+    ManifestComponent, 
+    ShippingInstructionComponent]
 })
 export class DocumentationModule { }

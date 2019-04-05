@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && !formAddEdit.controls.estimatedTimeofDepature.valid }">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && etdSelected == null }">
                         <label class="form-control-label" for="">
                             Estimated time of departure <span class="m--font-danger">(*)</span>
                         </label>
@@ -39,7 +39,7 @@
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                              <div class="form-control-feedback" *ngIf="submitted && !formAddEdit.controls.estimatedTimeofDepature.valid">
+                              <div class="form-control-feedback" *ngIf="submitted && etdSelected == null">
                                 Estimated time of departure is required
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                                 </span>
                             </span>
                               <div class="form-control-feedback" *ngIf="etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
-                                Estimated time of Arrival must more or equal estimated time of departure
+                                Estimated time of Arrival must more than estimated time of departure
                             </div>
                         </div>
                     </div>
@@ -101,10 +101,10 @@
                         <label class="form-control-label" for="">
                                 Supplier/Vendor (co-loader)
                         </label>
-                        <div class="dropdown e--combogrid" #selectedColoader>
+                        <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="" [value]="selectedColoader.value == null?'Please selected coloader':selectedColoader.value"
-                                  formControlName="coloaderName" [(ngModel)]="shipment.coloaderName">
+                                  data-toggle="dropdown" placeholder="" [value]="shipment.coloaderName == null?'Please selected coloader':shipment.coloaderName"
+                                  formControlName="coloaderName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
@@ -132,7 +132,7 @@
                                         <table class="table table-hover" *ngIf="coloaders">
                                             <tbody *ngFor="let coloader of coloaders;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.coloaderId!==null && shipment.coloaderId===coloader.id }" data-id="{{i}}" 
-                                                (click)="shipment.coloaderId = coloader.id; formAddEdit.controls['coloaderId'].setValue(coloader.id); selectedColoader.value=coloader.partnerNameEn">
+                                                (click)="shipment.coloaderId = coloader.id; formAddEdit.controls['coloaderId'].setValue(coloader.id); shipment.coloaderName=coloader.partnerNameEn">
                                                     <td>{{ coloader.accountNo }}</td>
                                                     <td>{{ coloader.shortName }}</td>
                                                     <td>{{ coloader.partnerNameEn }}</td>
@@ -177,10 +177,10 @@
                         <label class="form-control-label" for="">
                             Agent
                         </label>
-                        <div class="dropdown e--combogrid" #selectedAgent>
+                        <div class="dropdown e--combogrid" >
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="" [value]="selectedAgent.value == null?'Please selected agent':selectedAgent.value"
-                                  formControlName="agentName" [(ngModel)]="shipment.agentName">
+                                  data-toggle="dropdown" placeholder="" [value]="shipment.agentName == null?'Please selected agent':shipment.agentName"
+                                  formControlName="agentName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
@@ -208,7 +208,7 @@
                                         <table class="table table-hover" *ngIf="agents">
                                             <tbody *ngFor="let agent of agents;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.agentId!==null && shipment.agentId===agent.id }" data-id="{{i}}" 
-                                                    (click)="shipment.agentId = agent.id; formAddEdit.controls['agentId'].setValue(agent.id); selectedAgent.value=agent.partnerNameEn">
+                                                    (click)="shipment.agentId = agent.id; formAddEdit.controls['agentId'].setValue(agent.id); shipment.agentName=agent.partnerNameEn">
                                                     <td>{{ agent.accountNo }}</td>
                                                     <td>{{ agent.shortName }}</td>
                                                     <td>{{ agent.partnerNameEn }}</td>
@@ -229,17 +229,17 @@
                         <label class="form-control-label" for="">
                             Port of loading <span class="m--font-danger">(*)</span>
                         </label>
-                        <div class="dropdown e--combogrid" #selectedPOL>
+                        <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="" [value]="selectedPOL.value == null?'Please selected port of loading':selectedPOL.value"
-                                  formControlName="polName" [(ngModel)]="shipment.polName">
+                                  data-toggle="dropdown" placeholder="" [value]="shipment.polName == null?'Please selected port of loading':shipment.polName"
+                                  formControlName="polName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
                                         <div class="table-filter-block">
                                             <div class="search-field">
                                                   <input class="form-control m-input m-input--square" type="text"
-                                                      placeholder="Search..." (keyup)="changePort($event.target.value)">
+                                                      placeholder="Search..." (keyup)="changePortLoading($event.target.value)">
                                                 <i class="icon-search"></i>
                                             </div>
                                         </div>
@@ -259,7 +259,7 @@
                                         <table class="table table-hover" *ngIf="portOfLadings">
                                             <tbody *ngFor="let pol of portOfLadings;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pol!==null && shipment.pol===pol.id }" data-id="{{i}}" 
-                                                    (click)="shipment.pol = pol.id;formAddEdit.controls['pol'].setValue(pol.id); selectedPOL.value= pol.nameEN">
+                                                    (click)="shipment.pol = pol.id;formAddEdit.controls['pol'].setValue(pol.id); shipment.polName= pol.nameEN">
                                                     <td>{{ pol.code }}</td>
                                                     <td>{{ pol.nameEN }}</td>
                                                     <td>{{ pol.countryName }}</td>
@@ -280,17 +280,17 @@
                         <label class="form-control-label" for="">
                             Port of destination
                         </label>
-                        <div class="dropdown e--combogrid" #selectedPOD>
+                        <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="" [value]="selectedPOD.value == null?'Please selected port of loading':selectedPOD.value"
-                                  formControlName="podName" [(ngModel)]="shipment.podName">
+                                  data-toggle="dropdown" placeholder="" [value]="shipment.podName == null?'Please selected port of loading':shipment.podName"
+                                  formControlName="podName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
                                         <div class="table-filter-block">
                                             <div class="search-field">
                                                   <input class="form-control m-input m-input--square" type="text"
-                                                      placeholder="Search..." (keyup)="changePort($event.target.value)">
+                                                      placeholder="Search..." (keyup)="changePortDestination($event.target.value)">
                                                 <i class="icon-search"></i>
                                             </div>
                                         </div>
@@ -310,7 +310,7 @@
                                         <table class="table table-hover" *ngIf="portOfDestinations">
                                             <tbody *ngFor="let pod of portOfDestinations;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.pod!==null && shipment.pod===pod.id }" data-id="{{i}}" 
-                                                    (click)="shipment.pod = pod.id;formAddEdit.controls['pod'].setValue(pod.id); selectedPOD.value= pod.nameEN">
+                                                    (click)="shipment.pod = pod.id;formAddEdit.controls['pod'].setValue(pod.id); shipment.podName= pod.nameEN">
                                                     <td>{{ pod.code }}</td>
                                                     <td>{{ pod.nameEN }}</td>
                                                     <td>{{ pod.countryName }}</td>
@@ -391,10 +391,10 @@
                         <label class="form-control-label" for="">
                             Person in charge
                         </label>
-                        <div class="dropdown e--combogrid" #selectedPersonInCharge>
+                        <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                  data-toggle="dropdown" placeholder="" [value]="selectedPersonInCharge.value == null?'Please selected person in charge':selectedPersonInCharge.value"
-                                  formControlName="personInChargeName" [(ngModel)]="shipment.personInChargeName">
+                                  data-toggle="dropdown" placeholder="" [value]="shipment.personInChargeName == null?'Please selected person in charge':shipment.personInChargeName"
+                                  formControlName="personInChargeName">
                             <div class="dropdown-menu e--combogrid-content">
                                 <div class="tabel-wrapper table-fixed">
                                     <div class="table-head-fixed">
@@ -421,7 +421,7 @@
                                         <table class="table table-hover" *ngIf="userInCharges">
                                             <tbody *ngFor="let user of userInCharges;let i = index;">
                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shipment.personIncharge!==null && shipment.personIncharge===user.id }" data-id="{{i}}" 
-                                                    (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); selectedPersonInCharge.value= user.username">
+                                                    (click)="shipment.personIncharge=user.id; formAddEdit.controls['personIncharge'].setValue(user.id); shipment.personInChargeName= user.username">
                                                     <td>{{ user.username }}</td>
                                                     <td>{{ user.employeeNameVn }}</td>
                                                     <td>{{ user.employeeNameVn }}</td>

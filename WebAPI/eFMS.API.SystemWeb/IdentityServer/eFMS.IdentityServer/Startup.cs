@@ -47,7 +47,6 @@ namespace AuthServer
             .AddSigningCredential(cert)
                 .AddValidationKey(cert);
 
-
             services.AddTransient<IAuthenUserService, AuthenticateService>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
 

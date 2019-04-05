@@ -1,18 +1,18 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { BaseService } from 'src/services-base/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
-import * as shipmentHelper from 'src/helper/shipment.helper';
-import * as dataHelper from 'src/helper/data.helper';
-// import * as lodash from 'lodash';
-import {filter} from 'lodash';
-import * as moment from 'moment';
-import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+// import * as lodash from 'lodash';
+import filter from 'lodash/filter';
+import moment from 'moment/moment';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import * as dataHelper from 'src/helper/data.helper';
+import * as shipmentHelper from 'src/helper/shipment.helper';
+import { BaseService } from 'src/services-base/base.service';
 declare var $: any;
 
 @Component({
@@ -32,21 +32,23 @@ export class HousebillAddnewComponent implements OnInit {
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
     this.HouseBillWorking.jobId = this.MasterBillData.id;
+    this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
   }
 
-  @Input() set currentHouseBill(_currentHouseBill: any) {
-    if (_currentHouseBill != null) {
+  @Input() set currentHouseBill(_currentHouseBill: any) {    
+    if (_currentHouseBill != null) {     
       this.isEditing = true;
       this.EditingHouseBill = _currentHouseBill;
       this.HouseBillWorking = this.EditingHouseBill;
       this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
-      this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
+      // this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
       this.getActiveOriginCountry();
       this.getActivePortOfLoading();
       this.getActivePortOfDischarge();
       this.getHouseBillContainers(this.HouseBillWorking.id);
       this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
       this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
+      // this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
     } else {
       this.isEditing = false;
       this.HouseBillWorking = new CsTransactionDetail();
@@ -613,6 +615,11 @@ export class HousebillAddnewComponent implements OnInit {
     else {
       this.lstHouseBillContainers[index].allowEdit = false;
     }
+  }
+
+
+  closeAddContainerForm(){
+    $('#container-list-of-job-modal-house').modal('hide');
   }
 
 

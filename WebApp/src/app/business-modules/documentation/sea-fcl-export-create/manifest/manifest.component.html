@@ -1,9 +1,11 @@
+<form name="formManifest" #formManifest="ngForm" novalidate (ngSubmit)="formManifest.form.valid" *ngIf="isLoad"> 
+
 <!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <app-breadcrumb></app-breadcrumb>
+            <!-- <app-breadcrumb></app-breadcrumb> -->
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
@@ -13,7 +15,7 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#">Crystal Report</a>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#preview-modal">Crystal Report</a>
                 </div>
             </div>
             <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#confirm-refresh-manifest-modal">
@@ -24,7 +26,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveManifest(formManifest)">
                 <span>
                     <i class="la la-save"></i>
                     <span>
@@ -32,7 +34,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/documentation/sea-fcl-export-create/', { id: shipment.id }]">
                 <span>
                     <i class="la la-ban"></i>
                     <span>
@@ -52,19 +54,30 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && refNo.invalid }">
                             <label class="form-control-label" for="">
-                                Reference No <span class="m--font-danger">(*)</span>
+                                Reference No <span class="m--font-danger" *ngIf="formManifest.submitted && refNo.invalid">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="refNo" [(ngModel)]="manifest.refNo" #refNo="ngModel"
+                                (change)="manifest.refNo = manifest.refNo.trim()" required disabled>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && refNo.invalid">
+                                Reference No is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && supplier.invalid }">
                             <label class="form-control-label" for="">
                                 Supplier <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Enter master bill of lading no"
+                              autocomplete="nope" [(ngModel)]="manifest.supplier" name="supplier" #supplier="ngModel"
+                              (change)="manifest.supplier = manifest.supplier.trim()" required>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && supplier.invalid">
+                                Supplier is required
+                            </div>
+                            <!-- <input type="text" class="form-control m-input m-input--square" placeholder=""> -->
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -72,60 +85,78 @@
                             <label class="form-control-label" for="">
                                 Attention
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                name="attention" [(ngModel)]="manifest.attention" #attention="ngModel"
+                                (change)="manifest.attention = manifest.attention.trim()">
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && masksOfRegistration.invalid }">
                             <label class="form-control-label" for="">
                                 Marks of Nationality & Registration <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                name="masksOfRegistration" [(ngModel)]="manifest.masksOfRegistration" #masksOfRegistration="ngModel"
+                                (change)="manifest.masksOfRegistration = manifest.masksOfRegistration.trim()" required>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && masksOfRegistration.invalid">
+                                Marks of Nationality & Registration is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && voyNo.invalid }">
                             <label class="form-control-label" for="">
                                 Vessel No <span class="m--font-danger">(*)</span>
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="voyNo" [(ngModel)]="manifest.voyNo" #voyNo="ngModel" autocomplete="nope"
+                                (change)="manifest.voyNo = manifest.voyNo.trim()" required >
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && voyNo.invalid">
+                                Vessel No is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && etdSelected == null }">
                             <label class="form-control-label" for="">
                                 Date <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="m-input-icon m-input-icon--right">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                    [autoApply]="true" 
+                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                    [(ngModel)]="etdSelected" 
+                                    [singleDatePicker]="true" name="singledater" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
                                     </span>
                                 </span>
                             </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && etdSelected == null">
+                                Date is required
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.pol == null }">
                             <label class="form-control-label" for="">
                                 Port of Loading <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                    data-toggle="dropdown" placeholder="Please selected" value="">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
+                                    data-toggle="dropdown" [value]="manifest.polName == null?'Please selected port of loading':manifest.polName" value="">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
                                             <div class="table-filter-block">
                                                 <div class="search-field">
                                                     <input class="form-control m-input m-input--square" type="text"
+                                                        (keyup)="changePortLoading($event.target.value)"
                                                         placeholder="Search...">
                                                     <i class="icon-search"></i>
                                                 </div>
@@ -143,27 +174,13 @@
                                             </div>
                                         </div>
                                         <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected" data-id="1">
-                                                        <td>AAC</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="2">
-                                                        <td>AAB</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="3">
-                                                        <td>AAA</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="4">
-                                                        <td>AAD</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
+                                            <table class="table table-hover" *ngIf="portOfLadings">
+                                                <tbody *ngFor="let pol of portOfLadings;let i = index;">
+                                                    <tr class="data-row" [ngClass]="{ 'data-selected': manifest.pol!==null && manifest.pol===pol.id }" data-id="{{pol.id}}" 
+                                                        (click)="manifest.pol = pol.id; manifest.pol = pol.id; manifest.polName= pol.nameEN">
+                                                        <td>{{ pol.code }}</td>
+                                                        <td>{{ pol.nameEN }}</td>
+                                                        <td>{{ pol.countryName }}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -171,22 +188,26 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == null">
+                                Port of Loading is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.pod == null }">
                             <label class="form-control-label" for="">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                    data-toggle="dropdown" placeholder="Please selected" value="">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
+                                    data-toggle="dropdown" placeholder="Please selected"  [value]="manifest.podName == null?'Please selected port of loading':manifest.podName">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
                                             <div class="table-filter-block">
                                                 <div class="search-field">
                                                     <input class="form-control m-input m-input--square" type="text"
+                                                        (keyup)="changePortDestination($event.target.value)"
                                                         placeholder="Search...">
                                                     <i class="icon-search"></i>
                                                 </div>
@@ -204,27 +225,13 @@
                                             </div>
                                         </div>
                                         <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected" data-id="1">
-                                                        <td>AAC</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="2">
-                                                        <td>AAB</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="3">
-                                                        <td>AAA</td>
-                                                        <td>Bà Rịa - Vũng Tàu</td>
-                                                        <td>Việt Nam</td>
-                                                    </tr>
-                                                    <tr class="data-row" data-id="4">
-                                                        <td>AAD</td>
-                                                        <td>Hồ Chí Minh</td>
-                                                        <td>Việt Nam</td>
+                                            <table class="table table-hover" *ngIf="portOfDestinations">
+                                                <tbody *ngFor="let pod of portOfDestinations;let i = index;">
+                                                    <tr class="data-row" [ngClass]="{ 'data-selected': manifest.pod!==null && manifest.pod===pod.id }" data-id="{{i}}" 
+                                                        (click)="manifest.pod = pod.id; manifest.pod=pod.id; manifest.podName= pod.nameEN">
+                                                        <td>{{ pod.code }}</td>
+                                                        <td>{{ pod.nameEN }}</td>
+                                                        <td>{{ pod.countryName }}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -232,17 +239,27 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == null">
+                                Port of Discharge is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifest.paymentTerm == null }">
                             <label class="form-control-label" for="">
                                 Freight Charge <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select [allowClear]="true" [items]="items"  [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                            <ng-select [allowClear]="true" 
+                                [items]="paymentTerms" 
+                                [disabled]="disabled"
+                                [active]="paymentTermActive"
+                                (data)="refreshValue($event)" (selected)="manifest.paymentTerm = $event.id" 
+                                (removed)="manifest.paymentTerm = null"
                                 (typed)="typed($event)" placeholder="Please selected">
                             </ng-select>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.paymentTerm == null">
+                                Freight Charge is required
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -254,7 +271,9 @@
                                     <label class="form-control-label" for="">
                                         Consolidator
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                        name="consolidator" [(ngModel)]="manifest.consolidator" #consolidator="ngModel"
+                                        (change)="manifest.consolidator = manifest.consolidator.trim()">
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -262,7 +281,9 @@
                                     <label class="form-control-label" for="">
                                         De-Consolidator
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                        name="deConsolidator" [(ngModel)]="manifest.deConsolidator" #deConsolidator="ngModel"
+                                        (change)="manifest.deConsolidator = manifest.deConsolidator.trim()">
                                 </div>
                             </div>
                         </div>
@@ -272,7 +293,9 @@
                                     <label class="form-control-label" for="">
                                         Weight (Kgs)
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="number" class="form-control m-input m-input--square" placeholder="" readonly
+                                        name="weight" [(ngModel)]="manifest.weight" #weight="ngModel"
+                                        (change)="manifest.weight = manifest.weight.trim()">
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -280,17 +303,25 @@
                                     <label class="form-control-label" for="">
                                         Volume (CBM)
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="" readonly
+                                        name="volume" [(ngModel)]="manifest.volume" #weight="ngModel"
+                                        (change)="volume.volume = manifest.volume.trim()">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formManifest.submitted && manifestIssuer.invalid }">
                             <label class="form-control-label" for="">
                                 Agent who assembled this manifest <span class="m--font-danger">(*)</span>
                             </label>
-                            <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                            <textarea class="form-control m-input--square" id="" name="" rows="5" autocomplete="nope"
+                                name="manifestIssuer" [(ngModel)]="manifest.manifestIssuer" #manifestIssuer="ngModel"
+                                (change)="manifest.manifestIssuer = manifest.manifestIssuer.trim()" required>
+                            </textarea>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifestIssuer.invalid">
+                                Agent who assembled this manifest is required
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -308,7 +339,10 @@
                     <div class="col-lg-4 order-2 order-lg-1">
                         <div class="form-group">
                             <div class="m-input-icon m-input-icon--left">
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Search..." autocomplete="nope"
+                                    [ngModel]="searchHouse"
+                                    (change)="searchHouse = searchHouse.trim()"
+                                    (ngModelChange)="searchHouseBill($event)" name="searchHouse">
                                 <span class="m-input-icon__icon m-input-icon__icon--left">
                                     <span>
                                         <i class="la la-search"></i>
@@ -318,7 +352,7 @@
                         </div>
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="remove()">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -347,114 +381,90 @@
                             <th class="table-actions-col no-sorting">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" name="">
+                                        <input type="checkbox" name="" [checked]="checkAll" (change)="checkAll=!checkAll; checkAllChange()">
                                         <span></span>
                                     </label>
                                 </div>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hwbno'), 'sorting_desc': (!isDesc && sortKey == 'hwbno'), 'sorting': sortKey != 'hwbno' }"
+                                (click)="sort('hwbno')">
                                 <span>HBL No</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerNames'), 'sorting_desc': (!isDesc && sortKey == 'containerNames'), 'sorting': sortKey != 'containerNames' }"
+                                (click)="sort('containerNames')">
                                 <span>No of Pieces</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gw'), 'sorting_desc': (!isDesc && sortKey == 'gw'), 'sorting': sortKey != 'gw' }"
+                                (click)="sort('gw')">
                                 <span>G.W</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbm'), 'sorting_desc': (!isDesc && sortKey == 'cbm'), 'sorting': sortKey != 'cbm' }"
+                                (click)="sort('cbm')">
                                 <span>CBM</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'podName'), 'sorting_desc': (!isDesc && sortKey == 'podName'), 'sorting': sortKey != 'podName' }"
+                                (click)="sort('podName')">
                                 <span>Destination</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'shipperDescription'), 'sorting_desc': (!isDesc && sortKey == 'shipperDescription'), 'sorting': sortKey != 'shipperDescription' }"
+                                (click)="sort('shipperDescription')">
                                 <span>Shipper</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'consigneeDescription'), 'sorting_desc': (!isDesc && sortKey == 'consigneeDescription'), 'sorting': sortKey != 'consigneeDescription' }"
+                                (click)="sort('consigneeDescription')">
                                 <span>Consignee</span>
                             </th>
-                            <th class="no-sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'desOfGoods'), 'sorting_desc': (!isDesc && sortKey == 'desOfGoods'), 'sorting': sortKey != 'desOfGoods' }"
+                                (click)="sort('desOfGoods')">
                                 <span>Description</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'freightPayment'), 'sorting_desc': (!isDesc && sortKey == 'freightPayment'), 'sorting': sortKey != 'freightPayment' }"
+                                (click)="sort('freightPayment')">
                                 <span>Freight Charge</span>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="tbody-group">
-                        <tr class="">
-                            <td class="table-actions-col">
-                                <div class="table-actions">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" name="">
-                                        <span></span>
-                                    </label>
-                                </div>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class="table-actions-col">
-                                <div class="table-actions">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" name="">
-                                        <span></span>
-                                    </label>
-                                </div>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
+                    <tbody class="tbody-group" *ngIf="housebills">
+                        <tr class="" *ngFor="let detail of housebills; let i=index">
+                            <ng-container *ngIf="detail.isRemoved == false">
+                                <td class="table-actions-col">
+                                    <div class="table-actions">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" [checked]="detail.isChecked" 
+                                                (change)="detail.isChecked=!detail.isChecked; removeAllChecked();">
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>{{ detail.hwbno }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.containerNames }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.gw }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.cbm }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.podName }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.shipperDescription }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.consigneeDescription }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.desOfGoods }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ detail.freightPayment }}</span>
+                                </td>
+                            </ng-container>
+                            
                         </tr>
                     </tbody>
                 </table>
@@ -466,6 +476,7 @@
 </div>
 <!--end::m-content-->
 
+</form>
 <!--begin::add-remaining-HBL-modal-->
 <div class="modal fade" id="add-remaining-HBL-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
@@ -487,7 +498,10 @@
                             <div class="col-lg-4 order-2 order-lg-1">
                                 <div class="form-group">
                                     <div class="m-input-icon m-input-icon--left">
-                                        <input type="text" class="form-control m-input m-input--square"
+                                        <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                        [ngModel]="searchHouseRemoved"
+                                        (change)="searchHouseRemoved = searchHouseRemoved.trim()"
+                                        (ngModelChange)="searchHouseBillRemoved($event)" name="searchHouseRemoved"
                                             placeholder="Search...">
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
                                             <span>
@@ -535,80 +549,47 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="tbody-group">
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
+                            <tbody class="tbody-group" *ngIf="housebillsRemoved">
+                                <tr class="" *ngFor="let detail of housebillsRemoved; let i=index">
+                                    <ng-container>
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" name="" [checked]="detail.isChecked" 
+                                                        (change)="detail.isChecked=!detail.isChecked; removeChecked();">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.hwbno }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.containerNames }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.gw }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.cbm }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.podName }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.shipperDescription }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.consigneeDescription }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.desOfGoods }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ detail.freightPayment }}</span>
+                                        </td>
+                                    </ng-container>
+                                    
                                 </tr>
                             </tbody>
                         </table>
@@ -619,7 +600,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="addHouse()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -657,7 +638,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="refreshManifest()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -678,3 +659,40 @@
     </div>
 </div>
 <!--end::confirm-refresh-manifest-modal-->
+
+<!--begin::preview-modal-->
+<div class="modal fade" id="preview-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe src="http://localhost:57587/api/CsTransaction?apiUrl=" height="500" width="100%"></iframe>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="addHouse()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            add HBL
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::preview-modal-->

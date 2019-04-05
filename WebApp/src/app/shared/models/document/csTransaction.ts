@@ -2,7 +2,7 @@ import { Container } from "src/app/shared/models/document/container.model";
 import { CsTransactionDetail } from "src/app/shared/models/document/csTransactionDetail";
 
 export class CsTransaction {
-  id: String = "00000000-0000-0000-0000-000000000000";
+  id: string = "00000000-0000-0000-0000-000000000000";
   branchId: String = "00000000-0000-0000-0000-000000000000";
   jobNo: String = null;
   mawb: String = null;
@@ -57,4 +57,5 @@ export class CsTransaction {
   desOfGoods: String = '';
   csMawbcontainers: Container[] = null;
   csTransactionDetails: CsTransactionDetail[] = null;
+
 }

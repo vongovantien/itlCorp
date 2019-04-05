@@ -1,10 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit, AfterContentChecked, AfterViewChecked } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment/moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as shipmentHelper from 'src/helper/shipment.helper';
-import * as lodash from 'lodash';
-import { NgForm, FormGroup } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -46,7 +45,8 @@ export class MasterBillComponent implements OnInit{
 
     async ngOnInit() {
         this.baseServices.spinnerShow();
-        await this.getPorIndexs(null);
+        await this.getPortLoading(null);
+        await this.changePortDestination(null);
         await this.getColoaders(null);
         await this.getAgents(null);
         await this.getUserInCharges(null);
@@ -57,13 +57,13 @@ export class MasterBillComponent implements OnInit{
             console.log(this.shipment.etd);
             if(this.isImport == false){
                 this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
-                this.etaSelected = { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) };
+                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
             }
             else{
                 this.etaSelected = null;
                 this.etaSelected = null;
                 let claim = localStorage.getItem('id_token_claims_obj');
-                let index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
+                index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
                 if(index > -1) {
                     this.shipment.personInChargeName = this.userInCharges[index].username;
                     this.shipment.personIncharge = JSON.parse(claim)["id"];
@@ -119,11 +119,17 @@ export class MasterBillComponent implements OnInit{
         }
         this.baseServices.spinnerHide();
     }
-    changePort(keySearch: any) {
+    changePortLoading(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
             return 0;
         }
-        this.getPorIndexs(keySearch);
+        this.getPortLoading(keySearch);
+    }
+    changePortDestination(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getDestinations(keySearch);
     }
     changeAgent(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
@@ -150,7 +156,8 @@ export class MasterBillComponent implements OnInit{
         this.terms = dataHelper.prepareNg2SelectData(data.freightTerms, 'value', 'displayName');
         this.shipmentTypes = dataHelper.prepareNg2SelectData(data.shipmentTypes, 'value', 'displayName');
     }
-    async getPorIndexs(searchText: any) {
+    
+    async getPortLoading(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
@@ -158,8 +165,24 @@ export class MasterBillComponent implements OnInit{
         const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
         if (portIndexs != null) {
             this.portOfLadings = portIndexs.data;
+            console.log(this.portOfLadings);
+        }
+        else{
+            this.portOfLadings = [];
+        }
+    }
+    async getDestinations(searchText: any) {
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            portSearchIndex.inactive = null;
+        }
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        if (portIndexs != null) {
             this.portOfDestinations = portIndexs.data;
             console.log(this.portOfLadings);
+        }
+        else{
+            this.portOfDestinations = [];
         }
     }
 
@@ -173,6 +196,9 @@ export class MasterBillComponent implements OnInit{
             this.coloaders = partners.data;
             console.log(this.coloaders);
         }
+        else{
+            this.coloaders = [];
+        }
     }
     async getAgents(searchText: any) {
         let criteriaSearchAgent = { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: searchText };
@@ -182,6 +208,9 @@ export class MasterBillComponent implements OnInit{
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
         if (partners != null) {
             this.agents = partners.data;
+        }
+        else{
+            this.agents = [];
         }
     }
 
@@ -199,6 +228,9 @@ export class MasterBillComponent implements OnInit{
                 }
                 else this.shipment.personInChargeName = '';
             }
+        }
+        else{
+            this.userInCharges = [];
         }
     }
     /**

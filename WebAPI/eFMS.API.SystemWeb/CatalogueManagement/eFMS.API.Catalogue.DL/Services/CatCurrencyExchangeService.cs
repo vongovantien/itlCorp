@@ -67,8 +67,12 @@ namespace eFMS.API.Catalogue.DL.Services
         public CurrencyExchangeNewestViewModel GetExchangeRates(DateTime date, string localCurrency, string fromCurrency)
         {
             var users = ((eFMSDataContext)DataContext.DC).GetViewData<vw_sysUser>();
-            var data = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.DatetimeCreated.Value.Date == date.Date
-                && x.CurrencyToId == localCurrency && (x.CurrencyFromId == fromCurrency || string.IsNullOrEmpty(fromCurrency)));
+            var data = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange
+                .Where(x => x.DatetimeCreated.Value.Day == date.Day
+                && x.DatetimeCreated.Value.Month == date.Month
+                && x.DatetimeCreated.Value.Year == date.Year
+                && x.CurrencyToId == localCurrency 
+                && (x.CurrencyFromId == fromCurrency || string.IsNullOrEmpty(fromCurrency)));
 
             var result = new CurrencyExchangeNewestViewModel();
             if (data.Count() == 0) return result;
@@ -84,11 +88,11 @@ namespace eFMS.API.Catalogue.DL.Services
                 var rate = new vw_catCurrencyExchangeNewest
                 {
                     CurrencyFromID = item.CurrencyFromId,
-                    Rate = item.Rate,
-                    //DatetimeModifield = item.DatetimeModified ==null?item.DatetimeCreated : item.DatetimeModified,
+                    Rate = item.Rate
                 };
                 result.ExchangeRates.Add(rate);
             }
+            result.ExchangeRates = result.ExchangeRates.GroupBy(x => new { x.CurrencyFromID, x.Rate }).Select(x => new vw_catCurrencyExchangeNewest { CurrencyFromID = x.Key.CurrencyFromID, Rate = x.Key.Rate }).ToList();
             return result;
         }
 
@@ -191,8 +195,11 @@ namespace eFMS.API.Catalogue.DL.Services
                             CurrencyFromId = item.CurrencyFromId,
                             CurrencyToId = model.CurrencyToId,
                             Rate = item.Rate,
+                            Inactive = false,
                             UserCreated = model.UserModified,
-                            DatetimeCreated = DateTime.Now
+                            DatetimeCreated = DateTime.Now,
+                            UserModified = model.UserModified,
+                            DatetimeModified = DateTime.Now
                         };
                         ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Add(rate);
                     }

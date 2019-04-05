@@ -3,6 +3,7 @@ import { Container } from './container.model';
 export class CsTransactionDetail {
   id: String = "00000000-0000-0000-0000-000000000000";
   jobId: String = "00000000-0000-0000-0000-000000000000";
+  jobNo: String = null;
   hwbno: String = null;
   hbltype: String = null;
   customerId: String = null;
@@ -58,4 +59,5 @@ export class CsTransactionDetail {
   containerNames:String = null;
   packageTypes:String = null;
   cbm:Number = 0;
+  manifestRefNo: string = null;
 }

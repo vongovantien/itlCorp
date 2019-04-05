@@ -1,9 +1,11 @@
+<form name="formShippingInstruction" #formShippingInstruction="ngForm" novalidate (ngSubmit)="formShippingInstruction.form.valid" *ngIf="isLoad">
+
 <!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <app-breadcrumb></app-breadcrumb>
+            <!-- <app-breadcrumb></app-breadcrumb> -->
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
@@ -33,7 +35,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save(formShippingInstruction)">
                 <span>
                     <i class="la la-save"></i>
                     <span>
@@ -41,7 +43,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" *ngIf="shipment" class="btn m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/documentation/sea-fcl-export-create/', { id: shipment.id }]">
                 <span>
                     <i class="la la-ban"></i>
                     <span>
@@ -84,11 +86,16 @@
                         <div class="m-form m-form--state">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && refNo.invalid }">
                                         <label class="form-control-label" for="">
                                             Reference No <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                            name="refNo" [(ngModel)]="shippingIns.refNo" #refNo="ngModel"
+                                            (change)="shippingIns.refNo = shippingIns.refNo.trim()" required disabled>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && refNo.invalid">
+                                            Reference No is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -96,42 +103,48 @@
                                         <label class="form-control-label" for="">
                                             Booking No
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            name="bookingNo" [(ngModel)]="shippingIns.bookingNo" #bookingNo="ngModel"
+                                            (change)="shippingIns.bookingNo = shippingIns.bookingNo.trim()" >
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && issueDate == null }">
                                         <label class="form-control-label" for="">
                                             Date <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="m-input-icon m-input-icon--right">
                                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                                 [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                                [(ngModel)]="issueDate" [singleDatePicker]="true" name="issueDate" readonly />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                 <span>
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
                                         </div>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && issueDate == null">
+                                            Date is required
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.issuedUser == null }">
                                         <label class="form-control-label" for="">
                                             Issue By <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                                data-toggle="dropdown" placeholder="Please selected" value="">
+                                                data-toggle="dropdown" placeholder="Please selected" value=""
+                                                [value]="shippingIns.issuedUserName == null?'Please selected issued user':shippingIns.issuedUserName" value="">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
                                                                     placeholder="Search...">
                                                                 <i class="icon-search"></i>
                                                             </div>
@@ -150,15 +163,13 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>Tâm</td>
-                                                                    <td>Tâm Tâm Full Name</td>
-                                                                    <td>Cs</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>Thor</td>
-                                                                    <td>Thor Thế Full Name</td>
+                                                            <tbody *ngIf="userInCharges">
+                                                                <tr *ngFor="let user of userInCharges;let i = index;" class="data-row" 
+                                                                    [ngClass]="{ 'data-selected': shippingIns.issuedUser!==null && shippingIns.issuedUser===user.id }" 
+                                                                    data-id="{{user.id}}" 
+                                                                    (click)="shippingIns.issuedUser = user.id; shippingIns.issuedUser = user.id; shippingIns.issuedUserName= user.username">
+                                                                    <td>{{ user.username }}</td>
+                                                                    <td>{{ user.employeeNameVn }}</td>
                                                                     <td>Cs</td>
                                                                 </tr>
                                                             </tbody>
@@ -167,21 +178,26 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.issuedUser == null">
+                                            Issue by is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.supplier == null }">
                                         <label class="form-control-label" for="">
                                             Supplier <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" 
+                                                [value]="shippingIns.supplierName == null?'Please selected supplier':shippingIns.supplierName"
+                                                placeholder="Please selected" value="">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text"
+                                                                <input class="form-control m-input m-input--square" type="text" 
                                                                     placeholder="Search...">
                                                                 <i class="icon-search"></i>
                                                             </div>
@@ -201,30 +217,24 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="suppliers">
+                                                                <tr class="data-row data-selected" *ngFor="let supplier of suppliers;let i = index;" 
+                                                                    [ngClass]="{ 'data-selected': shippingIns.supplier!==null && shippingIns.supplier === supplier.id }" 
+                                                                    data-id="{{supplier.id}}" 
+                                                                    (click)="shippingIns.supplier = supplier.id; shippingIns.supplierName = supplier.username">
+                                                                    <td>{{ supplier.accountNo }}</td>
+                                                                    <td>{{ supplier.shortName }}</td>
+                                                                    <td>{{ supplier.partnerNameEn }}</td>
+                                                                    <td>{{ supplier.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.supplier == null">
+                                            Supplier is required
                                         </div>
                                     </div>
                                 </div>
@@ -233,26 +243,35 @@
                                         <label class="form-control-label" for="">
                                             Attention
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            name="invoiceNoticeRecevier" [(ngModel)]="shippingIns.invoiceNoticeRecevier" #invoiceNoticeRecevier="ngModel"
+                                            (change)="shippingIns.invoiceNoticeRecevier = shippingIns.invoiceNoticeRecevier.trim()" >
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.shipper == null }">
                                         <label class="form-control-label" for="">
                                             Shipper <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="5" autocomplete="nope" 
+                                            name="shipper" [(ngModel)]="shippingIns.shipper" #shipper="ngModel"
+                                            (change)="shippingIns.shipper = shippingIns.shipper.trim()" required >
+                                        </textarea>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.shipper == null">
+                                            Shipper is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && (shippingIns.consigneeId == null || consigneeDescription.invalid) }">
                                         <label class="form-control-label" for="">
                                             Consignee <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
+                                                [value]="shippingIns.consigneeName == null?'Please selected consignee':shippingIns.consigneeName">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
@@ -278,24 +297,15 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="consignees">
+                                                                <tr class="data-row data-selected" *ngFor="let consignee of consignees;let i = index;" 
+                                                                    [ngClass]="{ 'data-selected': shippingIns.consigneeId!==null && shippingIns.consigneeId === consignee.id }" 
+                                                                    data-id="{{consignee.id}}" 
+                                                                    (click)="shippingIns.consigneeId = consignee.id; shippingIns.consigneeName = consignee.partnerNameEn; getConsigneeDescription(consignee)">
+                                                                    <td>{{ consignee.accountNo }}</td>
+                                                                    <td>{{ consignee.shortName }}</td>
+                                                                    <td>{{ consignee.partnerNameEn }}</td>
+                                                                    <td>{{ consignee.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -303,7 +313,12 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="3"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="3"  autocomplete="nope"
+                                            name="consigneeDescription" [(ngModel)]="shippingIns.consigneeDescription" #consigneeDescription="ngModel"
+                                            (change)="shippingIns.consigneeDescription = shippingIns.consigneeDescription.trim()" required></textarea>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && (shippingIns.consigneeId == null || consigneeDescription.invalid)">
+                                            Shipper is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -311,18 +326,22 @@
                                         <label class="form-control-label" for="">
                                             Notify Party
                                         </label>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="5" autocomplete="nope"
+                                            name="cargoNoticeRecevier" [(ngModel)]="shippingIns.cargoNoticeRecevier" #cargoNoticeRecevier="ngModel"
+                                            (change)="shippingIns.cargoNoticeRecevier = shippingIns.cargoNoticeRecevier.trim()" >
+                                        </textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" > 
                                         <label class="form-control-label" for="">
                                             Real Shipper
                                         </label>
                                         <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
+                                                [value]="shippingIns.actualShipperName == null?'Please selected real shipper':shippingIns.actualShipperName">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
@@ -348,24 +367,15 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="realShippers">
+                                                                <tr class="data-row" *ngFor="let realShipper of realShippers;let i = index;"  
+                                                                    [ngClass]="{ 'data-selected': shippingIns.actualShipperName!==null && shippingIns.actualShipperId === realShipper.id }" 
+                                                                    data-id="{{realShipper.id}}" 
+                                                                    (click)="shippingIns.actualShipperId = realShipper.id; shippingIns.actualShipperName = realShipper.partnerNameEn; getRealShipperDescription(realShipper)">
+                                                                    <td>{{ realShipper.accountNo }}</td>
+                                                                    <td>{{ realShipper.shortName }}</td>
+                                                                    <td>{{ realShipper.partnerNameEn }}</td>
+                                                                    <td>{{ realShipper.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -373,7 +383,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="3"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
+                                            name="actualShipperDescription" [(ngModel)]="shippingIns.actualShipperDescription" #actualShipperDescription="ngModel"
+                                            (change)="shippingIns.actualShipperDescription = shippingIns.actualShipperDescription.trim()"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -382,7 +394,8 @@
                                             Real Consignee
                                         </label>
                                         <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
+                                                [value]="shippingIns.actualConsigneeName == null?'Please selected real consignee':shippingIns.actualConsigneeName">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
@@ -408,24 +421,15 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>partner name 1234567</td>
-                                                                    <td>Name viết tắt</td>
-                                                                    <td>Đây là một name dài thật là dài luôn nạ Thor</td>
-                                                                    <td>090xxxxxxxxxx</td>
+                                                            <tbody *ngIf="realConsignees">
+                                                                <tr class="data-row data-selected" *ngFor="let realConsignee of realConsignees;let i = index;" 
+                                                                    [ngClass]="{ 'data-selected': shippingIns.actualConsigneeName!==null && shippingIns.actualConsigneeId === realConsignee.id }" 
+                                                                    data-id="{{realConsignee.id}}" 
+                                                                    (click)="shippingIns.actualConsigneeId = realConsignee.id; shippingIns.actualConsigneeName = realConsignee.partnerNameEn; getRealConsigneeDescription(realConsignee)">
+                                                                    <td>{{ realConsignee.accountNo }}</td>
+                                                                    <td>{{ realConsignee.shortName }}</td>
+                                                                    <td>{{ realConsignee.partnerNameEn }}</td>
+                                                                    <td>{{ realConsignee.taxCode }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -433,25 +437,34 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="3"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
+                                            name="actualConsigneeDescription" [(ngModel)]="shippingIns.actualConsigneeDescription" #actualConsigneeDescription="ngModel"
+                                            (change)="shippingIns.actualConsigneeDescription = shippingIns.actualConsigneeDescription.trim()"></textarea>
                                     </div>
                                 </div>
                                 
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.paymentTerm == null }">
                                         <label class="form-control-label" for="">
                                             Payment Type <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="paymentTypes"  [disabled]="disabled"
-                                            (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                                        <ng-select [allowClear]="true" [items]="paymentTerms"  [disabled]="disabled"
+                                            [active]="paymentTermActive"
+                                            (data)="refreshValue($event)" (selected)="shippingIns.paymentTerm = $event.id" 
+                                            (removed)="shippingIns.paymentTerm = null"
                                             (typed)="typed($event)" placeholder="Please selected">
                                         </ng-select>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.paymentTerm == null">
+                                            Payment Type is required
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
                                             Remark
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            name="remark" [(ngModel)]="shippingIns.remark" #remark="ngModel"
+                                            (change)="shippingIns.remark = shippingIns.remark.trim()" >
                                     </div>
                                 </div>
                             </div>
@@ -468,19 +481,20 @@
                         <div class="m-form m-form--state">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.pol == null }">
                                         <label class="form-control-label" for="">
                                             Port of Loading <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                                data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
+                                                data-toggle="dropdown" [value]="shippingIns.polName == null?'Please selected port of loading':shippingIns.polName" value="">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
                                                                 <input class="form-control m-input m-input--square" type="text"
+                                                                    (keyup)="changePortLoading($event.target.value)"
                                                                     placeholder="Search...">
                                                                 <i class="icon-search"></i>
                                                             </div>
@@ -498,27 +512,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>AAC</td>
-                                                                    <td>Bà Rịa - Vũng Tàu</td>
-                                                                    <td>Việt Nam</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>AAB</td>
-                                                                    <td>Hồ Chí Minh</td>
-                                                                    <td>Việt Nam</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>AAA</td>
-                                                                    <td>Bà Rịa - Vũng Tàu</td>
-                                                                    <td>Việt Nam</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="4">
-                                                                    <td>AAD</td>
-                                                                    <td>Hồ Chí Minh</td>
-                                                                    <td>Việt Nam</td>
+                                                        <table class="table table-hover" *ngIf="portOfLadings">
+                                                            <tbody *ngFor="let pol of portOfLadings;let i = index;">
+                                                                <tr class="data-row" [ngClass]="{ 'data-selected': shippingIns.pol!==null && shippingIns.pol===pol.id }" data-id="{{pol.id}}" 
+                                                                    (click)="shippingIns.pol = pol.id; shippingIns.polName= pol.nameEN">
+                                                                    <td>{{ pol.code }}</td>
+                                                                    <td>{{ pol.nameEN }}</td>
+                                                                    <td>{{ pol.countryName }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -526,22 +526,26 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pol == null">
+                                            Port of Loading is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.pod == null }">
                                         <label class="form-control-label" for="">
                                             Port of Discharge <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                                data-toggle="dropdown" placeholder="Please selected" value="">
+                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
+                                                data-toggle="dropdown" placeholder="Please selected"  [value]="shippingIns.podName == null?'Please selected port of discharge':shippingIns.podName">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
                                                                 <input class="form-control m-input m-input--square" type="text"
+                                                                    (keyup)="changePortDestination($event.target.value)"
                                                                     placeholder="Search...">
                                                                 <i class="icon-search"></i>
                                                             </div>
@@ -559,27 +563,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row data-selected" data-id="1">
-                                                                    <td>AAC</td>
-                                                                    <td>Bà Rịa - Vũng Tàu</td>
-                                                                    <td>Việt Nam</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="2">
-                                                                    <td>AAB</td>
-                                                                    <td>Hồ Chí Minh</td>
-                                                                    <td>Việt Nam</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="3">
-                                                                    <td>AAA</td>
-                                                                    <td>Bà Rịa - Vũng Tàu</td>
-                                                                    <td>Việt Nam</td>
-                                                                </tr>
-                                                                <tr class="data-row" data-id="4">
-                                                                    <td>AAD</td>
-                                                                    <td>Hồ Chí Minh</td>
-                                                                    <td>Việt Nam</td>
+                                                        <table class="table table-hover" *ngIf="portOfDestinations">
+                                                            <tbody *ngFor="let pod of portOfDestinations;let i = index;">
+                                                                <tr class="data-row" [ngClass]="{ 'data-selected': shippingIns.pod!==null && shippingIns.pod===pod.id }" data-id="{{pod.id}}" 
+                                                                    (click)="shippingIns.pod = pod.id; shippingIns.pod=pod.id; shippingIns.shippingIns= pod.nameEN; shippingIns.poDelivery = pod.nameEN">
+                                                                    <td>{{ pod.code }}</td>
+                                                                    <td>{{ pod.nameEN }}</td>
+                                                                    <td>{{ pod.countryName }}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -587,40 +577,56 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pol == null">
+                                            Port of Discharge is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.poDelivery == null }">
                                         <label class="form-control-label" for="">
                                             Place of Delivery <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            name="poDelivery" [(ngModel)]="shippingIns.poDelivery" #poDelivery="ngModel"
+                                            (change)="shippingIns.poDelivery = shippingIns.poDelivery.trim()">
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.poDelivery == null">
+                                            Place of Delivery is required
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.voyNo == null }">
                                         <label class="form-control-label" for="">
                                             Vessel & Voy <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            name="voyNo" [(ngModel)]="shippingIns.voyNo" #voyNo="ngModel"
+                                            (change)="shippingIns.voyNo = shippingIns.voyNo.trim()">
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.voyNo == null">
+                                            Vessel & Voy is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && loadingDate == null }">
                                         <label class="form-control-label" for="">
                                             Loading Date <span class="m--font-danger">(*)</span>
                                         </label>
                                         <div class="m-input-icon m-input-icon--right">
                                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                                 [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                                [(ngModel)]="loadingDate" [singleDatePicker]="true" name="singledater" readonly />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                 <span>
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                        </div>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && loadingDate == null">
+                                            Loading Dat is required
                                         </div>
                                     </div>
                                 </div>
@@ -642,7 +648,10 @@
                                         <label class="form-control-label" for="">
                                             Container & Seal No
                                         </label>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="5"
+                                            autocomplete="nope"
+                                            [(ngModel)]="shippingIns.containerSealNo" name="containerSealNo" 
+                                            #containerSealNo="ngModel"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-lg-8">
@@ -650,7 +659,10 @@
                                         <label class="form-control-label" for="">
                                             Description of Goods
                                         </label>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="5"
+                                            autocomplete="nope"
+                                            [(ngModel)]="shippingIns.goodsDescription" name="goodsDescription" 
+                                            #goodsDescription="ngModel"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -660,7 +672,10 @@
                                         <label class="form-control-label" for="">
                                             Containers
                                         </label>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="5"
+                                            autocomplete="nope"
+                                            [(ngModel)]="shippingIns.containerNote" name="containerNote" 
+                                            #containerNote="ngModel"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -668,7 +683,9 @@
                                         <label class="form-control-label" for="">
                                             Packages
                                         </label>
-                                        <textarea class="form-control m-input--square" id="" name="" rows="5"></textarea>
+                                        <textarea class="form-control m-input--square" id="" rows="5" autocomplete="nope"
+                                            [(ngModel)]="shippingIns.packagesNote" name="packagesNote" 
+                                            #packagesNote="ngModel"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -676,13 +693,17 @@
                                         <label class="form-control-label" for="">
                                             Gross Weight
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="number" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            [(ngModel)]="shippingIns.grossWeight" name="grossWeight" min="0.01"
+                                            appTwoDigitDecimaNumber #grossWeight="ngModel">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
                                             CBM
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="" autocomplete="nope"
+                                            [(ngModel)]="shippingIns.volume" name="volume" min="0.01"
+                                            appTwoDigitDecimaNumber #volume="ngModel">
                                     </div>
                                 </div>
                             </div>
@@ -713,9 +734,9 @@
                                     <th class="no-sorting">
                                         <span>Containers</span>
                                     </th>
-                                    <th class="no-sorting">
+                                    <!-- <th class="no-sorting">
                                         <span>Packages</span>
-                                    </th>
+                                    </th> -->
                                     <th class="no-sorting">
                                         <span>G.W</span>
                                     </th>
@@ -724,51 +745,28 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="tbody-group">
-                                <tr class="">
+                            <tbody class="tbody-group" *ngIf="housebills">
+                                <tr class="" *ngFor="let housebill of housebills;let i = index;">
                                     <td>
-                                        <span>text</span>
+                                        <span>{{ housebill.hwbno }}</span>
                                     </td>
                                     <td>
-                                        <span>text</span>
+                                        <span>{{ housebill.desOfGoods }}</span>
                                     </td>
                                     <td>
-                                        <span>text</span>
+                                        <span>{{ housebill.shippingMark }}</span>
                                     </td>
                                     <td>
+                                        <span>{{ housebill.packageContainer }}</span>
+                                    </td>
+                                    <!-- <td>
                                         <span>text</span>
+                                    </td> -->
+                                    <td>
+                                        <span>{{ housebill.gw }}</span>
                                     </td>
                                     <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
-                                <tr class="">
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
+                                        <span>{{ housebill.cbm }}</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -784,6 +782,7 @@
 </div>
 <!--end::m-content-->
 
+</form>
 <!--begin::confirm-refresh-shipping-instruction-modal-->
 <div class="modal fade" id="confirm-refresh-shipping-instruction-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">

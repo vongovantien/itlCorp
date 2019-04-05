@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment/moment';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { Router } from '@angular/router';
-import { timeout } from 'q';
+// import { timeout } from 'q';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
+declare var $: any;
 
 @Component({
     selector: 'app-sea-fcl-export',
@@ -161,7 +162,22 @@ export class SeaFCLExportComponent implements OnInit {
         this.sortKey = property;
         this.shipmentDetails = this.sortService.sort(this.shipmentDetails, property, this.isDesc);
     }
-  
+    itemToDelete: any = null;
+    async confirmDelete(item: { id: string; }){
+        this.itemToDelete = item;
+        let respone = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.checkAllowDelete + item.id, false, true);
+        if(respone == true){
+            $('#confirm-delete-modal').modal('show');
+        }
+        else{
+            $('#confirm-can-not-delete-job-modal').modal('show');
+        }
+    }
+    async deleteJob(){
+        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsTransaction.delete + this.itemToDelete.id, false, true);
+        $('#confirm-delete-modal').modal('hide');
+        this.getShipments();
+    }
     /**
        * Daterange picker
        */

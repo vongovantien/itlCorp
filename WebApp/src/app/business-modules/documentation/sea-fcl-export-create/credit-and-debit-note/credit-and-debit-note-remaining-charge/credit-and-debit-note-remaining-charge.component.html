@@ -72,205 +72,64 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="tbody-group">
-                                <!-- <tr>
-                                    <td colspan="12">
-                                        <div class="no-data">
-                                            <i class="flaticon-coins"></i>
-                                            <span class="no-data-text">No records found</span>
-                                        </div>
-                                    </td>
-                                </tr> -->
-                                <tr class="collapse-toggle-row tgroup">
+                            <tbody class="tbody-group" *ngFor="let item of ListRemainingCharges; let i = index;">
+    
+                                <tr class="collapse-toggle-row tgroup" *ngIf="checkToDisplay(item)">
                                     <td colspan="12">
                                         <label class="m-checkbox">
-                                            <input type="checkbox" name="">
-                                            HBL No: HBLA123456
+                                            <input type="checkbox" name="" attr.data-id="{{i}}" class="group-charge-hb-select" (change)="selectAllChargeInGroup($event,i)">
+                                            HBL No: {{item.hwbno}}
                                             <span></span>
                                         </label> 
                                     </td>
                                 </tr>
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label> 
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label> 
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
-                                <tr class="collapse-toggle-row tgroup">
-                                    <td colspan="12">
-                                        <label class="m-checkbox">
-                                            <input type="checkbox" name="">
-                                            HBL No: HBLA123456
-                                            <span></span>
-                                        </label> 
-                                    </td>
-                                </tr>
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label> 
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label> 
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
+                                <ng-container   *ngFor="let charge of item.listCharges;let k = index;">
+                                    <tr class="" *ngIf="charge.isRemaining">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" name="" attr.data-id="{{k}}" class="single-charge-select" (change)="selectSingleCharge($event,k)" >
+                                                    <span></span>
+                                                </label> 
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{item.hwbno}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{charge.chargeCode}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{charge.nameEn}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{charge.quantity}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{charge.unit}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{charge.unitPrice}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{charge.currency}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{charge.vatrate}}</span>
+                                        </td>
+                                        <td>
+                                            <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && partnerId===charge.receiverId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>                                           
+                                        </td>
+                                        <td>
+                                            <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && partnerId===charge.payerId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>                                           
+                                        </td>
+                                        <td>
+                                            <span>{{charge.notes}}</span>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                       
+                             
                             </tbody>
                         </table>
                     </div>
@@ -280,7 +139,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"  data-dismiss="modal">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addCharges()"  data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>

@@ -13,14 +13,14 @@
         <div class="div-inside bg-secondary m--margin-bottom-10">
             <h3 class="c-block-title">
                 <button
-                    class="btn btn-block btn-sm m-btn--square m-btn--icon m-btn--icon-only collapse-toggle m--margin-right-5"
+                    class="btn btn-block btn-sm m-btn--square m-btn--icon m-btn--icon-only collapse-toggle m--margin-right-5 collapsed"
                     data-toggle="collapse" data-target="#hbl-summary">
                     <i class="la la-angle-up"></i>
                 </button>
                 Summary
             </h3>
             <!--begin::hbl-summary-->
-            <div class="collapse show" id="hbl-summary">
+            <div class="collapse" id="hbl-summary">
                 <hr>
                 <div class="row">
                     <div class="col-xl-8">
@@ -139,22 +139,7 @@
                             </th>
                             <th class="">
                                 <span>
-                                    Containers
-                                </span>
-                            </th>
-                            <th class="">
-                                <span>
-                                    Qty
-                                </span>
-                            </th>
-                            <th class="">
-                                <span>
-                                    Unit
-                                </span>
-                            </th>
-                            <th class="">
-                                <span>
-                                    C.W
+                                    Package
                                 </span>
                             </th>
                             <th class="">
@@ -167,6 +152,7 @@
                                     CBM
                                 </span>
                             </th>
+                           
                         </tr>
                     </thead>
 
@@ -217,34 +203,20 @@
                             </td>
                             <td>
                                 <span>
-                                    Containers
+                                    Package
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    Qty
+                                    {{hb.gw}}
                                 </span>
                             </td>
                             <td>
                                 <span>
-                                    Unit
+                                    {{hb.cbm}}
                                 </span>
                             </td>
-                            <td>
-                                <span>
-                                    C.W
-                                </span>
-                            </td>
-                            <td>
-                                <span>
-                                    G.W
-                                </span>
-                            </td>
-                            <td>
-                                <span>
-                                    CBM
-                                </span>
-                            </td>
+                        
                         </tr>
                     </tbody>
                 </table>

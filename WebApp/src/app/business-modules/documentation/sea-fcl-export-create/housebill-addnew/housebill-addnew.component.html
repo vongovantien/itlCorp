@@ -45,8 +45,8 @@
                                 <label class="form-control-label" for="">
                                     Master bill of lading
                                 </label>
-                                <input type="text" disabled
-                                    [(ngModel)]="MasterBillData.jobNo" required
+                                <input type="text" 
+                                    [(ngModel)]="HouseBillWorking.jobNo" required
                                     class="form-control m-input m-input--square" placeholder="Enter text"
                                     #MasterBillOfLadingName="ngModel" name="MasterBillOfLadingName">
                                 <div class="form-control-feedback"
@@ -1114,9 +1114,9 @@
             <div class="modal-content m-form m-form--state">
                 <div class="modal-header">
                     <h5 class="modal-title">Container List Module</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" aria-label="Close" (click)="closeAddContainerForm()">
                         <span aria-hidden="true">&times;</span>
-                    </button>
+                    </button>    
                 </div>
                 <div class="modal-body">
 
@@ -1587,7 +1587,7 @@
                         </span>
                     </button>
                     <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmitContainer()"></app-default-button> -->
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="closeAddContainerForm()">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
