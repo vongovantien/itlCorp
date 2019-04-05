@@ -20,5 +20,6 @@ namespace eFMS.API.Documentation.DL.IService
         CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount);
         object ImportCSTransactionDetail(CsTransactionDetailModel model);
+
     }
 }

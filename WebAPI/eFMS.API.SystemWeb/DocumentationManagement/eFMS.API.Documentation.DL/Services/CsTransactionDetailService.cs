@@ -68,14 +68,16 @@ namespace eFMS.API.Documentation.DL.Services
                 DataContext.Update(hb, x => x.Id == hb.Id);
                 foreach(var item in model.CsMawbcontainers)
                 {
-                    var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();
+                    //var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();
+                    var cont = mapper.Map<CsMawbcontainer>(item);
                     if (cont != null)
                     {
                         cont.UserModified = ChangeTrackerHelper.currentUser;
                         cont.DatetimeModified = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).SaveChanges();
+                        ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Update(cont);                       
                     }
                 }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
                 var hs = new HandleState();
                 return hs;
             }

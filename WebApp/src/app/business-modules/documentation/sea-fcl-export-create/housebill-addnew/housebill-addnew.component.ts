@@ -41,7 +41,7 @@ export class HousebillAddnewComponent implements OnInit {
       this.EditingHouseBill = _currentHouseBill;
       this.HouseBillWorking = this.EditingHouseBill;
       this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
-      this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
+      // this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
       this.getActiveOriginCountry();
       this.getActivePortOfLoading();
       this.getActivePortOfDischarge();
