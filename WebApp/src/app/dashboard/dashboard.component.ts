@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
-// import * as Highcharts from 'highcharts';
-import Highcharts from 'highcharts/highcharts'
+import Highcharts from 'highcharts/highcharts';
+// import { Chart } from 'angular-highcharts';
 
 @Component({
     selector: 'app-dashboard',
@@ -16,6 +16,7 @@ export class DashboardComponent implements OnInit {
     }
 
     ngOnInit() {
+        // this.init();
     }
 
     /**
@@ -40,7 +41,89 @@ export class DashboardComponent implements OnInit {
                 .endOf('month')
         ]
     };
-    
+
+    //add active to button-group
+    onButtonGroupClick($event) {
+        let clickedElement = $event.target || $event.srcElement;
+
+        if (clickedElement.nodeName === "BUTTON") {
+
+            let isCertainButtonAlreadyActive = clickedElement.parentElement.querySelector(".active");
+            // if a Button already has Class: .active
+            if (isCertainButtonAlreadyActive) {
+                isCertainButtonAlreadyActive.classList.remove("active");
+            }
+
+            clickedElement.className += " active";
+        }
+
+    }
+    //angular-highchart
+    //https://www.npmjs.com/package/angular-highcharts
+    // chart: Chart;
+
+    // //draw chart by month
+    // init() {
+    //     let chart = new Chart({
+    //         chart: {
+    //             marginLeft: 40, // Keep all charts left aligned
+    //             spacingTop: 20,
+    //             spacingBottom: 20,
+    //             className: 'chart-sync-revenue'
+    //         },
+    //         title: {
+    //             text: 'Revenue',
+    //             align: 'left',
+    //             margin: 0,
+    //             x: 30
+    //         },
+    //         credits: {
+    //             enabled: false
+    //         },
+    //         legend: {
+    //             enabled: true,
+    //             verticalAlign: 'top',
+    //             y: 0
+    //         },
+    //         xAxis: {
+    //             type: 'datetime'
+    //         },
+    //         yAxis: {
+    //             title: {
+    //                 text: null
+    //             }
+    //         },
+    //         series: [
+    //             {
+    //                 type: 'line',
+    //                 color: '#ffb822',
+    //                 data: [
+    //                     [Date.UTC(2010, 0, 1), 29.9],
+    //                     [Date.UTC(2010, 2, 1), 71.5],
+    //                     [Date.UTC(2010, 3, 1), 106.4]
+    //                 ],
+    //                 name: "USD"
+    //             },
+    //             {
+    //                 type: 'line',
+    //                 color: "#c9cdd4",
+    //                 data: [
+    //                     [Date.UTC(2010, 0, 1), 29.9],
+    //                     [Date.UTC(2010, 2, 1), 71.5],
+    //                     [Date.UTC(2010, 3, 1), 106.4]
+    //                 ],
+    //                 name: "VND"
+    //             }
+    //         ]
+    //     });
+    //     this.chart = chart;
+    // }
+    // //draw chart by day
+    // chartPerDay() {
+    //     this.chart.removeSeries(this.chart.ref.series.length - 1);
+    // }
+
+
     // highchart
     // https://www.npmjs.com/package/highcharts-angular
     Highcharts = Highcharts;
@@ -49,11 +132,11 @@ export class DashboardComponent implements OnInit {
             marginLeft: 40, // Keep all charts left aligned
             spacingTop: 20,
             spacingBottom: 20,
-            className: "chart-sync-revenue"
+            className: 'chart-sync-revenue'
         },
         title: {
-            text: "Revenue",
-            align: "left",
+            text: 'Revenue',
+            align: 'left',
             margin: 0,
             x: 30
         },
@@ -71,7 +154,7 @@ export class DashboardComponent implements OnInit {
             //     setExtremes: function (e) {
             //         var thisChart = this.chart;
 
-            //         if (e.trigger !== "syncExtremes") {
+            //         if (e.trigger !== 'syncExtremes') {
             //             // Prevent feedback loop
             //             Highcharts.each(Highcharts.charts, void function (chart) {
             //                 if (
@@ -82,7 +165,7 @@ export class DashboardComponent implements OnInit {
             //                     if (chart.xAxis[0].setExtremes) {
             //                         // It is null while updating
             //                         chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
-            //                             trigger: "syncExtremes"
+            //                             trigger: 'syncExtremes'
             //                         });
             //                     }
             //                 }
@@ -91,9 +174,9 @@ export class DashboardComponent implements OnInit {
             //     }
             // },
             // labels: {
-            //     format: "{value}"
+            //     format: '{value}'
             // }
-            categories:["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', "Nov", "Dec"]
         },
         yAxis: {
             title: {
@@ -180,7 +263,7 @@ export class DashboardComponent implements OnInit {
             // labels: {
             //     format: "{value}"
             // }
-            categories:["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         },
         yAxis: {
             title: {
@@ -267,7 +350,7 @@ export class DashboardComponent implements OnInit {
             // labels: {
             //     format: "{value}"
             // }
-            categories:["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         },
         yAxis: {
             title: {
@@ -304,5 +387,5 @@ export class DashboardComponent implements OnInit {
             }
         ]
     };
-    
+
 }
