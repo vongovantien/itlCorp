@@ -139,9 +139,22 @@ export class CreditAndDebitNoteComponent implements OnInit {
     }
 
 
-    EditingCDNote:string = null;
+    EditingCDNoteNo:string = null;
     openEdit(soaNo:string){
-        this.EditingCDNote = soaNo;
+        this.EditingCDNoteNo = soaNo
+        setTimeout(() => {
+            this.EditingCDNote = null;
+        }, 1000);
+    }
+
+    EditingCDNote:any = null;
+    CdNoteEditingCatcher(cdNote:any){
+        this.EditingCDNote = cdNote;
+    }
+
+    UpdateStatus:boolean = false;
+    updateSttCatcher(event:boolean){
+        this.UpdateStatus = event; 
     }
 
 }

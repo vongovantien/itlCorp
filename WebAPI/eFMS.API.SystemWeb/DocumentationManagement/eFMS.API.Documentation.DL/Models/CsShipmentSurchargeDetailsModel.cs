@@ -14,5 +14,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string Currency { get; set; }
         public string ChargeCode { get; set; }
         public decimal? ExchangeRate { get; set; }
+        public string hwbno { get; set; }
     }
 }

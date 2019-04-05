@@ -86,7 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
             return returnList;
         }
 
-        public List<object> GroupChargeByHB(Guid JobId, string PartnerId)
+        public List<object> GroupChargeByHB(Guid JobId, string PartnerId,bool getAll=false)
         {
             List<object> returnList = new List<object>();
             List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList().Select(x => x.Id).ToList();
@@ -100,17 +100,18 @@ namespace eFMS.API.Documentation.DL.Services
                     listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.ReceiverId == PartnerId || x.PaymentObjectId == PartnerId)).ToList();
                 }
 
-                listCharges = listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
-                if (listCharges.Count > 0)
-                {               
-                    foreach(var item in listCharges)
-                    {
-                        var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId==item.CurrencyId && x.CurrencyToId == "VND" && x.Inactive==false)).OrderByDescending(x=>x.DatetimeModified).FirstOrDefault();
-                        item.ExchangeRate = exchangeRate?.Rate;
-                    }
-                    var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
-                    returnList.Add(returnObj);
-                }            
+                //listCharges = getAll==true?listCharges : listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
+                listCharges = listCharges.Where(x => (x.Soano == null || x.Soano.Trim() == "")).ToList();
+              
+                foreach(var item in listCharges)
+                {
+                    var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId==item.CurrencyId && x.CurrencyToId == "VND" && x.Inactive==false)).OrderByDescending(x=>x.DatetimeModified).FirstOrDefault();
+                    item.ExchangeRate = exchangeRate?.Rate;
+                }
+                var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
+
+                returnList.Add(returnObj);
+                    
             }
             return returnList;
 

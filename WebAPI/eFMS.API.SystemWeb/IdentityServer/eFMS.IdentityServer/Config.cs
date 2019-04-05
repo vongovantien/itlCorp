@@ -32,7 +32,7 @@ namespace AuthServer
                     //RedirectUris = redirectUris,
                     RedirectUris = new List<string> {"http://localhost:4200/auth-callback", "http://localhost:4200/silent-refresh.html"},
                     PostLogoutRedirectUris = new List<string> {"http://localhost:4200/"},
-                    AllowedCorsOrigins = new List<string> {"http://localhost:4200", "http://localhost:4300","http://test.efms.itlvn.com", "http://test.efms.itlvn.com/en/", "http://test.efms.itlvn.com/vi/", "http://test.api-efms.itlvn.com/Catalogue", "http://localhost:44361"},
+                    AllowedCorsOrigins = new List<string> {"http://localhost:4200", "http://localhost:4300","http://test.efms.itlvn.com", "http://test.efms.itlvn.com/en/", "http://test.efms.itlvn.com/vi/", "http://staging.efms.itlvn.com", "http://staging.efms.itlvn.com/en/", "http://staging.efms.itlvn.com/vi/", "http://test.api-efms.itlvn.com/Catalogue", "http://localhost:44361"},
                     AlwaysIncludeUserClaimsInIdToken = true,
                     
                     

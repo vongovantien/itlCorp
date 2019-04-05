@@ -96,7 +96,7 @@
                                                 <span>{{s.soa.type}}</span>
                                             </td>
                                             <td>
-                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">{{s.soa.code}}</a>
+                                                <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal" (click)="openEdit(s.soa.code)">{{s.soa.code}}</a>
                                             </td>
                                             <td>
                                                 <span>{{s.total_charge}}</span>
@@ -135,11 +135,11 @@
 <!--end:: add-credit-debit-note-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->
-<app-credit-and-debit-note-detail [EditingCDNote]="EditingCDNote"></app-credit-and-debit-note-detail>
+<app-credit-and-debit-note-detail [updateStatus]="UpdateStatus" [EditingCDNoteNo]="EditingCDNoteNo" (CdNoteEditingEmiter)="CdNoteEditingCatcher($event)"></app-credit-and-debit-note-detail>
 <!--end:: detail-credit-debit-note-modal-->
 
 <!--begin:: edit-credit-debit-note-modal-->
-<app-credit-and-debit-note-edit></app-credit-and-debit-note-edit>
+<app-credit-and-debit-note-edit (updated)="updateSttCatcher($event)" [chargesFromRemaining]="ListChargesFromRemaining" [editingCdNote]="EditingCDNote" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)"></app-credit-and-debit-note-edit>
 <!--end:: edit-credit-debit-note-modal-->
 
 <!--begin:: add-remaining-charge-modal-->

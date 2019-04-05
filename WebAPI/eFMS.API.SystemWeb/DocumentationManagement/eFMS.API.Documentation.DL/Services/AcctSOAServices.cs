@@ -76,7 +76,46 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState UpdateSOA(AcctSOAModel model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var soa = DataContext.First(x => (x.Id == model.Id && x.Code == model.Code));
+                soa = mapper.Map<AcctSoa>(model);
+                if (soa == null)
+                {
+                    throw new Exception("CD Note not found !");
+                }
+                var stt = DataContext.Update(soa, x => x.Id == soa.Id);
+                if (stt.Success)
+                {
+                    var chargesOfSOA = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == soa.Code).ToList();
+                    foreach (var item in chargesOfSOA)
+                    {
+                        item.Soano = null;
+                    }
+                    foreach (var item in model.listShipmentSurcharge)
+                    {
+                        var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == item.Id).FirstOrDefault();
+                        if (charge != null)
+                        {
+                            charge.Soano = soa.Code;
+                            charge.Soaclosed = true;
+                            charge.DatetimeModified = DateTime.Now;
+                            charge.UserModified = "admin"; // need update in the future 
+                            ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
+                        }
+                    }
+                }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
+
+                return new HandleState();
+
+            }
+            catch(Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+
         }
 
         public List<object> GroupSOAByPartner(Guid JobId)
@@ -196,20 +235,35 @@ namespace eFMS.API.Documentation.DL.Services
             }
             
             var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == SOACode).ToList();
+
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
+            List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
             foreach(var item in charges)
             {
+                var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);               
                 var hb = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == item.Hblid).FirstOrDefault();
-                HBList.Add(hb);
+                var catCharge = ((eFMSDataContext)DataContext.DC).CatCharge.First(x => x.Id == charge.ChargeId);
+                var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+
+                charge.Currency = ((eFMSDataContext)DataContext.DC).CatCurrency.First(x => x.Id == charge.CurrencyId).CurrencyName;
+                charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
+                charge.hwbno = hb.Hwbno;
+                charge.Unit = ((eFMSDataContext)DataContext.DC).CatUnit.First(x => x.Id == charge.UnitId).UnitNameEn;
+                charge.ChargeCode = catCharge.Code;
+                charge.NameEn = catCharge.ChargeNameEn;
+                listSurcharges.Add(charge);
+                HBList.Add(hb);                
                 HBList = HBList.Distinct().ToList().OrderBy(x => x.Hwbno).ToList();
             }
 
             var hbOfLadingNo = string.Empty;
+            var mbOfLadingNo = string.Empty;
             var hbConstainers = string.Empty;
             decimal? volum = 0;
             foreach(var item in HBList)
             {
                 hbOfLadingNo += (item.Hwbno + ", ");
+                mbOfLadingNo += (item.JobNo + ", ");
                 var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
                 foreach(var cont in conts)
                 {
@@ -228,7 +282,9 @@ namespace eFMS.API.Documentation.DL.Services
                 partnerShippingAddress = partner.AddressShippingEn,
                 partnerTel = partner.Tel,
                 partnerTaxcode = partner.TaxCode,
+                partnerId = partner.Id,
                 hbLadingNo = hbOfLadingNo,
+                mbLadingNo = mbOfLadingNo,
                 jobId = Shipment.Id,
                 pol = pol.NameEn,
                 polCountry = ((eFMSDataContext)DataContext.DC).CatCountry.Where(x => x.Id == pol.CountryId).FirstOrDefault().NameEn,
@@ -240,10 +296,12 @@ namespace eFMS.API.Documentation.DL.Services
                 hbConstainers,
                 etd= Shipment.Etd,
                 eta= Shipment.Eta,
-                soaNo = Soa.Code,
+                //soaNo = Soa.Code,
                 isLocked = false, // need update later 
                 volum,
-                charges
+                listSurcharges,
+                Soa
+                //charges
 
             };
 

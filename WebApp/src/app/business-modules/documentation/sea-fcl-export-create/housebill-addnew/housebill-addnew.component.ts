@@ -32,10 +32,11 @@ export class HousebillAddnewComponent implements OnInit {
   @Input() set masterBillData(_masterBilData: CsTransaction) {
     this.MasterBillData = _masterBilData;
     this.HouseBillWorking.jobId = this.MasterBillData.id;
+    this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
   }
 
-  @Input() set currentHouseBill(_currentHouseBill: any) {
-    if (_currentHouseBill != null) {
+  @Input() set currentHouseBill(_currentHouseBill: any) {    
+    if (_currentHouseBill != null) {     
       this.isEditing = true;
       this.EditingHouseBill = _currentHouseBill;
       this.HouseBillWorking = this.EditingHouseBill;
@@ -47,6 +48,7 @@ export class HousebillAddnewComponent implements OnInit {
       this.getHouseBillContainers(this.HouseBillWorking.id);
       this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
       this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
+      // this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
     } else {
       this.isEditing = false;
       this.HouseBillWorking = new CsTransactionDetail();

@@ -32,6 +32,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HighchartsChartModule } from "highcharts-angular";
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -64,6 +65,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     PerfectScrollbarModule,
     SelectModule, // Scrollbar
     OAuthModule.forRoot(),
+    NgxDaterangepickerMd,
     HighchartsChartModule
   ],
   providers: [

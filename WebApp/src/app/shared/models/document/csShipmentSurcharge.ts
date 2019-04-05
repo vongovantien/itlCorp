@@ -39,4 +39,26 @@ export class CsShipmentSurcharge{
     userModified: String = null;
     datetimeModified: Date = null;
     exchangeRate:number = null;
+    chargeCode:String = null;
+    unit:String = null;
+    hwbno:String = null;
+    soaadjustmentReason:String = null;
+    soaadjustmentRequestedDate: Date = null;
+    soaadjustmentRequestor: String = null;
+    soaclosed: Boolean = null;
+    soano: String = null;
+    currency: String = null;
+    nameEn:String = null;
+    otherSoa: String = null;
+    partnerName: String = null;
+    payerName: String = null;
+    receiverName: String = null;
+    unlockedSoadirector: String = null;
+    unlockedSoadirectorDate: Date = null;
+    unlockedSoadirectorStatus: String = null;
+    unlockedSoasaleMan: String = null;
+    unlockedSoasaleManDate: Date = null;
+    unlockedSoasaleManStatus: String = null;
+
+    isRemaining:Boolean = null;
 }

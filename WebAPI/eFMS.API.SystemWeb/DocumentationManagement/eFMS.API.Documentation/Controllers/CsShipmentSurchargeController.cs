@@ -44,10 +44,10 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpGet]
         [Route("GroupByListHB")]
-        public List<object> GetByListHouseBill(Guid JobId,string partnerID)
+        public List<object> GetByListHouseBill(Guid JobId,string partnerID,bool getAll=false)
         {
 
-            return csShipmentSurchargeService.GroupChargeByHB(JobId, partnerID);
+            return csShipmentSurchargeService.GroupChargeByHB(JobId, partnerID,getAll);
         }
 
         [HttpGet]

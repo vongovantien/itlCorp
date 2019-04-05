@@ -1,12 +1,12 @@
-import * as lodash from 'lodash';
-
-
+// import * as lodash from 'lodash';
+import orderBy from 'lodash/orderBy'
+import deburr from 'lodash/deburr'
 export class SortService {
     sort(items: any[], property: string, isDesc: boolean){       
         if(isDesc){
-           return lodash.orderBy(items,[item => (!item[property]?null:this.prepareStringToSort(item[property]))],['asc']);
+           return orderBy(items,[item => (!item[property]?null:this.prepareStringToSort(item[property]))],['asc']);
         }else{
-            return lodash.orderBy(items,[item => (!item[property]?null:this.prepareStringToSort(item[property]))],['desc']);
+            return orderBy(items,[item => (!item[property]?null:this.prepareStringToSort(item[property]))],['desc']);
         }        
       }
 
@@ -44,7 +44,7 @@ export class SortService {
 
     private prepareStringToSort(str:any){
         str = str.toString().toLowerCase();
-        return lodash.deburr(str);
+        return deburr(str);
     }
 
     private letterSort(lang:any, letters:any) {

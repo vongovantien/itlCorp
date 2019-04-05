@@ -39,4 +39,5 @@ export class AcctSOA {
     trackingTransportBill: String = null ;
     trackingTransportDate: Date = null ;
     listShipmentSurcharge : CsShipmentSurcharge[]= [];
+
   }
