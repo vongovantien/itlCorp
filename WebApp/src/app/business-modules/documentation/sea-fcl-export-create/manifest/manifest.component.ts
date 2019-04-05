@@ -75,9 +75,14 @@ export class ManifestComponent implements OnInit {
                     index = this.portOfDestinations.findIndex(x => x.id == this.manifest.pod);
                     if(index > -1) this.manifest.pod = this.portOfDestinations[index].id;
                 }
+                await this.getContainerList(prams.id);
                 this.isLoad = true;
             }
         });
+    }
+    async getContainerList(id: any) {
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
+        this.manifest.csMawbcontainers = responses;
     }
     async getManifest(id: any) {
         this.manifest = await this.baseServices.getAsync(this.api_menu.Documentation.CsManifest.get + "?jobId=" + id, false, true);
@@ -95,9 +100,9 @@ export class ManifestComponent implements OnInit {
         }
     }
     async previewReport(){
-        this.previewReportLink = "http://localhost:57587/api/CsTransactionDetail";
+        this.previewReportLink = "http://localhost:57587/api/CsTransactionDetail/PreviewFCLManifest";
         this.manifest.jobId = this.shipment.id;
-        this.manifest.csTransactionDetails = this.housebills;
+        this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
         let res = await this.baseServices.previewfile(this.previewReportLink, this.manifest);
         this.dataLocalUrl = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(res));

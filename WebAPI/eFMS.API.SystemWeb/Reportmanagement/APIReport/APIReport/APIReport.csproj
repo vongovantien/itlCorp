@@ -301,6 +301,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\APIProvider.cs" />
+    <Compile Include="Models\CsMawbcontainerModel.cs" />
+    <Compile Include="Models\CsShippingInstructionModel.cs" />
     <Compile Include="Models\ManifestModel.cs" />
     <Compile Include="Models\TransactionDetailModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -314,6 +316,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ManifestReport.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\FCLExport\ShippingInstructionReport.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ShippingInstructionReport.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Reports\HBL Report Sample.cs">
@@ -362,7 +370,10 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Reports\FCLExport\FCLManifest.ttx" />
+    <Content Include="Reports\FCLExport\ManifestHouseBillDetail.ttx" />
+    <Content Include="Reports\FCLExport\ManifestFCL.ttx" />
+    <Content Include="Reports\FCLExport\ShippingInstructionContHouseBill.ttx" />
+    <Content Include="Reports\FCLExport\ShippingInstructionReport.ttx" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -424,6 +435,10 @@
     <EmbeddedResource Include="Reports\FCLExport\ManifestReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>ManifestReport.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\FCLExport\ShippingInstructionReport.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ShippingInstructionReport.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\HBL Report Sample.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>

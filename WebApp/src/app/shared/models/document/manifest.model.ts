@@ -1,4 +1,5 @@
 import { CsTransactionDetail } from "./csTransactionDetail";
+import { Container } from "./container.model";
 
 export class CsManifest {
     jobId: string = "00000000-0000-0000-0000-000000000000";
@@ -25,5 +26,6 @@ export class CsManifest {
     csTransactionDetails: CsTransactionDetail [] = null;
     polName: string = null;
     podName: string = null;
+    csMawbcontainers: Container[] = null;
   }
   

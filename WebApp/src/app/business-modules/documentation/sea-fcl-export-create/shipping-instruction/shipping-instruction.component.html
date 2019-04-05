@@ -15,7 +15,7 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#">Crystal Report</a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="previewSIReport()">Crystal Report</a>
                 </div>
             </div>
             <div class="dropdown m-dropdown m-dropdown--inline">
@@ -820,3 +820,32 @@
     </div>
 </div>
 <!--end::confirm-refresh-shipping-instruction-modal-->
+
+<!--begin::preview-shipping-instruction-modal-->
+<div class="modal fade" id="preview-shipping-instruction-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true" *ngIf="dataLocalUrl">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe [attr.src]="dataLocalUrl" type="application/pdf" height="500" width="100%"></iframe>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::preview-shipping-instruction-modal-->

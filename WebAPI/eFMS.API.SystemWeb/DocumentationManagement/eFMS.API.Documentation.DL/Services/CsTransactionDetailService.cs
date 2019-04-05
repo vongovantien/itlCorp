@@ -107,7 +107,7 @@ namespace eFMS.API.Documentation.DL.Services
                 detail.PackageTypes = string.Empty;
                 detail.CBM = 0;
                 var containerHouses = containers.Where(x => x.container.Hblid == detail.Id);
-                if(containerHouses != null)
+                if (containerHouses != null)
                 {
                     detail.CsMawbcontainers = new List<CsMawbcontainerModel>();
                     foreach (var item in containerHouses)
@@ -122,13 +122,13 @@ namespace eFMS.API.Documentation.DL.Services
                         detail.GW = detail.GW + item.container.Gw != null ? item.container.Gw : 0;
                         detail.CBM = detail.CBM + item.container.Cbm != null ? item.container.Cbm : 0;
                         detail.CW = detail.CW + item.container.ChargeAbleWeight != null ? item.container.ChargeAbleWeight : 0;
-                       
+
                         detail.CsMawbcontainers.DefaultIfEmpty(item.container);
                     }
                 }
-                if(detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length-1) == ';')
+                if (detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length - 1) == ';')
                 {
-                    detail.ContainerNames = detail.ContainerNames.Substring(0, detail.ContainerNames.Length-1);
+                    detail.ContainerNames = detail.ContainerNames.Substring(0, detail.ContainerNames.Length - 1);
                 }
                 if (detail.PackageTypes.Length > 0 && detail.PackageTypes.ElementAt(detail.PackageTypes.Length - 1) == ';')
                 {

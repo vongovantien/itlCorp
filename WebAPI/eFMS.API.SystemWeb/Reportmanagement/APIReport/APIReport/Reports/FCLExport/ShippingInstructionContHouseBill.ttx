@@ -1,0 +1,5 @@
+ContainerSealNo  	String	1000
+PackagesNote 	String	1000
+GoodsDescription	String	1000
+GrossWeight	Number		200
+Volume Number		200

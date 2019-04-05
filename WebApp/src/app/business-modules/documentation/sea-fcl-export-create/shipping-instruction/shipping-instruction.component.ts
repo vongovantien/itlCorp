@@ -11,6 +11,7 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import moment from 'moment/moment';
 import { NgForm } from '@angular/forms';
 import { embeddedViewEnd } from '@angular/core/src/render3';
+declare var $: any;
 
 @Component({
     selector: 'app-shipping-instruction',
@@ -38,6 +39,8 @@ export class ShippingInstructionComponent implements OnInit {
     loadingDate: any;
     totalGW = 0;
     totalCBM = 0;
+    previewSIReportLink = '';
+    dataLocalSIUrl = null;
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
@@ -89,7 +92,11 @@ export class ShippingInstructionComponent implements OnInit {
         this.shippingIns = await this.baseServices.getAsync(this.api_menu.Documentation.CsShippingInstruction.get + id, false, true);
         console.log(this.shippingIns);
     }
-    
+    async previewSIReport(){
+        this.previewSIReportLink = "http://localhost:57587/api/CsTransactionDetail/PreviewFCLManifest";
+        this.shippingIns.jobId = this.shipment.id;
+        $('#preview-shipping-instruction-modal').modal('show');
+    }
     getContainerInfos(){
         this.totalCBM = 0;
         this.totalGW = 0;
@@ -148,7 +155,9 @@ export class ShippingInstructionComponent implements OnInit {
         else{
             this.housebills = [];
         }
-        console.log(this.shipment.csTransactionDetails);
+        this.shippingIns.csTransactionDetails = this.housebills;
+        console.log(this.shippingIns);
+        //console.log(this.shipment.csTransactionDetails);
     }
     refreshShippingInstruction(){
         this.shippingIns.invoiceNoticeRecevier = null;

@@ -30,7 +30,10 @@ namespace APIReport.Models
         public DateTime? InactiveOn { get; set; }
         public string PolName { get; set; }
         public string PodName { get; set; }
+        public string SealNoContainerNames { get; set; }
+        public string NumberContainerTypes { get; set; }
 
-        public List<TransactionDetailModel> csTransactionDetails { get; set; }
+        public List<TransactionDetailModel> CsTransactionDetails { get; set; }
+        public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
     }
 }
