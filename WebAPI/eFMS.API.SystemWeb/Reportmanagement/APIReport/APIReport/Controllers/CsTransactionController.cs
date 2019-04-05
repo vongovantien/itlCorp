@@ -40,8 +40,7 @@ namespace APIReport.Controllers
                 response.Content = new StreamContent(memoryStream);
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
                 //response.Content.Headers.ContentLength = byteInfo.Length;
-                ContentDispositionHeaderValue contentDisposition = null;
-                if (ContentDispositionHeaderValue.TryParse("inline; filename=" + string.Format("Waybill-{0}.pdf", "aa"), out contentDisposition))
+                if (ContentDispositionHeaderValue.TryParse("inline; filename=" + string.Format("Waybill-{0}.pdf", "aa"), out ContentDispositionHeaderValue contentDisposition))
                 {
                     response.Content.Headers.ContentDisposition = contentDisposition;
                 }
@@ -78,8 +77,7 @@ namespace APIReport.Controllers
                 response.Content = new StreamContent(memoryStream);
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
                 //response.Content.Headers.ContentLength = byteInfo.Length;
-                ContentDispositionHeaderValue contentDisposition = null;
-                if (ContentDispositionHeaderValue.TryParse("inline; filename=" + string.Format("Waybill-{0}.pdf", "aa"), out contentDisposition))
+                if (ContentDispositionHeaderValue.TryParse("inline; filename=" + string.Format("Waybill-{0}.pdf", "aa"), out ContentDispositionHeaderValue contentDisposition))
                 {
                     response.Content.Headers.ContentDisposition = contentDisposition;
                 }

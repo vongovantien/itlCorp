@@ -15,7 +15,7 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#">Crystal Report</a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="previewSIReport()">Crystal Report</a>
                 </div>
             </div>
             <div class="dropdown m-dropdown m-dropdown--inline">
@@ -163,8 +163,8 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody *ngIf="userInCharges">
-                                                                <tr *ngFor="let user of userInCharges;let i = index;" class="data-row" 
+                                                            <tbody *ngIf="userIssues">
+                                                                <tr *ngFor="let user of userIssues;let i = index;" class="data-row" 
                                                                     [ngClass]="{ 'data-selected': shippingIns.issuedUser!==null && shippingIns.issuedUser===user.id }" 
                                                                     data-id="{{user.id}}" 
                                                                     (click)="shippingIns.issuedUser = user.id; shippingIns.issuedUser = user.id; shippingIns.issuedUserName= user.username">
@@ -197,8 +197,8 @@
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" 
-                                                                    placeholder="Search...">
+                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
+                                                                    placeholder="Search..."  (keyup)="changeSupplier($event.target.value)">
                                                                 <i class="icon-search"></i>
                                                             </div>
                                                         </div>
@@ -221,7 +221,7 @@
                                                                 <tr class="data-row data-selected" *ngFor="let supplier of suppliers;let i = index;" 
                                                                     [ngClass]="{ 'data-selected': shippingIns.supplier!==null && shippingIns.supplier === supplier.id }" 
                                                                     data-id="{{supplier.id}}" 
-                                                                    (click)="shippingIns.supplier = supplier.id; shippingIns.supplierName = supplier.username">
+                                                                    (click)="shippingIns.supplier = supplier.id; shippingIns.supplierName = supplier.partnerNameEn">
                                                                     <td>{{ supplier.accountNo }}</td>
                                                                     <td>{{ supplier.shortName }}</td>
                                                                     <td>{{ supplier.partnerNameEn }}</td>
@@ -277,8 +277,8 @@
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text"
-                                                                    placeholder="Search...">
+                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
+                                                                    placeholder="Search..." (keyup)="changeConsignee($event.target.value)">
                                                                 <i class="icon-search"></i>
                                                             </div>
                                                         </div>
@@ -317,7 +317,7 @@
                                             name="consigneeDescription" [(ngModel)]="shippingIns.consigneeDescription" #consigneeDescription="ngModel"
                                             (change)="shippingIns.consigneeDescription = shippingIns.consigneeDescription.trim()" required></textarea>
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && (shippingIns.consigneeId == null || consigneeDescription.invalid)">
-                                            Shipper is required
+                                            Consignee is required
                                         </div>
                                     </div>
                                 </div>
@@ -347,8 +347,8 @@
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text"
-                                                                    placeholder="Search...">
+                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
+                                                                    placeholder="Search..." (keyup)="changeRealShipper($event.target.value)">
                                                                 <i class="icon-search"></i>
                                                             </div>
                                                         </div>
@@ -401,8 +401,8 @@
                                                     <div class="table-head-fixed">
                                                         <div class="table-filter-block">
                                                             <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text"
-                                                                    placeholder="Search...">
+                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
+                                                                    placeholder="Search..." (keyup)="changeRealConsignee($event.target.value)">
                                                                 <i class="icon-search"></i>
                                                             </div>
                                                         </div>
@@ -444,17 +444,17 @@
                                 </div>
                                 
                                 <div class="col-lg-4">
-                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.paymentTerm == null }">
+                                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.paymenType == null }">
                                         <label class="form-control-label" for="">
                                             Payment Type <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select [allowClear]="true" [items]="paymentTerms"  [disabled]="disabled"
                                             [active]="paymentTermActive"
-                                            (data)="refreshValue($event)" (selected)="shippingIns.paymentTerm = $event.id" 
-                                            (removed)="shippingIns.paymentTerm = null"
+                                            (data)="refreshValue($event)" (selected)="shippingIns.paymenType = $event.id" 
+                                            (removed)="shippingIns.paymenType = null"
                                             (typed)="typed($event)" placeholder="Please selected">
                                         </ng-select>
-                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.paymentTerm == null">
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.paymenType == null">
                                             Payment Type is required
                                         </div>
                                     </div>
@@ -566,7 +566,7 @@
                                                         <table class="table table-hover" *ngIf="portOfDestinations">
                                                             <tbody *ngFor="let pod of portOfDestinations;let i = index;">
                                                                 <tr class="data-row" [ngClass]="{ 'data-selected': shippingIns.pod!==null && shippingIns.pod===pod.id }" data-id="{{pod.id}}" 
-                                                                    (click)="shippingIns.pod = pod.id; shippingIns.pod=pod.id; shippingIns.shippingIns= pod.nameEN; shippingIns.poDelivery = pod.nameEN">
+                                                                    (click)="shippingIns.pod = pod.id; shippingIns.pod=pod.id; shippingIns.podName= pod.nameEN; shippingIns.poDelivery = pod.nameEN">
                                                                     <td>{{ pod.code }}</td>
                                                                     <td>{{ pod.nameEN }}</td>
                                                                     <td>{{ pod.countryName }}</td>
@@ -577,7 +577,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pol == null">
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pod == null">
                                             Port of Discharge is required
                                         </div>
                                     </div>
@@ -799,7 +799,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="refreshShippingInstruction()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -820,3 +820,32 @@
     </div>
 </div>
 <!--end::confirm-refresh-shipping-instruction-modal-->
+
+<!--begin::preview-shipping-instruction-modal-->
+<div class="modal fade" id="preview-shipping-instruction-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true" *ngIf="dataLocalUrl">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe [attr.src]="dataLocalUrl" type="application/pdf" height="500" width="100%"></iframe>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::preview-shipping-instruction-modal-->

@@ -16,5 +16,6 @@ namespace eFMS.Domain.Report
         public string NotifyParty { get; set; }
         public string ShippingMark { get; set; }
         public string Description { get; set; }
+        public string FreightPayment { get; set; }
     }
 }

@@ -25,13 +25,13 @@ namespace eFMS.API.Documentation.DL.Services
                 var manifest = mapper.Map<CsManifest>(model);
                 manifest.CreatedDate = DateTime.Now;
                 var hs = new HandleState();
-                if (model.JobId == Guid.Empty)
+                if (DataContext.Any(x => x.JobId == model.JobId))
                 {
-                    hs = DataContext.Add(manifest);
+                    hs = DataContext.Update(manifest, x => x.JobId == model.JobId);
                 }
                 else
                 {
-                    hs = DataContext.Update(manifest, x => x.JobId == model.JobId);
+                    hs = DataContext.Add(manifest);
                 }
                 if (hs.Success)
                 {

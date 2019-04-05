@@ -15,7 +15,8 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#preview-modal">Crystal Report</a>
+                    <!-- <a class="dropdown-item" href="#" data-toggle="modal" data-target="#preview-modal">Crystal Report</a> -->
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="previewReport()">Crystal Report</a>
                 </div>
             </div>
             <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#confirm-refresh-manifest-modal">
@@ -206,7 +207,7 @@
                                         <div class="table-head-fixed">
                                             <div class="table-filter-block">
                                                 <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text"
+                                                    <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
                                                         (keyup)="changePortDestination($event.target.value)"
                                                         placeholder="Search...">
                                                     <i class="icon-search"></i>
@@ -239,7 +240,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == null">
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pod == null">
                                 Port of Discharge is required
                             </div>
                         </div>
@@ -672,17 +673,9 @@
                 </button>
             </div>
             <div class="modal-body">
-                <iframe src="http://localhost:57587/api/CsTransaction?apiUrl=" height="500" width="100%"></iframe>
+                <iframe [attr.src]="dataLocalUrl" type="application/pdf" height="500" width="100%"></iframe>
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="addHouse()">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            add HBL
-                        </span>
-                    </span>
-                </button>
                 <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
                     <span>
                         <i class="la la-ban"></i>

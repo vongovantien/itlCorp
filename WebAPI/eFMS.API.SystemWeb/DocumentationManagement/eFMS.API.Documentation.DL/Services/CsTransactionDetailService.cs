@@ -109,7 +109,7 @@ namespace eFMS.API.Documentation.DL.Services
                 detail.PackageTypes = string.Empty;
                 detail.CBM = 0;
                 var containerHouses = containers.Where(x => x.container.Hblid == detail.Id);
-                if(containerHouses != null)
+                if (containerHouses != null)
                 {
                     detail.CsMawbcontainers = new List<CsMawbcontainerModel>();
                     foreach (var item in containerHouses)
@@ -124,13 +124,13 @@ namespace eFMS.API.Documentation.DL.Services
                         detail.GW = detail.GW + item.container.Gw != null ? item.container.Gw : 0;
                         detail.CBM = detail.CBM + item.container.Cbm != null ? item.container.Cbm : 0;
                         detail.CW = detail.CW + item.container.ChargeAbleWeight != null ? item.container.ChargeAbleWeight : 0;
-                       
+
                         detail.CsMawbcontainers.DefaultIfEmpty(item.container);
                     }
                 }
-                if(detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length-1) == ';')
+                if (detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length - 1) == ';')
                 {
-                    detail.ContainerNames = detail.ContainerNames.Substring(0, detail.ContainerNames.Length-1);
+                    detail.ContainerNames = detail.ContainerNames.Substring(0, detail.ContainerNames.Length - 1);
                 }
                 if (detail.PackageTypes.Length > 0 && detail.PackageTypes.ElementAt(detail.PackageTypes.Length - 1) == ';')
                 {
@@ -186,16 +186,35 @@ namespace eFMS.API.Documentation.DL.Services
                          from x in prods.DefaultIfEmpty()
                              //where detail.JobId == criteria.JobId
                          select new { transDetail, customer = y, notiParty = noti, saleman = x, agent = f }
-                          ).FirstOrDefault();
+                          );
             if (data == null) return null;
-            var detail = mapper.Map<CsTransactionDetailReport>(data.transDetail);
+            var results = new CsTransactionDetailReport();
+            results.HouseBillManifestModels = new List<HouseBillManifestModel>();
+            foreach(var item in data)
+            {
+                var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.transDetail.Id);
+                decimal weight = (decimal)containers.Sum(x => x.Gw);
+                decimal volumn = (decimal)containers.Sum(x => x.Cbm);
+                var houseBill = new HouseBillManifestModel
+                {
+                    Hwbno = item.transDetail.Hwbno,
+                    Packages = item.transDetail.PackageContainer,
+                    Weight = weight,
+                    Volumn = volumn,
+                    Shipper = item.transDetail.ShipperDescription,
+                    NotifyParty = item.transDetail.NotifyPartyDescription,
+                    ShippingMark = item.transDetail.ShippingMark,
+                    Description = ""
+                };
+                results.HouseBillManifestModels.Add(houseBill);
+            }
             //detail.CustomerName = data.customer?.PartnerNameEn;
             //detail.CustomerNameVn = data.customer?.PartnerNameVn;
             //detail.SaleManName = data.saleman?.Username;
             //detail.NotifyParty = data.notiParty?.PartnerNameEn;
             //detail.ForwardingAgentName = data.agent?.PartnerNameEn;
-            return detail;
-    }
+            return results;
+        }
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
             var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail

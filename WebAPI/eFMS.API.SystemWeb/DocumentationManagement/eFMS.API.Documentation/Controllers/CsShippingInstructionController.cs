@@ -46,7 +46,7 @@ namespace eFMS.API.Documentation.Controllers
             model.UserCreated = currentUser.UserID;
             model.CreatedDate = DateTime.Now;
             var hs = shippingInstructionService.AddOrUpdate(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
+            var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
