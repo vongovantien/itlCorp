@@ -121,6 +121,55 @@ namespace eFMS.API.Documentation.DL.Services
             throw new NotImplementedException();
         }
 
+        public CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId)
+        {
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = JobId };
+            var housebills = QueryDetail(criteria).ToList();
+            CsTransactionDetailModel returnHB = housebills.First(x => x.Id == HbId);
+            var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer
+               .Join(((eFMSDataContext)DataContext.DC).CatUnit,
+                   container => container.ContainerTypeId,
+                   unit => unit.Id, (container, unit) => new { container, unit })
+                   .ToList();
+            if (containers.Count() == 0) return returnHB;
+
+
+            returnHB.ContainerNames = string.Empty;
+            returnHB.PackageTypes = string.Empty;
+            returnHB.CBM = 0;
+            var containerHouses = containers.Where(x => x.container.Hblid == returnHB.Id);
+            if (containerHouses != null)
+            {
+                returnHB.CsMawbcontainers = new List<CsMawbcontainerModel>();
+                foreach (var item in containerHouses)
+                {
+                    returnHB.ContainerNames = returnHB.ContainerNames + item.container.Quantity + "x" + item.unit.Code + ((item.container.ContainerNo.Length > 0) ? ";" : "");
+                    if (item.container.PackageQuantity != null && item.container.PackageTypeId != null)
+                    {
+                        returnHB.PackageTypes = returnHB.PackageTypes + item.container.PackageQuantity != null ? (item.container.PackageQuantity
+                            + item.container.PackageTypeId != null ? ("x" + item.container.PackageTypeId) : string.Empty + item.container.PackageQuantity != null ? "; " : string.Empty) : string.Empty;
+
+                    }
+                    returnHB.GW = returnHB.GW + item.container.Gw != null ? item.container.Gw : 0;
+                    returnHB.CBM = returnHB.CBM + item.container.Cbm != null ? item.container.Cbm : 0;
+                    returnHB.CW = returnHB.CW + item.container.ChargeAbleWeight != null ? item.container.ChargeAbleWeight : 0;
+
+                    returnHB.CsMawbcontainers.DefaultIfEmpty(item.container);
+                }
+            }
+            if (returnHB.ContainerNames.Length > 0 && returnHB.ContainerNames.ElementAt(returnHB.ContainerNames.Length - 1) == ';')
+            {
+                returnHB.ContainerNames = returnHB.ContainerNames.Substring(0, returnHB.ContainerNames.Length - 1);
+            }
+            if (returnHB.PackageTypes.Length > 0 && returnHB.PackageTypes.ElementAt(returnHB.PackageTypes.Length - 1) == ';')
+            {
+                returnHB.PackageTypes = returnHB.PackageTypes.Substring(0, returnHB.PackageTypes.Length - 1);
+            }
+
+            return returnHB;
+
+        }
+
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
         {
             var results = QueryDetail(criteria).ToList();
@@ -383,5 +432,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return new { model = new object { }, result };
             }
         }
+
+
     }
 }
