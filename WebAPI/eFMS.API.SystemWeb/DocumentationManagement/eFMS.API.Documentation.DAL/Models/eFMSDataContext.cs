@@ -2163,6 +2163,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Mawb)
+                    .HasColumnName("MAWB")
+                    .HasMaxLength(800);
+
                 entity.Property(e => e.MoveType).HasMaxLength(160);
 
                 entity.Property(e => e.NotifyPartyDescription).HasMaxLength(500);
@@ -2223,6 +2227,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
 
             });
 

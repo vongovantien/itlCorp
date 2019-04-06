@@ -1,4 +1,4 @@
-import moment from 'moment/moment';
+import moment from 'moment/moment'
 import { Component, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter, ElementRef } from '@angular/core';
 // import { PaginationComponent } from 'ngx-bootstrap';
 import { BaseService } from 'src/services-base/base.service';

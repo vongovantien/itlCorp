@@ -21,6 +21,22 @@ namespace eFMS.API.Documentation.DL.Services
         {
         }
 
+        public List<object> ListContOfHB(Guid JobId)
+        {
+            var houseBills = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList();
+            List<object> returnList = new List<object>();
+            foreach(var item in houseBills)
+            {
+                var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
+                foreach(var c in conts)
+                {
+                    var obj = new { c.ContainerTypeId, c.Quantity,hblid=item.Id };
+                    returnList.Add(obj);
+                }
+            }
+            return returnList;
+        }
+
         public IQueryable<CsMawbcontainerModel> Query(CsMawbcontainerCriteria criteria)
         {
             var data = GetView();

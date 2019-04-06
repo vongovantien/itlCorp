@@ -427,6 +427,7 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+                    display: inline-block;
                 }
                
             }
@@ -434,6 +435,7 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                    display: inline-block;
                 }
                 
             }
@@ -441,6 +443,7 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
         }
@@ -451,18 +454,21 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
             .sorting_asc {
                 span {
                     padding-right: 16px;
                     background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
             .sorting_desc {
                 span {
                     padding-right: 16px;
                     background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
         }
