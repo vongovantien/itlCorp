@@ -15,5 +15,6 @@ namespace eFMS.API.Documentation.DL.IService
     {
         IQueryable<CsMawbcontainerModel> Query(CsMawbcontainerCriteria criteria);
         HandleState Update(List<CsMawbcontainerModel> list, Guid? masterId, Guid? housebillId);
+        List<object> ListContOfHB(Guid JobId);
     }
 }

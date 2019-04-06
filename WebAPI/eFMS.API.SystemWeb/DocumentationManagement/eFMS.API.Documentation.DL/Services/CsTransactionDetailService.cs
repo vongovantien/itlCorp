@@ -65,18 +65,45 @@ namespace eFMS.API.Documentation.DL.Services
                 hb.UserModified = ChangeTrackerHelper.currentUser;
                 hb.DatetimeModified = DateTime.Now;
                 hb = mapper.Map<CsTransactionDetail>(model);
-                DataContext.Update(hb, x => x.Id == hb.Id);
-                foreach(var item in model.CsMawbcontainers)
+                var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
+                if (isUpdateDone.Success)
                 {
-                    //var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();
-                    var cont = mapper.Map<CsMawbcontainer>(item);
-                    if (cont != null)
+                    if (model.CsMawbcontainers.Count > 0)
                     {
-                        cont.UserModified = ChangeTrackerHelper.currentUser;
-                        cont.DatetimeModified = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Update(cont);                       
+                        foreach (var item in model.CsMawbcontainers)
+                        {
+                            //var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();
+                            var cont = mapper.Map<CsMawbcontainer>(item);
+
+                            if (cont.Id == Guid.Empty)
+                            {
+                                cont.Id = Guid.NewGuid();
+                                cont.Hblid = hb.Id;
+                                cont.UserModified = hb.UserModified;
+                                cont.DatetimeModified = DateTime.Now;
+
+                                ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
+                            }
+                            else
+                            {
+                                cont.Hblid = hb.Id;
+                                cont.UserModified = hb.UserModified;
+                                cont.DatetimeModified = DateTime.Now;
+                                ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Update(cont);
+                            }
+                        }
                     }
+                    else
+                    {
+                        var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
+                        foreach (var item in conts)
+                        {
+                            ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
+                        }
+                    }
+
                 }
+
                 ((eFMSDataContext)DataContext.DC).SaveChanges();
                 var hs = new HandleState();
                 return hs;
