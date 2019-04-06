@@ -383,6 +383,10 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 this.isLoaded = false;
+                if(this.inEditing == false){
+                    this.activeTab();
+                }
+                this.inEditing = true;
                 setTimeout(() => {
                     this.isLoaded = true;
                   }, 300);
