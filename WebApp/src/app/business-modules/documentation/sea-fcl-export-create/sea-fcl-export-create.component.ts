@@ -15,6 +15,7 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
+import * as stringHelper from 'src/helper/string.helper';
 
 
 export class FirstLoadData {
@@ -78,6 +79,9 @@ export class SeaFclExportCreateComponent implements OnInit {
     switchTab(tab:string){
 
         if(tab==="shipment"){
+            this.isShipment = true;
+            this.isHouseBill = false;
+            this.isCDnote = false;
             if(this.inEditing == true){
                 this.isLoaded = false;
                 setTimeout(() => {
@@ -93,9 +97,6 @@ export class SeaFclExportCreateComponent implements OnInit {
                     personInChargeName: this.shipment.personInChargeName
                 });
             }
-            this.isShipment = true;
-            this.isHouseBill = false;
-            this.isCDnote = false;
         }
         if(tab==="housebilllist"){
             if(this.inEditing == false){
@@ -113,24 +114,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.isCDnote = true;
         }
         this.cdr.detectChanges(); 
-
-        // if(this.inEditing == false){
-        //     this.validateShipmentForm();
-        // }
-        // else{
-        //     this.isLoaded = false;
-        //     setTimeout(() => {
-        //         this.isLoaded = true;
-        //         this.inEditing = true;
-        //     }, 300);
-        //     this.myForm.patchValue({
-        //     polName: this.shipment.pol,
-        //     podName: this.shipment.podName,
-        //     coloaderName: this.shipment.coloaderName,
-        //     agentName: this.shipment.agentName,
-        //     personInChargeName: this.shipment.personInChargeName
-        //   });
-        // }
     }
 
     //open tab by link
@@ -188,6 +171,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             }
             this.getShipmentContainerDescription(this.lstMasterContainers);
         }
+        this.lstContainerTemp = this.lstMasterContainers;
     }
     getShipmentContainerDescription(listContainers: any[]){
         for (var i = 0; i < listContainers.length; i++) {
@@ -228,16 +212,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.removeEndComma();
     }
     removeEndComma(){
-        this.shipment.commodity = this.subStringComma(this.shipment.commodity);
-        this.shipment.desOfGoods = this.subStringComma(this.shipment.desOfGoods);
-        this.shipment.packageContainer = this.subStringComma(this.shipment.packageContainer);
-    }
-    subStringComma(textString: String){
-        if(textString.length <= 0) textString = '';
-        if(textString[textString.length -2] == ','){
-            textString = textString.substring(0, (textString.length-2));
-        }
-        return textString;
+        this.shipment.commodity = stringHelper.subStringComma(this.shipment.commodity);
+        this.shipment.desOfGoods = stringHelper.subStringComma(this.shipment.desOfGoods);
+        this.shipment.packageContainer = stringHelper.subStringComma(this.shipment.packageContainer);
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
@@ -284,18 +261,10 @@ export class SeaFclExportCreateComponent implements OnInit {
     async getWeightTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
         this.listWeightMesurement = responses;
-        // if (responses != null) {
-        //     this.weightMesurements = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-        //     console.log(this.weightMesurements);
-        // }
     }
     async getPackageTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
         this.listPackageTypes = responses;
-        // if (responses != null) {
-        //     this.packageTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-        //     console.log(this.packageTypes);
-        // }
     }
     async getComodities(searchText: any) {
         let criteriaSearchCommodity = { inactive: false, all: searchText };
@@ -452,7 +421,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     async showShipment(event){
         await this.getShipmentDetail(event);
         this.isLoaded = false;
-        this.shipment.jobNo = null;
+        //this.shipment.jobNo = null;
         this.shipment.mawb = null;
         this.isImport = true;
         await this.getShipmentContainer(event);
@@ -567,8 +536,6 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
         console.log(this.containerMasterForm.submitted && this.lstMasterContainers[index].containerTypeId == null && this.lstMasterContainers[index].verifying);
         this.lstMasterContainers[index].verifying = true;
-        //if (this.containerMasterForm.invalid) return;
-        //if(this.lstMasterContainers[index].containerTypeId == null) return;
         if(this.lstMasterContainers[index].quantity == null || this.lstMasterContainers[index].containerTypeId == null){
             this.saveContainerSuccess = false;
             return;
@@ -576,8 +543,6 @@ export class SeaFclExportCreateComponent implements OnInit {
         //Cont Type, Cont Q'ty, Container No, Package Type
         let existedItems = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
             && x.quantity == this.lstMasterContainers[index].quantity);
-            // && x.containerNo == this.lstMasterContainers[index].containerNo
-            // && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
         if(this.lstMasterContainers[index].containerNo.length != 0 && this.lstMasterContainers[index].packageTypeId != null){
             existedItems = existedItems.filter(x => x.containerNo == this.lstMasterContainers[index].containerNo
                 && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);

@@ -45,5 +45,6 @@ export class CsShippingInstruction{
     polName: string = null;
     podName: string = null;
     csTransactionDetails: CsTransactionDetail [] = null;
+    csMawbcontainers:Container[]=[] ;
   }
   

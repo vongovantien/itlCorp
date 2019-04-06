@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace APIReport.Reports.FCLExport {
+namespace APIReport.Reports {
     using System;
     using System.ComponentModel;
     using CrystalDecisions.Shared;
@@ -16,14 +16,14 @@ namespace APIReport.Reports.FCLExport {
     using CrystalDecisions.CrystalReports.Engine;
     
     
-    public class ManifestHouseBillDetail : ReportClass {
+    public class ReportSample : ReportClass {
         
-        public ManifestHouseBillDetail() {
+        public ReportSample() {
         }
         
         public override string ResourceName {
             get {
-                return "ManifestHouseBillDetail.rpt";
+                return "ReportSample.rpt";
             }
             set {
                 // Do nothing
@@ -41,7 +41,7 @@ namespace APIReport.Reports.FCLExport {
         
         public override string FullResourceName {
             get {
-                return "APIReport.Reports.FCLExport.ManifestHouseBillDetail.rpt";
+                return "APIReport.Reports.ReportSample.rpt";
             }
             set {
                 // Do nothing
@@ -58,7 +58,7 @@ namespace APIReport.Reports.FCLExport {
         
         [Browsable(false)]
         [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section Section2 {
+        public CrystalDecisions.CrystalReports.Engine.Section ReportHeaderSection2 {
             get {
                 return this.ReportDefinition.Sections[1];
             }
@@ -66,7 +66,7 @@ namespace APIReport.Reports.FCLExport {
         
         [Browsable(false)]
         [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section Section3 {
+        public CrystalDecisions.CrystalReports.Engine.Section Section2 {
             get {
                 return this.ReportDefinition.Sections[2];
             }
@@ -74,7 +74,7 @@ namespace APIReport.Reports.FCLExport {
         
         [Browsable(false)]
         [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section Section4 {
+        public CrystalDecisions.CrystalReports.Engine.Section Section3 {
             get {
                 return this.ReportDefinition.Sections[3];
             }
@@ -82,17 +82,25 @@ namespace APIReport.Reports.FCLExport {
         
         [Browsable(false)]
         [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public CrystalDecisions.CrystalReports.Engine.Section Section5 {
+        public CrystalDecisions.CrystalReports.Engine.Section Section4 {
             get {
                 return this.ReportDefinition.Sections[4];
+            }
+        }
+        
+        [Browsable(false)]
+        [DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+        public CrystalDecisions.CrystalReports.Engine.Section Section5 {
+            get {
+                return this.ReportDefinition.Sections[5];
             }
         }
     }
     
     [System.Drawing.ToolboxBitmapAttribute(typeof(CrystalDecisions.Shared.ExportOptions), "report.bmp")]
-    public class CachedManifestHouseBillDetail : Component, ICachedReport {
+    public class CachedReportSample : Component, ICachedReport {
         
-        public CachedManifestHouseBillDetail() {
+        public CachedReportSample() {
         }
         
         [Browsable(false)]
@@ -129,7 +137,7 @@ namespace APIReport.Reports.FCLExport {
         }
         
         public virtual CrystalDecisions.CrystalReports.Engine.ReportDocument CreateReport() {
-            ManifestHouseBillDetail rpt = new ManifestHouseBillDetail();
+            ReportSample rpt = new ReportSample();
             rpt.Site = this.Site;
             return rpt;
         }

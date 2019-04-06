@@ -71,5 +71,6 @@ namespace APIReport.Models
 
         public DateTime? Etd { get; set; }
         public string Mawb { get; set; }
+        public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
     }
 }

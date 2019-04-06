@@ -6,7 +6,6 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Shipment.Service.Helpers;
-using eFMS.Domain.Report;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -95,15 +94,32 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
         {
             var results = QueryDetail(criteria).ToList();
-            var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer
-                .Join(((eFMSDataContext)DataContext.DC).CatUnit,
-                    container => container.ContainerTypeId,
-                    unit => unit.Id, (container, unit) => new { container, unit })
-                    .ToList();
+            //var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer
+            //    .Join(((eFMSDataContext)DataContext.DC).CatUnit,
+            //        container => container.ContainerTypeId,
+            //        unit => unit.Id, (container, unit) => new { container, unit })
+            //        .ToList();
+            var containers = (from container in ((eFMSDataContext)DataContext.DC).CsMawbcontainer
+            join unit in ((eFMSDataContext)DataContext.DC).CatUnit on container.ContainerTypeId equals unit.Id
+            join unitMeasure in ((eFMSDataContext)DataContext.DC).CatUnit on container.UnitOfMeasureId equals unitMeasure.Id into grMeasure
+            from measure in grMeasure.DefaultIfEmpty()
+            join packageType in ((eFMSDataContext)DataContext.DC).CatUnit on container.PackageTypeId equals packageType.Id into grPackage
+            from packType in grPackage.DefaultIfEmpty()
+            join commodity in ((eFMSDataContext)DataContext.DC).CatCommodity on container.CommodityId equals commodity.Id into grCommodity
+            from commo in grCommodity.DefaultIfEmpty()
+                select new
+                {
+                    container,
+                    unit,
+                    UnitOfMeasureName = measure.UnitNameEn,
+                    PackageTypeName = packType.UnitNameEn,
+                    CommodityName = commo.CommodityNameEn
+                });
+
             if (containers.Count() == 0) return results;
             results.ForEach(detail =>
             {
-                detail.ContainerNames = string.Empty;
+                //detail.ContainerNames = string.Empty;
                 detail.PackageTypes = string.Empty;
                 detail.CBM = 0;
                 var containerHouses = containers.Where(x => x.container.Hblid == detail.Id);
@@ -112,24 +128,28 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.CsMawbcontainers = new List<CsMawbcontainerModel>();
                     foreach (var item in containerHouses)
                     {
-                        detail.ContainerNames = detail.ContainerNames + item.container.Quantity + "x" + item.unit.Code + ((item.container.ContainerNo.Length > 0) ? ";" : "");
+                        //detail.ContainerNames = detail.ContainerNames + item.container.Quantity + "x" + item.unit.UnitNameEn + ((item.container.ContainerNo.Length > 0) ? ";" : "");
                         if (item.container.PackageQuantity != null && item.container.PackageTypeId != null)
                         {
-                            detail.PackageTypes = detail.PackageTypes + item.container.PackageQuantity != null ? (item.container.PackageQuantity
-                                + item.container.PackageTypeId != null ? ("x" + item.container.PackageTypeId) : string.Empty + item.container.PackageQuantity != null ? "; " : string.Empty) : string.Empty;
+                            detail.PackageTypes += item.container.PackageQuantity + "x" + item.PackageTypeName + ", ";
 
                         }
                         detail.GW = detail.GW + item.container.Gw != null ? item.container.Gw : 0;
                         detail.CBM = detail.CBM + item.container.Cbm != null ? item.container.Cbm : 0;
                         detail.CW = detail.CW + item.container.ChargeAbleWeight != null ? item.container.ChargeAbleWeight : 0;
 
-                        detail.CsMawbcontainers.DefaultIfEmpty(item.container);
+                        var container = mapper.Map<CsMawbcontainerModel>(item.container);
+                        container.CommodityName = item.CommodityName;
+                        container.PackageTypeName = item.PackageTypeName;
+                        container.ContainerTypeName = item.unit.UnitNameEn;
+                        container.UnitOfMeasureName = item.UnitOfMeasureName;
+                        detail.CsMawbcontainers.Add(container);
                     }
                 }
-                if (detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length - 1) == ';')
-                {
-                    detail.ContainerNames = detail.ContainerNames.Substring(0, detail.ContainerNames.Length - 1);
-                }
+                //if (detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length - 1) == ';')
+                //{
+                //    detail.ContainerNames = detail.ContainerNames.Substring(0, detail.ContainerNames.Length - 1);
+                //}
                 if (detail.PackageTypes.Length > 0 && detail.PackageTypes.ElementAt(detail.PackageTypes.Length - 1) == ';')
                 {
                     detail.PackageTypes = detail.PackageTypes.Substring(0, detail.PackageTypes.Length - 1);
@@ -170,49 +190,49 @@ namespace eFMS.API.Documentation.DL.Services
             return results.AsQueryable();
         }
 
-        public CsTransactionDetailReport GetReportBy(Guid jobId)
-        {
-            var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == jobId);
-            var data = (from transDetail in details
-                         join customer in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.CustomerId equals customer.Id into detailCustomers
-                         from y in detailCustomers.DefaultIfEmpty()
-                         join noti in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.NotifyPartyId equals noti.Id into detailNotis
-                         from noti in detailNotis.DefaultIfEmpty()
-                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.ForwardingAgentId equals fwd.Id into forwarding
-                         from f in forwarding.DefaultIfEmpty()
-                         join saleman in ((eFMSDataContext)DataContext.DC).SysUser on transDetail.SaleManId equals saleman.Id into prods
-                         from x in prods.DefaultIfEmpty()
-                             //where detail.JobId == criteria.JobId
-                         select new { transDetail, customer = y, notiParty = noti, saleman = x, agent = f }
-                          );
-            if (data == null) return null;
-            var results = new CsTransactionDetailReport();
-            results.HouseBillManifestModels = new List<HouseBillManifestModel>();
-            foreach(var item in data)
-            {
-                var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.transDetail.Id);
-                decimal weight = (decimal)containers.Sum(x => x.Gw);
-                decimal volumn = (decimal)containers.Sum(x => x.Cbm);
-                var houseBill = new HouseBillManifestModel
-                {
-                    Hwbno = item.transDetail.Hwbno,
-                    Packages = item.transDetail.PackageContainer,
-                    Weight = weight,
-                    Volumn = volumn,
-                    Shipper = item.transDetail.ShipperDescription,
-                    NotifyParty = item.transDetail.NotifyPartyDescription,
-                    ShippingMark = item.transDetail.ShippingMark,
-                    Description = ""
-                };
-                results.HouseBillManifestModels.Add(houseBill);
-            }
-            //detail.CustomerName = data.customer?.PartnerNameEn;
-            //detail.CustomerNameVn = data.customer?.PartnerNameVn;
-            //detail.SaleManName = data.saleman?.Username;
-            //detail.NotifyParty = data.notiParty?.PartnerNameEn;
-            //detail.ForwardingAgentName = data.agent?.PartnerNameEn;
-            return results;
-        }
+        //public CsTransactionDetailReport GetReportBy(Guid jobId)
+        //{
+        //    var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == jobId);
+        //    var data = (from transDetail in details
+        //                 join customer in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.CustomerId equals customer.Id into detailCustomers
+        //                 from y in detailCustomers.DefaultIfEmpty()
+        //                 join noti in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.NotifyPartyId equals noti.Id into detailNotis
+        //                 from noti in detailNotis.DefaultIfEmpty()
+        //                 join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.ForwardingAgentId equals fwd.Id into forwarding
+        //                 from f in forwarding.DefaultIfEmpty()
+        //                 join saleman in ((eFMSDataContext)DataContext.DC).SysUser on transDetail.SaleManId equals saleman.Id into prods
+        //                 from x in prods.DefaultIfEmpty()
+        //                     //where detail.JobId == criteria.JobId
+        //                 select new { transDetail, customer = y, notiParty = noti, saleman = x, agent = f }
+        //                  );
+        //    if (data == null) return null;
+        //    var results = new CsTransactionDetailReport();
+        //    results.HouseBillManifestModels = new List<HouseBillManifestModel>();
+        //    foreach(var item in data)
+        //    {
+        //        var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.transDetail.Id);
+        //        decimal weight = (decimal)containers.Sum(x => x.Gw);
+        //        decimal volumn = (decimal)containers.Sum(x => x.Cbm);
+        //        var houseBill = new HouseBillManifestModel
+        //        {
+        //            Hwbno = item.transDetail.Hwbno,
+        //            Packages = item.transDetail.PackageContainer,
+        //            Weight = weight,
+        //            Volumn = volumn,
+        //            Shipper = item.transDetail.ShipperDescription,
+        //            NotifyParty = item.transDetail.NotifyPartyDescription,
+        //            ShippingMark = item.transDetail.ShippingMark,
+        //            Description = ""
+        //        };
+        //        results.HouseBillManifestModels.Add(houseBill);
+        //    }
+        //    //detail.CustomerName = data.customer?.PartnerNameEn;
+        //    //detail.CustomerNameVn = data.customer?.PartnerNameVn;
+        //    //detail.SaleManName = data.saleman?.Username;
+        //    //detail.NotifyParty = data.notiParty?.PartnerNameEn;
+        //    //detail.ForwardingAgentName = data.agent?.PartnerNameEn;
+        //    return results;
+        //}
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
             var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail

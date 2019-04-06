@@ -304,6 +304,8 @@ export class HousebillAddnewComponent implements OnInit {
   isImporting = false;
   async showShipmentDetail(event) {
     this.HouseBillWorking = event;
+    this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
+    this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
     this.isImporting = true;
     this.HouseBillWorking.jobId = this.MasterBillData.id;
     this.HouseBillWorking.hwbno = null;

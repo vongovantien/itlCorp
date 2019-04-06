@@ -11,6 +11,7 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { NgForm } from '@angular/forms';
+import * as stringHelper from 'src/helper/string.helper';
 declare var $: any;
 import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
@@ -244,6 +245,7 @@ export class ManifestComponent implements OnInit {
         if(responses != null){
             responses.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
                 element.isChecked = false;
+                element["packageTypes"] = stringHelper.subStringComma(element["packageTypes"]);
                 if(element["manifestRefNo"] != null){
                     element.isRemoved = false;
                 }

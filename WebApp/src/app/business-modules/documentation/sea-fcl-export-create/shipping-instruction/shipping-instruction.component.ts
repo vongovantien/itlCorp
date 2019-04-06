@@ -11,6 +11,7 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import moment from 'moment/moment';
 import { NgForm } from '@angular/forms';
 import { embeddedViewEnd } from '@angular/core/src/render3';
+import { DomSanitizer } from '@angular/platform-browser';
 declare var $: any;
 
 @Component({
@@ -41,10 +42,13 @@ export class ShippingInstructionComponent implements OnInit {
     totalCBM = 0;
     previewSIReportLink = '';
     dataLocalSIUrl = null;
+    previewOCLReportLink = '';
+    dataLocalOCLUrl = null;
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
-        private api_menu: API_MENU) {
+        private api_menu: API_MENU,
+        private sanitizer: DomSanitizer) {
             this.issueDate = { startDate: moment(), endDate: moment()};
          }
 
@@ -63,11 +67,16 @@ export class ShippingInstructionComponent implements OnInit {
                 }
                 await this.getHouseBillList(prams.id);
                 this.getContainerInfos();
+                this.getContainerList(prams.id);
                 this.shippingIns.refNo = this.shipment.jobNo;
                 this.isLoad = true;
                 console.log(this.housebills);
             }
         });
+    }
+    async getContainerList(id: any) {
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
+        this.shippingIns.csMawbcontainers = responses;
     }
     async loadReferenceData() {
         await this.getUserInCharges(null);
@@ -93,9 +102,26 @@ export class ShippingInstructionComponent implements OnInit {
         console.log(this.shippingIns);
     }
     async previewSIReport(){
-        this.previewSIReportLink = "http://localhost:57587/api/CsTransactionDetail/PreviewFCLManifest";
+        this.previewSIReportLink = "http://localhost:57587/api/CsTransactionDetail/PreviewFCLShippingInstruction";
         this.shippingIns.jobId = this.shipment.id;
+        this.shippingIns.csTransactionDetails = this.housebills;
+        let res = await this.baseServices.previewfile(this.previewSIReportLink, this.shippingIns);
+        var binaryData = [];
+        binaryData.push(res);
+        window.URL.createObjectURL(new Blob(binaryData, {type: "application/pdf"}))
+        this.dataLocalSIUrl = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(new Blob(binaryData, {type: "application/pdf"})));
         $('#preview-shipping-instruction-modal').modal('show');
+    }
+    async previewOCLReport(){
+        this.previewOCLReportLink = "http://localhost:57587/api/CsTransactionDetail/PreviewOLC";
+        this.shippingIns.jobId = this.shipment.id;
+        this.shippingIns.csTransactionDetails = this.housebills;
+        let res = await this.baseServices.previewfile(this.previewOCLReportLink, this.shippingIns);
+        var binaryData = [];
+        binaryData.push(res);
+        window.URL.createObjectURL(new Blob(binaryData, {type: "application/pdf"}))
+        this.dataLocalOCLUrl = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(new Blob(binaryData, {type: "application/pdf"})));
+        $('#preview-OCL-modal').modal('show');
     }
     getContainerInfos(){
         this.totalCBM = 0;

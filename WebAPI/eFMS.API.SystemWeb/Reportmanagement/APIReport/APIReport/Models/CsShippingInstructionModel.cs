@@ -49,5 +49,6 @@ namespace APIReport.Models
         public string PolName { get; set; }
         public string PodName { get; set; }
         public List<TransactionDetailModel> CsTransactionDetails { get; set; }
+        public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
     }
 }
