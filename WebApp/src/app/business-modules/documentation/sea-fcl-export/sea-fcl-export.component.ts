@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
 declare var $: any;
+import * as stringHelper from 'src/helper/string.helper';
 
 @Component({
     selector: 'app-sea-fcl-export',
@@ -54,6 +55,10 @@ export class SeaFCLExportComponent implements OnInit {
         console.log(this.shipmentDetails);
         if(this.shipmentDetails != null){
             this.shipmentDetails = this.sortService.sort(this.shipmentDetails, 'hwbno', true);
+            this.shipmentDetails.forEach(x => {
+                x.packageTypes = stringHelper.subStringComma(x.packageTypes);
+                x.packageContainer = stringHelper.subStringComma(x.packageContainer);
+            });
         }
     }
     async getCustomers(searchText: any){

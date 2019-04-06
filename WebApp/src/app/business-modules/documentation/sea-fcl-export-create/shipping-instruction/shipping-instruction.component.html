@@ -24,7 +24,7 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Export excel</a>
-                    <a class="dropdown-item" href="#">Crystal Report</a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="previewOCLReport()">Crystal Report</a>
                 </div>
             </div>
             <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#confirm-refresh-shipping-instruction-modal">
@@ -823,7 +823,7 @@
 
 <!--begin::preview-shipping-instruction-modal-->
 <div class="modal fade" id="preview-shipping-instruction-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true" *ngIf="dataLocalUrl">
+    aria-hidden="true" *ngIf="dataLocalSIUrl">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -833,7 +833,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <iframe [attr.src]="dataLocalUrl" type="application/pdf" height="500" width="100%"></iframe>
+                <iframe [attr.src]="dataLocalSIUrl" type="application/pdf" height="500" width="100%"></iframe>
             </div>
             <div class="modal-footer m--align-center">
                 <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
@@ -849,3 +849,33 @@
     </div>
 </div>
 <!--end::preview-shipping-instruction-modal-->
+
+
+<!--begin::preview-OCL-modal-->
+<div class="modal fade" id="preview-OCL-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true" *ngIf="dataLocalOCLUrl">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe [attr.src]="dataLocalOCLUrl" type="application/pdf" height="500" width="100%"></iframe>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::preview-OCL-modal-->

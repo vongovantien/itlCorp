@@ -14,4 +14,9 @@ namespace eFMS.Domain.Report
         public decimal GrossWeight { get; set; }
         public decimal Volume { get; set; }
     }
+    public class ContainerObject
+    {
+        public int Quantity { get; set; }
+        public string Name { get; set; }
+    }
 }

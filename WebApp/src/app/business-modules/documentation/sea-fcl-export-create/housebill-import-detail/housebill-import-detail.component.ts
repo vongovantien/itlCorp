@@ -97,7 +97,7 @@ export class HousebillImportDetailComponent implements OnInit {
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
+    //maxDate: moment.Moment = moment();
     ranges: any = {
         Today: [moment(), moment()],
         Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],

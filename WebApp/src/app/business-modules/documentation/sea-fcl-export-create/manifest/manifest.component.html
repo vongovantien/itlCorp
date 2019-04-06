@@ -391,8 +391,8 @@
                                 (click)="sort('hwbno')">
                                 <span>HBL No</span>
                             </th>
-                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerNames'), 'sorting_desc': (!isDesc && sortKey == 'containerNames'), 'sorting': sortKey != 'containerNames' }"
-                                (click)="sort('containerNames')">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'packageTypes'), 'sorting_desc': (!isDesc && sortKey == 'packageTypes'), 'sorting': sortKey != 'packageTypes' }"
+                                (click)="sort('packageTypes')">
                                 <span>No of Pieces</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gw'), 'sorting_desc': (!isDesc && sortKey == 'gw'), 'sorting': sortKey != 'gw' }"
@@ -441,7 +441,7 @@
                                     <span>{{ detail.hwbno }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ detail.containerNames }}</span>
+                                    <span>{{ detail.packageTypes }}</span>
                                 </td>
                                 <td>
                                     <span>{{ detail.gw }}</span>

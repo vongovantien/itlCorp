@@ -328,9 +328,18 @@ export class HousebillAddnewComponent implements OnInit {
   isImporting = false;
   async showShipmentDetail(event) {
     this.HouseBillWorking = event;
+    this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
+    this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
     this.isImporting = true;
     this.HouseBillWorking.jobId = this.MasterBillData.id;
+    this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+    this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
     this.HouseBillWorking.hwbno = null;
+    this.HouseBillWorking.closingDate = null;
+    this.HouseBillWorking.sailingDate = null;
+    this.HouseBillWorking.referenceNo = null;
+    this.HouseBillWorking.issueHblplaceAndDate = null;
+    this.HouseBillWorking.exportReferenceNo = null;
   }
 
   /**
@@ -417,6 +426,7 @@ export class HousebillAddnewComponent implements OnInit {
         if (response != null) {
           if (response.result.success) {
             var latestListHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + this.MasterBillData.id);
+            this.isImporting = false;
             this.houseBillComing.emit(latestListHouseBill);
             $('#add-house-bill-modal').modal('hide');
           }

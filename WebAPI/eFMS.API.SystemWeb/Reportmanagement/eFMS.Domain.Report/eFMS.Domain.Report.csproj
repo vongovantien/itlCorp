@@ -40,8 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CsMawbcontainerModel.cs" />
     <Compile Include="CsTransactionDetailReport.cs" />
     <Compile Include="HouseBillManifestModel.cs" />
+    <Compile Include="OCLContainerModel.cs" />
+    <Compile Include="OCLModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShippingInstructionContHouse.cs" />
     <Compile Include="ShippingInstructionReport.cs" />

@@ -130,12 +130,12 @@ namespace eFMS.API.Documentation.Controllers
             return message;
         }
 
-        [HttpGet("GetReport")]
-        public CsTransactionDetailReport GetReport(Guid jobId)
-        {
-            var result = csTransactionDetailService.GetReportBy(jobId);
-            return result;
-    }
+    //    [HttpGet("GetReport")]
+    //    public CsTransactionDetailReport GetReport(Guid jobId)
+    //    {
+    //        var result = csTransactionDetailService.GetReportBy(jobId);
+    //        return result;
+    //}
 
         [HttpPost]
         [Route("Paging")]

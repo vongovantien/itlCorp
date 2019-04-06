@@ -14,7 +14,7 @@ PoDelivery 	String	200
 VesselNo 	String	200
 SumContainerSealNo  	String	1000
 SumPackagesNote 	String	1000
-SumGrossWeight	Number		200
-SumVolume Number		200
+SumGrossWeight	Number
+SumVolume Number
 Remark 	String	50
 PaymenType String	50
