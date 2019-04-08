@@ -90,27 +90,31 @@ export class SeaFCLExportComponent implements OnInit {
         this.pager.totalItems = responses.totalItems;
     }
     searchShipment(){
-        this.criteria.jobNo ='';
-        this.criteria.mawb = '';
-        this.criteria.supplierName = '';
-        this.criteria.agentName = '';
+        this.criteria.jobNo =null;
+        this.criteria.mawb = null;
+        this.criteria.supplierName = null;
+        this.criteria.agentName = null;
+        this.criteria.all = null;
         //this.criteria.hwbNo = '';
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;
         if(this.selectFilter === 'Job ID'){
             this.criteria.jobNo = this.searchString;
         }
-        if(this.selectFilter === 'MBL No'){
+        else if(this.selectFilter === 'MBL No'){
             this.criteria.mawb = this.searchString;
         }
-        if(this.selectFilter === 'Supplier'){
+        else if(this.selectFilter === 'Supplier'){
             this.criteria.supplierName = this.searchString;
         }
-        if(this.selectFilter === 'Agent'){
+        else if(this.selectFilter === 'Agent'){
             this.criteria.agentName = this.searchString;
         }
-        if(this.selectFilter === 'HBL No'){
+        else if(this.selectFilter === 'HBL No'){
             this.criteria.hwbNo = this.searchString;
+        }
+        else{
+            this.criteria.all = this.searchString;
         }
         this.getShipments();
     }
@@ -133,6 +137,7 @@ export class SeaFCLExportComponent implements OnInit {
         this.getUserInCharges(keySearch);
     }
     resetSearch(){
+        this.selectFilter = 'Job ID';
         this.searchFilterActive = ['Job ID'];
         this.criteria = {};
         this.searchString = null;
@@ -179,7 +184,7 @@ export class SeaFCLExportComponent implements OnInit {
         }
     }
     async deleteJob(){
-        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsTransaction.delete + this.itemToDelete.id, false, true);
+        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsTransaction.delete + this.itemToDelete.id, true, true);
         $('#confirm-delete-modal').modal('hide');
         this.getShipments();
     }
