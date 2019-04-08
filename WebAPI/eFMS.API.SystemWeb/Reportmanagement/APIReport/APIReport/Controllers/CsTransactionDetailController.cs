@@ -314,5 +314,131 @@ namespace APIReport.Controllers
         //    }
         //    return response;
         //}
+
+        [HttpGet]
+        [Route("api/CsTransactionDetail/PreviewShippingInstructionTest")]
+        public HttpResponseMessage PreviewShippingInstructionTest(CsShippingInstructionModel model)
+        {
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.BadRequest);
+            try
+            {
+                var listShippings = new List<ShippingInstructionReportTest>()
+                {
+                    new ShippingInstructionReportTest
+                    {
+                        IssuedUserName = model.IssuedUserName,
+                        IssuedUserTel = "01267404321",
+                        SupplierName = model.SupplierName,
+                        CargoNoticeRecevier = model.CargoNoticeRecevier,
+                        Shipper = model.Shipper,
+                        ConsigneeDescription = model.ConsigneeDescription,
+                        InvoiceNoticeRecevier = model.InvoiceNoticeRecevier,
+                        PolName = model.PolName,
+                        PodName = model.PodName,
+                        PoDelivery = model.PoDelivery,
+                        VesselNo = model.VoyNo,
+                        InvoiceDate = model.InvoiceDate!= null? model.InvoiceDate: null,
+                        LoadingDate = model.LoadingDate!= null? model.LoadingDate: null,
+                        BookingNo = model.BookingNo
+                    }
+                };
+                List<ContainerObject> listContainerTypes = new List<ContainerObject>();
+                List<ContainerObject> listPackageTypes = new List<ContainerObject>();
+                var listContainer = new List<ShippingInstructionContainerListTest>();
+                if (model.CsTransactionDetails != null)
+                {
+                    foreach (var transactionDetail in model.CsTransactionDetails)
+                    {
+                        var item = new ShippingInstructionContainerListTest();
+                        if (transactionDetail.CsMawbcontainers != null)
+                        {
+                            item.ContainerSealNo = string.Empty;
+                            item.PackagesNote = string.Empty;
+                            foreach (var container in transactionDetail.CsMawbcontainers)
+                            {
+                                listContainerTypes.Add(new ContainerObject { Quantity = (int)container.Quantity, Name = container.ContainerTypeName });
+                                item.ContainerSealNo += container.Quantity + "X" + container.ContainerTypeName + " ";
+                                if (!string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
+                                {
+                                    item.ContainerSealNo += container.ContainerNo + "/" + item.ContainerSealNo + ", ";
+                                }
+                                if (container.PackageQuantity != null && container.PackageTypeId != null)
+                                {
+                                    item.PackagesNote += container.PackageQuantity + " " + container.PackageTypeName;
+                                    listPackageTypes.Add(new ContainerObject { Quantity = (int)container.PackageQuantity, Name = container.PackageTypeName });
+                                }
+                                item.DesOfGoods = string.Join(",", transactionDetail.CsMawbcontainers.Select(x => x.Description));
+                                item.GW = (decimal)transactionDetail.CsMawbcontainers.Sum(x => x.Gw);
+                                item.CBM = (decimal)transactionDetail.CsMawbcontainers.Sum(x => x.Cbm);
+                            }
+                        }
+                        listContainer.Add(item);
+                    }
+                }
+                var s = listContainerTypes.GroupBy(x => new { x.Quantity, x.Name });
+                var t = listPackageTypes.GroupBy(x => new { x.Quantity, x.Name });
+                //var listContainer = new List<ShippingInstructionContainerListTest>() {
+                //    new ShippingInstructionContainerListTest
+                //    {
+                //        ContainerTypesNote = "1X40'HR ",
+                //        ContainerSealNo = "TRLU6625029/adsd",
+                //        PackagesNote = "Carefull",
+                //        DesOfGoods = "123 BAG",
+                //        GW =  123123,
+                //        CBM =  123123
+                //    },
+                //    new ShippingInstructionContainerListTest {
+                //        ContainerTypesNote = "1X40'HR ",
+                //        ContainerSealNo = "TRLU6625029/adsd",
+                //        PackagesNote = "Carefull",
+                //        DesOfGoods = "123 BAG",
+                //        GW =  123123,
+                //        CBM =  123123,
+                //    },
+                //    new ShippingInstructionContainerListTest {
+                //        ContainerTypesNote = "1X40'HR ",
+                //        ContainerSealNo = "TRLU6625029/adsd",
+                //        PackagesNote = "Carefull",
+                //        DesOfGoods = "123 BAG",
+                //        GW =  123123,
+                //        CBM =  123123,
+                //    }
+                //};
+                var sumvolumn = listContainer.Sum(x => x.CBM);
+                var sumGW = listContainer.Sum(x => x.GW);
+                listContainer.ForEach(x =>
+                {
+                    x.SumVolume = sumvolumn;
+                    x.SumGrossWeight = sumGW;
+                    x.Remark = "Original";
+                    x.Payment = "Prepaid";
+                });
+                var rd = new ReportDocument();
+                rd.Load(Path.Combine(System.Web.Hosting.HostingEnvironment.MapPath("~/Reports/FCLExport"), "rptShippingInstruction.rpt"));
+                rd.SetDataSource(listShippings);
+                rd.Subreports[0].SetDataSource(listContainer);
+                Stream stream = rd.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                MemoryStream memoryStream = new MemoryStream();
+                stream.CopyTo(memoryStream);
+                stream.Close();
+                memoryStream.Position = 0;
+                //200
+                //successful
+                var statuscode = HttpStatusCode.OK;
+                response = Request.CreateResponse(statuscode);
+                response.Content = new StreamContent(memoryStream);
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+                if (ContentDispositionHeaderValue.TryParse("inline; filename=" + string.Format("Waybill-{0}.pdf", "aa"), out ContentDispositionHeaderValue contentDisposition))
+                {
+                    response.Content.Headers.ContentDisposition = contentDisposition;
+                }
+            }
+            catch (Exception ex)
+            {
+                var statuscode = HttpStatusCode.NotFound;
+                response = Request.CreateResponse(statuscode);
+            }
+            return response;
+        }
     }
 }

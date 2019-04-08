@@ -4,3 +4,10 @@ PackagesNote	String	100	123 BAG
 DesOfGoods	String	200	Carefully
 GW	Long		123,123.000
 CBM	Long		123,123.000
+SumContainerSealNo	String	200	
+SumPackagesNote	String	200	
+SumGrossWeight	Long		
+SumVolume	Long		
+Remark	String	100	
+Payment	String	100		
+

@@ -1,0 +1,20 @@
+IssuedUserName	String	100
+IssuedUserTel	String	100
+SupplierName	String	100
+InvoiceNoticeRecevier	String	100
+BookingNo	String	100
+InvoiceDate	String	100
+LoadingDate	String	100
+Shipper	String	100
+ConsigneeDescription	String	400
+CargoNoticeRecevier	String	100
+PolName	String	200
+PodName	String	200
+PoDelivery 	String	200
+VesselNo 	String	200
+SumContainerSealNo  	String	1000
+SumPackagesNote 	String	1000
+SumGrossWeight	Number
+SumVolume Number
+Remark 	String	50
+PaymenType String	50

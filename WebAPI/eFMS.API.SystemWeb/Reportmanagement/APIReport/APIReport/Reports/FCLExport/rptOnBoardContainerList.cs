@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace APIReport.Reports {
+namespace APIReport.Reports.FCLExport {
     using System;
     using System.ComponentModel;
     using CrystalDecisions.Shared;
@@ -16,14 +16,14 @@ namespace APIReport.Reports {
     using CrystalDecisions.CrystalReports.Engine;
     
     
-    public class ReportSample : ReportClass {
+    public class rptOnBoardContainerList : ReportClass {
         
-        public ReportSample() {
+        public rptOnBoardContainerList() {
         }
         
         public override string ResourceName {
             get {
-                return "ReportSample.rpt";
+                return "rptOnBoardContainerList.rpt";
             }
             set {
                 // Do nothing
@@ -41,7 +41,7 @@ namespace APIReport.Reports {
         
         public override string FullResourceName {
             get {
-                return "APIReport.Reports.ReportSample.rpt";
+                return "APIReport.Reports.FCLExport.rptOnBoardContainerList.rpt";
             }
             set {
                 // Do nothing
@@ -98,9 +98,9 @@ namespace APIReport.Reports {
     }
     
     [System.Drawing.ToolboxBitmapAttribute(typeof(CrystalDecisions.Shared.ExportOptions), "report.bmp")]
-    public class CachedReportSample : Component, ICachedReport {
+    public class CachedrptOnBoardContainerList : Component, ICachedReport {
         
-        public CachedReportSample() {
+        public CachedrptOnBoardContainerList() {
         }
         
         [Browsable(false)]
@@ -137,7 +137,7 @@ namespace APIReport.Reports {
         }
         
         public virtual CrystalDecisions.CrystalReports.Engine.ReportDocument CreateReport() {
-            ReportSample rpt = new ReportSample();
+            rptOnBoardContainerList rpt = new rptOnBoardContainerList();
             rpt.Site = this.Site;
             return rpt;
         }

@@ -6,4 +6,7 @@ Shipper	String	1000	Shipper
 NotifyParty	String	1000	NotifyParty
 ShippingMark	String	1000	ShippingMark
 Description	String	1000	Description
-FreightPayment String 100	PaymentTerm
+FreightPayment	String	1000
+TotalPackage	Number
+SumGrossWeight	Number
+SumVolumn	Number

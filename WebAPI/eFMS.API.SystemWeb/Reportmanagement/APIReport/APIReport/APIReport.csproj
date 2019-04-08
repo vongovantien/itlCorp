@@ -318,6 +318,23 @@
       <DependentUpon>OCL.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Reports\FCLExport\rptManifest.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rptManifest.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\FCLExport\rptOnBoardContainerList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rptOnBoardContainerList.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\FCLExport\SeaHBillofLadingUPSFrame.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SeaHBillofLadingUPSFrame.rpt</DependentUpon>
+    </Compile>
     <Compile Include="Reports\FCLExport\ShippingInstructionReport.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -336,11 +353,16 @@
       <DependentUpon>HBLReportSample.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Reports\ReportSample.cs">
+    <Compile Include="Reports\FCLExport\rptShippingInstruction.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ReportSample.rpt</DependentUpon>
+      <DependentUpon>rptShippingInstruction.rpt</DependentUpon>
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\SeaHBillofLadingUPSFrame.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SeaHBillofLadingUPSFrame.rpt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -442,6 +464,18 @@
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>OCL.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reports\FCLExport\rptManifest.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptManifest.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\FCLExport\rptOnBoardContainerList.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptOnBoardContainerList.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\FCLExport\SeaHBillofLadingUPSFrame.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>SeaHBillofLadingUPSFrame.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\FCLExport\ShippingInstructionReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>ShippingInstructionReport.cs</LastGenOutput>
@@ -454,9 +488,13 @@
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>HBLReportSample.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Reports\ReportSample.rpt">
+    <EmbeddedResource Include="Reports\FCLExport\rptShippingInstruction.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>ReportSample.cs</LastGenOutput>
+      <LastGenOutput>rptShippingInstruction.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\SeaHBillofLadingUPSFrame.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>SeaHBillofLadingUPSFrame.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
