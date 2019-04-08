@@ -29,19 +29,26 @@ export class HousebillAddnewComponent implements OnInit {
   activePortOfLoading: string = null;
   activePortOfDischarge: string = null;
 
+  totalGrossWeight: number = 0;
+  totalNetWeight: number = 0;
+  totalCharWeight: number = 0;
+  totalCBM: number = 0;
+  numberOfTimeSaveContainer: number = 0;
+
   @Input() set masterBillData(_masterBilData: CsTransaction) {
-    if(_masterBilData!=null){
+    if (_masterBilData != null) {
       this.MasterBillData = _masterBilData;
       this.HouseBillWorking.jobId = this.MasterBillData.id;
       this.HouseBillWorking.mawb = this.MasterBillData.mawb;
       this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
       this.getListContsOfAllHB();
+      // this.numberOfTimeSaveContainer = 0;
     }
 
   }
 
-  @Input() set currentHouseBill(_currentHouseBill: any) {    
-    if (_currentHouseBill != null) {     
+  @Input() set currentHouseBill(_currentHouseBill: any) {
+    if (_currentHouseBill != null) {
       this.isEditing = true;
       this.EditingHouseBill = _currentHouseBill;
       this.HouseBillWorking = this.EditingHouseBill;
@@ -61,6 +68,8 @@ export class HousebillAddnewComponent implements OnInit {
       this.HouseBillWorking.jobId = this.MasterBillData.id;
       this.customerSaleman = null;
     }
+
+    this.numberOfTimeSaveContainer = 0;
   }
 
 
@@ -68,6 +77,7 @@ export class HousebillAddnewComponent implements OnInit {
   getHouseBillContainers(hblid: String) {
     this.baseServices.post(this.api_menu.Documentation.CsMawbcontainer.query, { "hblid": hblid }).subscribe((res: any) => {
       this.lstHouseBillContainers = res;
+      this.calculateHbWeight();
     })
   }
 
@@ -107,7 +117,7 @@ export class HousebillAddnewComponent implements OnInit {
   listTypeOfService: any = [];
   customerSaleman: any = null;
   extend_data: any = {};
-  listContsOfHB: any[]= [];
+  listContsOfHB: any[] = [];
 
   /**
    * House Bill Variables 
@@ -138,10 +148,10 @@ export class HousebillAddnewComponent implements OnInit {
     this.getPackageTypes();
   }
 
-  getListContsOfAllHB(){
-     this.baseServices.get(this.api_menu.Documentation.CsMawbcontainer.getHBLConts+"?JobId="+this.MasterBillData.id).subscribe((res:any)=>{
-        console.log({"List_conts_hbl": res});
-        this.listContsOfHB = res;
+  getListContsOfAllHB() {
+    this.baseServices.get(this.api_menu.Documentation.CsMawbcontainer.getHBLConts + "?JobId=" + this.MasterBillData.id).subscribe((res: any) => {
+      console.log({ "List_conts_hbl": res });
+      this.listContsOfHB = res;
     });
   }
 
@@ -390,7 +400,7 @@ export class HousebillAddnewComponent implements OnInit {
       this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
       this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.sailingDate.startDate);
       this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.closingDate.startDate);
-      
+
 
       if (this.isImporting == false) {
         if (this.isEditing) {
@@ -494,12 +504,12 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   saveNewContainer(index: number, form: NgForm) {
-    
-    if(this.lstHouseBillContainers.length==0){
-      return true;     
-    } 
+
+    if (this.lstHouseBillContainers.length == 0) {
+      return true;
+    }
     this.lstHouseBillContainers[index].verifying = true;
-  
+
     if (this.containerListForm.invalid) return;
 
     if (this.compareContainerList(this.lstHouseBillContainers[index], this.MasterBillData.csMawbcontainers) != true) {
@@ -510,7 +520,7 @@ export class HousebillAddnewComponent implements OnInit {
       return false;
     }
     //Cont Type, Cont Q'ty, Container No, Package Type
-    if(this.lstHouseBillContainers[index].containerTypeId!=null && this.lstHouseBillContainers[index].quantity!=0 && this.lstHouseBillContainers[index].containerNo!=null && this.lstHouseBillContainers[index].packageTypeId!=null){
+    if (this.lstHouseBillContainers[index].containerTypeId != null && this.lstHouseBillContainers[index].quantity != 0 && this.lstHouseBillContainers[index].containerNo != null && this.lstHouseBillContainers[index].packageTypeId != null) {
 
     }
     let existedItem = this.lstHouseBillContainers.filter(x => x.containerTypeId == this.lstHouseBillContainers[index].containerTypeId
@@ -533,11 +543,7 @@ export class HousebillAddnewComponent implements OnInit {
     // this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
   }
 
-  totalGrossWeight: number;
-  totalNetWeight: number;
-  totalCharWeight: number;
-  totalCBM: number;
-  numberOfTimeSaveContainer: number = 0;
+ 
   onSubmitContainer(form: NgForm) {
 
 
@@ -554,8 +560,7 @@ export class HousebillAddnewComponent implements OnInit {
       this.totalNetWeight = 0;
       this.totalCharWeight = 0;
       this.totalCBM = 0;
-      this.HouseBillWorking.commodity = '';
-      this.HouseBillWorking.desOfGoods = '';
+
       this.HouseBillWorking.packageContainer = '';
       for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
         this.lstHouseBillContainers[i].isSave = true;
@@ -565,6 +570,8 @@ export class HousebillAddnewComponent implements OnInit {
         this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
         this.HouseBillWorking.packageContainer = this.HouseBillWorking.packageContainer + (this.lstHouseBillContainers[i].quantity == "" ? "" : this.lstHouseBillContainers[i].quantity + "x" + this.lstHouseBillContainers[i].containerTypeName + ", ");
         if (this.numberOfTimeSaveContainer == 1) {
+          this.HouseBillWorking.commodity = '';
+          this.HouseBillWorking.desOfGoods = '';
           this.HouseBillWorking.commodity = this.HouseBillWorking.commodity + (this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ", ");
           this.HouseBillWorking.desOfGoods = this.HouseBillWorking.desOfGoods + (this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ", ");
         }
@@ -573,10 +580,22 @@ export class HousebillAddnewComponent implements OnInit {
     }
   }
 
+  calculateHbWeight(){
+    this.totalGrossWeight = 0;
+    this.totalNetWeight = 0;
+    this.totalCharWeight = 0;
+    this.totalCBM = 0;
+    for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+      this.lstHouseBillContainers[i].isSave = true;
+      this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
+      this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
+      this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
+      this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
+    }
+  }
 
-   compareContainerList(currentContainer: Container, masterBillContainerList: Container[]):Boolean{
 
-    
+  compareContainerList(currentContainer: Container, masterBillContainerList: Container[]): Boolean {
 
 
     masterBillContainerList = filter(masterBillContainerList, function (o: Container) {
@@ -588,11 +607,11 @@ export class HousebillAddnewComponent implements OnInit {
     });
 
     const currentHBId = this.HouseBillWorking.id;
-    const listHBConts = filter(this.listContsOfHB,function(o){
-      return (o.containerTypeId == currentContainer.containerTypeId && o.hblid!=currentHBId);
+    const listHBConts = filter(this.listContsOfHB, function (o) {
+      return (o.containerTypeId == currentContainer.containerTypeId && o.hblid != currentHBId);
     });
 
-    const totalAllHBContainer = listHBConts.length == 0 ? 0 : listHBConts.map(x=>x.quantity).reduce((a,c)=>a+c);
+    const totalAllHBContainer = listHBConts.length == 0 ? 0 : listHBConts.map(x => x.quantity).reduce((a, c) => a + c);
     const totalHBContainer = listHBWithCurrentContainerType.length == 0 ? 0 : listHBWithCurrentContainerType.map(x => x.quantity).reduce((a, c) => a + c);
     const totalMasterContainer = masterBillContainerList.length == 0 ? 0 : masterBillContainerList.map(x => x.quantity).reduce((a, c) => a + c);
     if ((totalHBContainer + totalAllHBContainer) > totalMasterContainer) {
@@ -660,7 +679,7 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
 
-  closeAddContainerForm(){
+  closeAddContainerForm() {
     $('#container-list-of-job-modal-house').modal('hide');
   }
 
