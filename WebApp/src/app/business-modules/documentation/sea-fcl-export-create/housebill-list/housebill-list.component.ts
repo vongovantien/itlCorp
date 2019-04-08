@@ -12,6 +12,7 @@ import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import moment from 'moment/moment';
+import { async } from '@angular/core/testing';
 
 declare var $: any;
 // import * as $ from 'jquery';
@@ -619,6 +620,22 @@ export class HousebillListComponent implements OnInit {
 
   public refreshValue(value: any): void {
     this.value = value;
+  }
+
+
+  houseBillIdToDelete:string = null
+  async DeleteHouseBill(stt:string,hbId:string=null){
+    if(stt=="confirm"){
+      console.log(hbId);
+      this.houseBillIdToDelete = hbId;      
+    }
+    if(stt=="ok"){
+      var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsTransactionDetail.delete+"?hblId="+this.houseBillIdToDelete);
+      if(res.status){
+        this.getHouseBillsOfMaster();
+      }
+     
+    }
   }
 }
 
