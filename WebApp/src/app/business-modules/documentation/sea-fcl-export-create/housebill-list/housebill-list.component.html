@@ -114,7 +114,7 @@
                             <th class="table-actions-col"></th>
                             <th class="sorting">
                                 <span>
-                                    H-B/L No hoho
+                                    H-B/L No
                                 </span>
                             </th>
                             <th class="sorting">
@@ -169,9 +169,9 @@
                                         data-target="#add-house-bill-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button"
+                                    <button type="button" (click)="DeleteHouseBill('confirm',hb.id)"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-housebill-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -3494,3 +3494,44 @@
 <!--begin:: add-remaining-charge-modal-->
 <app-credit-and-debit-note-remaining-charge></app-credit-and-debit-note-remaining-charge>
 <!--end:: add-remaining-charge-modal-->
+
+
+<!--begin::confirm-delete-housebill-modal-->
+<div class="modal fade" id="confirm-delete-housebill-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure want to delete this House Bill? <br> All related charges added to this House Bill will be lost!</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="DeleteHouseBill('ok')">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-housebill-modal-->

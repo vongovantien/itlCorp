@@ -268,49 +268,6 @@ namespace eFMS.API.Documentation.DL.Services
             return results.AsQueryable();
         }
 
-        //public CsTransactionDetailReport GetReportBy(Guid jobId)
-        //{
-        //    var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == jobId);
-        //    var data = (from transDetail in details
-        //                 join customer in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.CustomerId equals customer.Id into detailCustomers
-        //                 from y in detailCustomers.DefaultIfEmpty()
-        //                 join noti in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.NotifyPartyId equals noti.Id into detailNotis
-        //                 from noti in detailNotis.DefaultIfEmpty()
-        //                 join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on transDetail.ForwardingAgentId equals fwd.Id into forwarding
-        //                 from f in forwarding.DefaultIfEmpty()
-        //                 join saleman in ((eFMSDataContext)DataContext.DC).SysUser on transDetail.SaleManId equals saleman.Id into prods
-        //                 from x in prods.DefaultIfEmpty()
-        //                     //where detail.JobId == criteria.JobId
-        //                 select new { transDetail, customer = y, notiParty = noti, saleman = x, agent = f }
-        //                  );
-        //    if (data == null) return null;
-        //    var results = new CsTransactionDetailReport();
-        //    results.HouseBillManifestModels = new List<HouseBillManifestModel>();
-        //    foreach(var item in data)
-        //    {
-        //        var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.transDetail.Id);
-        //        decimal weight = (decimal)containers.Sum(x => x.Gw);
-        //        decimal volumn = (decimal)containers.Sum(x => x.Cbm);
-        //        var houseBill = new HouseBillManifestModel
-        //        {
-        //            Hwbno = item.transDetail.Hwbno,
-        //            Packages = item.transDetail.PackageContainer,
-        //            Weight = weight,
-        //            Volumn = volumn,
-        //            Shipper = item.transDetail.ShipperDescription,
-        //            NotifyParty = item.transDetail.NotifyPartyDescription,
-        //            ShippingMark = item.transDetail.ShippingMark,
-        //            Description = ""
-        //        };
-        //        results.HouseBillManifestModels.Add(houseBill);
-        //    }
-        //    //detail.CustomerName = data.customer?.PartnerNameEn;
-        //    //detail.CustomerNameVn = data.customer?.PartnerNameVn;
-        //    //detail.SaleManName = data.saleman?.Username;
-        //    //detail.NotifyParty = data.notiParty?.PartnerNameEn;
-        //    //detail.ForwardingAgentName = data.agent?.PartnerNameEn;
-        //    return results;
-        //}
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
             var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
@@ -453,6 +410,50 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public HandleState DeleteTransactionDetail(Guid hbId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                
+                var hbl = DataContext.Where(x => x.Id == hbId).FirstOrDefault();
+                if (hbl == null)
+                {
+                    hs = new HandleState("House Bill not found !");
+                }
+                else
+                {
+                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == hbl.Id).ToList();
+                    var isSOA = false;
+                    foreach(var item in charges)
+                    {
+                        if(item.Soano!=null && item.Soano!="")
+                        {
+                            isSOA = true;
+                        }
+                    }
+                    if (isSOA == true)
+                    {
+                        hs = new HandleState("Cannot delete, this house bill is containing at least one charge have SOA no!");
+                    }
+                    else
+                    {
+                        foreach(var item in charges)
+                        {
+                            ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Remove(item);
+                        }
+                        DataContext.Delete(x=>x.Id==hbl.Id);
+                        ((eFMSDataContext)DataContext.DC).SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
 
+            return hs;
+          
+        }
     }
 }
