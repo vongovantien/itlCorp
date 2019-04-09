@@ -15,7 +15,7 @@ import { SelectComponent } from 'ng2-select';
 export class PartnerDataDetailComponent implements OnInit {
   departments: any[];
   users: any[] = [];
-  departmentActive: any;
+  departmentActive: any[] = [];
   partner: Partner;
   parentCustomers: any[];
   parentCustomerActive: any;
@@ -31,7 +31,7 @@ export class PartnerDataDetailComponent implements OnInit {
   shippingProvinceActive: any;
   partnerGroups: any[];
   partnerGroupActives: any[] = [];
-  salemanActive: any;
+  salemanActive: any[] = [];
   activeNg = true;
   isRequiredSaleman = false;
   employee: any ={};
@@ -66,14 +66,15 @@ export class PartnerDataDetailComponent implements OnInit {
     if(this.partner.partnerGroup.includes('CUSTOMER')){
       this.isRequiredSaleman = true;
     }
-    this.salemanActive = this.saleMans.find(x => x.id == this.partner.salePersonId);
+    this.salemanActive = [this.saleMans.find(x => x.id == this.partner.salePersonId)];
     if(this.partner.partnerGroup.includes('CUSTOMER')){
       this.isRequiredSaleman = true;
     }
     console.log(this.isRequiredSaleman);
     console.log(this.partner.salePersonId);
     this.getPartnerGroupActives(this.partner.partnerGroup.split(';'));
-    this.departmentActive = this.departments.find(x => x.id == this.partner.departmentId);
+    let index = this.departments.findIndex(x => x.id == this.partner.departmentId);
+    if(index > -1) this.departmentActive = [this.departments[index].id];
     this.parentCustomerActive = this.parentCustomers.find(x => x.id == this.partner.parentId);
     this.workPlaceActive = this.workPlaces.find(x => x.id == this.partner.workPlaceId);
     this.billingCountryActive = this.countries.find(x => x.id == this.partner.countryId);
@@ -192,7 +193,7 @@ export class PartnerDataDetailComponent implements OnInit {
     this.baseService.put(this.api_menu.Catalogue.PartnerData.update + this.partner.id, this.partner).subscribe((response: any) => {
         this.baseService.spinnerHide();
         this.baseService.successToast(response.message);
- 
+        this.router.navigate(["/home/catalogue/partner-data"]);
     }, err=>{
       this.baseService.handleError(err);
       this.baseService.spinnerHide();

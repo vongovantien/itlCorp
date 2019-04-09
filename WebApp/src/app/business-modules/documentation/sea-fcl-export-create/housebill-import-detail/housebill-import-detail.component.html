@@ -16,8 +16,8 @@
                                 <label class="form-control-label" for="">
                                     Search text
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
-                                    name="searchString" (change)="searchString = searchString.trim()"
+                                <input type="text" class="form-control m-input m-input--square" id="searchTextHouseBill" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                                    name="searchString" (change)="searchString = searchString.trim()" autofocus
                                     placeholder="Search text">
                             </div>
                         </div>

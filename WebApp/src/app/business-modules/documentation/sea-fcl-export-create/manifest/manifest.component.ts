@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
@@ -20,7 +20,13 @@ import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser
     templateUrl: './manifest.component.html',
     styleUrls: ['./manifest.component.scss']
 })
-export class ManifestComponent implements OnInit {
+export class ManifestComponent implements OnInit, AfterViewInit {
+    ngAfterViewInit(): void {
+        if(this.frm){
+            this.frm.nativeElement.submit();
+          }
+    }
+    @ViewChild('formReport') frm:ElementRef;
     shipment: CsTransaction = new CsTransaction();
     manifest: CsManifest = new CsManifest();
     paymentTerms: any[] = [];
@@ -85,6 +91,9 @@ export class ManifestComponent implements OnInit {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
         this.manifest.csMawbcontainers = responses;
     }
+    submitForm(event){
+        return true;
+      }
     async getManifest(id: any) {
         this.manifest = await this.baseServices.getAsync(this.api_menu.Documentation.CsManifest.get + "?jobId=" + id, false, true);
     }
