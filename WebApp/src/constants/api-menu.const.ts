@@ -1,6 +1,5 @@
 import { SystemConstants } from "./system.const";
 import {environment} from 'src/environments/environment';
-import { CsTransactionDetail } from "../app/shared/models/document/csTransactionDetail";
 
 export class API_MENU {
     private HOST = {
@@ -266,7 +265,8 @@ export class API_MENU {
         },
         CsManifest: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest",
+            preview: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/PreviewFCLManifest"
         },
         CsShippingInstruction: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/",

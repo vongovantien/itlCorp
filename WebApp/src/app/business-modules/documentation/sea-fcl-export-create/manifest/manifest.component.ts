@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
@@ -20,15 +20,10 @@ import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser
     templateUrl: './manifest.component.html',
     styleUrls: ['./manifest.component.scss']
 })
-export class ManifestComponent implements OnInit, AfterViewInit {
-    ngAfterViewInit(): void {
-        if(this.frm){
-            this.frm.nativeElement.submit();
-          }
-    }
+export class ManifestComponent implements OnInit {
     @ViewChild('formReport') frm:ElementRef;
     shipment: CsTransaction = new CsTransaction();
-    manifest: CsManifest = new CsManifest();
+    manifest: CsManifest;// = new CsManifest();
     paymentTerms: any[] = [];
     paymentTermActive: any[] = [];
     etdSelected: any;
@@ -45,6 +40,7 @@ export class ManifestComponent implements OnInit, AfterViewInit {
     searchHouseRemoved = '';
     previewReportLink = '';
     dataLocalUrl = null;
+    dataReport: any;
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
@@ -91,9 +87,6 @@ export class ManifestComponent implements OnInit, AfterViewInit {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
         this.manifest.csMawbcontainers = responses;
     }
-    submitForm(event){
-        return true;
-      }
     async getManifest(id: any) {
         this.manifest = await this.baseServices.getAsync(this.api_menu.Documentation.CsManifest.get + "?jobId=" + id, false, true);
     }
@@ -114,9 +107,22 @@ export class ManifestComponent implements OnInit, AfterViewInit {
         this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        //this.dataReport = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
         let res = await this.baseServices.previewfile(this.previewReportLink, this.manifest);
         this.dataLocalUrl = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(res));
         $('#preview-modal').modal('show');
+    }
+    async previewReportTest(){
+        this.dataReport = null;
+        this.manifest.jobId = this.shipment.id;
+        this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
+        this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
+        console.log(response);
+        this.dataReport = response;
+        setTimeout(function(){ 
+            $('#preview-test-modal').modal('show');
+        }, 100);
     }
     removeAllChecked(){
         this.checkAll = false;
@@ -170,6 +176,10 @@ export class ManifestComponent implements OnInit, AfterViewInit {
             this.manifest.pod = this.portOfDestinations[index].id;
             this.manifest.podName = this.portOfDestinations[index].nameEN;
         }
+    }
+    removeChecked(){
+        this.checkAll = false;
+        //this.checkAllChange();
     }
     refreshManifest(){
         this.manifest.refNo = null;
@@ -255,7 +265,7 @@ export class ManifestComponent implements OnInit, AfterViewInit {
             responses.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
                 element.isChecked = false;
                 element["packageTypes"] = stringHelper.subStringComma(element["packageTypes"]);
-                if(element["manifestRefNo"] != null){
+                if(element["manifestRefNo"] == null){
                     element.isRemoved = false;
                 }
                 else{
