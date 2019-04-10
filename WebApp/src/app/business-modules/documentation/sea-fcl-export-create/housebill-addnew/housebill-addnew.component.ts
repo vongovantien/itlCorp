@@ -340,6 +340,11 @@ export class HousebillAddnewComponent implements OnInit {
     this.HouseBillWorking.referenceNo = null;
     this.HouseBillWorking.issueHblplaceAndDate = null;
     this.HouseBillWorking.exportReferenceNo = null;
+    this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
+    // this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
+    this.getActiveOriginCountry();
+    this.getActivePortOfLoading();
+    this.getActivePortOfDischarge();
   }
 
   /**

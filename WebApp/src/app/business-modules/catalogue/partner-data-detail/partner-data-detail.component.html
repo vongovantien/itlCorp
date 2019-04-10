@@ -319,8 +319,13 @@
                                 <label class="form-control-label">
                                     Saleman <span class="m--font-danger" *ngIf="partner.salePersonId == null && isRequiredSaleman">(*)</span>
                                 </label>
-                                <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
-                                    (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"
+                                <ng-select #chooseSaleman [allowClear]="true" 
+                                    [items]="saleMans" 
+                                    [disabled]="disabled" 
+                                    (data)="refreshValue($event)" name="partnerSaleman"
+                                    (selected)="selected($event, 'saleman')" 
+                                    [active]="salemanActive"
+                                    (removed)="removed($event,'saleman')" (typed)="typed($event)"
                                     placeholder="">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="(partner.salePersonId == null && isRequiredSaleman)" >
@@ -380,7 +385,9 @@
                             <label class="form-control-label" for="">
                                 Department <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select [allowClear]="true" [items]="departments" [active]="departmentActive==null?[]:[departmentActive]" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
+                            <ng-select [allowClear]="true" [items]="departments" 
+                                [active]="departmentActive" 
+                                [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
                                 (selected)="selected($event, 'department')" (removed)="removed($event,'department')" placeholder="Select filter">
                             </ng-select>
                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && this.partner.departmentId == null" >

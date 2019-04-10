@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
@@ -21,8 +21,9 @@ import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser
     styleUrls: ['./manifest.component.scss']
 })
 export class ManifestComponent implements OnInit {
+    @ViewChild('formReport') frm:ElementRef;
     shipment: CsTransaction = new CsTransaction();
-    manifest: CsManifest = new CsManifest();
+    manifest: CsManifest;// = new CsManifest();
     paymentTerms: any[] = [];
     paymentTermActive: any[] = [];
     etdSelected: any;
@@ -39,6 +40,7 @@ export class ManifestComponent implements OnInit {
     searchHouseRemoved = '';
     previewReportLink = '';
     dataLocalUrl = null;
+    dataReport: any;
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
@@ -105,9 +107,22 @@ export class ManifestComponent implements OnInit {
         this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        //this.dataReport = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
         let res = await this.baseServices.previewfile(this.previewReportLink, this.manifest);
         this.dataLocalUrl = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(res));
         $('#preview-modal').modal('show');
+    }
+    async previewReportTest(){
+        this.dataReport = null;
+        this.manifest.jobId = this.shipment.id;
+        this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
+        this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
+        console.log(response);
+        this.dataReport = response;
+        setTimeout(function(){ 
+            $('#preview-test-modal').modal('show');
+        }, 100);
     }
     removeAllChecked(){
         this.checkAll = false;
@@ -161,6 +176,10 @@ export class ManifestComponent implements OnInit {
             this.manifest.pod = this.portOfDestinations[index].id;
             this.manifest.podName = this.portOfDestinations[index].nameEN;
         }
+    }
+    removeChecked(){
+        this.checkAll = false;
+        //this.checkAllChange();
     }
     refreshManifest(){
         this.manifest.refNo = null;
@@ -246,7 +265,7 @@ export class ManifestComponent implements OnInit {
             responses.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
                 element.isChecked = false;
                 element["packageTypes"] = stringHelper.subStringComma(element["packageTypes"]);
-                if(element["manifestRefNo"] != null){
+                if(element["manifestRefNo"] == null){
                     element.isRemoved = false;
                 }
                 else{

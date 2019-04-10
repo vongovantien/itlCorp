@@ -14,7 +14,8 @@
                     Preview & Print
                 </button>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">Export excel</a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="previewReportTest()">Export excel</a>
+                    <!-- <a class="dropdown-item" href="#" data-toggle="modal" data-target="#preview-test-modal">Export excel</a> -->
                     <!-- <a class="dropdown-item" href="#" data-toggle="modal" data-target="#preview-modal">Crystal Report</a> -->
                     <a class="dropdown-item" href="javascript:void(0)" (click)="previewReport()">Crystal Report</a>
                 </div>
@@ -661,6 +662,39 @@
 </div>
 <!--end::confirm-refresh-manifest-modal-->
 
+<!--begin::preview-test-modal-->
+<!-- <div class="modal fade" id="preview-test-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form #formReport target="frame" method="POST" [action]="scr" (ngSubmit)="submitForm($event)">
+
+                </form>
+                <iframe #frame id="frame" name="frame" src="" type="application/pdf" height="1200px"  width="100%"  allowfullscreen 
+                frameborder="0"  ></iframe>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!--end::preview-test-modal-->
+<app-report-preview [data]="dataReport" *ngIf="dataReport"></app-report-preview>
 <!--begin::preview-modal-->
 <div class="modal fade" id="preview-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">

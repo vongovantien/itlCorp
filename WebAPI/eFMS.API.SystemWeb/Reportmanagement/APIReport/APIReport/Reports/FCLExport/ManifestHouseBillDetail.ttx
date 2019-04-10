@@ -1,9 +1,0 @@
-Hwbno	String	50	hwbno
-Packages	String	2000	Packages
-Weight	Number
-Volumn	Number
-Shipper	String	1000	Shipper
-NotifyParty	String	1000	NotifyParty
-ShippingMark	String	1000	ShippingMark
-Description	String	1000	Description
-FreightPayment String 100	PaymentTerm

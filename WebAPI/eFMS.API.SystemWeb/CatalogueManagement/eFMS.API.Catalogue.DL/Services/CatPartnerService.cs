@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -42,7 +41,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.UserCreated = ChangeTrackerHelper.currentUser;
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
-                    //partner.Inactive = item.Status.ToString().ToLower() == "active" ? false : true;
+                    partner.Inactive = false;
                     dc.CatPartner.Add(partner);
                 }
                 dc.SaveChanges();
@@ -271,12 +270,15 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var partners = dc.CatPartner.ToList();
-            var partnerGroups = DataEnums.CatPartnerGroups;
+            //var partnerGroups = DataEnums.CatPartnerGroups;
             var users = dc.SysUser.ToList();
             var countries = dc.CatCountry;
             var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
             var branchs = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
             var salemans = dc.SysUser;
+
+            var allGroup = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
+            var partnerGroups = allGroup.Split(";");
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.TaxCode))
@@ -299,13 +301,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    if (item.PartnerGroup.ToLower() == DataEnums.AllPartner.ToLower())
+                    item.PartnerGroup = item.PartnerGroup.ToUpper();
+                    if (item.PartnerGroup == DataEnums.AllPartner)
                     {
-                        item.PartnerGroup = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
+                        item.PartnerGroup = allGroup;
                     }
                     else
                     {
-                        var group = partnerGroups.FirstOrDefault(x => x.Id.ToLower() == item.PartnerGroup.ToLower());
+                        var groups = item.PartnerGroup.Split(";");
+                        var group = partnerGroups.Intersect(groups);
                         if (group == null)
                         {
                             item.PartnerGroup = string.Format("Partner group {0} is not found!|wrong", item.PartnerGroup);
@@ -313,14 +317,35 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         else
                         {
-                            item.PartnerGroup = group.Id;
-                            if (group.Id == DataEnums.CustomerPartner)
+                            item.PartnerGroup = String.Join(";", group);
+                            if (item.PartnerGroup.Contains(DataEnums.CustomerPartner))
                             {
-                                if (string.IsNullOrEmpty(item.SalePersonId))
+                                //if (string.IsNullOrEmpty(item.SalePersonId))
+                                //{
+                                //    item.SaleManName = string.Format("Saleman is not allow empty!|wrong");
+                                //    item.IsValid = false;
+                                //}
+                                //else
+                                //{
+                                if (string.IsNullOrEmpty(item.SaleManName))
                                 {
-                                    item.PartnerGroup = string.Format("Saleman is not allow empty!|wrong");
-                                    item.IsValid = false;
+                                    item.SaleManName = "Sale man is not allow empty. Please check again!|wrong";
+                                    item.Inactive = false;
                                 }
+                                else
+                                {
+                                    var salePerson = salemans.FirstOrDefault(i => i.Username == item.SaleManName);
+                                    if (salePerson == null)
+                                    {
+                                        item.SaleManName = string.Format("Sale man '{0}' is not found!|wrong", item.SaleManName);
+                                        item.IsValid = false;
+                                    }
+                                    else
+                                    {
+                                        item.SalePersonId = salePerson.Id;
+                                    }
+                                }
+                                //}
                             }
                         }
                     }
@@ -365,12 +390,27 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(item.CityBilling))
+                    item.CountryBilling = "Country billing is empty. Please check again!|wrong";
+                    if (string.IsNullOrEmpty(item.CityBilling))
                     {
-                        item.CountryBilling = "Country billing is empty. Please check again!|wrong";
                         item.CityBilling = "City billing is empty. Please check again!|wrong";
-                        item.Inactive = false;
                     }
+                    else
+                    {
+                        item.CityBilling = string.Format("City billing '{0}' is not found!|wrong", item.CityBilling);
+                    }
+                    item.Inactive = false;
+                }
+                if (string.IsNullOrEmpty(item.AddressEn))
+                {
+                    item.AddressEn = "Billing address is not allow empty. Please check again!|wrong";
+                    item.Inactive = false;
+
+                }
+                if (string.IsNullOrEmpty(item.AddressVn))
+                {
+                    item.AddressVn = "Billing local address is not allow empty. Please check agian!|wrong";
+                    item.Inactive = false;
                 }
                 if (!string.IsNullOrEmpty(item.CountryShipping))
                 {
@@ -397,12 +437,26 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(item.CityShipping))
+                    item.CountryShipping = "Country shipping is empty. Please check again!|wrong";
+                    if (string.IsNullOrEmpty(item.CityShipping))
                     {
-                        item.CountryShipping = "Country shipping is empty. Please check again!|wrong";
-                        item.CountryShipping = "Country shipping is empty. Please check again!|wrong";
-                        item.Inactive = false;
+                        item.CityShipping = "City shipping is empty. Please check again!|wrong";
                     }
+                    else
+                    {
+                        item.CityShipping = string.Format("City shipping '{0}' is not found!|wrong", item.CityShipping);
+                    }
+                    item.Inactive = false;
+                }
+                if (string.IsNullOrEmpty(item.AddressShippingEn))
+                {
+                    item.AddressShippingEn = "Shipping address is not allow empty. Please check agian!|wrong";
+                    item.Inactive = false;
+                }
+                if (string.IsNullOrEmpty(item.AddressShippingVn))
+                {
+                    item.AddressShippingVn = "Shipping local address is not allow empty. Please check again!|wrong";
+                    item.Inactive = false;
                 }
                 if (!string.IsNullOrEmpty(item.Profile))
                 {
@@ -415,19 +469,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     else
                     {
                         item.WorkPlaceId = workplace.Id;
-                    }
-                }
-                if (!string.IsNullOrEmpty(item.SaleManName))
-                {
-                    var salePerson = salemans.FirstOrDefault(i => i.Username == item.SaleManName);
-                    if (salePerson == null)
-                    {
-                        item.SaleManName = string.Format("Sale man '{0}' is not found!|wrong", item.SaleManName);
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.SalePersonId = salePerson.Id;
                     }
                 }
             });

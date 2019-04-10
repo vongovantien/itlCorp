@@ -31,6 +31,9 @@ export class HousebillImportDetailComponent implements OnInit {
 
     ngOnInit() {
         this.selectFilter = 'HBL No';
+        $('#import-housebill-detail-modal').on('shown.bs.modal', function() {
+            $('#searchTextHouseBill').trigger('focus');
+          });
     }
 
     async getShipmentDetails(){

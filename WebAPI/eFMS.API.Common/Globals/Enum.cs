@@ -43,4 +43,43 @@
         Update,
         Delete
     }
+    public enum ExportFormatType
+    {
+        //
+        // Summary:
+        //     No export format specified.
+        NoFormat = 0,
+        //
+        // Summary:
+        //     Export format of the report is a Crystal Report file.
+        CrystalReport = 1,
+        //
+        // Summary:
+        //     Export format of the report is a rich text file.
+        RichText = 2,
+        //
+        // Summary:
+        //     Export format of the report is a Microsoft Word file.
+        WordForWindows = 3,
+        //
+        // Summary:
+        //     Export format of the report is a Microsoft Excel file.
+        Excel = 4,
+        //
+        // Summary:
+        //     Export format of the report is a PDF file.
+        PortableDocFormat = 5,
+        //
+        // Summary:
+        //     Export format of the report is an HTML 3.2 file.
+        HTML32 = 6,
+        //
+        // Summary:
+        //     Export format of the report is an HTML 4.0 file.
+        HTML40 = 7,
+        //
+        // Summary:
+        //     Export format of the report is an Excel Record file.
+        ExcelRecord = 8
+    }
 }
