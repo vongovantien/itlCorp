@@ -308,5 +308,57 @@ namespace eFMS.API.Documentation.DL.Services
             return returnObj;
 
         }
+
+        public HandleState DeleteSOA(Guid idSoA)
+        {
+            var hs = new HandleState();
+            try
+            {
+                var cdNote = DataContext.Where(x => x.Id == idSoA).FirstOrDefault();
+                if (cdNote == null)
+                {
+                    hs = new HandleState("Credit debit note not found !");
+                }
+                else
+                {
+                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == cdNote.Code).ToList();
+                    var isOtherSOA = false;
+                    foreach(var item in charges)
+                    {
+                        if (item.OtherSoa != null)
+                        {
+                            isOtherSOA = true;
+                        }
+                    }
+                    if (isOtherSOA == true)
+                    {
+                        hs = new HandleState("Cannot delete, this credit debit not is containing at least one charge have SOA no!");
+                    }
+                    else
+                    {                       
+                        var _hs = DataContext.Delete(x => x.Id == idSoA);
+                        if (hs.Success)
+                        {
+                            foreach (var item in charges)
+                            {
+                                item.Soano = null;
+                                item.UserModified = cdNote.UserModified;
+                                item.DatetimeModified = DateTime.Now;
+                                ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);
+                            }
+                            ((eFMSDataContext)DataContext.DC).SaveChanges();
+
+                        }
+                        
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
     }
 }

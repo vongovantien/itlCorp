@@ -1,4 +1,4 @@
-import { Component, OnInit, Output,EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../extend-data';
@@ -53,8 +53,8 @@ export class CreditAndDebitNoteComponent implements OnInit {
                     x.listSOA[i].total_charge.toString().toLowerCase() === search_key ||
                     x.listSOA[i].soa.total.toString().toLowerCase().includes(search_key) ||
                     x.listSOA[i].soa.userCreated.toLowerCase().includes(search_key) ||
-                    x.listSOA[i].soa.code.toLowerCase().includes(search_key)||
-                    x.listSOA[i].soa.code.toLowerCase().includes(search_key)||
+                    x.listSOA[i].soa.code.toLowerCase().includes(search_key) ||
+                    x.listSOA[i].soa.code.toLowerCase().includes(search_key) ||
                     date.includes(search_key)) {
                     listSOA.push(x.listSOA[i]);
                     branch = true;
@@ -129,8 +129,8 @@ export class CreditAndDebitNoteComponent implements OnInit {
         this.ListChargesFromAdd = cloneDeep(event);
     }
     ListChargesFromRemaining: any[] = [];
-    chargesFromRemainingCatcher(event:any){
-       this.ListChargesFromRemaining = cloneDeep(event);
+    chargesFromRemainingCatcher(event: any) {
+        this.ListChargesFromRemaining = cloneDeep(event);
     }
 
     currentPartnerId: string = null;
@@ -139,22 +139,36 @@ export class CreditAndDebitNoteComponent implements OnInit {
     }
 
 
-    EditingCDNoteNo:string = null;
-    openEdit(soaNo:string){
+    EditingCDNoteNo: string = null;
+    openEdit(soaNo: string) {
         this.EditingCDNoteNo = soaNo
         setTimeout(() => {
             this.EditingCDNote = null;
         }, 1000);
     }
 
-    EditingCDNote:any = null;
-    CdNoteEditingCatcher(cdNote:any){
+    EditingCDNote: any = null;
+    CdNoteEditingCatcher(cdNote: any) {
         this.EditingCDNote = cdNote;
     }
 
-    UpdateStatus:boolean = false;
-    updateSttCatcher(event:boolean){
-        this.UpdateStatus = event; 
+    UpdateStatus: boolean = false;
+    updateSttCatcher(event: boolean) {
+        this.UpdateStatus = event;
+    }
+
+    cdNoteIdToDelete: string = null;
+    async DeleteCDNote(stt: string, cdNoteId: string = null) {
+        if (stt == "confirm") {
+            console.log(cdNoteId);
+            this.cdNoteIdToDelete = cdNoteId;
+        }
+        if (stt == "ok") {
+            var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.cdNoteIdToDelete);
+            if (res.status) {
+                this.getAllCDNote();
+            }
+        }
     }
 
 }

@@ -427,14 +427,14 @@ namespace eFMS.API.Documentation.DL.Services
                     var isSOA = false;
                     foreach(var item in charges)
                     {
-                        if(item.Soano!=null && item.Soano!="")
+                        if(item.Soano!=null || item.OtherSoa!=null)
                         {
                             isSOA = true;
                         }
                     }
-                    if (isSOA == true)
+                    if ( isSOA == true)
                     {
-                        hs = new HandleState("Cannot delete, this house bill is containing at least one charge have SOA no!");
+                        hs = new HandleState("Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!");
                     }
                     else
                     {

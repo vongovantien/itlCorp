@@ -536,6 +536,7 @@ export class HousebillListComponent implements OnInit {
     this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id + "&type=SELL").subscribe((res: any) => {
       this.ListSellingRateCharges = res;
       this.ConstListSellingRateCharges = res;
+      console.log({"LIST_SELLING_CHARGE":res});
       this.totalSellingCharge();
     })
   }
@@ -637,6 +638,23 @@ export class HousebillListComponent implements OnInit {
      
     }
   }
+
+
+  chargeIdToDelete:string=null;
+  async DeleteCharge(stt:string,chargeId:string=null){
+    if(stt=="confirm"){
+      console.log(chargeId);
+      this.chargeIdToDelete = chargeId;      
+    }
+    if(stt=="ok"){
+      var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsShipmentSurcharge.delete+"?chargId="+this.chargeIdToDelete);
+      if(res.status){
+        this.getHouseBillsOfMaster();
+      }
+     
+    }
+  }
+
 }
 
 
