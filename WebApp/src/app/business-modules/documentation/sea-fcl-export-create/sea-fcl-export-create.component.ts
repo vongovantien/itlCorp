@@ -413,11 +413,15 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.isHouseBill = true;
                 this.isCDnote = false;
                 this.isShipment = false;
-                this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 if(this.inEditing == false){
+                    setTimeout(() => {
+                        this.isLoaded = true;
+                        this.inEditing = true;
+                        //this.inEditing = true;
+                    }, 400);
                     this.activeTab();
                 }
-                this.inEditing = true;
+                this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
             }
         }
         this.housebillTabviewHref = "#housebill-tabview-tab";

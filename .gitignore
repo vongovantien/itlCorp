@@ -87,3 +87,4 @@ bin
 /WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/packages/Autofac.WebApi2.4.2.0
 /WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/packages/Autofac.4.9.1
 /WebAPI/eFMS.API.SystemWeb/ReportPreview/packages
+/WebAPI/eFMS.API.SystemWeb/ReportPreview/.vs
