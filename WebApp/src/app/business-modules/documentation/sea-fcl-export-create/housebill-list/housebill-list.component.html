@@ -159,8 +159,7 @@
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
                         <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
                             [ngClass]="{'selected-row':i==0}"
-                            (click)="$event.path[0].closest('tbody').querySelector('tr.selected-row')==null?return:$event.path[0].closest('tbody').querySelector('tr.selected-row').classList.remove('selected-row');$event.path[0].closest('tr').classList.add('selected-row');
-                                    getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb)">
+                            (click)="getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb);focusLine($event)">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"

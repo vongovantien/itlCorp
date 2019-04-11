@@ -12,10 +12,7 @@ import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import moment from 'moment/moment';
-import { async } from '@angular/core/testing';
-
-declare var $: any;
-// import * as $ from 'jquery';
+ declare var $: any;
 
 @Component({
   selector: 'app-housebill-list',
@@ -151,8 +148,8 @@ export class HousebillListComponent implements OnInit {
 
       this.ListBuyingRateCharges.forEach(element => {
 
-        this.totalBuyingUSD += element.total;
-        this.totalBuyingLocal += element.total * 23000;
+        this.totalBuyingLocal += element.total * element.exchangeRate;
+        this.totalBuyingUSD += this.totalBuyingLocal/element.exchangeRateUSDToVND;
         this.totalProfit();
 
       });
@@ -166,10 +163,9 @@ export class HousebillListComponent implements OnInit {
     this.totalSellingLocal = 0;
     if (this.ListSellingRateCharges.length > 0) {
 
-      this.ListSellingRateCharges.forEach(element => {
-
-        this.totalSellingUSD += element.total;
-        this.totalSellingLocal += element.total * 23000;
+      this.ListSellingRateCharges.forEach(element => {        
+        this.totalSellingLocal += element.total * element.exchangeRate;
+        this.totalSellingUSD += this.totalSellingLocal/element.exchangeRateUSDToVND;
         this.totalProfit();
 
       });
@@ -187,8 +183,8 @@ export class HousebillListComponent implements OnInit {
 
       this.ListOBHCharges.forEach(element => {
 
-        this.totalOBHUSD += element.total;
-        this.totalOBHLocal += element.total * 23000;
+        this.totalOBHLocal += element.total * element.exchangeRate;
+        this.totalOBHUSD += this.totalOBHLocal/element.exchangeRateUSDToVND;
         this.totalProfit();
       });
 
@@ -555,7 +551,13 @@ export class HousebillListComponent implements OnInit {
     this.currentHouseBill.emit(hb);
     // setTimeout(() => {
     //   this.currentHouseBill.emit(null);
-    // }, 1500);
+    // }, 1500);    
+  }
+
+  focusLine(event:any){
+    var currentSelected =  $(event.srcElement).closest("tbody").find("tr.selected-row").first();
+    currentSelected.removeClass("selected-row");
+    $(event.srcElement).closest("tr").addClass("selected-row");
   }
   prepareEdit(type: string) {
 

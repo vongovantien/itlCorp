@@ -508,12 +508,16 @@ export class HousebillAddnewComponent implements OnInit {
     console.log(this.lstHouseBillContainers);
   }
 
-  saveNewContainer(index: number, form: NgForm) {
+  saveNewContainer(index: number, form: NgForm) {    
 
     if (this.lstHouseBillContainers.length == 0) {
       return true;
     }
     this.lstHouseBillContainers[index].verifying = true;
+
+    if (this.lstHouseBillContainers[index].containerNo.length > 0 || this.lstHouseBillContainers[index].sealNo.length > 0 || this.lstHouseBillContainers[index].markNo.length > 0) {
+      this.lstHouseBillContainers[index].quantity = 1;
+    }
 
     if (this.containerListForm.invalid) return;
 
@@ -548,7 +552,7 @@ export class HousebillAddnewComponent implements OnInit {
     // this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
   }
 
- 
+
   onSubmitContainer(form: NgForm) {
 
 
@@ -577,15 +581,15 @@ export class HousebillAddnewComponent implements OnInit {
         if (this.numberOfTimeSaveContainer == 1) {
           this.HouseBillWorking.commodity = '';
           this.HouseBillWorking.desOfGoods = '';
-          this.HouseBillWorking.commodity = this.HouseBillWorking.commodity + (this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ", ");
-          this.HouseBillWorking.desOfGoods = this.HouseBillWorking.desOfGoods + (this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ", ");
+          this.HouseBillWorking.commodity = this.HouseBillWorking.commodity + (this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ",");
+          this.HouseBillWorking.desOfGoods = this.HouseBillWorking.desOfGoods + (this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ", \n");
         }
       }
       $('#container-list-of-job-modal-house').modal('hide');
     }
   }
 
-  calculateHbWeight(){
+  calculateHbWeight() {
     this.totalGrossWeight = 0;
     this.totalNetWeight = 0;
     this.totalCharWeight = 0;
@@ -677,6 +681,9 @@ export class HousebillAddnewComponent implements OnInit {
   changeEditStatus(index: any) {
     if (this.lstHouseBillContainers[index].allowEdit == false) {
       this.lstHouseBillContainers[index].allowEdit = true;
+      this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null ? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }] : [];
+      this.lstHouseBillContainers[index].packageTypeActive = this.lstHouseBillContainers[index].packageTypeId != null ? [{ id: this.lstHouseBillContainers[index].packageTypeId, text: this.lstHouseBillContainers[index].packageTypeName }] : [];
+      this.lstHouseBillContainers[index].unitOfMeasureActive = this.lstHouseBillContainers[index].unitOfMeasureId != null ? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }] : [];
     }
     else {
       this.lstHouseBillContainers[index].allowEdit = false;
