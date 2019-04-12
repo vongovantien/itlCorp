@@ -225,7 +225,7 @@
                                                     <div class="table-filter-block">
                                                         <div class="search-field">
                                                             <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
+                                                                type="text" placeholder="Search..." (focusout)="getListConsignees(null)"
                                                                 (keyup)="getListConsignees($event.target.value)">
                                                             <i class="icon-search"></i>
                                                         </div>
@@ -288,8 +288,8 @@
                                                     <div class="table-filter-block">
                                                         <div class="search-field">
                                                             <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
-                                                                (keyup)="getListConsignees($event.target.value)">
+                                                                type="text" placeholder="Search..." (focusout)="getListConsignees(null)"
+                                                                (keyup)="getListNotifyParty($event.target.value)">
                                                             <i class="icon-search"></i>
                                                         </div>
                                                     </div>
@@ -1317,18 +1317,17 @@
                                                     <div class="dropdown e--combogrid" #selectedCommodity>
                                                         <input
                                                             class="form-control m-input m-input--square dropdown-toggle"
-                                                            type="text" readonly data-toggle="dropdown"
+                                                            type="text" readonly data-toggle="dropdown" (keyup)="SearchCommodity($event.target.value)"
                                                             placeholder="Please selected"
-                                                            [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value"
-                                                            [(ngModel)]="selectedCommodityValue"
-                                                            name="selectedCommodityValue">
+                                                            [value]="container.commodityName == null?'Please selected a commodity':container.commodityName"
+                                                           >
                                                         <div
                                                             class="dropdown-menu  dropdown-menu-right e--combogrid-content">
                                                             <div class="tabel-wrapper table-fixed">
                                                                 <div class="table-head-fixed">
                                                                     <div class="table-filter-block">
                                                                         <div class="search-field">
-                                                                            <input
+                                                                            <input (keyup)="getComodities($event.target.value)" (focusout)="getComodities(null)"
                                                                                 class="form-control m-input m-input--square"
                                                                                 type="text" placeholder="Search...">
                                                                             <i class="icon-search"></i>

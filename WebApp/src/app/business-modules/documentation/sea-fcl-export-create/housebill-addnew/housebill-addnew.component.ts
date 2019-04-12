@@ -31,7 +31,7 @@ export class HousebillAddnewComponent implements OnInit {
   activePortOfDischarge: string = null;
 
   totalGrossWeight: number = 0;
-  totalNetWeight: number = 0;
+  totalNetWeight: number = 0; 
   totalCharWeight: number = 0;
   totalCBM: number = 0;
   numberOfTimeSaveContainer: number = 0;
@@ -55,27 +55,6 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   @Input() set currentHouseBill(_currentHouseBill: any) {
-    // if (_currentHouseBill != null) {
-    //   this.isEditing = true;
-    //   this.EditingHouseBill = _currentHouseBill;
-    //   this.HouseBillWorking = this.EditingHouseBill;
-    //   this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
-    //   // this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
-    //   this.getActiveOriginCountry();
-    //   this.getActivePortOfLoading();
-    //   this.getActivePortOfDischarge();
-    //   this.getHouseBillContainers(this.HouseBillWorking.id);
-    //   this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
-    //   this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
-    //   this.HouseBillWorking.mawb = this.MasterBillData.mawb;
-    //   this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
-    // } else {
-    //   this.isEditing = false;
-    //   this.lstHouseBillContainers = this.MasterBillData.csMawbcontainers;
-    //   this.HouseBillWorking = new CsTransactionDetail();
-    //   this.HouseBillWorking.jobId = this.MasterBillData.id;
-    //   this.customerSaleman = null;
-    // }
     if (_currentHouseBill != null && _currentHouseBill!='addnew') {
       this.isEditing = true;
       this.getHouseBillDetails(_currentHouseBill);
@@ -89,6 +68,8 @@ export class HousebillAddnewComponent implements OnInit {
       this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
       this.HouseBillWorking.oceanVoyNo = this.MasterBillData.voyNo + "" + this.MasterBillData.flightVesselName;
       this.HouseBillWorking.customsBookingNo = this.MasterBillData.bookingNo;
+      this.HouseBillWorking.serviceType = this.MasterBillData.typeOfService;
+      this.HouseBillWorking.purchaseOrderNo = this.MasterBillData.pono;
       this.activePortOfLoading = this.MasterBillData.polName + "";
       this.HouseBillWorking.pol = this.MasterBillData.pol;
       this.activePortOfDischarge = this.MasterBillData.podName + "";
@@ -264,6 +245,19 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   public getListConsignees(search_key: string = null) {
+    var key = "";
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
+      return 0;
+    } else {
+      key = search_key;
+    }
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
+      var data = res['data']
+      this.listConsignee = data;
+    });
+  }
+
+  public getListNotifyParty(search_key: string = null){
     var key = "";
     if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
       return 0;
@@ -526,11 +520,30 @@ export class HousebillAddnewComponent implements OnInit {
       console.log(this.packageTypes);
     }
   }
-  async getComodities() {
-    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false }, false, false);
-    this.commodities = responses;
+  // async getComodities(search_key: string = null) {
+  //   var key = "";
+  //   if(search_key !== null && search_key.length<3 && search_key.length > 0){
+  //     return 0;
+  //   }else{
+  //     key = search_key;
+  //   }
+  //   let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false,all:key }, false, false);
+  //   this.commodities = responses;
+  //   console.log(this.commodities);
+  // }
+
+  async getComodities(search_key: string = null) {
+    var key = "";
+    if(search_key !== null && search_key.length<3 && search_key.length > 0){
+      return 0;
+    }else{
+      key = search_key;
+    }
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page="+ 1 + "&size=" + 20, { inactive: false ,all:key}, false, false);
+    this.commodities = responses.data;
     console.log(this.commodities);
   }
+
 
   addNewContainer() {
     let hasItemEdited = false;
@@ -728,7 +741,7 @@ export class HousebillAddnewComponent implements OnInit {
       this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null ? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }] : [];
       this.lstHouseBillContainers[index].packageTypeActive = this.lstHouseBillContainers[index].packageTypeId != null ? [{ id: this.lstHouseBillContainers[index].packageTypeId, text: this.lstHouseBillContainers[index].packageTypeName }] : [];
       this.lstHouseBillContainers[index].unitOfMeasureActive = this.lstHouseBillContainers[index].unitOfMeasureId != null ? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }] : [];
-      // this.lstHouseBillContainers[index].com = this.lstHouseBillContainers[index].unitOfMeasureId != null ? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }] : [];
+      this.lstHouseBillContainers[index].commodityName = this.lstHouseBillContainers[index].commodityName != null ? this.lstHouseBillContainers[index].commodityName : null;
     }
     else {
       this.lstHouseBillContainers[index].allowEdit = false;
@@ -764,6 +777,10 @@ export class HousebillAddnewComponent implements OnInit {
     if (!this.isEditing) {
       this.lstHouseBillContainers = this.MasterBillData.csMawbcontainers;
     }
+  }
+
+  SearchCommodity(key:string){
+
   }
 
 
