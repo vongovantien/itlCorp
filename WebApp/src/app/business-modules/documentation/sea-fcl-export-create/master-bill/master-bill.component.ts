@@ -14,12 +14,27 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
     templateUrl: './master-bill.component.html',
     styleUrls: ['./master-bill.component.scss']
 })
-export class MasterBillComponent implements OnInit{
+export class MasterBillComponent implements OnInit, AfterViewInit{
+    ngAfterViewInit(): void {
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            this.inEditing = true;
+            console.log(this.shipment.etd);
+            if(this.isImport == false){
+                this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
+                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
+            }
+            else{
+                this.etaSelected = null;
+                this.etaSelected = null;
+            }
+        }
+    }
 
     @Input()shipment: CsTransaction;
     @Input()isImport: boolean;
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
+    @Input() isLoaded: boolean;
     @Output() shipmentDetails = new EventEmitter<any>();
     terms: any[];
     shipmentTypes: any[];
@@ -55,13 +70,9 @@ export class MasterBillComponent implements OnInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             this.inEditing = true;
             console.log(this.shipment.etd);
-            if(this.isImport == false){
-                this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
-                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
-            }
-            else{
-                this.etaSelected = null;
-                this.etaSelected = null;
+            if(this.isImport == true){
+                // this.etaSelected = null;
+                // this.etaSelected = null;
                 let claim = localStorage.getItem('id_token_claims_obj');
                 index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
                 if(index > -1) {
@@ -117,6 +128,7 @@ export class MasterBillComponent implements OnInit{
                 this.shipment.shipmentType = this.shipmentTypes[index].id;
             } 
         }
+        this.isLoaded = true;
         this.baseServices.spinnerHide();
     }
     changePortLoading(keySearch: any) {

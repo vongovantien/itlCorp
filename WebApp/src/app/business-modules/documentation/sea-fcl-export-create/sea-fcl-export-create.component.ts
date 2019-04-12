@@ -87,7 +87,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 setTimeout(() => {
                     this.isLoaded = true;
                     this.inEditing = true;
-                }, 400);
+                }, 100);
                 this.myForm.patchValue({
                     estimatedTimeofDepature: { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) },
                     polName: this.shipment.polName,
@@ -412,15 +412,15 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.isHouseBill = true;
                 this.isCDnote = false;
                 this.isShipment = false;
+                this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
+                this.isLoaded = false;
                 if(this.inEditing == false){
-                    setTimeout(() => {
-                        this.isLoaded = true;
-                        this.inEditing = true;
-                        //this.inEditing = true;
-                    }, 400);
                     this.activeTab();
                 }
-                this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
+                this.inEditing = true;
+                setTimeout(() => {
+                    this.isLoaded = true;
+                  }, 300);
             }
         }
         this.housebillTabviewHref = "#housebill-tabview-tab";

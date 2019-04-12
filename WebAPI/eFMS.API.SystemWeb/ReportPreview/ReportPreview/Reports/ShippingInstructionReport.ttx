@@ -1,0 +1,14 @@
+IssuedUserName	String	100	
+IssuedUserTel	String	200	
+SupplierName	String	200	
+InvoiceNoticeRecevier	String	200	
+BookingNo	String	100	
+InvoiceDate	Date		
+LoadingDate	Date		
+Shipper	String	200	
+ConsigneeDescription	String	200	
+CargoNoticeRecevier	String	200	
+PolName	String	200	
+PodName	String	200	
+PoDelivery	String	200	
+VesselNo	String	100	

@@ -66,14 +66,15 @@ export class PartnerDataDetailComponent implements OnInit {
     if(this.partner.partnerGroup.includes('CUSTOMER')){
       this.isRequiredSaleman = true;
     }
-    this.salemanActive = [this.saleMans.find(x => x.id == this.partner.salePersonId)];
+    let index = this.saleMans.findIndex(x => x.id == this.partner.salePersonId)
+    if(index > -1) this.salemanActive = [this.saleMans.find(x => x.id == this.partner.salePersonId)];
     if(this.partner.partnerGroup.includes('CUSTOMER')){
       this.isRequiredSaleman = true;
     }
     console.log(this.isRequiredSaleman);
     console.log(this.partner.salePersonId);
     this.getPartnerGroupActives(this.partner.partnerGroup.split(';'));
-    let index = this.departments.findIndex(x => x.id == this.partner.departmentId);
+    index = this.departments.findIndex(x => x.id == this.partner.departmentId);
     if(index > -1) this.departmentActive = [this.departments[index].id];
     this.parentCustomerActive = this.parentCustomers.find(x => x.id == this.partner.parentId);
     this.workPlaceActive = this.workPlaces.find(x => x.id == this.partner.workPlaceId);

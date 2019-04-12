@@ -23,6 +23,8 @@ import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-num
 import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima-number.directive';
 import { IntergerInputDirective } from './directives/interger-input.directive';
 import { ReportPreviewComponent } from './common/report-preview/report-preview.component';
+import { SpecialCharacterDirective } from './directives/specialChracter.directive';
+import { from } from 'rxjs';
 @NgModule({
   imports: [CommonModule, FormsModule,SelectModule],
   declarations: [
@@ -40,7 +42,8 @@ import { ReportPreviewComponent } from './common/report-preview/report-preview.c
     TwoDigitDecimaNumberDirective,
     ThreeDigitDecimaNumberDirective,
     IntergerInputDirective,
-    ReportPreviewComponent
+    ReportPreviewComponent,
+    SpecialCharacterDirective
   ],
   exports: [
     CommonModule,
@@ -57,7 +60,8 @@ import { ReportPreviewComponent } from './common/report-preview/report-preview.c
     TableDetailComponent,
     CloseModalButtonComponent,
     NgProgressModule,
-    ReportPreviewComponent
+    ReportPreviewComponent,
+    SpecialCharacterDirective
   ],
   providers: [
     SortService,
