@@ -9,6 +9,7 @@ import { Crystal } from '../../models/report/crystal.model';
   styleUrls: ['./report-preview.component.scss']
 })
 export class ReportPreviewComponent implements OnInit, AfterViewInit {
+  @Input() modalId: any;
   @Input() data: Crystal;
   @ViewChild('formReport') frm: ElementRef;
   
@@ -32,6 +33,7 @@ export class ReportPreviewComponent implements OnInit, AfterViewInit {
     }
   }
   get scr(){
-    return this.sanitizer.bypassSecurityTrustResourceUrl("http://localhost:51830/Default.aspx");
+    let url = this.api_menu.Report; //http://localhost:51830/Default.aspx
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 }

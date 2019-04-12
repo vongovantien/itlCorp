@@ -38,9 +38,8 @@ export class ManifestComponent implements OnInit {
     totalCBM = 0;
     searchHouse = '';
     searchHouseRemoved = '';
-    previewReportLink = '';
-    dataLocalUrl = null;
     dataReport: any;
+    previewModalId = "preview-modal";
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
@@ -103,16 +102,6 @@ export class ManifestComponent implements OnInit {
         }
     }
     async previewReport(){
-        this.previewReportLink = "http://localhost:57587/api/CsTransactionDetail/PreviewFCLManifest";
-        this.manifest.jobId = this.shipment.id;
-        this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
-        this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
-        //this.dataReport = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
-        let res = await this.baseServices.previewfile(this.previewReportLink, this.manifest);
-        this.dataLocalUrl = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(res));
-        $('#preview-modal').modal('show');
-    }
-    async previewReportTest(){
         this.dataReport = null;
         this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
@@ -120,8 +109,9 @@ export class ManifestComponent implements OnInit {
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
         console.log(response);
         this.dataReport = response;
+        var id = this.previewModalId;
         setTimeout(function(){ 
-            $('#preview-test-modal').modal('show');
+            $('#' + id).modal('show');
         }, 100);
     }
     removeAllChecked(){

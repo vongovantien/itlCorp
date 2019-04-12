@@ -31,7 +31,7 @@ export class HousebillAddnewComponent implements OnInit {
   activePortOfDischarge: string = null;
 
   totalGrossWeight: number = 0;
-  totalNetWeight: number = 0; 
+  totalNetWeight: number = 0;
   totalCharWeight: number = 0;
   totalCBM: number = 0;
   numberOfTimeSaveContainer: number = 0;
@@ -55,7 +55,7 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   @Input() set currentHouseBill(_currentHouseBill: any) {
-    if (_currentHouseBill != null && _currentHouseBill!='addnew') {
+    if (_currentHouseBill != null && _currentHouseBill != 'addnew') {
       this.isEditing = true;
       this.getHouseBillDetails(_currentHouseBill);
     }
@@ -257,7 +257,7 @@ export class HousebillAddnewComponent implements OnInit {
     });
   }
 
-  public getListNotifyParty(search_key: string = null){
+  public getListNotifyParty(search_key: string = null) {
     var key = "";
     if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
       return 0;
@@ -520,26 +520,15 @@ export class HousebillAddnewComponent implements OnInit {
       console.log(this.packageTypes);
     }
   }
-  // async getComodities(search_key: string = null) {
-  //   var key = "";
-  //   if(search_key !== null && search_key.length<3 && search_key.length > 0){
-  //     return 0;
-  //   }else{
-  //     key = search_key;
-  //   }
-  //   let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false,all:key }, false, false);
-  //   this.commodities = responses;
-  //   console.log(this.commodities);
-  // }
 
   async getComodities(search_key: string = null) {
     var key = "";
-    if(search_key !== null && search_key.length<3 && search_key.length > 0){
+    if (search_key !== null && search_key.length < 3 && search_key.length > 0) {
       return 0;
-    }else{
+    } else {
       key = search_key;
     }
-    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page="+ 1 + "&size=" + 20, { inactive: false ,all:key}, false, false);
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }, false, false);
     this.commodities = responses.data;
     console.log(this.commodities);
   }
@@ -712,9 +701,9 @@ export class HousebillAddnewComponent implements OnInit {
       containerNo: '',
       sealNo: '',
       markNo: '',
-      unitOfMeasureId: null,
-      unitOfMeasureName: '',
-      unitOfMeasureActive: [],
+      unitOfMeasureId: 37,
+      unitOfMeasureName: 'Kilogam',
+      unitOfMeasureActive: [{ "id": 37, "text": "Kilogam" }],
       commodityId: null,
       commodityName: '',
       packageTypeId: null,
@@ -753,7 +742,7 @@ export class HousebillAddnewComponent implements OnInit {
     $('#container-list-of-job-modal-house').modal('hide');
   }
 
-  closeAddNewHBForm(form:NgForm) {
+  closeAddNewHBForm(form: NgForm) {
     // form.reset();
     this.HouseBillWorking = new CsTransactionDetail();
     this.HouseBillWorking.jobId = this.MasterBillData.id;
@@ -779,7 +768,7 @@ export class HousebillAddnewComponent implements OnInit {
     }
   }
 
-  SearchCommodity(key:string){
+  SearchCommodity(key: string) {
 
   }
 

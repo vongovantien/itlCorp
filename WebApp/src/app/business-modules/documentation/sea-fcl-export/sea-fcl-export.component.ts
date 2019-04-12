@@ -90,6 +90,7 @@ export class SeaFCLExportComponent implements OnInit {
         this.pager.totalItems = responses.totalItems;
     }
     searchShipment(){
+        this.pager.totalItems = 0;
         this.criteria.jobNo =null;
         this.criteria.mawb = null;
         this.criteria.supplierName = null;

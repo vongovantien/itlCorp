@@ -13,7 +13,8 @@ export class API_MENU {
         Catalogue: 44361,
         Department: 44242,
         auditlog: 44363,
-        Documentation: 44366
+        Documentation: 44366,
+        Report: 51830
     }
 
     private PROTOCOL = "http://";
@@ -46,7 +47,17 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
     }
-
+    private getReportPath(Module){
+        if (this.CURRENT_HOST == this.HOST.Local) {
+            return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/Default.aspx";
+        }
+        if (this.CURRENT_HOST == this.HOST.Test) {
+            return this.PROTOCOL + this.HOST.Test + "/Default.aspx";
+        }
+        if (this.CURRENT_HOST == this.HOST.Staging) {
+            return this.PROTOCOL + this.HOST.Staging + "/Default.aspx";
+        }
+    }
     private getPort(Module: String) {
         return eval("this.PORT." + Module);
     }
@@ -274,7 +285,10 @@ export class API_MENU {
         },
         CsShippingInstruction: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction",
+            previewSI: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLShippingInstruction",
+            previewOCL: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLOCL"
         }
     }
+    public Report = this.getReportPath(SystemConstants.MODULE_NAME.Report);
 }

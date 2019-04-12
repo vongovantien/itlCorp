@@ -116,7 +116,10 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <app-master-bill  (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment" [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted" *ngIf="shipment && isLoaded && isShipment"></app-master-bill>
+                <ng-container *ngIf="shipment && isLoaded && isShipment">
+
+                    <app-master-bill  (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment" 
+                        [isImport]="isImport" [formAddEdit]="myForm" [isLoaded]=false [submitted]="submitted"></app-master-bill>
                 <!--begin:: m-portlet-->
                 <div class="m-portlet">
                     <div class="m-portlet__head">
@@ -232,7 +235,7 @@
                     </div>
                 </div>
                 <!--end:: m-portlet-->
-
+    
                 <!--begin:: m-portlet-->
                 <div class="m-portlet"  *ngIf="inEditing && listTotalHouseBill.length>0">
                     <div class="m-portlet__head">
@@ -292,6 +295,7 @@
                     </div>
                 </div>
                 <!--end:: m-portlet-->
+                </ng-container>
             </div>
             <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
                 <app-housebill-list [houseBillList]="houseBillList" [firstLoadData]="_firstLoadData" [masterBillData]="shipmentDetails" (currentHouseBill)="currentHouseBillCatcher($event)" *ngIf="isHouseBill"></app-housebill-list>

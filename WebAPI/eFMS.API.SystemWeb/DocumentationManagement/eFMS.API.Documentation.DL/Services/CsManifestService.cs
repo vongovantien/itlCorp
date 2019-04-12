@@ -151,6 +151,7 @@ namespace eFMS.API.Documentation.DL.Services
                     x.SumVolumn = sumVolumn;
                 });
             }
+            result.ReportName = "rptManifest.rpt";
             result.AddDataSource(new List<ManifestReportResult> { manifest });
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.AddSubReport("ManifestHouseBillDetail", housebillList);

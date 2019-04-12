@@ -30,7 +30,7 @@ export class SystemConstants {
         SYSTEM: "System",
         LOG: "auditlog",
         Documentation: "Documentation",
-        Report: ""
+        Report: "Report"
     }
     public static readonly LANGUAGES = {
         ENGLISH_API:  "en-US",  //SystemConstants.DEFAULT_LANGUAGE,

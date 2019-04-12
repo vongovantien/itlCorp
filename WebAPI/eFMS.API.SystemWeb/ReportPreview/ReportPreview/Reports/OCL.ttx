@@ -1,0 +1,8 @@
+VesselNo	String	100	
+VoyNo	String	100
+POL	String	100	
+POD	String	100	
+SLD	String	20	
+SlotOwner	String	100	
+OP	String	100	
+FDestination	String	100	
