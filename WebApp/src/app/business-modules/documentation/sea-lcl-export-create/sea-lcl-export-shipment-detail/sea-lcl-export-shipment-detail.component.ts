@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
 
 @Component({
-    selector: 'app-sea-lcl-export',
-    templateUrl: './sea-lcl-export.component.html',
-    styleUrls: ['./sea-lcl-export.component.scss']
+    selector: 'app-sea-lcl-export-shipment-detail',
+    templateUrl: './sea-lcl-export-shipment-detail.component.html',
+    styleUrls: ['./sea-lcl-export-shipment-detail.component.scss']
 })
-export class SeaLCLExportComponent implements OnInit {
+export class SeaLclExportShipmentDetailComponent implements OnInit {
 
     constructor() { }
 
@@ -14,8 +14,8 @@ export class SeaLCLExportComponent implements OnInit {
     }
 
     /**
-       * Daterange picker
-       */
+     * Daterange picker
+     */
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;
@@ -37,37 +37,37 @@ export class SeaLCLExportComponent implements OnInit {
     };
 
     /**
-     * ng2-select
-     */
-    searchFilters: Array<string> = ['Job ID', 'MBL No', 'Supplier', 'Agent', 'HBL No'];
-    searchFilterActive = ['Job ID'];
+    * ng2-select
+    */
+    public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
+        'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
+
     private value: any = {};
     private _disabledV: string = '0';
     public disabled: boolean = false;
 
-    public get disabledV(): string {
+    private get disabledV(): string {
         return this._disabledV;
     }
 
-    public set disabledV(value: string) {
+    private set disabledV(value: string) {
         this._disabledV = value;
         this.disabled = this._disabledV === '1';
     }
 
-    selectFilter : []
     public selected(value: any): void {
         console.log('Selected value is: ', value);
-        //this.selectFilter = value.id;
     }
 
     public removed(value: any): void {
         console.log('Removed value is: ', value);
     }
 
+    public typed(value: any): void {
+        console.log('New search input: ', value);
+    }
+
     public refreshValue(value: any): void {
         this.value = value;
     }
-
-    public typed(e){}
-
 }

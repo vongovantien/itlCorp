@@ -1,0 +1,147 @@
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <app-breadcrumb></app-breadcrumb>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#sea-lcl-export-import-detail-modal">
+                <span>
+                    <i class="la la-search"></i>
+                    <span>
+                        import job detail
+                    </span>
+                    <!-- <span>
+                        duplicate job detail
+                    </span> -->
+                </span>
+            </button>
+            <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10" data-toggle="modal" data-target="">
+                <span>
+                    <i class="la la-trash"></i>
+                    <span>
+                        delete
+                    </span>
+                </span>
+            </button> -->
+            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" >
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        Create
+                    </span>
+                    <!-- <span>
+                        save
+                    </span> -->
+                </span>
+            </button>
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#confirm-cancel-create-job-modal">
+                <span>
+                    <i class="la la-ban"></i>
+                    <span>
+                        cancel
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+ <!--begin::m-content-->
+ <div class="m-content">
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link active" id="masterbill-tablink" data-toggle="tab"
+                        href="#masterbill-tabview-tab" role="tab">
+                        Shipment detail
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="tab-content" id="jobTabContent">
+        <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
+            <!--begin:: shipment-detail-->
+            <app-sea-lcl-export-shipment-detail></app-sea-lcl-export-shipment-detail>
+            <!--end:: shipment-detail-->
+
+            <!--begin:: m-portlet-->
+            <div class="m-portlet">
+                <div class="m-portlet__head">
+                    <div class="m-portlet__head-caption">
+                        <div class="m-portlet__head-title">
+                            <h3 class="m-portlet__head-text">
+                                Shipment Good Summary
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-portlet__body" style="min-height: 300px">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Commodities
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"  name="commodity" autocomplete="nope">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total Gross Weight  <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"  name="" autocomplete="nope">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total CBM  <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"  name="" autocomplete="nope">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total Package Qty  <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"  name="" autocomplete="nope">
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">Package Type</label>
+                                <ng-select [multiple]="true" [items]="packageTypes" 
+                                    [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" 
+                                    (removed)="removed($event)" 
+                                    (typed)="typed($event)"
+                                    placeholder="Select type">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end:: m-portlet-->
+        </div>
+    </div>
+</div>
+<!--end::m-content-->
+
+<!--begin::import-job-detail-modal-->
+<div class="modal fade" id="sea-lcl-export-import-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <app-sea-lcl-export-detail-import></app-sea-lcl-export-detail-import>
+</div>
+<!--end::import-job-detail-modal-->
+
+
