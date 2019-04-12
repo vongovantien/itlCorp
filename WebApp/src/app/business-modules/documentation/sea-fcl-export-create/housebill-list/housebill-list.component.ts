@@ -549,9 +549,9 @@ export class HousebillListComponent implements OnInit {
 
   emitSelectedHB(hb: any) {
     this.currentHouseBill.emit(hb);
-    // setTimeout(() => {
-    //   this.currentHouseBill.emit(null);
-    // }, 1500);    
+    setTimeout(() => {
+      this.currentHouseBill.emit(null);
+    }, 1000);    
   }
 
   focusLine(event:any){

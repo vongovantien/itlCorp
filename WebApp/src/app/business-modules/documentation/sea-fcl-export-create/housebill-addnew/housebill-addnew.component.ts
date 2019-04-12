@@ -13,6 +13,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import * as dataHelper from 'src/helper/data.helper';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import { BaseService } from 'src/services-base/base.service';
+import cloneDeep from 'lodash/cloneDeep';
 declare var $: any;
 
 @Component({
@@ -41,6 +42,12 @@ export class HousebillAddnewComponent implements OnInit {
       this.HouseBillWorking.jobId = this.MasterBillData.id;
       this.HouseBillWorking.mawb = this.MasterBillData.mawb;
       this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
+      this.HouseBillWorking.oceanVoyNo = this.MasterBillData.voyNo + "" + this.MasterBillData.flightVesselName;
+      this.HouseBillWorking.customsBookingNo = this.MasterBillData.bookingNo;
+      this.activePortOfLoading = this.MasterBillData.polName + "";
+      this.HouseBillWorking.pol = this.MasterBillData.pol;
+      this.activePortOfDischarge = this.MasterBillData.podName + "";
+      this.HouseBillWorking.pod = this.MasterBillData.pod;
       this.getListContsOfAllHB();
       // this.numberOfTimeSaveContainer = 0;
     }
@@ -48,28 +55,65 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   @Input() set currentHouseBill(_currentHouseBill: any) {
-    if (_currentHouseBill != null) {
+    // if (_currentHouseBill != null) {
+    //   this.isEditing = true;
+    //   this.EditingHouseBill = _currentHouseBill;
+    //   this.HouseBillWorking = this.EditingHouseBill;
+    //   this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
+    //   // this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
+    //   this.getActiveOriginCountry();
+    //   this.getActivePortOfLoading();
+    //   this.getActivePortOfDischarge();
+    //   this.getHouseBillContainers(this.HouseBillWorking.id);
+    //   this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
+    //   this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
+    //   this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+    //   this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
+    // } else {
+    //   this.isEditing = false;
+    //   this.lstHouseBillContainers = this.MasterBillData.csMawbcontainers;
+    //   this.HouseBillWorking = new CsTransactionDetail();
+    //   this.HouseBillWorking.jobId = this.MasterBillData.id;
+    //   this.customerSaleman = null;
+    // }
+    if (_currentHouseBill != null && _currentHouseBill!='addnew') {
       this.isEditing = true;
-      this.EditingHouseBill = _currentHouseBill;
-      this.HouseBillWorking = this.EditingHouseBill;
-      this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
-      // this.lstHouseBillContainers = _currentHouseBill.csMawbcontainers;
-      this.getActiveOriginCountry();
-      this.getActivePortOfLoading();
-      this.getActivePortOfDischarge();
-      this.getHouseBillContainers(this.HouseBillWorking.id);
-      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
-      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
-      this.HouseBillWorking.mawb = this.MasterBillData.mawb;
-      this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
-    } else {
+      this.getHouseBillDetails(_currentHouseBill);
+    }
+    if (_currentHouseBill === 'addnew') {
       this.isEditing = false;
+      this.lstHouseBillContainers = this.MasterBillData.csMawbcontainers;
       this.HouseBillWorking = new CsTransactionDetail();
       this.HouseBillWorking.jobId = this.MasterBillData.id;
+      this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+      this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
+      this.HouseBillWorking.oceanVoyNo = this.MasterBillData.voyNo + "" + this.MasterBillData.flightVesselName;
+      this.HouseBillWorking.customsBookingNo = this.MasterBillData.bookingNo;
+      this.activePortOfLoading = this.MasterBillData.polName + "";
+      this.HouseBillWorking.pol = this.MasterBillData.pol;
+      this.activePortOfDischarge = this.MasterBillData.podName + "";
+      this.HouseBillWorking.pod = this.MasterBillData.pod;
       this.customerSaleman = null;
     }
 
+    $('#hb-mblno').focus();
     this.numberOfTimeSaveContainer = 0;
+  }
+
+
+  async getHouseBillDetails(hblid: string) {
+    this.HouseBillWorking = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getHBDetails + "?JobId=" + this.MasterBillData.id + "&HbId=" + hblid);
+    this.EditingHouseBill = cloneDeep(this.HouseBillWorking);
+    this.lstHouseBillContainers = this.HouseBillWorking.csMawbcontainers;
+    this.customerSaleman = [{ id: this.HouseBillWorking.saleManId, text: this.HouseBillWorking.saleManName.split(".")[0] }];
+    this.getActiveOriginCountry();
+    this.getActivePortOfLoading();
+    this.getActivePortOfDischarge();
+    this.getHouseBillContainers(this.HouseBillWorking.id);
+    this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
+    this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
+    this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+    this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
   }
 
 
@@ -508,7 +552,7 @@ export class HousebillAddnewComponent implements OnInit {
     console.log(this.lstHouseBillContainers);
   }
 
-  saveNewContainer(index: number, form: NgForm) {    
+  saveNewContainer(index: number, form: NgForm) {
 
     if (this.lstHouseBillContainers.length == 0) {
       return true;
@@ -684,6 +728,7 @@ export class HousebillAddnewComponent implements OnInit {
       this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null ? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }] : [];
       this.lstHouseBillContainers[index].packageTypeActive = this.lstHouseBillContainers[index].packageTypeId != null ? [{ id: this.lstHouseBillContainers[index].packageTypeId, text: this.lstHouseBillContainers[index].packageTypeName }] : [];
       this.lstHouseBillContainers[index].unitOfMeasureActive = this.lstHouseBillContainers[index].unitOfMeasureId != null ? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }] : [];
+      // this.lstHouseBillContainers[index].com = this.lstHouseBillContainers[index].unitOfMeasureId != null ? [{ id: this.lstHouseBillContainers[index].unitOfMeasureId, text: this.lstHouseBillContainers[index].unitOfMeasureName }] : [];
     }
     else {
       this.lstHouseBillContainers[index].allowEdit = false;
@@ -693,6 +738,32 @@ export class HousebillAddnewComponent implements OnInit {
 
   closeAddContainerForm() {
     $('#container-list-of-job-modal-house').modal('hide');
+  }
+
+  closeAddNewHBForm(form:NgForm) {
+    // form.reset();
+    this.HouseBillWorking = new CsTransactionDetail();
+    this.HouseBillWorking.jobId = this.MasterBillData.id;
+    this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+    this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
+    this.HouseBillWorking.oceanVoyNo = this.MasterBillData.voyNo + "" + this.MasterBillData.flightVesselName;
+    this.HouseBillWorking.customsBookingNo = this.MasterBillData.bookingNo;
+    this.activePortOfLoading = this.MasterBillData.polName + "";
+    this.HouseBillWorking.pol = this.MasterBillData.pol;
+    this.activePortOfDischarge = this.MasterBillData.podName + "";
+    this.HouseBillWorking.pod = this.MasterBillData.pod;
+    this.lstHouseBillContainers = this.MasterBillData.csMawbcontainers;
+    this.isDisplay = false;
+    setTimeout(() => {
+      this.isDisplay = true;
+    }, 500);
+    $('#add-house-bill-modal').modal('hide');
+  }
+
+  showAddContainerForm() {
+    if (!this.isEditing) {
+      this.lstHouseBillContainers = this.MasterBillData.csMawbcontainers;
+    }
   }
 
 

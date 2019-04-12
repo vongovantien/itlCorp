@@ -94,7 +94,7 @@
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="emitSelectedHB(null)" data-toggle="modal" data-target="#add-house-bill-modal">
+                            (click)="emitSelectedHB('addnew')" data-toggle="modal" data-target="#add-house-bill-modal">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -159,7 +159,7 @@
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
                         <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
                             [ngClass]="{'selected-row':i==0}"
-                            (click)="getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb);focusLine($event)">
+                            (click)="getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb.id);focusLine($event)">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
@@ -1177,7 +1177,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add buying rate</h5>
+                    <h5 class="modal-title">Add buying charge</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1951,7 +1951,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add selling rate</h5>
+                    <h5 class="modal-title">Add selling charge</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1998,9 +1998,8 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover"
                                                         *ngIf="lstBuyingRateChargesComboBox!=null && lstBuyingRateChargesComboBox.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row"
-                                                                *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
+                                                        <tbody  *ngFor="let item of lstSellingRateChargesComboBox;let i = index;">
+                                                            <tr class="data-row"                                                               
                                                                 attr.data-id={{i}} (click)="SellingRateChargeToAdd.chargeId=item.charge.id;
                                                             SellingRateChargeToAdd.unitId=item.charge.unitId;
                                                             SellingRateChargeToAdd.unitPrice=item.charge.unitPrice;
@@ -2734,9 +2733,8 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover"
                                                         *ngIf="lstOBHChargesComboBox!=null && lstOBHChargesComboBox.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row"
-                                                                *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
+                                                        <tbody *ngFor="let item of lstOBHChargesComboBox;let i = index;">
+                                                            <tr class="data-row"                                                               
                                                                 attr.data-id={{i}} (click)="OBHChargeToAdd.chargeId=item.charge.id;
                                                             OBHChargeToAdd.unitId=item.charge.unitId;
                                                             OBHChargeToAdd.unitPrice=item.charge.unitPrice;
@@ -3060,7 +3058,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-charge-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

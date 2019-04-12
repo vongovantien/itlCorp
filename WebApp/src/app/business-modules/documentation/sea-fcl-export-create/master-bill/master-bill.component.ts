@@ -102,8 +102,7 @@ export class MasterBillComponent implements OnInit{
                 if(index > -1) this.shipment.personInChargeName = this.userInCharges[index].username;
                 else this.shipment.personInChargeName = '';
             }
-            console.log({"HERE":this.shipment});
-            this.shipmentDetails.emit(Object.assign({},this.shipment));
+                  
         }
         else{
             index = this.terms.findIndex(x => x.id == "Prepaid");
@@ -117,6 +116,7 @@ export class MasterBillComponent implements OnInit{
                 this.shipment.shipmentType = this.shipmentTypes[index].id;
             } 
         }
+        this.shipmentDetails.emit(Object.assign({},this.shipment));    
         this.baseServices.spinnerHide();
     }
     changePortLoading(keySearch: any) {

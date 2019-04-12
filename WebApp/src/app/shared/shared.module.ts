@@ -22,6 +22,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-number.directive';
 import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima-number.directive';
 import { IntergerInputDirective } from './directives/interger-input.directive';
+import {FocusDirective} from './directives/autofocus.directive';
 import { ReportPreviewComponent } from './common/report-preview/report-preview.component';
 @NgModule({
   imports: [CommonModule, FormsModule,SelectModule],
@@ -40,6 +41,7 @@ import { ReportPreviewComponent } from './common/report-preview/report-preview.c
     TwoDigitDecimaNumberDirective,
     ThreeDigitDecimaNumberDirective,
     IntergerInputDirective,
+    FocusDirective,
     ReportPreviewComponent
   ],
   exports: [
@@ -47,6 +49,7 @@ import { ReportPreviewComponent } from './common/report-preview/report-preview.c
     TwoDigitDecimaNumberDirective,
     ThreeDigitDecimaNumberDirective,
     IntergerInputDirective,
+    FocusDirective,
     TableLayoutComponent,
     BreadcrumbComponent,
     DefaultButtonComponent,
