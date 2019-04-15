@@ -10,6 +10,7 @@ using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,10 @@ namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatPartnerService : RepositoryBase<CatPartner, CatPartnerModel>, ICatPartnerService
     {
-        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
+            stringLocalizer = localizer;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -86,11 +89,13 @@ namespace eFMS.API.Catalogue.DL.Services
             List<CustomerPartnerViewModel> results = new List<CustomerPartnerViewModel>();
             foreach (var item in data)
             {
-                var partner = new CustomerPartnerViewModel();
-                partner.SalePersonId = item.Key;
-                partner.SalePersonName = item.Key!=null? ((eFMSDataContext)DataContext.DC).SysUser.First(x => x.Id == item.Key).Username: null;
-                partner.CatPartnerModels = item.ToList();
-                partner.SumNumberPartner = item.Count();
+                var partner = new CustomerPartnerViewModel
+                {
+                    SalePersonId = item.Key,
+                    SalePersonName = item.Key != null ? ((eFMSDataContext)DataContext.DC).SysUser.First(x => x.Id == item.Key).Username : null,
+                    CatPartnerModels = item.ToList(),
+                    SumNumberPartner = item.Count()
+                };
                 results.Add(partner);
             }
             return results;
@@ -277,26 +282,40 @@ namespace eFMS.API.Catalogue.DL.Services
             var branchs = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
             var salemans = dc.SysUser;
 
-            var allGroup = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
+            var allGroup = DataEnums.PARTNER_GROUP;
             var partnerGroups = allGroup.Split(";");
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.TaxCode))
                 {
-                    item.TaxCode = string.Format("Tax code is not allow empty!|wrong");
+                    item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_EMPTY]);
                     item.IsValid = false;
                 }
                 else
                 {
-                    if (partners.Any(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()))
+                    bool isNumeric = int.TryParse(item.TaxCode, out int n);
+                    if (list.Count(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()) > 1)
                     {
-                        item.TaxCode = string.Format("Tax code {0} has been existed!|wrong", item.TaxCode);
+                        item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
+                    }
+                    if (isNumeric == false)
+                    {
+                        item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_NOT_NUMBER]);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        if (partners.Any(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()))
+                        {
+                            item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
+                            item.IsValid = false;
+                        }
                     }
                 }
                 if (string.IsNullOrEmpty(item.PartnerGroup))
                 {
-                    item.PartnerGroup = string.Format("Partner group is not allow empty!|wrong");
+                    item.PartnerGroup = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_GROUP_EMPTY]);
                     item.IsValid = false;
                 }
                 else
@@ -312,7 +331,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         var group = partnerGroups.Intersect(groups);
                         if (group == null)
                         {
-                            item.PartnerGroup = string.Format("Partner group {0} is not found!|wrong", item.PartnerGroup);
+                            item.PartnerGroup = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_GROUP_NOT_FOUND], item.PartnerGroup);
                             item.IsValid = false;
                         }
                         else
@@ -320,16 +339,9 @@ namespace eFMS.API.Catalogue.DL.Services
                             item.PartnerGroup = String.Join(";", group);
                             if (item.PartnerGroup.Contains(DataEnums.CustomerPartner))
                             {
-                                //if (string.IsNullOrEmpty(item.SalePersonId))
-                                //{
-                                //    item.SaleManName = string.Format("Saleman is not allow empty!|wrong");
-                                //    item.IsValid = false;
-                                //}
-                                //else
-                                //{
                                 if (string.IsNullOrEmpty(item.SaleManName))
                                 {
-                                    item.SaleManName = "Sale man is not allow empty. Please check again!|wrong";
+                                    item.SaleManName = stringLocalizer[LanguageSub.MSG_PARTNER_SALEMAN_EMPTY];
                                     item.Inactive = false;
                                 }
                                 else
@@ -337,7 +349,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     var salePerson = salemans.FirstOrDefault(i => i.Username == item.SaleManName);
                                     if (salePerson == null)
                                     {
-                                        item.SaleManName = string.Format("Sale man '{0}' is not found!|wrong", item.SaleManName);
+                                        item.SaleManName = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_SALEMAN_NOT_FOUND], item.SaleManName);
                                         item.IsValid = false;
                                     }
                                     else
@@ -352,123 +364,105 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.PartnerNameEn))
                 {
-                    item.PartnerNameEn = string.Format("Partner name EN is not allow empty!|wrong");
+                    item.PartnerNameEn = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_NAME_EN_EMPTY]);
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.PartnerNameVn))
                 {
-                    item.PartnerNameVn = string.Format("Partner name VN is not allow empty!|wrong");
+                    item.PartnerNameVn = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_NAME_VN_EMPTY]);
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ShortName))
                 {
-                    item.ShortName = string.Format("Short name is not allow empty!|wrong");
+                    item.ShortName = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_SHORT_NAME_EMPTY]);
                     item.IsValid = false;
                 }
-                if (!string.IsNullOrEmpty(item.CountryBilling))
-                {
-                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryBilling.ToLower());
-                    if (country == null)
-                    {
-                        item.CountryBilling = string.Format("Country billing '{0}' is not found!|wrong", item.CountryBilling);
-                        item.CityBilling = string.Format("Country billing '{0}' is not found!|wrong", item.CountryBilling);
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.CountryId = country.Id;
-                        if (!string.IsNullOrEmpty(item.CityBilling))
-                        {
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityBilling.ToLower() && i.CountryId == country.Id);
-                            if (province == null)
-                            {
-                                item.CityBilling = string.Format("City billing '{0}' is not found!|wrong", item.CityBilling);
-                                item.IsValid = false;
-                            }
-                        }
-                    }
+                if (string.IsNullOrEmpty(item.CountryBilling)) {
+                    item.CountryBilling = stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY];
+                    item.IsValid = false;
                 }
-                else
+                if (string.IsNullOrEmpty(item.CityBilling))
                 {
-                    item.CountryBilling = "Country billing is empty. Please check again!|wrong";
-                    if (string.IsNullOrEmpty(item.CityBilling))
-                    {
-                        item.CityBilling = "City billing is empty. Please check again!|wrong";
-                    }
-                    else
-                    {
-                        item.CityBilling = string.Format("City billing '{0}' is not found!|wrong", item.CityBilling);
-                    }
-                    item.Inactive = false;
+                    item.CityBilling = stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_BILLING_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CountryShipping))
+                {
+                    item.CountryShipping = stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CityShipping))
+                {
+                    item.CityShipping = stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_EMPTY];
+                    item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.AddressEn))
                 {
-                    item.AddressEn = "Billing address is not allow empty. Please check again!|wrong";
+                    item.AddressEn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_BILLING_EN_NOT_FOUND];
                     item.Inactive = false;
 
                 }
                 if (string.IsNullOrEmpty(item.AddressVn))
                 {
-                    item.AddressVn = "Billing local address is not allow empty. Please check agian!|wrong";
+                    item.AddressVn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND];
                     item.Inactive = false;
                 }
-                if (!string.IsNullOrEmpty(item.CountryShipping))
+                if (string.IsNullOrEmpty(item.AddressShippingEn))
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping.ToLower());
+                    item.AddressShippingEn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND];
+                    item.Inactive = false;
+                }
+                //if (!string.IsNullOrEmpty(item.Profile))
+                //{
+                //    var workplace = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile);
+                //    if (workplace == null)
+                //    {
+                //        item.CityBilling = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_WORKPLACE_NOT_FOUND], item.Profile);
+                //        item.IsValid = false;
+                //    }
+                //    else
+                //    {
+                //        item.WorkPlaceId = workplace.Id;
+                //    }
+                //}
+                if (string.IsNullOrEmpty(item.AddressShippingVn))
+                {
+                    item.AddressShippingVn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
+                    item.Inactive = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryBilling.ToLower());
                     if (country == null)
                     {
-                        item.CountryShipping = string.Format("Country shipping '{0}' is not found!|wrong", item.CountryShipping);
-                        item.CityShipping = string.Format("Country shipping '{0}' is not found!|wrong", item.CountryShipping);
+                        item.CountryBilling = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND], item.CountryBilling);
                         item.IsValid = false;
                     }
                     else
                     {
                         item.CountryId = country.Id;
-                        if (!string.IsNullOrEmpty(item.CityShipping))
+                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityBilling.ToLower() && i.CountryId == country.Id);
+                        if (province == null)
                         {
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == country.Id);
-                            if (province == null)
-                            {
-                                item.CityShipping = string.Format("City shipping '{0}' is not found!|wrong", item.CityShipping);
-                                item.IsValid = false;
-                            }
+                            item.CityBilling = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_BILLING_NOT_FOUND], item.CityBilling);
+                            item.IsValid = false;
                         }
                     }
-                }
-                else
-                {
-                    item.CountryShipping = "Country shipping is empty. Please check again!|wrong";
-                    if (string.IsNullOrEmpty(item.CityShipping))
+                    var countryShipping = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping.ToLower());
+                    if (countryShipping == null)
                     {
-                        item.CityShipping = "City shipping is empty. Please check again!|wrong";
-                    }
-                    else
-                    {
-                        item.CityShipping = string.Format("City shipping '{0}' is not found!|wrong", item.CityShipping);
-                    }
-                    item.Inactive = false;
-                }
-                if (string.IsNullOrEmpty(item.AddressShippingEn))
-                {
-                    item.AddressShippingEn = "Shipping address is not allow empty. Please check agian!|wrong";
-                    item.Inactive = false;
-                }
-                if (string.IsNullOrEmpty(item.AddressShippingVn))
-                {
-                    item.AddressShippingVn = "Shipping local address is not allow empty. Please check again!|wrong";
-                    item.Inactive = false;
-                }
-                if (!string.IsNullOrEmpty(item.Profile))
-                {
-                    var workplace = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile);
-                    if (workplace == null)
-                    {
-                        item.CityBilling = string.Format("Workplace '{0}' is not found!|wrong", item.Profile);
+                        item.CountryShipping = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_NOT_FOUND], item.CountryShipping);
                         item.IsValid = false;
                     }
                     else
                     {
-                        item.WorkPlaceId = workplace.Id;
+                        item.CountryId = countryShipping.Id;
+                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == country.Id);
+                        if (province == null)
+                        {
+                            item.CityShipping = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);
+                            item.IsValid = false;
+                        }
                     }
                 }
             });

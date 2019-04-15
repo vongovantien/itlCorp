@@ -5,12 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -243,10 +243,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("import")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Import([FromBody] List<CatChargeImportModel> data)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catChargeService.Import(data);
             if (result.Success)
             {

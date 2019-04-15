@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -9,6 +10,7 @@ using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,8 +22,10 @@ namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCountryService : RepositoryBase<CatCountry, CatCountryModel>, ICatCountryService
     {
-        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
+            stringLocalizer = localizer;
             SetChildren<CatPlace>("Id", "CountryId");
         }
 
@@ -33,17 +37,17 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    item.NameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.NameEn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    item.NameVn = string.Format("Name Vn is not allow empty!|wrong");
+                    item.NameVn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = string.Format("Code is not allow empty!|wrong");
+                    item.Code = stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -51,12 +55,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     var country = countries.FirstOrDefault(x => x.Code.ToLower()==item.Code.ToLower());
                     if(country != null)
                     {
-                        item.Code = string.Format("Code {0} has been existed!|wrong", item.Code);
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_EXISTED], item.Code);
                         item.IsValid = false;
                     }
                     if(list.Count(x => (x.Code??"").IndexOf(item.Code ??"", StringComparison.OrdinalIgnoreCase) >=0) > 1)
                     {
-                        item.Code = string.Format("Code {0} has been duplicated!|wrong", item.Code);
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;
                     }
                 }

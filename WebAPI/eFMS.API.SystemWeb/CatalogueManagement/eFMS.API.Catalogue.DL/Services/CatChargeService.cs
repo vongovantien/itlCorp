@@ -12,14 +12,17 @@ using System.Text;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Common.Globals;
 using eFMS.API.Catalogue.Service.Helpers;
+using eFMS.API.Catalogue.DL.Common;
+using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatChargeService  :RepositoryBase<CatCharge,CatChargeModel>,ICatChargeService
     {
-        public CatChargeService(IContextBase<CatCharge> repository,IMapper mapper):base(repository,mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        public CatChargeService(IContextBase<CatCharge> repository,IMapper mapper, IStringLocalizer<LanguageSub> localizer) :base(repository,mapper)
         {
-
+            stringLocalizer = localizer;
         }
 
         public HandleState AddCharge(CatChargeAddOrUpdateModel model)
@@ -172,12 +175,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.ChargeNameEn))
                 {
-                    item.ChargeNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.ChargeNameEn = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ChargeNameVn))
                 {
-                    item.ChargeNameVn = string.Format("Name local is not allow to empty!|wrong");
+                    item.ChargeNameVn = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.UnitId<=0)
@@ -201,7 +204,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.CurrencyId))
                 {
-                    item.CurrencyId = string.Format("Currency is not allow to empty!|wrong");
+                    item.CurrencyId = stringLocalizer[LanguageSub.MSG_CHARGE_CURRENCY_EMPTY];
                     item.IsValid = false;
                 }
                 if (!string.IsNullOrEmpty(item.CurrencyId))
@@ -209,23 +212,23 @@ namespace eFMS.API.Catalogue.DL.Services
                     var currency = dc.CatCurrency.FirstOrDefault(x => x.Id == item.CurrencyId);
                     if (currency == null)
                     {
-                        item.CurrencyId = string.Format("Currency not found, maybe wrong CurrencyId !|wrong");
+                        item.CurrencyId = stringLocalizer[LanguageSub.MSG_CHARGE_CURRENCY_NOT_FOUND];
                         item.IsValid = false;
                     }
                 }
                 if (string.IsNullOrEmpty(item.Type))
                 {
-                    item.Type = string.Format("Type is not allow to empty!|wrong");
+                    item.Type = stringLocalizer[LanguageSub.MSG_CHARGE_TYPE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ServiceTypeId))
                 {
-                    item.ServiceTypeId = string.Format("Service is not allow to empty!|wrong");
+                    item.ServiceTypeId = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = string.Format("Code is not allow to empty!|wrong");
+                    item.Code = stringLocalizer[LanguageSub.MSG_CHARGE_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 if(!string.IsNullOrEmpty(item.Code))
@@ -233,12 +236,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.Code?.ToLower());
                     if (charge != null)
                     {
-                        item.Code = string.Format("Code {0} has been existed!|wrong", item.Code);
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_CODE_EXISTED], item.Code);
                         item.IsValid = false;
                     }
                     if (list.Count(x => x.Code?.ToLower() == item.Code?.ToLower()) > 1)
                     {
-                        item.Code = string.Format("Code {0} has been duplicated!|wrong", item.Code);
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_CODE_DUPLICATED], item.Code);
                         item.IsValid = false;
                     }
                 }
@@ -256,18 +259,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     var charge = new CatCharge
                     {
-                        Id              = Guid.NewGuid(),
-                        Code            = item.Code,
-                        ChargeNameEn    = item.ChargeNameEn,
-                        ChargeNameVn    = item.ChargeNameVn,
-                        UnitId          = item.UnitId,
-                        UnitPrice       = item.UnitPrice,
-                        CurrencyId      = item.CurrencyId,
-                        Type            = item.Type,
-                        ServiceTypeId   = item.ServiceTypeId,
-                        Inactive        = item.Status.ToString().ToLower()=="active"?false:true,
+                        Id = Guid.NewGuid(),
+                        Code = item.Code,
+                        ChargeNameEn = item.ChargeNameEn,
+                        ChargeNameVn = item.ChargeNameVn,
+                        UnitId = item.UnitId,
+                        UnitPrice = item.UnitPrice,
+                        CurrencyId = item.CurrencyId,
+                        Type = item.Type,
+                        ServiceTypeId = item.ServiceTypeId,
+                        Inactive = item.Status.ToString().ToLower() == "active" ? false : true,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated     = "Thor"  // ChangeTrackerHelper.currentUser
+                        UserCreated = ChangeTrackerHelper.currentUser
                     };
                     dc.CatCharge.Add(charge);
                 }

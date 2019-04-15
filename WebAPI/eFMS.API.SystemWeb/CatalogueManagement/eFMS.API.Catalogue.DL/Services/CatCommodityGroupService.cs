@@ -14,13 +14,17 @@ using System.Globalization;
 using System.Threading;
 using ITL.NetCore.Common;
 using eFMS.API.Catalogue.Service.Helpers;
+using Microsoft.Extensions.Localization;
+using eFMS.API.Catalogue.DL.Common;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCommodityGroupService : RepositoryBase<CatCommodityGroup, CatCommodityGroupModel>, ICatCommodityGroupService
     {
-        public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
+            stringLocalizer = localizer;
             SetChildren<CatCommodity>("Id", "CommodityGroupId");
         }
 
@@ -114,17 +118,17 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.GroupNameEn))
                 {
-                    item.GroupNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.GroupNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.GroupNameVn))
                 {
-                    item.GroupNameVn = string.Format("Name Vn is not allow empty!|wrong");
+                    item.GroupNameVn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Status))
                 {
-                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.Status = stringLocalizer[LanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
                     item.IsValid = false;
                 }
             });

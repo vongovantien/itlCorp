@@ -18,17 +18,17 @@ export class PartnerDataDetailComponent implements OnInit {
   departmentActive: any[] = [];
   partner: Partner;
   parentCustomers: any[];
-  parentCustomerActive: any;
+  parentCustomerActive: any[] = [];
   workPlaces: any[];
-  workPlaceActive: any;
+  workPlaceActive: any[] = [];
   saleMans: any[];
   countries: any[];
-  billingCountryActive: any;
+  billingCountryActive: any[] = [];
   billingProvinces: any[];
-  billingProvinceActive: any;
-  shippingCountryActive: any;
+  billingProvinceActive: any[];
+  shippingCountryActive: any[] = [];
   shippingProvinces: any[];
-  shippingProvinceActive: any;
+  shippingProvinceActive: any[] = [];
   partnerGroups: any[];
   partnerGroupActives: any[] = [];
   salemanActive: any[] = [];
@@ -76,15 +76,19 @@ export class PartnerDataDetailComponent implements OnInit {
     this.getPartnerGroupActives(this.partner.partnerGroup.split(';'));
     index = this.departments.findIndex(x => x.id == this.partner.departmentId);
     if(index > -1) this.departmentActive = [this.departments[index].id];
-    this.parentCustomerActive = this.parentCustomers.find(x => x.id == this.partner.parentId);
-    this.workPlaceActive = this.workPlaces.find(x => x.id == this.partner.workPlaceId);
-    this.billingCountryActive = this.countries.find(x => x.id == this.partner.countryId);
-    if(this.billingCountryActive){
-      this.getProvincesByCountry(this.billingCountryActive.id, true);
+    index = this.parentCustomers.findIndex(x => x.id == this.partner.parentId);
+    if(index > -1) this.parentCustomerActive = [this.parentCustomers[index]];
+    index = this.workPlaces.findIndex(x => x.id == this.partner.workPlaceId);
+    if(index > -1) this.workPlaceActive = [this.workPlaces[index]];
+    index = this.countries.findIndex(x => x.id == this.partner.countryId);
+    if(index > - 1){
+      this.billingCountryActive = [this.countries[index]];
+      this.getProvincesByCountry(this.countries[index].id, true);
     }
-    this.shippingCountryActive = this.countries.find(x => x.id == this.partner.countryShippingId);
-    if(this.shippingCountryActive){
-      this.getProvincesByCountry(this.shippingCountryActive.id, false);
+    index = this.countries.findIndex(x => x.id == this.partner.countryShippingId);
+    if(index > -1){
+      this.shippingCountryActive = [this.countries[index]];
+      this.getProvincesByCountry(this.countries[index].id, false);
     }
     if(this.partner.salePersonId){
       let user = this.users.find(x => x.id == this.partner.salePersonId);
@@ -155,13 +159,16 @@ export class PartnerDataDetailComponent implements OnInit {
   getProvincesByCountry(countryId: number, isBilling: boolean): any {
     this.baseService.get(this.api_menu.Catalogue.CatPlace.getProvinces + "?countryId=" + countryId).subscribe((response: any) => {
       if(response != null){
+        let index = -1;
         if(isBilling){
           this.billingProvinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
-          this.billingProvinceActive = this.billingProvinces.find(x => x.id == this.partner.provinceId);
+          index = this.billingProvinces.findIndex(x => x.id == this.partner.provinceId);
+          if(index > -1) this.billingProvinceActive = [this.billingProvinces[index]];
         }
         else{
           this.shippingProvinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
-          this.shippingProvinceActive = this.shippingProvinces.find(x => x.id == this.partner.provinceId);
+          index = this.shippingProvinces.findIndex(x => x.id == this.partner.provinceShippingId);
+          if(index > -1) this.shippingProvinceActive = [this.shippingProvinces[index]];
         }
       }
       else{

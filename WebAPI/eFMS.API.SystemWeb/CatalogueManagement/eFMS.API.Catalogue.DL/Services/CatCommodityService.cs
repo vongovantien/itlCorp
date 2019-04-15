@@ -12,13 +12,16 @@ using System.Linq;
 using eFMS.API.Catalogue.DL.ViewModels;
 using ITL.NetCore.Common;
 using eFMS.API.Catalogue.Service.Helpers;
+using Microsoft.Extensions.Localization;
+using eFMS.API.Catalogue.DL.Common;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCommodityService : RepositoryBase<CatCommodity, CatCommodityModel>, ICatCommodityService
     {
+        private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatCommodityGroup> catCommonityGroupRepo;
-        public CatCommodityService(IContextBase<CatCommodity> repository, IMapper mapper, IContextBase<CatCommodityGroup> catCommonityGroup) : base(repository, mapper)
+        public CatCommodityService(IContextBase<CatCommodity> repository, IMapper mapper, IContextBase<CatCommodityGroup> catCommonityGroup, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
             catCommonityGroupRepo = catCommonityGroup;
         }
@@ -31,12 +34,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.CommodityNameEn))
                 {
-                    item.CommodityNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.CommodityNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CommodityNameVn))
                 {
-                    item.CommodityNameVn = string.Format("Name Local is not allow empty!|wrong");
+                    item.CommodityNameVn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.CommodityGroupId == null)
@@ -46,7 +49,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.Status))
                 {
-                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.Status = stringLocalizer[LanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
                     item.IsValid = false;
                 }
             });

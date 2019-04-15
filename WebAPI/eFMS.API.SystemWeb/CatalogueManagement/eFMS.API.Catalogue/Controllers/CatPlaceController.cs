@@ -22,7 +22,6 @@ using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using System.Linq;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
 
 namespace eFMS.API.Catalogue.Controllers
 {

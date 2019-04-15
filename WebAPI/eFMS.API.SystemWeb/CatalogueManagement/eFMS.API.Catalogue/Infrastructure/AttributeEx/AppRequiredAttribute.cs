@@ -1,4 +1,4 @@
-﻿using eFMS.API.Catalogue.Resources;
+﻿using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Localization;
 using System;
 using System.ComponentModel.DataAnnotations;
