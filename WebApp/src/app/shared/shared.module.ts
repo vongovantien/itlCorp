@@ -24,7 +24,6 @@ import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima
 import { IntergerInputDirective } from './directives/interger-input.directive';
 import { ReportPreviewComponent } from './common/report-preview/report-preview.component';
 import { SpecialCharacterDirective } from './directives/specialChracter.directive';
-import { from } from 'rxjs';
 @NgModule({
   imports: [CommonModule, FormsModule,SelectModule],
   declarations: [

@@ -5,7 +5,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add new house bill of landing</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeAddNewHBForm(addHouseBillForm)">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
@@ -43,9 +43,9 @@
                         <div class="col-lg-4">
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && MasterBillOfLadingName.invalid }">
                                 <label class="form-control-label" for="">
-                                    Master bill of lading
+                                    Master bill of lading <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="text" 
+                                <input type="text" id="hb-mblno"
                                     [(ngModel)]="HouseBillWorking.mawb" required
                                     class="form-control m-input m-input--square" placeholder="Enter text"
                                     #MasterBillOfLadingName="ngModel" name="MasterBillOfLadingName">
@@ -59,9 +59,9 @@
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.customerId==null }">
                                 <label class="form-control-label" for="">
-                                    Customer (Payer)
+                                    Customer (Payer) <span class="m--font-danger">(*)</span>
                                 </label>
-                                <div class="dropdown e--combogrid" #selectedCustomer *ngIf="listCustomers.length>0">
+                                <div class="dropdown e--combogrid" #selectedCustomer>
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                         readonly data-toggle="dropdown" placeholder="combogrid"
                                         [value]="HouseBillWorking.customerName==null?'Please select customer':HouseBillWorking.customerName">
@@ -148,7 +148,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.shipperId==null }">
                                     <label class="form-control-label" for="">
-                                        Shipper
+                                        Shipper <span class="m--font-danger">(*)</span>
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedShipper>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
@@ -213,7 +213,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.consigneeId==null }">
                                     <label class="form-control-label" for="">
-                                        Consignee
+                                        Consignee <span class="m--font-danger">(*)</span>
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedConsignee>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
@@ -225,7 +225,7 @@
                                                     <div class="table-filter-block">
                                                         <div class="search-field">
                                                             <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
+                                                                type="text" placeholder="Search..." (focusout)="getListConsignees(null)"
                                                                 (keyup)="getListConsignees($event.target.value)">
                                                             <i class="icon-search"></i>
                                                         </div>
@@ -276,7 +276,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.notifyPartyId==null }">
                                     <label class="form-control-label" for="">
-                                        Notify party
+                                        Notify party <span class="m--font-danger">(*)</span>
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedPartner>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
@@ -288,8 +288,8 @@
                                                     <div class="table-filter-block">
                                                         <div class="search-field">
                                                             <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
-                                                                (keyup)="getListConsignees($event.target.value)">
+                                                                type="text" placeholder="Search..." (focusout)="getListConsignees(null)"
+                                                                (keyup)="getListNotifyParty($event.target.value)">
                                                             <i class="icon-search"></i>
                                                         </div>
                                                     </div>
@@ -346,7 +346,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillLadingNoName.invalid}">
                                     <label class="form-control-label" for="">
-                                        House bill of lading no.
+                                        House bill of lading no. <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" (change)="HouseBillWorking.hwbno=HouseBillWorking.hwbno.trim()"
                                         required name="HouseBillLadingNoName" #HouseBillLadingNoName="ngModel"
@@ -362,7 +362,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.hbltype==null}">
                                     <label class="form-control-label" for="">
-                                        House bill of lading type
+                                        House bill of lading type <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select [allowClear]="true" [items]="listHouseBillLadingType"
                                         [disabled]="disabled" (data)="refreshValue($event)" [active]="HouseBillWorking.hbltype==null?'':[{'text':HouseBillWorking.hbltype,'id':HouseBillWorking.hbltype}]"
@@ -377,19 +377,15 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && BookingNoName.invalid}">
+                                <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Booking no.
                                     </label>
-                                    <input type="text" required name="BookingNoName" #BookingNoName="ngModel"
+                                    <input type="text"  name="BookingNoName"
                                         (change)="HouseBillWorking.customsBookingNo=HouseBillWorking.customsBookingNo.trim()"
                                         [(ngModel)]="HouseBillWorking.customsBookingNo"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
-                                    <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && BookingNoName.invalid">
-                                        Booking no is required
-                                    </div>
+                           
                                 </div>
                             </div>
                         </div>
@@ -409,9 +405,9 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && OceanVesselAndVoyNoName.invalid}">
                                     <label class="form-control-label" for="">
-                                        Ocean vessel & voy no.
+                                        Ocean vessel & voy no. <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" required name="OceanVesselAndVoyNoName" #OceanVesselAndVoyNoName
+                                    <input type="text" required name="OceanVesselAndVoyNoName" #OceanVesselAndVoyNoName="ngModel"
                                         [(ngModel)]="HouseBillWorking.oceanVoyNo"
                                         (change)="HouseBillWorking.oceanVoyNo=HouseBillWorking.oceanVoyNo.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
@@ -422,8 +418,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.originCountryId==null}">
+                                <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Point of country origin
                                     </label>
@@ -472,38 +467,28 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.originCountryId==null">
-                                        Point of country origin is required
-                                    </div>
+                                    </div>            
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.pickupPlace==null}">
+                                <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Place of receipt
                                     </label>
 
-                                    <input type="text" name="PlaceOfReceipt" #PlaceOfReceipt="ngModel"
+                                    <input type="text" name="PlaceOfReceipt" 
                                         [(ngModel)]="HouseBillWorking.pickupPlace"
                                         (change)="HouseBillWorking.pickupPlace=HouseBillWorking.pickupPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
-                                    <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.pickupPlace==null">
-                                        Place of receipt is required
-                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.pol==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && (HouseBillWorking.pol==null || HouseBillWorking.pol==HouseBillWorking.pod)}">
                                     <label class="form-control-label" for="">
-                                        Port of loading
+                                        Port of loading <span class="m--font-danger">(*)</span>
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedPortOfLoading>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
@@ -552,16 +537,16 @@
                                         </div>
                                     </div>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.pol==null">
-                                        Port of loading is required
+                                        *ngIf="addHouseBillForm.submitted && (HouseBillWorking.pol==null || HouseBillWorking.pol==HouseBillWorking.pod)">
+                                        Port of loading is required and must be difference with port of discharge
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.pod==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && (HouseBillWorking.pod==null || HouseBillWorking.pol==HouseBillWorking.pod)}">
                                     <label class="form-control-label" for="">
-                                        Port of discharge
+                                        Port of discharge <span class="m--font-danger">(*)</span>
                                     </label>
 
                                     <div class="dropdown e--combogrid" #selectedPortOfDischarge>
@@ -611,8 +596,8 @@
                                         </div>
                                     </div>
                                     <div class="form-control-feedback"
-                                        *ngIf="addHouseBillForm.submitted && HouseBillWorking.pod==null">
-                                        Port of discharge is required
+                                        *ngIf="addHouseBillForm.submitted && (HouseBillWorking.pod==null || HouseBillWorking.pol==HouseBillWorking.pod)">
+                                        Port of discharge is required and must be difference with port of loading
                                     </div>
                                 </div>
                             </div>
@@ -643,7 +628,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && HouseBillWorking.freightPayment==null}">
                                     <label class="form-control-label" for="">
-                                        Freight payment
+                                        Freight payment <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select [allowClear]="true" [items]="listFreightPayment" [disabled]="disabled"
                                         [active]="HouseBillWorking.freightPayment==null?'':[{'text':HouseBillWorking.freightPayment,'id':HouseBillWorking.freightPayment}]"
@@ -663,14 +648,14 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Closing date
+                                        Closing date 
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"                                            
                                              ngxDaterangepickerMd
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [(ngModel)]="HouseBillWorking.closingDate" [ranges]="ranges"
-                                            [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                             name="closingDateName" placeholder="Select date" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
@@ -684,14 +669,14 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && sailingDateName.invalid}">
                                     <label class="form-control-label" for="">
-                                        Sailling date
+                                        Sailling date <span class="m--font-danger">(*)</span>
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd
                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [(ngModel)]="HouseBillWorking.sailingDate" [ranges]="ranges" required
-                                            [maxDate]="maxDate" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                             name="sailingDateName" #sailingDateName="ngModel" placeholder="Select date"
                                             readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -710,7 +695,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addHouseBillForm.submitted && FreightPayableAtName.invalid}">
                                     <label class="form-control-label" for="">
-                                        Freight payable at
+                                        Freight payable at <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" required name="FreightPayableAtName"
                                         (change)="HouseBillWorking.placeFreightPay=HouseBillWorking.placeFreightPay.trim()"
@@ -730,7 +715,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Forwarding agent
+                                        Forwarding agent 
                                     </label>
 
                                     <div class="dropdown e--combogrid" #selectedForwardingAgent>
@@ -962,7 +947,7 @@
                                     <span>
                                         <i class="la la-refresh"></i>
                                         <span>
-                                            Reset
+                                            Refresh
                                         </span>
                                     </span>
                                 </button>
@@ -1028,7 +1013,7 @@
                                     <span>{{totalCBM}}</span>
                                 </div>
                                 <div class="m--margin-top-10">
-                                    <button type="button"
+                                    <button type="button" (click)="showAddContainerForm()"
                                         class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                         data-toggle="modal" data-target="#container-list-of-job-modal-house">
                                         <span>
@@ -1260,7 +1245,7 @@
                                             </td>
                                             <td class="">
                                                 <span class="content-editable">
-                                                    Cont Type
+                                                    Cont Type <span class="m--font-danger">(*)</span>
                                                 </span>
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerListForm.submitted && container.containerTypeId == null && container.verifying}">
@@ -1332,18 +1317,17 @@
                                                     <div class="dropdown e--combogrid" #selectedCommodity>
                                                         <input
                                                             class="form-control m-input m-input--square dropdown-toggle"
-                                                            type="text" readonly data-toggle="dropdown"
+                                                            type="text" readonly data-toggle="dropdown" (keyup)="SearchCommodity($event.target.value)"
                                                             placeholder="Please selected"
-                                                            [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value"
-                                                            [(ngModel)]="selectedCommodityValue"
-                                                            name="selectedCommodityValue">
+                                                            [value]="container.commodityName == null?'Please selected a commodity':container.commodityName"
+                                                           >
                                                         <div
                                                             class="dropdown-menu  dropdown-menu-right e--combogrid-content">
                                                             <div class="tabel-wrapper table-fixed">
                                                                 <div class="table-head-fixed">
                                                                     <div class="table-filter-block">
                                                                         <div class="search-field">
-                                                                            <input
+                                                                            <input (keyup)="getComodities($event.target.value)" (focusout)="getComodities(null)"
                                                                                 class="form-control m-input m-input--square"
                                                                                 type="text" placeholder="Search...">
                                                                             <i class="icon-search"></i>
@@ -1459,7 +1443,7 @@
                                                 </span>
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="weightMesurements"
-                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        [disabled]="true" (data)="refreshValue($event)"
                                                         (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
                                                         (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
                                                         (typed)="typed($event)" [active]="container.unitOfMeasureActive"

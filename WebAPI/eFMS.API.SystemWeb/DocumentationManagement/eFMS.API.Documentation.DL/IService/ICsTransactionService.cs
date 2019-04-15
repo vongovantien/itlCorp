@@ -22,5 +22,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
         bool CheckAllowDelete(Guid jobId);
         HandleState DeleteCSTransaction(Guid jobId);
+        List<object> GetListTotalHB(Guid JobId);
     }
 }

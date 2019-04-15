@@ -144,6 +144,56 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public List<object> GetListTotalHB(Guid JobId)
+        {
+            List<object> returnList = new List<object>();
+            var housebills = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList();
+            foreach(var item in housebills)
+            {
+                var totalBuying = (decimal?)0;
+                var totalSelling = (decimal?)0;
+                var totalobh = (decimal?)0;
+                var totallogistic = (decimal?)0;
+
+
+                var totalBuyingUSD = (decimal?)0;
+                var totalSellingUSD = (decimal?)0;
+                var totalobhUSD = (decimal?)0;
+                var totallogisticUSD = (decimal?)0;
+
+                var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == item.Id).ToList();
+
+                foreach (var c in charges)
+                {
+                    var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var UsdToVnd = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var rate = exchangeRate == null ? 1 : exchangeRate.Rate;
+                    var usdToVndRate = UsdToVnd == null ? 1 : UsdToVnd.Rate;
+                    if (c.Type.ToLower() == "buy")
+                    {
+                        totalBuying += c.Total * rate;
+                        totalBuyingUSD += (totalBuying / usdToVndRate);
+                    }
+                    if (c.Type.ToLower()== "sell")
+                    {
+                        totalSelling += c.Total * rate;
+                        totalSellingUSD +=(totalSelling / usdToVndRate);
+                    }
+                    if (c.Type.ToLower() == "obh")
+                    {
+                        totalobh += c.Total * rate;
+                        totalobhUSD += (totalobh / usdToVndRate);
+                    }
+                }
+
+                var totalVND = totalSelling - totalBuying - totallogistic;
+                var totalUSD = totalSellingUSD - totalBuyingUSD - totallogisticUSD;
+                var obj = new { item.Hwbno, totalVND, totalUSD };
+                returnList.Add(obj);
+            }
+            return returnList;
+        }
+
         public object ImportCSTransaction(CsTransactionEditModel model)
         {
             try

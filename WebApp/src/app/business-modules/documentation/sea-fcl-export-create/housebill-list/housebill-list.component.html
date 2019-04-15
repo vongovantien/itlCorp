@@ -94,7 +94,7 @@
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="emitSelectedHB(null)" data-toggle="modal" data-target="#add-house-bill-modal">
+                            (click)="emitSelectedHB('addnew')" data-toggle="modal" data-target="#add-house-bill-modal">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -159,8 +159,7 @@
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
                         <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
                             [ngClass]="{'selected-row':i==0}"
-                            (click)="$event.path[0].closest('tbody').querySelector('tr.selected-row')==null?return:$event.path[0].closest('tbody').querySelector('tr.selected-row').classList.remove('selected-row');$event.path[0].closest('tr').classList.add('selected-row');
-                                    getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb)">
+                            (click)="getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb.id);focusLine($event)">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
@@ -378,9 +377,9 @@
                                             title="Edit" data-toggle="modal" data-target="#edit-buying-rate-modal">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button"
+                                        <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -438,7 +437,7 @@
                                 </td>
                                 <td>
                                     <span>
-                                        SOA
+                                        {{charge.soano}}
                                     </span>
                                 </td>
                                 <td>
@@ -583,9 +582,9 @@
                                             title="Edit" data-toggle="modal" data-target="#edit-selling-rate-modal">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button"
+                                        <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -643,7 +642,7 @@
                                 </td>
                                 <td>
                                     <span>
-                                        SOA
+                                        {{charge.soano}}
                                     </span>
                                 </td>
                                 <td>
@@ -793,9 +792,9 @@
                                             title="Edit" data-toggle="modal" data-target="#edit-obh-charge-modal">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button"
+                                        <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -858,7 +857,7 @@
                                 </td>
                                 <td>
                                     <span>
-                                        SOA
+                                        {{charge.soano}}
                                     </span>
                                 </td>
                                 <td>
@@ -1082,7 +1081,7 @@
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title">
                 <h3 class="m-portlet__head-text">
-                    Grant Total Profit
+                    Profit Summary
                 </h3>
             </div>
         </div>
@@ -1178,7 +1177,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add buying rate</h5>
+                    <h5 class="modal-title">Add buying charge</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1952,7 +1951,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add selling rate</h5>
+                    <h5 class="modal-title">Add selling charge</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1999,9 +1998,8 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover"
                                                         *ngIf="lstBuyingRateChargesComboBox!=null && lstBuyingRateChargesComboBox.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row"
-                                                                *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
+                                                        <tbody  *ngFor="let item of lstSellingRateChargesComboBox;let i = index;">
+                                                            <tr class="data-row"                                                               
                                                                 attr.data-id={{i}} (click)="SellingRateChargeToAdd.chargeId=item.charge.id;
                                                             SellingRateChargeToAdd.unitId=item.charge.unitId;
                                                             SellingRateChargeToAdd.unitPrice=item.charge.unitPrice;
@@ -2735,9 +2733,8 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover"
                                                         *ngIf="lstOBHChargesComboBox!=null && lstOBHChargesComboBox.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row"
-                                                                *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
+                                                        <tbody *ngFor="let item of lstOBHChargesComboBox;let i = index;">
+                                                            <tr class="data-row"                                                               
                                                                 attr.data-id={{i}} (click)="OBHChargeToAdd.chargeId=item.charge.id;
                                                             OBHChargeToAdd.unitId=item.charge.unitId;
                                                             OBHChargeToAdd.unitPrice=item.charge.unitPrice;
@@ -3061,7 +3058,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-charge-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -3535,3 +3532,44 @@
     </div>
 </div>
 <!--end::confirm-delete-housebill-modal-->
+
+
+<!--begin::confirm-delete-charge-modal-->
+<div class="modal fade" id="confirm-delete-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure want to delete this Charge?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="DeleteCharge('ok')">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-charge-modal-->

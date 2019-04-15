@@ -98,6 +98,10 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var list = Query(criteria);
             List<object> listReturn = new List<object>();
+            if(criteria.Type!=null && criteria.ServiceTypeId!=null && criteria.Inactive != null)
+            {
+                list = list.Where(x => (x.Type.Trim().ToLower() == criteria.Type.Trim().ToLower() && x.ServiceTypeId.IndexOf(criteria.ServiceTypeId)>-1 && x.Inactive == criteria.Inactive)).ToList();
+            }
 
             rowsCount = list.Count;
             if (size > 1)

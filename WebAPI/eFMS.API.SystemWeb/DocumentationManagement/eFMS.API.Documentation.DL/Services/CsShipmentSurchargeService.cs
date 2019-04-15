@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -16,6 +17,30 @@ namespace eFMS.API.Documentation.DL.Services
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper) : base(repository, mapper)
         {
 
+        }
+
+        public HandleState DeleteCharge(Guid chargeId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
+                if (charge == null)
+                    hs = new HandleState("Charge not found! ");
+                if(charge!=null && (charge.Soano != null || charge.OtherSoa!=null))
+                {
+                    hs = new HandleState("Cannot delete, this charge is containing Credit Debit Note/SOA no!");
+                }
+                else
+                {
+                    DataContext.Delete(x => x.Id == chargeId);
+                }
+            }
+            catch(Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
         }
 
         public List<CatPartner> GetAllParnerByJob(Guid JobId)
@@ -144,7 +169,13 @@ namespace eFMS.API.Documentation.DL.Services
                         ).ToList();
             foreach (var item in query)
             {
+               
+                
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item.charge);
+                var exchangeCurrencyToVND = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == charge.ExchangeDate.Value.Date && x.CurrencyFromId == charge.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                var exchangeUSDToVND = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == charge.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                charge.ExchangeRate = exchangeCurrencyToVND == null ? 1 : exchangeCurrencyToVND.Rate;
+                charge.ExchangeRateUSDToVND = exchangeUSDToVND == null ? 1 : exchangeUSDToVND.Rate;
                 charge.PartnerName = item.p?.PartnerNameEn;
                 charge.NameEn = item?.ChargeNameEn;
                 charge.ReceiverName = item.r?.PartnerNameEn;

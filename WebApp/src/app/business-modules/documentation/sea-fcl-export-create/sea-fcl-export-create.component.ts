@@ -136,7 +136,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         await this.route.params.subscribe(async prams => {
             if(prams.id != undefined){
                 this.inEditing = true;
-                this.shipment.id = prams.id;               
+                this.shipment.id = prams.id;         
+                await this.getTotalProfit();      
                 await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
@@ -860,6 +861,17 @@ export class SeaFclExportCreateComponent implements OnInit {
     currentHouseBillCatcher(currentHouseBill:any){
         this.currentHouseBill = currentHouseBill;
         console.log({"Current_HouseBill":this.currentHouseBill});
+    }
+
+    listTotalHouseBill:any[]=[];
+    totalUSD : number = 0;
+    totalVND : number = 0;
+    async getTotalProfit(){
+        this.listTotalHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getTotalProfit+"?JobId="+this.shipment.id);
+        this.listTotalHouseBill.forEach(ele => {
+            this.totalUSD += ele.totalUSD ;
+            this.totalVND += ele.totalVND ;
+        });
     }
 
 }

@@ -97,5 +97,20 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
 
         }
+
+        [HttpDelete]
+        [Route("Delete")]
+        //[Authorize]
+        public IActionResult Delete(Guid chargId)
+        {
+            var hs = csShipmentSurchargeService.DeleteCharge(chargId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
