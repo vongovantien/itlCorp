@@ -599,6 +599,53 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
 
+  getPackageContainerSummary() {
+    var returnSummary: string = "";
+
+    for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+      returnSummary += this.lstHouseBillContainers[i].quantity + "x" + this.lstHouseBillContainers[i].containerTypeName;
+      if (this.lstHouseBillContainers[i].packageTypeName != null && this.lstHouseBillContainers[i].packageTypeName.trim() != "") {
+        returnSummary += " : " + this.lstHouseBillContainers[i].packageTypeName + "x" + this.lstHouseBillContainers[i].packageQuantity + ",";
+      } else {
+        returnSummary += this.lstHouseBillContainers[i].quantity + "x" + this.lstHouseBillContainers[i].containerTypeName + ","
+      }
+    }
+    return returnSummary;
+  }
+
+  getCommoditySummary() {
+    var returnSummary: string = "";
+    for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+      returnSummary += this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ","
+    }
+    return returnSummary;
+  }
+
+  getDescriptionOfGoodSummary() {
+    var returnSummary: string = "";
+    for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+      returnSummary += this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ",\n"
+    }
+    return returnSummary;
+  }
+
+  refreshHBLSummary(){
+      this.totalGrossWeight = 0;
+      this.totalNetWeight = 0;
+      this.totalCharWeight = 0;
+      this.totalCBM = 0;
+      this.HouseBillWorking.packageContainer = '';
+    for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+      this.HouseBillWorking.commodity = this.getCommoditySummary();
+      this.HouseBillWorking.desOfGoods = this.getDescriptionOfGoodSummary();
+      this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
+      this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
+      this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
+      this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
+      this.HouseBillWorking.packageContainer = this.getPackageContainerSummary();
+    }
+  }
+
   onSubmitContainer(form: NgForm) {
 
 
@@ -606,32 +653,26 @@ export class HousebillAddnewComponent implements OnInit {
       return;
     }
 
-
-
-
-    this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
     if (this.containerListForm.valid) {
       this.totalGrossWeight = 0;
       this.totalNetWeight = 0;
       this.totalCharWeight = 0;
       this.totalCBM = 0;
-
       this.HouseBillWorking.packageContainer = '';
       for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
+        if (this.numberOfTimeSaveContainer == 0) {
+          this.HouseBillWorking.commodity = this.getCommoditySummary();
+          this.HouseBillWorking.desOfGoods = this.getDescriptionOfGoodSummary();
+        }
         this.lstHouseBillContainers[i].isSave = true;
         this.totalGrossWeight = this.totalGrossWeight + this.lstHouseBillContainers[i].gw;
         this.totalNetWeight = this.totalNetWeight + this.lstHouseBillContainers[i].nw;
         this.totalCharWeight = this.totalCharWeight + this.lstHouseBillContainers[i].chargeAbleWeight;
         this.totalCBM = this.totalCBM + this.lstHouseBillContainers[i].cbm;
-        this.HouseBillWorking.packageContainer = this.HouseBillWorking.packageContainer + (this.lstHouseBillContainers[i].quantity == "" ? "" : this.lstHouseBillContainers[i].quantity + "x" + this.lstHouseBillContainers[i].containerTypeName + ", ");
-        if (this.numberOfTimeSaveContainer == 1) {
-          this.HouseBillWorking.commodity = '';
-          this.HouseBillWorking.desOfGoods = '';
-          this.HouseBillWorking.commodity = this.HouseBillWorking.commodity + (this.lstHouseBillContainers[i].commodityName == "" ? "" : this.lstHouseBillContainers[i].commodityName + ",");
-          this.HouseBillWorking.desOfGoods = this.HouseBillWorking.desOfGoods + (this.lstHouseBillContainers[i].description == "" ? "" : this.lstHouseBillContainers[i].description + ", \n");
-        }
+        this.HouseBillWorking.packageContainer = this.getPackageContainerSummary();
       }
       $('#container-list-of-job-modal-house').modal('hide');
+      this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
     }
   }
 
@@ -725,6 +766,12 @@ export class HousebillAddnewComponent implements OnInit {
   }
 
   changeEditStatus(index: any) {
+    var saveBtns = $('#hb-containers-list').find('i.la-save')
+    if (saveBtns.length > 0) {
+      this.baseServices.errorToast("You must save current container before continue !");
+      return;
+    }
+
     if (this.lstHouseBillContainers[index].allowEdit == false) {
       this.lstHouseBillContainers[index].allowEdit = true;
       this.lstHouseBillContainers[index].containerTypeActive = this.lstHouseBillContainers[index].containerTypeId != null ? [{ id: this.lstHouseBillContainers[index].containerTypeId, text: this.lstHouseBillContainers[index].containerTypeName }] : [];
@@ -736,6 +783,8 @@ export class HousebillAddnewComponent implements OnInit {
       this.lstHouseBillContainers[index].allowEdit = false;
     }
   }
+
+
 
 
   closeAddContainerForm() {

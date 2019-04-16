@@ -452,8 +452,11 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <span *ngIf="charge.exchangeDate.startDate==undefined">
                                         {{charge.exchangeDate | date:'dd/MM/yyyy'}}
+                                    </span>
+                                    <span *ngIf="charge.exchangeDate.startDate!=undefined">
+                                        {{charge.exchangeDate.startDate | date:'dd/MM/yyyy'}}
                                     </span>
                                 </td>
                             </tr>
@@ -1579,7 +1582,7 @@
                                             &nbsp;</small>
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedBuyingChargeEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" [disabled]="BuyingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="BuyingRateChargeToEdit.nameEn" title="charge">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -1643,7 +1646,7 @@
                                     <ng-select [allowClear]="true" [items]="[
                                                             { 'text': 'AGENT', 'id': 'AGENT' },
                                                             { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
-                                                            { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
+                                                            { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [active]="[{'text':BuyingRateChargeToEdit.objectBePaid,'id':BuyingRateChargeToEdit.objectBePaid}]"
                                         (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.objectBePaid=$event.id;
@@ -1669,8 +1672,8 @@
                                         Partner name
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedBuyingRatePartnerEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER'" readonly
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"                                           
+                                            [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.soano!=null" readonly
                                             data-toggle="dropdown" placeholder="Please selected"
                                             [value]="BuyingRateChargeToEdit.partnerName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -1732,6 +1735,7 @@
                                     </label>
                                     <input type="text" required #buyingRateChangeQuantityNameEdt="ngModel" required
                                         class="form-control m-input m-input--square" appIntergerInputCheck
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="BuyingRateChargeToEdit.quantity" placeholder="Enter text"
                                         name="buyingRateChangeQuantityNameEdt" (keyup)="calculateTotalEachBuying(true)">
                                     <div class="form-control-feedback"
@@ -1748,6 +1752,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            [disabled]="BuyingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="BuyingRateChargeToEdit.unit">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -1801,6 +1806,7 @@
                                         Unit price
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="BuyingRateChargeToEdit.unitPrice" placeholder="Enter text" required
                                         name="BuyingRateChargeUnitPriceNameEdt"
                                         #BuyingRateChargeUnitPriceNameEdt="ngModel"
@@ -1821,7 +1827,7 @@
                                     </label>
                                     <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
                                         [active]="[{'text':BuyingRateChargeToEdit.currency,'id':BuyingRateChargeToEdit.currencyId}]"
-                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null" (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.currencyId=$event.id;BuyingRateChargeToEdit.currency=$event.text"
                                         (removed)="BuyingRateChargeToEdit.currencyId=null"
                                         (typed)="getListCurrency($event)" placeholder="Select filter">
@@ -1840,6 +1846,7 @@
                                     </label>
                                     <input type="number" name="BuyingRateChargeVATNameEdt" required max="100"
                                         #BuyingRateChargeVATNameEdt="ngModel"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="BuyingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachBuying(true)">
@@ -1867,6 +1874,7 @@
                                         Doc no
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.docNo"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeDocNameEdt">
                                 </div>
@@ -1877,6 +1885,7 @@
                                         Note
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.notes"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeNoteNameEdt">
                                 </div>
@@ -1888,6 +1897,7 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
+                                            [attr.disabled]="BuyingRateChargeToEdit.soano!=null"
                                             ngxDaterangepickerMd [autoApply]="true"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="BuyingRateChargeToEdit.exchangeDate" [singleDatePicker]="true"
@@ -1905,6 +1915,7 @@
                                     <div>
                                         <label class="m-checkbox m-checkbox--bold">
                                             <input type="checkbox" [(ngModel)]="BuyingRateChargeToEdit.kickBack"
+                                                [disabled]="BuyingRateChargeToEdit.soano!=null"
                                                 name="BuyingRateChargeKickBacksNameEdt">
                                             Kick back
                                             <span></span>
@@ -2331,7 +2342,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="SellingRateChargeToEdit.soano!=null"
                                             [value]="SellingRateChargeToEdit.nameEn" title="charge">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -2391,7 +2402,7 @@
                                     <label class="form-control-label" for="">
                                         Partner type
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="partnerTypes" [disabled]="disabled"
+                                    <ng-select [allowClear]="true" [items]="partnerTypes" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [active]="[{'text':SellingRateChargeToEdit.objectBePaid,'id':SellingRateChargeToEdit.objectBePaid}]"
                                         (data)="refreshValue($event)"
                                         (selected)="SellingRateChargeToEdit.objectBePaid=$event.id;
@@ -2417,8 +2428,8 @@
                                         Partner name
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedSellingRatePartnerEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER'" readonly
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"                                        
+                                            [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null" readonly
                                             data-toggle="dropdown" placeholder="Please selected"
                                             [value]="SellingRateChargeToEdit.partnerName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -2479,7 +2490,7 @@
                                     <label class="form-control-label" for="">
                                         Quantity
                                     </label>
-                                    <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required
+                                    <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" appIntergerInputCheck
                                         [(ngModel)]="SellingRateChargeToEdit.quantity" placeholder="Enter text"
                                         name="sellingRateChangeQuantityNameEdt"
@@ -2498,6 +2509,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            [disabled]="SellingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="SellingRateChargeToEdit.unit">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -2551,6 +2563,7 @@
                                         Unit price
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="SellingRateChargeToEdit.unitPrice" placeholder="Enter text"
                                         required name="SellingRateChargeUnitPriceNameEdt"
                                         #SellingRateChargeUnitPriceNameEdt="ngModel"
@@ -2571,7 +2584,7 @@
                                     </label>
                                     <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
                                         [active]="[{'text':SellingRateChargeToEdit.currency,'id':SellingRateChargeToEdit.currencyId}]"
-                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null" (data)="refreshValue($event)"
                                         (selected)="SellingRateChargeToEdit.currencyId=$event.id;SellingRateChargeToEdit.currency=$event.text"
                                         (removed)="SellingRateChargeToEdit.currencyId=null"
                                         (typed)="getListCurrency($event)" placeholder="Select filter">
@@ -2589,7 +2602,7 @@
                                         VAT
                                     </label>
                                     <input type="number" name="SellingRateChargeVATNameEdt" required max="100"
-                                        #SellingRateChargeVATNameEdt="ngModel"
+                                        #SellingRateChargeVATNameEdt="ngModel" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="SellingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachSelling(true)">
@@ -2616,7 +2629,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeDocNameEdt">
                                 </div>
@@ -2626,7 +2639,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeNoteNameEdt">
                                 </div>
@@ -2638,7 +2651,7 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true"
+                                            ngxDaterangepickerMd [autoApply]="true" [disabled]="SellingRateChargeToEdit.soano!=null"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="SellingRateChargeToEdit.exchangeDate" [singleDatePicker]="true"
                                             name="SellingRateChargeExchangeDateNameEdt" readonly />
@@ -3081,7 +3094,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit OBH charge</h5>
+                    <h5 class="modal-title">Edit OBH rate</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -3099,7 +3112,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
                                             [value]="OBHChargeToEdit.nameEn"
                                             title="Đây là một charge name dài thật là dài luôn nạ Thor">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -3161,7 +3174,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
                                             [value]="OBHChargeToEdit.receiverName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -3220,7 +3233,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
                                             [value]="OBHChargeToEdit.payerName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -3281,7 +3294,7 @@
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
                                         placeholder="Enter text" #OBHQuantityNameEdt="ngModel" appIntergerInputCheck
-                                        [(ngModel)]="OBHChargeToEdit.quantity" required
+                                        [(ngModel)]="OBHChargeToEdit.quantity" required [disabled]="OBHChargeToEdit.soano!=null"
                                         (keyup)="calculateTotalEachOBH(true)" name="OBHQuantityNameEdt">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeForm.submitted && OBHQuantityNameEdt.invalid">
@@ -3298,7 +3311,7 @@
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="OBHChargeToEdit.unit">
+                                            [value]="OBHChargeToEdit.unit" [disabled]="OBHChargeToEdit.soano!=null">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
@@ -3349,7 +3362,7 @@
                                     <label class="form-control-label" for="">
                                         Unit price
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
+                                    <input type="text" class="form-control m-input m-input--square" [disabled]="OBHChargeToEdit.soano!=null"
                                         [(ngModel)]="OBHChargeToEdit.unitPrice" placeholder="Enter text" required
                                         name="OBHUnitPriceNameEdt" #OBHUnitPriceNameEdt="ngModel"
                                         (keyup)="calculateTotalEachOBH(true)">
@@ -3368,7 +3381,7 @@
                                         Currency
                                     </label>
                                     <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
-                                        [disabled]="disabled"
+                                        [disabled]="OBHChargeToEdit.soano!=null"
                                         [active]="[{'text':OBHChargeToEdit.currency,'id':OBHChargeToEdit.currencyId}]"
                                         (data)="refreshValue($event)" (selected)="OBHChargeToEdit.currencyId=$event.id"
                                         (removed)="OBHChargeToEdit.currencyId=null" (typed)="getListCurrency($event)"
@@ -3386,7 +3399,7 @@
                                     <label class="form-control-label" for="">
                                         VAT
                                     </label>
-                                    <input type="number" max="100" name="OBHChargeVATNameEdt" required
+                                    <input type="number" max="100" name="OBHChargeVATNameEdt" required [disabled]="OBHChargeToEdit.soano!=null"
                                         #OBHChargeVATNameEdt="ngModel" [(ngModel)]="OBHChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachOBH(true)">
@@ -3413,7 +3426,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo" [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeDocName">
                                 </div>
@@ -3423,7 +3436,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes" [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeNoteName">
                                 </div>
@@ -3435,7 +3448,7 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true"
+                                            ngxDaterangepickerMd [autoApply]="true" [disabled]="OBHChargeToEdit.soano!=null"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="OBHChargeToEdit.exchangeDate" [singleDatePicker]="true"
                                             name="OBHExchangeDateNameEdt" readonly />

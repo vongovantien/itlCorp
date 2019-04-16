@@ -67,11 +67,17 @@ namespace eFMS.API.Documentation.DL.Services
                 var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
                 if (isUpdateDone.Success)
                 {
+                   
+
                     if (model.CsMawbcontainers.Count > 0)
                     {
+
                         foreach (var item in model.CsMawbcontainers)
                         {
                             //var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();
+
+
+               
                             var cont = mapper.Map<CsMawbcontainer>(item);
 
                             if (cont.Id == Guid.Empty)
@@ -90,6 +96,16 @@ namespace eFMS.API.Documentation.DL.Services
                                 cont.DatetimeModified = DateTime.Now;
                                 ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Update(cont);
                             }
+                        }
+                        var listConts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
+                        foreach (var item in listConts)
+                        {
+                            var isExist = model.CsMawbcontainers.Where(x => x.Id == item.Id).FirstOrDefault();
+                            if (isExist == null)
+                            {
+                                ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
+                            }
+
                         }
                     }
                     else

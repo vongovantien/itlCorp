@@ -942,7 +942,7 @@
                                 </h3>
                             </div>
                             <div class="col-6 m--align-right">
-                                <button type="button"
+                                <button type="button" (click)="refreshHBLSummary()"
                                     class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase">
                                     <span>
                                         <i class="la la-refresh"></i>
@@ -1099,6 +1099,7 @@
             <div class="modal-content m-form m-form--state">
                 <div class="modal-header">
                     <h5 class="modal-title">Container List Module</h5>
+                    
                     <button type="button" class="close" aria-label="Close" (click)="closeAddContainerForm()">
                         <span aria-hidden="true">&times;</span>
                     </button>    
@@ -1120,6 +1121,7 @@
                                                 </span>
                                             </span>
                                         </div>
+                                        <h6>Number Time of Save : {{numberOfTimeSaveContainer}}</h6>
                                     </div>
                                 </div>
                                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
@@ -1226,7 +1228,7 @@
                                 </thead>
 
 
-                                <tbody *ngIf="lstHouseBillContainers">
+                                <tbody *ngIf="lstHouseBillContainers" id="hb-containers-list">
                                     <ng-container *ngFor="let container of lstHouseBillContainers; let i= index">
                                         <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit">
                                             <td class="table-actions-col fixed-side">
