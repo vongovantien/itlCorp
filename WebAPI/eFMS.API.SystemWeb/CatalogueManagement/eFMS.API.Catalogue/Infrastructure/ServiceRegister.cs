@@ -8,6 +8,17 @@ using eFMS.API.Catalogue.DL.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.Extensions.Configuration;
+using System.Globalization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Swashbuckle.AspNetCore.Swagger;
+using System.Collections.Generic;
+using eFMS.API.Catalogue.Infrastructure.Filters;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -37,6 +48,85 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatChargeDefaultAccountService, CatChargeDefaultService>();
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
+        }
+
+        public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddJsonLocalization(opts => opts.ResourcesPath = configuration["LANGUAGE_PATH"]);
+            //Multiple language setting
+            var supportedCultures = new[]
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("vi-VN")
+            };
+            var localizationOptions = new RequestLocalizationOptions()
+            {
+                DefaultRequestCulture = new RequestCulture(culture: "en-US"),
+                SupportedCultures = supportedCultures,
+
+            };
+
+            localizationOptions.RequestCultureProviders = new[]
+            {
+                 new RouteDataRequestCultureProvider()
+                 {
+                     RouteDataStringKey = "lang",
+                     Options = localizationOptions
+                 }
+            };
+
+            services.AddSingleton(localizationOptions);
+            return services;
+        }
+
+        public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
+        {
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddIdentityServerAuthentication(options =>
+            {
+                options.Authority = configuration["Authentication:Authority"];
+                options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
+                options.ApiName = configuration["Authentication:ApiName"];
+                options.ApiSecret = configuration["Authentication:ApiSecret"];
+            });
+            return services;
+        }
+        public static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddSwaggerGen(
+                options =>
+                {
+                    var provider = services.BuildServiceProvider()
+                    .GetRequiredService<IApiVersionDescriptionProvider>();
+
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.SwaggerDoc(
+                            description.GroupName,
+                            new Info()
+                            {
+                                Title = $"eFMS Catalogue API {description.ApiVersion}",
+                                Version = description.ApiVersion.ToString(),
+                                Description = "eFMS Catalogue API Document"
+                            });
+                    }
+                    //options.DocumentFilter<SwaggerAddEnumDescriptions>();
+
+                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    {
+                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
+                        AuthorizationUrl = "",
+                        Scopes = new Dictionary<string, string> { { "apimobile", "Catalogue API" } }
+                    });
+                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
+                    options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
+                });
+            return services;
         }
     }
 }

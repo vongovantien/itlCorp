@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Linq;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -17,25 +18,28 @@ namespace eFMS.API.Catalogue.Service.Models
         }
         public override int SaveChanges()
         {
-            var modifiedEntities = ChangeTracker.Entries()
-                .Where(p => p.State == EntityState.Modified).ToList();
-            var now = DateTime.UtcNow;
-
-            foreach (var change in modifiedEntities)
+            var entities = ChangeTracker.Entries();
+            var mongoDb = Helpers.MongoDbHelper.GetDatabase();
+            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+            var addedList = ChangeTrackerHelper.GetAdded(entities);
+            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
+            var result = base.SaveChanges();
+            if (result > 0)
             {
-                var entityName = change.Entity.GetType().Name;
-                var properties = change.OriginalValues.Properties;
-                var primaryKey = properties.Where(x => x.IsKey());
-                foreach (var prop in properties)
+                if (addedList != null)
                 {
-                    var originalValue = change.OriginalValues[prop]?.ToString();
-                    var currentValue = change.CurrentValues[prop]?.ToString();
-                    if (originalValue != currentValue)
-                    {
-                    }
+                    ChangeTrackerHelper.InsertToMongoDb(addedList, EntityState.Added);
+                }
+                if (modifiedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(modifiedList, EntityState.Modified);
+                }
+                if (deletedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(deletedList, EntityState.Deleted);
                 }
             }
-            return base.SaveChanges();
+            return result;
         }
         public virtual DbSet<CatArea> CatArea { get; set; }
         public virtual DbSet<CatBranch> CatBranch { get; set; }

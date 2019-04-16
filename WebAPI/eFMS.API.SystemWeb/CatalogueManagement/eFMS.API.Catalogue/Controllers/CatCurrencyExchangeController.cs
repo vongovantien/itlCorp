@@ -74,22 +74,6 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        [Route("Add")]
-        public IActionResult Post(CatCurrencyExchangeModel model)
-        {
-            if (!ModelState.IsValid) return BadRequest();
-            model.Inactive = false;
-            var hs = catCurrencyExchangeService.Add(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
         [HttpPut]
         [Route("UpdateRate")]
         [Authorize]

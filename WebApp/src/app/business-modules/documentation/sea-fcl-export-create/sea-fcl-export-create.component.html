@@ -672,7 +672,7 @@ aria-hidden="true">
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid && container.verifying}">
                                                     <input type="number" class="form-control m-input m-input--square"
-                                                        min="1" value="1" oninput="validity.valid||(value='');"
+                                                        min="1" max="2147483647" value="1" oninput="validity.valid||(value='');"
                                                         placeholder="Please enter" [(ngModel)]="container.quantity"
                                                         name="conQuantity" #conQuantity="ngModel" required>
                                                     <div class="form-control-feedback"
@@ -790,7 +790,7 @@ aria-hidden="true">
                                                 </span> -->
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
-                                                        min="1" [(ngModel)]="container.packageQuantity"
+                                                        min="1" max="32767" [(ngModel)]="container.packageQuantity"
                                                         name="packageQuantity" #packageQuantity="ngModel"
                                                         oninput="validity.valid||(value='');" placeholder="Please enter"
                                                         autocomplete="nope">

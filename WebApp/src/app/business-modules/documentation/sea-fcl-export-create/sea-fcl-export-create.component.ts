@@ -868,10 +868,12 @@ export class SeaFclExportCreateComponent implements OnInit {
     totalVND : number = 0;
     async getTotalProfit(){
         this.listTotalHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getTotalProfit+"?JobId="+this.shipment.id);
-        this.listTotalHouseBill.forEach(ele => {
-            this.totalUSD += ele.totalUSD ;
-            this.totalVND += ele.totalVND ;
-        });
+        if(this.listTotalHouseBill){
+            this.listTotalHouseBill.forEach(ele => {
+                this.totalUSD += ele.totalUSD ;
+                this.totalVND += ele.totalVND ;
+            });
+        }
     }
 
 }

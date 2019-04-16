@@ -8,7 +8,7 @@ namespace eFMS.API.Catalogue.Service.Contexts
     {
         public Base(): base()
         {
-            ConfigDataContext<eFMSDataContext>("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+            ConfigDataContext<eFMSDataContext>(DbHelper.DbHelper.ConnectionString);
         }
     }
 }
