@@ -2,24 +2,29 @@ import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
 
 @Component({
-    selector: 'app-sea-lcl-export',
-    templateUrl: './sea-lcl-export.component.html',
-    styleUrls: ['./sea-lcl-export.component.scss']
+    selector: 'app-sea-lcl-export-detail-import',
+    templateUrl: './sea-lcl-export-detail-import.component.html',
+    styleUrls: ['./sea-lcl-export-detail-import.component.scss']
 })
-export class SeaLCLExportComponent implements OnInit {
+export class SeaLclExportDetailImportComponent implements OnInit {
 
-    constructor() { }
+    selectFilter: string = 'Job ID';
+
+    constructor() {
+        this.keepCalendarOpeningWithRange = true;
+        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment(Date.now()) };
+    }
 
     ngOnInit() {
     }
 
     /**
-       * Daterange picker
-       */
+     * Daterange picker
+     */
     selectedRange: any;
-    selectedDate: any;
+    //selectedDate: any;
     keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
+    //maxDate: moment.Moment = moment();
     ranges: any = {
         Today: [moment(), moment()],
         Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -39,35 +44,31 @@ export class SeaLCLExportComponent implements OnInit {
     /**
      * ng2-select
      */
-    searchFilters: Array<string> = ['Job ID', 'MBL No', 'Supplier', 'Agent', 'HBL No'];
+    searchFilters: Array<string> = ['Job ID', 'MBL No', 'Supplier'];
     searchFilterActive = ['Job ID'];
-    private value: any = {};
+
     private _disabledV: string = '0';
     public disabled: boolean = false;
 
-    public get disabledV(): string {
-        return this._disabledV;
-    }
 
-    public set disabledV(value: string) {
+    private set disabledV(value: string) {
         this._disabledV = value;
         this.disabled = this._disabledV === '1';
     }
 
-    selectFilter : []
     public selected(value: any): void {
         console.log('Selected value is: ', value);
-        //this.selectFilter = value.id;
     }
 
     public removed(value: any): void {
         console.log('Removed value is: ', value);
     }
 
-    public refreshValue(value: any): void {
-        this.value = value;
+    public typed(value: any): void {
+        console.log('New search input: ', value);
     }
 
-    public typed(e){}
+    public refreshValue(value: any): void {
+    }
 
 }

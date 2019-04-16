@@ -226,7 +226,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="">Multi select</label>
+                            <label  class="form-control-label" for="">Multi select</label>
                             <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                 placeholder="Select type">

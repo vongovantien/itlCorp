@@ -12,6 +12,7 @@ import { SeaLCLImportComponent } from './sea-lcl-import/sea-lcl-import.component
 import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-export-create.component';
 import { ManifestComponent } from './sea-fcl-export-create/manifest/manifest.component';
 import { ShippingInstructionComponent } from './sea-fcl-export-create/shipping-instruction/shipping-instruction.component';
+import { SeaLclExportCreateComponent } from './sea-lcl-export-create/sea-lcl-export-create.component'; 
 
 const routes: Routes = [
   {
@@ -62,6 +63,10 @@ const routes: Routes = [
   {
     path:'sea-lcl-export',
     component:SeaLCLExportComponent
+  },
+  {
+    path:'sea-lcl-export-create',
+    component:SeaLclExportCreateComponent
   },
   {
     path:'sea-lcl-import',

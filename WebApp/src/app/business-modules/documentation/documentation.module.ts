@@ -28,6 +28,11 @@ import { CreditAndDebitNoteEditComponent } from './sea-fcl-export-create/credit-
 import { CreditAndDebitNoteRemainingChargeComponent } from './sea-fcl-export-create/credit-and-debit-note/credit-and-debit-note-remaining-charge/credit-and-debit-note-remaining-charge.component';
 import { ManifestComponent } from './sea-fcl-export-create/manifest/manifest.component';
 import { ShippingInstructionComponent } from './sea-fcl-export-create/shipping-instruction/shipping-instruction.component';
+import { SeaLclExportCreateComponent } from './sea-lcl-export-create/sea-lcl-export-create.component';
+import { SeaLclExportShipmentDetailComponent } from './sea-lcl-export-create/sea-lcl-export-shipment-detail/sea-lcl-export-shipment-detail.component';
+import { SeaLclExportHousebillListComponent } from './sea-lcl-export-create/sea-lcl-export-housebill-list/sea-lcl-export-housebill-list.component';
+import { SeaLclExportHousebillAddnewComponent } from './sea-lcl-export-create/sea-lcl-export-housebill-addnew/sea-lcl-export-housebill-addnew.component';
+import { SeaLclExportDetailImportComponent } from './sea-lcl-export-create/sea-lcl-export-detail-import/sea-lcl-export-detail-import.component';
 
 @NgModule({
   imports: [
@@ -63,6 +68,8 @@ import { ShippingInstructionComponent } from './sea-fcl-export-create/shipping-i
     CreditAndDebitNoteEditComponent, 
     CreditAndDebitNoteRemainingChargeComponent, 
     ManifestComponent, 
-    ShippingInstructionComponent]
+    ShippingInstructionComponent, 
+    SeaLclExportCreateComponent, SeaLclExportShipmentDetailComponent, SeaLclExportHousebillListComponent, SeaLclExportHousebillAddnewComponent, SeaLclExportDetailImportComponent
+    ]
 })
 export class DocumentationModule { }
