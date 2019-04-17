@@ -5,6 +5,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
+import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 import { Router } from '@angular/router';
 // import { timeout } from 'q';
 import {ExtendData} from '../extend-data';
@@ -21,6 +22,7 @@ export class SeaFCLExportComponent implements OnInit {
     customers: any[];
     selectFilter: string = 'Job ID';
     criteria: any = {
+        transactionType: TransactionTypeEnum.SeaFCLExport
     };
     searchString: string = '';
     notifyPartries: any[];
@@ -140,7 +142,9 @@ export class SeaFCLExportComponent implements OnInit {
     resetSearch(){
         this.selectFilter = 'Job ID';
         this.searchFilterActive = ['Job ID'];
-        this.criteria = {};
+        this.criteria = {
+            transactionType: TransactionTypeEnum.SeaFCLExport
+        };
         this.searchString = null;
         this.pager.currentPage = 1;
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };

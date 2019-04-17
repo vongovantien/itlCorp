@@ -69,7 +69,7 @@ namespace eFMS.API.Catalogue.DL.Services
             int currentMonth = DateTime.Now.Month;
             foreach(var item in lvCatPlace)
             {
-                if(item.DatetimeCreated.Value.Date != DateTime.Now.Date)
+                if(item.DatetimeCreated.Value.Date < DateTime.Now.Date)
                 {
                     var exchangeRate = new CatCurrencyExchange
                     {
@@ -77,14 +77,15 @@ namespace eFMS.API.Catalogue.DL.Services
                         CurrencyToId = "VND",
                         Rate = item.Rate,
                         UserCreated = "system",
-                        DatetimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now,
+                        UserModified = "system",
+                        DatetimeCreated = DateTime.Now.Date,
+                        DatetimeModified = DateTime.Now.Date,
                         Inactive = false
                     };
                     ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Add(exchangeRate);
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
             }
+            ((eFMSDataContext)DataContext.DC).SaveChanges();
             return lvCatPlace;
         }
 
@@ -104,7 +105,8 @@ namespace eFMS.API.Catalogue.DL.Services
             result.LocalCurrency = localCurrency;
             result.DatetimeCreated = lastRate.DatetimeCreated;
             result.DatetimeModified = lastRate.DatetimeModified?? lastRate.DatetimeCreated;
-            result.UserModifield = lastRate != null ? (lastRate.UserModified!= null ?(users.FirstOrDefault(x => x.ID == lastRate.UserModified).Username): null) ?? (users.FirstOrDefault(x => x.ID == lastRate.UserCreated).Username) : null;
+            result.UserModifield = lastRate != null ? (lastRate.UserModified!= null ?(users.FirstOrDefault(x => x.ID == lastRate.UserModified)?.Username): null) 
+                ?? (users.FirstOrDefault(x => x.ID == lastRate.UserCreated)?.Username) : null;
 
             result.ExchangeRates = new List<vw_catCurrencyExchangeNewest>();
             foreach (var item in data)

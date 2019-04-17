@@ -124,9 +124,14 @@ export class ExchangeRateComponent implements OnInit {
     if(this.selectedrange != null){
       this.criteria.fromDate = this.selectedrange.startDate;
       this.criteria.toDate = this.selectedrange.endDate;
+    }
       this.pager.currentPage = 1;
       this.getExchangeRates(this.pager);
-    }
+  }
+  resetSearch(){
+    this.selectedrange = null;
+    this.criteria = {};
+    this.searchHistory();
   }
   showDetail(item){
     this.getChargeRateBy(item.datetimeCreated, item.localCurrency, '');

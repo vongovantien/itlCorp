@@ -20,11 +20,11 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
             this.inEditing = true;
             console.log(this.shipment.etd);
             if(this.isImport == false){
-                this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
+                this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
                 this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
             }
             else{
-                this.etaSelected = null;
+                this.etdSelected = null;
                 this.etaSelected = null;
             }
         }
@@ -68,11 +68,17 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         await this.getShipmentCommonData();
         let index = -1;
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            if(this.isImport == false){
+                this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
+                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
+            }
+            else{
+                this.etdSelected = null;
+                this.etaSelected = null;
+            }
             this.inEditing = true;
             console.log(this.shipment.etd);
             if(this.isImport == true){
-                // this.etaSelected = null;
-                // this.etaSelected = null;
                 let claim = localStorage.getItem('id_token_claims_obj');
                 index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
                 if(index > -1) {

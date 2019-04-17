@@ -382,14 +382,14 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
-                this.isHouseBill = true;
+                this.isShipment = true;
+                this.isHouseBill = false;
                 this.isCDnote = false;
-                this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 this.isLoaded = false;
-                if(this.inEditing == false){
-                    this.activeTab();
-                }
+                // if(this.inEditing == false){
+                //     this.activeTab();
+                // }
                 this.inEditing = true;
                 setTimeout(() => {
                     this.isLoaded = true;
@@ -410,22 +410,22 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
-                this.isHouseBill = true;
+                this.isShipment = true;
+                this.isHouseBill = false;
                 this.isCDnote = false;
-                this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 this.isLoaded = false;
-                if(this.inEditing == false){
-                    this.activeTab();
-                }
+                // if(this.inEditing == false){
+                //     this.activeTab();
+                // }
                 this.inEditing = true;
                 setTimeout(() => {
                     this.isLoaded = true;
                   }, 300);
             }
         }
-        this.housebillTabviewHref = "#housebill-tabview-tab";
-        this.housebillRoleToggle = "tab";
+        // this.housebillTabviewHref = "#housebill-tabview-tab";
+        // this.housebillRoleToggle = "tab";
     }
     cancelSaveJob() {
         $('#confirm-create-job-modal').modal('hide');

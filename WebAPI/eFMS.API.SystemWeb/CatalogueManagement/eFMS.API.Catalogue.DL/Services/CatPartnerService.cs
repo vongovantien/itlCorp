@@ -299,7 +299,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
-                    if (isNumeric == false)
+                    if (isNumeric == false || n <0)
                     {
                         item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_NOT_NUMBER]);
                         item.IsValid = false;
@@ -342,7 +342,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                 if (string.IsNullOrEmpty(item.SaleManName))
                                 {
                                     item.SaleManName = stringLocalizer[LanguageSub.MSG_PARTNER_SALEMAN_EMPTY];
-                                    item.Inactive = false;
+                                    item.IsValid = false;
                                 }
                                 else
                                 {
@@ -399,18 +399,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (string.IsNullOrEmpty(item.AddressEn))
                 {
                     item.AddressEn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_BILLING_EN_NOT_FOUND];
-                    item.Inactive = false;
+                    item.IsValid = false;
 
                 }
                 if (string.IsNullOrEmpty(item.AddressVn))
                 {
                     item.AddressVn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND];
-                    item.Inactive = false;
+                    item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.AddressShippingEn))
                 {
                     item.AddressShippingEn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND];
-                    item.Inactive = false;
+                    item.IsValid = false;
                 }
                 //if (!string.IsNullOrEmpty(item.Profile))
                 //{
@@ -428,7 +428,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (string.IsNullOrEmpty(item.AddressShippingVn))
                 {
                     item.AddressShippingVn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
-                    item.Inactive = false;
+                    item.IsValid = false;
                 }
                 else
                 {
@@ -457,7 +457,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     else
                     {
                         item.CountryId = countryShipping.Id;
-                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == country.Id);
+                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == item.CountryId);
                         if (province == null)
                         {
                             item.CityShipping = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);

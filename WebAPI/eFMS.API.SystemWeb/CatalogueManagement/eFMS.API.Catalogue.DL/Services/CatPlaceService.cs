@@ -284,7 +284,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
                         if (province == null)
                         {
-                            item.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName);
+                            item.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                             item.IsValid = false;
                         }
                         else
@@ -293,7 +293,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && i.ProvinceId == province.Id);
                             if (district == null)
                             {
-                                item.DistrictName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName);
+                                item.DistrictName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName, item.ProvinceName);
                                 item.IsValid = false;
                             }
                             else
@@ -367,7 +367,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                         if (province == null)
                         {
-                            item.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName);
+                            item.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                             item.IsValid = false;
                         }
                         else
@@ -577,7 +577,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
                         if (province == null)
                         {
-                            result.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName);
+                            result.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                             result.IsValid = false;
                         }
                         else
@@ -586,7 +586,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
                             if (district == null)
                             {
-                                result.DistrictName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName);
+                                result.DistrictName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName, item.ProvinceName);
                                 result.IsValid = false;
                             }
                             else

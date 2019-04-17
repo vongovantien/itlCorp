@@ -6,6 +6,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { NgForm } from '@angular/forms';
 import { SelectComponent } from 'ng2-select';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
   selector: 'app-partner-data-detail',
@@ -46,7 +47,8 @@ export class PartnerDataDetailComponent implements OnInit {
     private router:Router,
     private baseService: BaseService,
     private toastr: ToastrService,
-    private api_menu: API_MENU) { }
+    private api_menu: API_MENU,
+    private sortService: SortService) { }
 
   async ngOnInit() {
     await this.route.params.subscribe(prams => {
@@ -142,6 +144,10 @@ export class PartnerDataDetailComponent implements OnInit {
     if(responses != null){
       this.users = responses;
       this.saleMans = responses.map(x=>({"text":x.username,"id":x.id}));
+      
+      if(this.saleMans.length != null){
+        this.saleMans = this.sortService.sort(this.saleMans, 'text', true);
+      }
     }
   }
   async getCountries() {
