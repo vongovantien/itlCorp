@@ -1,3 +1,1226 @@
-<p>
-  sea-lcl-export-housebill-list works!
-</p>
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text">
+                    House Bill List
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        
+        <div class="">
+            <!--begin: Search Form -->
+            <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 order-2 order-lg-1">
+                        <div class="form-group">
+                            <div class="m-input-icon m-input-icon--left">
+                                <input type="text" name="search_house_bill"
+                                    (keyup)="searchHouseBill($event.target.value)"
+                                    class="form-control m-input m-input--square" placeholder="Search...">
+                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                    <span>
+                                        <i class="la la-search"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                            routerLink="/home/documentation/sea-lcl-export-housebill-addnew">
+                            <span>
+                                <i class="la la-plus"></i>
+                                <span>
+                                    add house bill
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--end: Search Form -->
+            <!--begin: Datatable-->
+            <div class="table-wrapper fit-height-div m--margin-bottom-10" id="">
+                <table class="table table-striped table-brand dataTable">
+                    <thead class="">
+                        <tr class="">
+                            <th class="table-actions-col"></th>
+                            <th class="sorting">
+                                <span>
+                                    H-B/L No hoho
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Customer
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Saleman
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Notify Party
+                                </span>
+                            </th>
+                            <th class="sorting">
+                                <span>
+                                    Destination
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    Package
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    G.W
+                                </span>
+                            </th>
+                            <th class="">
+                                <span>
+                                    CBM
+                                </span>
+                            </th>
+                            
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr class="" style="cursor: pointer;">
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove" data-toggle="modal" data-target="#confirm-housebill-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>
+                                    hb.hwbno
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    hb.customerName
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    hb.saleManName
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    hb.notifyParty
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    hb.finalDestinationPlace
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    Package
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    hb.gw
+                                </span>
+                            </td>
+                            <td>
+                                <span>
+                                    hb.cbm
+                                </span>
+                            </td>
+                        
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--end: Datatable-->
+        </div>
+
+        <div class="bg-secondary">
+            <h3 class="c-block-title m--padding-10">
+                <button
+                    class="btn btn-block btn-sm m-btn--square m-btn--icon m-btn--icon-only collapse-toggle m--margin-right-5 collapsed"
+                    data-toggle="collapse" data-target="#hbl-summary">
+                    <i class="la la-angle-up"></i>
+                </button>
+                Good Summary of all HBL
+            </h3>
+            <!--begin::hbl-summary-->
+            <div class="collapse" id="hbl-summary">
+                <div class="border-top m--padding-10">
+                    <div class="row">
+                        <div class="col-xl-8">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="m--margin-bottom-10">
+                                        <span class="m--font-bolder">
+                                            Container:
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="m--margin-bottom-10">
+                                        <span class="m--font-bolder">
+                                            Commodities:
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total gross weight:
+                                </span>
+                                <span></span>
+                            </div>
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total net weight:
+                                </span>
+                                <span></span>
+                            </div>
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total chargeable weight:
+                                </span>
+                                <span></span>
+                            </div>
+                            <div class="m--margin-bottom-10">
+                                <span class="m--font-bolder">
+                                    Total CBM:
+                                </span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::hbl-summary-->
+        </div>
+    </div>
+</div>
+<!--end:: m-portlet-->
+
+<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link active" data-toggle="tab" href="#buying-rate" role="tab">
+                    Buying Rate
+                </a>
+            </li>
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#selling-rate" role="tab">
+                    Selling Rate
+                </a>
+            </li>
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#obh-charge" role="tab">
+                    OBH
+                </a>
+            </li>
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#logistic-charge" role="tab">
+                    Logistic Charges
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+    
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="tab-content" id="">
+            <div class="tab-pane fade show active" id="buying-rate" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                data-toggle="modal" data-target="#add-buying-rate-modal">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add charge
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper table-scrollable" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="sorting">
+                                    <span>
+                                        Partner
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit price
+                                    </span>
+                                </th>
+
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        SOA
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Credit/ Debit note
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Exchange rate date
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" data-toggle="modal" data-target="#edit-buying-rate-modal">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.partnerName
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.nameEn
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.quantity
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.unit
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.unitPrice
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span>
+                                        charge.currency
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.vatrate
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.total
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.notes
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.docNo
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        SOA
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal">
+                                        Credit/ Debit note
+                                    </a>
+                                </td>
+                                <td>
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.exchangeDate | date:'dd/MM/yyyy'
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
+            </div>
+
+
+            <div class="tab-pane fade" id="selling-rate" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                data-toggle="modal" data-target="#add-selling-rate-modal">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add new
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper table-scrollable" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="sorting">
+                                    <span>
+                                        Partner
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit Price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        SOA
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Credit/ Debit note
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Exchange rate date
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" data-toggle="modal" data-target="#edit-selling-rate-modal">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.partnerName
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.nameEn
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.quantity
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.unit
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.unitPrice
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span>
+                                        charge.currency
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.vatrate
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.total
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.notes
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.docNo
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        SOA
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal">
+                                        Credit/ Debit note
+                                    </a>
+                                </td>
+                                <td>
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.exchangeDate | date:'dd/MM/yyyy'
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
+            </div>
+
+
+            <div class="tab-pane fade" id="obh-charge" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 c-button-actions m--align-right">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                data-toggle="modal" data-target="#add-obh-charge-modal">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add new
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper table-scrollable" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class=""></th>
+                                <th class="sorting">
+                                    <span>
+                                        Receiver
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Payer
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit price
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        SOA
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Credit/ Debit note
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Exchange rate date
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" data-toggle="modal" data-target="#edit-obh-charge-modal">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.receiverName
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.payerName
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.nameEn
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.quantity
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.unit
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.unitPrice
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span>
+                                        charge.currency
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.vatrate
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.total
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.notes
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.docNo
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        SOA
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal">
+                                        Credit/ Debit note
+                                    </a>
+                                </td>
+                                <td>
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        charge.exchangeDate | date:'dd/MM/yyyy'
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
+            </div>
+
+            <div class="tab-pane fade" id="logistic-charge" role="tabpanel">
+                <!--begin: Search Form -->
+                <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 order-2 order-lg-1">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Search...">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable-->
+                <div class="table-wrapper table-scrollable" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead class="">
+                            <tr class="">
+                                <th class="sorting">
+                                    <span>
+                                        Partner
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Unit price
+                                    </span>
+                                </th>
+
+                                <th class="sorting">
+                                    <span>
+                                        Currency
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        VAT
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Total
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Note
+                                    </span>
+                                </th>
+                                <th class="">
+                                    <span>
+                                        Docs
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        SOA
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Credit/ Debit note
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </th>
+                                <th class="sorting">
+                                    <span>
+                                        Exchange rate date
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="">
+                                <td>
+                                    <span>
+                                        Partner
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Name EN
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Quantity
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Unit
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Unit price
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Currency
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        VAT
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Total
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Note
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Docs
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        SOA
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#detail-credit-debit-note-modal">
+                                        Credit/ Debit note
+                                    </a>
+                                </td>
+                                <td>
+                                    <span>
+                                        Settle payment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        Exchange rate date
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--end: Datatable-->
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:: m-portlet-->
+
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text">
+                    Grant Total Profit
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <!--begin: table -->
+        <div class="table-wrapper" id="">
+            <table class="table table-striped table-brand">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>
+                            <span>USD</span>
+                        </th>
+                        <th>
+                            <span>Local (VNĐ)</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span>Buying rate</span>
+                        </td>
+                        <td>
+                            <span>totalBuyingUSD</span>
+                        </td>
+                        <td>
+                            <span>totalBuyingLocal</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span>Selling rate</span>
+                        </td>
+                        <td>
+                            <span>totalSellingUSD</span>
+                        </td>
+                        <td>
+                            <span>totalSellingLocal</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span>OBH</span>
+                        </td>
+                        <td>
+                            <span>totalOBHUSD</span>
+                        </td>
+                        <td>
+                            <span>totalOBHLocal</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span>Logictis charge</span>
+                        </td>
+                        <td>
+                            <span>totalLogisticChargeUSD</span>
+                        </td>
+                        <td>
+                            <span>totalLogisticChargeLocal</span>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>
+                            <span>Total</span>
+                        </th>
+                        <th>
+                            <span>totalProfitUSD</span>
+                        </th>
+                        <th>
+                            <span>totalProfitLocal</span>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <!--end: table -->
+    </div>
+</div>
+<!--end:: m-portlet-->
+
+<!--begin::confirm-housebill-modal-->
+<div class="modal fade" id="confirm-housebill-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete house bill</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure want to delete this house bill? All related changes added to this House Bill will be lost </span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-housebill-modal-->
+
+<!--begin::confirm-can-not-housebill-modal-->
+<div class="modal fade" id="confirm-can-not-housebill-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Can not delete house bill</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>You are not allowed to delete this house bill, Looks like one of changes is issued</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            OK
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-can-not-housebill-modal-->
