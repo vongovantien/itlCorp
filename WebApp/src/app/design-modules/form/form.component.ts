@@ -42,8 +42,8 @@ export class FormComponent implements OnInit {
     /**
    * ng2-select
    */
-    public items: Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
-        'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',];
+    public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
+        'option 5', 'option 6', 'option 7'];
 
     private value: any = {};
     private _disabledV: string = '0';
