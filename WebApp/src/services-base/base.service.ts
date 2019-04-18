@@ -246,8 +246,6 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
-
-    console.log(error)
     if (error.status === 400) {
       this.errorToast(error.error.message, this.LANG.NOTIFI_MESS.CLIENT_ERR_TITLE);
     }
@@ -307,14 +305,15 @@ export class BaseService implements ErrorHandler {
     if (this.hasValidAccessToken() == false) {
       if (display_warning) {
         this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
-      }
+      }     
       this.router.navigateByUrl('/login');
       return false;
     } else {
       return true;
     }
-
   }
+
+
 
   reloadPage() {
     if (window.location.hostname === 'localhost') {
@@ -331,15 +330,34 @@ export class BaseService implements ErrorHandler {
       var expiresAt = localStorage.getItem('expires_at');
       var now = new Date();
       if (expiresAt && parseInt(expiresAt, 10) < now.getTime()) {
+        localStorage.clear(); 
         return false;
       }
       return true;
     }
+    localStorage.clear(); 
     return false;
   };
 
+  /**
+   * Return true if access token will be expire time after 3 minutes
+   */
+  public checkExpireTimeToken() {
+    if (this.getAccessToken()) {
+      var expiresAt = localStorage.getItem('expires_at');
+      var now = new Date();
+      var after3min:any = now.setMinutes(now.getMinutes()+3);
+      after3min = new Date(after3min);
+      if (expiresAt && parseInt(expiresAt, 10) < after3min.getTime()) {
+        return true;
+      }
+      return false;
+    }
+    return true;
+  };
 
-  private getAccessToken() {
+
+  public getAccessToken() {
     return localStorage.getItem('access_token');
   }
 
