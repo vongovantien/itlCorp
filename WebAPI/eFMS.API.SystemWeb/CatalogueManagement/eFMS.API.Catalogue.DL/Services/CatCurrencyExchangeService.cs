@@ -110,7 +110,8 @@ namespace eFMS.API.Catalogue.DL.Services
                                 && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
                                 && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null)
                                 && (x.Inactive == criteria.Inactive || criteria.Inactive == null))
-                                .Join(users, x => x.UserCreated, y => y.ID, (x, y) => new { x, y }).OrderByDescending(x => x.x.DatetimeCreated);
+                                .Join(users, x => x.UserCreated, y => y.ID, (x, y) => new { x, y })
+                                .OrderByDescending(x => x.x.DatetimeCreated);
             var dateCreateds = data.GroupBy(x => x.x.DatetimeCreated.Value.Date)
                 .Select(x => x);
             rowsCount = dateCreateds.Count();
