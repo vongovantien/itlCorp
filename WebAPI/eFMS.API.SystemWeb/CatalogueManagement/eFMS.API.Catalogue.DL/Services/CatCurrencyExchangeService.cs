@@ -50,11 +50,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return new { fromCurrencies, toCurrencies };
         }
 
-        public CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest()
+        public CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest(string currencyToId)
         {
             var lastRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.OrderByDescending(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).FirstOrDefault();
             if (lastRate == null) return null;
-            var lvCatPlace = GetExchangeRateNewest();
+            var lvCatPlace = GetExchangeRateNewest(currencyToId);
             var result = new CurrencyExchangeNewestViewModel
             {
                 DatetimeModified = lastRate.DatetimeModified ?? lastRate.DatetimeCreated,
@@ -63,29 +63,10 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        private List<vw_catCurrencyExchangeNewest> GetExchangeRateNewest()
+        private List<vw_catCurrencyExchangeNewest> GetExchangeRateNewest(string currencyToId)
         {
             List<vw_catCurrencyExchangeNewest> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
-            int currentMonth = DateTime.Now.Month;
-            foreach(var item in lvCatPlace)
-            {
-                if(item.DatetimeCreated.Value.Date < DateTime.Now.Date)
-                {
-                    var exchangeRate = new CatCurrencyExchange
-                    {
-                        CurrencyFromId = item.CurrencyFromID,
-                        CurrencyToId = "VND",
-                        Rate = item.Rate,
-                        UserCreated = "system",
-                        UserModified = "system",
-                        DatetimeCreated = DateTime.Now.Date,
-                        DatetimeModified = DateTime.Now.Date,
-                        Inactive = false
-                    };
-                    ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Add(exchangeRate);
-                }
-            }
-            ((eFMSDataContext)DataContext.DC).SaveChanges();
+            if(!string.IsNullOrEmpty(currencyToId)) lvCatPlace = lvCatPlace.Where(x => x.CurrencyToID == currencyToId).ToList();
             return lvCatPlace;
         }
 

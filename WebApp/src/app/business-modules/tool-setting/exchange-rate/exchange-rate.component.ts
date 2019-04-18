@@ -125,7 +125,7 @@ export class ExchangeRateComponent implements OnInit {
       this.criteria.fromDate = this.selectedrange.startDate;
       this.criteria.toDate = this.selectedrange.endDate;
     }
-      this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
       this.getExchangeRates(this.pager);
   }
   resetSearch(){
@@ -313,7 +313,7 @@ export class ExchangeRateComponent implements OnInit {
     });
   }
   async getExchangeNewest(){
-    var responses = await this.baseService.getAsync(this.api_menu.ToolSetting.ExchangeRate.getNewest);
+    var responses = await this.baseService.getAsync(this.api_menu.ToolSetting.ExchangeRate.getNewest + "?currencyToId=" + this.localCurrency);
     this.exchangeRateNewest = responses;
     console.log(this.exchangeRateNewest);
   }
