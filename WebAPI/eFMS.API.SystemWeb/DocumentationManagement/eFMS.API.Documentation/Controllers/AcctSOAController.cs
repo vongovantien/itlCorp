@@ -57,7 +57,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(AcctSOAModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -65,6 +65,21 @@ namespace eFMS.API.Documentation.Controllers
             model.DatetimeCreated = DateTime.Now;
             var hs = acctSOAServices.UpdateSOA(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("Delete")]
+        [Authorize]
+        public IActionResult Delete(Guid cdNoteId)
+        {
+            var hs = acctSOAServices.DeleteSOA(cdNoteId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {

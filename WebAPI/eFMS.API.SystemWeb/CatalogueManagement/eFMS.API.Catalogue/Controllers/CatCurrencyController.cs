@@ -15,7 +15,7 @@ using System.Linq;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
+using eFMS.API.Catalogue.DL.Common;
 
 namespace eFMS.API.Catalogue.Controllers
 {

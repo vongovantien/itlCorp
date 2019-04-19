@@ -12,7 +12,10 @@ namespace eFMS.API.Shipment.Infrastructure.Common
     {
         public static string GetMessage(HandleState hs, Crud crud)
         {
+          
             string message = LanguageSub.MSG_DATA_NOT_FOUND;
+
+
             switch (hs.Code)
             {
                 case 200:
@@ -29,6 +32,9 @@ namespace eFMS.API.Shipment.Infrastructure.Common
                     break;
                 case 204:
                     message = LanguageSub.MSG_OBJECT_RELATION_NOT_VALID;
+                    break;
+                case 400:
+                    message = hs.Exception.Message;
                     break;
 
             }

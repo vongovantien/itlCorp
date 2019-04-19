@@ -19,14 +19,16 @@ using System.Threading;
 using System.Globalization;
 using ITL.NetCore.Common;
 using eFMS.API.Catalogue.Service.Helpers;
+using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatChargeDefaultService:RepositoryBase<CatChargeDefaultAccount,CatChargeDefaultAccountModel>,ICatChargeDefaultAccountService
     {
-        public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository,IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository,IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
-
+            stringLocalizer = localizer;
         }
 
         public List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list)
@@ -37,7 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.ChargeCode))
                 {
-                    item.ChargeCode = string.Format("Charge code is not allow to empty!|wrong");
+                    item.ChargeCode = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -45,23 +47,23 @@ namespace eFMS.API.Catalogue.DL.Services
                     var charge = dc.CatCharge.FirstOrDefault(x => x.Code == item.ChargeCode);
                     if (charge == null)
                     {
-                        item.ChargeCode = string.Format("The charge with code {0} not found !|wrong", item.ChargeCode);
+                        item.ChargeCode = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
                         item.IsValid = false;
                     }
                 }
 
                 if (string.IsNullOrEmpty(item.Type)){
-                    item.Type = string.Format("Voucher type is not allow to empty!|wrong");
+                    item.Type = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.DebitAccountNo.ToString()))
                 {
-                    item.DebitAccountNo = string.Format("Account debit no. is not allow to empty!|wrong");
+                    item.DebitAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CreditAccountNo.ToString()))
                 {
-                    item.CreditAccountNo = string.Format("Account credit no. is not allow to empty!|wrong");
+                    item.CreditAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.DebitVat == null)

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
@@ -11,6 +11,9 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { NgForm } from '@angular/forms';
+import * as stringHelper from 'src/helper/string.helper';
+declare var $: any;
+import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 @Component({
     selector: 'app-manifest',
@@ -18,8 +21,9 @@ import { NgForm } from '@angular/forms';
     styleUrls: ['./manifest.component.scss']
 })
 export class ManifestComponent implements OnInit {
+    @ViewChild('formReport') frm:ElementRef;
     shipment: CsTransaction = new CsTransaction();
-    manifest: CsManifest = new CsManifest();
+    manifest: CsManifest;// = new CsManifest();
     paymentTerms: any[] = [];
     paymentTermActive: any[] = [];
     etdSelected: any;
@@ -34,11 +38,14 @@ export class ManifestComponent implements OnInit {
     totalCBM = 0;
     searchHouse = '';
     searchHouseRemoved = '';
+    dataReport: any;
+    previewModalId = "preview-modal";
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
         private api_menu: API_MENU,
-        private sortService: SortService) {
+        private sortService: SortService,
+        private sanitizer: DomSanitizer) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -70,9 +77,14 @@ export class ManifestComponent implements OnInit {
                     index = this.portOfDestinations.findIndex(x => x.id == this.manifest.pod);
                     if(index > -1) this.manifest.pod = this.portOfDestinations[index].id;
                 }
+                await this.getContainerList(prams.id);
                 this.isLoad = true;
             }
         });
+    }
+    async getContainerList(id: any) {
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
+        this.manifest.csMawbcontainers = responses;
     }
     async getManifest(id: any) {
         this.manifest = await this.baseServices.getAsync(this.api_menu.Documentation.CsManifest.get + "?jobId=" + id, false, true);
@@ -88,6 +100,19 @@ export class ManifestComponent implements OnInit {
                 x.isChecked = false;
             });
         }
+    }
+    async previewReport(){
+        this.dataReport = null;
+        this.manifest.jobId = this.shipment.id;
+        this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
+        this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
+        console.log(response);
+        this.dataReport = response;
+        var id = this.previewModalId;
+        setTimeout(function(){ 
+            $('#' + id).modal('show');
+        }, 100);
     }
     removeAllChecked(){
         this.checkAll = false;
@@ -119,11 +144,11 @@ export class ManifestComponent implements OnInit {
     getNewManifest(){
         //MSEYYMM/#####: YYYY-MM-DDTHH:mm:ss.sssZ
         this.manifest = new CsManifest();
-        this.manifest.jobId = this.shipment.id;
         let date = new Date().toISOString().substr(0, 19);
         let jobNo = this.shipment.jobNo;
         this.manifest.refNo = "MSE" + date.substring(2, 4) + date.substring(5,7) + jobNo.substring(jobNo.length-5, jobNo.length);
         this.manifest.supplier = this.shipment["supplierName"];
+        this.manifest.voyNo = this.shipment.flightVesselName;
         let index = this.paymentTerms.findIndex(x => x.id == this.shipment.paymentTerm);
         if(index > -1){
             this.paymentTermActive = [this.paymentTerms[index]];
@@ -142,6 +167,10 @@ export class ManifestComponent implements OnInit {
             this.manifest.podName = this.portOfDestinations[index].nameEN;
         }
     }
+    removeChecked(){
+        this.checkAll = false;
+        //this.checkAllChange();
+    }
     refreshManifest(){
         this.manifest.refNo = null;
         this.manifest.supplier = null;
@@ -157,9 +186,12 @@ export class ManifestComponent implements OnInit {
         this.getHouseBillList(this.shipment.id);
     }
     async saveManifest(form: NgForm){
+        this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills;
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
-        if(form.valid){
+        if(form.valid 
+            && this.manifest.pod != null
+            && this.manifest.paymentTerm != null){
             let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.update, this.manifest, true, true);
         }
         console.log(this.manifest);
@@ -222,7 +254,8 @@ export class ManifestComponent implements OnInit {
         if(responses != null){
             responses.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
                 element.isChecked = false;
-                if(element["manifestRefNo"] != null){
+                element["packageTypes"] = stringHelper.subStringComma(element["packageTypes"]);
+                if(element["manifestRefNo"] == null){
                     element.isRemoved = false;
                 }
                 else{

@@ -4,7 +4,7 @@
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
-            <app-breadcrumb></app-breadcrumb>
+            <!-- <app-breadcrumb></app-breadcrumb> -->
         </div>
         <div class="c-button-actions">
             <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
@@ -45,6 +45,7 @@
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" disabled name="partnerAccountNo" autocomplete="nope" minlength="3" maxlength="20"
                              [(ngModel)]="partner.accountNo" #partnerAccountNo="ngModel" (change)="partner.accountNo = partner.taxCode.trim()" 
+                             specialIsAlphaNumeric
                              [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerAccountNo.invalid }" required >
                              <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerAccountNo.invalid" >
                                 Partner ID  required least 3 characters
@@ -98,7 +99,7 @@
                                 Tax Code <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="number" min="0" class="form-control m-input m-input--square" title="Tax code must be number" placeholder="Please enter Tax Code" autocomplete="nope" minlength="3" maxlength="100"
-                                name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" oninput="validity.valid||(value='');"
+                                name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" oninput="validity.valid||(value='');" specialIsAlphaNumeric
                                 [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerTaxCode.invalid }" required>
                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerTaxCode.invalid" >
                                 Partner Tax Code is required and must be number

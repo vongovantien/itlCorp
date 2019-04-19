@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -12,5 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         CsShippingInstructionModel GetById(Guid jobId);
         HandleState AddOrUpdate(CsShippingInstructionModel model);
+        Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model);
+        Crystal PreviewOCL(CsShippingInstructionReportModel model);
     }
 }

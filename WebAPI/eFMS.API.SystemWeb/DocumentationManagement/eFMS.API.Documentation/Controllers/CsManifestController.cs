@@ -58,5 +58,13 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("PreviewFCLManifest")]
+        public IActionResult PreviewFCLManifest(ManifestReportModel model)
+        {
+            var result = manifestService.Preview(model);
+            return Ok(result);
+        }
     }
 }

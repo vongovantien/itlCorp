@@ -24,7 +24,8 @@ export class ChargeDetailsComponent implements OnInit {
     private baseServices: BaseService,
     private toastr: ToastrService,
     private api_menu: API_MENU,  
-    private route:ActivatedRoute) { }
+    private route:ActivatedRoute,
+    private router:Router) { }
     //Charge : CatChargeOrUpdate = new CatChargeOrUpdate();
     isAddNewLine:boolean = false;
     isMaximumAccountRow:boolean =false;
@@ -152,7 +153,10 @@ export class ChargeDetailsComponent implements OnInit {
       // console.log(this.isAddNewLine);
       this.isAddNewLine = true;
       if (form.form.status != "INVALID" && this.validatateDefaultAcountLine() && this.isSameVoucherType == false) {      
-         await this.baseServices.putAsync(this.api_menu.Catalogue.Charge.update,this.Charge,true,true);
+         var response = await this.baseServices.putAsync(this.api_menu.Catalogue.Charge.update,this.Charge,true,true);
+         if(response){
+          this.router.navigate(["/home/catalogue/charge"]);
+        }
       }  
 
   }

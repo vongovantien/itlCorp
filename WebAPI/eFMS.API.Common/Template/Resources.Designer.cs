@@ -68,5 +68,14 @@ namespace eFMS.API.Common.Template {
                 return ResourceManager.GetString("ExcelTemplate", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to D:\Workspace\efms\src\WebAPI\eFMS.API.SystemWeb\Reportmanagement\APIReport\APIReport\Reports\FCLExport.
+        /// </summary>
+        internal static string Reports {
+            get {
+                return ResourceManager.GetString("Reports", resourceCulture);
+            }
+        }
     }
 }

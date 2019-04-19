@@ -44,5 +44,25 @@ namespace eFMS.API.Common.Helpers
             ExcelPackage rs = new ExcelPackage(file.OpenReadStream());
             return rs;
         }
+        public static async Task<MemoryStream> ReadFileAsync(string pathFile)
+        {
+            if (!System.IO.File.Exists(pathFile)) return null;
+            try
+            {
+                FileInfo file = new FileInfo(pathFile);
+                var memory = new MemoryStream();
+
+                using (var stream = new FileStream(pathFile, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                return memory;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
     }
 }

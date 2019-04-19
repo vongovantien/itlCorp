@@ -15,6 +15,7 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
+import * as stringHelper from 'src/helper/string.helper';
 
 
 export class FirstLoadData {
@@ -78,12 +79,15 @@ export class SeaFclExportCreateComponent implements OnInit {
     switchTab(tab:string){
 
         if(tab==="shipment"){
+            this.isShipment = true;
+            this.isHouseBill = false;
+            this.isCDnote = false;
             if(this.inEditing == true){
                 this.isLoaded = false;
                 setTimeout(() => {
                     this.isLoaded = true;
                     this.inEditing = true;
-                }, 400);
+                }, 100);
                 this.myForm.patchValue({
                     estimatedTimeofDepature: { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) },
                     polName: this.shipment.polName,
@@ -93,9 +97,6 @@ export class SeaFclExportCreateComponent implements OnInit {
                     personInChargeName: this.shipment.personInChargeName
                 });
             }
-            this.isShipment = true;
-            this.isHouseBill = false;
-            this.isCDnote = false;
         }
         if(tab==="housebilllist"){
             if(this.inEditing == false){
@@ -113,24 +114,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.isCDnote = true;
         }
         this.cdr.detectChanges(); 
-
-        // if(this.inEditing == false){
-        //     this.validateShipmentForm();
-        // }
-        // else{
-        //     this.isLoaded = false;
-        //     setTimeout(() => {
-        //         this.isLoaded = true;
-        //         this.inEditing = true;
-        //     }, 300);
-        //     this.myForm.patchValue({
-        //     polName: this.shipment.pol,
-        //     podName: this.shipment.podName,
-        //     coloaderName: this.shipment.coloaderName,
-        //     agentName: this.shipment.agentName,
-        //     personInChargeName: this.shipment.personInChargeName
-        //   });
-        // }
     }
 
     //open tab by link
@@ -153,7 +136,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         await this.route.params.subscribe(async prams => {
             if(prams.id != undefined){
                 this.inEditing = true;
-                this.shipment.id = prams.id;               
+                this.shipment.id = prams.id;         
+                await this.getTotalProfit();      
                 await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
@@ -186,13 +170,17 @@ export class SeaFclExportCreateComponent implements OnInit {
                     element.markNo = '';
                   });
             }
-            this.getShipmentContainerDescription(this.lstMasterContainers);
+            else{
+                this.shipment.packageContainer = '';
+                this.getShipmentContainerDescription(this.lstMasterContainers);
+            }
         }
+        this.lstContainerTemp = this.lstMasterContainers;
     }
     getShipmentContainerDescription(listContainers: any[]){
         for (var i = 0; i < listContainers.length; i++) {
             listContainers[i].isSave = true;
-            if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
+            // if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
                 this.shipment.grossWeight = this.shipment.grossWeight + listContainers[i].gw;
                 this.shipment.netWeight = this.shipment.netWeight + listContainers[i].nw;
                 this.shipment.chargeWeight = this.shipment.chargeWeight + listContainers[i].chargeAbleWeight;
@@ -208,7 +196,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                         this.shipment.packageContainer = this.shipment.packageContainer + temp;
                     }
                 }
-                if(this.numberOfTimeSaveContainer == 1){
+                if(this.numberOfTimeSaveContainer == 1 && this.shipment.id == "00000000-0000-0000-0000-000000000000"){
                     //this.shipment.packageContainer = this.shipment.packageContainer + ((listContainers[i].quantity == null && listContainers[i].containerTypeName==null)?"": (listContainers[i].quantity + "x" + listContainers[i].containerTypeName + ", "));
                     if(listContainers[i].commodityName != "" || listContainers[i].commodityName != null){
                         if(!this.shipment.commodity.includes(listContainers[i].commodityName)){
@@ -223,21 +211,14 @@ export class SeaFclExportCreateComponent implements OnInit {
                     //this.shipment.commodity = this.shipment.commodity + ((listContainers[i].commodityName== "" || listContainers[i].commodityName == null)?"": (listContainers[i].commodityName + ", "));
                     //this.shipment.desOfGoods = this.shipment.desOfGoods + (listContainers[i].description== null?"": (listContainers[i].description + ", "));
                 }
-            }
+            // }
         }
         this.removeEndComma();
     }
     removeEndComma(){
-        this.shipment.commodity = this.subStringComma(this.shipment.commodity);
-        this.shipment.desOfGoods = this.subStringComma(this.shipment.desOfGoods);
-        this.shipment.packageContainer = this.subStringComma(this.shipment.packageContainer);
-    }
-    subStringComma(textString: String){
-        if(textString.length <= 0) textString = '';
-        if(textString[textString.length -2] == ','){
-            textString = textString.substring(0, (textString.length-2));
-        }
-        return textString;
+        this.shipment.commodity = stringHelper.subStringComma(this.shipment.commodity);
+        this.shipment.desOfGoods = stringHelper.subStringComma(this.shipment.desOfGoods);
+        this.shipment.packageContainer = stringHelper.subStringComma(this.shipment.packageContainer);
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
@@ -284,18 +265,10 @@ export class SeaFclExportCreateComponent implements OnInit {
     async getWeightTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
         this.listWeightMesurement = responses;
-        // if (responses != null) {
-        //     this.weightMesurements = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-        //     console.log(this.weightMesurements);
-        // }
     }
     async getPackageTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
         this.listPackageTypes = responses;
-        // if (responses != null) {
-        //     this.packageTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-        //     console.log(this.packageTypes);
-        // }
     }
     async getComodities(searchText: any) {
         let criteriaSearchCommodity = { inactive: false, all: searchText };
@@ -319,6 +292,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.getComodities(keySearch);
     }
     validateShipmentForm(){
+        if(this.lstMasterContainers.find(x => x.isNew == false) != null){
+            this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
+        }
         if(this.myForm.value.estimatedTimeofDepature != null){
             this.shipment.etd = dataHelper.dateTimeToUTC(this.myForm.value.estimatedTimeofDepature["startDate"]);
         }
@@ -335,11 +311,11 @@ export class SeaFclExportCreateComponent implements OnInit {
                 $('#confirm-can-not-create-job-modal').modal('show');
         }
         else{
-            if(this.shipment.csMawbcontainers != null){
-                $('#confirm-create-job-modal').modal('show');
+            if(this.shipment.csMawbcontainers == null){
+                $('#confirm-not-create-job-misscont-modal').modal('show');
             }
             else{
-                $('#confirm-not-create-job-misscont-modal').modal('show');
+                $('#confirm-create-job-modal').modal('show');
             }
         }
     }
@@ -363,9 +339,6 @@ export class SeaFclExportCreateComponent implements OnInit {
             && this.shipment.pod != this.shipment.pol
             && validDate == true) {
             console.log('abc');
-            if(this.lstMasterContainers.find(x => x.isNew == false) != null){
-                this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
-            }
             await this.saveJob();
         }
     }
@@ -414,6 +387,10 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 this.isLoaded = false;
+                if(this.inEditing == false){
+                    this.activeTab();
+                }
+                this.inEditing = true;
                 setTimeout(() => {
                     this.isLoaded = true;
                   }, 300);
@@ -437,10 +414,14 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.isCDnote = false;
                 this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
+                this.isLoaded = false;
                 if(this.inEditing == false){
                     this.activeTab();
                 }
                 this.inEditing = true;
+                setTimeout(() => {
+                    this.isLoaded = true;
+                  }, 300);
             }
         }
         this.housebillTabviewHref = "#housebill-tabview-tab";
@@ -452,7 +433,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     async showShipment(event){
         await this.getShipmentDetail(event);
         this.isLoaded = false;
-        this.shipment.jobNo = null;
+        //this.shipment.jobNo = null;
         this.shipment.mawb = null;
         this.isImport = true;
         await this.getShipmentContainer(event);
@@ -567,8 +548,6 @@ export class SeaFclExportCreateComponent implements OnInit {
         }
         console.log(this.containerMasterForm.submitted && this.lstMasterContainers[index].containerTypeId == null && this.lstMasterContainers[index].verifying);
         this.lstMasterContainers[index].verifying = true;
-        //if (this.containerMasterForm.invalid) return;
-        //if(this.lstMasterContainers[index].containerTypeId == null) return;
         if(this.lstMasterContainers[index].quantity == null || this.lstMasterContainers[index].containerTypeId == null){
             this.saveContainerSuccess = false;
             return;
@@ -576,8 +555,6 @@ export class SeaFclExportCreateComponent implements OnInit {
         //Cont Type, Cont Q'ty, Container No, Package Type
         let existedItems = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
             && x.quantity == this.lstMasterContainers[index].quantity);
-            // && x.containerNo == this.lstMasterContainers[index].containerNo
-            // && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
         if(this.lstMasterContainers[index].containerNo.length != 0 && this.lstMasterContainers[index].packageTypeId != null){
             existedItems = existedItems.filter(x => x.containerNo == this.lstMasterContainers[index].containerNo
                 && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
@@ -769,8 +746,8 @@ export class SeaFclExportCreateComponent implements OnInit {
                     this.shipment.packageContainer = this.shipment.packageContainer + temp;
                 }
             }
-            if(this.shipment.csMawbcontainers[i].commodityName!= "" || this.shipment.csMawbcontainers[i].commodityName != null){
-                if(!this.shipment.commodity.includes(this.shipment.csMawbcontainers[i].commodityName)){
+            if(this.shipment.csMawbcontainers[i].commodityName != null){
+                if(!this.shipment.commodity.includes(this.shipment.csMawbcontainers[i].commodityName) && this.shipment.csMawbcontainers[i].commodityName!= "" ){
                     this.shipment.commodity = this.shipment.commodity + this.shipment.csMawbcontainers[i].commodityName + ", ";
                 }
             }
@@ -884,6 +861,19 @@ export class SeaFclExportCreateComponent implements OnInit {
     currentHouseBillCatcher(currentHouseBill:any){
         this.currentHouseBill = currentHouseBill;
         console.log({"Current_HouseBill":this.currentHouseBill});
+    }
+
+    listTotalHouseBill:any[]=[];
+    totalUSD : number = 0;
+    totalVND : number = 0;
+    async getTotalProfit(){
+        this.listTotalHouseBill = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getTotalProfit+"?JobId="+this.shipment.id);
+        if(this.listTotalHouseBill){
+            this.listTotalHouseBill.forEach(ele => {
+                this.totalUSD += ele.totalUSD ;
+                this.totalVND += ele.totalVND ;
+            });
+        }
     }
 
 }

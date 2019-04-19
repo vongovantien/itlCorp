@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Linq;
+using eFMS.API.Catalogue.Service.Helpers;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -14,7 +16,31 @@ namespace eFMS.API.Catalogue.Service.Models
             : base(options)
         {
         }
-
+        public override int SaveChanges()
+        {
+            var entities = ChangeTracker.Entries();
+            var mongoDb = Helpers.MongoDbHelper.GetDatabase();
+            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+            var addedList = ChangeTrackerHelper.GetAdded(entities);
+            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
+            var result = base.SaveChanges();
+            if (result > 0)
+            {
+                if (addedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(addedList, EntityState.Added);
+                }
+                if (modifiedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(modifiedList, EntityState.Modified);
+                }
+                if (deletedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(deletedList, EntityState.Deleted);
+                }
+            }
+            return result;
+        }
         public virtual DbSet<CatArea> CatArea { get; set; }
         public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }

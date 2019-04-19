@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
@@ -41,7 +41,8 @@ export class PartnerDataAddnewComponent implements OnInit {
 
   constructor(private route:ActivatedRoute,
     private baseService: BaseService,
-    private api_menu: API_MENU) { }
+    private api_menu: API_MENU,
+    private router: Router) { }
 
   ngOnInit() {
     this.route.params.subscribe(prams => {
@@ -208,7 +209,8 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.baseService.post(this.api_menu.Catalogue.PartnerData.add, this.partner).subscribe((response: any) => {   
         this.baseService.spinnerHide();
         this.baseService.successToast(response.message);
-        this.resetForm();     
+        this.router.navigate(["/home/catalogue/partner-data"]);
+        //this.resetForm();     
     }, err=>{
       this.baseService.spinnerHide();
       this.baseService.handleError(err);
@@ -222,7 +224,7 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.partner.provinceId = null;
     this.partner.countryShippingId = null;
     this.partner.provinceShippingId = null;
-    this.partner.departmentId = "Head Office";
+    this.partner.departmentId = "1";
     //this.partner.partnerGroup = '';
     this.partner.salePersonId = null;
     this.partner.workPlaceId = null;

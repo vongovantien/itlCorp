@@ -441,8 +441,8 @@
                                                                 (click)="sortShipmentDetail('finalDestinationPlace')">
                                                                 <span>Destination</span>
                                                             </th>
-                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerNames'), 'sorting_desc': (!isDesc && sortKey == 'containerNames'), 'sorting': sortKey != 'containerNames' }"
-                                                                (click)="sortShipmentDetail('containerNames')">
+                                                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'packageContainer'), 'sorting_desc': (!isDesc && sortKey == 'packageContainer'), 'sorting': sortKey != 'containerNames' }"
+                                                                (click)="sortShipmentDetail('packageContainer')">
                                                                 <span>Containers</span>
                                                             </th>
                                                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'packageTypes'), 'sorting_desc': (!isDesc && sortKey == 'packageTypes'), 'sorting': sortKey != 'packageTypes' }"
@@ -473,7 +473,7 @@
                                                                 <span>{{ detail.podName }}</span>
                                                             </td>
                                                             <td>
-                                                                <span>{{ detail.containerNames }}</span>
+                                                                <span>{{ detail.packageContainer }}</span>
                                                             </td>
                                                             <td>
                                                                 <span>{{ detail.packageTypes }}</span>

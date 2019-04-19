@@ -4,7 +4,7 @@
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
-            <app-breadcrumb></app-breadcrumb>
+            <!-- <app-breadcrumb></app-breadcrumb> -->
         </div>
         <div class="c-button-actions">
             <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
@@ -171,9 +171,10 @@
                                         <label class="form-control-label">
                                             Country <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseBillingCountry [allowClear]="true" [items]="countries" [active]="billingCountryActive==null?[]:[billingCountryActive]" [disabled]="disabled" (data)="refreshValue($event)" 
+                                        <ng-select #chooseBillingCountry [allowClear]="true" [items]="countries"
+                                            [disabled]="disabled" (data)="refreshValue($event)" 
                                             (selected)="selected($event, 'billingCountry')" (removed)="removed($event, 'billingCountry')" (typed)="typed($event)"
-                                            [active]="billingCountryActive==null?[]:[billingCountryActive]"
+                                            [active]="billingCountryActive"
                                             placeholder="Select country">
                                         </ng-select>
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.countryId == null" >
@@ -186,9 +187,9 @@
                                         <label class="form-control-label">
                                             City <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseBillingProvince [allowClear]="true" [items]="billingProvinces" [active]="billingProvinceActive==null?[]:[billingProvinceActive]" [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseBillingProvince [allowClear]="true" [items]="billingProvinces" 
+                                            [active]="billingProvinceActive" [disabled]="disabled" (data)="refreshValue($event)"
                                             (selected)="selected($event, 'billingProvince')" (removed)="removed($event, 'billingProvince')" (typed)="typed($event)"
-                                            [active]="billingProvinceActive==null?[]:[billingProvinceActive]"
                                             placeholder="Select city/ province">
                                         </ng-select>
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.provinceId == null" >
@@ -250,7 +251,9 @@
                                         <label class="form-control-label">
                                             Country <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseShippingCountry [allowClear]="true" [items]="countries" [active]="shippingCountryActive==null?[]:[shippingCountryActive]" [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseShippingCountry [allowClear]="true" [items]="countries" 
+                                            [active]="shippingCountryActive" 
+                                            [disabled]="disabled" (data)="refreshValue($event)"
                                             (selected)="selected($event, 'shippingCountry')" (removed)="removed($event, 'shippingCountry')" (typed)="typed($event)"
                                             placeholder="Select country">
                                         </ng-select>
@@ -264,7 +267,7 @@
                                         <label class="form-control-label">
                                             City <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseShippingProvince [allowClear]="true" [items]="shippingProvinces" [active]="shippingProvinceActive==null?[]:[shippingProvinceActive]" [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseShippingProvince [allowClear]="true" [items]="shippingProvinces" [active]="shippingProvinceActive" [disabled]="disabled" (data)="refreshValue($event)"
                                             (selected)="selected($event, 'shippingProvince')" (removed)="removed($event, 'shippingProvince')" (typed)="typed($event)"
                                             placeholder="Select province/ city">
                                         </ng-select>
@@ -319,8 +322,13 @@
                                 <label class="form-control-label">
                                     Saleman <span class="m--font-danger" *ngIf="partner.salePersonId == null && isRequiredSaleman">(*)</span>
                                 </label>
-                                <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
-                                    (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"
+                                <ng-select #chooseSaleman [allowClear]="true" 
+                                    [items]="saleMans" 
+                                    [disabled]="disabled" 
+                                    (data)="refreshValue($event)" name="partnerSaleman"
+                                    (selected)="selected($event, 'saleman')" 
+                                    [active]="salemanActive"
+                                    (removed)="removed($event,'saleman')" (typed)="typed($event)"
                                     placeholder="">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="(partner.salePersonId == null && isRequiredSaleman)" >
@@ -380,7 +388,9 @@
                             <label class="form-control-label" for="">
                                 Department <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select [allowClear]="true" [items]="departments" [active]="departmentActive==null?[]:[departmentActive]" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
+                            <ng-select [allowClear]="true" [items]="departments" 
+                                [active]="departmentActive" 
+                                [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
                                 (selected)="selected($event, 'department')" (removed)="removed($event,'department')" placeholder="Select filter">
                             </ng-select>
                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && this.partner.departmentId == null" >
@@ -393,7 +403,7 @@
                             <label class="form-control-label" for="">
                                 A/C Ref
                             </label>
-                            <ng-select [allowClear]="true" [active]="parentCustomerActive==null?[]:[parentCustomerActive]" [items]="parentCustomers" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
+                            <ng-select [allowClear]="true" [active]="parentCustomerActive" [items]="parentCustomers" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
                                 (selected)="selected($event, 'accountRef')" (removed)="removed($event)" placeholder="Select A/C Ref">
                             </ng-select>
                         </div>
@@ -432,7 +442,7 @@
                             <label class="form-control-label" for="">
                                 Profile
                             </label>
-                            <ng-select [allowClear]="true" [active]="workPlaceActive==null?[]:[workPlaceActive]" [items]="workPlaces" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
+                            <ng-select [allowClear]="true" [active]="workPlaceActive" [items]="workPlaces" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
                                 (selected)="selected($event, 'workplace')" (removed)="removed($event)" placeholder="Select filter">
                             </ng-select>
                         </div>

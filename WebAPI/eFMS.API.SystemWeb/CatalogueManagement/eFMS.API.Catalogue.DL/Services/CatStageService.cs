@@ -12,14 +12,17 @@ using System.Text;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Common.Globals;
 using eFMS.API.Catalogue.Service.Helpers;
+using Microsoft.Extensions.Localization;
+using eFMS.API.Catalogue.DL.Common;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatStageService : RepositoryBase<CatStage, CatStageModel>, ICatStageService
     {
-        public CatStageService(IContextBase<CatStage> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        public CatStageService(IContextBase<CatStage> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
-            
+            stringLocalizer = localizer;
         }        
         
 
@@ -146,7 +149,7 @@ namespace eFMS.API.Catalogue.DL.Services
                
                 if (string.IsNullOrEmpty(item.StageNameEn))
                 {
-                    item.StageNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.StageNameEn = stringLocalizer[LanguageSub.MSG_STAGE_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.DepartmentId==null)
@@ -156,12 +159,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.Status))
                 {
-                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.Status = stringLocalizer[LanguageSub.MSG_STAGE_STATUS_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = string.Format("Code is not allow empty!|wrong"); ;
+                    item.Code = stringLocalizer[LanguageSub.MSG_STAGE_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -169,12 +172,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     var stage = stages.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
                     if (stage != null)
                     {
-                        item.Code = string.Format("Code {0} has been existed!|wrong",item.Code);
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED],item.Code);
                         item.IsValid = false;
                     }
                     if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
                     {
-                        item.Code = string.Format("Code {0} has been duplicated!|wrong", item.Code);
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;
                     }
                 }

@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2042
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ReportPreview", "ReportPreview\", "{C32F5ED5-F23F-474F-89D6-EC67F379B552}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6.1"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_51830"
+		Debug.AspNetCompiler.PhysicalPath = "ReportPreview\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51830\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_51830"
+		Release.AspNetCompiler.PhysicalPath = "ReportPreview\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51830\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "51830"
+		SlnRelativePath = "ReportPreview\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C32F5ED5-F23F-474F-89D6-EC67F379B552}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C32F5ED5-F23F-474F-89D6-EC67F379B552}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C32F5ED5-F23F-474F-89D6-EC67F379B552}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{C32F5ED5-F23F-474F-89D6-EC67F379B552}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A0340C5-5FB5-4F98-941B-D4042A9745B3}
+	EndGlobalSection
+EndGlobal

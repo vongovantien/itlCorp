@@ -182,7 +182,19 @@ export class BaseService implements ErrorHandler {
       return false;
     }
   }
-
+  public async previewfile(url: string, data?: any):Promise<any> {    
+    var token = 'Bearer ' + localStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization", token);
+    this.spinnerShow();
+    try {
+      this.spinnerHide();
+      const res = await this._http.post(url, data, { responseType: "blob" }).toPromise();
+      return res;
+    } catch (error) {
+      console.log({DOWNLOAD_ERROR_LOG:error});
+      this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
+    }
+  }
   public async downloadfile(url: string,saveAsFileName:string):Promise<any> {    
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);

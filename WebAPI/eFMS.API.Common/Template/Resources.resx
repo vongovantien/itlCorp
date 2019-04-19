@@ -120,4 +120,7 @@
   <data name="ExcelTemplate" xml:space="preserve">
     <value>C:\inetpub\efms-api\template</value>
   </data>
+  <data name="Reports" xml:space="preserve">
+    <value>D:\Workspace\efms\src\WebAPI\eFMS.API.SystemWeb\Reportmanagement\APIReport\APIReport\Reports\FCLExport</value>
+  </data>
 </root>

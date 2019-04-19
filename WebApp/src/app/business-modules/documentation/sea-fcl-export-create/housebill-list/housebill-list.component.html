@@ -94,7 +94,7 @@
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="emitSelectedHB(null)" data-toggle="modal" data-target="#add-house-bill-modal">
+                            (click)="emitSelectedHB('addnew')" data-toggle="modal" data-target="#add-house-bill-modal">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -114,7 +114,7 @@
                             <th class="table-actions-col"></th>
                             <th class="sorting">
                                 <span>
-                                    H-B/L No hoho
+                                    H-B/L No
                                 </span>
                             </th>
                             <th class="sorting">
@@ -159,8 +159,7 @@
                     <tbody *ngIf="HouseBillListData!==null && HouseBillListData.length>0">
                         <tr class="" *ngFor="let hb of HouseBillListData;let i = index;" style="cursor:pointer;"
                             [ngClass]="{'selected-row':i==0}"
-                            (click)="$event.path[0].closest('tbody').querySelector('tr.selected-row')==null?return:$event.path[0].closest('tbody').querySelector('tr.selected-row').classList.remove('selected-row');$event.path[0].closest('tr').classList.add('selected-row');
-                                    getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb)">
+                            (click)="getBuyingChargesOfHouseBill(hb);getSellingChargesOfHouseBill(hb);getOBHChargesOfHouseBill(hb);emitSelectedHB(hb.id);focusLine($event)">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
@@ -169,9 +168,9 @@
                                         data-target="#add-house-bill-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button"
+                                    <button type="button" (click)="DeleteHouseBill('confirm',hb.id)"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-housebill-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -378,9 +377,9 @@
                                             title="Edit" data-toggle="modal" data-target="#edit-buying-rate-modal">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button"
+                                        <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -438,7 +437,7 @@
                                 </td>
                                 <td>
                                     <span>
-                                        SOA
+                                        {{charge.soano}}
                                     </span>
                                 </td>
                                 <td>
@@ -453,8 +452,11 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <span *ngIf="charge.exchangeDate.startDate==undefined">
                                         {{charge.exchangeDate | date:'dd/MM/yyyy'}}
+                                    </span>
+                                    <span *ngIf="charge.exchangeDate.startDate!=undefined">
+                                        {{charge.exchangeDate.startDate | date:'dd/MM/yyyy'}}
                                     </span>
                                 </td>
                             </tr>
@@ -583,9 +585,9 @@
                                             title="Edit" data-toggle="modal" data-target="#edit-selling-rate-modal">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button"
+                                        <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -643,7 +645,7 @@
                                 </td>
                                 <td>
                                     <span>
-                                        SOA
+                                        {{charge.soano}}
                                     </span>
                                 </td>
                                 <td>
@@ -793,9 +795,9 @@
                                             title="Edit" data-toggle="modal" data-target="#edit-obh-charge-modal">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button"
+                                        <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
+                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -858,7 +860,7 @@
                                 </td>
                                 <td>
                                     <span>
-                                        SOA
+                                        {{charge.soano}}
                                     </span>
                                 </td>
                                 <td>
@@ -1082,7 +1084,7 @@
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title">
                 <h3 class="m-portlet__head-text">
-                    Grant Total Profit
+                    Profit Summary
                 </h3>
             </div>
         </div>
@@ -1178,7 +1180,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add buying rate</h5>
+                    <h5 class="modal-title">Add buying charge</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1580,7 +1582,7 @@
                                             &nbsp;</small>
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedBuyingChargeEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" [disabled]="BuyingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="BuyingRateChargeToEdit.nameEn" title="charge">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -1644,7 +1646,7 @@
                                     <ng-select [allowClear]="true" [items]="[
                                                             { 'text': 'AGENT', 'id': 'AGENT' },
                                                             { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
-                                                            { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
+                                                            { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [active]="[{'text':BuyingRateChargeToEdit.objectBePaid,'id':BuyingRateChargeToEdit.objectBePaid}]"
                                         (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.objectBePaid=$event.id;
@@ -1670,8 +1672,8 @@
                                         Partner name
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedBuyingRatePartnerEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER'" readonly
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"                                           
+                                            [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.soano!=null" readonly
                                             data-toggle="dropdown" placeholder="Please selected"
                                             [value]="BuyingRateChargeToEdit.partnerName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -1733,6 +1735,7 @@
                                     </label>
                                     <input type="text" required #buyingRateChangeQuantityNameEdt="ngModel" required
                                         class="form-control m-input m-input--square" appIntergerInputCheck
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="BuyingRateChargeToEdit.quantity" placeholder="Enter text"
                                         name="buyingRateChangeQuantityNameEdt" (keyup)="calculateTotalEachBuying(true)">
                                     <div class="form-control-feedback"
@@ -1749,6 +1752,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            [disabled]="BuyingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="BuyingRateChargeToEdit.unit">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -1802,6 +1806,7 @@
                                         Unit price
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="BuyingRateChargeToEdit.unitPrice" placeholder="Enter text" required
                                         name="BuyingRateChargeUnitPriceNameEdt"
                                         #BuyingRateChargeUnitPriceNameEdt="ngModel"
@@ -1822,7 +1827,7 @@
                                     </label>
                                     <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
                                         [active]="[{'text':BuyingRateChargeToEdit.currency,'id':BuyingRateChargeToEdit.currencyId}]"
-                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null" (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.currencyId=$event.id;BuyingRateChargeToEdit.currency=$event.text"
                                         (removed)="BuyingRateChargeToEdit.currencyId=null"
                                         (typed)="getListCurrency($event)" placeholder="Select filter">
@@ -1841,6 +1846,7 @@
                                     </label>
                                     <input type="number" name="BuyingRateChargeVATNameEdt" required max="100"
                                         #BuyingRateChargeVATNameEdt="ngModel"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="BuyingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachBuying(true)">
@@ -1868,6 +1874,7 @@
                                         Doc no
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.docNo"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeDocNameEdt">
                                 </div>
@@ -1878,6 +1885,7 @@
                                         Note
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.notes"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeNoteNameEdt">
                                 </div>
@@ -1889,6 +1897,7 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
+                                            [attr.disabled]="BuyingRateChargeToEdit.soano!=null"
                                             ngxDaterangepickerMd [autoApply]="true"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="BuyingRateChargeToEdit.exchangeDate" [singleDatePicker]="true"
@@ -1906,6 +1915,7 @@
                                     <div>
                                         <label class="m-checkbox m-checkbox--bold">
                                             <input type="checkbox" [(ngModel)]="BuyingRateChargeToEdit.kickBack"
+                                                [disabled]="BuyingRateChargeToEdit.soano!=null"
                                                 name="BuyingRateChargeKickBacksNameEdt">
                                             Kick back
                                             <span></span>
@@ -1952,7 +1962,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add selling rate</h5>
+                    <h5 class="modal-title">Add selling charge</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1999,9 +2009,8 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover"
                                                         *ngIf="lstBuyingRateChargesComboBox!=null && lstBuyingRateChargesComboBox.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row"
-                                                                *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
+                                                        <tbody  *ngFor="let item of lstSellingRateChargesComboBox;let i = index;">
+                                                            <tr class="data-row"                                                               
                                                                 attr.data-id={{i}} (click)="SellingRateChargeToAdd.chargeId=item.charge.id;
                                                             SellingRateChargeToAdd.unitId=item.charge.unitId;
                                                             SellingRateChargeToAdd.unitPrice=item.charge.unitPrice;
@@ -2333,7 +2342,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="SellingRateChargeToEdit.soano!=null"
                                             [value]="SellingRateChargeToEdit.nameEn" title="charge">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -2393,7 +2402,7 @@
                                     <label class="form-control-label" for="">
                                         Partner type
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="partnerTypes" [disabled]="disabled"
+                                    <ng-select [allowClear]="true" [items]="partnerTypes" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [active]="[{'text':SellingRateChargeToEdit.objectBePaid,'id':SellingRateChargeToEdit.objectBePaid}]"
                                         (data)="refreshValue($event)"
                                         (selected)="SellingRateChargeToEdit.objectBePaid=$event.id;
@@ -2419,8 +2428,8 @@
                                         Partner name
                                     </label>
                                     <div class="dropdown e--combogrid" #selectedSellingRatePartnerEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER'" readonly
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"                                        
+                                            [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null" readonly
                                             data-toggle="dropdown" placeholder="Please selected"
                                             [value]="SellingRateChargeToEdit.partnerName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -2481,7 +2490,7 @@
                                     <label class="form-control-label" for="">
                                         Quantity
                                     </label>
-                                    <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required
+                                    <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" appIntergerInputCheck
                                         [(ngModel)]="SellingRateChargeToEdit.quantity" placeholder="Enter text"
                                         name="sellingRateChangeQuantityNameEdt"
@@ -2500,6 +2509,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            [disabled]="SellingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="SellingRateChargeToEdit.unit">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -2553,6 +2563,7 @@
                                         Unit price
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="SellingRateChargeToEdit.unitPrice" placeholder="Enter text"
                                         required name="SellingRateChargeUnitPriceNameEdt"
                                         #SellingRateChargeUnitPriceNameEdt="ngModel"
@@ -2573,7 +2584,7 @@
                                     </label>
                                     <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
                                         [active]="[{'text':SellingRateChargeToEdit.currency,'id':SellingRateChargeToEdit.currencyId}]"
-                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null" (data)="refreshValue($event)"
                                         (selected)="SellingRateChargeToEdit.currencyId=$event.id;SellingRateChargeToEdit.currency=$event.text"
                                         (removed)="SellingRateChargeToEdit.currencyId=null"
                                         (typed)="getListCurrency($event)" placeholder="Select filter">
@@ -2591,7 +2602,7 @@
                                         VAT
                                     </label>
                                     <input type="number" name="SellingRateChargeVATNameEdt" required max="100"
-                                        #SellingRateChargeVATNameEdt="ngModel"
+                                        #SellingRateChargeVATNameEdt="ngModel" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="SellingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachSelling(true)">
@@ -2618,7 +2629,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeDocNameEdt">
                                 </div>
@@ -2628,7 +2639,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes" [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeNoteNameEdt">
                                 </div>
@@ -2640,7 +2651,7 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true"
+                                            ngxDaterangepickerMd [autoApply]="true" [disabled]="SellingRateChargeToEdit.soano!=null"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="SellingRateChargeToEdit.exchangeDate" [singleDatePicker]="true"
                                             name="SellingRateChargeExchangeDateNameEdt" readonly />
@@ -2735,9 +2746,8 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover"
                                                         *ngIf="lstOBHChargesComboBox!=null && lstOBHChargesComboBox.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row"
-                                                                *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
+                                                        <tbody *ngFor="let item of lstOBHChargesComboBox;let i = index;">
+                                                            <tr class="data-row"                                                               
                                                                 attr.data-id={{i}} (click)="OBHChargeToAdd.chargeId=item.charge.id;
                                                             OBHChargeToAdd.unitId=item.charge.unitId;
                                                             OBHChargeToAdd.unitPrice=item.charge.unitPrice;
@@ -3061,7 +3071,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-charge-modal')">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -3084,7 +3094,7 @@
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit OBH charge</h5>
+                    <h5 class="modal-title">Edit OBH rate</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -3102,7 +3112,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
                                             [value]="OBHChargeToEdit.nameEn"
                                             title="Đây là một charge name dài thật là dài luôn nạ Thor">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -3164,7 +3174,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
                                             [value]="OBHChargeToEdit.receiverName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -3223,7 +3233,7 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
                                             [value]="OBHChargeToEdit.payerName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -3284,7 +3294,7 @@
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
                                         placeholder="Enter text" #OBHQuantityNameEdt="ngModel" appIntergerInputCheck
-                                        [(ngModel)]="OBHChargeToEdit.quantity" required
+                                        [(ngModel)]="OBHChargeToEdit.quantity" required [disabled]="OBHChargeToEdit.soano!=null"
                                         (keyup)="calculateTotalEachOBH(true)" name="OBHQuantityNameEdt">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeForm.submitted && OBHQuantityNameEdt.invalid">
@@ -3301,7 +3311,7 @@
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="OBHChargeToEdit.unit">
+                                            [value]="OBHChargeToEdit.unit" [disabled]="OBHChargeToEdit.soano!=null">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
@@ -3352,7 +3362,7 @@
                                     <label class="form-control-label" for="">
                                         Unit price
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
+                                    <input type="text" class="form-control m-input m-input--square" [disabled]="OBHChargeToEdit.soano!=null"
                                         [(ngModel)]="OBHChargeToEdit.unitPrice" placeholder="Enter text" required
                                         name="OBHUnitPriceNameEdt" #OBHUnitPriceNameEdt="ngModel"
                                         (keyup)="calculateTotalEachOBH(true)">
@@ -3371,7 +3381,7 @@
                                         Currency
                                     </label>
                                     <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
-                                        [disabled]="disabled"
+                                        [disabled]="OBHChargeToEdit.soano!=null"
                                         [active]="[{'text':OBHChargeToEdit.currency,'id':OBHChargeToEdit.currencyId}]"
                                         (data)="refreshValue($event)" (selected)="OBHChargeToEdit.currencyId=$event.id"
                                         (removed)="OBHChargeToEdit.currencyId=null" (typed)="getListCurrency($event)"
@@ -3389,7 +3399,7 @@
                                     <label class="form-control-label" for="">
                                         VAT
                                     </label>
-                                    <input type="number" max="100" name="OBHChargeVATNameEdt" required
+                                    <input type="number" max="100" name="OBHChargeVATNameEdt" required [disabled]="OBHChargeToEdit.soano!=null"
                                         #OBHChargeVATNameEdt="ngModel" [(ngModel)]="OBHChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachOBH(true)">
@@ -3416,7 +3426,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo" [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeDocName">
                                 </div>
@@ -3426,7 +3436,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes" [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeNoteName">
                                 </div>
@@ -3438,7 +3448,7 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true"
+                                            ngxDaterangepickerMd [autoApply]="true" [disabled]="OBHChargeToEdit.soano!=null"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="OBHChargeToEdit.exchangeDate" [singleDatePicker]="true"
                                             name="OBHExchangeDateNameEdt" readonly />
@@ -3494,3 +3504,85 @@
 <!--begin:: add-remaining-charge-modal-->
 <app-credit-and-debit-note-remaining-charge></app-credit-and-debit-note-remaining-charge>
 <!--end:: add-remaining-charge-modal-->
+
+
+<!--begin::confirm-delete-housebill-modal-->
+<div class="modal fade" id="confirm-delete-housebill-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure want to delete this House Bill? <br> All related charges added to this House Bill will be lost!</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="DeleteHouseBill('ok')">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-housebill-modal-->
+
+
+<!--begin::confirm-delete-charge-modal-->
+<div class="modal fade" id="confirm-delete-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Are you sure want to delete this Charge?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="DeleteCharge('ok')">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-charge-modal-->

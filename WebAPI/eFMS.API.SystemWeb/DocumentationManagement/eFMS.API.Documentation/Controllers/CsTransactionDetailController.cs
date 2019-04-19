@@ -10,8 +10,6 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
-using eFMS.API.Shipment.Service.Helpers;
-using eFMS.Domain.Report;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +45,13 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(csTransactionDetailService.GetByJob(criteria));
         }
 
+        [HttpGet]
+        [Route("GetHbDetails")]
+        public CsTransactionDetailModel GetHbDetails(Guid JobId,Guid HbId)
+        {
+            return csTransactionDetailService.GetHbDetails(JobId,HbId);
+        }
+
         [HttpPost]
         [Route("addNew")]
         [Authorize]
@@ -71,6 +76,22 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpDelete]
+        [Route("delete")]
+        [Authorize]
+        public IActionResult Delete(Guid hblId)
+        {
+            var hs = csTransactionDetailService.DeleteTransactionDetail(hblId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpPost]
         [Authorize]
         [Route("Import")]
@@ -130,12 +151,12 @@ namespace eFMS.API.Documentation.Controllers
             return message;
         }
 
-        [HttpGet("GetReport")]
-        public CsTransactionDetailReport GetReport(Guid jobId)
-        {
-            var result = csTransactionDetailService.GetReportBy(jobId);
-            return result;
-    }
+    //    [HttpGet("GetReport")]
+    //    public CsTransactionDetailReport GetReport(Guid jobId)
+    //    {
+    //        var result = csTransactionDetailService.GetReportBy(jobId);
+    //        return result;
+    //}
 
         [HttpPost]
         [Route("Paging")]

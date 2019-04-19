@@ -54,14 +54,38 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var lastRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.OrderByDescending(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).FirstOrDefault();
             if (lastRate == null) return null;
-            List<vw_catCurrencyExchangeNewest> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
-
+            var lvCatPlace = GetExchangeRateNewest();
             var result = new CurrencyExchangeNewestViewModel
             {
                 DatetimeModified = lastRate.DatetimeModified ?? lastRate.DatetimeCreated,
                 ExchangeRates = lvCatPlace
             };
             return result;
+        }
+
+        private List<vw_catCurrencyExchangeNewest> GetExchangeRateNewest()
+        {
+            List<vw_catCurrencyExchangeNewest> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
+            int currentMonth = DateTime.Now.Month;
+            foreach(var item in lvCatPlace)
+            {
+                if(item.DatetimeCreated.Value.Date != DateTime.Now.Date)
+                {
+                    var exchangeRate = new CatCurrencyExchange
+                    {
+                        CurrencyFromId = item.CurrencyFromID,
+                        CurrencyToId = "VND",
+                        Rate = item.Rate,
+                        UserCreated = "system",
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        Inactive = false
+                    };
+                    ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Add(exchangeRate);
+                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                }
+            }
+            return lvCatPlace;
         }
 
         public CurrencyExchangeNewestViewModel GetExchangeRates(DateTime date, string localCurrency, string fromCurrency)

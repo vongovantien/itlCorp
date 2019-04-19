@@ -1,6 +1,5 @@
 import { SystemConstants } from "./system.const";
 import {environment} from 'src/environments/environment';
-import { CsTransactionDetail } from "../app/shared/models/document/csTransactionDetail";
 
 export class API_MENU {
     private HOST = {
@@ -14,7 +13,8 @@ export class API_MENU {
         Catalogue: 44361,
         Department: 44242,
         auditlog: 44363,
-        Documentation: 44366
+        Documentation: 44366,
+        Report: 51830
     }
 
     private PROTOCOL = "http://";
@@ -47,7 +47,17 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
     }
-
+    private getReportPath(Module){
+        if (this.CURRENT_HOST == this.HOST.Local) {
+            return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/Default.aspx";
+        }
+        if (this.CURRENT_HOST == this.HOST.Test) {
+            return this.PROTOCOL + this.HOST.Test + "/Default.aspx";
+        }
+        if (this.CURRENT_HOST == this.HOST.Staging) {
+            return this.PROTOCOL + this.HOST.Staging + "/Default.aspx";
+        }
+    }
     private getPort(Module: String) {
         return eval("this.PORT." + Module);
     }
@@ -234,24 +244,29 @@ export class API_MENU {
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
+            getTotalProfit: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/GetTotalProfit",
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Import",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
             checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/CheckAllowDelete/"
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob",
+            getHBDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetHbDetails",
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/addNew",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/delete",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/Paging",
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/Import"
         },
         CsMawbcontainer: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Update"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Update",
+            getHBLConts: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/GetHBConts",
         },
         CsShipmentSurcharge:{
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Delete",
             getByHBId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetByHB",
             getPartnerByJobId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetPartnersByJob",
             getChargesByPartner: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GroupByListHB",
@@ -259,16 +274,21 @@ export class API_MENU {
         AcctSOA: {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Delete",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Get",
             getDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/GetDetails",
         },
         CsManifest: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest",
+            preview: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/PreviewFCLManifest"
         },
         CsShippingInstruction: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction",
+            previewSI: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLShippingInstruction",
+            previewOCL: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLOCL"
         }
     }
+    public Report = this.getReportPath(SystemConstants.MODULE_NAME.Report);
 }

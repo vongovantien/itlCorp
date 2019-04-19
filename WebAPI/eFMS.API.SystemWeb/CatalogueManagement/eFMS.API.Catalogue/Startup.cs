@@ -51,22 +51,7 @@ namespace eFMS.API.Catalogue
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                       .AddIdentityServerAuthentication(options =>
-                       {
-                           options.Authority = Configuration["Authentication:Authority"];
-                           options.RequireHttpsMetadata = bool.Parse(Configuration["Authentication:RequireHttpsMetadata"]);
-                           options.ApiName = Configuration["Authentication:ApiName"];
-                           options.ApiSecret = Configuration["Authentication:ApiSecret"];
-                       });
-            // services.AddAuthorization(options => options.AddPolicy("Founder", policy => policy.RequireClaim("Employee", "Mosalla")));
-
+            services.AddAuthorize(Configuration);
             services.AddAutoMapper();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
@@ -85,7 +70,6 @@ namespace eFMS.API.Catalogue
                             .AllowCredentials();
                     });
             });
-            //services.AddCustomAuthentication(Configuration);
             services.AddApiVersioning(config =>
             {
                 config.ReportApiVersions = true;
@@ -95,59 +79,21 @@ namespace eFMS.API.Catalogue
             });
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
-            //Multiple language setting
-            var supportedCultures = new[]
-            {
-                new CultureInfo("en-US"),
-                new CultureInfo("vi-VN")
-            };
-
-            var localizationOptions = new RequestLocalizationOptions()
-            {
-                DefaultRequestCulture = new RequestCulture(culture: "en-US"),               
-                SupportedCultures = supportedCultures,
-                 
-            };
-
-            localizationOptions.RequestCultureProviders = new[]
-            {
-                 new RouteDataRequestCultureProvider()
-                 {
-                     RouteDataStringKey = "lang",
-                     Options = localizationOptions
-                 }
-            };
-
-            services.AddSingleton(localizationOptions);
-            services.AddSwaggerGen(
-                options =>
+            services.AddCulture(Configuration);
+            services.AddSwagger(Configuration);
+            DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<eFMSDataContext>(options =>
                 {
-                    var provider = services.BuildServiceProvider()
-                    .GetRequiredService<IApiVersionDescriptionProvider>();
-
-                    foreach (var description in provider.ApiVersionDescriptions)
-                    {
-                        options.SwaggerDoc(
-                            description.GroupName,
-                            new Info()
-                            {
-                                Title = $"eFMS Catalogue API {description.ApiVersion}",
-                                Version = description.ApiVersion.ToString(),
-                                Description = "eFMS Catalogue API Document"
-                            });
-                    }
-                    //options.DocumentFilter<SwaggerAddEnumDescriptions>();
-
-                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
-                    {
-                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
-                        AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Catalogue API" } }
-                    });
-                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
-                    options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
-                });
+                    options.UseSqlServer(Configuration["ConnectionStrings:eFMSConnection"],
+                        sqlServerOptionsAction: sqlOptions =>
+                        {
+                            //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                            sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                        });
+                },
+                ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
+                );
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
@@ -195,8 +141,6 @@ namespace eFMS.API.Catalogue
             });
 
             app.UseCors("AllowAllOrigins");
-            //app.UseCors("CorsPolicy");
-            //ConfigureAuth(app);
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
