@@ -72,5 +72,8 @@ export class SeaLclExportCreateComponent implements OnInit {
     public refreshValue(value: any): void {
         this.value = value;
     }
+    switchTab(){
+        
+    }
 
 }

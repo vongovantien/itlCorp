@@ -26,15 +26,17 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
 
    ngOnInit() {
     this.cdRef.detectChanges();
-    setInterval(() => {
-       var isCloseExpriteTime = this.baseServices.checkExpireTimeToken();
+    setInterval(() => {      
+       var remainingMinutes : number = this.baseServices.remainingExpireTimeToken();
        var token = this.baseServices.getAccessToken();
-       if(token!==null && isCloseExpriteTime){
-          this.baseServices.warningToast("Phiên đăng nhập sẽ hết hạn trong 3 phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc !","Cảnh Báo !")
+       if(token!==null && remainingMinutes<=3 && remainingMinutes>0){
+          this.baseServices.warningToast("Phiên đăng nhập sẽ hết hạn sau " +remainingMinutes+ " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.","Cảnh Báo !")
        }
-    }, 60000);
+       if(!this.baseServices.checkLoginSession()){
+          this.baseServices.logOut();
+       }
+    }, 30000);
   }
-
 
   MenuChanged(event){
     this.Page_Info = event;      

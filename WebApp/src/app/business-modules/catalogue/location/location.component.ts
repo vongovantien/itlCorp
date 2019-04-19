@@ -322,6 +322,7 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID") {
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
         await this.getCountries();
+        this.getAllCountries();
         if(response){
           this.setPageAfterAdd();
           form.onReset();
