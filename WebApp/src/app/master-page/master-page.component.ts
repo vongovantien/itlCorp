@@ -3,6 +3,7 @@ import {PageSidebarComponent} from './page-sidebar/page-sidebar.component';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { BaseService } from 'src/services-base/base.service';
 
 
 @Component({
@@ -21,12 +22,21 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
    this.Page_Info = this.Page_side_bar.Page_Info;  
   }
 
-  constructor(private router: Router,private cdRef:ChangeDetectorRef,private cookieService: CookieService,private oauthService: OAuthService, ) { }
+  constructor(private baseServices:BaseService,private router: Router,private cdRef:ChangeDetectorRef,private cookieService: CookieService,private oauthService: OAuthService, ) { }
 
    ngOnInit() {
     this.cdRef.detectChanges();
+    setInterval(() => {      
+       var remainingMinutes : number = this.baseServices.remainingExpireTimeToken();
+       var token = this.baseServices.getAccessToken();
+       if(token!==null && remainingMinutes<=3 && remainingMinutes>0){
+          this.baseServices.warningToast("Phiên đăng nhập sẽ hết hạn sau " +remainingMinutes+ " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.","Cảnh Báo !")
+       }
+       if(!this.baseServices.checkLoginSession()){
+          this.baseServices.logOut();
+       }
+    }, 30000);
   }
-
 
   MenuChanged(event){
     this.Page_Info = event;      
@@ -36,7 +46,7 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
   logout(){
     this.oauthService.logOut(true);  
     this.router.navigateByUrl("/login");
-    localStorage.clear()   
+    localStorage.clear(); 
   }
 
 

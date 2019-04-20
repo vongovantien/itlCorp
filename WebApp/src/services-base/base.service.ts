@@ -35,7 +35,7 @@ export class BaseService implements ErrorHandler {
    * @param url 
    */
   public get(url: string) {
-  
+
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.get(url, { headers: this.headers });
@@ -182,7 +182,7 @@ export class BaseService implements ErrorHandler {
       return false;
     }
   }
-  public async previewfile(url: string, data?: any):Promise<any> {    
+  public async previewfile(url: string, data?: any): Promise<any> {
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     this.spinnerShow();
@@ -191,25 +191,25 @@ export class BaseService implements ErrorHandler {
       const res = await this._http.post(url, data, { responseType: "blob" }).toPromise();
       return res;
     } catch (error) {
-      console.log({DOWNLOAD_ERROR_LOG:error});
+      console.log({ DOWNLOAD_ERROR_LOG: error });
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
-  public async downloadfile(url: string,saveAsFileName:string):Promise<any> {    
+  public async downloadfile(url: string, saveAsFileName: string): Promise<any> {
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     this.spinnerShow();
     try {
       this.spinnerHide();
-      const res = await this._http.get(url,{responseType:'blob'}).toPromise();
-      saveAs(res,saveAsFileName);
+      const res = await this._http.get(url, { responseType: 'blob' }).toPromise();
+      saveAs(res, saveAsFileName);
     } catch (error) {
-      console.log({DOWNLOAD_ERROR_LOG:error});
+      console.log({ DOWNLOAD_ERROR_LOG: error });
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
 
-  uploadfile(url: any, files: any, name: string = null) {   
+  uploadfile(url: any, files: any, name: string = null) {
     var token = 'Bearer ' + localStorage.getItem("access_token");
     if (files.length === 0)
 
@@ -246,8 +246,6 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
-
-    console.log(error)
     if (error.status === 400) {
       this.errorToast(error.error.message, this.LANG.NOTIFI_MESS.CLIENT_ERR_TITLE);
     }
@@ -266,6 +264,14 @@ export class BaseService implements ErrorHandler {
       }, 400);
     }
 
+  }
+
+  public logOut() {
+    localStorage.clear();
+    this.reloadPage();
+    setTimeout(() => {
+      this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
+    }, 1000);
   }
 
   /**
@@ -313,8 +319,9 @@ export class BaseService implements ErrorHandler {
     } else {
       return true;
     }
-
   }
+
+
 
   reloadPage() {
     if (window.location.hostname === 'localhost') {
@@ -331,15 +338,32 @@ export class BaseService implements ErrorHandler {
       var expiresAt = localStorage.getItem('expires_at');
       var now = new Date();
       if (expiresAt && parseInt(expiresAt, 10) < now.getTime()) {
+        localStorage.clear();
         return false;
       }
       return true;
     }
+    localStorage.clear();
     return false;
   };
 
+  /**
+   * Return true if access token will be expire time after 3 minutes
+   */
+  public remainingExpireTimeToken() :number{
+    if (this.getAccessToken()) {
+      var expiresAt = localStorage.getItem('expires_at');
+      var expTime = +new Date(parseInt(expiresAt));
+      var nowTime = +new Date();
+      const remainingMinutes = new Date(expTime - nowTime).getMinutes();
 
-  private getAccessToken() {
+      return remainingMinutes
+    }
+    return -1;
+  };
+
+
+  public getAccessToken() {
     return localStorage.getItem('access_token');
   }
 

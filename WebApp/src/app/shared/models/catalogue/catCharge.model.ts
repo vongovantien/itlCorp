@@ -8,7 +8,7 @@ export class CatCharge{
      currencyId :string;
      unitPrice :number;
      unitId :number;
-     vat :number;
+     vatrate :number;
      userCreated :string;
      datetimeCreated :Date;
      userModified :string;
