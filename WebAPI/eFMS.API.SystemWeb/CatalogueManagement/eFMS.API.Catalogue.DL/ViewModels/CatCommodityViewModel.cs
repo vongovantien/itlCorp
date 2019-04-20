@@ -10,8 +10,8 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string CommodityNameVn { get; set; }
         public string CommodityNameEn { get; set; }
         public short? CommodityGroupId { get; set; }
-        public string CommonityGroupNameVn { get; set; }
-        public string CommonityGroupNameEn { get; set; }
+        public string CommodityGroupNameVn { get; set; }
+        public string CommodityGroupNameEn { get; set; }
         public string Note { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

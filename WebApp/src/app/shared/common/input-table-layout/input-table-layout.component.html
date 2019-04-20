@@ -25,13 +25,13 @@
     <ng-container *ngIf="column.format == 'date-time' && item[column.primaryKey]">
         <span>{{ item[column.primaryKey] | date: 'MMMM dd. yyyy'}}</span> &nbsp;
         <span>-</span> &nbsp;
-        <span>{{ item[column.primaryKey] | date: 'h:mm'}}</span>
+        <span>{{ item[column.primaryKey] | date: 'shortTime'}}</span>
     </ng-container>
     <ng-container *ngIf="column.format == 'EnglishDate'">
         <span>{{ item[column.primaryKey] | date: 'MMMM dd. yyyy'}}</span>
     </ng-container>
     <ng-container *ngIf="column.format == undefined">
-        <span>{{ item[column.primaryKey] | date: 'h:mm'}}</span> &nbsp;
+        <span>{{ item[column.primaryKey] | date: 'shortTime'}}</span> &nbsp;
         <span>{{ item[column.primaryKey] | date: 'dd/MM/yyyy'}}</span>
     </ng-container>
   </ng-container>

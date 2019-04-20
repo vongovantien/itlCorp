@@ -177,11 +177,17 @@ export class CommodityComponent implements OnInit {
       if(event.field == "commodityGroupNameEn"){
         this.criteria.commodityGroupNameEn = event.searchString;
       }
+      if(event.field == "code"){
+        this.criteria.code = event.searchString;
+      }
     }
-    this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
     this.getCommodities(this.pager);
   }
   searchCommodityGroup(event: any): any {
+    if(event.searchString == ""){
+      event.searchString = null;
+    }
     if(event.field == "All"){
       this.criteria.all = event.searchString;
     }

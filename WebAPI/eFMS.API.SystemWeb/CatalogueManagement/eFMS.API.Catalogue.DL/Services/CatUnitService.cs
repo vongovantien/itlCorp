@@ -17,7 +17,10 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatUnitService(IContextBase<CatUnit> repository,IMapper mapper) : base(repository, mapper)
         {
-
+            SetChildren<CatCharge>("Id", "UnitId"); 
+            SetChildren<CsMawbcontainer>("Id", "ContainerTypeId");
+            SetChildren<CsMawbcontainer>("Id", "UnitOfMeasureId");
+            SetChildren<CsShipmentSurcharge>("Id", "UnitId");
         }
 
         public List<UnitType> GetUnitTypes()

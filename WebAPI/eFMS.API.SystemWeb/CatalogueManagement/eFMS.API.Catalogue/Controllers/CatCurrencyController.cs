@@ -83,12 +83,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserCreated = currentUser.UserID;
-            catCurrencyModel.DatetimeCreated = DateTime.Now;
-            catCurrencyModel.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catCurrencyService.Add(catCurrencyModel);
+            model.UserCreated = currentUser.UserID;
+            var hs = catCurrencyService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -109,15 +105,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserModified = currentUser.UserID;
-            catCurrencyModel.DatetimeModified = DateTime.Now;         
-            if(catCurrencyModel.Inactive == true)
-            {
-                catCurrencyModel.InactiveOn = DateTime.Now;
-            }
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catCurrencyService.Update(catCurrencyModel);
+            model.UserModified = currentUser.UserID;
+            var hs = catCurrencyService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

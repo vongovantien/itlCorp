@@ -24,11 +24,16 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatCharge>("Id", "CurrencyId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyToId");
+            SetChildren<AcctSoa>("Id", "CurrencyId");
+            SetChildren<CatCharge>("Id", "CurrencyId");
+            SetChildren<CsShipmentSurcharge>("Id", "CurrencyId");
         }
 
         public override HandleState Add(CatCurrencyModel model)
         {
             var entity = mapper.Map<CatCurrency>(model);
+            entity.DatetimeCreated = DateTime.Now;
+            entity.Inactive = false;
             var result = DataContext.Add(entity, true);
             return result;
         }
@@ -73,19 +78,33 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Update(CatCurrencyModel model)
         {
-            var result = Update(model, x => x.Id == model.Id);
-            if (result.Success)
+            HandleState result = new HandleState();
+            try
             {
-                if (model.IsDefault)
+                var entity = mapper.Map<CatCurrency>(model);
+                entity.DatetimeModified = DateTime.Now;
+                if (entity.Inactive == true)
                 {
-                    var listDefaults = DataContext.Get(x => x.Id != model.Id && x.IsDefault == true);
-                    foreach (var item in listDefaults)
-                    {
-                        item.IsDefault = false;
-                        DataContext.DC.Update(item);
-                    }
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                    entity.InactiveOn = DateTime.Now;
                 }
+                result = DataContext.Update(entity, x => x.Id == model.Id, false);
+                if (result.Success)
+                {
+                    if (model.IsDefault)
+                    {
+                        var listDefaults = DataContext.Get(x => x.Id != model.Id && x.IsDefault == true);
+                        foreach (var item in listDefaults)
+                        {
+                            item.IsDefault = false;
+                            DataContext.DC.Update(item);
+                        }
+                    }
+                }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
             }
             return result;
         }
