@@ -268,10 +268,12 @@ export class BaseService implements ErrorHandler {
 
   public logOut() {
     localStorage.clear();
-    this.reloadPage();
+   
     setTimeout(() => {
       this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
     }, 1000);
+
+    this.reloadPage();
   }
 
   /**
@@ -313,8 +315,10 @@ export class BaseService implements ErrorHandler {
     if (this.hasValidAccessToken() == false) {
       if (display_warning) {
         this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
-      }
+      }     
       this.router.navigateByUrl('/login');
+      localStorage.clear();
+      // this.reloadPage();
       return false;
     } else {
       return true;
@@ -353,7 +357,7 @@ export class BaseService implements ErrorHandler {
   public remainingExpireTimeToken() :number{
     if (this.getAccessToken()) {
       var expiresAt = localStorage.getItem('expires_at');
-      var expTime = +new Date(parseInt(expiresAt));
+      var expTime = +new Date(parseInt(expiresAt,10));
       var nowTime = +new Date();
       const remainingMinutes = new Date(expTime - nowTime).getMinutes();
 
