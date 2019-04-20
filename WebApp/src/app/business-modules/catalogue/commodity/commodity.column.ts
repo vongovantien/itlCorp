@@ -11,6 +11,7 @@ export const COMMODITYCOLUMNSETTING: ColumnSetting[] =
   {
     primaryKey: 'code',
     header: 'Code',
+    allowSearch: true,
     isShow: true,
     dataType: 'text',
     required: true,
@@ -35,7 +36,7 @@ export const COMMODITYCOLUMNSETTING: ColumnSetting[] =
     lookup: ''
   },
   {
-    primaryKey: 'commonityGroupNameEn',
+    primaryKey: 'commodityGroupNameEn',
     header: 'Group',
     isShow: true,
     dataType: 'text',

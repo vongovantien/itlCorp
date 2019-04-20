@@ -23,6 +23,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatCommodityGroup> catCommonityGroupRepo;
         public CatCommodityService(IContextBase<CatCommodity> repository, IMapper mapper, IContextBase<CatCommodityGroup> catCommonityGroup, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
+            SetChildren<CsMawbcontainer>("Id", "CommodityId");
             catCommonityGroupRepo = catCommonityGroup;
         }
 
@@ -32,6 +33,24 @@ namespace eFMS.API.Catalogue.DL.Services
             var commodities = dc.CatCommodity.ToList();
             list.ForEach(item =>
             {
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if(commodities.Any(x => x.Code.ToLower() == item.Code.ToLower()))
+                    {
+                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
+                        item.IsValid = false;
+                    }
+                    if(list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
+                    {
+                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_DUPLICATED];
+                        item.IsValid = false;
+                    }
+                }
                 if (string.IsNullOrEmpty(item.CommodityNameEn))
                 {
                     item.CommodityNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
@@ -108,10 +127,11 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 results = commonities.Join(catCommonityGroups, com => com.CommodityGroupId, group => group.Id,
                                         (com, group) => new { com, group })
-                                     .Where(x => ((x.com.CommodityNameVn ?? "").IndexOf(criteria.CommodityNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              && ((x.com.CommodityNameEn ?? "").IndexOf(criteria.CommodityNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              && ((x.group.GroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              && ((x.group.GroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                     .Where(x => (x.com.CommodityNameVn ?? "").IndexOf(criteria.CommodityNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              && (x.com.CommodityNameEn ?? "").IndexOf(criteria.CommodityNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              && (x.group.GroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              && (x.group.GroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              && (x.com.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                      ).Select(x => new CatCommodityViewModel {
                                          Id = x.com.Id,
                                          Code = x.com.Code,
@@ -125,21 +145,32 @@ namespace eFMS.API.Catalogue.DL.Services
                                          DatetimeModified = x.com.DatetimeModified,
                                          Inactive = x.com.Inactive,
                                          InactiveOn = x.com.InactiveOn,
-                                         CommonityGroupNameEn = x.group.GroupNameEn,
-                                         CommonityGroupNameVn = x.group.GroupNameVn
+                                         CommodityGroupNameEn = x.group.GroupNameEn,
+                                         CommodityGroupNameVn = x.group.GroupNameVn
                                     }).ToList();
             }
             else
             {
+                //var data = commonities.Join(catCommonityGroups, com => com.CommodityGroupId, group => group.Id,
+                //                        (com, group) => new { com, group }).Select(x => new { x.com, x.group}).ToList();
+                //var data1 = data.Where(x => (x.com.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                //                              || (x.com.CommodityNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= -1
+                //                              || (x.com.CommodityNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= -1
+                //                              || (x.group.GroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= -1
+                //                              || (x.group.GroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+
+                //                ).ToList();
                 results = commonities.Join(catCommonityGroups, com => com.CommodityGroupId, group => group.Id,
                                         (com, group) => new { com, group })
-                                     .Where(x => ((x.com.CommodityNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              || ((x.com.CommodityNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              || ((x.group.GroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                              || ((x.group.GroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                     .Where(x => (x.com.CommodityNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              || (x.com.CommodityNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              || (x.group.GroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              || (x.group.GroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                              || (x.com.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                      ).Select(x => new CatCommodityViewModel
                                      {
                                          Id = x.com.Id,
+                                         Code = x.com.Code,
                                          CommodityNameVn = x.com.CommodityNameVn,
                                          CommodityNameEn = x.com.CommodityNameEn,
                                          CommodityGroupId = x.com.CommodityGroupId,
@@ -150,8 +181,8 @@ namespace eFMS.API.Catalogue.DL.Services
                                          DatetimeModified = x.com.DatetimeModified,
                                          Inactive = x.com.Inactive,
                                          InactiveOn = x.com.InactiveOn,
-                                         CommonityGroupNameEn = x.group.GroupNameEn,
-                                         CommonityGroupNameVn = x.group.GroupNameVn
+                                         CommodityGroupNameEn = x.group.GroupNameEn,
+                                         CommodityGroupNameVn = x.group.GroupNameVn
                                      }).ToList();
             }
             return results;

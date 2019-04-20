@@ -27,6 +27,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
@@ -471,6 +472,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 //transaction.UserModified = "01";

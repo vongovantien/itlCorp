@@ -185,9 +185,10 @@ namespace eFMS.API.Catalogue.Controllers
                     var commodity = new CommodityImportModel
                     {
                         IsValid = true,
-                        CommodityNameEn = worksheet.Cells[row, 1].Value?.ToString(),
-                        CommodityNameVn = worksheet.Cells[row, 2].Value?.ToString(),
-                        CommodityGroupId = worksheet.Cells[row, 3].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 3].Value),
+                        Code = worksheet.Cells[row, 1].Value?.ToString(),
+                        CommodityNameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                        CommodityNameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                        CommodityGroupId = worksheet.Cells[row, 4].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 3].Value),
                         Status = worksheet.Cells[row,4].Value?.ToString()
                     };
                     list.Add(commodity);

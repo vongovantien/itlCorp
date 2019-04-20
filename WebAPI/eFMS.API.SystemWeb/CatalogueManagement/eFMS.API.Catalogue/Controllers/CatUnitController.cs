@@ -87,7 +87,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
             catUnit.UserCreated = currentUser.UserID;
-            catUnit.DatetimeCreated = DateTime.Now;
+            catUnit.DatetimeCreated = catUnit.DatetimeModified = DateTime.Now;
             catUnit.Inactive = false;
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catUnitService.Add(catUnit);

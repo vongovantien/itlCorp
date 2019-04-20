@@ -83,7 +83,10 @@
   //------------start: Commodity
   "MSG_COMMOIDITY_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",
   "MSG_COMMOIDITY_NAME_LOCAL_EMPTY": "Name Local is not allow empty!|wrong",
-  "MSG_COMMOIDITY_STATUS_EMPTY": "Code is not allow empty!|wrong",
+  "MSG_COMMOIDITY_CODE_EMPTY": "Code is not allow empty!|wrong",
+  "MSG_COMMOIDITY_CODE_EXISTED": "Code has been existed!|wrong",
+  "MSG_COMMOIDITY_CODE_DUPLICATED": "Code has been duplicated!|wrong",
+  "MSG_COMMOIDITY_STATUS_EMPTY": "Status is not allow empty!|wrong",
   //------------end  : Commodity
 
   //------------start: COUNTRY

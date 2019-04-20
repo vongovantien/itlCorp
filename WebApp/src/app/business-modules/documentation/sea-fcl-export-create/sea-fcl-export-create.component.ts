@@ -16,6 +16,7 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as stringHelper from 'src/helper/string.helper';
+import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 
 
 export class FirstLoadData {
@@ -130,6 +131,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         private route: ActivatedRoute,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
         this.initNewShipmentForm();
+        this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
     }
 
     async ngOnInit() {
@@ -382,6 +384,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
+                this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
                 this.isShipment = true;
                 this.isHouseBill = false;
                 this.isCDnote = false;
@@ -410,6 +413,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
+                this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
                 this.isShipment = true;
                 this.isHouseBill = false;
                 this.isCDnote = false;

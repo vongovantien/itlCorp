@@ -58,8 +58,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
-            //var query = GetQueryExpression(criteria);
-            //return Paging(query, page, size, out rowsCount);
             List<CatPartnerViewModel> results = null;
             var list = Query(criteria);
             rowsCount = list.ToList().Count;
@@ -101,7 +99,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
+        public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
             string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
             var partners = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
@@ -112,10 +110,9 @@ namespace eFMS.API.Catalogue.DL.Services
                          from x in prods.DefaultIfEmpty()
                          select new { user = y, partner, saleman = x }
                           );
-            IQueryable<CatPartnerViewModel> results = null;
             if (criteria.All == null)
             {
-                results = query.Where(x => ((x.partner.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                query = query.Where(x => ((x.partner.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.PartnerNameEn ?? "").IndexOf(criteria.PartnerNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.PartnerNameVn ?? "").IndexOf(criteria.PartnerNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -127,59 +124,11 @@ namespace eFMS.API.Catalogue.DL.Services
                            //&& (x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null)
-                           )).Select(x => new CatPartnerViewModel {
-                               Id = x.partner.Id,
-                               PartnerGroup = x.partner.PartnerGroup,
-                               PartnerNameVn = x.partner.PartnerNameVn,
-                               PartnerNameEn = x.partner.PartnerNameEn,
-                               AddressVn = x.partner.AddressVn,
-                               AddressEn = x.partner.AddressEn,
-                               AddressShippingVn = x.partner.AddressShippingVn,
-                               AddressShippingEn = x.partner.AddressShippingEn,
-                               ShortName = x.partner.ShortName,
-                               CountryId = x.partner.CountryId,
-                               AccountNo = x.partner.AccountNo,
-                               Tel = x.partner.Tel,
-                               Fax = x.partner.Fax,
-                               TaxCode = x.partner.TaxCode,
-                               Email = x.partner.Email,
-                               Website = x.partner.Website,
-                               BankAccountNo = x.partner.BankAccountNo,
-                               BankAccountName = x.partner.BankAccountName,
-                               BankAccountAddress = x.partner.BankAccountAddress,
-                               Note = x.partner.Note,
-                               SalePersonId = x.partner.SalePersonId,
-                               Public = x.partner.Public,
-                               CreditAmount = x.partner.CreditAmount,
-                               DebitAmount = x.partner.DebitAmount,
-                               RefuseEmail = x.partner.RefuseEmail,
-                               ReceiveAttachedWaybill = x.partner.ReceiveAttachedWaybill,
-                               RoundedSoamethod = x.partner.RoundedSoamethod,
-                               TaxExemption = x.partner.TaxExemption,
-                               ReceiveEtaemail = x.partner.ReceiveEtaemail,
-                               ShowInDashboard = x.partner.ShowInDashboard,
-                               ProvinceId = x.partner.ProvinceId,
-                               ParentId = x.partner.ParentId,
-                               PercentCredit = x.partner.PercentCredit,
-                               AlertPercentCreditEmail = x.partner.AlertPercentCreditEmail,
-                               PaymentBeneficiary = x.partner.PaymentBeneficiary,
-                               UsingParrentRateCard = x.partner.UsingParrentRateCard,
-                               SugarId = x.partner.SugarId,
-                               BookingOverdueDay = x.partner.BookingOverdueDay,
-                               FixRevenueByProject = x.partner.FixRevenueByProject,
-                               UserCreated = x.partner.UserCreated,
-                               DatetimeCreated = x.partner.DatetimeCreated,
-                               UserModified = x.partner.UserModified,
-                               DatetimeModified = x.partner.DatetimeModified,
-                               Inactive = x.partner.Inactive,
-                               InactiveOn = x.partner.InactiveOn,
-                               UserCreatedName = x.user.Username,
-                               SalePersonName = x.saleman.Username
-                            }).OrderBy(x => x.AccountNo);
+                           ));
             }
             else
             {
-                results = query.Where(x => 
+                query = query.Where(x =>
                            ((x.partner.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.PartnerNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -190,85 +139,20 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           ) 
+                           )
                            //&& (x.partner.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null))
-                           .Select(x => new CatPartnerViewModel {
-                               Id = x.partner.Id,
-                               PartnerGroup = x.partner.PartnerGroup,
-                               PartnerNameVn = x.partner.PartnerNameVn,
-                               PartnerNameEn = x.partner.PartnerNameEn,
-                               AddressVn = x.partner.AddressVn,
-                               AddressEn = x.partner.AddressEn,
-                               ShortName = x.partner.ShortName,
-                               CountryId = x.partner.CountryId,
-                               AccountNo = x.partner.AccountNo,
-                               Tel = x.partner.Tel,
-                               Fax = x.partner.Fax,
-                               TaxCode = x.partner.TaxCode,
-                               Email = x.partner.Email,
-                               Website = x.partner.Website,
-                               BankAccountNo = x.partner.BankAccountNo,
-                               BankAccountName = x.partner.BankAccountName,
-                               BankAccountAddress = x.partner.BankAccountAddress,
-                               Note = x.partner.Note,
-                               SalePersonId = x.partner.SalePersonId,
-                               Public = x.partner.Public,
-                               CreditAmount = x.partner.CreditAmount,
-                               DebitAmount = x.partner.DebitAmount,
-                               RefuseEmail = x.partner.RefuseEmail,
-                               ReceiveAttachedWaybill = x.partner.ReceiveAttachedWaybill,
-                               RoundedSoamethod = x.partner.RoundedSoamethod,
-                               TaxExemption = x.partner.TaxExemption,
-                               ReceiveEtaemail = x.partner.ReceiveEtaemail,
-                               ShowInDashboard = x.partner.ShowInDashboard,
-                               ProvinceId = x.partner.ProvinceId,
-                               ParentId = x.partner.ParentId,
-                               PercentCredit = x.partner.PercentCredit,
-                               AlertPercentCreditEmail = x.partner.AlertPercentCreditEmail,
-                               PaymentBeneficiary = x.partner.PaymentBeneficiary,
-                               UsingParrentRateCard = x.partner.UsingParrentRateCard,
-                               SugarId = x.partner.SugarId,
-                               BookingOverdueDay = x.partner.BookingOverdueDay,
-                               FixRevenueByProject = x.partner.FixRevenueByProject,
-                               UserCreated = x.partner.UserCreated,
-                               DatetimeCreated = x.partner.DatetimeCreated,
-                               UserModified = x.partner.UserModified,
-                               DatetimeModified = x.partner.DatetimeModified,
-                               Inactive = x.partner.Inactive,
-                               InactiveOn = x.partner.InactiveOn,
-                               UserCreatedName = x.user.Username,
-                               SalePersonName = x.saleman.Username
-                           }).OrderBy(x => x.AccountNo);
+                           && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null));
+            }
+            if (query.Count() == 0) return null;
+            List<CatPartnerViewModel> results = new List<CatPartnerViewModel>();
+            foreach (var item in query)
+            {
+                var partner = mapper.Map<CatPartnerViewModel>(item.partner);
+                partner.UserCreatedName = item.user?.Username;
+                partner.SalePersonName = item.saleman?.Username;
+                results.Add(partner);
             }
             return results;
-            //var data = Get();
-            //IQueryable<CatPartnerModel> results = null;
-            //string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
-            //if (criteria.All == null)
-            //{
-            //    results = data.Where(x => ((x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               && (x.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               && (x.AddressVn ?? "").IndexOf(criteria.AddressVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               && (x.TaxCode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               && (x.Tel ?? "").IndexOf(criteria.Tel ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               && (x.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               && (x.UserCreated ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               && (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               ));
-            //}
-            //else
-            //{
-            //    results = data.Where(x => ((x.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               || (x.AddressVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               || (x.TaxCode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               || (x.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               || (x.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               || (x.UserCreated ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            //               ) && ((x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
-            //}
-            //return results;
         }
 
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
