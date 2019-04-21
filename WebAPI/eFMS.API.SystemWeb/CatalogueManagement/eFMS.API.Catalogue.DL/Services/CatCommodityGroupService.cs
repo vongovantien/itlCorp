@@ -121,11 +121,42 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.GroupNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
+                else
+                {
+                    var commodityGr = commodityGroups.FirstOrDefault(x => x.GroupNameEn.ToLower() == item.GroupNameEn.ToLower());
+                    if (commodityGr != null)
+                    {
+                        item.GroupNameEn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED], item.GroupNameEn);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.GroupNameEn.ToLower() == item.GroupNameEn.ToLower()) > 1){
+                        item.GroupNameEn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.GroupNameEn);
+                        item.IsValid = false;
+                    }
+                }
+
+
                 if (string.IsNullOrEmpty(item.GroupNameVn))
                 {
                     item.GroupNameVn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
+                else
+                {
+                    var commodityGr = commodityGroups.FirstOrDefault(x => x.GroupNameVn.ToLower() == item.GroupNameVn.ToLower());
+                    if (commodityGr != null)
+                    {
+                        item.GroupNameVn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED], item.GroupNameVn);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.GroupNameVn.ToLower() == item.GroupNameVn.ToLower()) > 1)
+                    {
+                        item.GroupNameVn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.GroupNameVn);
+                        item.IsValid = false;
+                    }
+                }
+
+
                 if (string.IsNullOrEmpty(item.Status))
                 {
                     item.Status = stringLocalizer[LanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
