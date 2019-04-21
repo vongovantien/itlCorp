@@ -103,7 +103,25 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return list;
         }
-
+        public override HandleState Add(CatPlaceModel model)
+        {
+            var entity = mapper.Map<CatPlace>(model);
+            entity.Id = Guid.NewGuid();
+            entity.DatetimeCreated = DateTime.Now;
+            entity.Inactive = false;
+            var result = DataContext.Add(entity, true);
+            return result;
+        }
+        public HandleState Update(CatPlaceModel model)
+        {
+            model.DatetimeModified = DateTime.Now;
+            if (model.Inactive == true)
+            {
+                model.InactiveOn = DateTime.Now;
+            }
+            var result = Update(model, x => x.Id == model.Id);
+            return result;
+        }
         private List<CatPlaceViewModel> GetCulturalData(List<vw_catPlace> list)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;

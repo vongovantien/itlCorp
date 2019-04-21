@@ -14,7 +14,7 @@ export class API_MENU {
         Department: 44242,
         auditlog: 44363,
         Documentation: 44366,
-        Report: 51830
+        ReportPreview: 53717
     }
 
     private PROTOCOL = "http://";
@@ -52,10 +52,10 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/Default.aspx";
         }
         if (this.CURRENT_HOST == this.HOST.Test) {
-            return this.PROTOCOL + this.HOST.Test + "/Default.aspx";
+            return this.PROTOCOL + this.HOST.Test + "/" + Module + "/Home.aspx";
         }
         if (this.CURRENT_HOST == this.HOST.Staging) {
-            return this.PROTOCOL + this.HOST.Staging + "/Default.aspx";
+            return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/Default.aspx";
         }
     }
     private getPort(Module: String) {

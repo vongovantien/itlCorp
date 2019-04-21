@@ -113,11 +113,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.Id = Guid.NewGuid();
             catPlace.UserCreated = currentUser.UserID;
-            catPlace.DatetimeCreated = DateTime.Now;
-            catPlace.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catPlaceService.Add(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -140,14 +136,9 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var catPlace = mapper.Map<CatPlaceModel>(model);
             catPlace.UserModified = currentUser.UserID;
-            catPlace.DatetimeModified = DateTime.Now;
             catPlace.Id = id;
-            if(catPlace.Inactive == true)
-            {
-                catPlace.InactiveOn = DateTime.Now;
-            }
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catPlaceService.Update(catPlace, x => x.Id == id);
+            //var hs = catPlaceService.Update(catPlace, x => x.Id == id);
+            var hs = catPlaceService.Update(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

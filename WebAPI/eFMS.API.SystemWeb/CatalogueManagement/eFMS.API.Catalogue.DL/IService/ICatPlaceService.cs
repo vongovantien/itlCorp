@@ -22,5 +22,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<ModeOfTransport> GetModeOfTransport();
         List<CatPlaceImportModel> CheckValidImport(List<CatPlaceImportModel> list, CatPlaceTypeEnum placeType);
         HandleState Import(List<CatPlaceImportModel> data);
+        HandleState Update(CatPlaceModel model);
     }
 }

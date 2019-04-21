@@ -92,7 +92,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeService.AddCharge(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -115,7 +114,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeService.UpdateCharge(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
