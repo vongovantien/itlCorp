@@ -63,7 +63,21 @@
                                 <label class="form-control-label" for="">
                                     Customer (Payer) <span class="m--font-danger">(*)</span>
                                 </label>
-                                <div class="dropdown e--combogrid" #selectedCustomer>
+                                <app-combo-grid-virtual-scroll 
+                                                    [currentActiveItemId]="{field:'id',value:HouseBillWorking.customerId}"
+                                                    (itemSelected)="
+                                                    HouseBillWorking.customerId=$event.id;
+                                                    HouseBillWorking.customerName=$event.partnerNameEn;
+                                                    getCustomerSaleman($event.salePersonId);
+                                                    extend_data.customer_nameEn=$event.partnerNameEn;
+                                                    extend_data.customer_nameVn=$event.partnerNameVn;
+                                                    HouseBillWorking.shipperId=$event.id;
+                                                    getShipperDescription($event)"
+                                                    [selectedDisplayFields]="['partnerNameEn']"
+                                                    [dataSources]="listCustomers" 
+                                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                </app-combo-grid-virtual-scroll>
+                                <!-- <div class="dropdown e--combogrid" #selectedCustomer>
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                         readonly data-toggle="dropdown" placeholder="combogrid"
                                         [value]="HouseBillWorking.customerName==null?'Please select customer':HouseBillWorking.customerName">
@@ -94,7 +108,6 @@
                                             <div class="table-body-scroll">
                                                 <table class="table table-hover">
                                                     <tbody>
-                                                        <!-- HouseBillWorking.customerId=item.partnerID -->
                                                         <ng-container *ngFor="let item of listCustomers;let i = index">
                                                             <tr class="data-row" attr.data-id="{{i}}" (click)="
                                                                 HouseBillWorking.customerId=item.id;
@@ -117,7 +130,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="form-control-feedback"
                                     *ngIf="addHouseBillForm.submitted && HouseBillWorking.customerId==null">
                                     Customer is required
@@ -152,7 +165,16 @@
                                     <label class="form-control-label" for="">
                                         Shipper <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedShipper>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:HouseBillWorking.shipperId,hardValue:HouseBillWorking.customerName}"
+                                        (itemSelected)="
+                                        HouseBillWorking.shipperId=$event.id;
+                                        getShipperDescription($event)"
+                                        [selectedDisplayFields]="['partnerNameEn']"
+                                        [dataSources]="listShipper" 
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedShipper>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
                                             [value]="selectedShipper.value==null?'Please select shipper':selectedShipper.value">
@@ -183,7 +205,6 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listShipper;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}" (click)="
@@ -202,7 +223,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <textarea class="form-control m-input--square" id="" name="shipperDescription"
                                         rows="3" [(ngModel)]="HouseBillWorking.shipperDescription"></textarea>
                                     <div class="form-control-feedback"
@@ -217,7 +238,14 @@
                                     <label class="form-control-label" for="">
                                         Consignee <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedConsignee>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:HouseBillWorking.consigneeId}"
+                                        (itemSelected)="HouseBillWorking.consigneeId=$event.id;getConsigneeDescription($event)"
+                                        [selectedDisplayFields]="['partnerNameEn']"
+                                        [dataSources]="listConsignee" 
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedConsignee>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
                                             [value]="selectedConsignee.value==null?'Please select consignee':selectedConsignee.value">
@@ -249,7 +277,6 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listConsignee;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
@@ -266,7 +293,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <textarea class="form-control m-input--square" id="" name="consigneeDescription"
                                         [(ngModel)]="HouseBillWorking.consigneeDescription" rows="3"></textarea>
                                     <div class="form-control-feedback"
@@ -281,7 +308,18 @@
                                     <label class="form-control-label" for="">
                                         Notify party <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedPartner>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:HouseBillWorking.notifyPartyId}"
+                                        (itemSelected)="
+                                        HouseBillWorking.notifyPartyId=$event.id;
+                                        getNotifyPartyDescription($event);
+                                        extend_data.notify_party_nameEn=$event.partnerNameEn;
+                                        extend_data.notify_party_nameVn=$event.partnerNameVn;"
+                                        [selectedDisplayFields]="['partnerNameEn']"
+                                        [dataSources]="listConsignee" 
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                   </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedPartner>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
                                             [value]="selectedPartner.value==null?'Please select third party':selectedPartner.value">
@@ -313,7 +351,6 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listConsignee;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
@@ -335,7 +372,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <textarea class="form-control m-input--square" id="" name="notifyPartyDescription"
                                         [(ngModel)]="HouseBillWorking.notifyPartyDescription" rows="3"></textarea>
                                     <div class="form-control-feedback"
@@ -427,8 +464,14 @@
                                     <label class="form-control-label" for="">
                                         Point of country origin
                                     </label>
-
-                                    <div class="dropdown e--combogrid" #selectedCountry>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:HouseBillWorking.originCountryId}"
+                                        (itemSelected)="HouseBillWorking.originCountryId=$event.id;activeOriginCountry=$event.nameEn;"
+                                        [selectedDisplayFields]="['nameEn']"
+                                        [dataSources]="listCountryOrigin" 
+                                        [displayFields]="[{'field':'code','label':'Country Code'},{'field':'nameEn','label':'Name EN'}]">
+                                   </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedCountry>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
                                             [value]="activeOriginCountry==null?'Please select country':activeOriginCountry">
@@ -457,7 +500,6 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container
                                                                 *ngFor="let item of listCountryOrigin;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
@@ -472,7 +514,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -494,7 +536,14 @@
                                     <label class="form-control-label" for="">
                                         Port of loading <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedPortOfLoading>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:HouseBillWorking.pol}"
+                                        (itemSelected)="HouseBillWorking.pol=$event.id;activePortOfLoading=$event.name_EN;"
+                                        [selectedDisplayFields]="['name_EN']"
+                                        [dataSources]="listPort" 
+                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'name_EN','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                   </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedPortOfLoading>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
                                             [value]="activePortOfLoading==null?'Please select port of loading':activePortOfLoading">
@@ -524,7 +573,6 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container *ngFor="let item of listPort;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
                                                                     (click)="HouseBillWorking.pol=item.id;activePortOfLoading=item.nameEN;"
@@ -539,7 +587,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="form-control-feedback"
                                         *ngIf="addHouseBillForm.submitted && (HouseBillWorking.pol==null || HouseBillWorking.pol==HouseBillWorking.pod)">
                                         Port of loading is required and must be difference with port of discharge
@@ -552,8 +600,14 @@
                                     <label class="form-control-label" for="">
                                         Port of discharge <span class="m--font-danger">(*)</span>
                                     </label>
-
-                                    <div class="dropdown e--combogrid" #selectedPortOfDischarge>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:HouseBillWorking.pod}"
+                                        (itemSelected)="HouseBillWorking.pod=$event.id;activePortOfDischarge=$event.name_EN;"
+                                        [selectedDisplayFields]="['name_EN']"
+                                        [dataSources]="listPort" 
+                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'name_EN','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                   </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedPortOfDischarge>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="combogrid"
                                             [value]="activePortOfDischarge==null?'Please select port of discharge':activePortOfDischarge">
@@ -583,7 +637,6 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <!-- HouseBillWorking.customerId=item.partnerID -->
                                                             <ng-container *ngFor="let item of listPort;let i = index">
                                                                 <tr class="data-row" attr.data-id="{{i}}"
                                                                     (click)="HouseBillWorking.pod=item.id;activePortOfDischarge=item.nameEN;"
@@ -598,7 +651,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="form-control-feedback"
                                         *ngIf="addHouseBillForm.submitted && (HouseBillWorking.pod==null || HouseBillWorking.pol==HouseBillWorking.pod)">
                                         Port of discharge is required and must be difference with port of loading

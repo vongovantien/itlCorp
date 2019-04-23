@@ -198,12 +198,9 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listCustomers = data;
-
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query , { partnerGroup: PartnerGroupEnum.CUSTOMER, inactive: false, all: key }).subscribe(res => {
+      this.listCustomers = res;
     });
-
   }
 
   public getShipperDescription(shipper: any) {
@@ -222,10 +219,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.SHIPPER, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listShipper = data;
-
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.SHIPPER, inactive: false, all: key }).subscribe(res => {
+      this.listShipper = res;
     });
   }
 
@@ -252,9 +247,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listConsignee = data;
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
+      this.listConsignee = res;
     });
   }
 
@@ -265,9 +259,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listConsignee = data;
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
+      this.listConsignee = res;
     });
   }
 
@@ -279,12 +272,9 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.Country.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, code: key, nameEn: key, nameVn: key, condition: 1 }).subscribe(res => {
-      var data = res['data'];
-      this.listCountryOrigin = data;
+    this.baseServices.post(this.api_menu.Catalogue.Country.query, { inactive: false, code: key, nameEn: key, nameVn: key, condition: 1 }).subscribe(res => {
+      this.listCountryOrigin = res;
     });
-
-    console.log(this.listCountryOrigin);
   }
 
   getListPorts(search_key: string = null) {
@@ -294,10 +284,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.CatPlace.paging + "?page=" + 1 + "&size=" + 20, { modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
-      var data = res['data'];
-      this.listPort = data;
-      console.log({ list_port: this.listPort });
+    this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
+      this.listPort = res;
     });
   }
 
@@ -324,9 +312,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: key }).subscribe(res => {
-      var data = res['data'];
-      this.listFowardingAgent = data;
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: key }).subscribe(res => {
+      this.listFowardingAgent = res;
     });
   }
 

@@ -101,7 +101,14 @@
                         <label class="form-control-label" for="">
                                 Supplier/Vendor (co-loader)
                         </label>
-                        <div class="dropdown e--combogrid">
+                        <app-combo-grid-virtual-scroll 
+                            [currentActiveItemId]="{field:'id',value:shipment.coloaderId}"
+                            (itemSelected)="shipment.coloaderId = $event.id; formAddEdit.controls['coloaderId'].setValue($event.id); shipment.coloaderName=$event.partnerNameEn"
+                            [selectedDisplayFields]="['partnerNameEn']"
+                            [dataSources]="coloaders" 
+                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                        </app-combo-grid-virtual-scroll>
+                        <!-- <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                   data-toggle="dropdown" placeholder="" [value]="shipment.coloaderName == null?'Please selected coloader':shipment.coloaderName"
                                   formControlName="coloaderName">
@@ -143,7 +150,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -177,7 +184,14 @@
                         <label class="form-control-label" for="">
                             Agent
                         </label>
-                        <div class="dropdown e--combogrid" >
+                        <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:shipment.agentId}"
+                                        (itemSelected)="shipment.agentId = $event.id; formAddEdit.controls['agentId'].setValue($event.id); shipment.agentName=$event.partnerNameEn"
+                                        [selectedDisplayFields]="['partnerNameEn']"
+                                        [dataSources]="agents" 
+                                        [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                         </app-combo-grid-virtual-scroll>
+                        <!-- <div class="dropdown e--combogrid" >
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                   data-toggle="dropdown" placeholder="" [value]="shipment.agentName == null?'Please selected agent':shipment.agentName"
                                   formControlName="agentName">
@@ -219,7 +233,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -229,7 +243,14 @@
                         <label class="form-control-label" for="">
                             Port of loading <span class="m--font-danger">(*)</span>
                         </label>
-                        <div class="dropdown e--combogrid">
+                        <app-combo-grid-virtual-scroll 
+                            [currentActiveItemId]="{field:'id',value:shipment.pol}"
+                            (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.name_EN"
+                            [selectedDisplayFields]="['name_EN']"
+                            [dataSources]="portOfLadings" 
+                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'name_EN','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                        </app-combo-grid-virtual-scroll>   
+                        <!-- <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                   data-toggle="dropdown" placeholder="" [value]="shipment.polName == null?'Please selected port of loading':shipment.polName"
                                   formControlName="polName">
@@ -269,7 +290,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                           <div class="form-control-feedback" *ngIf="submitted && shipment.pol == null">
                             Port of loading is required
                         </div>
@@ -280,7 +301,14 @@
                         <label class="form-control-label" for="">
                             Port of destination
                         </label>
-                        <div class="dropdown e--combogrid">
+                        <app-combo-grid-virtual-scroll 
+                            [currentActiveItemId]="{field:'id',value:shipment.pod}"
+                            (itemSelected)="shipment.pod = $event.id;formAddEdit.controls['pod'].setValue($event.id); shipment.podName= $event.name_EN"
+                            [selectedDisplayFields]="['name_EN']"
+                            [dataSources]="portOfDestinations" 
+                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'name_EN','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                        </app-combo-grid-virtual-scroll>   
+                        <!-- <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                   data-toggle="dropdown" placeholder="" [value]="shipment.podName == null?'Please selected port of loading':shipment.podName"
                                   formControlName="podName">
@@ -320,7 +348,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="form-control-feedback" *ngIf="submitted && shipment.pol == shipment.pod && shipment.pod != null">
                             Port of loading is not allow same value
                         </div>
@@ -391,7 +419,14 @@
                         <label class="form-control-label" for="">
                             Person in charge
                         </label>
-                        <div class="dropdown e--combogrid">
+                        <app-combo-grid-virtual-scroll 
+                            [currentActiveItemId]="{field:'id',value:shipment.personIncharge}"
+                            (itemSelected)="shipment.personIncharge=$event.id; formAddEdit.controls['personIncharge'].setValue($event.id); shipment.personInChargeName= $event.username"
+                            [selectedDisplayFields]="['username']"
+                            [dataSources]="userInCharges" 
+                            [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'},{'field':'employeeNameVn','label':'Role'}]">
+                        </app-combo-grid-virtual-scroll>
+                        <!-- <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                   data-toggle="dropdown" placeholder="" [value]="shipment.personInChargeName == null?'Please selected person in charge':shipment.personInChargeName"
                                   formControlName="personInChargeName">
@@ -431,7 +466,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="col-lg-8">

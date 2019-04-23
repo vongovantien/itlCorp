@@ -12,7 +12,7 @@ import $ from 'jquery';
 export class ComboGridVirtualScrollComponent implements OnInit {
 
   currentItemSelected:any = null;
-  CurrentActiveItemIdObj:{field:string,value:any} = null;
+  CurrentActiveItemIdObj:{field:string,value:any,hardValue:any} = null;
   indexSelected: number = -1;
   displaySelectedStr: string = '';
 
@@ -28,7 +28,7 @@ export class ComboGridVirtualScrollComponent implements OnInit {
    * INPUT DATA
    */
   @Input() set dataSources(data: any[]) {
-    if (data.length > 0) {
+    if (data!=undefined && data.length > 0) {
       this.DataSources = data;
       this.ConstDataSources = cloneDeep(data);
     }
@@ -64,6 +64,9 @@ export class ComboGridVirtualScrollComponent implements OnInit {
         var item = this.ConstDataSources[itemIndex];
         this.setCurrentActiveItem(item);
       }
+      if(itemIndex===-1 && data.hardValue!=null){
+        this.displaySelectedStr = data.hardValue;
+      }
     }
   }
 
@@ -85,7 +88,9 @@ export class ComboGridVirtualScrollComponent implements OnInit {
     this.itemSelected.emit(item);
     this.setCurrentActiveItem(item);
     this.currentItemSelected = item;
-    this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
+    if(this.CurrentActiveItemIdObj!==null && this.CurrentActiveItemIdObj.value!==null){
+      this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
+    }
   }
 
   setCurrentActiveItem(item:any){
@@ -128,10 +133,13 @@ export class ComboGridVirtualScrollComponent implements OnInit {
       return matched;
     });
 
-    var _CurrentActiveItemIdObj : {field:string,value:any} = this.CurrentActiveItemIdObj;
-    this.indexSelected = findIndex(this.DataSources,function(o){
-      return o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value;
-    });
+    if(this.CurrentActiveItemIdObj!==null && this.CurrentActiveItemIdObj.value!==null){
+      var _CurrentActiveItemIdObj : {field:string,value:any,hardValue:any} = this.CurrentActiveItemIdObj;
+      this.indexSelected = findIndex(this.DataSources,function(o){
+        return o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value;
+      });
+    }
+
 
   }
 

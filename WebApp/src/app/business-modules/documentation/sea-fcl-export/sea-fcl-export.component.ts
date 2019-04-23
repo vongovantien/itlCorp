@@ -65,17 +65,17 @@ export class SeaFCLExportComponent implements OnInit {
     }
     async getCustomers(searchText: any){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, modeOfTransport : 'SEA', all: searchText };
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
         if(partners != null){
-            this.customers = partners.data;
+            this.customers = partners;
             console.log(this.customers);
         }
     }
     async getNotifyPartries(searchText: any){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CONSIGNEE, modeOfTransport : 'SEA', all: searchText };
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=1&size=20", criteriaSearchColoader, false, false);
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
         if(partners != null){
-            this.notifyPartries = partners.data;
+            this.notifyPartries = partners;
             console.log(this.customers);
         }
     }

@@ -106,7 +106,14 @@
                                     <label class="form-control-label" for="">
                                         Customer
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedCustomer>
+                                    <app-combo-grid-virtual-scroll 
+                                                    [currentActiveItemId]="{field:'id',value:criteria.customerId}"
+                                                    (itemSelected)="criteria.customerId = $event.id;"
+                                                    [selectedDisplayFields]="['partnerNameEn']"
+                                                    [dataSources]="customers" 
+                                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedCustomer>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select" 
                                             [value]="selectedCustomer.value == null?'Please selected customer':selectedCustomer.value">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -147,7 +154,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -155,7 +162,14 @@
                                     <label class="form-control-label" for="">
                                         Notify party
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedNotifyPartry>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:criteria.notifyPartyId}"
+                                        (itemSelected)="criteria.notifyPartyId = $event.id;"
+                                        [selectedDisplayFields]="['partnerNameEn']"
+                                        [dataSources]="notifyPartries" 
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedNotifyPartry>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please select"
                                             [value]="selectedNotifyPartry.value == null?'Please selected notify party':selectedNotifyPartry.value">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -196,7 +210,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="col-lg-4">

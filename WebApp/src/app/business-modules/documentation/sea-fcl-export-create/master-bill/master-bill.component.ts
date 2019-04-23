@@ -180,9 +180,9 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
         }
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfLadings = portIndexs.data;
+            this.portOfLadings = portIndexs;
             console.log(this.portOfLadings);
         }
         else{
@@ -194,9 +194,9 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
         }
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfDestinations = portIndexs.data;
+            this.portOfDestinations = portIndexs;
             console.log(this.portOfLadings);
         }
         else{
@@ -209,9 +209,9 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchColoader.inactive = null;
         }
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchColoader, false, false);
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query , criteriaSearchColoader, false, false);
         if (partners != null) {
-            this.coloaders = partners.data;
+            this.coloaders = partners;
             console.log(this.coloaders);
         }
         else{
@@ -223,9 +223,9 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchAgent.inactive = null;
         }
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchAgent, false, false);
         if (partners != null) {
-            this.agents = partners.data;
+            this.agents = partners;
         }
         else{
             this.agents = [];
