@@ -10,6 +10,7 @@ using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -23,10 +24,15 @@ namespace eFMS.API.Catalogue.DL.Services
     public class CatCountryService : RepositoryBase<CatCountry, CatCountryModel>, ICatCountryService
     {
         private readonly IStringLocalizer stringLocalizer;
-        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+        private readonly IDistributedCache cache;
+        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
         {
             stringLocalizer = localizer;
+            cache = distributedCache;
             SetChildren<CatPlace>("Id", "CountryId");
+            SetChildren<CatPartner>("Id", "CountryId");
+            SetChildren<CatPartner>("Id", "CountryShippingId");
+            SetChildren<CsTransactionDetail>("Id", "OriginCountryId");
         }
 
         public List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list)
@@ -70,10 +76,24 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCountryViewModel> GetByLanguage()
         {
-            var data = DataContext.Get();
+            var data = GetCountries();
+            if (data == null)
+            {
+                return null;
+            }
+
             return GetDataByLanguage(data);
         }
 
+        private IQueryable<CatCountry> GetCountries()
+        {
+            IQueryable<CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
+            if (data == null)
+            {
+                data = DataContext.Get();
+            }
+            return data;
+        }
         public List<CatCountry> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount)
         {
             var returnList = new List<CatCountry>();

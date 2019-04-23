@@ -19,5 +19,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<DepartmentPartner> GetDepartments();
         List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list);
         HandleState Import(List<CatPartnerImportModel> data);
+        HandleState Delete(string id);
+        HandleState Update(CatPartnerModel model);
     }
 }

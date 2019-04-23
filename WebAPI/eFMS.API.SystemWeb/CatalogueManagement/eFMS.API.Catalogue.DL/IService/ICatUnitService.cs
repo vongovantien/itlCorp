@@ -15,5 +15,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatUnit> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
 
         List<UnitType> GetUnitTypes();
+        HandleState Update(CatUnitModel model);
+        HandleState Delete(short id);
     }
 }
