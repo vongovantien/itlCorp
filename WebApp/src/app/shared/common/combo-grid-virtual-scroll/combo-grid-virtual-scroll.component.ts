@@ -11,8 +11,11 @@ import $ from 'jquery';
 })
 export class ComboGridVirtualScrollComponent implements OnInit {
 
+  currentItemSelected:any = null;
+  CurrentActiveItemIdObj:{field:string,value:any} = null;
   indexSelected: number = -1;
   displaySelectedStr: string = '';
+
 
   ConstDataSources: any[] = [];
   DataSources: any[] = [];
@@ -51,7 +54,7 @@ export class ComboGridVirtualScrollComponent implements OnInit {
 
   @Input() set currentActiveItemId(data: any) {
     if (data.value !=null) {
-
+      this.CurrentActiveItemIdObj = data;
       var itemIndex = findIndex(this.ConstDataSources,function(o){
         console.log(o[data.field]);
         return o[data.field] === data.value;
@@ -81,6 +84,8 @@ export class ComboGridVirtualScrollComponent implements OnInit {
   emitSelected(item: any) {
     this.itemSelected.emit(item);
     this.setCurrentActiveItem(item);
+    this.currentItemSelected = item;
+    this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
   }
 
   setCurrentActiveItem(item:any){
@@ -99,8 +104,8 @@ export class ComboGridVirtualScrollComponent implements OnInit {
   }
 
   Search(key: string) {
-    this.indexSelected = -1;
-    this.displaySelectedStr = '';
+    // this.indexSelected = -1;
+    // this.displaySelectedStr = '';
     key = key.toLowerCase().trim();
     var constData = this.ConstDataSources;
     var displayFields = this.DisplayFields;
@@ -121,6 +126,11 @@ export class ComboGridVirtualScrollComponent implements OnInit {
         }
       }    
       return matched;
+    });
+
+    var _CurrentActiveItemIdObj : {field:string,value:any} = this.CurrentActiveItemIdObj;
+    this.indexSelected = findIndex(this.DataSources,function(o){
+      return o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value;
     });
 
   }

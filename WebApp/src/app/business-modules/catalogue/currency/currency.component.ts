@@ -36,7 +36,7 @@ export class CurrencyComponent implements OnInit {
     settingFields: this.currenciesSettings,
     typeSearch: TypeSearch.outtab
   };
-  //keySortDefault = "id";
+  keySortDefault = "";
   isDesc: boolean = true;
   nameModal: string = 'edit-currency-modal';
   titleAddModal: string = 'Add currency';
