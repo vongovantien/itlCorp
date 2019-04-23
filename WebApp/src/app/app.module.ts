@@ -33,6 +33,7 @@ import { environment } from '../environments/environment';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HighchartsChartModule } from "highcharts-angular";
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 // import { ChartModule } from 'angular-highcharts';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
@@ -52,6 +53,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   ],
   imports: [    
    // ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
+    ScrollingModule,
     SharedModule,
     CommonModule,
     BrowserModule,
@@ -81,6 +83,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     }
   ],
   bootstrap: [AppComponent],
-  exports:[]
+  exports:[ScrollingModule]
 })
 export class AppModule { }

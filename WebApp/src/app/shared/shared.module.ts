@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// import { ModalModule } from 'ngx-bootstrap';
-
 import { TableLayoutComponent } from './common/table-layout/table-layout.component';
 import { StyleCellDirective } from './directives/style-cell.directive';
 import { InputTableLayoutComponent } from './common/input-table-layout/input-table-layout.component';
@@ -24,8 +22,10 @@ import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima
 import { IntergerInputDirective } from './directives/interger-input.directive';
 import { ReportPreviewComponent } from './common/report-preview/report-preview.component';
 import { SpecialCharacterDirective } from './directives/specialChracter.directive';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 @NgModule({
-  imports: [CommonModule, FormsModule,SelectModule],
+  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 
@@ -42,10 +42,12 @@ import { SpecialCharacterDirective } from './directives/specialChracter.directiv
     ThreeDigitDecimaNumberDirective,
     IntergerInputDirective,
     ReportPreviewComponent,
-    SpecialCharacterDirective
+    SpecialCharacterDirective,
+    ComboGridVirtualScrollComponent
   ],
   exports: [
     CommonModule,
+    ScrollingModule,
     TwoDigitDecimaNumberDirective,
     ThreeDigitDecimaNumberDirective,
     IntergerInputDirective,
@@ -60,7 +62,8 @@ import { SpecialCharacterDirective } from './directives/specialChracter.directiv
     CloseModalButtonComponent,
     NgProgressModule,
     ReportPreviewComponent,
-    SpecialCharacterDirective
+    SpecialCharacterDirective,
+    ComboGridVirtualScrollComponent
   ],
   providers: [
     SortService,
