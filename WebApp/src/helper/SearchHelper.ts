@@ -159,13 +159,11 @@ function PrepareListFieldsSearchWithAndCondition(current_list_fields_search, lis
             for (var i = 0; i < current_list_fields_search.length; i++) {
                 var obj_comp = Object.keys(current_list_fields_search[i])[0] === key;
                 if (obj_comp) {
-                    console.log(obj_comp);
                     index_existed = i;
                 }
             }
 
             if (index_existed != -1 && value != "") {
-                console.log(index_existed);
                 current_list_fields_search.splice(index_existed, 1, search_obj);
             }
             if (index_existed != -1 && value == "") {

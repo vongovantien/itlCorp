@@ -528,8 +528,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }, false, false);
-    this.commodities = responses.data;
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false, all: key }, false, false);
+    this.commodities = responses;
     console.log(this.commodities);
   }
 

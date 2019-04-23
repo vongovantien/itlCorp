@@ -61,7 +61,7 @@
                             </label>
                             <input type="text" required class="form-control m-input m-input--square"
                                 placeholder="Enter text" name="MasterBillOfLadingName">
-                            <div class="form-control-feedback">
+                            <div class="form-control-feedback" style="display: none">
                                 Master bill of lading is required !
                             </div>
                         </div>
@@ -114,7 +114,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-control-feedback">
+                            <div class="form-control-feedback" style="display: none">
                                 Customer is required
                             </div>
                         </div>
@@ -190,7 +190,7 @@
                                 </div>
                                 <textarea class="form-control m-input--square" id="" name="shipperDescription"
                                     rows="3"></textarea>
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Shipper is required
                                 </div>
                             </div>
@@ -245,7 +245,7 @@
                                 </div>
                                 <textarea class="form-control m-input--square" id="" name="consigneeDescription"
                                     rows="3"></textarea>
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Consignee is required
                                 </div>
                             </div>
@@ -253,7 +253,7 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Notify party <span class="m--font-danger">(*)</span>
+                                    Notify party
                                 </label>
                                 <div class="dropdown e--combogrid" #selectedPartner>
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
@@ -298,11 +298,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <textarea class="form-control m-input--square" id="" name="notifyPartyDescription"
-                                    rows="3"></textarea>
-                                <div class="form-control-feedback">
-                                    NotifyParty is required
-                                </div>
+                                <textarea class="form-control m-input--square" id="" name="notifyPartyDescription" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -314,7 +310,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="Enter text">
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     House bill of lading no is required
                                 </div>
                             </div>
@@ -334,7 +330,7 @@
                                     (data)="refreshValue($event)" (selected)="selected($event)"
                                     (removed)="removed($event)" (typed)="typed($event)" placeholder="Select option">
                                 </ng-select>
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     House bill of lading type is required
                                 </div>
                             </div>
@@ -342,13 +338,9 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Booking no. <span class="m--font-danger">(*)</span>
+                                    Booking no.
                                 </label>
-                                <input type="text" required name="BookingNoName"
-                                    class="form-control m-input m-input--square" placeholder="Enter text">
-                                <div class="form-control-feedback">
-                                    Booking no is required
-                                </div>
+                                <input type="text" required name="BookingNoName" class="form-control m-input m-input--square" placeholder="Enter text">
                             </div>
                         </div>
                     </div>
@@ -369,7 +361,7 @@
                                 </label>
                                 <input type="text" required name="OceanVesselAndVoyNoName"
                                     class="form-control m-input m-input--square" placeholder="Enter text">
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Ocean vessel & voy no is required
                                 </div>
                             </div>
@@ -377,7 +369,7 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Point of country origin <span class="m--font-danger">(*)</span>
+                                    Point of country origin
                                 </label>
 
                                 <div class="dropdown e--combogrid" #selectedCountry>
@@ -419,10 +411,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="form-control-feedback">
-                                    Point of country origin is required
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -435,7 +423,7 @@
 
                                 <input type="text" name="PlaceOfReceipt" class="form-control m-input m-input--square"
                                     placeholder="Enter text">
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Place of receipt is required
                                 </div>
                             </div>
@@ -486,7 +474,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Port of loading is required
                                 </div>
                             </div>
@@ -538,7 +526,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Port of discharge is required
                                 </div>
                             </div>
@@ -578,7 +566,7 @@
                                     (data)="refreshValue($event)" (selected)="selected($event)"
                                     (removed)="removed($event)" (typed)="typed($event)" placeholder="Select option">
                                 </ng-select>
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Freight payment is required
                                 </div>
                             </div>
@@ -618,7 +606,7 @@
                                             <i class="la la-calendar"></i>
                                         </span>
                                     </span>
-                                    <div class="form-control-feedback">
+                                    <div class="form-control-feedback" style="display: none">
                                         Sailing date is required
                                     </div>
                                 </div>
@@ -631,7 +619,7 @@
                                 </label>
                                 <input type="text" required name="FreightPayableAtName"
                                     class="form-control m-input m-input--square" placeholder="Enter text">
-                                <div class="form-control-feedback">
+                                <div class="form-control-feedback" style="display: none">
                                     Freight payable at is required
                                 </div>
                             </div>
@@ -880,7 +868,26 @@
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
-                                            Commodities:
+                                            Container No/ Sea No/ Marks No
+                                        </label>
+                                        <textarea class="form-control m-input--square" name="" 
+                                            rows="3">ContNo_1/SealNo_1/MarkNo_1, ContNo_2/SealNo_2/MarkNo_2</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Container Qty
+                                        </label>
+                                        <textarea class="form-control m-input--square" name="" rows="3">Part of container-1, Part of container-2</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Commodities
                                         </label>
                                         <textarea class="form-control m-input--square" name="commodityHB" id=""
                                             rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
@@ -889,47 +896,58 @@
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
-                                            Detail container & packages:
+                                            Description of good
                                         </label>
-                                        <textarea class="form-control m-input--square" name="packageContainerHB"
-                                            rows="3">container-1, container-2, container-3</textarea>
+                                        <textarea class="form-control m-input--square" name="desOfGoodsHB" id=""
+                                            rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Packages Qty <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="input-group m-input-group m-input-group--square">
+                                    <input type="text" class="form-control m-input" aria-label="">
+                                    <div class="input-group-prepend">
+                                        <ng-select 
+                                            [allowClear]="false" 
+                                            [items]="packagesUnit" 
+                                            [active]="packagesUnitActive"
+                                            [disabled]="disabled" 
+                                            (data)="refreshValue($event)"
+                                            (selected)="selected($event)" 
+                                            (removed)="removed($event)" 
+                                            (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="form-control-feedback" style="display: none">
+                                    Packages Qty is required !
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Description of good:
+                                    Total Gross Weight (KGS) <span class="m--font-danger">(*)</span>
                                 </label>
-                                <textarea class="form-control m-input--square" name="desOfGoodsHB" id=""
-                                    rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
+                                <input type="text" class="form-control m-input m-input--square" name="" placeholder="">
+                                <div class="form-control-feedback" style="display: none">
+                                    Total Gross Weight is required !
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-xl-4">
-                            <div class="m--margin-bottom-10">
-                                <span class="m--font-bolder">
-                                    Total gross weight:
-                                </span>
-                                <span></span>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total Volume (CBM) <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" name="" placeholder="">
+                                <div class="form-control-feedback" style="display: none">
+                                    Total Volume is required !
+                                </div>
                             </div>
-                            <div class="m--margin-bottom-10">
-                                <span class="m--font-bolder">
-                                    Total net weight:
-                                </span>
-                                <span></span>
-                            </div>
-                            <div class="m--margin-bottom-10">
-                                <span class="m--font-bolder">
-                                    Total chargeable weight:
-                                </span>
-                                <span></span>
-                            </div>
-                            <div class="m--margin-bottom-10">
-                                <span class="m--font-bolder">
-                                    Total CBM:
-                                </span>
-                                <span></span>
-                            </div>
-                            <div class="m--margin-top-10">
+                            <div class="m--margin-bottom-5 m--margin-top-5">
                                 <button type="button"
                                     class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                     <span>
@@ -950,8 +968,7 @@
                                 <label class="form-control-label" for="">
                                     Shipping mark
                                 </label>
-                                <input type="text" name="ShippingMark" class="form-control m-input m-input--square"
-                                    placeholder="Enter text">
+                                <textarea class="form-control m-input--square" id="" name="ShippingMark" rows="3"  placeholder="Enter text"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -959,8 +976,7 @@
                                 <label class="form-control-label" for="">
                                     In word
                                 </label>
-                                <input type="text" name="InWord" class="form-control m-input m-input--square"
-                                    placeholder="Enter text">
+                                <textarea class="form-control m-input--square" id="" name="InWord" rows="3"  placeholder="Enter text"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -968,8 +984,7 @@
                                 <label class="form-control-label" for="">
                                     On board status
                                 </label>
-                                <input type="text" name="OnBoardStatus" class="form-control m-input m-input--square"
-                                    placeholder="Enter text">
+                                <textarea class="form-control m-input--square" id="" name="OnBoardStatus" rows="3"  placeholder="Enter text"></textarea>
                             </div>
                         </div>
                     </div>

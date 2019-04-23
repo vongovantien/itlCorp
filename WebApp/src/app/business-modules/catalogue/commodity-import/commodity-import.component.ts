@@ -61,6 +61,7 @@ export class CommodityImportComponent implements OnInit {
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    console.log(this.pagedItems);
   }
 
   async setPage(pager: PagerSetting) {

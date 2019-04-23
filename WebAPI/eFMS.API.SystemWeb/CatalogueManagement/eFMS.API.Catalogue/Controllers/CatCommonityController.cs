@@ -163,19 +163,23 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
-                if (worksheet.Cells[1, 1].Value?.ToString() != "English Name")
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Code")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Code'" });
                 }
-                if (worksheet.Cells[1, 2].Value?.ToString() != "Local Name")
+                if (worksheet.Cells[1, 2].Value?.ToString() != "English Name")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'Local Name'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'English Name'" });
                 }
-                if (worksheet.Cells[1, 3].Value?.ToString() != "Commodity Group ID")
+                if (worksheet.Cells[1, 3].Value?.ToString() != "Local Name")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Commodity Group ID'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Local Name'" });
                 }
-                if (worksheet.Cells[1, 4].Value?.ToString() != "Status")
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Commodity Group ID")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Commodity Group ID'" });
+                }
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Status")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Status'" });
                 }
@@ -188,8 +192,8 @@ namespace eFMS.API.Catalogue.Controllers
                         Code = worksheet.Cells[row, 1].Value?.ToString(),
                         CommodityNameEn = worksheet.Cells[row, 2].Value?.ToString(),
                         CommodityNameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                        CommodityGroupId = worksheet.Cells[row, 4].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 3].Value),
-                        Status = worksheet.Cells[row,4].Value?.ToString()
+                        CommodityGroupId = worksheet.Cells[row, 4].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 4].Value),
+                        Status = worksheet.Cells[row,5].Value?.ToString()
                     };
                     list.Add(commodity);
                 }
