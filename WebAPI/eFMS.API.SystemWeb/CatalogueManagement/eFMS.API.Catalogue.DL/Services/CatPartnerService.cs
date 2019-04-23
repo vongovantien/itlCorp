@@ -10,6 +10,7 @@ using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,11 @@ namespace eFMS.API.Catalogue.DL.Services
     public class CatPartnerService : RepositoryBase<CatPartner, CatPartnerModel>, ICatPartnerService
     {
         private readonly IStringLocalizer stringLocalizer;
-        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+        private readonly IDistributedCache cache;
+        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
         {
             stringLocalizer = localizer;
+            cache = distributedCache;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -32,12 +35,66 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             return DataEnums.Departments;
         }
-
+        public override HandleState Add(CatPartnerModel model)
+        {
+            var entity = mapper.Map<CatPartner>(model);
+            entity.DatetimeCreated = DateTime.Now;
+            entity.Inactive = false;
+            var hs = DataContext.Add(entity);
+            if (hs.Success)
+            {
+                RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, DataContext.Get().ToList());
+            }
+            return hs;
+        }
+        public HandleState Delete(string id)
+        {
+            var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
+            {
+                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
+                var index = lstPartner.FindIndex(x => x.Id ==id);
+                if (index > -1)
+                {
+                    lstPartner.RemoveAt(index);
+                    RedisCacheHelper.SetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName, lstPartner);
+                }
+            }
+            return hs;
+        }
+        public HandleState Update(CatPartnerModel model)
+        {
+            var entity = mapper.Map<CatPartner>(model);
+            entity.DatetimeModified = DateTime.Now;
+            entity.Inactive = false;
+            if (entity.Inactive == true)
+            {
+                entity.InactiveOn = DateTime.Now;
+            }
+            var hs = DataContext.Update(entity, x => x.Id == model.Id);
+            if (hs.Success)
+            {
+                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
+                var index = lstPartner.FindIndex(x => x.Id == entity.Id);
+                if(index > -1)
+                {
+                    lstPartner[index] = entity;
+                    RedisCacheHelper.SetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName, lstPartner);
+                }
+            }
+            return hs;
+        }
         public HandleState Import(List<CatPartnerImportModel> data)
         {
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
+                if(lstPartner == null)
+                {
+                    lstPartner = new List<CatPartner>();
+                }
+                var newList = new List<CatPartner>();
                 foreach (var item in data)
                 {
                     var partner = mapper.Map<CatPartner>(item);
@@ -45,9 +102,19 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
                     partner.Inactive = false;
-                    dc.CatPartner.Add(partner);
+                    newList.Add(partner);
                 }
+                dc.CatPartner.AddRange(newList);
                 dc.SaveChanges();
+                if(lstPartner.Count == 0)
+                {
+                    lstPartner = dc.CatPartner.ToList();
+                }
+                else
+                {
+                    lstPartner.AddRange(newList);
+                }
+                RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, lstPartner);
                 return new HandleState();
             }
             catch (Exception ex)
@@ -99,10 +166,24 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+        private IQueryable<CatPartner> GetPartners()
+        {
+            var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
+            IQueryable<CatPartner> data = null;
+            if (lstPartner != null)
+            {
+                data = lstPartner.AsQueryable();
+            }
+            else
+            {
+                data = DataContext.Get();
+            }
+            return data;
+        }
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
             string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
-            var partners = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
                          join user in ((eFMSDataContext)DataContext.DC).SysUser on partner.UserCreated equals user.Id into userPartners
                          from y in userPartners.DefaultIfEmpty()
@@ -158,10 +239,13 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var partners = dc.CatPartner.ToList();
-            //var partnerGroups = DataEnums.CatPartnerGroups;
+            var partners = GetPartners()?.ToList();
             var users = dc.SysUser.ToList();
-            var countries = dc.CatCountry;
+            var countries = RedisCacheHelper.GetObject<List<CatCountry>>(cache, Templates.CatCountry.NameCaching.ListName)?.AsQueryable();
+            if(countries == null)
+            {
+                countries = dc.CatCountry;
+            }
             var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
             var branchs = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
             var salemans = dc.SysUser;

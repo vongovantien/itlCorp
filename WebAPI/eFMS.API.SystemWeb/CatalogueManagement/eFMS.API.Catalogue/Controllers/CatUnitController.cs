@@ -87,9 +87,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
             catUnit.UserCreated = currentUser.UserID;
-            catUnit.DatetimeCreated = catUnit.DatetimeModified = DateTime.Now;
-            catUnit.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catUnitService.Add(catUnit);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -113,9 +110,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
             catUnit.UserModified = currentUser.UserID;
-            catUnit.DatetimeModified = DateTime.Now;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catUnitService.Update(catUnit,x=>x.Id==model.Id);
+            var hs = catUnitService.Update(catUnit);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -129,10 +124,11 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpDelete]
         [Route("Delete/{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(short id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catUnitService.Delete(x => x.Id == id);
+            //var hs = catUnitService.Delete(x => x.Id == id);
+            var hs = catUnitService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

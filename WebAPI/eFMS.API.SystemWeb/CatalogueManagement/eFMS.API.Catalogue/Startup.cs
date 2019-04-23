@@ -51,6 +51,12 @@ namespace eFMS.API.Catalogue
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDistributedRedisCache(options =>
+            {
+                options.InstanceName = "Catalogue";
+                options.Configuration = Configuration.GetConnectionString("Redis");
+            });
+            services.AddSession();
             services.AddAuthorize(Configuration);
             services.AddAutoMapper();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -143,6 +149,7 @@ namespace eFMS.API.Catalogue
             app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+            app.UseSession();
             app.UseMvc();
             app.UseRequestLocalization();
         }

@@ -33,7 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
+        //private string templateName = "ImportTemplate.xlsx";
         public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -87,8 +87,8 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var partner = mapper.Map<CatPartnerModel>(model);
             partner.UserCreated = currentUser.UserID;
-            partner.DatetimeCreated = DateTime.Now;
-            partner.Inactive = false;
+            //partner.DatetimeCreated = DateTime.Now;
+            //partner.Inactive = false;
             //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
             var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -111,14 +111,14 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var partner = mapper.Map<CatPartnerModel>(model);
             partner.UserModified = currentUser.UserID;
-            partner.DatetimeModified = DateTime.Now;
             partner.Id = id;
+            //partner.DatetimeModified = DateTime.Now;
             //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
-            if (partner.Inactive == true)
-            {
-                partner.InactiveOn = DateTime.Now;
-            }
-            var hs = catPartnerService.Update(partner, x => x.Id == id);
+            //if (partner.Inactive == true)
+            //{
+            //    partner.InactiveOn = DateTime.Now;
+            //}
+            var hs = catPartnerService.Update(partner);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -131,7 +131,8 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            var hs = catPartnerService.Delete(x => x.Id == id);
+            //var hs = catPartnerService.Delete(x => x.Id == id);
+            var hs = catPartnerService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -182,7 +183,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            templateName = "Partner" + templateName;
+            string templateName = Templates.CatPartner.ExelImportFileName + Templates.ExelImportEx;
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
             {

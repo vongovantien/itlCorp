@@ -44,36 +44,47 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages)
         {
-            var list = Query(criteria);
-            rowsCount = list.Count;
-            totalPages = (rowsCount % pageSize == 0) ? rowsCount / pageSize : (rowsCount / pageSize) + 1;
-            if (pageSize > 1)
+            var data = Query(criteria);
+            List<CatCurrency> results = new List<CatCurrency>();
+            if (data == null)
             {
-                if (pageNumber < 1)
-                {
-                    pageNumber = 1;
-                }
-                list = list.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                rowsCount = 0;
+                totalPages = 0;
             }
-            return list;
+            else
+            {
+                rowsCount = data.Count();
+                totalPages = (rowsCount % pageSize == 0) ? rowsCount / pageSize : (rowsCount / pageSize) + 1;
+                if (pageSize > 1)
+                {
+                    if (pageNumber < 1)
+                    {
+                        pageNumber = 1;
+                    }
+                    results = data.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                }
+            }
+            return results;
         }
 
 
-        public List<CatCurrency> Query(CatCurrrencyCriteria criteria)
+        public IQueryable<CatCurrency> Query(CatCurrrencyCriteria criteria)
         {
             var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
-                list = list.Where(x => ((x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.CurrencyName ?? "").IndexOf(criteria.CurrencyName ?? "", StringComparison.OrdinalIgnoreCase) >= 0));              
+                list = list.Where(x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.CurrencyName ?? "").IndexOf(criteria.CurrencyName ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    .OrderByDescending(x => x.DatetimeModified);              
             }
             else
             {
 
-                list = list.Where(x => ((x.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                || ((x.CurrencyName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                list = list.Where(x => (x.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >-1
+                                    || (x.CurrencyName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    .OrderByDescending(x => x.DatetimeModified);
             }
-            return list.ToList();
+            return list;
         }
 
         public HandleState Update(CatCurrencyModel model)
