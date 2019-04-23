@@ -1,6 +1,9 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
+import findIndex from 'lodash/findIndex';
+import $ from 'jquery';
+// declare var $: any;
 @Component({
   selector: 'app-combo-grid-virtual-scroll',
   templateUrl: './combo-grid-virtual-scroll.component.html',
@@ -16,6 +19,7 @@ export class ComboGridVirtualScrollComponent implements OnInit {
   DisplayFields: { field: string, label: string }[] = [];
   SearchFields: string[] = [];
   SelectedDisplayFields: string[] = [];
+  CurrentActiveItem:any = null;
 
   /**
    * INPUT DATA
@@ -29,20 +33,34 @@ export class ComboGridVirtualScrollComponent implements OnInit {
 
   @Input() set displayFields(data: { field: string, label: string }[]) {
     if (data.length > 0) {
-      console.log({ DISPLAY: data })
       this.DisplayFields = data;
     }
   }
 
   @Input() set searchFields(data: any[]) {
     if (data.length > 0) {
-      this.SearchFields = data
+      this.SearchFields = data;
     }
   }
 
   @Input() set selectedDisplayFields(data: any[]) {
     if (data.length > 0) {
-      this.SelectedDisplayFields = data
+      this.SelectedDisplayFields = data;
+    }
+  }
+
+  @Input() set currentActiveItemId(data: any) {
+    if (data.value !=null) {
+
+      var itemIndex = findIndex(this.ConstDataSources,function(o){
+        console.log(o[data.field]);
+        return o[data.field] === data.value;
+      });
+      if(itemIndex!=-1){
+        this.indexSelected = itemIndex;
+        var item = this.ConstDataSources[itemIndex];
+        this.setCurrentActiveItem(item);
+      }
     }
   }
 
@@ -62,7 +80,10 @@ export class ComboGridVirtualScrollComponent implements OnInit {
 
   emitSelected(item: any) {
     this.itemSelected.emit(item);
+    this.setCurrentActiveItem(item);
+  }
 
+  setCurrentActiveItem(item:any){
     this.displaySelectedStr = '';
     for (var i = 0; i < this.SelectedDisplayFields.length; i++) {
       const field = this.SelectedDisplayFields[i];
@@ -102,7 +123,18 @@ export class ComboGridVirtualScrollComponent implements OnInit {
       return matched;
     });
 
+  }
 
+
+  /**
+   * Auto focus to search input whenever user open combo grid 
+   */
+  opening(event:any){
+    var srcEle = $(event.srcElement);
+    var targetEle = srcEle.closest('div.dropdown').find('input.cbgr-input-search');
+    setTimeout(() => {
+      targetEle.focus();
+    }, 100);
   }
 
   

@@ -1,10 +1,10 @@
 <div class="dropdown e--combogrid" >
-    <input
+    <input (click)="opening($event)"
         class="form-control m-input m-input--square dropdown-toggle"
         type="text" readonly data-toggle="dropdown"
         (keyup)="Search($event.target.value)"
-        placeholder="Please selected"
-        [value]="displaySelectedStr==''?'Please select option':displaySelectedStr">
+        placeholder="Please enter"
+        [value]="displaySelectedStr==''?null:displaySelectedStr">
     <div
         class="dropdown-menu  dropdown-menu-right e--combogrid-content">
         <div class="tabel-wrapper table-fixed">
@@ -13,7 +13,7 @@
                     <div class="search-field">
                         <input
                             (keyup)="Search($event.target.value)"
-                            class="form-control m-input m-input--square"
+                            class="form-control m-input m-input--square cbgr-input-search"
                             type="text" placeholder="Search...">
                         <i class="icon-search"></i>
                     </div>

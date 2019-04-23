@@ -1320,11 +1320,11 @@
                                                 </span>
                                                 <div class="control-editable">
                                                     <app-combo-grid-virtual-scroll 
-                                                    (itemSelected)="container.commodityId=$event"
+                                                    [currentActiveItemId]="{field:'id',value:container.commodityId}"
+                                                    (itemSelected)="container.commodityId=$event.id;container.commodityName=$event.commodityNameEn"
                                                     [selectedDisplayFields]="['commodityNameEn']"
                                                     [dataSources]="commodities" 
                                                     [displayFields]="[{'field':'commodityNameEn','label':'Name EN'},{'field':'commodityNameVn','label':'Name VN'},{'field':'commonityGroupNameEn','label':'Group'}]">
-
                                                     </app-combo-grid-virtual-scroll>
                                                     <!-- <div class="dropdown e--combogrid" #selectedCommodity>
                                                         <input

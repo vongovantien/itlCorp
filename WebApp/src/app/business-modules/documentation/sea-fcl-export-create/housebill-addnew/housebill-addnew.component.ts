@@ -14,7 +14,8 @@ import * as dataHelper from 'src/helper/data.helper';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import { BaseService } from 'src/services-base/base.service';
 import cloneDeep from 'lodash/cloneDeep';
-declare var $: any;
+
+ declare var $: any;
 
 @Component({
   selector: 'app-housebill-addnew',
