@@ -80,8 +80,7 @@
                                             <div class="table-filter-block">
                                                 <div class="search-field">
                                                     <input class="form-control m-input m-input--square" type="text"
-                                                        placeholder="Search..."
-                                                        (keyup)="getListCustomers($event.target.value)">
+                                                        placeholder="Search...">
                                                     <i class="icon-search"></i>
                                                 </div>
                                             </div>
@@ -1060,3 +1059,9 @@
     </div>
 </div>
 <!--end::confirm-cancel-create-housebill-modal-->
+
+<!--begin::import-housebill-detail-modal-->
+<div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <app-sea-lcl-export-housebill-detail-import></app-sea-lcl-export-housebill-detail-import>
+</div>
+<!--end::import-housebill-detail-modal-->

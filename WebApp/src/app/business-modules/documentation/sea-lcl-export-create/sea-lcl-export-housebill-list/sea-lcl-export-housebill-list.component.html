@@ -104,7 +104,7 @@
                                     </button>
                                     <button type="button"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-housebill-modal">
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-housebill-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -1155,8 +1155,8 @@
 </div>
 <!--end:: m-portlet-->
 
-<!--begin::confirm-housebill-modal-->
-<div class="modal fade" id="confirm-housebill-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<!--begin::confirm-delete-housebill-modal-->
+<div class="modal fade" id="confirm-delete-housebill-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -1192,7 +1192,19 @@
         </div>
     </div>
 </div>
-<!--end::confirm-housebill-modal-->
+<!--end::confirm-delete-housebill-modal-->
+
+<!--begin:: detail-credit-debit-note-modal-->
+<app-credit-and-debit-note-detail></app-credit-and-debit-note-detail>
+<!--end:: detail-credit-debit-note-modal-->
+
+<!--begin:: edit-credit-debit-note-modal-->
+<app-credit-and-debit-note-edit></app-credit-and-debit-note-edit>
+<!--end:: edit-credit-debit-note-modal-->
+
+<!--begin:: add-remaining-charge-modal-->
+<app-credit-and-debit-note-remaining-charge></app-credit-and-debit-note-remaining-charge>
+<!--end:: add-remaining-charge-modal-->
 
 <!--begin::confirm-can-not-housebill-modal-->
 <div class="modal fade" id="confirm-can-not-housebill-modal" data-backdrop="static" role="dialog" aria-labelledby=""
