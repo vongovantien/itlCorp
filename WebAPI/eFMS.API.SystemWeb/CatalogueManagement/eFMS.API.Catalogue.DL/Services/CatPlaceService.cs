@@ -20,15 +20,18 @@ using System.Globalization;
 using ITL.NetCore.Common;
 using eFMS.API.Catalogue.Service.Helpers;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatPlaceService : RepositoryBase<CatPlace, CatPlaceModel>, ICatPlaceService
     {
         private readonly IStringLocalizer stringLocalizer;
-        public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+        private readonly IDistributedCache cache;
+        public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
         {
             stringLocalizer = localizer;
+            cache = distributedCache;
             SetChildren<CatCountry>("Id", "CountryId");
             SetChildren<CatPlace>("Id", "ProvinceId");
             SetChildren<CatPlace>("Id", "DistrictId");
@@ -107,19 +110,29 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPlace>(model);
             entity.Id = Guid.NewGuid();
-            entity.DatetimeCreated = DateTime.Now;
+            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
             entity.Inactive = false;
             var result = DataContext.Add(entity, true);
+            if (result.Success)
+            {
+                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, DataContext.Get());
+            }
             return result;
         }
         public HandleState Update(CatPlaceModel model)
         {
+            var entity = mapper.Map<CatPlace>(model);
             model.DatetimeModified = DateTime.Now;
             if (model.Inactive == true)
             {
                 model.InactiveOn = DateTime.Now;
             }
-            var result = Update(model, x => x.Id == model.Id);
+            var result = DataContext.Update(entity, x => x.Id == model.Id);
+            if (result.Success)
+            {
+                Func<CatPlace, bool> predicate = x => x.Id == model.Id;
+                RedisCacheHelper.ChangeItemInList(cache, Templates.CatPlace.NameCaching.ListName, entity, predicate);
+            }
             return result;
         }
         private List<CatPlaceViewModel> GetCulturalData(List<vw_catPlace> list)
@@ -655,6 +668,17 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public HandleState Delete(Guid id)
+        {
+            var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
+            {
+                Func<CatPlace, bool> predicate = x => x.Id == id;
+                RedisCacheHelper.RemoveItemInList(cache, Templates.CatPlace.NameCaching.ListName, predicate);
+            }
+            return hs;
         }
     }
 }

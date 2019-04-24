@@ -89,7 +89,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var catCommodityGroup = mapper.Map<CatCommodityGroupModel>(model);
             catCommodityGroup.UserCreated = currentUser.UserID;
-            catCommodityGroup.DatetimeCreated = DateTime.Now;
+            catCommodityGroup.DatetimeCreated = catCommodityGroup.DatetimeModified = DateTime.Now;
             catCommodityGroup.Inactive = false;
             var hs = catComonityGroupService.Add(catCommodityGroup);
             var message = HandleError.GetMessage(hs, Crud.Insert);

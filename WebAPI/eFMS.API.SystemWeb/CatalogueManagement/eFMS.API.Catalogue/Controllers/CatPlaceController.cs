@@ -153,7 +153,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Delete(Guid id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catPlaceService.Delete(x => x.Id == id);
+            var hs = catPlaceService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

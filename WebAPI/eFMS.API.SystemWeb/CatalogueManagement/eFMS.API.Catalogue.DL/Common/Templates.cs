@@ -14,11 +14,40 @@ namespace eFMS.API.Catalogue.DL.Common
                 public static string ListName = "Areas";
             }
         }
+        public struct CatCharge
+        {
+            public struct NameCaching
+            {
+                public static string ListName = "CatCharge";
+            }
+        }
+        public struct CatChargeDefaultAccount
+        {
+            public struct NameCaching
+            {
+                public static string ListName = "ChargeDefaultAccounts";
+            }
+        }
+        public struct CatCommodity
+        {
+            public static string ExelImportFileName = "Commodity";
+            public struct NameCaching
+            {
+                public static string ListName = "commodities";
+            }
+        }
         public struct CatCountry
         {
             public struct NameCaching
             {
                 public static string ListName = "Countries";
+            }
+        }
+        public struct CatCurrency
+        {
+            public struct NameCaching
+            {
+                public static string ListName = "currencies";
             }
         }
         public struct CatPartner
@@ -27,6 +56,22 @@ namespace eFMS.API.Catalogue.DL.Common
             public struct NameCaching
             {
                 public static string ListName = "Partners";
+            }
+        }
+        public struct CatPlace
+        {
+            public static string ExelImportFileName = "Place";
+            public struct NameCaching
+            {
+                public static string ListName = "Places";
+            }
+        }
+        public struct CatStage
+        {
+            public static string ExelImportFileName = "Stage";
+            public struct NameCaching
+            {
+                public static string ListName = "Stages";
             }
         }
         public struct CatUnit
