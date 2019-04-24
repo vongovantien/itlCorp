@@ -274,28 +274,30 @@ namespace eFMS.API.Documentation.DL.Services
 
             }
 
+            var countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
+
 
 
             var returnObj = new
             {
-                partnerNameEn = partner.PartnerNameEn,
-                partnerShippingAddress = partner.AddressShippingEn,
-                partnerTel = partner.Tel,
-                partnerTaxcode = partner.TaxCode,
-                partnerId = partner.Id,
+                partnerNameEn = partner?.PartnerNameEn,
+                partnerShippingAddress = partner?.AddressShippingEn,
+                partnerTel = partner?.Tel,
+                partnerTaxcode = partner?.TaxCode,
+                partnerId = partner?.Id,
                 hbLadingNo = hbOfLadingNo,
                 mbLadingNo = mbOfLadingNo,
                 jobId = Shipment.Id,
-                pol = pol.NameEn,
-                polCountry = ((eFMSDataContext)DataContext.DC).CatCountry.Where(x => x.Id == pol.CountryId).FirstOrDefault().NameEn,
+                pol = pol?.NameEn,
+                polCountry = pol==null?null:countries.Where(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn,
 
-                pod = pod.NameEn,
-                podCountry = ((eFMSDataContext)DataContext.DC).CatCountry.Where(x => x.Id == pod.CountryId).FirstOrDefault().NameEn,
+                pod = pod?.NameEn,
+                podCountry = pod==null?null:countries.Where(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn,
 
-                vessel = Shipment.FlightVesselName,
+                vessel = Shipment?.FlightVesselName,
                 hbConstainers,
-                etd= Shipment.Etd,
-                eta= Shipment.Eta,
+                etd= Shipment?.Etd,
+                eta= Shipment?.Eta,
                 //soaNo = Soa.Code,
                 isLocked = false, // need update later 
                 volum,

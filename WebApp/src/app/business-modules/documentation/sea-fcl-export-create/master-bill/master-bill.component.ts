@@ -28,6 +28,7 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
                 this.etaSelected = null;
             }
         }
+        this.cdr.checkNoChanges();
     }
 
     @Input()shipment: CsTransaction;
