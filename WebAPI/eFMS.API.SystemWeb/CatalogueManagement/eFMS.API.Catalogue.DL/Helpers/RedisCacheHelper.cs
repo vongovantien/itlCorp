@@ -54,5 +54,37 @@ namespace eFMS.API.Catalogue.DL
                 return null;
             }
         }
+
+        public static void ChangeItemInList<T>(IDistributedCache cache, string key, T newItem, Func<T, bool> predicate)
+        {
+            var list = GetObject<List<T>>(cache, key);
+            int index = 0;
+            foreach (var item in list)
+            {
+                if (predicate(item))
+                {
+                    list[index] = newItem;
+                    break;
+                }
+                index++;
+            }
+            SetObject(cache, key, list);
+        }
+
+        public static void RemoveItemInList<T>(IDistributedCache cache, string key, Func<T, bool> predicate)
+        {
+            var list = GetObject<List<T>>(cache, key);
+            int index = 0;
+            foreach (var item in list)
+            {
+                if (predicate(item))
+                {
+                    list.RemoveAt(index);
+                    break;
+                }
+                index++;
+            }
+            SetObject(cache, key, list);
+        }
     }
 }

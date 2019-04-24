@@ -11,7 +11,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -34,7 +34,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Add(model);
             if (hs.Success)
             {
-                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get().ToList());
+                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
             }
             return hs;
         }
@@ -49,13 +49,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                var listUnit = RedisCacheHelper.GetObject<List<CatUnit>>(cache, Templates.CatUnit.NameCaching.ListName);
-                var index = listUnit.FindIndex(x => x.Id == entity.Id);
-                if (index > -1)
-                {
-                    listUnit[index] = entity;
-                    RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, listUnit);
-                }
+                Func<CatUnit, bool> predicate = x => x.Id == model.Id;
+                RedisCacheHelper.ChangeItemInList(cache, Templates.CatUnit.NameCaching.ListName, entity, predicate);
             }
             return hs;
         }
@@ -64,13 +59,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                var listUnit = RedisCacheHelper.GetObject<List<CatUnit>>(cache, Templates.CatUnit.NameCaching.ListName);
-                var index = listUnit.FindIndex(x => x.Id == id);
-                if (index > -1)
-                {
-                    listUnit.RemoveAt(index);
-                    RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, listUnit);
-                }
+                Func<CatCountry, bool> predicate = x => x.Id == id;
+                RedisCacheHelper.RemoveItemInList(cache, Templates.CatCountry.NameCaching.ListName, predicate);
             }
             return hs;
         }
@@ -81,47 +71,73 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatUnit> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
         {
-            var list = Query(criteria);
-            rowsCount = list.Count;
+            List<CatUnit> returnList = null;
+            var data = Query(criteria);
+            rowsCount = data.Count();
+            if (rowsCount == 0) return returnList;
+            else data = data.OrderByDescending(x => x.DatetimeModified);
             if (pageSize > 1)
             {
                 if (pageNumber < 1)
                 {
                     pageNumber = 1;
                 }
-                list = list.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                returnList = data.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
             }
-            return list;
+            return returnList;
         }
 
-        public List<CatUnit> Query(CatUnitCriteria criteria)
+        public IQueryable<CatUnit> Query(CatUnitCriteria criteria)
         {
-            var data = GetAll();
-            if (data == null) return null;
-            var list = data.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
+            IQueryable<CatUnit> list = null;
             if (criteria.All == null)
             {
-                list = list.Where(x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                && (x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"", StringComparison.OrdinalIgnoreCase) > -1
-                && (x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"", StringComparison.OrdinalIgnoreCase) > -1
-                && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                ).OrderByDescending(x => x.DatetimeModified);
+                //list = data.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                Expression<Func<CatUnit, bool>> andQuery = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                        && (x.UnitNameVn ?? "").IndexOf(criteria.UnitNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                        && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                        && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                        && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                list = Query(data, andQuery);
+                //list = list.Where(x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                //&& (x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"", StringComparison.OrdinalIgnoreCase) > -1
+                //&& (x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"", StringComparison.OrdinalIgnoreCase) > -1
+                //&& (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                //);
             }
             else
             {
-                list = list.Where(x => (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                ).OrderByDescending(x => x.DatetimeModified);
+                Expression<Func<CatUnit, bool>> orQuery = x => ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                                || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                                || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                                || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                list = Query(data, orQuery);
+                //list = data.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                //list = list.Where(x => (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                //|| (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                //|| (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                //|| (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                //);
             }
-            return list.ToList();
+            return list;
         }
-
+        private IQueryable<CatUnit> Query(IQueryable<CatUnit> dataFromCache, Expression<Func<CatUnit, bool>> query)
+        {
+            if (dataFromCache == null)
+            {
+                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
+                return DataContext.Get(query);
+            }
+            else
+            {
+                return dataFromCache.Where(query);
+            }
+        }
         private IQueryable<CatUnit> GetAll()
         {
             IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
-            cache.Remove(Templates.CatUnit.NameCaching.ListName);
             if (data == null)
             {
                 data = DataContext.Get();

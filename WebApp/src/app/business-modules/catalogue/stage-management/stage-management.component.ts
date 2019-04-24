@@ -106,6 +106,10 @@ export class StageManagementComponent implements OnInit {
                 if(res){
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
+                    
+                    this.pager.currentPage = 1;
+                    this.child.setPage(this.pager.currentPage);
+                    //await this.getStages(this.pager);
                     //await this.setPage(this.pager);
                 }
             }
@@ -128,12 +132,15 @@ export class StageManagementComponent implements OnInit {
             if (form.form.status != "INVALID") {
                 await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
                 this.StageToAdd = new StageModel();
-                await this.getStages(this.pager);
+                this.pager.currentPage = 1;
+                this.pager.totalItems = 0;
                 this.child.setPage(this.pager.currentPage);
-                if (this.pager.currentPage < this.pager.totalPages) {
-                    this.pager.currentPage = this.pager.totalPages;
-                    this.child.setPage(this.pager.currentPage);
-                }
+                //await this.getStages(this.pager);
+                // this.child.setPage(this.pager.currentPage);
+                // if (this.pager.currentPage < this.pager.totalPages) {
+                //     this.pager.currentPage = this.pager.totalPages;
+                //     this.child.setPage(this.pager.currentPage);
+                // }
 
                 this.resetNgSelect();
                 form.onReset();

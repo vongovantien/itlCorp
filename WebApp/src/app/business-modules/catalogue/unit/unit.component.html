@@ -123,56 +123,56 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody *ngIf="ListUnits">
-                        <ng-container *ngIf="ListUnits.length>0; else norecord" >
-                            <tr *ngFor="let unit of ListUnits;let i = index;">
-                                <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 70px">
-                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            (click)="showUpdateUnit(unit.id)" title="Edit unit" data-toggle="modal"
-                                            data-target="#update-unit-modal">
-                                            <i class="la la-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            (click)="prepareDeleteUnit(unit.id)" title="Remove unit" data-toggle="modal"
-                                            data-target="#confirm-delete-modal">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span>{{unit.code}}</span>
-                                </td>
-                                <td>
-                                    <span>{{unit.unitNameEn}}</span>
-                                </td>
-                                <td>
-                                    <span>{{unit.unitNameVn}}</span>
-                                </td>
-                                <td>
-                                    <span>{{unit.unitType}}</span>
-                                </td>
-                                <td>
-                                    <span>{{unit.descriptionEn}}</span>
-                                </td>
-                                <td>
-                                    <span>{{unit.descriptionVn}}</span>
-                                </td>
-                                <td>
-                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="unit.inactive" disabled type="checkbox"><span></span></label>
-                                </td>
-                            </tr>
-                        </ng-container>
-                    </tbody>
-                    <ng-template #norecord>
-                        <tr>
-                            <td colspan="8">
-                                <div class="no-data">
-                                    <i class="flaticon-coins"></i>
-                                    <span class="no-data-text">No records found</span>
+                    <tbody *ngIf="ListUnits; else norecord">
+                        <tr *ngFor="let unit of ListUnits;let i = index;">
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        (click)="showUpdateUnit(unit.id)" title="Edit unit" data-toggle="modal"
+                                        data-target="#update-unit-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        (click)="prepareDeleteUnit(unit.id)" title="Remove unit" data-toggle="modal"
+                                        data-target="#confirm-delete-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
                                 </div>
                             </td>
+                            <td>
+                                <span>{{unit.code}}</span>
+                            </td>
+                            <td>
+                                <span>{{unit.unitNameEn}}</span>
+                            </td>
+                            <td>
+                                <span>{{unit.unitNameVn}}</span>
+                            </td>
+                            <td>
+                                <span>{{unit.unitType}}</span>
+                            </td>
+                            <td>
+                                <span>{{unit.descriptionEn}}</span>
+                            </td>
+                            <td>
+                                <span>{{unit.descriptionVn}}</span>
+                            </td>
+                            <td>
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input [checked]="unit.inactive" disabled type="checkbox"><span></span></label>
+                            </td>
                         </tr>
+                    </tbody>
+                    <ng-template #norecord>
+                        <tbody>
+                            <tr>
+                                <td colspan="8">
+                                    <div class="no-data">
+                                        <i class="flaticon-coins"></i>
+                                        <span class="no-data-text">No records found</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
                     </ng-template>
                 </table>
             </div>

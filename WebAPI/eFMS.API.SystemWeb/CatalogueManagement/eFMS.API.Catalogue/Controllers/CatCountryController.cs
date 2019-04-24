@@ -82,9 +82,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            catCountry.DatetimeCreated = DateTime.Now;
             catCountry.UserCreated = currentUser.UserID;
-            catCountry.Inactive = false;
             var hs = catCountryService.Add(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -106,9 +104,10 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            catCountry.DatetimeModified = DateTime.Now;
+            //catCountry.DatetimeModified = DateTime.Now;
             catCountry.UserModified = currentUser.UserID;
-            var hs = catCountryService.Update(catCountry,x=>x.Id==catCountry.Id);
+            //var hs = catCountryService.Update(catCountry,x=>x.Id==catCountry.Id);
+            var hs = catCountryService.Update(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -121,10 +120,11 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(short id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catCountryService.Delete(x => x.Id == id);
+            //var hs = catCountryService.Delete(x => x.Id == id);
+            var hs = catCountryService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
