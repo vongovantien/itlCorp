@@ -47,7 +47,8 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
                                     && ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
                                     && ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
-                                    && (stage.Inactive == criteria.Inactive || criteria.Inactive == null));
+                                    && (stage.Inactive == criteria.Inactive || criteria.Inactive == null))
+                                    .OrderByDescending(x => x.DatetimeModified);
 
                 var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
                 result = (from i in s
@@ -58,7 +59,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                var s = DataContext.Get();
+                var s = DataContext.Get().OrderByDescending(x => x.DatetimeModified);
                 var t = ((eFMSDataContext)DataContext.DC).CatDepartment;
                 
                  result = s.Join(t, stage => stage.DepartmentId, department => department.Id, (stage, department) => new { stage, department }).Where(x => 
