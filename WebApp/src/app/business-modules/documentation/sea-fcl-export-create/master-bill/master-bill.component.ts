@@ -19,7 +19,7 @@ import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum'
 })
 export class MasterBillComponent implements OnInit, OnChanges {
     async ngOnChanges(changes: import("@angular/core").SimpleChanges) {
-        this.baseServices.spinnerShow();
+        //this.baseServices.spinnerShow();
     }
     @Input()shipment: CsTransaction;
     @Input()isImport: boolean;
