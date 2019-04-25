@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import  moment from 'moment/moment';
+import moment from 'moment/moment';
 import { NgForm } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 declare var $: any;
