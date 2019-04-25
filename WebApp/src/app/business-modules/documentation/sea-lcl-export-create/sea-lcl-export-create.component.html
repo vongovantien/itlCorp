@@ -56,19 +56,19 @@
             <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
                 <li class="nav-item m-tabs__item">
                     <a class="nav-link m-tabs__link active" id="masterbill-tablink" data-toggle="tab"
-                        href="#masterbill-tabview-tab" role="tab">
+                        href="#masterbill-tabview-tab" role="tab" (click)="switchTab('shipment')">
                         Shipment detail
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
                     <a class="nav-link m-tabs__link" id="housebill-tablink" 
-                        href="#housebill-tabview-tab" data-toggle="tab" role="tab">
+                        href="#housebill-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab('housebilllist')">
                         House Bill List
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
                     <a class="nav-link m-tabs__link" id="housebill-tablink" 
-                        href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab()">
+                        href="#credit-debit-note-tabview-tab" data-toggle="tab" role="tab" (click)="switchTab('cdnote')">
                         Credit Note & Debit Note
                     </a>
                 </li>
@@ -76,7 +76,7 @@
         </div>
     </div>
     <div class="tab-content" id="jobTabContent">
-        <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
+        <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab" *ngIf="isShipment">
             <!--begin:: shipment-detail-->
             <app-sea-lcl-export-shipment-detail></app-sea-lcl-export-shipment-detail>
             <!--end:: shipment-detail-->
@@ -226,11 +226,11 @@
             </div>
             <!--end:: m-portlet-->
         </div>
-        <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="">
+        <div class="tab-pane fade" id="housebill-tabview-tab" role="tabpanel" aria-labelledby="" *ngIf="isHouseBill">
             <app-sea-lcl-export-housebill-list></app-sea-lcl-export-housebill-list>
         </div>
-        <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="">
-            credit-and-debit-note
+        <div class="tab-pane fade" id="credit-debit-note-tabview-tab" role="tabpanel" aria-labelledby="" *ngIf="isCDnote">
+            <app-sea-lcl-export-credit-and-debit-note></app-sea-lcl-export-credit-and-debit-note>
         </div>
     </div>
 </div>
