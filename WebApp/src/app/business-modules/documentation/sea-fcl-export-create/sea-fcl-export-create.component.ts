@@ -858,9 +858,9 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
 
-    shipmentDetails:any = null;
     shipmentDetailCatcher(shipmentDetails:any){
-        this.shipmentDetails =  shipmentDetails;
+        this.shipment = shipmentDetails;
+        this.shipment.csMawbcontainers = this.lstMasterContainers;
         ExtendData.currentJobID = shipmentDetails.id;
         this.baseServices.spinnerHide();
     }

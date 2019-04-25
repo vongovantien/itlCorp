@@ -117,11 +117,16 @@ export class WarehouseComponent implements OnInit {
   }
   getDataCombobox(){
     this.getCountries();
+    this.getProvinces();
+    this.getDistricts();
   }
   async getCountries(){
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage, false, true);
     if(responses != null){
       this.countries = responses.map(x=>({"text":x.name,"id":x.id}));
+    }
+    else{
+      this.countries = [];
     }
   }
   async getProvinces(countryId?: number){
@@ -133,6 +138,9 @@ export class WarehouseComponent implements OnInit {
     if(responses != null){
       this.provinces = responses.map(x=>({"text":x.name_VN,"id":x.id}));
     }
+    else{
+      this.provinces = [];
+    }
   }
   async getDistricts(provinceId?: any){
     let url = this.api_menu.Catalogue.CatPlace.getDistricts;
@@ -142,6 +150,9 @@ export class WarehouseComponent implements OnInit {
     let responses = await this.baseService.getAsync(url, false, true);
     if(responses != null){
       this.districts = responses.map(x=>({"text":x.name_VN,"id":x.id}));
+    }
+    else{
+      this.districts = [];
     }
   }
   async getWarehouses(pager: PagerSetting) {
@@ -167,16 +178,18 @@ export class WarehouseComponent implements OnInit {
     this.warehouse = item;
     //await this.getCountries();
     if(this.warehouse.countryID != null){
+      await this.getProvinces(this.warehouse.countryID);
       let indexOfCountryActive = this.countries.findIndex(x => x.id == this.warehouse.countryID);
       this.countryActive = [this.countries[indexOfCountryActive]];
     }
     if(this.warehouse.provinceID != null){
-      await this.getProvinces(this.warehouse.countryID);
+      //await this.getProvinces(this.warehouse.countryID);
+      await this.getDistricts(this.warehouse.provinceID);
       let indexOfProvinceActive = this.provinces.findIndex(x => x.id == this.warehouse.provinceID);
       this.provinceActive = [this.provinces[indexOfProvinceActive]];
     }
     if(this.warehouse.districtID != null){
-      await this.getDistricts(this.warehouse.provinceID);
+      //await this.getDistricts(this.warehouse.provinceID);
       let indexOfDistrictActive = this.districts.findIndex(x => x.id == this.warehouse.districtID);
       this.districtActive = [this.districts[indexOfDistrictActive]];
     }
