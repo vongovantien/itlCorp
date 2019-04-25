@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange, SimpleChanges, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
 import findIndex from 'lodash/findIndex';
@@ -9,7 +9,7 @@ import $ from 'jquery';
   templateUrl: './combo-grid-virtual-scroll.component.html',
   styleUrls: ['./combo-grid-virtual-scroll.component.scss']
 })
-export class ComboGridVirtualScrollComponent implements OnInit, OnChanges {
+export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterViewInit {
 
   currentItemSelected: any = null;
   CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
@@ -108,7 +108,12 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges {
    */
   @Output() itemSelected = new EventEmitter<any>();
 
-  constructor() { }
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  ngAfterViewInit(): void {
+    console.log("VIEW INITED ")
+    this.cdr.markForCheck();
+  }
 
 
   ngOnInit() {
@@ -163,6 +168,8 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges {
       }
       return matched;
     });
+
+    console.log(this.DataSources);
 
     if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
       var _CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = this.CurrentActiveItemIdObj;
