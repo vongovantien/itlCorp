@@ -41,7 +41,7 @@ export class HousebillAddnewComponent implements OnInit {
     if (_masterBilData != null) {
       this.MasterBillData = _masterBilData;
       this.HouseBillWorking.jobId = this.MasterBillData.id;
-      this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+      this.HouseBillWorking.mawb = this.HouseBillWorking.mawb==null? this.MasterBillData.mawb: this.HouseBillWorking.mawb;
       this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
       this.HouseBillWorking.oceanVoyNo = this.MasterBillData.voyNo + "" + this.MasterBillData.flightVesselName;
       this.HouseBillWorking.customsBookingNo = this.MasterBillData.bookingNo;
@@ -94,7 +94,7 @@ export class HousebillAddnewComponent implements OnInit {
     this.getHouseBillContainers(this.HouseBillWorking.id);
     this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
     this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
-    this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+    this.HouseBillWorking.mawb = this.HouseBillWorking.mawb==null? this.MasterBillData.mawb: this.HouseBillWorking.mawb;
     this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
   }
 

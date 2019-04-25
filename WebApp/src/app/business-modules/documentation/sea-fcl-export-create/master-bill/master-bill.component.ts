@@ -8,6 +8,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+import cloneDeep from 'lodash/cloneDeep';
 import { isFormattedError } from '@angular/compiler';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 
@@ -303,4 +304,18 @@ export class MasterBillComponent implements OnInit, OnChanges {
     public refreshValue(value: any): void {
         this.value = value;
     }
+
+    _coloaders(){
+        return cloneDeep(this.coloaders);
+    }
+    _agents(){
+        return cloneDeep(this.agents);
+    }
+    _portOfLadings(){
+        return cloneDeep(this.portOfLadings);
+    }
+    _portOfDestinations(){
+        return cloneDeep(this.portOfDestinations);
+    }
+
 }
