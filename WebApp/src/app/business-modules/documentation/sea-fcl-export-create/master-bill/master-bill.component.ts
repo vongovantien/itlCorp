@@ -8,6 +8,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'app-master-bill',
@@ -16,19 +17,19 @@ import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 })
 export class MasterBillComponent implements OnInit, AfterViewInit{
     ngAfterViewInit(): void {
-        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
-            this.inEditing = true;
-            console.log(this.shipment.etd);
-            if(this.isImport == false){
-                this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
-                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
-            }
-            else{
-                this.etdSelected = null;
-                this.etaSelected = null;
-            }
-        }
-        this.cdr.checkNoChanges();
+        // if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+        //     this.inEditing = true;
+        //     console.log(this.shipment.etd);
+        //     if(this.isImport == false){
+        //         this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
+        //         this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
+        //     }
+        //     else{
+        //         this.etdSelected = null;
+        //         this.etaSelected = null;
+        //     }
+        // }
+        // this.cdr.checkNoChanges();
     }
 
     @Input()shipment: CsTransaction;
@@ -308,4 +309,18 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
     public refreshValue(value: any): void {
         this.value = value;
     }
+
+    _coloaders(){
+        return cloneDeep(this.coloaders);
+    }
+    _agents(){
+        return cloneDeep(this.agents);
+    }
+    _portOfLadings(){
+        return cloneDeep(this.portOfLadings);
+    }
+    _portOfDestinations(){
+        return cloneDeep(this.portOfDestinations);
+    }
+
 }
