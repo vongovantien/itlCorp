@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, OnChanges, SimpleChange, SimpleChanges, DoCheck } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange, SimpleChanges } from '@angular/core';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
 import findIndex from 'lodash/findIndex';
@@ -9,11 +9,7 @@ import $ from 'jquery';
   templateUrl: './combo-grid-virtual-scroll.component.html',
   styleUrls: ['./combo-grid-virtual-scroll.component.scss']
 })
-export class ComboGridVirtualScrollComponent implements OnInit, AfterViewInit, OnChanges,DoCheck {
-  ngDoCheck(): void {
-    this.cdr.markForCheck();
-  }
-
+export class ComboGridVirtualScrollComponent implements OnInit, OnChanges {
 
   currentItemSelected: any = null;
   CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
@@ -41,7 +37,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, AfterViewInit, O
     const _selectedDisplayFields: SimpleChange = changes.selectedDisplayFields;
     const _currentActiveItemId: SimpleChange = changes.currentActiveItemId;
 
-    if (_dataSources !== undefined && _dataSources !== null ) {
+    if (_dataSources !== undefined && _dataSources !== null) {
       this.setDataSource(_dataSources.currentValue);
     }
     if (_displayFields !== undefined && _displayFields !== null) {
@@ -60,6 +56,21 @@ export class ComboGridVirtualScrollComponent implements OnInit, AfterViewInit, O
     if (data != undefined && data.length > 0) {
       this.DataSources = data;
       this.ConstDataSources = cloneDeep(data);
+
+      if (this.CurrentActiveItemIdObj !== null) {
+        var activeItemData = this.CurrentActiveItemIdObj;
+        var itemIndex = findIndex(this.ConstDataSources, function (o) {
+          return o[activeItemData.field] === activeItemData.value;
+        });
+        if (itemIndex != -1) {
+          this.indexSelected = itemIndex;
+          var item = this.ConstDataSources[itemIndex];
+          this.setCurrentActiveItem(item);
+        }
+        if (itemIndex === -1 && activeItemData.hardValue != null) {
+          this.displaySelectedStr = activeItemData.hardValue;
+        }
+      }
     }
   }
 
@@ -92,66 +103,12 @@ export class ComboGridVirtualScrollComponent implements OnInit, AfterViewInit, O
     }
   }
 
-
-
-  ngAfterViewInit(): void {
-    console.log("VIEW INITED ")
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * INPUT DATA
-   */
-  // @Input() set dataSources(data: any[]) {
-  //   if (data != undefined && data.length > 0) {
-  //     this.DataSources = data;
-  //     this.ConstDataSources = cloneDeep(data);
-  //   }
-  // }
-
-  // @Input() set displayFields(data: { field: string, label: string }[]) {
-  //   if (data.length > 0) {
-  //     this.DisplayFields = data;
-  //   }
-  // }
-
-  // @Input() set searchFields(data: any[]) {
-  //   if (data.length > 0) {
-  //     this.SearchFields = data;
-  //   }
-  // }
-
-  // @Input() set selectedDisplayFields(data: any[]) {
-  //   if (data.length > 0) {
-  //     this.SelectedDisplayFields = data;
-  //   }
-  // }
-
-  // @Input() set currentActiveItemId(data: any) {
-  //   if (data.value != null) {
-  //     this.CurrentActiveItemIdObj = data;
-  //     var itemIndex = findIndex(this.ConstDataSources, function (o) {
-  //       return o[data.field] === data.value;
-  //     });
-  //     if (itemIndex != -1) {
-  //       this.indexSelected = itemIndex;
-  //       var item = this.ConstDataSources[itemIndex];
-  //       this.setCurrentActiveItem(item);
-  //     }
-  //     if (itemIndex === -1 && data.hardValue != null) {
-  //       this.displaySelectedStr = data.hardValue;
-  //     }
-  //   }
-  // }
-
-
-
   /**
    * OUTPUT DATA
    */
   @Output() itemSelected = new EventEmitter<any>();
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor() { }
 
 
   ngOnInit() {
