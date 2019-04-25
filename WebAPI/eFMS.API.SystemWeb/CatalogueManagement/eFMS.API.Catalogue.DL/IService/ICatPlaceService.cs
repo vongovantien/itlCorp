@@ -10,19 +10,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatPlaceService : IRepositoryBase<CatPlace, CatPlaceModel>
     {
-        List<vw_catPlace> Query(CatPlaceCriteria criteria);
+        IQueryable<vw_catPlace> Query(CatPlaceCriteria criteria);
+        Task<IQueryable<CatPlaceViewModel>> GetByType(CatPlaceTypeEnum placeType);
         List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount);
         List<vw_catProvince> GetProvinces(short? countryId);
         List<vw_catDistrict> GetDistricts(Guid? provinceId);
         List<ModeOfTransport> GetModeOfTransport();
         List<CatPlaceImportModel> CheckValidImport(List<CatPlaceImportModel> list, CatPlaceTypeEnum placeType);
         HandleState Import(List<CatPlaceImportModel> data);
-        HandleState Add(CatPlaceModel model);
+        //HandleState Add(CatPlaceModel model);
         HandleState Update(CatPlaceModel model);
         HandleState Delete(Guid id);
     }

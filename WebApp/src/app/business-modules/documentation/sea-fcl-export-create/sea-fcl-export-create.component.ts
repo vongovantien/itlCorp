@@ -38,7 +38,7 @@ export class SeaFclExportCreateComponent implements OnInit {
 
     _firstLoadData:FirstLoadData = new FirstLoadData();
     
-    shipment: CsTransaction = new CsTransaction();
+    shipment: CsTransaction;
     containerTypes: any[] = [];
     lstMasterContainers: any[] = [];
     lstContainerTemp: any[];
@@ -131,16 +131,18 @@ export class SeaFclExportCreateComponent implements OnInit {
         private route: ActivatedRoute,
         private api_menu: API_MENU, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
         this.initNewShipmentForm();
-        this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
     }
 
     async ngOnInit() {
+        this.baseServices.spinnerShow();
         await this.route.params.subscribe(async prams => {
+            this.shipment = new CsTransaction();
+            this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
             if(prams.id != undefined){
                 this.inEditing = true;
                 this.shipment.id = prams.id;         
                 await this.getTotalProfit();      
-                await this.getShipmentDetail(this.shipment.id);
+                //await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
                 this.housebillRoleToggle = "tab";
@@ -859,6 +861,8 @@ export class SeaFclExportCreateComponent implements OnInit {
     shipmentDetails:any = null;
     shipmentDetailCatcher(shipmentDetails:any){
         this.shipmentDetails =  shipmentDetails;
+        ExtendData.currentJobID = shipmentDetails.id;
+        this.baseServices.spinnerHide();
     }
 
     currentHouseBill:any = null;

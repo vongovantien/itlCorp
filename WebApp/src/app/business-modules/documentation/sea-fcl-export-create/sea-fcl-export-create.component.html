@@ -116,10 +116,10 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <ng-container *ngIf="shipment && isLoaded && isShipment">
+                <ng-container *ngIf="shipment && isShipment">
 
-                    <app-master-bill  (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment" 
-                        [isImport]="isImport" [formAddEdit]="myForm" [isLoaded]=false [submitted]="submitted"></app-master-bill>
+                    <app-master-bill  (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment"
+                        [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted"></app-master-bill>
                 <!--begin:: m-portlet-->
                 <div class="m-portlet">
                     <div class="m-portlet__head">
