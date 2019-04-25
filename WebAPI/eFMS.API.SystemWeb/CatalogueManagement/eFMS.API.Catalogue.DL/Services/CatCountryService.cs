@@ -150,7 +150,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             List<CatCountry> returnList = null;
 
-            cache.Remove(Templates.CatCountry.NameCaching.ListName);
+            //cache.Remove(Templates.CatCountry.NameCaching.ListName);
             //Expression<Func<CatCountry, bool>> query = null;
             //IQueryable<CatCountry >
             //if (criteria.condition == SearchCondition.AND)

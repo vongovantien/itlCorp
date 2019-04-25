@@ -76,6 +76,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        [HttpGet("GetBy")]
+        public async Task<IActionResult> GetBy(CatPlaceTypeEnum placeType)
+        {
+            var data = await catPlaceService.GetByType(placeType);
+            return Ok(data);
+        }
+
         [HttpGet]
         [Route("GetProvinces")]
         public IActionResult GetProvinces(short? countryId)

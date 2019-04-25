@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit, AfterContentChecked, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit, AfterContentChecked, AfterViewChecked, OnChanges } from '@angular/core';
 import moment from 'moment/moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -9,34 +9,23 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import cloneDeep from 'lodash/cloneDeep';
+import { isFormattedError } from '@angular/compiler';
+import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 
 @Component({
     selector: 'app-master-bill',
     templateUrl: './master-bill.component.html',
     styleUrls: ['./master-bill.component.scss']
 })
-export class MasterBillComponent implements OnInit, AfterViewInit{
-    ngAfterViewInit(): void {
-        // if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
-        //     this.inEditing = true;
-        //     console.log(this.shipment.etd);
-        //     if(this.isImport == false){
-        //         this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
-        //         this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
-        //     }
-        //     else{
-        //         this.etdSelected = null;
-        //         this.etaSelected = null;
-        //     }
-        // }
-        // this.cdr.checkNoChanges();
+export class MasterBillComponent implements OnInit, OnChanges {
+    async ngOnChanges(changes: import("@angular/core").SimpleChanges) {
+        this.baseServices.spinnerShow();
     }
-
     @Input()shipment: CsTransaction;
     @Input()isImport: boolean;
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
-    @Input() isLoaded: boolean;
+    //@Input() isLoaded: boolean;
     @Output() shipmentDetails = new EventEmitter<any>();
     terms: any[];
     shipmentTypes: any[];
@@ -61,7 +50,7 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         private api_menu: API_MENU) { }
 
     async ngOnInit() {
-        this.baseServices.spinnerShow();
+        console.log(this.shipment);
         await this.getPortLoading(null);
         await this.changePortDestination(null);
         await this.getColoaders(null);
@@ -69,7 +58,22 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         await this.getUserInCharges(null);
         await this.getShipmentCommonData();
         let index = -1;
-        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+        if(this.shipment == null){
+            this.shipment = new CsTransaction();
+            this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
+            index = this.terms.findIndex(x => x.id == "Prepaid");
+            if(index > -1){
+                this.shipment.paymentTerm = this.terms[index].id;
+                this.paymentTermActive = [this.terms[index]];
+            } 
+            index = this.shipmentTypes.findIndex(x => x.id == "Freehand");
+            if(index > -1){
+                this.shimentTypeActive = [this.shipmentTypes[index]];
+                this.shipment.shipmentType = this.shipmentTypes[index].id;
+            } 
+        }
+        else if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            await this.getShipmentDetail(this.shipment.id);
             if(this.isImport == false){
                 this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
                 this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
@@ -123,21 +127,12 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
             }
                   
         }
-        else{
-            index = this.terms.findIndex(x => x.id == "Prepaid");
-            if(index > -1){
-                this.shipment.paymentTerm = this.terms[index].id;
-                this.paymentTermActive = [this.terms[index]];
-            } 
-            index = this.shipmentTypes.findIndex(x => x.id == "Freehand");
-            if(index > -1){
-                this.shimentTypeActive = [this.shipmentTypes[index]];
-                this.shipment.shipmentType = this.shipmentTypes[index].id;
-            } 
-        }
         this.shipmentDetails.emit(Object.assign({},this.shipment));    
-        this.isLoaded = true;
-        this.baseServices.spinnerHide();
+        //this.isLoaded = true;
+    }
+    async getShipmentDetail(id: string) {
+        this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
+        //ExtendData.currentJobID = this.shipment.id;
     }
     changePortLoading(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
