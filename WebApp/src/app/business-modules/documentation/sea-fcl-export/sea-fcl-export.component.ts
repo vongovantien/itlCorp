@@ -146,7 +146,7 @@ export class SeaFCLExportComponent implements OnInit {
             transactionType: TransactionTypeEnum.SeaFCLExport
         };
         this.searchString = null;
-        this.pager.currentPage = 1;
+        //this.pager.currentPage = 1;
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;

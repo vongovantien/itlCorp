@@ -56,11 +56,12 @@ namespace eFMS.API.Catalogue.DL.Services
             if (rowsCount == 0) return results;
             if (size > 1)
             {
+                data = data.OrderByDescending(x => x.DatetimeModified);
                 if (page < 1)
                 {
                     page = 1;
                 }
-                data = data.OrderByDescending(x => x.DatetimeModified).Skip((page-1)* size).Take(size);
+                data = data.Skip((page-1)* size).Take(size);
             }
             results = GetCulturalData(data).ToList();
             return results;
@@ -128,15 +129,15 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Update(CatPlaceModel model)
         {
             var entity = mapper.Map<CatPlace>(model);
-            model.DatetimeModified = DateTime.Now;
-            if (model.Inactive == true)
+            entity.DatetimeModified = DateTime.Now;
+            if (entity.Inactive == true)
             {
-                model.InactiveOn = DateTime.Now;
+                entity.InactiveOn = DateTime.Now;
             }
             var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
             {
-                Func<CatPlace, bool> predicate = x => x.Id == model.Id;
+                Func<CatPlace, bool> predicate = x => x.Id == entity.Id;
                 RedisCacheHelper.ChangeItemInList(cache, Templates.CatPlace.NameCaching.ListName, entity, predicate);
             }
             return result;
@@ -638,7 +639,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
-
+        
         public HandleState Import(List<CatPlaceImportModel> data)
         {
             try
@@ -687,22 +688,74 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
-        public async Task<IQueryable<CatPlaceViewModel>> GetByType(CatPlaceTypeEnum placeType)
+        public List<CatPlaceViewModel> GetBy(CatPlaceTypeEnum placeType, string modeOfTransport, bool? inactive)
         {
             string type = PlaceTypeEx.GetPlaceType(placeType);
-            IQueryable<CatPlace> data = RedisCacheHelper.Get<CatPlace>(cache, Templates.CatPlace.NameCaching.ListName);
-            if(data == null)
+            List<CatPlaceViewModel> results = null;
+            var allPlaces = RedisCacheHelper.Get<CatPlace>(cache, Templates.CatPlace.NameCaching.ListName);
+            if (allPlaces == null)
             {
-                data = DataContext.Get();
-                await RedisCacheHelper.SetObjectAsync(cache, Templates.CatPlace.NameCaching.ListName, data);
-                data = data.Where(x => (x.PlaceTypeId ?? "").IndexOf(type ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                var data = DataContext.Get();
+                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, data);
+            }
+            var places = allPlaces.Where(x => x.PlaceTypeId == type || string.IsNullOrEmpty(type)).ToList();
+            var provinces = allPlaces.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
+            var districts = allPlaces.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District)).ToList();
+            var countries = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName).ToList();
+            if (countries == null)
+            {
+                countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
+                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, countries);
+            }
+            var areas = RedisCacheHelper.GetList<CatArea>(cache, Templates.CatArea.NameCaching.ListName);
+            if (areas == null)
+            {
+                areas = ((eFMSDataContext)DataContext.DC).CatArea.ToList();
+            }
+
+            var query = (from place in places
+                         join countr in countries on place.CountryId equals countr.Id into countryGrp
+                         from country in countryGrp.DefaultIfEmpty()
+                         join provin in provinces on place.ProvinceId equals provin.Id into provinceGrp
+                         from province in provinceGrp.DefaultIfEmpty()
+                         join distr in districts on place.DistrictId equals distr.Id into districGrp
+                         from district in districGrp.DefaultIfEmpty()
+                         join are in areas on place.AreaId equals are.Id into areaGrp
+                         from area in areaGrp.DefaultIfEmpty()
+                         select new
+                         {
+                             place,
+                             CountryNameEN = country?.NameEn,
+                             CountryNameVN = country?.NameVn,
+                             ProvinceNameEN = province?.NameEn,
+                             ProvinceNameVN = province?.NameVn,
+                             DistrictNameEN = district?.NameEn,
+                             DistrictNameVN = district?.NameVn,
+                             AreaNameEN = area?.NameEn,
+                             AreaNameVN = area?.NameVn
+                         }).ToList();
+            if (places == null)
+            {
+                query = query.Where(x => (x.place.Inactive == inactive || inactive == null)
+                                       && (x.place.ModeOfTransport ?? "").IndexOf(modeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1).ToList();
             }
             else
             {
-                data = data.Where(x => (x.PlaceTypeId ?? "").IndexOf(type ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                query = query.Where(x => (x.place.Inactive == inactive || inactive == null)
+                                       && (x.place.ModeOfTransport ?? "").IndexOf(modeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1).ToList();
             }
-            if (data == null) return null;
-            return data.Select(x => mapper.Map<CatPlaceViewModel>(x));
+            if (query == null) return results;
+            else results = new List<CatPlaceViewModel>();
+            foreach(var item in query)
+            {
+                var place = mapper.Map<CatPlaceViewModel>(item.place);
+                place.CountryName = item.CountryNameEN;
+                place.ProvinceName = item.ProvinceNameEN;
+                place.DistrictName = item.DistrictNameEN;
+                place.AreaName = item.AreaNameEN;
+                results.Add(place);
+            }
+            return results;
         }
     }
 }

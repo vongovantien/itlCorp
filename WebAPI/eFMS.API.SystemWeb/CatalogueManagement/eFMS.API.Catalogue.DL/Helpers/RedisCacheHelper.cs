@@ -54,7 +54,18 @@ namespace eFMS.API.Catalogue.DL
                 return null;
             }
         }
-
+        public static List<T> GetList<T>(IDistributedCache cache, string key)
+        {
+            var lstUnit = GetObject<List<T>>(cache, key);
+            if (lstUnit != null)
+            {
+                return lstUnit;
+            }
+            else
+            {
+                return null;
+            }
+        }
         public static void ChangeItemInList<T>(IDistributedCache cache, string key, T newItem, Func<T, bool> predicate)
         {
             var list = GetObject<List<T>>(cache, key);
