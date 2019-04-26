@@ -305,17 +305,4 @@ export class MasterBillComponent implements OnInit, OnChanges {
         this.value = value;
     }
 
-    _coloaders(){
-        return cloneDeep(this.coloaders);
-    }
-    _agents(){
-        return cloneDeep(this.agents);
-    }
-    _portOfLadings(){
-        return cloneDeep(this.portOfLadings);
-    }
-    _portOfDestinations(){
-        return cloneDeep(this.portOfDestinations);
-    }
-
 }
