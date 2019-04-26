@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import moment from 'moment/moment';
 
 @Component({
     selector: 'app-sea-lcl-export-housebill-list',
@@ -11,14 +12,40 @@ export class SeaLclExportHousebillListComponent implements OnInit {
     open_CD() {
         this.openCD = true;
     }
-    constructor() { }
+    constructor() {
+        this.keepCalendarOpeningWithRange = true;
+        this.selectedDate = Date.now();
+        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+    }
 
     ngOnInit() {
     }
 
     /**
-  * ng2-select
-  */
+     * Daterange picker
+     */
+    selectedRange: any;
+    selectedDate: any;
+    keepCalendarOpeningWithRange: true;
+    maxDate: moment.Moment = moment();
+    ranges: any = {
+        Today: [moment(), moment()],
+        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [
+            moment()
+                .subtract(1, 'month')
+                .startOf('month'),
+            moment()
+                .subtract(1, 'month')
+                .endOf('month')
+        ]
+    };
+    /**
+       * ng2-select
+       */
     public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4', 'option 5', 'option 6', 'option 7'];
 
     private value: any = {};
