@@ -77,9 +77,9 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("GetBy")]
-        public async Task<IActionResult> GetBy(CatPlaceTypeEnum placeType)
+        public IActionResult GetBy(CatPlaceTypeEnum placeType, string modeOfTransport, bool? inactive)
         {
-            var data = await catPlaceService.GetByType(placeType);
+            var data = catPlaceService.GetBy(placeType, modeOfTransport, inactive);
             return Ok(data);
         }
 

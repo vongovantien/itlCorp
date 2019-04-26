@@ -110,7 +110,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                list = list.Skip((page - 1) * size).Take(size).ToList();
+                list = list.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).ToList();
             }
             foreach(var charge in list)
             {
