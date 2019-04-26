@@ -858,6 +858,7 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
 
+
     shipmentDetailCatcher(shipmentDetails:any){
         this.shipment = shipmentDetails;
         this.shipment.csMawbcontainers = this.lstMasterContainers;

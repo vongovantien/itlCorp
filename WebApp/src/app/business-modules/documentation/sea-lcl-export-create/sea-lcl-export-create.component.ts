@@ -16,6 +16,36 @@ export class SeaLclExportCreateComponent implements OnInit {
     }
 
     /**
+       * problem: Bad performance when switch between 'Shipment Detail' tab and 'House Bill List' tab
+       * this method imporove performance for web when detecting change 
+       * for more informations, check this reference please 
+       * https://blog.bitsrc.io/boosting-angular-app-performance-with-local-change-detection-8a6a3afa8d4d
+       *
+     */
+
+    isShipment: boolean = true;
+    isHouseBill: boolean = false;
+    isCDnote: boolean = false;
+    switchTab(tab: string) {
+
+        if (tab === "shipment") {
+            this.isShipment = true;
+            this.isHouseBill = false;
+            this.isCDnote = false;
+        }
+        if (tab === "housebilllist") {
+            this.isShipment = false;
+            this.isHouseBill = true;
+            this.isCDnote = false;
+        }
+        if (tab === "cdnote") {
+            this.isShipment = false;
+            this.isHouseBill = false;
+            this.isCDnote = true;
+        }
+    }
+
+    /**
      * Daterange picker
      */
     selectedRange: any;
@@ -41,7 +71,7 @@ export class SeaLclExportCreateComponent implements OnInit {
     /**
    * ng2-select
    */
-    
+
     public packageTypes: Array<string> = ['Container', 'Case', 'Boxes', 'Cage'];
 
     private value: any = {};
@@ -71,9 +101,6 @@ export class SeaLclExportCreateComponent implements OnInit {
 
     public refreshValue(value: any): void {
         this.value = value;
-    }
-    switchTab(){
-        
     }
 
 }

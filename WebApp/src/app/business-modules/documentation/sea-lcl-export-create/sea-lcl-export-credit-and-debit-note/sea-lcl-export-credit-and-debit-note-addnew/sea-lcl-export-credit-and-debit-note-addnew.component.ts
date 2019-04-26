@@ -1,25 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-    selector: 'app-sea-lcl-export-housebill-list',
-    templateUrl: './sea-lcl-export-housebill-list.component.html',
-    styleUrls: ['./sea-lcl-export-housebill-list.component.scss']
+    selector: 'app-sea-lcl-export-credit-and-debit-note-addnew',
+    templateUrl: './sea-lcl-export-credit-and-debit-note-addnew.component.html',
+    styleUrls: ['./sea-lcl-export-credit-and-debit-note-addnew.component.scss']
 })
-export class SeaLclExportHousebillListComponent implements OnInit {
+export class SeaLclExportCreditAndDebitNoteAddnewComponent implements OnInit {
 
-    openCD: boolean = false;
-    open_CD() {
-        this.openCD = true;
-    }
     constructor() { }
 
     ngOnInit() {
     }
 
     /**
-  * ng2-select
-  */
-    public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4', 'option 5', 'option 6', 'option 7'];
+     * ng2-select
+     */
+    public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
+        'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
 
     private value: any = {};
     private _disabledV: string = '0';
@@ -49,4 +46,5 @@ export class SeaLclExportHousebillListComponent implements OnInit {
     public refreshValue(value: any): void {
         this.value = value;
     }
+
 }

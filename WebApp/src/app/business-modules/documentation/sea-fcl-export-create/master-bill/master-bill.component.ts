@@ -83,7 +83,7 @@ export class MasterBillComponent implements OnInit, OnChanges {
                 this.etaSelected = null;
             }
             this.inEditing = true;
-            console.log(this.shipment.etd);
+            console.log(this.shipment.etd);         
             if(this.isImport == true){
                 let claim = localStorage.getItem('id_token_claims_obj');
                 index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
