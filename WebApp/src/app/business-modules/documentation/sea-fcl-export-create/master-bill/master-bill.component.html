@@ -246,9 +246,9 @@
                         <app-combo-grid-virtual-scroll *ngIf="shipment"
                             [dataSources]="portOfLadings"
                             [currentActiveItemId]="{field:'id',value:shipment.pol}"
-                            (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEN"
-                            [selectedDisplayFields]="['nameEN']"                             
-                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEN','label':'Port Name'},{'field':'countryName','label':'Country'}]">
+                            (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEn"
+                            [selectedDisplayFields]="['nameEn']"                             
+                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                         </app-combo-grid-virtual-scroll>   
                         <!-- <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
@@ -303,9 +303,9 @@
                         </label>
                         <app-combo-grid-virtual-scroll *ngIf="shipment" [dataSources]="portOfDestinations" 
                             [currentActiveItemId]="{field:'id',value:shipment.pod}"
-                            (itemSelected)="shipment.pod = $event.id;formAddEdit.controls['pod'].setValue($event.id); shipment.podName= $event.nameEN"
-                            [selectedDisplayFields]="['nameEN']"                            
-                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEN','label':'Port Name'},{'field':'countryName','label':'Country'}]">
+                            (itemSelected)="shipment.pod = $event.id;formAddEdit.controls['pod'].setValue($event.id); shipment.podName= $event.nameEn"
+                            [selectedDisplayFields]="['nameEn']"                            
+                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                         </app-combo-grid-virtual-scroll>   
                         <!-- <div class="dropdown e--combogrid">
                               <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly

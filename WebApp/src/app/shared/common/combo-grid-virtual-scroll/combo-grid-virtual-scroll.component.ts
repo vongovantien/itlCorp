@@ -3,6 +3,7 @@ import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
 import findIndex from 'lodash/findIndex';
 import $ from 'jquery';
+import { SortService } from '../../services/sort.service';
 // declare var $: any;
 @Component({
   selector: 'app-combo-grid-virtual-scroll',
@@ -53,7 +54,10 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
   }
 
   private setDataSource(data: any[]) {
+   
     if (data != undefined && data.length > 0) {
+      data = this.sortService.sort(data, this.displayFields[0].field, true);
+      console.log(data);
       this.DataSources = data;
       this.ConstDataSources = cloneDeep(data);
 
@@ -108,7 +112,8 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
    */
   @Output() itemSelected = new EventEmitter<any>();
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef,
+    private sortService: SortService) { }
 
   ngAfterViewInit(): void {
     console.log("VIEW INITED ")

@@ -363,10 +363,19 @@ export class ShippingInstructionComponent implements OnInit {
         }
     }
     async getPortOfLading(searchText: any) {
+        // let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
+        // const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        // if (portIndexs != null) {
+        //     this.portOfLadings = portIndexs.data;
+        //     console.log(this.portOfLadings);
+        // }
+        // else{
+        //     this.portOfLadings = [];
+        // }
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfLadings = portIndexs.data;
+            this.portOfLadings = portIndexs;
             console.log(this.portOfLadings);
         }
         else{
@@ -374,11 +383,20 @@ export class ShippingInstructionComponent implements OnInit {
         }
     }
     async getPortOfDestination(searchText: any) {
+        // let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
+        // const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        // if (portIndexs != null) {
+        //     this.portOfDestinations = portIndexs.data;
+        //     console.log(this.portOfLadings);
+        // }
+        // else{
+        //     this.portOfDestinations = [];
+        // }
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfDestinations = portIndexs.data;
-            console.log(this.portOfLadings);
+            this.portOfDestinations = portIndexs;
+            console.log(this.portOfDestinations);
         }
         else{
             this.portOfDestinations = [];

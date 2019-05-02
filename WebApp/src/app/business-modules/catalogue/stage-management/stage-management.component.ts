@@ -107,8 +107,10 @@ export class StageManagementComponent implements OnInit {
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
                     
-                    this.pager.currentPage = 1;
-                    this.child.setPage(this.pager.currentPage);
+                    //this.pager.currentPage = 1;
+                    //this.child.setPage(this.pager.currentPage);
+                    this.pager.totalItems = 0;
+                    this.getStages(this.pager);
                     //await this.getStages(this.pager);
                     //await this.setPage(this.pager);
                 }

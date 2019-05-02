@@ -76,13 +76,6 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
-        [HttpGet("GetBy")]
-        public IActionResult GetBy(CatPlaceTypeEnum placeType, string modeOfTransport, bool? inactive)
-        {
-            var data = catPlaceService.GetBy(placeType, modeOfTransport, inactive);
-            return Ok(data);
-        }
-
         [HttpGet]
         [Route("GetProvinces")]
         public IActionResult GetProvinces(short? countryId)
@@ -371,14 +364,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower())))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower()) && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower()) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

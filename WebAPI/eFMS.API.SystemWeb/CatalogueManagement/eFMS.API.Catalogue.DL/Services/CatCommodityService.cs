@@ -34,7 +34,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public override HandleState Add(CatCommodityModel model)
         {
             var commonity = mapper.Map<CatCommodity>(model);
-            commonity.DatetimeCreated = DateTime.Now;
+            commonity.DatetimeCreated = commonity.DatetimeModified = DateTime.Now;
             commonity.Inactive = false;
             var result = DataContext.Add(commonity);
             if (result.Success)
@@ -151,13 +151,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 return results;
             }
             rowsCount = data.Count();
+            data = data.OrderByDescending(x => x.DatetimeModified);
             if (size > 1)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                results = data.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).ToList();
+                results = data.Skip((page - 1) * size).Take(size).ToList();
             }
             return results;
         }

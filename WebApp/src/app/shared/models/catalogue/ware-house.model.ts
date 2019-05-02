@@ -1,7 +1,8 @@
 export class Warehouse { 
     id: number;
     code: string;
-    name: string;
+    nameEn: string;
+    nameVn: string;
     countryID?: number;
     districtID?: string;
     provinceID?:string;

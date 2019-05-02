@@ -22,6 +22,7 @@ using eFMS.API.Catalogue.Service.Helpers;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -67,16 +68,16 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        public IQueryable<vw_catPlace> Query(CatPlaceCriteria criteria)
+        public IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria)
         {
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
-            var list = GetView();
-            IQueryable<vw_catPlace> results = null;
+            var list = GetView(placetype);
+            IQueryable<sp_GetCatPlace> results = null;
             if (criteria.All == null)
             {
                 results = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.Name_EN ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.Name_VN ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.CountryNameEN ?? "").IndexOf(criteria.CountryNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.CountryNameVN ?? "").IndexOf(criteria.CountryNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.DistrictNameEN ?? "").IndexOf(criteria.DistrictNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -87,7 +88,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.ProvinceNameEN ?? "").IndexOf(criteria.ProvinceNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
                     ).AsQueryable();
@@ -96,8 +97,8 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 results = list.Where(x => (
                                       ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   || ((x.Name_EN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   || ((x.Name_VN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.CountryNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.CountryNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.DistrictNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -107,7 +108,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    )
-                                   && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
                                    ).AsQueryable();
             }
@@ -142,7 +143,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return result;
         }
-        private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<vw_catPlace> list)
+        private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<sp_GetCatPlace> list)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             if (currentCulture.Name == "vi-VN")
@@ -151,8 +152,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     ID = x.ID,
                     Code = x.Code,
-                    NameEN = x.Name_EN,
-                    NameVN = x.Name_VN,
+                    NameEn = x.NameEn,
+                    NameVn = x.NameVn,
                     DisplayName = x.DisplayName,
                     Address = x.Address,
                     DistrictID = x.DistrictID,
@@ -183,8 +184,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     ID = x.ID,
                     Code = x.Code,
-                    NameEN = x.Name_EN,
-                    NameVN = x.Name_VN,
+                    NameEn = x.NameEn,
+                    NameVn = x.NameVn,
                     DisplayName = x.DisplayName,
                     Address = x.Address,
                     DistrictID = x.DistrictID,
@@ -211,10 +212,15 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        private List<vw_catPlace> GetView()
+        private List<sp_GetCatPlace> GetView(string placeTypeID)
         {
-            List<vw_catPlace> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catPlace>();
-            return lvCatPlace;
+            //List<vw_catPlace> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catPlace>();
+            //return lvCatPlace;
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName="@placeTypeID", Value = placeTypeID }
+            };
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetCatPlace>(parameters);
+            return list;
         }
 
         private List<vw_catProvince> GetProvinces()
@@ -686,76 +692,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 RedisCacheHelper.RemoveItemInList(cache, Templates.CatPlace.NameCaching.ListName, predicate);
             }
             return hs;
-        }
-
-        public List<CatPlaceViewModel> GetBy(CatPlaceTypeEnum placeType, string modeOfTransport, bool? inactive)
-        {
-            string type = PlaceTypeEx.GetPlaceType(placeType);
-            List<CatPlaceViewModel> results = null;
-            var allPlaces = RedisCacheHelper.Get<CatPlace>(cache, Templates.CatPlace.NameCaching.ListName);
-            if (allPlaces == null)
-            {
-                var data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, data);
-            }
-            var places = allPlaces.Where(x => x.PlaceTypeId == type || string.IsNullOrEmpty(type)).ToList();
-            var provinces = allPlaces.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
-            var districts = allPlaces.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District)).ToList();
-            var countries = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName).ToList();
-            if (countries == null)
-            {
-                countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, countries);
-            }
-            var areas = RedisCacheHelper.GetList<CatArea>(cache, Templates.CatArea.NameCaching.ListName);
-            if (areas == null)
-            {
-                areas = ((eFMSDataContext)DataContext.DC).CatArea.ToList();
-            }
-
-            var query = (from place in places
-                         join countr in countries on place.CountryId equals countr.Id into countryGrp
-                         from country in countryGrp.DefaultIfEmpty()
-                         join provin in provinces on place.ProvinceId equals provin.Id into provinceGrp
-                         from province in provinceGrp.DefaultIfEmpty()
-                         join distr in districts on place.DistrictId equals distr.Id into districGrp
-                         from district in districGrp.DefaultIfEmpty()
-                         join are in areas on place.AreaId equals are.Id into areaGrp
-                         from area in areaGrp.DefaultIfEmpty()
-                         select new
-                         {
-                             place,
-                             CountryNameEN = country?.NameEn,
-                             CountryNameVN = country?.NameVn,
-                             ProvinceNameEN = province?.NameEn,
-                             ProvinceNameVN = province?.NameVn,
-                             DistrictNameEN = district?.NameEn,
-                             DistrictNameVN = district?.NameVn,
-                             AreaNameEN = area?.NameEn,
-                             AreaNameVN = area?.NameVn
-                         }).ToList();
-            if (places == null)
-            {
-                query = query.Where(x => (x.place.Inactive == inactive || inactive == null)
-                                       && (x.place.ModeOfTransport ?? "").IndexOf(modeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1).ToList();
-            }
-            else
-            {
-                query = query.Where(x => (x.place.Inactive == inactive || inactive == null)
-                                       && (x.place.ModeOfTransport ?? "").IndexOf(modeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1).ToList();
-            }
-            if (query == null) return results;
-            else results = new List<CatPlaceViewModel>();
-            foreach(var item in query)
-            {
-                var place = mapper.Map<CatPlaceViewModel>(item.place);
-                place.CountryName = item.CountryNameEN;
-                place.ProvinceName = item.ProvinceNameEN;
-                place.DistrictName = item.DistrictNameEN;
-                place.AreaName = item.AreaNameEN;
-                results.Add(place);
-            }
-            return results;
         }
     }
 }
