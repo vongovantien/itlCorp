@@ -116,7 +116,7 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <ng-container *ngIf="shipment && isShipment">
+                <ng-container *ngIf="shipment && isShipment && isLoaded">
 
                     <app-master-bill  (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment"
                         [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted"></app-master-bill>
