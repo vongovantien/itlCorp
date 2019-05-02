@@ -173,23 +173,11 @@ export class MasterBillComponent implements OnInit, OnChanges {
     }
     
     async getPortLoading(searchText: any) {
-        // let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
-        // if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
-        //     portSearchIndex.inactive = null;
-        // }
-        // const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
-        // if (portIndexs != null) {
-        //     this.portOfLadings = portIndexs;
-        //     console.log(this.portOfLadings);
-        // }
-        // else{
-        //     this.portOfLadings = [];
-        // }
-        let url = this.api_menu.Catalogue.CatPlace.getBy + "?placeType=" + PlaceTypeEnum.Port + "&modeOfTransport=SEA";
-        if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
-            url = url + "&inactive=false";
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            portSearchIndex.inactive = null;
         }
-        const portIndexs = await this.baseServices.getAsync(url, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
             this.portOfLadings = portIndexs;
             console.log(this.portOfLadings);
@@ -199,26 +187,14 @@ export class MasterBillComponent implements OnInit, OnChanges {
         }
     }
     async getDestinations(searchText: any) {
-        // let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
-        // if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
-        //     portSearchIndex.inactive = null;
-        // }
-        // const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
-        // if (portIndexs != null) {
-        //     this.portOfDestinations = portIndexs;
-        //     console.log(this.portOfLadings);
-        // }
-        // else{
-        //     this.portOfDestinations = [];
-        // }
-        let url = this.api_menu.Catalogue.CatPlace.getBy + "?placeType=" + PlaceTypeEnum.Port + "&modeOfTransport=SEA";
-        if(this.shipment.id == "00000000-0000-0000-0000-000000000000"){
-            url = url + "&inactive=false";
+        let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', inactive: false, all: searchText };
+        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            portSearchIndex.inactive = null;
         }
-        const portIndexs = await this.baseServices.getAsync(url, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
             this.portOfDestinations = portIndexs;
-            console.log(this.portOfLadings);
+            console.log(this.portOfDestinations);
         }
         else{
             this.portOfDestinations = [];

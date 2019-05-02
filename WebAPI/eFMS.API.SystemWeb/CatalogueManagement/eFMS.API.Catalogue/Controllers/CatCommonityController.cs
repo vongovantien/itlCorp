@@ -100,6 +100,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var commodity = mapper.Map<CatCommodityModel>(model);
+            commodity.Id = id;
             commodity.UserModified = currentUser.UserID;
             var hs = catComonityService.Update(commodity);
             var message = HandleError.GetMessage(hs, Crud.Update);

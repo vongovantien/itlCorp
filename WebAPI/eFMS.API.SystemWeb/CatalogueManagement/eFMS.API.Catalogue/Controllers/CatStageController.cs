@@ -71,7 +71,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult AddStage(CatStageModel catStageModel)
         {
-            catStageModel.DatetimeCreated = DateTime.Now;
+            catStageModel.DatetimeCreated = catStageModel.DatetimeModified = DateTime.Now;
             catStageModel.UserCreated = currentUser.UserID;
             catStageModel.Inactive = false;
             var hs = catStageService.Add(catStageModel);

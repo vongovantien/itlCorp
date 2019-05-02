@@ -18,7 +18,7 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     lookup:''
   },
   {
-    primaryKey: 'nameEN',
+    primaryKey: 'nameEn',
     header: 'Name (EN)',
     isShow: true,
     dataType: 'text',
@@ -27,7 +27,7 @@ export const PORTINDEXCOLUMNSETTING: ColumnSetting[] =
     lookup: ''
   },
   {
-    primaryKey: 'nameVN',
+    primaryKey: 'nameVn',
     header: 'Name (Local)',
     isShow: true,
     dataType: 'text',

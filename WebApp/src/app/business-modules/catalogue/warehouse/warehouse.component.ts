@@ -55,7 +55,8 @@ export class WarehouseComponent implements OnInit {
     this.warehouse = {
       id: null,
       code: null,
-      name: null,
+      nameEn: null,
+      nameVn: null,
       countryID: null,
       districtID: null,
       provinceID:null,

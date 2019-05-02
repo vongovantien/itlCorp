@@ -218,7 +218,14 @@
                                     <label class="form-control-label" for="">
                                         Saleman
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedSaleman>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:criteria.saleManID}"
+                                        (itemSelected)="criteria.saleManID = $event.id;"
+                                        [selectedDisplayFields]="['employeeNameVn']"
+                                        [dataSources]="salemans" 
+                                        [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedSaleman>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="combogrid" 
                                             [value]="selectedSaleman.value == null?'Please selected a saleman':selectedSaleman.value" autocomplete="nope">
                                         <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
@@ -255,7 +262,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>

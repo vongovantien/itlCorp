@@ -39,6 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeCreated = DateTime.Now;
+            entity.DatetimeModified = DateTime.Now;
             entity.Inactive = false;
             var hs = DataContext.Add(entity);
             if (hs.Success)
@@ -66,7 +67,6 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
-            entity.Inactive = false;
             if (entity.Inactive == true)
             {
                 entity.InactiveOn = DateTime.Now;
@@ -178,7 +178,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 data = DataContext.Get();
             }
-            return data;
+            return data?.OrderByDescending(x => x.DatetimeModified);
         }
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {

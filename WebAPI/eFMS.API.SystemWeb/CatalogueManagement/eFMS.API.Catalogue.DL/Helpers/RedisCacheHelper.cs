@@ -69,17 +69,20 @@ namespace eFMS.API.Catalogue.DL
         public static void ChangeItemInList<T>(IDistributedCache cache, string key, T newItem, Func<T, bool> predicate)
         {
             var list = GetObject<List<T>>(cache, key);
-            int index = 0;
-            foreach (var item in list)
+            if(list != null)
             {
-                if (predicate(item))
+                int index = 0;
+                foreach (var item in list)
                 {
-                    list[index] = newItem;
-                    break;
+                    if (predicate(item))
+                    {
+                        list[index] = newItem;
+                        break;
+                    }
+                    index++;
                 }
-                index++;
+                SetObject(cache, key, list);
             }
-            SetObject(cache, key, list);
         }
 
         public static void RemoveItemInList<T>(IDistributedCache cache, string key, Func<T, bool> predicate)

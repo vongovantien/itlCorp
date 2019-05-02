@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Catalogue.Service.ViewModels
 {
-    public partial class vw_catPlace
+    public class sp_GetCatPlace
     {
         public Guid ID { get; set; }
         public string Code { get; set; }
@@ -21,6 +19,8 @@ namespace eFMS.API.Catalogue.Service.ViewModels
         public Nullable<short> CountryID { get; set; }
         public string AreaID { get; set; }
         public string LocalAreaID { get; set; }
+        public string LocalAreaNameEN { get; set; }
+        public string LocalAreaNameVN { get; set; }
         public string ModeOfTransport { get; set; }
         public string GeoCode { get; set; }
         public string PlaceTypeID { get; set; }
@@ -35,7 +35,5 @@ namespace eFMS.API.Catalogue.Service.ViewModels
         public string CountryNameEN { get; set; }
         public string AreaNameVN { get; set; }
         public string AreaNameEN { get; set; }
-        public string LocalAreaNameEN { get; set; }
-        public string LocalAreaNameVN { get; set; }
     }
 }

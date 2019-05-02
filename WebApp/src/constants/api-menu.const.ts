@@ -71,7 +71,7 @@ export class API_MENU {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Query",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/",
-            getBy: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetBy",
+            //getBy: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetBy",
             add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
