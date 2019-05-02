@@ -84,11 +84,11 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.isHouseBill = false;
             this.isCDnote = false;
             if(this.inEditing == true){
-                this.isLoaded = false;
-                setTimeout(() => {
-                    this.isLoaded = true;
-                    this.inEditing = true;
-                }, 100);
+                // this.isLoaded = false;
+                // setTimeout(() => {
+                //     this.isLoaded = true;
+                //     this.inEditing = true;
+                // }, 100);
                 this.myForm.patchValue({
                     estimatedTimeofDepature: { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) },
                     polName: this.shipment.polName,
@@ -97,7 +97,11 @@ export class SeaFclExportCreateComponent implements OnInit {
                     agentName: this.shipment.agentName,
                     personInChargeName: this.shipment.personInChargeName,
                     mawb: this.shipment.mawb,
-                    
+                    bookingNo: this.shipment.bookingNo,
+                    flightVesselName: this.shipment.flightVesselName,
+                    voyNo: this.shipment.voyNo,
+                    pono: this.shipment.pono,
+                    notes: this.shipment.notes
                 });
             }
         }
@@ -298,9 +302,10 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.getComodities(keySearch);
     }
     validateShipmentForm(){
-        if(this.lstMasterContainers != null){
-            this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
-        }
+        // if(this.lstMasterContainers != null){
+        //     this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
+        // }
+        this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
         if(this.myForm.value.estimatedTimeofDepature != null){
             this.shipment.etd = dataHelper.dateTimeToUTC(this.myForm.value.estimatedTimeofDepature["startDate"]);
         }
@@ -317,7 +322,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 $('#confirm-can-not-create-job-modal').modal('show');
         }
         else{
-            if(this.shipment.csMawbcontainers == null){
+            if(this.shipment.csMawbcontainers.length == 0){
                 $('#confirm-not-create-job-misscont-modal').modal('show');
             }
             else{
@@ -423,14 +428,14 @@ export class SeaFclExportCreateComponent implements OnInit {
                 this.isHouseBill = false;
                 this.isCDnote = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
-                //this.isLoaded = false;
+                this.isLoaded = false;
                 // if(this.inEditing == false){
                 //     this.activeTab();
                 // }
                 this.inEditing = true;
-                // setTimeout(() => {
-                //     this.isLoaded = true;
-                //   }, 300);
+                setTimeout(() => {
+                    this.isLoaded = true;
+                  }, 300);
             }
         }
         // this.housebillTabviewHref = "#housebill-tabview-tab";
