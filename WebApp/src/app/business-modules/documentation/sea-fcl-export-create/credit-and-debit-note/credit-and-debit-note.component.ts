@@ -36,6 +36,10 @@ export class CreditAndDebitNoteComponent implements OnInit {
         });
     }
 
+    getCDNotesAfterAdd(e:boolean){
+        if(e===true) this.getAllCDNote();
+    }
+
     SearchCDNotes(search_key: string) {
         this.listCDNotes = cloneDeep(this.constListCDNotes)
         search_key = search_key.trim().toLowerCase();
