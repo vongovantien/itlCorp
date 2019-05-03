@@ -4,12 +4,12 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using ITL.NetCore.Connection.NoSql;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using System;
@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 
 namespace eFMS.API.Catalogue.DL.Services
@@ -39,7 +38,8 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
             model.Inactive = false;
-            var hs = DataContext.Add(model);
+            var entity = mapper.Map<CatCountry>(model);
+            var hs = DataContext.Add(entity);
             if (hs.Success)
             {
                 RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());

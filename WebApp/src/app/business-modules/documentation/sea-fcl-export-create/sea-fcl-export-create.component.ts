@@ -305,7 +305,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         // if(this.lstMasterContainers != null){
         //     this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
         // }
-        this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
+        this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isSave == true);
         if(this.myForm.value.estimatedTimeofDepature != null){
             this.shipment.etd = dataHelper.dateTimeToUTC(this.myForm.value.estimatedTimeofDepature["startDate"]);
         }

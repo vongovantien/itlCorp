@@ -75,12 +75,12 @@ export class ManifestComponent implements OnInit {
                     index = this.portOfLadings.findIndex(x => x.id == this.manifest.pol);
                     if(index > -1) {
                         this.manifest.pol = this.portOfLadings[index].id;
-                        this.manifest.polName = this.portOfLadings[index].nameEN;
+                        this.manifest.polName = this.portOfLadings[index].nameEn;
                     }
                     index = this.portOfDestinations.findIndex(x => x.id == this.manifest.pod);
                     if(index > -1) {
                         this.manifest.pod = this.portOfDestinations[index].id;
-                        this.manifest.podName = this.portOfDestinations[index].nameEN;
+                        this.manifest.podName = this.portOfDestinations[index].nameEn;
                     }
                 }
                 await this.getContainerList(prams.id);
@@ -147,7 +147,7 @@ export class ManifestComponent implements OnInit {
         }
         this.getPortOfDestination(keySearch);
     }
-    getNewManifest(){
+    async getNewManifest(){
         //MSEYYMM/#####: YYYY-MM-DDTHH:mm:ss.sssZ
         this.manifest = new CsManifest();
         let date = new Date().toISOString().substr(0, 19);
@@ -164,20 +164,20 @@ export class ManifestComponent implements OnInit {
         index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
         if(index > -1){
             this.manifest.pol = this.portOfLadings[index].id;
-            this.manifest.polName = this.portOfLadings[index].nameEN;
+            this.manifest.polName = this.portOfLadings[index].nameEn;
         } 
         index = this.portOfDestinations.findIndex(x => x.id == this.shipment.pod);
         if(index > -1)
         {
             this.manifest.pod = this.portOfDestinations[index].id;
-            this.manifest.podName = this.portOfDestinations[index].nameEN;
+            this.manifest.podName = this.portOfDestinations[index].nameEn;
         }
     }
     removeChecked(){
         this.checkAll = false;
         //this.checkAllChange();
     }
-    refreshManifest(){
+    async refreshManifest(){
         this.manifest.refNo = null;
         this.manifest.supplier = null;
         this.manifest.attention = null;
@@ -188,8 +188,17 @@ export class ManifestComponent implements OnInit {
         this.manifest.weight = null;
         this.manifest.volume = null;
         this.manifest.manifestIssuer = null;
+        await this.getShipmentDetail(this.shipment.id);
         this.getNewManifest();
-        this.getHouseBillList(this.shipment.id);
+        this.housebills = [];
+        this.housebillsRemoved = [];
+        //this.getHouseBillList(this.shipment.id);
+        this.housebillsTemp.forEach(x => {
+            var item = x;
+            item.isRemoved = false;
+            this.housebills.push(item);
+        });
+        console.log(this.housebillsTemp);
     }
     async saveManifest(form: NgForm){
         this.manifest.jobId = this.shipment.id;
@@ -262,10 +271,10 @@ export class ManifestComponent implements OnInit {
                 element.isChecked = false;
                 element["packageTypes"] = stringHelper.subStringComma(element["packageTypes"]);
                 if(element["manifestRefNo"] == null){
-                    element.isRemoved = false;
+                    element.isRemoved = true;
                 }
                 else{
-                    element.isRemoved = true;
+                    element.isRemoved = false;
                 }
             });
             this.housebills = responses;

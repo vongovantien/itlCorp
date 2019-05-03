@@ -31,6 +31,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatPlaceModel, CatPlace>();
             CreateMap<CatPartnerImportModel, CatPartner>();
             CreateMap<CatStageModel, CatStage>();
+            CreateMap<CatPartnerModel, CatPartner>();
         }
     }
 }

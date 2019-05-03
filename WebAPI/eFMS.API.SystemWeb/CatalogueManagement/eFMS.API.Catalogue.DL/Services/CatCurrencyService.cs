@@ -3,19 +3,14 @@ using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Caching.Distributed;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {

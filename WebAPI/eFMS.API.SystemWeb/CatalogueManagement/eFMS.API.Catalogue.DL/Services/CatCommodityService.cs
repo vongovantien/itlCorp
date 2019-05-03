@@ -7,14 +7,12 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using eFMS.API.Catalogue.DL.ViewModels;
 using ITL.NetCore.Common;
-using eFMS.API.Catalogue.Service.Helpers;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
+using ITL.NetCore.Connection.NoSql;
 
 namespace eFMS.API.Catalogue.DL.Services
 {

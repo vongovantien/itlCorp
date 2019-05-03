@@ -176,13 +176,13 @@ export class LocationComponent implements OnInit {
       if(isCountry){
         dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
       }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.name_EN, "id": x.id }));    
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
       }  
     } else {
       if(isCountry){
         dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));    
       }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.name_VN, "id": x.id }));     
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));     
       }      
     }
     return dataReturn;
@@ -321,10 +321,11 @@ export class LocationComponent implements OnInit {
       delete this.CountryToAdd.id;
       if (form.form.status != "INVALID") {
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
+        this.pager.totalItems = 0;
         await this.getCountries();
         this.getAllCountries();
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           $('#add-country-modal').modal('hide');
         }
@@ -446,10 +447,11 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.ProvinceCityToAdd.countryId != null) {
         this.ProvinceCityToAdd.placeType = PlaceTypeEnum.Province;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.ProvinceCityToAdd);
+        this.pager.totalItems = 0;
         await this.getProvinceCities();
         console.log(response);
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
           $('#add-city-province-modal').modal('hide');
@@ -556,6 +558,7 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.DistrictToAdd.countryId != null && this.DistrictToAdd.provinceId != null) {
         this.DistrictToAdd.placeType = PlaceTypeEnum.District;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.DistrictToAdd);
+        this.pager.totalItems = 0;
         await this.getDistrict();
         if(response){
           this.setPageAfterAdd();
@@ -688,9 +691,10 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.WardToAdd.countryId != null && this.WardToAdd.provinceId != null && this.WardToAdd.districtId != null) {
         this.WardToAdd.placeType = PlaceTypeEnum.Ward;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.WardToAdd);
+        this.pager.totalItems = 0;
         await this.getWards();        
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
           $('#add-ward-modal').modal('hide');

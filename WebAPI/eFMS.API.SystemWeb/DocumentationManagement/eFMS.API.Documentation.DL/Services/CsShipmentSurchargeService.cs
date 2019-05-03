@@ -18,6 +18,15 @@ namespace eFMS.API.Documentation.DL.Services
         {
 
         }
+        public override HandleState Add(CsShipmentSurchargeModel model)
+        {
+            model.Id = Guid.NewGuid();
+            model.ExchangeDate = DateTime.Now;
+            model.DatetimeCreated = DateTime.Now;
+            var entity = mapper.Map<CsShipmentSurcharge>(model);
+            var result = DataContext.Add(entity);
+            return result;
+        }
 
         public HandleState DeleteCharge(Guid chargeId)
         {

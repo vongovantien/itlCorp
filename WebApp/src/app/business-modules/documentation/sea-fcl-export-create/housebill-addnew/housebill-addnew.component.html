@@ -538,10 +538,10 @@
                                     </label>
                                     <app-combo-grid-virtual-scroll 
                                         [currentActiveItemId]="{field:'id',value:HouseBillWorking.pol}"
-                                        (itemSelected)="HouseBillWorking.pol=$event.id;activePortOfLoading=$event.name_EN;"
-                                        [selectedDisplayFields]="['name_EN']"
+                                        (itemSelected)="HouseBillWorking.pol=$event.id;activePortOfLoading=$event.nameEn;"
+                                        [selectedDisplayFields]="['nameEn']"
                                         [dataSources]="listPort" 
-                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'name_EN','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                                    </app-combo-grid-virtual-scroll>
                                     <!-- <div class="dropdown e--combogrid" #selectedPortOfLoading>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
@@ -602,10 +602,10 @@
                                     </label>
                                     <app-combo-grid-virtual-scroll 
                                         [currentActiveItemId]="{field:'id',value:HouseBillWorking.pod}"
-                                        (itemSelected)="HouseBillWorking.pod=$event.id;activePortOfDischarge=$event.name_EN;"
-                                        [selectedDisplayFields]="['name_EN']"
+                                        (itemSelected)="HouseBillWorking.pod=$event.id;activePortOfDischarge=$event.nameEn;"
+                                        [selectedDisplayFields]="['nameEn']"
                                         [dataSources]="listPort" 
-                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'name_EN','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                                    </app-combo-grid-virtual-scroll>
                                     <!-- <div class="dropdown e--combogrid" #selectedPortOfDischarge>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"

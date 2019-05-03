@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\..\bin\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="BL\TableManager.cs" />
+    <Compile Remove="DataContextEx - Copy.cs" />
+    <Compile Remove="DataReaderEx.cs" />
+    <Compile Remove="EF\ContextBase - Copy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="LocalizationCultureCore" Version="1.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+    <PackageReference Include="mongocsharpdriver" Version="2.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ITL.NetCore.Common">
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
