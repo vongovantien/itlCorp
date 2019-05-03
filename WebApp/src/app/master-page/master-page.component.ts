@@ -40,7 +40,7 @@ export class MasterPageComponent implements OnInit,AfterViewInit {
     }, 30000);
   }
 
-  MenuChanged(event){
+  MenuChanged(event:any){
     this.Page_Info = event;      
     this.Component_name = event.children; 
   }
