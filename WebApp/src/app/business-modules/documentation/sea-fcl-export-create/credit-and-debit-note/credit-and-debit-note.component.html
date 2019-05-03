@@ -131,7 +131,7 @@
 <!--end:: m-portlet-->
 
 <!--begin:: add-credit-debit-note-modal-->
-<app-credit-and-debit-note-addnew [chargesFromRemaining]="ListChargesFromRemaining" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
+<app-credit-and-debit-note-addnew (newCDNote)="getCDNotesAfterAdd($event)" [chargesFromRemaining]="ListChargesFromRemaining" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
 <!--end:: add-credit-debit-note-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->

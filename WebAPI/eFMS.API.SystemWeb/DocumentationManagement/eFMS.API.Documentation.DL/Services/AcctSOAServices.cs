@@ -157,7 +157,7 @@ namespace eFMS.API.Documentation.DL.Services
                 listPartners = listPartners.Distinct().ToList();
                 foreach(var item in listPartners)
                 {
-                    var SOA = DataContext.Where(x => x.PartnerId == item.Id).ToList();
+                    var SOA = DataContext.Where(x => x.PartnerId == item.Id && x.JobId==JobId).ToList();
                     List<object> listSOA = new List<object>();
                     foreach(var soa in SOA)
                     {

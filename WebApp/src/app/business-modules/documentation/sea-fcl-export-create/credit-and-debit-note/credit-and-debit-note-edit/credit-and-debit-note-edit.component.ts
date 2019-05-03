@@ -60,11 +60,7 @@ export class CreditAndDebitNoteEditComponent implements OnInit {
       }
 
     }
-
-
-
-    // console.log(this.EditingCDNote.listShipmentSurcharge);
-    // console.log(this.listChargeOfPartner);
+    
     this.totalCreditDebitCalculate();
     this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
     this.addNewRemainingCharges.emit(this.constListChargeOfPartner);

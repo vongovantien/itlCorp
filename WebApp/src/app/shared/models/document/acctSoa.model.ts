@@ -3,6 +3,7 @@ import { CsShipmentSurcharge } from "./csShipmentSurcharge";
 export class AcctSOA {
     id: String = "00000000-0000-0000-0000-000000000000" ;
     code: String = null ;
+    jobId: String = null;
     branchId: String = "00000000-0000-0000-0000-000000000000" ;
     partnerId: String = null ;
     partnerName: String = null ;
