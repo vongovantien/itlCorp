@@ -23,8 +23,8 @@ export class PaginationComponent implements OnInit {
   // pager object
   pager: any = {};
   ngOnInit() {   
-    this.setPage(1);
-    //this.getPages(1);
+    //this.setPage(1);
+    this.getPages(1);
   }
 
   sendBackData() {

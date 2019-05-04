@@ -5,7 +5,6 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
-
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
         public string JobNo { get; set; }
@@ -48,12 +47,12 @@ namespace eFMS.API.Documentation.Service.Models
         public string Notes { get; set; }
         public bool? Locked { get; set; }
         public DateTime? LockedDate { get; set; }
+        public string TransactionType { get; set; }
         public string UserCreated { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string UserModified { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-
     }
 }

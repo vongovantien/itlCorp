@@ -50,11 +50,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return new { fromCurrencies, toCurrencies };
         }
 
-        public CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest()
+        public CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest(string currencyToId)
         {
             var lastRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.OrderByDescending(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).FirstOrDefault();
             if (lastRate == null) return null;
-            var lvCatPlace = GetExchangeRateNewest();
+            var lvCatPlace = GetExchangeRateNewest(currencyToId);
             var result = new CurrencyExchangeNewestViewModel
             {
                 DatetimeModified = lastRate.DatetimeModified ?? lastRate.DatetimeCreated,
@@ -63,28 +63,10 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        private List<vw_catCurrencyExchangeNewest> GetExchangeRateNewest()
+        private List<vw_catCurrencyExchangeNewest> GetExchangeRateNewest(string currencyToId)
         {
             List<vw_catCurrencyExchangeNewest> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
-            int currentMonth = DateTime.Now.Month;
-            foreach(var item in lvCatPlace)
-            {
-                if(item.DatetimeCreated.Value.Date != DateTime.Now.Date)
-                {
-                    var exchangeRate = new CatCurrencyExchange
-                    {
-                        CurrencyFromId = item.CurrencyFromID,
-                        CurrencyToId = "VND",
-                        Rate = item.Rate,
-                        UserCreated = "system",
-                        DatetimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now,
-                        Inactive = false
-                    };
-                    ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Add(exchangeRate);
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
-                }
-            }
+            if(!string.IsNullOrEmpty(currencyToId)) lvCatPlace = lvCatPlace.Where(x => x.CurrencyToID == currencyToId).ToList();
             return lvCatPlace;
         }
 
@@ -104,7 +86,8 @@ namespace eFMS.API.Catalogue.DL.Services
             result.LocalCurrency = localCurrency;
             result.DatetimeCreated = lastRate.DatetimeCreated;
             result.DatetimeModified = lastRate.DatetimeModified?? lastRate.DatetimeCreated;
-            result.UserModifield = lastRate != null ? (lastRate.UserModified!= null ?(users.FirstOrDefault(x => x.ID == lastRate.UserModified).Username): null) ?? (users.FirstOrDefault(x => x.ID == lastRate.UserCreated).Username) : null;
+            result.UserModifield = lastRate != null ? (lastRate.UserModified!= null ?(users.FirstOrDefault(x => x.ID == lastRate.UserModified)?.Username): null) 
+                ?? (users.FirstOrDefault(x => x.ID == lastRate.UserCreated)?.Username) : null;
 
             result.ExchangeRates = new List<vw_catCurrencyExchangeNewest>();
             foreach (var item in data)
@@ -123,12 +106,21 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatCurrencyExchangeHistory> Paging(CatCurrencyExchangeCriteria criteria, int page, int size, out int rowsCount)
         {
             var users = ((eFMSDataContext)DataContext.DC).GetViewData<vw_sysUser>();
-            var data = Get(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            var exchanges = DataContext.Get(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                 && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
                                 && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null)
-                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null))
-                                .Join(users, x => x.UserCreated, y => y.ID, (x, y) => new { x, y }).OrderByDescending(x => x.x.DatetimeCreated);
-            var dateCreateds = data.GroupBy(x => x.x.DatetimeCreated.Value.Date)
+                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null));
+            var data = (from ex in exchanges
+                        join u in users on ex.UserCreated equals u.ID into grpUsers
+                        from user in grpUsers.DefaultIfEmpty()
+                        select new { ex, user }).OrderByDescending(x => x.ex.DatetimeCreated);
+            //var data = Get(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            //                    && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
+            //                    && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null)
+            //                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null))
+            //                    .Join(users, x => x.UserCreated, y => y.ID, (x, y) => new { x, y })
+            //                    .OrderByDescending(x => x.x.DatetimeCreated);
+            var dateCreateds = data.GroupBy(x => x.ex.DatetimeCreated.Value.Date)
                 .Select(x => x);
             rowsCount = dateCreateds.Count();
             if (rowsCount == 0) return null;
@@ -143,13 +135,22 @@ namespace eFMS.API.Catalogue.DL.Services
             List<CatCurrencyExchangeHistory> results = new List<CatCurrencyExchangeHistory>();
             foreach (var item in dateCreateds)
             {
-                var date = data.Where(x => x.x.DatetimeCreated.Value.Date == item.Key).OrderBy(x => x.x.DatetimeCreated == item.Key).First();
+                var date = data.Where(x => x.ex.DatetimeCreated.Value.Date == item.Key)
+                                .OrderBy(x => x.ex.DatetimeCreated == item.Key).First();
+                var userName = "system";
+                if(date.ex.UserModified != null)
+                {
+                    if(date.ex.UserModified != "system")
+                    {
+                        userName = date.user.Username;
+                    }
+                }
                 var rate = new CatCurrencyExchangeHistory
                 {
                     DatetimeCreated = item.Key,
-                    UserModifield = date.x.UserModified==null? date.y.Username: (users.FirstOrDefault(x => x.ID == date.x.UserModified)?.Username),
-                    LocalCurrency = date.x.CurrencyToId,
-                    DatetimeUpdated = date.x.DatetimeModified ?? date.x.DatetimeCreated
+                    UserModifield = userName,
+                    LocalCurrency = date.ex.CurrencyToId,
+                    DatetimeUpdated = date.ex.DatetimeModified ?? date.ex.DatetimeCreated
                 };
                 results.Add(rate);
             }

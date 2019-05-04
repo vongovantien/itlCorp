@@ -6,13 +6,14 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatCommodityGroupService : IRepositoryBase<CatCommodityGroup, CatCommodityGroupModel>
     {
-        List<CatCommodityGroupModel> Query(CatCommodityGroupCriteria criteria);
+        IQueryable<CatCommodityGroupModel> Query(CatCommodityGroupCriteria criteria);
         List<CatCommodityGroupModel> Paging(CatCommodityGroupCriteria criteria, int page, int size, out int rowsCount);
         List<CatCommodityGroupViewModel> GetByLanguage();
         List<CommodityGroupImportModel> CheckValidImport(List<CommodityGroupImportModel> list);

@@ -124,6 +124,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.InvoiceNo).HasMaxLength(100);
 
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
                 entity.Property(e => e.PaidBehalfPrice).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.PaidDate).HasColumnType("smalldatetime");
@@ -1437,8 +1439,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2057,6 +2057,11 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.TransactionType)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.TypeOfService)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2227,8 +2232,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-
             });
 
             modelBuilder.Entity<SysAuthorization>(entity =>

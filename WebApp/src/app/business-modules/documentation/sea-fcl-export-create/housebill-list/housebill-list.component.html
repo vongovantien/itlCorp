@@ -1169,7 +1169,7 @@
 <!--end:: m-portlet-->
 
 
-<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm"
+<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm" 
     (ngSubmit)="addBuyingRateChargeForm.form.valid">
     <!--begin:: add-buying-rate-modal-->
     <div class="modal fade" id="add-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -1179,12 +1179,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add buying charge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('add-buying-rate-modal',addBuyingRateChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
 
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -1235,7 +1235,7 @@
                                                                      BuyingRateChargeToAdd.vatrate=item.charge.vatrate;
                                                                      selectedBuyingChargeCode.value=item.charge.code;
                                                                      selectedBuyingCharge.value=item.charge.chargeNameEn;
-                                                                     selectedBuyingUnit.value=item.unit;"
+                                                                     selectedBuyingUnit.value=item.unit;calculateTotalEachBuying()"
                                                                 [ngClass]="{'data-selected':BuyingRateChargeToAdd.chargeId!==null && BuyingRateChargeToAdd.chargeId==item.charge.id}">
                                                                 <td>{{item.charge.code}}</td>
                                                                 <td>{{item.charge.chargeNameEn}}</td>
@@ -1538,7 +1538,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-buying-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-buying-rate-modal',addBuyingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -1563,11 +1563,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit buying rate</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('edit-buying-rate-modal',editBuyingRateChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -1617,7 +1617,7 @@
                                                                  BuyingRateChargeToEdit.vatrate=item.charge.vatrate;                                                                 
                                                                  BuyingRateChargeToEdit.nameEn=item.charge.chargeNameEn;
                                                                  BuyingRateChargeToEdit.chargeCode=item.charge.code;
-                                                                 selectedBuyingUnitEdt.value=item.unit;"
+                                                                 selectedBuyingUnitEdt.value=item.unit;calculateTotalEachBuying(true)"
                                                                 [ngClass]="{'data-selected':BuyingRateChargeToEdit.chargeId!==null && BuyingRateChargeToEdit.chargeId==item.charge.id}">
                                                                 <td>{{item.charge.code}}</td>
                                                                 <td>{{item.charge.chargeNameEn}}</td>
@@ -1935,7 +1935,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-buying-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-buying-rate-modal',editBuyingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -1960,11 +1960,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add selling charge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('add-selling-rate-modal',addSellingRateChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -2014,7 +2014,7 @@
                                                             SellingRateChargeToAdd.vatrate = item.charge.vatrate;
                                                             selectedSellingChargeCode.value=item.charge.code;
                                                             selectedSellingCharge.value=item.charge.chargeNameEn;
-                                                            selectedSellingUnit.value=item.unit;">
+                                                            selectedSellingUnit.value=item.unit;calculateTotalEachSelling()">
                                                                 <td>{{item.charge.code}}</td>
                                                                 <td>{{item.charge.chargeNameEn}}</td>
                                                                 <td>{{item.charge.chargeNameVn}}</td>
@@ -2296,7 +2296,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-selling-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-selling-rate-modal',addSellingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2315,7 +2315,7 @@
 <form novalidate #editSellingRateChargeForm="ngForm" name="editSellingRateChargeForm"
     *ngIf="SellingRateChargeToEdit!=null">
     <!--begin:: edit-selling-rate-modal-->
-    <div class="modal fade" id="edit-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    <div class="modal fade" id="edit-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby="" (click)="resetChargeForm('edit-selling-rate-modal',editSellingRateChargeForm)"
         aria-hidden="true">
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
@@ -2325,7 +2325,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -2375,7 +2375,7 @@
                                                                 SellingRateChargeToEdit.vatrate=item.charge.vatrate;                                                                 
                                                                 SellingRateChargeToEdit.nameEn=item.charge.chargeNameEn;
                                                                 SellingRateChargeToEdit.chargeCode=item.charge.code;
-                                                                selectedSellingUnitEdt.value=item.unit;"
+                                                                selectedSellingUnitEdt.value=item.unit;calculateTotalEachSelling(true)"
                                                                 [ngClass]="{'data-selected':SellingRateChargeToEdit.chargeId!==null && SellingRateChargeToEdit.chargeId==item.charge.id}">
                                                                 <td>{{item.charge.code}}</td>
                                                                 <td>{{item.charge.chargeNameEn}}</td>
@@ -2674,7 +2674,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-selling-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-selling-rate-modal',editSellingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2697,11 +2697,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add OBH charge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('add-obh-charge-modal',addOBHChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -2751,7 +2751,7 @@
                                                             OBHChargeToAdd.vatrate = item.charge.vatrate;
                                                             selectedOBHChargeCode.value=item.charge.code;
                                                             selectedOBHCharge.value=item.charge.chargeNameEn;
-                                                            selectedOBHUnit.value=item.unit;">
+                                                            selectedOBHUnit.value=item.unit;calculateTotalEachOBH()">
                                                                 <td>{{item.charge.code}}</td>
                                                                 <td>{{item.charge.chargeNameEn}}</td>
                                                                 <td>{{item.charge.chargeNameVn}}</td>
@@ -3068,7 +3068,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-charge-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-charge-modal',addOBHChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -3092,11 +3092,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit OBH rate</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('edit-obh-rate-modal',editOBHChargeForm)"> 
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -3146,7 +3146,7 @@
                                                             OBHChargeToEdit.unitPrice=item.charge.unitPrice;
                                                             OBHChargeToEdit.vatrate = item.charge.vatrate;
                                                             OBHChargeToEdit.chargeCode=item.charge.code;
-                                                            OBHChargeToEdit.unit=item.unit;">
+                                                            OBHChargeToEdit.unit=item.unit;calculateTotalEachOBH(true)">
                                                                 <td>{{item.charge.code}}</td>
                                                                 <td>{{item.charge.chargeNameEn}}</td>
                                                                 <td>{{item.charge.chargeNameVn}}</td>
@@ -3471,7 +3471,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-obh-rate-modal')">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-obh-rate-modal',editOBHChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

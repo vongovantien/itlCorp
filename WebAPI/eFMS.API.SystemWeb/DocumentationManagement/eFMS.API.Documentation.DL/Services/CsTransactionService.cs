@@ -13,6 +13,7 @@ using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Common;
+using System.Data.SqlClient;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -26,6 +27,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
@@ -138,8 +140,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var result = mapper.Map<CsTransactionModel>(data);
                 if (result.ColoaderId != null) result.SupplierName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.ColoaderId).PartnerNameEn;
                 if (result.AgentId != null) result.AgentName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.AgentId).PartnerNameEn;
-                if (result.Pod != null) result.PODName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pod).NameEn;
-                if (result.Pol != null) result.POLName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pol).NameEn;
+                if (result.Pod != null) result.PODName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pod)?.NameEn;
+                if (result.Pol != null) result.POLName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pol)?.NameEn;
                 return result;
             }
         }
@@ -340,7 +342,7 @@ namespace eFMS.API.Documentation.DL.Services
                 x.RequestedDate,
                 x.FlightVesselName,
                 x.VoyNo,
-                x.FlightVesselConfirmedDate,
+                //x.FlightVesselConfirmedDate,
                 x.ShipmentType,
                 x.ServiceMode,
                 x.Commodity,
@@ -383,7 +385,7 @@ namespace eFMS.API.Documentation.DL.Services
                 RequestedDate = x.Key.RequestedDate,
                 FlightVesselName = x.Key.FlightVesselName,
                 VoyNo = x.Key.VoyNo,
-                FlightVesselConfirmedDate = x.Key.FlightVesselConfirmedDate,
+                //FlightVesselConfirmedDate = x.Key.FlightVesselConfirmedDate,
                 ShipmentType = x.Key.ShipmentType,
                 ServiceMode = x.Key.ServiceMode,
                 Commodity = x.Key.Commodity,
@@ -394,12 +396,12 @@ namespace eFMS.API.Documentation.DL.Services
                 RouteShipment = x.Key.RouteShipment,
                 Notes = x.Key.Notes,
                 Locked = x.Key.Locked,
-                LockedDate = x.Key.LockedDate,
+                //LockedDate = x.Key.LockedDate,
                 UserCreated = x.Key.UserCreated,
                 CreatedDate = x.Key.CreatedDate,
                 ModifiedDate = x.Key.ModifiedDate,
                 Inactive = x.Key.Inactive,
-                InactiveOn = x.Key.InactiveOn,
+                //InactiveOn = x.Key.InactiveOn,
                 SupplierName = x.Key.SupplierName,
                 CreatorName = x.Key.CreatorName,
                 SumCont = x.Key.SumCont,
@@ -417,16 +419,18 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
-        public IQueryable<vw_csTransaction> Query(CsTransactionCriteria criteria)
+        public IQueryable<sp_GetTransaction> Query(CsTransactionCriteria criteria)
         {
-            var list = GetView();
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            var list = GetView(transactionType);
+            if (list.Count == 0) return null;
             var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer;
             
             var query = (from transaction in list
                          join container in containers on transaction.ID equals container.Mblid into containerTrans
                          from cont in containerTrans.DefaultIfEmpty()
                          select new { transaction, cont?.ContainerNo, cont?.SealNo });
-            IQueryable<vw_csTransaction> results = null;
+            IQueryable<sp_GetTransaction> results = null;
 
             if (criteria.All == null)
             {
@@ -468,6 +472,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                //model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 //transaction.UserModified = "01";
@@ -503,10 +508,15 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        private List<vw_csTransaction> GetView()
+        private List<sp_GetTransaction> GetView(string transactionType)
         {
-            List<vw_csTransaction> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_csTransaction>();
-            return lvCatPlace;
+            //string transactionType = "SeaFCLExport";
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName="@transactionType", Value = transactionType }
+            };
+            //List<vw_csTransaction> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_csTransaction>();
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetTransaction>(parameters);
+            return list;
         }
     }
 }

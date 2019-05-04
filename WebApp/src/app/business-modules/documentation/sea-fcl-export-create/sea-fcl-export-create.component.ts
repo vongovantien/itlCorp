@@ -16,6 +16,7 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 import {ExtendData} from '../extend-data';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as stringHelper from 'src/helper/string.helper';
+import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 
 
 export class FirstLoadData {
@@ -37,7 +38,7 @@ export class SeaFclExportCreateComponent implements OnInit {
 
     _firstLoadData:FirstLoadData = new FirstLoadData();
     
-    shipment: CsTransaction = new CsTransaction();
+    shipment: CsTransaction;
     containerTypes: any[] = [];
     lstMasterContainers: any[] = [];
     lstContainerTemp: any[];
@@ -94,7 +95,9 @@ export class SeaFclExportCreateComponent implements OnInit {
                     podName: this.shipment.podName,
                     coloaderName: this.shipment.coloaderName,
                     agentName: this.shipment.agentName,
-                    personInChargeName: this.shipment.personInChargeName
+                    personInChargeName: this.shipment.personInChargeName,
+                    mawb: this.shipment.mawb,
+                    
                 });
             }
         }
@@ -133,12 +136,15 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
     async ngOnInit() {
+        this.baseServices.spinnerShow();
         await this.route.params.subscribe(async prams => {
+            this.shipment = new CsTransaction();
+            this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
             if(prams.id != undefined){
                 this.inEditing = true;
                 this.shipment.id = prams.id;         
                 await this.getTotalProfit();      
-                await this.getShipmentDetail(this.shipment.id);
+                //await this.getShipmentDetail(this.shipment.id);
                 await this.getShipmentContainer(this.shipment.id);
                 this.housebillTabviewHref = "#housebill-tabview-tab";
                 this.housebillRoleToggle = "tab";
@@ -292,7 +298,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.getComodities(keySearch);
     }
     validateShipmentForm(){
-        if(this.lstMasterContainers.find(x => x.isNew == false) != null){
+        if(this.lstMasterContainers != null){
             this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
         }
         if(this.myForm.value.estimatedTimeofDepature != null){
@@ -382,14 +388,15 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(response != null){
             if(response.result.success){
                 this.shipment = response.model;
-                this.isHouseBill = true;
+                this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
+                this.isShipment = true;
+                this.isHouseBill = false;
                 this.isCDnote = false;
-                this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
                 this.isLoaded = false;
-                if(this.inEditing == false){
-                    this.activeTab();
-                }
+                // if(this.inEditing == false){
+                //     this.activeTab();
+                // }
                 this.inEditing = true;
                 setTimeout(() => {
                     this.isLoaded = true;
@@ -409,23 +416,25 @@ export class SeaFclExportCreateComponent implements OnInit {
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, true);
         if(response != null){
             if(response.result.success){
+                this.submitted = false;
                 this.shipment = response.model;
-                this.isHouseBill = true;
+                this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
+                this.isShipment = true;
+                this.isHouseBill = false;
                 this.isCDnote = false;
-                this.isShipment = false;
                 this.router.navigate(["/home/documentation/sea-fcl-export-create/",{ id: this.shipment.id }]);
-                this.isLoaded = false;
-                if(this.inEditing == false){
-                    this.activeTab();
-                }
+                //this.isLoaded = false;
+                // if(this.inEditing == false){
+                //     this.activeTab();
+                // }
                 this.inEditing = true;
-                setTimeout(() => {
-                    this.isLoaded = true;
-                  }, 300);
+                // setTimeout(() => {
+                //     this.isLoaded = true;
+                //   }, 300);
             }
         }
-        this.housebillTabviewHref = "#housebill-tabview-tab";
-        this.housebillRoleToggle = "tab";
+        // this.housebillTabviewHref = "#housebill-tabview-tab";
+        // this.housebillRoleToggle = "tab";
     }
     cancelSaveJob() {
         $('#confirm-create-job-modal').modal('hide');
@@ -852,9 +861,12 @@ export class SeaFclExportCreateComponent implements OnInit {
     }
 
 
-    shipmentDetails:any = null;
+
     shipmentDetailCatcher(shipmentDetails:any){
-        this.shipmentDetails =  shipmentDetails;
+        this.shipment = shipmentDetails;
+        this.shipment.csMawbcontainers = this.lstMasterContainers;
+        ExtendData.currentJobID = shipmentDetails.id;
+        this.baseServices.spinnerHide();
     }
 
     currentHouseBill:any = null;

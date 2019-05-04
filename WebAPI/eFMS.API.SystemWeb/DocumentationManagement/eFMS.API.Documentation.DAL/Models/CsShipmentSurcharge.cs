@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string CurrencyId { get; set; }
         public bool? IncludedVat { get; set; }
         public decimal? Vatrate { get; set; }
-        public decimal? Total { get; set; }
+        public decimal Total { get; set; }
         public string PayerId { get; set; }
         public string ReceiverObject { get; set; }
         public string ReceiverId { get; set; }

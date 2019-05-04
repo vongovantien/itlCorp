@@ -177,11 +177,17 @@ export class CommodityComponent implements OnInit {
       if(event.field == "commodityGroupNameEn"){
         this.criteria.commodityGroupNameEn = event.searchString;
       }
+      if(event.field == "code"){
+        this.criteria.code = event.searchString;
+      }
     }
-    this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
     this.getCommodities(this.pager);
   }
   searchCommodityGroup(event: any): any {
+    if(event.searchString == ""){
+      event.searchString = null;
+    }
     if(event.field == "All"){
       this.criteria.all = event.searchString;
     }
@@ -327,6 +333,7 @@ export class CommodityComponent implements OnInit {
         this.formCommodity.onReset();
         this.commodity = new Commodity();
         $('#' + this.nameCommodityModal).modal('hide');
+        this.pager.totalItems = 0;
         await this.getCommodities(this.pager);
         this.setPageAfterAdd();
       }
@@ -350,9 +357,11 @@ export class CommodityComponent implements OnInit {
     if (response){
       this.getGroups();
       //await this.getGroupCommodities(this.pager);
-      this.pager.totalItems = this.pager.totalItems + 1;
-      this.pager.currentPage = 1;
-      this.child.setPage(this.pager.currentPage);
+      //this.pager.totalItems = this.pager.totalItems + 1;
+      //this.pager.currentPage = 1;
+      this.pager.totalItems = 0;
+      //this.child.setPage(this.pager.currentPage);
+      this.getCommodities(this.pager);
       this.formGroupCommodity.onReset();
       this.commodityGroup = new CommodityGroup();
       $('#' + this.nameGroupModal).modal('hide');
@@ -372,12 +381,12 @@ export class CommodityComponent implements OnInit {
     if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = new CommodityGroup();
       this.formGroupCommodity.onReset();
-      this.setPage(this.pager);
+      // this.setPage(this.pager);
     }
     if(tabName == this.tabName.commodity){
       this.commodity = new Commodity();
       this.formCommodity.onReset();
-      this.setPage(this.pager);
+      // this.setPage(this.pager);
     }
   }
   public removed(value:any):void {

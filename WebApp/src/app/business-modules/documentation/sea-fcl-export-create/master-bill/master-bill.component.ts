@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit, AfterContentChecked, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewInit, AfterContentChecked, AfterViewChecked, OnChanges } from '@angular/core';
 import moment from 'moment/moment';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -8,33 +8,24 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
+import cloneDeep from 'lodash/cloneDeep';
+import { isFormattedError } from '@angular/compiler';
+import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 
 @Component({
     selector: 'app-master-bill',
     templateUrl: './master-bill.component.html',
     styleUrls: ['./master-bill.component.scss']
 })
-export class MasterBillComponent implements OnInit, AfterViewInit{
-    ngAfterViewInit(): void {
-        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
-            this.inEditing = true;
-            console.log(this.shipment.etd);
-            if(this.isImport == false){
-                this.etdSelected = { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) };
-                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
-            }
-            else{
-                this.etaSelected = null;
-                this.etaSelected = null;
-            }
-        }
+export class MasterBillComponent implements OnInit, OnChanges {
+    async ngOnChanges(changes: import("@angular/core").SimpleChanges) {
+        //this.baseServices.spinnerShow();
     }
-
     @Input()shipment: CsTransaction;
     @Input()isImport: boolean;
     @Input() formAddEdit: NgForm;
     @Input() submitted: boolean;
-    @Input() isLoaded: boolean;
+    //@Input() isLoaded: boolean;
     @Output() shipmentDetails = new EventEmitter<any>();
     terms: any[];
     shipmentTypes: any[];
@@ -59,7 +50,7 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         private api_menu: API_MENU) { }
 
     async ngOnInit() {
-        this.baseServices.spinnerShow();
+        console.log(this.shipment);
         await this.getPortLoading(null);
         await this.changePortDestination(null);
         await this.getColoaders(null);
@@ -67,12 +58,33 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         await this.getUserInCharges(null);
         await this.getShipmentCommonData();
         let index = -1;
-        if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+        if(this.shipment == null){
+            this.shipment = new CsTransaction();
+            this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
+            index = this.terms.findIndex(x => x.id == "Prepaid");
+            if(index > -1){
+                this.shipment.paymentTerm = this.terms[index].id;
+                this.paymentTermActive = [this.terms[index]];
+            } 
+            index = this.shipmentTypes.findIndex(x => x.id == "Freehand");
+            if(index > -1){
+                this.shimentTypeActive = [this.shipmentTypes[index]];
+                this.shipment.shipmentType = this.shipmentTypes[index].id;
+            } 
+        }
+        else if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
+            await this.getShipmentDetail(this.shipment.id);
+            if(this.isImport == false){
+                this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
+                this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
+            }
+            else{
+                this.etdSelected = null;
+                this.etaSelected = null;
+            }
             this.inEditing = true;
-            console.log(this.shipment.etd);
+            console.log(this.shipment.etd);         
             if(this.isImport == true){
-                // this.etaSelected = null;
-                // this.etaSelected = null;
                 let claim = localStorage.getItem('id_token_claims_obj');
                 index = this.userInCharges.findIndex(x => x.id == JSON.parse(claim)["id"]);
                 if(index > -1) {
@@ -115,21 +127,12 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
             }
                   
         }
-        else{
-            index = this.terms.findIndex(x => x.id == "Prepaid");
-            if(index > -1){
-                this.shipment.paymentTerm = this.terms[index].id;
-                this.paymentTermActive = [this.terms[index]];
-            } 
-            index = this.shipmentTypes.findIndex(x => x.id == "Freehand");
-            if(index > -1){
-                this.shimentTypeActive = [this.shipmentTypes[index]];
-                this.shipment.shipmentType = this.shipmentTypes[index].id;
-            } 
-        }
         this.shipmentDetails.emit(Object.assign({},this.shipment));    
-        this.isLoaded = true;
-        this.baseServices.spinnerHide();
+        //this.isLoaded = true;
+    }
+    async getShipmentDetail(id: string) {
+        this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
+        //ExtendData.currentJobID = this.shipment.id;
     }
     changePortLoading(keySearch: any) {
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
@@ -174,9 +177,9 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
         }
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfLadings = portIndexs.data;
+            this.portOfLadings = portIndexs;
             console.log(this.portOfLadings);
         }
         else{
@@ -188,10 +191,10 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             portSearchIndex.inactive = null;
         }
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfDestinations = portIndexs.data;
-            console.log(this.portOfLadings);
+            this.portOfDestinations = portIndexs;
+            console.log(this.portOfDestinations);
         }
         else{
             this.portOfDestinations = [];
@@ -203,9 +206,9 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchColoader.inactive = null;
         }
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchColoader, false, false);
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query , criteriaSearchColoader, false, false);
         if (partners != null) {
-            this.coloaders = partners.data;
+            this.coloaders = partners;
             console.log(this.coloaders);
         }
         else{
@@ -217,9 +220,9 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchAgent.inactive = null;
         }
-        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=20", criteriaSearchAgent, false, false);
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchAgent, false, false);
         if (partners != null) {
-            this.agents = partners.data;
+            this.agents = partners;
         }
         else{
             this.agents = [];
@@ -301,4 +304,5 @@ export class MasterBillComponent implements OnInit, AfterViewInit{
     public refreshValue(value: any): void {
         this.value = value;
     }
+
 }

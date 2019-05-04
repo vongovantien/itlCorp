@@ -33,7 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityService catComonityService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
+        //private string templateName = "ImportTemplate.xlsx";
         public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -80,8 +80,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var commonity = mapper.Map<CatCommodityModel>(model);
             commonity.UserCreated = currentUser.UserID;
-            commonity.DatetimeCreated = DateTime.Now;
-            commonity.Inactive = false;
             var hs = catComonityService.Add(commonity);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -101,15 +99,10 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var commonity = mapper.Map<CatCommodityModel>(model);
-            commonity.UserModified = currentUser.UserID;
-            commonity.DatetimeModified = DateTime.Now;
-            commonity.Id = id;
-            if (commonity.Inactive == true)
-            {
-                commonity.InactiveOn = DateTime.Now;
-            }
-            var hs = catComonityService.Update(commonity, x => x.Id == id);
+            var commodity = mapper.Map<CatCommodityModel>(model);
+            commodity.Id = id;
+            commodity.UserModified = currentUser.UserID;
+            var hs = catComonityService.Update(commodity);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -123,7 +116,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Delete(short id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catComonityService.Delete(x => x.Id == id);
+            var hs = catComonityService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -163,19 +156,23 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
-                if (worksheet.Cells[1, 1].Value?.ToString() != "English Name")
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Code")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Code'" });
                 }
-                if (worksheet.Cells[1, 2].Value?.ToString() != "Local Name")
+                if (worksheet.Cells[1, 2].Value?.ToString() != "English Name")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'Local Name'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'English Name'" });
                 }
-                if (worksheet.Cells[1, 3].Value?.ToString() != "Commodity Group ID")
+                if (worksheet.Cells[1, 3].Value?.ToString() != "Local Name")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Commodity Group ID'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Local Name'" });
                 }
-                if (worksheet.Cells[1, 4].Value?.ToString() != "Status")
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Commodity Group ID")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Commodity Group ID'" });
+                }
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Status")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Status'" });
                 }
@@ -185,10 +182,11 @@ namespace eFMS.API.Catalogue.Controllers
                     var commodity = new CommodityImportModel
                     {
                         IsValid = true,
-                        CommodityNameEn = worksheet.Cells[row, 1].Value?.ToString(),
-                        CommodityNameVn = worksheet.Cells[row, 2].Value?.ToString(),
-                        CommodityGroupId = worksheet.Cells[row, 3].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 3].Value),
-                        Status = worksheet.Cells[row,4].Value?.ToString()
+                        Code = worksheet.Cells[row, 1].Value?.ToString(),
+                        CommodityNameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                        CommodityNameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                        CommodityGroupId = worksheet.Cells[row, 4].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 4].Value),
+                        Status = worksheet.Cells[row,5].Value?.ToString()
                     };
                     list.Add(commodity);
                 }
@@ -227,7 +225,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                templateName = "Commodity" + templateName;
+                var templateName = Templates.CatCommodity.ExelImportFileName + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

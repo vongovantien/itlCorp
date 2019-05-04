@@ -135,7 +135,7 @@
                                         <label class="form-control-label" for="">
                                             Issue By <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                                 data-toggle="dropdown" placeholder="Please selected" value=""
                                                 [value]="shippingIns.issuedUserName == null?'Please selected issued user':shippingIns.issuedUserName" value="">
@@ -177,7 +177,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
+                                        <app-combo-grid-virtual-scroll 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.issuedUser}"
+                                            (itemSelected)="shippingIns.issuedUser = $event.id; shippingIns.issuedUserName=$event.employeeNameVn"
+                                            [selectedDisplayFields]="['employeeNameVn']"
+                                            [dataSources]="userIssues" 
+                                            [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
+                                        </app-combo-grid-virtual-scroll>
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.issuedUser == null">
                                             Issue by is required
                                         </div>
@@ -188,7 +195,7 @@
                                         <label class="form-control-label" for="">
                                             Supplier <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" 
                                                 [value]="shippingIns.supplierName == null?'Please selected supplier':shippingIns.supplierName"
                                                 placeholder="Please selected" value="">
@@ -232,7 +239,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="suppliers" 
+                                            [currentActiveItemId]="{field:'id',value: shippingIns.supplier}"
+                                            (itemSelected)="shippingIns.supplier = $event.id; shippingIns.supplierName=$event.partnerNameEn"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.supplier == null">
                                             Supplier is required
                                         </div>
@@ -269,7 +283,7 @@
                                         <label class="form-control-label" for="">
                                             Consignee <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
                                                 [value]="shippingIns.consigneeName == null?'Please selected consignee':shippingIns.consigneeName">
                                             <div class="dropdown-menu e--combogrid-content">
@@ -312,7 +326,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="consignees" 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.consigneeId}"
+                                            (itemSelected)="shippingIns.consigneeId = $event.id; shippingIns.consigneeName=$event.partnerNameEn"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
                                         <textarea class="form-control m-input--square" id="" rows="3"  autocomplete="nope"
                                             name="consigneeDescription" [(ngModel)]="shippingIns.consigneeDescription" #consigneeDescription="ngModel"
                                             (change)="shippingIns.consigneeDescription = shippingIns.consigneeDescription.trim()" required></textarea>
@@ -339,7 +360,7 @@
                                         <label class="form-control-label" for="">
                                             Real Shipper
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
                                                 [value]="shippingIns.actualShipperName == null?'Please selected real shipper':shippingIns.actualShipperName">
                                             <div class="dropdown-menu e--combogrid-content">
@@ -382,7 +403,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="realShippers" 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.actualShipperId}"
+                                            (itemSelected)="shippingIns.actualShipperId = $event.id; shippingIns.actualShipperName=$event.partnerNameEn"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
                                         <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
                                             name="actualShipperDescription" [(ngModel)]="shippingIns.actualShipperDescription" #actualShipperDescription="ngModel"
                                             (change)="shippingIns.actualShipperDescription = shippingIns.actualShipperDescription.trim()"></textarea>
@@ -393,7 +421,7 @@
                                         <label class="form-control-label" for="">
                                             Real Consignee
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
                                                 [value]="shippingIns.actualConsigneeName == null?'Please selected real consignee':shippingIns.actualConsigneeName">
                                             <div class="dropdown-menu e--combogrid-content">
@@ -436,7 +464,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="realConsignees" 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.actualConsigneeId}"
+                                            (itemSelected)="shippingIns.actualConsigneeId = $event.id; shippingIns.actualConsigneeName=$event.partnerNameEn"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
                                         <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
                                             name="actualConsigneeDescription" [(ngModel)]="shippingIns.actualConsigneeDescription" #actualConsigneeDescription="ngModel"
                                             (change)="shippingIns.actualConsigneeDescription = shippingIns.actualConsigneeDescription.trim()"></textarea>
@@ -485,7 +520,7 @@
                                         <label class="form-control-label" for="">
                                             Port of Loading <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
                                                 data-toggle="dropdown" [value]="shippingIns.polName == null?'Please selected port of loading':shippingIns.polName" value="">
                                             <div class="dropdown-menu e--combogrid-content">
@@ -525,7 +560,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="portOfLadings"
+                                            [currentActiveItemId]="{field:'id',value:shipment.pol}"
+                                            (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEn"
+                                            [selectedDisplayFields]="['nameEn']"                             
+                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        </app-combo-grid-virtual-scroll>   
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pol == null">
                                             Port of Loading is required
                                         </div>
@@ -536,7 +578,7 @@
                                         <label class="form-control-label" for="">
                                             Port of Discharge <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
                                                 data-toggle="dropdown" placeholder="Please selected"  [value]="shippingIns.podName == null?'Please selected port of discharge':shippingIns.podName">
                                             <div class="dropdown-menu e--combogrid-content">
@@ -576,7 +618,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="portOfDestinations"
+                                            [currentActiveItemId]="{field:'id',value:shipment.pol}"
+                                            (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEn"
+                                            [selectedDisplayFields]="['nameEn']"                             
+                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        </app-combo-grid-virtual-scroll> 
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pod == null">
                                             Port of Discharge is required
                                         </div>

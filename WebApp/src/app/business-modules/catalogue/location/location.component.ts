@@ -274,7 +274,8 @@ export class LocationComponent implements OnInit {
     if (this.selectedFilterCountryTab == "All") {
       this.searchObject.condition = "OR";
       for (var i = 1; i < this.listFilterCountryTab.length; i++) {
-        eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
+        this.searchObject[this.listFilterCountryTab[i].field] = this.searchKeyCountryTab;
+        // eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
       }
 
     } else {
@@ -283,7 +284,8 @@ export class LocationComponent implements OnInit {
       for (var i = 1; i < this.listFilterCountryTab.length; i++) {
         console.log(this.listFilterCountryTab[i].field);
         if (this.selectedFilterCountryTab == this.listFilterCountryTab[i].filter) {
-          eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
+          this.searchObject[this.listFilterCountryTab[i].field] = this.searchKeyCountryTab;
+          // eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
         }
 
       }
@@ -292,6 +294,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetCountryTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyCountryTab = "";
     this.searchObject = {};
     this.selectedFilterCountryTab = this.listFilterCountryTab[0].filter;
@@ -318,6 +322,7 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID") {
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
         await this.getCountries();
+        this.getAllCountries();
         if(response){
           this.setPageAfterAdd();
           form.onReset();
@@ -399,7 +404,7 @@ export class LocationComponent implements OnInit {
    */
 
   async searchInProvinceCityTab() {
-
+    this.pager.currentPage = 1;
     this.searchObject = {};
     this.searchObject.placeType = PlaceTypeEnum.Province; //9;
     if (this.selectedFilterProvinceCityTab == "All") {
@@ -407,9 +412,9 @@ export class LocationComponent implements OnInit {
     } else {
       this.searchObject = {};
       for (var i = 1; i < this.listFilterProvinceCityTab.length; i++) {
-        console.log(this.listFilterProvinceCityTab[i].field);
         if (this.selectedFilterProvinceCityTab == this.listFilterProvinceCityTab[i].filter) {
-          eval("this.searchObject[this.listFilterProvinceCityTab[i].field]=this.searchKeyProvinceTab");
+          this.searchObject[this.listFilterProvinceCityTab[i].field] = this.searchKeyProvinceTab;
+          // eval("this.searchObject[this.listFilterProvinceCityTab[i].field]=this.searchKeyProvinceTab");
         }
 
       }
@@ -418,6 +423,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetProvinceCityTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyProvinceTab = "";
     this.searchObject = {};
     this.selectedFilterProvinceCityTab = this.listFilterProvinceCityTab[0].filter;
@@ -516,7 +523,8 @@ export class LocationComponent implements OnInit {
       for (var i = 1; i < this.listFilterDistrictTab.length; i++) {
         console.log(this.listFilterDistrictTab[i].field);
         if (this.selectedFilterDistrictTab == this.listFilterDistrictTab[i].filter) {
-          eval("this.searchObject[this.listFilterDistrictTab[i].field]=this.searchKeyDistrictTab");
+          this.searchObject[this.listFilterDistrictTab[i].field] = this.searchKeyDistrictTab;
+          // eval("this.searchObject[this.listFilterDistrictTab[i].field]=this.searchKeyDistrictTab");
         }
 
       }
@@ -525,6 +533,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetDistrictTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyDistrictTab = "";
     this.searchObject = {};
     this.selectedFilterDistrictTab = this.listFilterDistrictTab[0].filter;
@@ -640,7 +650,8 @@ export class LocationComponent implements OnInit {
       this.searchObject = {};
       for (var i = 1; i < this.listFilterWardTab.length; i++) {
         if (this.selectedFilterWardTab == this.listFilterWardTab[i].filter) {
-          eval("this.searchObject[this.listFilterWardTab[i].field]=this.searchKeyWardTab");
+          this.searchObject[this.listFilterWardTab[i].field] = this.searchKeyWardTab;
+          // eval("this.searchObject[this.listFilterWardTab[i].field]=this.searchKeyWardTab");
         }
 
       }
@@ -650,6 +661,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetWardTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyWardTab = "";
     this.searchObject = {};
     this.selectedFilterWardTab = this.listFilterWardTab[0].filter;

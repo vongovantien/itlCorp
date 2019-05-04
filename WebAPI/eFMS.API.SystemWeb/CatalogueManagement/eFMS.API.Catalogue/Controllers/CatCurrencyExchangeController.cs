@@ -48,9 +48,9 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         [HttpGet("GetNewest")]
-        public IActionResult GetNewest()
+        public IActionResult GetNewest(string currencyToId)
         {
-            var result = catCurrencyExchangeService.GetCurrencyExchangeNewest();
+            var result = catCurrencyExchangeService.GetCurrencyExchangeNewest(currencyToId);
             return Ok(result);
         }
         [HttpGet("GetExchangeRatesBy")]

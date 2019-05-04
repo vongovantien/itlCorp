@@ -7,6 +7,7 @@ namespace eFMS.API.Documentation.Service.Models
     {
         public Guid Id { get; set; }
         public string Code { get; set; }
+        public Guid JobId { get; set; }
         public Guid BranchId { get; set; }
         public string PartnerId { get; set; }
         public string Type { get; set; }

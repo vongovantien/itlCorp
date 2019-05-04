@@ -36,7 +36,7 @@ export class CurrencyComponent implements OnInit {
     settingFields: this.currenciesSettings,
     typeSearch: TypeSearch.outtab
   };
-  keySortDefault = "id";
+  keySortDefault = "";
   isDesc: boolean = true;
   nameModal: string = 'edit-currency-modal';
   titleAddModal: string = 'Add currency';
@@ -67,10 +67,13 @@ export class CurrencyComponent implements OnInit {
     private api_menu: API_MENU) { }
 
   ngOnInit() {
-    this.pager.totalItems = 0;
+    this.initPager();
     this.getCurrencies(this.pager);
   }
-
+  initPager(): any {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
+  }
   async getCurrencies(pager: PagerSetting) {
     this.baseService.spinnerShow();
     console.log(this.criteria);
@@ -106,12 +109,13 @@ export class CurrencyComponent implements OnInit {
         this.criteria.currencyName = event.searchString;
       }
     }
-    this.pager.currentPage = 1;
+    this.initPager();
     this.getCurrencies(this.pager);
   }
 
   resetSearch(event) {
     this.criteria = {};
+    this.onSearch(event);
   }
   onSortChange(column) {
     if (column.dataType != 'boolean') {
@@ -122,6 +126,7 @@ export class CurrencyComponent implements OnInit {
   }
   showAdd() {
     this.isAddnew = true;
+    this.form.onReset();
     this.currency = new catCurrency();
   }
   onCancel() {

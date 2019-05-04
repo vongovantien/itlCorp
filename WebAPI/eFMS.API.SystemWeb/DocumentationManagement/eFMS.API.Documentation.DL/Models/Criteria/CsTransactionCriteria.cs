@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Documentation.DL.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,5 +20,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string ContainerNo { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public TransactionTypeEnum TransactionType { get; set; }
     }
 }

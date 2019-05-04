@@ -16,7 +16,7 @@
 
   //------------start: partner data
   "MSG_PARTNER_TAXCODE_EMPTY": "Tax code is not allow empty!|wrong",
-  "MSG_PARTNER_TAXCODE_NOT_NUMBER": "Tax code must be number type!|wrong",
+  "MSG_PARTNER_TAXCODE_NOT_NUMBER": "Tax code must be number type and greater than 0!|wrong",
   "MSG_PARTNER_TAXCODE_EXISTED": "Tax code {0} has been existed!|wrong",
   "MSG_PARTNER_GROUP_EMPTY": "Partner group is not allow empty!|wrong",
   "MSG_PARTNER_GROUP_NOT_FOUND": "Partner group {0} is not found!|wrong",
@@ -48,9 +48,9 @@
   "MSG_PLACE_CODE_EMPTY": "Cde is not allow empty!|wrong",
   "MSG_PLACE_CODE_EXISTED": "Code {0} has been existed!|wrong",
   "MSG_PLACE_PROVINCE_NAME_EMPTY": "Country name is not allow empty!|wrong",
-  "MSG_PLACE_PROVINCE_NOT_FOUND": "Province name '{0}' is not found!|wrong",
+  "MSG_PLACE_PROVINCE_NOT_FOUND": "Province name '{0}' is not found in country {1}!|wrong",
   "MSG_PLACE_DISTRICT_NAME_EMPTY": "District name is not allow empty!|wrong",
-  "MSG_PLACE_DISTRICT_NOT_FOUND": "District name {0} is not found!|wrong",
+  "MSG_PLACE_DISTRICT_NOT_FOUND": "District name {0} is not found in province {1}!|wrong",
   "MSG_PLACE_CODE_DUPLICATE": "Code {0} has been duplicate!|wrong",
   "MSG_PLACE_PORTINDEX_MODE_EMPTY": "Mode of transport is not allow empty!|wrong",
   "MSG_PLACE_PORTINDEX_MODE_NOT_FOUND": "Mode of transport {0} is not found!|wrong",
@@ -83,7 +83,10 @@
   //------------start: Commodity
   "MSG_COMMOIDITY_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",
   "MSG_COMMOIDITY_NAME_LOCAL_EMPTY": "Name Local is not allow empty!|wrong",
-  "MSG_COMMOIDITY_STATUS_EMPTY": "Code is not allow empty!|wrong",
+  "MSG_COMMOIDITY_CODE_EMPTY": "Code is not allow empty!|wrong",
+  "MSG_COMMOIDITY_CODE_EXISTED": "Code has been existed!|wrong",
+  "MSG_COMMOIDITY_CODE_DUPLICATED": "Code has been duplicated!|wrong",
+  "MSG_COMMOIDITY_STATUS_EMPTY": "Status is not allow empty!|wrong",
   //------------end  : Commodity
 
   //------------start: COUNTRY

@@ -90,7 +90,7 @@
                                         Name(EN) <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameEN" autocomplete="nope" minlength="3"
-                                        [(ngModel)]="warehouse.nameEN" #warewhouseNameEN="ngModel" (change)="warehouse.nameEN = warehouse.nameEN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameEN.invalid }" required >
+                                        [(ngModel)]="warehouse.nameEn" #warewhouseNameEN="ngModel" (change)="warehouse.nameEn = warehouse.nameEn.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameEN.invalid }" required >
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warewhouseNameEN.invalid" >
                                         Name(EN) is required least 3 characters
                                     </div>
@@ -103,7 +103,7 @@
                                         Name(Local) <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameLocal" autocomplete="nope" minlength="3"
-                                        [(ngModel)]="warehouse.nameVN" #warewhouseNameLocal="ngModel" (change)="warehouse.nameVN = warehouse.nameVN.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameLocal.invalid }" required >
+                                        [(ngModel)]="warehouse.nameVn" #warewhouseNameLocal="ngModel" (change)="warehouse.nameVn = warehouse.nameVn.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameLocal.invalid }" required >
                                     <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warewhouseNameLocal.invalid" >
                                         Name(Local) is required least 3 characters
                                     </div>
@@ -225,8 +225,8 @@
                                             Name(EN) <span class="m--font-danger">(*)</span>
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter name" name="warehouseNameEN" autocomplete="nope" minlength="3"
-                                            (change)="warehouse.nameEN = warehouse.nameEN.trim()"
-                                            [(ngModel)]="warehouse.nameEN" #warehouseNameEN="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseNameEN.invalid }" required >
+                                            (change)="warehouse.nameEn = warehouse.nameEn.trim()"
+                                            [(ngModel)]="warehouse.nameEn" #warehouseNameEN="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseNameEN.invalid }" required >
                                        <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warehouseNameEN.invalid" >
                                             Name(EN) is required least 3 characters
                                         </div>
@@ -238,8 +238,8 @@
                                             Name(VN) <span class="m--font-danger">(*)</span>
                                         </label>
                                         <input type="text" class="form-control m-input" placeholder="Please enter name" name="warewhouseNameVN" autocomplete="nope" minlength="3"
-                                            (change)="warehouse.nameVN = warehouse.nameVN.trim()"
-                                            [(ngModel)]="warehouse.nameVN" #warewhouseNameVN="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameVN.invalid }" required >
+                                            (change)="warehouse.nameVn = warehouse.nameVn.trim()"
+                                            [(ngModel)]="warehouse.nameVn" #warewhouseNameVN="ngModel" [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameVN.invalid }" required >
                                         <div class="form-control-feedback" *ngIf="formAddEdit.submitted && warewhouseNameVN.invalid" >
                                             Name(VN) is required least 3 characters
                                         </div>

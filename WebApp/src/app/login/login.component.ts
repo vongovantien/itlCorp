@@ -47,8 +47,9 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
   remember_me: boolean = false;
 
   ngOnInit() {
-    this.setupLocalInfo();
+    // this.setupLocalInfo();
     if(this.baseService.checkLoginSession(false)){
+      this.setupLocalInfo();
       this.router.navigateByUrl('/home/dashboard');
     }
   }
@@ -64,7 +65,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
         if (claims) {
           localStorage.setItem("currently_userName",claims['preferred_username']);
           localStorage.setItem("currently_userEmail",claims['email']);
-          
+          this.setupLocalInfo();
           this.rememberMe();
           this.toastr.info("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "Login Success", { positionClass: 'toast-bottom-right' });
           this.router.navigateByUrl('/home/dashboard');       

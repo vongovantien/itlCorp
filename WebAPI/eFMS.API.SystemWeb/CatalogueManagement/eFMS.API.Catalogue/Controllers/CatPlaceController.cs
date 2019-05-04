@@ -113,11 +113,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.Id = Guid.NewGuid();
             catPlace.UserCreated = currentUser.UserID;
-            catPlace.DatetimeCreated = DateTime.Now;
-            catPlace.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catPlaceService.Add(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -140,14 +136,9 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var catPlace = mapper.Map<CatPlaceModel>(model);
             catPlace.UserModified = currentUser.UserID;
-            catPlace.DatetimeModified = DateTime.Now;
             catPlace.Id = id;
-            if(catPlace.Inactive == true)
-            {
-                catPlace.InactiveOn = DateTime.Now;
-            }
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catPlaceService.Update(catPlace, x => x.Id == id);
+            //var hs = catPlaceService.Update(catPlace, x => x.Id == id);
+            var hs = catPlaceService.Update(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -162,7 +153,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Delete(Guid id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catPlaceService.Delete(x => x.Id == id);
+            var hs = catPlaceService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -373,14 +364,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower())))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower()) && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower()) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

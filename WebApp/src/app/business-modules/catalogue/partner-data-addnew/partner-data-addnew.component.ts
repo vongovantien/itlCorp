@@ -6,6 +6,7 @@ import { BaseService } from 'src/services-base/base.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { NgForm } from '@angular/forms';
 import { SelectComponent } from 'ng2-select';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
   selector: 'app-partner-data-addnew',
@@ -42,7 +43,8 @@ export class PartnerDataAddnewComponent implements OnInit {
   constructor(private route:ActivatedRoute,
     private baseService: BaseService,
     private api_menu: API_MENU,
-    private router: Router) { }
+    private router: Router,
+    private sortService: SortService) { }
 
   ngOnInit() {
     this.route.params.subscribe(prams => {
@@ -98,6 +100,9 @@ export class PartnerDataAddnewComponent implements OnInit {
       if(response != null){
         this.users = response;
         this.saleMans = response.map(x=>({"text":x.username,"id":x.id}));
+        if(this.saleMans.length != null){
+          this.saleMans = this.sortService.sort(this.saleMans, 'text', true);
+        }
       }
      },err=>{
        this.baseService.handleError(err);

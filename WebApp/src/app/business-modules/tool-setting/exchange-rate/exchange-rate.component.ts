@@ -124,9 +124,14 @@ export class ExchangeRateComponent implements OnInit {
     if(this.selectedrange != null){
       this.criteria.fromDate = this.selectedrange.startDate;
       this.criteria.toDate = this.selectedrange.endDate;
-      this.pager.currentPage = 1;
-      this.getExchangeRates(this.pager);
     }
+    this.pager.totalItems = 0;
+      this.getExchangeRates(this.pager);
+  }
+  resetSearch(){
+    this.selectedrange = null;
+    this.criteria = {};
+    this.searchHistory();
   }
   showDetail(item){
     this.getChargeRateBy(item.datetimeCreated, item.localCurrency, '');
@@ -308,7 +313,7 @@ export class ExchangeRateComponent implements OnInit {
     });
   }
   async getExchangeNewest(){
-    var responses = await this.baseService.getAsync(this.api_menu.ToolSetting.ExchangeRate.getNewest);
+    var responses = await this.baseService.getAsync(this.api_menu.ToolSetting.ExchangeRate.getNewest + "?currencyToId=" + this.localCurrency);
     this.exchangeRateNewest = responses;
     console.log(this.exchangeRateNewest);
   }

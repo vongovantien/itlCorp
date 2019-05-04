@@ -14,7 +14,8 @@ import * as dataHelper from 'src/helper/data.helper';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import { BaseService } from 'src/services-base/base.service';
 import cloneDeep from 'lodash/cloneDeep';
-declare var $: any;
+
+ declare var $: any;
 
 @Component({
   selector: 'app-housebill-addnew',
@@ -40,7 +41,7 @@ export class HousebillAddnewComponent implements OnInit {
     if (_masterBilData != null) {
       this.MasterBillData = _masterBilData;
       this.HouseBillWorking.jobId = this.MasterBillData.id;
-      this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+      this.HouseBillWorking.mawb = this.HouseBillWorking.mawb==null? this.MasterBillData.mawb: this.HouseBillWorking.mawb;
       this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
       this.HouseBillWorking.oceanVoyNo = this.MasterBillData.voyNo + "" + this.MasterBillData.flightVesselName;
       this.HouseBillWorking.customsBookingNo = this.MasterBillData.bookingNo;
@@ -93,7 +94,7 @@ export class HousebillAddnewComponent implements OnInit {
     this.getHouseBillContainers(this.HouseBillWorking.id);
     this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
     this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
-    this.HouseBillWorking.mawb = this.MasterBillData.mawb;
+    this.HouseBillWorking.mawb = this.HouseBillWorking.mawb==null? this.MasterBillData.mawb: this.HouseBillWorking.mawb;
     this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
   }
 
@@ -197,12 +198,9 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CUSTOMER, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listCustomers = data;
-
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query , { partnerGroup: PartnerGroupEnum.CUSTOMER, inactive: false, all: key }).subscribe(res => {
+      this.listCustomers = res;
     });
-
   }
 
   public getShipperDescription(shipper: any) {
@@ -221,10 +219,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.SHIPPER, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listShipper = data;
-
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.SHIPPER, inactive: false, all: key }).subscribe(res => {
+      this.listShipper = res;
     });
   }
 
@@ -251,9 +247,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listConsignee = data;
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
+      this.listConsignee = res;
     });
   }
 
@@ -264,9 +259,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
-      var data = res['data']
-      this.listConsignee = data;
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CONSIGNEE, inactive: false, all: key }).subscribe(res => {
+      this.listConsignee = res;
     });
   }
 
@@ -278,12 +272,9 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.Country.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, code: key, nameEn: key, nameVn: key, condition: 1 }).subscribe(res => {
-      var data = res['data'];
-      this.listCountryOrigin = data;
+    this.baseServices.post(this.api_menu.Catalogue.Country.query, { inactive: false, code: key, nameEn: key, nameVn: key, condition: 1 }).subscribe(res => {
+      this.listCountryOrigin = res;
     });
-
-    console.log(this.listCountryOrigin);
   }
 
   getListPorts(search_key: string = null) {
@@ -293,10 +284,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.CatPlace.paging + "?page=" + 1 + "&size=" + 20, { modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
-      var data = res['data'];
-      this.listPort = data;
-      console.log({ list_port: this.listPort });
+    this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
+      this.listPort = res;
     });
   }
 
@@ -323,9 +312,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: key }).subscribe(res => {
-      var data = res['data'];
-      this.listFowardingAgent = data;
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: key }).subscribe(res => {
+      this.listFowardingAgent = res;
     });
   }
 
@@ -528,8 +516,8 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.paging + "?page=" + 1 + "&size=" + 20, { inactive: false, all: key }, false, false);
-    this.commodities = responses.data;
+    let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, { inactive: false, all: key }, false, false);
+    this.commodities = responses;
     console.log(this.commodities);
   }
 

@@ -10,5 +10,6 @@ namespace eFMS.API.Catalogue.Service.ViewModels
         public string CurrencyFromID { get; set; }
         public decimal Rate { get; set; }
         public Nullable<DateTime> DatetimeCreated { get; set; }
+        public string CurrencyToID { get; set; }
     }
 }

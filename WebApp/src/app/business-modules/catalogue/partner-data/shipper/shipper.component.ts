@@ -24,6 +24,7 @@ export class ShipperComponent implements OnInit {
   shippers: Array<Partner>;
   shipper: Partner;
   pager: PagerSetting = PAGINGSETTING;
+  @Output() detail = new EventEmitter<any>();
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.SHIPPER };
   isDesc: boolean = false;
@@ -65,7 +66,7 @@ export class ShipperComponent implements OnInit {
     this.deleteConfirm.emit(this.shipper);
   }
   showDetail(item) {
-    this.shipper = item;
+    this.detail.emit(item);
   }
 
   async exportShippers(){

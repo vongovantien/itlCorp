@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="eFMSTestModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="catCurrencyExchange">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CurrencyFromID" Type="varchar" MaxLength="30" />
+    <Property Name="CurrencyToID" Type="varchar" MaxLength="30" />
+    <Property Name="Rate" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+    <Property Name="EffectiveOn" Type="smalldatetime" />
+    <Property Name="UserCreated" Type="varchar" MaxLength="50" />
+    <Property Name="DatetimeCreated" Type="smalldatetime" />
+    <Property Name="UserModified" Type="varchar" MaxLength="50" />
+    <Property Name="DatetimeModified" Type="smalldatetime" />
+    <Property Name="Inactive" Type="bit" />
+    <Property Name="InactiveOn" Type="smalldatetime" />
+  </EntityType>
+  <!--Errors Found During Generation:
+warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+  <EntityType Name="vw_catCurrencyExchangeNewest">
+    <Key>
+      <PropertyRef Name="ID" />
+      <PropertyRef Name="Rate" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CurrencyFromID" Type="varchar" MaxLength="30" />
+    <Property Name="CurrencyToID" Type="varchar" MaxLength="30" />
+    <Property Name="Rate" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+    <Property Name="DatetimeCreated" Type="smalldatetime" />
+  </EntityType>
+  <EntityContainer Name="eFMSTestModelStoreContainer">
+    <EntitySet Name="catCurrencyExchange" EntityType="Self.catCurrencyExchange" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="vw_catCurrencyExchangeNewest" EntityType="Self.vw_catCurrencyExchangeNewest" store:Type="Views" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [vw_catCurrencyExchangeNewest].[ID] AS [ID], 
+    [vw_catCurrencyExchangeNewest].[CurrencyFromID] AS [CurrencyFromID], 
+    [vw_catCurrencyExchangeNewest].[CurrencyToID] AS [CurrencyToID], 
+    [vw_catCurrencyExchangeNewest].[Rate] AS [Rate], 
+    [vw_catCurrencyExchangeNewest].[DatetimeCreated] AS [DatetimeCreated]
+    FROM [dbo].[vw_catCurrencyExchangeNewest] AS [vw_catCurrencyExchangeNewest]</DefiningQuery>
+    </EntitySet>
+  </EntityContainer>
+</Schema>
