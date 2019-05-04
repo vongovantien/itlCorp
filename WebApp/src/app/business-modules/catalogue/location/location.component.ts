@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import * as lodash from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -16,6 +16,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { ActivatedRoute } from '@angular/router';
 declare var $: any;
 
 @Component({
@@ -23,7 +24,11 @@ declare var $: any;
   templateUrl: './location.component.html',
   styleUrls: ['./location.component.sass']
 })
-export class LocationComponent implements OnInit {
+export class LocationComponent implements OnInit,AfterViewInit {
+  ngAfterViewInit(): void {
+   
+
+  }
 
   /**
    *START VARIABLES DEFINITIONS
@@ -118,6 +123,7 @@ export class LocationComponent implements OnInit {
    */
 
   constructor(
+    private route:ActivatedRoute,
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,

@@ -24,8 +24,9 @@ import { ReportPreviewComponent } from './common/report-preview/report-preview.c
 import { SpecialCharacterDirective } from './directives/specialChracter.directive';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
+import { RouterModule } from '@angular/router';
 @NgModule({
-  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule],
+  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule,RouterModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 

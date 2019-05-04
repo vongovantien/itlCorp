@@ -23,39 +23,84 @@ const routes: Routes = [
   },
   {
     path:'inland-trucking',
-    component:InlandTruckingComponent
+    component:InlandTruckingComponent,
+    data:{
+      name:"Inland Trucking",
+      path:"inland-trucking",
+      level:2
+    }
   },
   {
     path:'air-export',
-    component:AirExportComponent
+    component:AirExportComponent,
+    data:{
+      name:"Air Export",
+      path:"air-export",
+      level:2
+    }
   },
   {
     path:'air-import',
-    component:AirImportComponent
+    component:AirImportComponent,
+    data:{
+      name:"Air Import",
+      path:"air-import",
+      level:2
+    }
   },
   {
     path:'sea-consol-export',
-    component:SeaConsolExportComponent
+    component:SeaConsolExportComponent,
+    data:{
+      name:"Sea Consol Export",
+      path:"sea-consol-export",
+      level:2
+    }
   },
   {
     path:'sea-consol-import',
-    component:SeaConsolImportComponent
+    component:SeaConsolImportComponent,
+    data:{
+      name:"Sea Consol Import",
+      path:"sea-consol-import",
+      level:2
+    }
   },
   {
     path:'sea-fcl-export',
-    component:SeaFCLExportComponent
+    component:SeaFCLExportComponent,
+    data:{
+      name:"Sea FCL Export",
+      path:"sea-fcl-export",
+      level:2
+    }
   },
   {
     path:'sea-fcl-export-create',
-    component:SeaFclExportCreateComponent
+    component:SeaFclExportCreateComponent,
+    data:{
+      name:"Sea FCL Create",
+      path:"sea-fcl-export-create",
+      level:3
+    }
   },
   {
     path:'manifest',
-    component:ManifestComponent
+    component:ManifestComponent,
+    data:{
+      name:"Manifest",
+      path:"manifest",
+      level:4
+    }
   },
   {
     path:'shipping-instruction',
-    component:ShippingInstructionComponent
+    component:ShippingInstructionComponent,
+    data:{
+      name:"Shipping Instruction",
+      path:"shipping-instruction",
+      level:4
+    }
   },
   {
     path:'sea-fcl-import',

@@ -32,35 +32,75 @@ const routes: Routes = [
   },
   {
     path:'location',
-    component:LocationComponent
+    component:LocationComponent,
+    data:{
+      name:"Location",
+      path:"location",
+      level:2
+    }
   },
   {
     path:'location-import',
-    component:LocationImportComponent
+    component:LocationImportComponent,
+    data:{
+      name:"Location Import",
+      path:"location-import",
+      level:3
+    }
   },
   {
     path:'ware-house',
-    component:WarehouseComponent
+    component:WarehouseComponent,
+    data:{
+      name:"Ware House",
+      path:"ware-house",
+      level:2
+    }
   },
   {
     path:'ware-house-import',
-    component:WarehouseImportComponent
+    component:WarehouseImportComponent,
+    data:{
+      name:"Ware House Import",
+      path:"ware-house-import",
+      level:3
+    }
   },
   {
     path:'charge',
-    component:ChargeComponent
+    component:ChargeComponent,
+    data:{
+      name:"Charge",
+      path:"charge",
+      level:2
+    }
   },
   {
     path:'charge-addnew',
-    component:ChargeAddnewComponent
+    component:ChargeAddnewComponent,
+    data:{
+      name:"Addnew Charge",
+      path:"charge-addnew",
+      level:3
+    }
   },
   {
     path:'charge-edit',
-    component:ChargeDetailsComponent
+    component:ChargeDetailsComponent,
+    data:{
+      name:"Edit Charge",
+      path:"charge-edit",
+      level:3
+    }
   },
   {
     path:'charge-import',
-    component:ChargeImportComponent
+    component:ChargeImportComponent,
+    data:{
+      name:"Edit Import",
+      path:"charge-import",
+      level:3
+    }
   },
   {
     path:'charge-import-account-voucher',
@@ -68,55 +108,120 @@ const routes: Routes = [
   },
   {
     path:'commodity',
-    component:CommodityComponent
+    component:CommodityComponent,
+    data:{
+      name:"Commodity",
+      path:"commodity",
+      level:2
+    }
   },
   {
     path:'commodity-import',
-    component:CommodityImportComponent
+    component:CommodityImportComponent,
+    data:{
+      name:"Commodity Import",
+      path:"commodity-import",
+      level:3
+    }
   },
   {
     path:'commodity-group-import',
-    component:CommodityGroupImportComponent
+    component:CommodityGroupImportComponent,
+    data:{
+      name:"Commodity Group Import",
+      path:"commodity-group-import",
+      level:3
+    }
   },
   {
     path:'partner-data',
-    component:PartnerComponent
+    component:PartnerComponent,
+    data:{
+      name:"Partner Data",
+      path:"partner-data",
+      level:2
+    }
   },
   {
     path: 'partner-data-import',
-    component: PartnerDataImportComponent
+    component: PartnerDataImportComponent,
+    data:{
+      name:"Partner Data Import",
+      path:"partner-data-import",
+      level:3
+    }
   },
   {
     path:'port-index',
-    component:PortIndexComponent
+    component:PortIndexComponent,
+    data:{
+      name:"Port Index",
+      path:"port-index",
+      level:2
+    }
   },
   {
     path:'port-index-import',
-    component:PortIndexImportComponent
+    component:PortIndexImportComponent,
+    data:{
+      name:"Port Index Import",
+      path:"port-index-import",
+      level:3
+    }
   },
   {
     path:'stage-management',
-    component:StageManagementComponent
+    component:StageManagementComponent,
+    data:{
+      name:"Stage Management",
+      path:"stage-management",
+      level:2
+    }
   },
   {
     path:'stage-import',
-    component:StageImportComponent
+    component:StageImportComponent,
+    data:{
+      name:"Stage Import",
+      path:"stage-import",
+      level:3
+    }
   },
   {
     path:'unit',
-    component:UnitComponent
+    component:UnitComponent,
+    data:{
+      name:"Unit",
+      path:"unit",
+      level:2
+    }
   },
   {
     path:'partner-data-addnew',
-    component:PartnerDataAddnewComponent
+    component:PartnerDataAddnewComponent,
+    data:{
+      name:"Partner Data Addnew",
+      path:"partner-data-addnew",
+      level:3
+    }
   },
   {
     path:'partner-data-detail',
-    component:PartnerDataDetailComponent
+    component:PartnerDataDetailComponent,
+    data:{
+      name:"Partner Data Details",
+      path:"partner-data-detail",
+      level:3
+    }
   },
   {
     path:'currency',
-    component:CurrencyComponent
+    component:CurrencyComponent,
+    data:{
+      name:"Currency",
+      path:"currency",
+      level:2
+    }
   }
 ];
 

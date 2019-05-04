@@ -16,6 +16,8 @@ export class AppComponent implements OnInit {
     }
   }
 
+  public BreadcrumbStack:{path:string,name:string,level:number}[]=[];
+
   constructor(private baseService:BaseService, private router:Router) {
   }
 

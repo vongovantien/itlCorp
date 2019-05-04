@@ -87,6 +87,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
   }
 
   sub_menu_click(sub_menu_name, parrent_index, children_index) { 
+    console.log(this.Menu[parrent_index].route_parent+this.Menu[parrent_index].childs[children_index].route_child)
     if(this.baseService.checkLoginSession()){
       var current_parent = document.getElementById(parrent_index.toString());
       var current_children = document.getElementById(parrent_index.toString() + '-' + children_index.toString());
