@@ -1,11 +1,8 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Location } from "@angular/common";
-import {language} from 'src/languages/language.en';
-import * as lodash from 'lodash';
-import uniq from 'lodash/uniq';
-import {BreadcrumbData} from './BreadcrumbData';
-
+// import * as lodash from 'lodash';
+import findIndex from 'lodash/findIndex';
+import filter from 'lodash/filter';
 
 @Component({
   selector: 'app-breadcrumb',
@@ -21,39 +18,36 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
+      var storagedRoutes = localStorage.getItem("ActiveRoute")
+      this.ActiveRoute = storagedRoutes==null?[]:JSON.parse(storagedRoutes);
       var currentURLParts = this.router.url.split("/");
-     
       var currentRoute = currentURLParts[currentURLParts.length-1];
       var moduleRoute= this.route.parent.snapshot.data;    
       var componentRoute = this.route.snapshot.data;
 
       componentRoute.path = currentRoute;
 
-      var indexModule = lodash.findIndex(BreadcrumbData.RouteStack,x=>x.level===moduleRoute.level);
-      var indexComponent = lodash.findIndex(BreadcrumbData.RouteStack,x=>x.level===componentRoute.level);
+      var indexModule = findIndex(this.ActiveRoute,x=>x.level===moduleRoute.level);
+      var indexComponent = findIndex(this.ActiveRoute,x=>x.level===componentRoute.level);
 
       if(indexModule===-1){
-        BreadcrumbData.RouteStack.push(moduleRoute,componentRoute);
+        this.ActiveRoute.push(moduleRoute,componentRoute);
       }else{
-        BreadcrumbData.RouteStack[indexModule] = moduleRoute;
+        this.ActiveRoute[indexModule] = moduleRoute;
         if(indexComponent!==-1){
-          BreadcrumbData.RouteStack[indexComponent] = componentRoute;
-          BreadcrumbData.RouteStack = lodash.filter(BreadcrumbData.RouteStack,function(o:any){
+          this.ActiveRoute[indexComponent] = componentRoute;
+          this.ActiveRoute = filter(this.ActiveRoute,function(o:any){
             return o.level <= componentRoute.level;
           });
         }
         else{
-          BreadcrumbData.RouteStack.push(componentRoute);
+          this.ActiveRoute.push(componentRoute);
         }
       }
 
-      this.ActiveRoute = BreadcrumbData.RouteStack;
-      console.log(BreadcrumbData.RouteStack);      
-    }, 200);
-    
-
-
-
+      this.ActiveRoute = this.ActiveRoute;
+      localStorage.setItem("ActiveRoute",JSON.stringify(this.ActiveRoute));      
+    }, 150);
   }
 
   navigateRoute(index:number){
@@ -66,21 +60,7 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
   }
 
 
-
-  getModuleRouteData(){
-    this.Menu = language.Menu;
-    var _route = "";
-    if(this.router.url.includes(";")){
-      _route = this.router.url.split(";")[0];
-    }else{
-      _route = this.router.url;
-    }
-    var routes = _route.split("/");
-    var module_path = routes[routes.length-2];
-
-  }
-
-  constructor(private location: Location,private route: ActivatedRoute, private router: Router, private cdRef: ChangeDetectorRef) { }
+  constructor(private route: ActivatedRoute, private router: Router, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit() {
     
