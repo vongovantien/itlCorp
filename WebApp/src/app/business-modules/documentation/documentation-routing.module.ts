@@ -14,6 +14,8 @@ import { ManifestComponent } from './sea-fcl-export-create/manifest/manifest.com
 import { ShippingInstructionComponent } from './sea-fcl-export-create/shipping-instruction/shipping-instruction.component';
 import { SeaLclExportCreateComponent } from './sea-lcl-export-create/sea-lcl-export-create.component'; 
 import { SeaLclExportHousebillAddnewComponent } from './sea-lcl-export-create/sea-lcl-export-housebill-addnew/sea-lcl-export-housebill-addnew.component'; 
+import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-export-manifest/sea-lcl-export-manifest.component';
+import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-create/sea-lcl-export-shipping-instruction/sea-lcl-export-shipping-instruction.component';
 
 const routes: Routes = [
   {
@@ -113,6 +115,14 @@ const routes: Routes = [
   {
     path:'sea-lcl-export-create',
     component:SeaLclExportCreateComponent
+  },
+  {
+    path:'sea-lcl-export-manifest',
+    component:SeaLclExportManifestComponent
+  },
+  {
+    path:'sea-lcl-export-shipping-instruction',
+    component:SeaLclExportShippingInstructionComponent
   },
   {
     path:'sea-lcl-export-housebill-addnew',
