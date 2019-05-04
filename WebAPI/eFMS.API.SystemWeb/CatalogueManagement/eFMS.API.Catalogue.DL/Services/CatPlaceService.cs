@@ -20,6 +20,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Data.SqlClient;
 using ITL.NetCore.Connection.NoSql;
+using eFMS.API.Catalogue.Service.Contexts;
 
 namespace eFMS.API.Catalogue.DL.Services
 {

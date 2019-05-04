@@ -14,6 +14,7 @@ using ITL.NetCore.Connection;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Common;
 using System.Data.SqlClient;
+using eFMS.API.Documentation.Service.Contexts;
 
 namespace eFMS.API.Documentation.DL.Services
 {

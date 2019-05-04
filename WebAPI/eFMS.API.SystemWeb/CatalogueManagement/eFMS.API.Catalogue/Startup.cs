@@ -2,6 +2,7 @@
 using eFMS.API.Catalogue.Infrastructure;
 using eFMS.API.Catalogue.Infrastructure.Filters;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -88,18 +89,18 @@ namespace eFMS.API.Catalogue
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
             DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
-            services.AddEntityFrameworkSqlServer()
-                .AddDbContext<eFMSDataContext>(options =>
-                {
-                    options.UseSqlServer(Configuration["ConnectionStrings:eFMSConnection"],
-                        sqlServerOptionsAction: sqlOptions =>
-                        {
-                            //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-                            sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
-                        });
-                },
-                ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
-                );
+            //services.AddEntityFrameworkSqlServer()
+            //    .AddDbContext<eFMSDataContext>(options =>
+            //    {
+            //        options.UseSqlServer(Configuration["ConnectionStrings:eFMSConnection"],
+            //            sqlServerOptionsAction: sqlOptions =>
+            //            {
+            //                //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+            //                sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+            //            });
+            //    },
+            //    ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
+            //    );
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
