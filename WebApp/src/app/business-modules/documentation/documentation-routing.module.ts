@@ -28,7 +28,6 @@ const routes: Routes = [
     component:InlandTruckingComponent,
     data:{
       name:"Inland Trucking",
-      path:"inland-trucking",
       level:2
     },
   },
@@ -37,7 +36,6 @@ const routes: Routes = [
     component:AirExportComponent,
     data:{
       name:"Air Export",
-      path:"air-export",
       level:2
     }
   },
@@ -46,7 +44,6 @@ const routes: Routes = [
     component:AirImportComponent,
     data:{
       name:"Air Import",
-      path:"air-import",
       level:2
     }
   },
@@ -55,7 +52,6 @@ const routes: Routes = [
     component:SeaConsolExportComponent,
     data:{
       name:"Sea Consol Export",
-      path:"sea-consol-export",
       level:2
     }
   },
@@ -64,7 +60,6 @@ const routes: Routes = [
     component:SeaConsolImportComponent,
     data:{
       name:"Sea Consol Import",
-      path:"sea-consol-import",
       level:2
     }
   },
@@ -73,7 +68,6 @@ const routes: Routes = [
     component:SeaFCLExportComponent,
     data:{
       name:"Sea FCL Export",
-      path:"sea-fcl-export",
       level:2
     }
   },
@@ -82,7 +76,6 @@ const routes: Routes = [
     component:SeaFclExportCreateComponent,
     data:{
       name:"Sea FCL Create",
-      path:"sea-fcl-export-create",
       level:3
     }
   },
@@ -91,7 +84,6 @@ const routes: Routes = [
     component:ManifestComponent,
     data:{
       name:"Manifest",
-      path:"manifest",
       level:4
     }
   },
@@ -100,7 +92,6 @@ const routes: Routes = [
     component:ShippingInstructionComponent,
     data:{
       name:"Shipping Instruction",
-      path:"shipping-instruction",
       level:4
     }
   },
@@ -110,19 +101,35 @@ const routes: Routes = [
   },
   {
     path:'sea-lcl-export',
-    component:SeaLCLExportComponent
+    component:SeaLCLExportComponent,
+    data:{
+      name:"Sea LCL Export",
+      level:2
+    }
   },
   {
     path:'sea-lcl-export-create',
-    component:SeaLclExportCreateComponent
+    component:SeaLclExportCreateComponent,
+    data:{
+      name:"Sea LCL Export Create",
+      level:3
+    }
   },
   {
     path:'sea-lcl-export-manifest',
-    component:SeaLclExportManifestComponent
+    component:SeaLclExportManifestComponent,
+    data:{
+      name:"Sea LCL Export Manifest",
+      level:4
+    }
   },
   {
     path:'sea-lcl-export-shipping-instruction',
-    component:SeaLclExportShippingInstructionComponent
+    component:SeaLclExportShippingInstructionComponent,
+    data:{
+      name:"Sea LCL Export Shipping Instruction",
+      level:4
+    }
   },
   {
     path:'sea-lcl-export-housebill-addnew',
@@ -130,7 +137,11 @@ const routes: Routes = [
   },
   {
     path:'sea-lcl-import',
-    component:SeaLCLImportComponent
+    component:SeaLCLImportComponent,
+    data:{
+      name:"Sea LCL Import",
+      level:2
+    }
   }
 ];
 

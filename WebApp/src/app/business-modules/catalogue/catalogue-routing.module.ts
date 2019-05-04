@@ -35,7 +35,6 @@ const routes: Routes = [
     component:LocationComponent,
     data:{
       name:"Location",
-      path:"location",
       level:2
     }
   },
@@ -44,7 +43,6 @@ const routes: Routes = [
     component:LocationImportComponent,
     data:{
       name:"Location Import",
-      path:"location-import",
       level:3
     }
   },
@@ -53,7 +51,6 @@ const routes: Routes = [
     component:WarehouseComponent,
     data:{
       name:"Ware House",
-      path:"ware-house",
       level:2
     }
   },
@@ -62,7 +59,6 @@ const routes: Routes = [
     component:WarehouseImportComponent,
     data:{
       name:"Ware House Import",
-      path:"ware-house-import",
       level:3
     }
   },
@@ -71,7 +67,6 @@ const routes: Routes = [
     component:ChargeComponent,
     data:{
       name:"Charge",
-      path:"charge",
       level:2
     }
   },
@@ -80,7 +75,6 @@ const routes: Routes = [
     component:ChargeAddnewComponent,
     data:{
       name:"Addnew Charge",
-      path:"charge-addnew",
       level:3
     }
   },
@@ -89,7 +83,6 @@ const routes: Routes = [
     component:ChargeDetailsComponent,
     data:{
       name:"Edit Charge",
-      path:"charge-edit",
       level:3
     }
   },
@@ -98,7 +91,6 @@ const routes: Routes = [
     component:ChargeImportComponent,
     data:{
       name:"Edit Import",
-      path:"charge-import",
       level:3
     }
   },
@@ -111,7 +103,6 @@ const routes: Routes = [
     component:CommodityComponent,
     data:{
       name:"Commodity",
-      path:"commodity",
       level:2
     }
   },
@@ -120,7 +111,6 @@ const routes: Routes = [
     component:CommodityImportComponent,
     data:{
       name:"Commodity Import",
-      path:"commodity-import",
       level:3
     }
   },
@@ -129,7 +119,6 @@ const routes: Routes = [
     component:CommodityGroupImportComponent,
     data:{
       name:"Commodity Group Import",
-      path:"commodity-group-import",
       level:3
     }
   },
@@ -138,7 +127,6 @@ const routes: Routes = [
     component:PartnerComponent,
     data:{
       name:"Partner Data",
-      path:"partner-data",
       level:2
     }
   },
@@ -147,7 +135,6 @@ const routes: Routes = [
     component: PartnerDataImportComponent,
     data:{
       name:"Partner Data Import",
-      path:"partner-data-import",
       level:3
     }
   },
@@ -156,7 +143,6 @@ const routes: Routes = [
     component:PortIndexComponent,
     data:{
       name:"Port Index",
-      path:"port-index",
       level:2
     }
   },
@@ -165,7 +151,6 @@ const routes: Routes = [
     component:PortIndexImportComponent,
     data:{
       name:"Port Index Import",
-      path:"port-index-import",
       level:3
     }
   },
@@ -174,7 +159,6 @@ const routes: Routes = [
     component:StageManagementComponent,
     data:{
       name:"Stage Management",
-      path:"stage-management",
       level:2
     }
   },
@@ -183,7 +167,6 @@ const routes: Routes = [
     component:StageImportComponent,
     data:{
       name:"Stage Import",
-      path:"stage-import",
       level:3
     }
   },
@@ -192,7 +175,6 @@ const routes: Routes = [
     component:UnitComponent,
     data:{
       name:"Unit",
-      path:"unit",
       level:2
     }
   },
@@ -201,7 +183,6 @@ const routes: Routes = [
     component:PartnerDataAddnewComponent,
     data:{
       name:"Partner Data Addnew",
-      path:"partner-data-addnew",
       level:3
     }
   },
@@ -210,7 +191,6 @@ const routes: Routes = [
     component:PartnerDataDetailComponent,
     data:{
       name:"Partner Data Details",
-      path:"partner-data-detail",
       level:3
     }
   },
@@ -219,7 +199,6 @@ const routes: Routes = [
     component:CurrencyComponent,
     data:{
       name:"Currency",
-      path:"currency",
       level:2
     }
   }
