@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -13,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Linq;
 using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.DL.Common;
+using ITL.NetCore.Connection.NoSql;
 
 namespace eFMS.API.Catalogue.Controllers
 {

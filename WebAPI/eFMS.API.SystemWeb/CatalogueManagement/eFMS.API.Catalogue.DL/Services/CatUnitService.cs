@@ -31,7 +31,8 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
             model.Inactive = false;
-            var hs = DataContext.Add(model);
+            var entitty = mapper.Map<CatUnit>(model);
+            var hs = DataContext.Add(entitty);
             if (hs.Success)
             {
                 RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());

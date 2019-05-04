@@ -190,10 +190,10 @@
                                     </div>
                                 </div>
                             </div> -->
-                            <app-combo-grid-virtual-scroll *ngIf="shipment"
+                            <app-combo-grid-virtual-scroll *ngIf="manifest"
                                 [dataSources]="portOfLadings"
-                                [currentActiveItemId]="{field:'id',value:shipment.pol}"
-                                (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEn"
+                                [currentActiveItemId]="{field:'id',value:manifest.pol}"
+                                (itemSelected)="manifest.pol = $event.id; formManifest.controls['pol'].setValue($event.id); manifest.polName= $event.nameEn"
                                 [selectedDisplayFields]="['nameEn']"                             
                                 [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                             </app-combo-grid-virtual-scroll>   
@@ -248,15 +248,18 @@
                                     </div>
                                 </div>
                             </div> -->
-                            <app-combo-grid-virtual-scroll *ngIf="shipment"
+                            <app-combo-grid-virtual-scroll *ngIf="manifest"
                                 [dataSources]="portOfDestinations"
-                                [currentActiveItemId]="{field:'id',value:shipment.pol}"
-                                (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEn"
+                                [currentActiveItemId]="{field:'id',value:manifest.pod}"
+                                (itemSelected)="manifest.pod = $event.id; formManifest.controls['pod'].setValue($event.id); manifest.podName= $event.nameEn"
                                 [selectedDisplayFields]="['nameEn']"                             
                                 [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
-                            </app-combo-grid-virtual-scroll>   
+                            </app-combo-grid-virtual-scroll>  
                             <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pod == null">
                                 Port of Discharge is required
+                            </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == manifest.pod && manifest.pod != null">
+                                Port of loading is not allow same value
                             </div>
                         </div>
                     </div>

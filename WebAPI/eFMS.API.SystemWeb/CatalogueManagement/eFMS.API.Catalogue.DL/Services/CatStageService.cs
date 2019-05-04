@@ -8,12 +8,11 @@ using ITL.NetCore.Connection.EF;
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Common.Globals;
-using eFMS.API.Catalogue.Service.Helpers;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
+using ITL.NetCore.Connection.NoSql;
 
 namespace eFMS.API.Catalogue.DL.Services
 {

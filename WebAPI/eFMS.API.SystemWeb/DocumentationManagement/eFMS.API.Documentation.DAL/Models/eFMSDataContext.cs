@@ -1,4 +1,5 @@
 ﻿using System;
+using ITL.NetCore.Connection.NoSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -14,7 +15,31 @@ namespace eFMS.API.Documentation.Service.Models
             : base(options)
         {
         }
-
+        public override int SaveChanges()
+        {
+            var entities = ChangeTracker.Entries();
+            var mongoDb = MongoDbHelper.GetDatabase();
+            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+            var addedList = ChangeTrackerHelper.GetAdded(entities);
+            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
+            var result = base.SaveChanges();
+            if (result > 0)
+            {
+                if (addedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(addedList, EntityState.Added);
+                }
+                if (modifiedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(modifiedList, EntityState.Modified);
+                }
+                if (deletedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(deletedList, EntityState.Deleted);
+                }
+            }
+            return result;
+        }
         public virtual DbSet<AcctSoa> AcctSoa { get; set; }
         public virtual DbSet<CatArea> CatArea { get; set; }
         public virtual DbSet<CatBranch> CatBranch { get; set; }

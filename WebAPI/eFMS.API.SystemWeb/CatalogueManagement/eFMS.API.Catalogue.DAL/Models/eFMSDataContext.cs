@@ -1,5 +1,5 @@
 ﻿using System;
-using eFMS.API.Catalogue.Service.Helpers;
+using ITL.NetCore.Connection.NoSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -18,7 +18,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public override int SaveChanges()
         {
             var entities = ChangeTracker.Entries();
-            var mongoDb = Helpers.MongoDbHelper.GetDatabase();
+            var mongoDb = MongoDbHelper.GetDatabase();
             var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
             var addedList = ChangeTrackerHelper.GetAdded(entities);
             var deletedList = ChangeTrackerHelper.GetDeleted(entities);
