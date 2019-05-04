@@ -13,6 +13,7 @@ using eFMS.API.Common.Globals;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
 using ITL.NetCore.Connection.NoSql;
+using eFMS.API.Catalogue.Service.Contexts;
 
 namespace eFMS.API.Catalogue.DL.Services
 {

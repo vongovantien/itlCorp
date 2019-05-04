@@ -11,6 +11,7 @@ using eFMS.API.Catalogue.DL.Common;
 using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
 using ITL.NetCore.Connection.NoSql;
+using eFMS.API.Catalogue.Service.Contexts;
 
 namespace eFMS.API.Catalogue.DL.Services
 {

@@ -717,7 +717,7 @@
                                                     Commodity
                                                 </span> -->
                                                 <div class="control-editable">
-                                                    <div class="dropdown e--combogrid" #selectedCommodity>
+                                                    <!-- <div class="dropdown e--combogrid" #selectedCommodity>
                                                         <input
                                                             class="form-control m-input m-input--square dropdown-toggle"
                                                             type="text" readonly data-toggle="dropdown"
@@ -759,7 +759,7 @@
                                                                                 [class.data-selected]="container.commodityId !==null && container.commodityId===commodity.id">
                                                                                 <td>{{ commodity.commodityNameEn }}</td>
                                                                                 <td>{{ commodity.commodityNameVn }}</td>
-                                                                                <td>{{ commodity.commonityGroupNameEn }}
+                                                                                <td>{{ commodity.commodityGroupNameEn }}
                                                                                 </td>
                                                                             </tr>
                                                                         </tbody>
@@ -767,7 +767,14 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
+                                                    <app-combo-grid-virtual-scroll 
+                                                        [currentActiveItemId]="{field:'id',value:container.commodityId}"
+                                                        (itemSelected)="container.commodityId=$event.id;container.commodityName=$event.commodityNameEn"
+                                                        [selectedDisplayFields]="['commodityNameEn']"
+                                                        [dataSources]="commodities" 
+                                                        [displayFields]="[{'field':'commodityNameEn','label':'Name EN'},{'field':'commodityNameVn','label':'Name VN'},{'field':'commodityGroupNameEn','label':'Group'}]">
+                                                        </app-combo-grid-virtual-scroll>
                                                 </div>
                                             </td>
                                             <td class="">

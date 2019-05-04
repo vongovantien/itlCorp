@@ -4,6 +4,7 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
+using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;

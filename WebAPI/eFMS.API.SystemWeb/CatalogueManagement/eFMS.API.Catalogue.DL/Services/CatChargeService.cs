@@ -12,6 +12,7 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Localization;
 using ITL.NetCore.Connection.NoSql;
+using eFMS.API.Catalogue.Service.Contexts;
 
 namespace eFMS.API.Catalogue.DL.Services
 {

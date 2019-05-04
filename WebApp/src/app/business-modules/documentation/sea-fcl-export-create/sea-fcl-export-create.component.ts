@@ -285,10 +285,10 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchCommodity.inactive = null;
         }
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.paging + "?page=1&size=20", criteriaSearchCommodity, false, false);
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, criteriaSearchCommodity, false, false);
         if(responses != null){
-            this.commodities = this.sortService.sort(responses.data, 'commodityNameEn', true);
-            console.log(this.commodities);
+            this.commodities = this.sortService.sort(responses, 'commodityNameEn', true);
+            console.log('commodities' + this.commodities);
         }
         else{
             this.commodities = [];
