@@ -90,3 +90,5 @@ bin
 /WebAPI/eFMS.API.SystemWeb/ReportPreview/.vs
 /WebAPI/ITL.NetCoreBase/.vs
 /WebAPI/ITL.NetCoreBase/bin
+/WebAPI/eFMS.API.SystemWeb/ReportPerview/obj
+/WebAPI/eFMS.API.SystemWeb/ReportPerview/.vs
