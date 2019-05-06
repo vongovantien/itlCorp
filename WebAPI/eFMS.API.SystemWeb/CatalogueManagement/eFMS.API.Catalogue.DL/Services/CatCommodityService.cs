@@ -124,7 +124,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     newList.Add(commodity);
                 }
                 dc.SaveChanges();
-                if (lstCommodity.Count == 0)
+                if (lstCommodity == null)
                 {
                     lstCommodity = dc.CatCommodity.ToList();
                 }
