@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import * as lodash from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -16,6 +16,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { ActivatedRoute } from '@angular/router';
 declare var $: any;
 
 @Component({
@@ -23,7 +24,11 @@ declare var $: any;
   templateUrl: './location.component.html',
   styleUrls: ['./location.component.sass']
 })
-export class LocationComponent implements OnInit {
+export class LocationComponent implements OnInit,AfterViewInit {
+  ngAfterViewInit(): void {
+   
+
+  }
 
   /**
    *START VARIABLES DEFINITIONS
@@ -118,6 +123,7 @@ export class LocationComponent implements OnInit {
    */
 
   constructor(
+    private route:ActivatedRoute,
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
@@ -176,13 +182,13 @@ export class LocationComponent implements OnInit {
       if(isCountry){
         dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
       }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.name_EN, "id": x.id }));    
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
       }  
     } else {
       if(isCountry){
         dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));    
       }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.name_VN, "id": x.id }));     
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));     
       }      
     }
     return dataReturn;
@@ -321,10 +327,11 @@ export class LocationComponent implements OnInit {
       delete this.CountryToAdd.id;
       if (form.form.status != "INVALID") {
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
+        this.pager.totalItems = 0;
         await this.getCountries();
         this.getAllCountries();
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           $('#add-country-modal').modal('hide');
         }
@@ -446,10 +453,11 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.ProvinceCityToAdd.countryId != null) {
         this.ProvinceCityToAdd.placeType = PlaceTypeEnum.Province;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.ProvinceCityToAdd);
+        this.pager.totalItems = 0;
         await this.getProvinceCities();
         console.log(response);
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
           $('#add-city-province-modal').modal('hide');
@@ -556,6 +564,7 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.DistrictToAdd.countryId != null && this.DistrictToAdd.provinceId != null) {
         this.DistrictToAdd.placeType = PlaceTypeEnum.District;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.DistrictToAdd);
+        this.pager.totalItems = 0;
         await this.getDistrict();
         if(response){
           this.setPageAfterAdd();
@@ -688,9 +697,10 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.WardToAdd.countryId != null && this.WardToAdd.provinceId != null && this.WardToAdd.districtId != null) {
         this.WardToAdd.placeType = PlaceTypeEnum.Ward;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.WardToAdd);
+        this.pager.totalItems = 0;
         await this.getWards();        
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
           $('#add-ward-modal').modal('hide');

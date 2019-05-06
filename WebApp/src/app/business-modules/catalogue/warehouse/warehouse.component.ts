@@ -254,12 +254,14 @@ export class WarehouseComponent implements OnInit {
   }
   addNew(){
     this.baseService.spinnerShow();
+    this.pager.totalItems = 0;
     this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {     
         this.baseService.spinnerHide();
         this.baseService.successToast(response.message);
         this.pager.totalItems = this.pager.totalItems + 1;
         this.pager.currentPage = 1;
-        this.child.setPage(this.pager.currentPage);
+        this.getWarehouses(this.pager);
+        //this.child.setPage(this.pager.currentPage);
         this.resetWarehouse();
         this.form.onReset();
         $('#' + this.addButtonSetting.dataTarget).modal('hide');     

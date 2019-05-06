@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 
 namespace eFMS.API.Documentation.DL.Services
 {

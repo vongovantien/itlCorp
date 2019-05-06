@@ -89,7 +89,7 @@ export class PartnerDataAddnewComponent implements OnInit {
   getWorkPlaces(): any {  
     this.baseService.post(this.api_menu.Catalogue.CatPlace.query, { placeType: 2 }).subscribe((response: any) => {
       if(response != null){
-        this.workPlaces = response.map(x=>({"text":x.code + ' - ' + x.name_VN ,"id":x.id}));
+        this.workPlaces = response.map(x=>({"text":x.code + ' - ' + x.nameVn ,"id":x.id}));
       }
      },err=>{    
        this.baseService.handleError(err);

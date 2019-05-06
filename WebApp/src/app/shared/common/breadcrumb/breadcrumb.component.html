@@ -1,19 +1,14 @@
 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-    <li class="m-nav__item">
-        <a href="javascript:void(0)" class="m-nav__link">
-            <span class="m-nav__link-text">{{parent_name}}</span>
-        </a>
-    </li>
-    <li class="m-nav__separator" *ngIf="parent_name">-</li>
-    <li class="m-nav__item">
-        <a href="javascript:void(0)" class="m-nav__link">
-            <span class="m-nav__link-text">{{children_name}}</span>
-        </a>
-    </li>
-    <!-- <li class="m-nav__separator">-</li>
+
+    <ng-container *ngFor="let item of ActiveRoute;let i = index;">
         <li class="m-nav__item">
-            <a href="javascript:void(0)" class="m-nav__link">
-                <span class="m-nav__link-text">Job Management</span>
+            <a class="m-nav__link" (click)="navigateRoute(i)" style="cursor:pointer;">
+                <span class="m-nav__link-text"
+                    [ngClass]="{ 'active-route': i===ActiveRoute.length-1}">{{item.name}}</span>
             </a>
-        </li> -->
+        </li>
+        <li class="m-nav__separator" *ngIf="i!==ActiveRoute.length-1">></li>
+    </ng-container>
+
+
 </ul>

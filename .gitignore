@@ -88,3 +88,7 @@ bin
 /WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/packages/Autofac.4.9.1
 /WebAPI/eFMS.API.SystemWeb/ReportPreview/packages
 /WebAPI/eFMS.API.SystemWeb/ReportPreview/.vs
+/WebAPI/ITL.NetCoreBase/.vs
+/WebAPI/ITL.NetCoreBase/bin
+/WebAPI/eFMS.API.SystemWeb/ReportPerview/obj
+/WebAPI/eFMS.API.SystemWeb/ReportPerview/.vs

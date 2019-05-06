@@ -43,6 +43,7 @@ export class SeaFCLExportComponent implements OnInit {
 
     async ngOnInit() {
         this.pager.totalItems = 0;
+        this.pager.currentPage = 1;
         this.criteria.fromDate = this.selectedRange.startDate;
         this.criteria.toDate = this.selectedRange.endDate;
         await this.getShipments();

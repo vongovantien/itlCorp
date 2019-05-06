@@ -5,7 +5,7 @@
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <!-- <app-breadcrumb></app-breadcrumb> -->
+            <app-breadcrumb></app-breadcrumb>
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
@@ -330,7 +330,7 @@
                                         <app-combo-grid-virtual-scroll *ngIf="shipment"
                                             [dataSources]="consignees" 
                                             [currentActiveItemId]="{field:'id',value:shippingIns.consigneeId}"
-                                            (itemSelected)="shippingIns.consigneeId = $event.id; shippingIns.consigneeName=$event.partnerNameEn"
+                                            (itemSelected)="shippingIns.consigneeId = $event.id; shippingIns.consigneeName=$event.partnerNameEn; getConsigneeDescription($event)"
                                             [selectedDisplayFields]="['partnerNameEn']"                                        
                                             [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                         </app-combo-grid-virtual-scroll>
@@ -407,7 +407,7 @@
                                         <app-combo-grid-virtual-scroll *ngIf="shipment"
                                             [dataSources]="realShippers" 
                                             [currentActiveItemId]="{field:'id',value:shippingIns.actualShipperId}"
-                                            (itemSelected)="shippingIns.actualShipperId = $event.id; shippingIns.actualShipperName=$event.partnerNameEn"
+                                            (itemSelected)="shippingIns.actualShipperId = $event.id; shippingIns.actualShipperName=$event.partnerNameEn; getRealShipperDescription($event)"
                                             [selectedDisplayFields]="['partnerNameEn']"                                        
                                             [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                         </app-combo-grid-virtual-scroll>
@@ -468,7 +468,7 @@
                                         <app-combo-grid-virtual-scroll *ngIf="shipment"
                                             [dataSources]="realConsignees" 
                                             [currentActiveItemId]="{field:'id',value:shippingIns.actualConsigneeId}"
-                                            (itemSelected)="shippingIns.actualConsigneeId = $event.id; shippingIns.actualConsigneeName=$event.partnerNameEn"
+                                            (itemSelected)="shippingIns.actualConsigneeId = $event.id; shippingIns.actualConsigneeName=$event.partnerNameEn;getRealConsigneeDescription($event)"
                                             [selectedDisplayFields]="['partnerNameEn']"                                        
                                             [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                         </app-combo-grid-virtual-scroll>
@@ -561,10 +561,10 @@
                                                 </div>
                                             </div>
                                         </div> -->
-                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                        <app-combo-grid-virtual-scroll *ngIf="shippingIns"
                                             [dataSources]="portOfLadings"
-                                            [currentActiveItemId]="{field:'id',value:shipment.pol}"
-                                            (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEn"
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.pol}"
+                                            (itemSelected)="shippingIns.pol = $event.id; formShippingInstruction.controls['pol'].setValue($event.id); shippingIns.polName= $event.nameEn"
                                             [selectedDisplayFields]="['nameEn']"                             
                                             [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                                         </app-combo-grid-virtual-scroll>   
@@ -619,15 +619,18 @@
                                                 </div>
                                             </div>
                                         </div> -->
-                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                        <app-combo-grid-virtual-scroll *ngIf="shippingIns"
                                             [dataSources]="portOfDestinations"
-                                            [currentActiveItemId]="{field:'id',value:shipment.pol}"
-                                            (itemSelected)="shipment.pol = $event.id;formAddEdit.controls['pol'].setValue($event.id); shipment.polName= $event.nameEn"
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.pod}"
+                                            (itemSelected)="shippingIns.pod = $event.id; formShippingInstruction.controls['pod'].setValue($event.id); shippingIns.podName= $event.nameEn"
                                             [selectedDisplayFields]="['nameEn']"                             
                                             [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                                         </app-combo-grid-virtual-scroll> 
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pod == null">
                                             Port of Discharge is required
+                                        </div>
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pol == shippingIns.pod && shippingIns.pod != null">
+                                            Port of loading is not allow same value
                                         </div>
                                     </div>
                                 </div>

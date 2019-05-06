@@ -23,6 +23,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsShipmentSurcharge, CsShipmentSurchargeDetailsModel>();
             CreateMap<CsManifestEditModel, CsManifest>();
             CreateMap<CsShippingInstructionModel, CsShippingInstruction>();
+            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
         }
     }
 }

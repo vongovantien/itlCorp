@@ -52,7 +52,7 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/Default.aspx";
         }
         if (this.CURRENT_HOST == this.HOST.Test) {
-            return this.PROTOCOL + this.HOST.Test + "/" + Module + "/Home.aspx";
+            return this.PROTOCOL + this.HOST.Test + "/" + Module + "/Default.aspx";
         }
         if (this.CURRENT_HOST == this.HOST.Staging) {
             return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/Default.aspx";

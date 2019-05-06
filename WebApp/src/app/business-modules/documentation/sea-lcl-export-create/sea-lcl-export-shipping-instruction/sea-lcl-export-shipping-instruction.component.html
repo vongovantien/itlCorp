@@ -121,7 +121,6 @@
                                                 ngxDaterangepickerMd
                                                 [autoApply]="true" 
                                                 [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                [(ngModel)]="issueDate" 
                                                 [singleDatePicker]="true" 
                                                 name="issueDate" 
                                                 readonly />
@@ -311,7 +310,7 @@
                                                     </div>
                                                     <div class="table-body-scroll">
                                                         <table class="table table-hover">
-                                                            <tbody *ngIf="consignees">
+                                                            <tbody >
                                                                 <tr class="data-row data-selected"
                                                                     data-id="consignee.id" >
                                                                     <td>consignee.accountNo</td>
@@ -643,7 +642,6 @@
                                                 ngxDaterangepickerMd
                                                 [autoApply]="true" 
                                                 [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                [(ngModel)]="loadingDate" 
                                                 [singleDatePicker]="true" 
                                                 name="singledater" 
                                                 readonly />

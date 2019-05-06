@@ -1,7 +1,8 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import {language} from 'src/languages/language.en';
-import * as lodash from 'lodash';
+// import * as lodash from 'lodash';
+import findIndex from 'lodash/findIndex';
+import filter from 'lodash/filter';
 
 @Component({
   selector: 'app-breadcrumb',
@@ -9,59 +10,60 @@ import * as lodash from 'lodash';
   styleUrls: ['./breadcrumb.component.scss']
 })
 export class BreadcrumbComponent implements OnInit, AfterViewInit {
+
   Menu: { parent_name: string; icon: string; route_parent: string; display_child: boolean; childs: { name: string; "route_child": string; }[]; }[];
   parent_name = null;
   children_name = null;
+  ActiveRoute:any[] = [];
+
   ngAfterViewInit(): void {
-    this.Menu = language.Menu;
-    console.log(this.router.url);
-    var _route = "";
-    if(this.router.url.includes(";")){
-      _route = this.router.url.split(";")[0];
-    }else{
-      _route = this.router.url;
-    }
-    var route = _route.split("/");
+    setTimeout(() => {
+      var storagedRoutes = localStorage.getItem("ActiveRoute")
+      this.ActiveRoute = storagedRoutes==null?[]:JSON.parse(storagedRoutes);
+      var currentURLParts = this.router.url.split("/");
+      var currentRoute = currentURLParts[currentURLParts.length-1];
+      var moduleRoute= this.route.parent.snapshot.data;    
+      var componentRoute = this.route.snapshot.data;
 
-    var child_path = route[route.length - 1];
-    var parent_path = route[route.length - 2];
-    var index_module = lodash.findIndex(this.Menu, function (o) {
-      var route_module = o.route_parent.split("/");
-      return route_module[route_module.length - 2] == parent_path;
-    });
-    var index_child = lodash.findIndex(this.Menu[index_module].childs, function (o) {
-      return child_path == o.route_child;
-    });
+      componentRoute.path = currentRoute;
 
-    this.parent_name = this.Menu[index_module].parent_name;
-    this.children_name = this.Menu[index_module].childs[index_child].name;
-    this.cdRef.detectChanges();
+      var indexModule = findIndex(this.ActiveRoute,x=>x.level===moduleRoute.level);
+      var indexComponent = findIndex(this.ActiveRoute,x=>x.level===componentRoute.level);
 
-    // setTimeout(() => {
-    //   var route = this.router.url.split("/");
-    //   var child_path = route[route.length - 1];
-    //   var parent_path = route[route.length - 2];
-    //   var index_module = lodash.findIndex(this.Menu, function (o) {
-    //     var route_module = o.route_parent.split("/");
-    //     return route_module[route_module.length - 2] == parent_path;
-    //   });
-    //   var index_child = lodash.findIndex(this.Menu[index_module].childs, function (o) {
-    //     return child_path == o.route_child;
-    //   });
-  
-    //   this.parent_name = this.Menu[index_module].parent_name;
-    //   this.children_name = this.Menu[index_module].childs[index_child].name;
-    //   this.cdRef.detectChanges();
-  
-    // }, 500);
- 
+      if(indexModule===-1){
+        this.ActiveRoute.push(moduleRoute,componentRoute);
+      }else{
+        this.ActiveRoute[indexModule] = moduleRoute;
+        if(indexComponent!==-1){
+          this.ActiveRoute[indexComponent] = componentRoute;
+          this.ActiveRoute = filter(this.ActiveRoute,function(o:any){
+            return o.level <= componentRoute.level;
+          });
+        }
+        else{
+          this.ActiveRoute.push(componentRoute);
+        }
+      }
 
+      this.ActiveRoute = this.ActiveRoute;
+      localStorage.setItem("ActiveRoute",JSON.stringify(this.ActiveRoute));      
+    }, 150);
   }
+
+  navigateRoute(index:number){
+    if(index!==this.ActiveRoute.length-1 && index!==0){
+      var url = encodeURI('/home/'+this.ActiveRoute[0].path+'/'+this.ActiveRoute[index].path);
+      this.router.navigateByUrl(url);
+    }else{
+      return null
+    }
+  }
+
 
   constructor(private route: ActivatedRoute, private router: Router, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit() {
-
+    
   }
   
 
