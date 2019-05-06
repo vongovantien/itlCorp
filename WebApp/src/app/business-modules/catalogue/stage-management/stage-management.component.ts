@@ -278,7 +278,7 @@ export class StageManagementComponent implements OnInit {
 
     isDesc = true;
     sortKey: string = "id";
-    sort(property) {
+    sort(property:any) {
         this.sortKey = property;
         this.isDesc = !this.isDesc;
         if (property === 'deptName') {
