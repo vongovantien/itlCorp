@@ -1,7 +1,0 @@
-Ladder	Number	
-Price	Number	
-UnitName_VN	String	100	
-UnitName_EN	String	100	
-PickupName	String	500	
-DeliveryName	String	500	
-ConditionID	String	100	
