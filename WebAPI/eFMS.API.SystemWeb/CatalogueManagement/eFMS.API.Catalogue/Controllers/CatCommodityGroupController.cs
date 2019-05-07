@@ -197,8 +197,8 @@ namespace eFMS.API.Catalogue.Controllers
                     list.Add(commodityGroup);
                 }
                 var data = catComonityGroupService.CheckValidImport(list);
-                var totoalValidRows = data.Count(x => x.IsValid == true);
-                var results = new { data, totoalValidRows };
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
                 return Ok(results);
             }
             return BadRequest(new ResultHandle { Status = false, Message = "Cannot upload, file not found !" });

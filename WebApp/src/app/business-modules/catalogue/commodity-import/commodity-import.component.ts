@@ -36,7 +36,7 @@ export class CommodityImportComponent implements OnInit {
   @ViewChild('form') form: any;
   @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
   ngOnInit() {
-
+    this.pager.totalItems = 0;
   }
   chooseFile(file: Event) {
     if (!this.baseService.checkLoginSession()) return;

@@ -141,16 +141,30 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == 0)
             {
-                if (catUnitService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower()) || (x.UnitNameVn.ToLower() == model.UnitNameEn.ToLower())))
+                if (catUnitService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || string.IsNullOrEmpty(model.Code)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower() || string.IsNullOrEmpty(model.UnitNameEn))){
+                    message = stringLocalizer[LanguageSub.MSG_NAME_EN_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower() || string.IsNullOrEmpty(model.UnitNameVn))){
+                    message = stringLocalizer[LanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
                 }
             }
             else
             {
-                if (catUnitService.Any(x => ((x.Code.ToLower() == model.Code.ToLower()) || (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower()) || (x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower())) && x.Id != id))
+                if (catUnitService.Any(x => (x.Code.ToLower() == model.Code.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.Code)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.UnitNameEn)))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_NAME_EN_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => (x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.UnitNameVn)))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
                 }
             }
             return message;

@@ -13,6 +13,8 @@
   "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",
   "FILE_NOT_FOUND": "File not found!",
   "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
+  "MSG_NAME_EN_EXISTED": "Name EN has been existed",
+  "MSG_NAME_LOCAL_EXISTED": "Name VN has been existed",
 
   //------------start: partner data
   "MSG_PARTNER_TAXCODE_EMPTY": "Tax code is not allow empty!|wrong",
@@ -45,7 +47,7 @@
   "MSG_PLACE_NAME_LOCAL_EMPTY": "NameVn is not allow empty!|wrong",
   "MSG_PLACE_COUNTRY_NAME_EMPTY": "Country name is not allow empty!|wrong",
   "MSG_PLACE_COUNTRY_NOT_FOUND": "Country '{0}' is not found!|wrong",
-  "MSG_PLACE_CODE_EMPTY": "Cde is not allow empty!|wrong",
+  "MSG_PLACE_CODE_EMPTY": "Code is not allow empty!|wrong",
   "MSG_PLACE_CODE_EXISTED": "Code {0} has been existed!|wrong",
   "MSG_PLACE_PROVINCE_NAME_EMPTY": "Country name is not allow empty!|wrong",
   "MSG_PLACE_PROVINCE_NOT_FOUND": "Province name '{0}' is not found in country {1}!|wrong",
