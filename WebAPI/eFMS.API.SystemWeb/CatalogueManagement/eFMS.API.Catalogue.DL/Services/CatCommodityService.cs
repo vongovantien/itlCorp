@@ -115,6 +115,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CommodityNameEn = item.CommodityNameEn,
                         CommodityNameVn = item.CommodityNameVn,
                         CommodityGroupId = item.CommodityGroupId,
+                        Code = item.Code,
                         Inactive = item.Status.ToString().ToLower()=="active"?false:true,
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,

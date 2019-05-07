@@ -110,9 +110,9 @@ export class StageManagementComponent implements OnInit {
                     //this.pager.currentPage = 1;
                     //this.child.setPage(this.pager.currentPage);
                     this.pager.totalItems = 0;
-                    this.getStages(this.pager);
+                    // this.getStages(this.pager);
                     //await this.getStages(this.pager);
-                    //await this.setPage(this.pager);
+                    await this.setPage(this.pager);
                 }
             }
         }
