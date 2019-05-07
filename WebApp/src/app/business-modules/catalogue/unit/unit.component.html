@@ -255,7 +255,7 @@
                                     (selected)="selected($event)" (removed)="removed($event)"
                                     (typed)="typed($event)" placeholder="Select unit type">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="addUnitForm.submitted && addUnitForm.unitType==null">
+                                <div class="form-control-feedback" *ngIf="addUnitForm.submitted && UnitToAdd.unitType==null">
                                     Unit type is required
                                 </div>
                             </div>
@@ -284,7 +284,7 @@
 
                     </div>
                     <div class="modal-footer m--align-center c-button-actions">
-                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addNewUnit(addUnitForm,'yes')">
+                        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addNewUnit(addUnitForm,'yes')">
                             <span>
                                 <i class="la la-save"></i>
                                 <span>

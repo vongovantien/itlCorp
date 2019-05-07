@@ -28,6 +28,11 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
 
+        #region Unit
+        public static readonly string MSG_NAME_EN_EXISTED = "MSG_NAME_EN_EXISTED";
+        public static readonly string MSG_NAME_LOCAL_EXISTED = "MSG_NAME_LOCAL_EXISTED";
+        #endregion
+
         #region Partner
         public static readonly string MSG_PARTNER_TAXCODE_EMPTY = "MSG_PARTNER_TAXCODE_EMPTY";
         public static readonly string MSG_PARTNER_TAXCODE_NOT_NUMBER = "MSG_PARTNER_TAXCODE_NOT_NUMBER";

@@ -153,6 +153,8 @@ namespace eFMS.API.Documentation.DL.Services
                 });
             }
             result.ReportName = "rptManifest.rpt";
+            result.AllowPrint = true;
+            result.AllowExport = true;
             result.AddDataSource(new List<ManifestReportResult> { manifest });
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.AddSubReport("ManifestHouseBillDetail", housebillList);
