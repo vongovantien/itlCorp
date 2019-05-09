@@ -1,45 +1,53 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
-import { Router } from '@angular/router';
-import { OAuthService, JwksValidationHandler} from 'angular-oauth2-oidc';
+import { Router, ActivatedRoute } from '@angular/router';
+import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
 import { NgForm } from '@angular/forms';
 import { authConfig } from '../shared/authenticate/authConfig';
 import { BaseService } from 'src/services-base/base.service';
+import $ from 'jquery';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
+export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
   ngAfterViewInit(): void {
-    // if (this.cookieService.get("login_status") === "LOGGED_IN") {
-    //   this.router.navigateByUrl('/home');
-    // }
-     this.getLoginData();
+    if(this.route.snapshot.paramMap.get("isEndSession")){
+      setTimeout(() => {
+        this.baseService.warningToast("Login again to continue, please !","Expired Session"); 
+      }, 50);      
+      /**
+       * To remove modal element in case has a modal is opening in previous step 
+       */
+      $('.modal-backdrop').remove();
+    }
+    this.getLoginData();
   }
 
   constructor(
     private toastr: ToastrService,
-    private baseService:BaseService,
+    private baseService: BaseService,
     private router: Router,
+    private route: ActivatedRoute,
     private oauthService: OAuthService,
     private cookieService: CookieService,
-    private changeDetector : ChangeDetectorRef ) {       
-      this.oauthService.setStorage(localStorage);
-      this.oauthService.setupAutomaticSilentRefresh();
+    private changeDetector: ChangeDetectorRef) {
+    this.oauthService.setStorage(localStorage);
+    this.oauthService.setupAutomaticSilentRefresh();
   }
-  ngAfterViewChecked(){
+  ngAfterViewChecked() {
     this.changeDetector.detectChanges();
   }
 
   private async configureWithNewConfigApi() {
     this.oauthService.configure(authConfig);
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
-    await this.oauthService.loadDiscoveryDocumentAndTryLogin();     
+    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
   }
 
   username: string = "";
@@ -48,13 +56,13 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
 
   ngOnInit() {
     // this.setupLocalInfo();
-    if(this.baseService.checkLoginSession(false)){
+    if (this.baseService.checkLoginSession()) {
       this.setupLocalInfo();
       this.router.navigateByUrl('/home/dashboard');
     }
   }
 
-  async Login(form: NgForm) {          
+  async Login(form: NgForm) {
     if (form.form.status !== "INVALID") {
       this.baseService.spinnerShow();
       await this.configureWithNewConfigApi();
@@ -63,12 +71,12 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
       }).then(() => {
         let claims = this.oauthService.getIdentityClaims();
         if (claims) {
-          localStorage.setItem("currently_userName",claims['preferred_username']);
-          localStorage.setItem("currently_userEmail",claims['email']);
+          localStorage.setItem("currently_userName", claims['preferred_username']);
+          localStorage.setItem("currently_userEmail", claims['email']);
           this.setupLocalInfo();
           this.rememberMe();
-          this.toastr.info("Welcome back, "+claims['preferred_username'].toUpperCase()+" !", "Login Success", { positionClass: 'toast-bottom-right' });
-          this.router.navigateByUrl('/home/dashboard');       
+          this.toastr.info("Welcome back, " + claims['preferred_username'].toUpperCase() + " !", "Login Success", { positionClass: 'toast-bottom-right' });
+          this.router.navigateByUrl('/home/dashboard');
           this.baseService.spinnerHide();
         }
       }).catch((err) => {
@@ -119,21 +127,21 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
     this.username = this.getUserName();
     this.password = this.getUserPassword();
     this.remember_me = (this.username != '' || this.password != '');
-  }  
+  }
 
   changeLanguage(lang: string) {
     localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, lang);
     if (localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE) === "en") {
-      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"en-US");
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "en-US");
       window.location.href = window.location.protocol + "//" + window.location.hostname;
     } else {
-      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE,"vi-VN");
+      localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "vi-VN");
       window.location.href = window.location.protocol + "//" + window.location.hostname + "/" + lang + "/";
     }
   }
 
 
-  setupLocalInfo(){
+  setupLocalInfo() {
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == null) {
       localStorage.setItem("CURRENT_LANGUAGE", SystemConstants.DEFAULT_LANGUAGE);
     }
@@ -141,7 +149,7 @@ export class LoginComponent implements OnInit, AfterViewInit,AfterViewChecked {
       localStorage.setItem("CURRENT_VERSION", "1");
     }
     var current_client_lang = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
- 
+
     if (current_client_lang === null) {
       localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");
     }

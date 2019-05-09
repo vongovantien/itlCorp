@@ -8,8 +8,8 @@ import { BaseService } from './base.service';
 export class AuthGuardService implements CanActivate {
 
   canActivate(): boolean{
-    if(!this.baseService.checkLoginSession(false)){
-      this.router.navigate(['/login']);
+    if(!this.baseService.checkLoginSession()){
+      this.router.navigate(['/login',{isEndSession:true}]);
       return false;
     }else{
       return true;

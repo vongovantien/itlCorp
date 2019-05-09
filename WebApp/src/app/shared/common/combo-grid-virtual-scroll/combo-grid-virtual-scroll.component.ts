@@ -10,7 +10,7 @@ import { SortService } from '../../services/sort.service';
   templateUrl: './combo-grid-virtual-scroll.component.html',
   styleUrls: ['./combo-grid-virtual-scroll.component.scss']
 })
-export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterViewInit {
+export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, AfterViewInit {
 
   currentItemSelected: any = null;
   CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
@@ -24,12 +24,14 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
   SearchFields: string[] = [];
   SelectedDisplayFields: string[] = [];
   CurrentActiveItem: any = null;
+  Disabled: boolean = false;
 
   @Input() dataSources: any[];
   @Input() displayFields: { field: string, label: string }[];
   @Input() searchFields: any[];
   @Input() selectedDisplayFields: any[];
   @Input() currentActiveItemId: any;
+  @Input() disabled: boolean;
 
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -37,6 +39,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
     const _displayFields: SimpleChange = changes.displayFields;
     const _selectedDisplayFields: SimpleChange = changes.selectedDisplayFields;
     const _currentActiveItemId: SimpleChange = changes.currentActiveItemId;
+    const _disabled: SimpleChange = changes.disabled;
 
     if (_dataSources !== undefined && _dataSources !== null) {
       this.setDataSource(_dataSources.currentValue);
@@ -50,17 +53,18 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
     if (_currentActiveItemId !== undefined && _currentActiveItemId !== null) {
       this.setCurrentActiveItemId(_currentActiveItemId.currentValue);
     }
+    if (_disabled !== undefined && _disabled !== null) {
+      this.setDisabled(_disabled.currentValue);
+    }
 
   }
 
   private setDataSource(data: any[]) {
-   
+
     if (data != undefined && data.length > 0) {
       data = this.sortService.sort(data, this.displayFields[0].field, true);
-      console.log(data);
       this.DataSources = data;
       this.ConstDataSources = cloneDeep(data);
-
       if (this.CurrentActiveItemIdObj !== null) {
         var activeItemData = this.CurrentActiveItemIdObj;
         var itemIndex = findIndex(this.ConstDataSources, function (o) {
@@ -90,11 +94,16 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
     }
   }
 
+  private setDisabled(data: boolean) {
+    this.Disabled = data;
+  }
+
   private setCurrentActiveItemId(data: any) {
     if (data.value != null) {
-      this.CurrentActiveItemIdObj = data;
+      var context = this;
       var itemIndex = findIndex(this.ConstDataSources, function (o) {
-        return o[data.field] === data.value;
+        var val = context.getValue(o, data.field);
+        return val === data.value;
       });
       if (itemIndex != -1) {
         this.indexSelected = itemIndex;
@@ -116,7 +125,6 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
     private sortService: SortService) { }
 
   ngAfterViewInit(): void {
-    console.log("VIEW INITED ")
     this.cdr.markForCheck();
   }
 
@@ -140,27 +148,28 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
       const field = this.SelectedDisplayFields[i];
 
       if (i === this.SelectedDisplayFields.length - 1) {
-        this.displaySelectedStr += item[field];
+        this.displaySelectedStr += this.getValue(item, field);
       }
       else {
-        this.displaySelectedStr += item[field] + " - ";
+        this.displaySelectedStr += this.getValue(item, field) + " - ";
       }
 
     }
   }
 
   Search(key: string) {
-    // this.indexSelected = -1;
-    // this.displaySelectedStr = '';
+
     key = key.toLowerCase().trim();
     var constData = this.ConstDataSources;
     var displayFields = this.DisplayFields;
+    var context = this;
+
     this.DataSources = filter(constData, function (o) {
       var matched: boolean = false;
 
       for (var i = 0; i < displayFields.length; i++) {
         const field: string = displayFields[i].field;
-        const value: string = o[field] == null ? "" : o[field].toString();
+        const value: string = context.getValue(o, field) == null ? "" : context.getValue(o, field);
         const valueType: string = typeof value;
 
         if (valueType === 'boolean' && value === key) {
@@ -174,8 +183,6 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
       return matched;
     });
 
-    console.log(this.DataSources);
-
     if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
       var _CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = this.CurrentActiveItemIdObj;
       this.indexSelected = findIndex(this.DataSources, function (o) {
@@ -185,6 +192,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
 
 
   }
+
 
 
   /**
@@ -198,6 +206,25 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges,AfterV
     }, 100);
   }
 
+
+  getValue(item: any, field: string) {
+    try {
+
+      if (field.includes(".")) {
+        var fieldList = field.split(".");
+        for (var i = 0; i < fieldList.length; i++) {
+          item = item[fieldList[i]];
+        }
+        return item;
+      } else {
+        return item[field];
+      }
+
+    } catch (error) {
+      return null;
+    }
+
+  }
 
 
 

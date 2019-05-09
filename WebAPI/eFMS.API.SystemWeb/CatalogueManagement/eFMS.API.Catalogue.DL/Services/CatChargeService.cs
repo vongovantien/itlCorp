@@ -101,7 +101,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 list = list.Where(x => (x.Type.Trim().ToLower() == criteria.Type.Trim().ToLower() && x.ServiceTypeId.IndexOf(criteria.ServiceTypeId)>-1 && x.Inactive == criteria.Inactive)).ToList();
             }
-
+            list = list.OrderByDescending(x => x.DatetimeModified).ToList();
             rowsCount = list.Count;
             if (size > 1)
             {
@@ -109,7 +109,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                list = list.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).ToList();
+                list = list.Skip((page - 1) * size).Take(size).ToList();
             }
             foreach(var charge in list)
             {
@@ -271,7 +271,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CurrencyId = item.CurrencyId,
                         Type = item.Type,
                         ServiceTypeId = item.ServiceTypeId,
-                        Inactive = item.Status.ToString().ToLower() == "active" ? false : true,
+                        Inactive = item.Status.Trim().ToLower() == "active" ? false : true,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = ChangeTrackerHelper.currentUser
                     };

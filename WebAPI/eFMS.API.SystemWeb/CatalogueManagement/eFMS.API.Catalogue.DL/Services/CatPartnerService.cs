@@ -128,6 +128,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             List<CatPartnerViewModel> results = null;
             var list = Query(criteria);
+            list = list.OrderByDescending(x => x.DatetimeModified).ToList();
             rowsCount = list.ToList().Count;
             if (size > 1)
             {

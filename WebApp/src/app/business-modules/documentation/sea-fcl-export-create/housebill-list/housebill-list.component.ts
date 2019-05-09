@@ -12,7 +12,7 @@ import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import moment from 'moment/moment';
-import { async } from '@angular/core/testing';
+import cloneDeep from 'lodash/cloneDeep';
  declare var $: any;
 
 @Component({
@@ -264,9 +264,10 @@ export class HousebillListComponent implements OnInit {
       key = search_key == null ? "" : search_key.trim();
     }
 
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstBuyingRateChargesComboBox = res['data'];
     });
+
   }
 
   getListSellingRateCharges(search_key: string = null) {
@@ -300,7 +301,7 @@ export class HousebillListComponent implements OnInit {
     } else {
       key = search_key == null ? "" : search_key.trim();
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=0", { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
       var data = res['data']
       this.comboBoxData.lstPartner = data;
     });
@@ -450,15 +451,15 @@ export class HousebillListComponent implements OnInit {
     form.onReset();
     this.resetDisplay();
     $('#'+formId).modal("hide");
-    // $('#'+formId).get(0).reset();
+  
     this.BuyingRateChargeToAdd= new CsShipmentSurcharge();
     this.SellingRateChargeToAdd= new CsShipmentSurcharge();
     this.OBHChargeToAdd = new CsShipmentSurcharge();  
-  
+    
     this.BuyingRateChargeToEdit= null;
     this.SellingRateChargeToEdit= null
     this.OBHChargeToEdit= null;
-    console.log(this.BuyingRateChargeToAdd);
+
   }
 
 
@@ -599,13 +600,19 @@ export class HousebillListComponent implements OnInit {
     currentSelected.removeClass("selected-row");
     $(event.srcElement).closest("tr").addClass("selected-row");
   }
-  prepareEdit(type: string) {
-
-    /**
-     * format exchangeDate to binding to ngx-daterangepicker-material  
-     */
+  prepareEdit(type: string,charge:any) {
+    
     if (type === "buy") {
+      this.BuyingRateChargeToEdit = cloneDeep(charge);
       this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+    }
+    if(type==="sell"){
+      this.SellingRateChargeToEdit = cloneDeep(charge);
+      this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+    }
+    if(type==="obh"){
+      this.OBHChargeToEdit = cloneDeep(charge);
+      this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
     }
   }
 
@@ -696,6 +703,7 @@ export class HousebillListComponent implements OnInit {
      
     }
   }
+
 
 }
 

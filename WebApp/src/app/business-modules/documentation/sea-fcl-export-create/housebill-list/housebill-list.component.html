@@ -372,7 +372,7 @@
                             <tr class="" *ngFor="let charge of ListBuyingRateCharges;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <button type="button" (click)="BuyingRateChargeToEdit=charge;prepareEdit('buy')"
+                                        <button type="button" (click)="prepareEdit('buy',charge)"
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="Edit" data-toggle="modal" data-target="#edit-buying-rate-modal">
                                             <i class="la la-edit"></i>
@@ -452,11 +452,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span *ngIf="charge.exchangeDate.startDate==undefined">
+                                    <span>
                                         {{charge.exchangeDate | date:'dd/MM/yyyy'}}
-                                    </span>
-                                    <span *ngIf="charge.exchangeDate.startDate!=undefined">
-                                        {{charge.exchangeDate.startDate | date:'dd/MM/yyyy'}}
                                     </span>
                                 </td>
                             </tr>
@@ -580,7 +577,7 @@
                             <tr class="" *ngFor="let charge of ListSellingRateCharges;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <button type="button" (click)="SellingRateChargeToEdit=charge"
+                                        <button type="button" (click)="prepareEdit('sell',charge)"
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="Edit" data-toggle="modal" data-target="#edit-selling-rate-modal">
                                             <i class="la la-edit"></i>
@@ -790,7 +787,7 @@
                             <tr class="" *ngFor="let charge of ListOBHCharges;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <button type="button" (click)="OBHChargeToEdit=charge"
+                                        <button type="button" (click)="prepareEdit('obh',charge)"
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="Edit" data-toggle="modal" data-target="#edit-obh-charge-modal">
                                             <i class="la la-edit"></i>
@@ -1196,7 +1193,20 @@
                                             class="m--margin-left-5 m--font-primary">{{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
                                             &nbsp;</small>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedBuyingCharge>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToAdd.chargeId}"
+                                        (itemSelected)="BuyingRateChargeToAdd.chargeId=$event.charge.id;
+                                        BuyingRateChargeToAdd.unitId=$event.charge.unitId;
+                                        BuyingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
+                                        BuyingRateChargeToAdd.vatrate=$event.charge.vatrate;
+                                        selectedBuyingChargeCode.value=$event.charge.code;calculateTotalEachBuying();"
+                                        [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstBuyingRateChargesComboBox"                                   
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingCharge>
+                                         [objectToGetData]="'charge'"
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedBuyingCharge.value==null?null:selectedBuyingCharge.value"
@@ -1246,7 +1256,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
                                         Charge is required
@@ -1288,7 +1298,15 @@
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedBuyingRatePartner>
+                                    <app-combo-grid-virtual-scroll 
+                                        [disabled]="BuyingRateChargeToAdd.objectBePaid!=='OTHER'"
+                                        [currentActiveItemId]="{field:'id',value:BuyingRateChargeToAdd.paymentObjectId}"
+                                        (itemSelected)="BuyingRateChargeToAdd.paymentObjectId = $event.id"
+                                        [selectedDisplayFields]="['shortName']"
+                                        [dataSources]="comboBoxData.lstPartner" 
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingRatePartner>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             [disabled]="BuyingRateChargeToAdd.objectBePaid!=='OTHER'" readonly
                                             data-toggle="dropdown" placeholder="Please selected"
@@ -1335,12 +1353,12 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null">
-                                            Partner name is required !
-                                        </div>
-                                    </div>
+                                        </div>                                      
+                                    </div> -->
+                                    <div class="form-control-feedback"
+                                    *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null">
+                                    Partner name is required !
+                                </div>
                                 </div>
                             </div>
                         </div>
@@ -1367,7 +1385,14 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedBuyingUnit>
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:BuyingRateChargeToAdd.unitId}"
+                                        (itemSelected)="BuyingRateChargeToAdd.unitId=$event.id"
+                                        [selectedDisplayFields]="['unitNameEn']"
+                                        [dataSources]="comboBoxData.lstUnit" 
+                                        [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingUnit>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedBuyingUnit.value==null?null:selectedBuyingUnit.value">
@@ -1406,13 +1431,15 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <div class="form-control-feedback"
-                                                    *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
-                                                    Unit is required
-                                                </div>
+                                               
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+                                    <div class="form-control-feedback"
+                                    *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
+                                    Unit is required
+                                   </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -1579,10 +1606,24 @@
                                             class="m--margin-left-5 m--font-primary">{{BuyingRateChargeToEdit.chargeCode}}
                                             &nbsp;</small>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedBuyingChargeEdt>
+                                    <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToEdit.chargeId}"
+                                            (itemSelected)="BuyingRateChargeToEdit.chargeId=$event.charge.id;
+                                            BuyingRateChargeToEdit.unitId=$event.charge.unitId;
+                                            BuyingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
+                                            BuyingRateChargeToEdit.vatrate=$event.charge.vatrate;                                                                 
+                                            BuyingRateChargeToEdit.nameEn=$event.charge.chargeNameEn;
+                                            BuyingRateChargeToEdit.chargeCod;
+                                            calculateTotalEachBuying(true)"
+                                            [selectedDisplayFields]="['charge.chargeNameEn']"
+                                            [dataSources]="lstBuyingRateChargesComboBox"                                   
+                                            [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+    
+                                        </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingChargeEdt>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text" [disabled]="BuyingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="BuyingRateChargeToEdit.nameEn" title="charge">
+                                            [value]="BuyingRateChargeToEdit.nameEn" title="charge">                                        
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
@@ -1628,7 +1669,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.chargeId==null">
                                         Charge is required
@@ -1669,7 +1710,16 @@
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedBuyingRatePartnerEdt>
+                                    <app-combo-grid-virtual-scroll 
+                                        [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.paymentObjectId}"
+                                        (itemSelected)="BuyingRateChargeToEdit.paymentObjectId = $event.id;
+                                        BuyingRateChargeToEdit.partnerName=$event.shortName;"
+                                        [selectedDisplayFields]="['shortName']"
+                                        [dataSources]="comboBoxData.lstPartner" 
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingRatePartnerEdt>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"                                           
                                             [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.soano!=null" readonly
                                             data-toggle="dropdown" placeholder="Please selected"
@@ -1720,7 +1770,7 @@
                                             *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null">
                                             Partner name is required !
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -1748,7 +1798,15 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <app-combo-grid-virtual-scroll 
+                                        [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.unitId}"
+                                        (itemSelected)="BuyingRateChargeToEdit.unitId=$event.id;
+                                        BuyingRateChargeToEdit.unit=$event.unitNameEn"
+                                        [selectedDisplayFields]="['unitNameEn']"
+                                        [dataSources]="comboBoxData.lstUnit" 
+                                        [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             [disabled]="BuyingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
@@ -1788,13 +1846,15 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <div class="form-control-feedback"
-                                                    *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.unitId==null">
-                                                    Unit is required
-                                                </div>
+                                               
                                             </div>
                                         </div>
+                                    </div> -->
+                                    <div class="form-control-feedback" *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.unitId==null">
+                                        Unit is required
                                     </div>
+
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -3092,7 +3152,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit OBH rate</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('edit-obh-rate-modal',editOBHChargeForm)"> 
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('edit-obh-charge-modal',editOBHChargeForm)"> 
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -3471,7 +3531,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-obh-rate-modal',editOBHChargeForm)">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-obh-charge-modal',editOBHChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

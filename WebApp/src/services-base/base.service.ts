@@ -135,7 +135,6 @@ export class BaseService implements ErrorHandler {
       this.spinnerShow();
     try {
       const res = await this._http.put(url, data, { headers: this.headers }).toPromise();
-      console.log(res)
       this.spinnerHide();
       this.handleState(res, display_notify);
       return res;
@@ -191,7 +190,6 @@ export class BaseService implements ErrorHandler {
       const res = await this._http.post(url, data, { responseType: "blob" }).toPromise();
       return res;
     } catch (error) {
-      console.log({ DOWNLOAD_ERROR_LOG: error });
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
@@ -204,7 +202,6 @@ export class BaseService implements ErrorHandler {
       const res = await this._http.get(url, { responseType: 'blob' }).toPromise();
       saveAs(res, saveAsFileName);
     } catch (error) {
-      console.log({ DOWNLOAD_ERROR_LOG: error });
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
@@ -311,14 +308,9 @@ export class BaseService implements ErrorHandler {
     this.spinnerService.hide();
   }
 
-  checkLoginSession(display_warning = true): boolean {
-    if (this.hasValidAccessToken() == false) {
-      if (display_warning) {
-        this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
-      }     
-      this.router.navigateByUrl('/login');
+  checkLoginSession(): boolean {
+    if (this.hasValidAccessToken() == false) {   
       localStorage.clear();
-      // this.reloadPage();
       return false;
     } else {
       return true;
@@ -326,8 +318,10 @@ export class BaseService implements ErrorHandler {
   }
 
 
-
-  reloadPage() {
+ /**
+  * Use to hot reload all app 
+  */
+  public reloadPage() {
     if (window.location.hostname === 'localhost') {
       window.location.href = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
     } else {
@@ -360,8 +354,12 @@ export class BaseService implements ErrorHandler {
       var expTime = +new Date(parseInt(expiresAt,10));
       var nowTime = +new Date();
       const remainingMinutes = new Date(expTime - nowTime).getMinutes();
-
-      return remainingMinutes
+      const remainingHours = new Date(expTime).getHours() - new Date(nowTime).getHours();
+      if(remainingHours==0){
+        return remainingMinutes;
+      }else{
+        return -1;
+      }
     }
     return -1;
   };

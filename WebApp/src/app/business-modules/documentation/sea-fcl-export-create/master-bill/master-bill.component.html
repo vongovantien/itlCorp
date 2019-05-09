@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                      <div class="form-group" [ngClass]="{ 'has-danger': etaSelected && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
+                      <div class="form-group" [ngClass]="{ 'has-danger': submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)}">
                         <label class="form-control-label" for="">
                             Estimated time of Arrival
                         </label>
@@ -61,7 +61,7 @@
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                              <div class="form-control-feedback" *ngIf="etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
+                              <div class="form-control-feedback" *ngIf="submitted && etaSelected != null && (etdSelected != null?etdSelected.startDate: null) >= (etaSelected != null?etaSelected.startDate: null)">
                                 Estimated time of Arrival must more than estimated time of departure
                             </div>
                         </div>

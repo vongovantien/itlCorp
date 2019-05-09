@@ -41,14 +41,12 @@ export class ChargeImportAccountVoucherComponent implements OnInit {
     this.pager.totalItems = 0;
   }
 
-  chooseFile(file: Event) {
-    if (!this.baseService.checkLoginSession()) return;
+  chooseFile(file: Event) {    
     if (file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.menu_api.Catalogue.Charge_DefaultAccount.uploadExel, file.target['files'], "uploadedFile")
       .subscribe(res => {
         this.data = res['data'];
-        console.log(this.data)
         this.pager.totalItems = this.data.length;
         this.totalValidRows = res['totalValidRows'];
         this.totalRows = this.data.length;
@@ -113,9 +111,6 @@ export class ChargeImportAccountVoucherComponent implements OnInit {
     }
     else {
       let validItems = this.data.filter(x => x.isValid);
-      if (!this.baseService.checkLoginSession()) {
-        return;
-      }
       var response = await this.baseService.postAsync(this.menu_api.Catalogue.Charge_DefaultAccount.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
