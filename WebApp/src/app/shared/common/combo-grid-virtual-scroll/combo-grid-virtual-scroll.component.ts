@@ -100,6 +100,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
 
   private setCurrentActiveItemId(data: any) {
     if (data.value != null) {
+      this.CurrentActiveItemIdObj = data;
       var context = this;
       var itemIndex = findIndex(this.ConstDataSources, function (o) {
         var val = context.getValue(o, data.field);
@@ -113,6 +114,8 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
       if (itemIndex === -1 && data.hardValue != null) {
         this.displaySelectedStr = data.hardValue;
       }
+    } else {
+      this.displaySelectedStr = null;
     }
   }
 

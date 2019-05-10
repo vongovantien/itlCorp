@@ -152,7 +152,7 @@
                                     CBM
                                 </span>
                             </th>
-                           
+
                         </tr>
                     </thead>
 
@@ -170,7 +170,8 @@
                                     </button>
                                     <button type="button" (click)="DeleteHouseBill('confirm',hb.id)"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-housebill-modal">
+                                        title="Remove" data-toggle="modal"
+                                        data-target="#confirm-delete-housebill-modal">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
@@ -215,7 +216,7 @@
                                     {{hb.cbm}}
                                 </span>
                             </td>
-                        
+
                         </tr>
                     </tbody>
                 </table>
@@ -379,7 +380,8 @@
                                         </button>
                                         <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
+                                            title="Remove" data-toggle="modal"
+                                            data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -584,7 +586,8 @@
                                         </button>
                                         <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
+                                            title="Remove" data-toggle="modal"
+                                            data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -794,7 +797,8 @@
                                         </button>
                                         <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-charge-modal">
+                                            title="Remove" data-toggle="modal"
+                                            data-target="#confirm-delete-charge-modal">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -1166,7 +1170,7 @@
 <!--end:: m-portlet-->
 
 
-<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm" 
+<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm"
     (ngSubmit)="addBuyingRateChargeForm.form.valid">
     <!--begin:: add-buying-rate-modal-->
     <div class="modal fade" id="add-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -1176,7 +1180,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add buying charge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('add-buying-rate-modal',addBuyingRateChargeForm)">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        (click)="resetChargeForm('add-buying-rate-modal',addBuyingRateChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -1201,7 +1206,7 @@
                                         BuyingRateChargeToAdd.vatrate=$event.charge.vatrate;
                                         selectedBuyingChargeCode.value=$event.charge.code;calculateTotalEachBuying();"
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
-                                        [dataSources]="lstBuyingRateChargesComboBox"                                   
+                                        [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
 
                                     </app-combo-grid-virtual-scroll>
@@ -1298,12 +1303,11 @@
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
-                                    <app-combo-grid-virtual-scroll 
+                                    <app-combo-grid-virtual-scroll
                                         [disabled]="BuyingRateChargeToAdd.objectBePaid!=='OTHER'"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToAdd.paymentObjectId}"
                                         (itemSelected)="BuyingRateChargeToAdd.paymentObjectId = $event.id"
-                                        [selectedDisplayFields]="['shortName']"
-                                        [dataSources]="comboBoxData.lstPartner" 
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
                                     <!-- <div class="dropdown e--combogrid" #selectedBuyingRatePartner>
@@ -1356,9 +1360,9 @@
                                         </div>                                      
                                     </div> -->
                                     <div class="form-control-feedback"
-                                    *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null">
-                                    Partner name is required !
-                                </div>
+                                        *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null">
+                                        Partner name is required !
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1385,11 +1389,10 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <app-combo-grid-virtual-scroll 
+                                    <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToAdd.unitId}"
                                         (itemSelected)="BuyingRateChargeToAdd.unitId=$event.id"
-                                        [selectedDisplayFields]="['unitNameEn']"
-                                        [dataSources]="comboBoxData.lstUnit" 
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
                                     <!-- <div class="dropdown e--combogrid" #selectedBuyingUnit>
@@ -1436,9 +1439,9 @@
                                         </div>
                                     </div> -->
                                     <div class="form-control-feedback"
-                                    *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
-                                    Unit is required
-                                   </div>
+                                        *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
+                                        Unit is required
+                                    </div>
 
                                 </div>
                             </div>
@@ -1565,7 +1568,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-buying-rate-modal',addBuyingRateChargeForm)">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="resetChargeForm('add-buying-rate-modal',addBuyingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -1590,7 +1594,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit buying rate</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('edit-buying-rate-modal',editBuyingRateChargeForm)">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        (click)="resetChargeForm('edit-buying-rate-modal',editBuyingRateChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -1607,19 +1612,20 @@
                                             &nbsp;</small>
                                     </label>
                                     <app-combo-grid-virtual-scroll
-                                            [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToEdit.chargeId}"
-                                            (itemSelected)="BuyingRateChargeToEdit.chargeId=$event.charge.id;
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToEdit.chargeId}"
+                                        (itemSelected)="BuyingRateChargeToEdit.chargeId=$event.charge.id;
                                             BuyingRateChargeToEdit.unitId=$event.charge.unitId;
                                             BuyingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
                                             BuyingRateChargeToEdit.vatrate=$event.charge.vatrate;                                                                 
                                             BuyingRateChargeToEdit.nameEn=$event.charge.chargeNameEn;
                                             BuyingRateChargeToEdit.chargeCod;
                                             calculateTotalEachBuying(true)"
-                                            [selectedDisplayFields]="['charge.chargeNameEn']"
-                                            [dataSources]="lstBuyingRateChargesComboBox"                                   
-                                            [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-    
-                                        </app-combo-grid-virtual-scroll>
+                                        [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstBuyingRateChargesComboBox"
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+
+                                    </app-combo-grid-virtual-scroll>
                                     <!-- <div class="dropdown e--combogrid" #selectedBuyingChargeEdt>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text" [disabled]="BuyingRateChargeToEdit.soano!=null"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
@@ -1685,7 +1691,8 @@
                                     <ng-select [allowClear]="true" [items]="[
                                                             { 'text': 'AGENT', 'id': 'AGENT' },
                                                             { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
-                                                            { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                                            { 'text': 'OTHER', 'id': 'OTHER' }]"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [active]="[{'text':BuyingRateChargeToEdit.objectBePaid,'id':BuyingRateChargeToEdit.objectBePaid}]"
                                         (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.objectBePaid=$event.id;
@@ -1710,13 +1717,12 @@
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
-                                    <app-combo-grid-virtual-scroll 
+                                    <app-combo-grid-virtual-scroll
                                         [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.paymentObjectId}"
                                         (itemSelected)="BuyingRateChargeToEdit.paymentObjectId = $event.id;
                                         BuyingRateChargeToEdit.partnerName=$event.shortName;"
-                                        [selectedDisplayFields]="['shortName']"
-                                        [dataSources]="comboBoxData.lstPartner" 
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
                                     <!-- <div class="dropdown e--combogrid" #selectedBuyingRatePartnerEdt>
@@ -1798,12 +1804,12 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <app-combo-grid-virtual-scroll 
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.unitId}"
                                         (itemSelected)="BuyingRateChargeToEdit.unitId=$event.id;
                                         BuyingRateChargeToEdit.unit=$event.unitNameEn"
-                                        [selectedDisplayFields]="['unitNameEn']"
-                                        [dataSources]="comboBoxData.lstUnit" 
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
                                     <!-- <div class="dropdown e--combogrid">
@@ -1850,7 +1856,8 @@
                                             </div>
                                         </div>
                                     </div> -->
-                                    <div class="form-control-feedback" *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.unitId==null">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.unitId==null">
                                         Unit is required
                                     </div>
 
@@ -1955,9 +1962,8 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            [attr.disabled]="BuyingRateChargeToEdit.soano!=null"
-                                            ngxDaterangepickerMd [autoApply]="true"
-                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [attr.disabled]="BuyingRateChargeToEdit.soano!=null" ngxDaterangepickerMd
+                                            [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="BuyingRateChargeToEdit.exchangeDate" [singleDatePicker]="true"
                                             name="BuyingRateChargeExchangeDateNameEdt" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -1995,7 +2001,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-buying-rate-modal',editBuyingRateChargeForm)">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="resetChargeForm('edit-buying-rate-modal',editBuyingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2020,7 +2027,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add selling charge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('add-selling-rate-modal',addSellingRateChargeForm)">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        (click)="resetChargeForm('add-selling-rate-modal',addSellingRateChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -2035,7 +2043,20 @@
                                         Charge <small
                                             class="m--margin-left-5 m--font-primary">{{selectedSellingChargeCode.value==null?'':selectedSellingChargeCode.value}}&nbsp;</small>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedSellingCharge>
+
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'charge.id',value:SellingRateChargeToAdd.chargeId}"
+                                        (itemSelected)="SellingRateChargeToAdd.chargeId=$event.charge.id;
+                                        SellingRateChargeToAdd.unitId=$event.charge.unitId;
+                                        SellingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
+                                        SellingRateChargeToAdd.vatrate = $event.charge.vatrate;
+                                        selectedSellingChargeCode.value=$event.charge.code;
+                                        calculateTotalEachSelling()" [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstSellingRateChargesComboBox"
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                    <!-- <div class="dropdown e--combogrid" #selectedSellingCharge>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedSellingCharge.value==null?null:selectedSellingCharge.value"
@@ -2084,11 +2105,15 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
-                                            Charge is required
-                                        </div>
+                                      
+                                    </div> -->
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
+                                        Charge is required
                                     </div>
+
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -2117,11 +2142,18 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeForm.submitted && SellingRateChargeToAdd.paymentObjectId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': (addSellingRateChargeForm.submitted && SellingRateChargeToAdd.paymentObjectId==null)||(!addSellingRateChargeForm.submitted && SellingRateChargeToAdd.objectBePaid!==null && SellingRateChargeToAdd.paymentObjectId==null)}">
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedSellingRatePartner>
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="SellingRateChargeToAdd.objectBePaid!=='OTHER'"
+                                        [currentActiveItemId]="{field:'id',value:SellingRateChargeToAdd.paymentObjectId}"
+                                        (itemSelected)="SellingRateChargeToAdd.paymentObjectId = $event.id"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedSellingRatePartner>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             [disabled]="SellingRateChargeToAdd.objectBePaid!=='OTHER'" readonly
                                             data-toggle="dropdown" placeholder="Please selected"
@@ -2169,11 +2201,18 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.paymentObjectId==null">
-                                            Partner name is required !
-                                        </div>
+                                        
+                                    </div> -->
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.paymentObjectId==null">
+                                        Partner name is required !
                                     </div>
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="!addSellingRateChargeForm.submitted && SellingRateChargeToAdd.objectBePaid!==null && SellingRateChargeToAdd.paymentObjectId==null">
+                                        Partner does not exist !
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -2201,7 +2240,13 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedSellingUnit>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:SellingRateChargeToAdd.unitId}"
+                                        (itemSelected)="SellingRateChargeToAdd.unitId=$event.id"
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
+                                        [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedSellingUnit>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedSellingUnit.value==null?null:selectedSellingUnit.value">
@@ -2240,13 +2285,16 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <div class="form-control-feedback"
-                                                    *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
-                                                    Unit is required
-                                                </div>
+                                               
                                             </div>
                                         </div>
+                                    </div> -->
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
+                                        Unit is required
                                     </div>
+
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -2356,7 +2404,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-selling-rate-modal',addSellingRateChargeForm)">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="resetChargeForm('add-selling-rate-modal',addSellingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2375,13 +2424,14 @@
 <form novalidate #editSellingRateChargeForm="ngForm" name="editSellingRateChargeForm"
     *ngIf="SellingRateChargeToEdit!=null">
     <!--begin:: edit-selling-rate-modal-->
-    <div class="modal fade" id="edit-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby="" (click)="resetChargeForm('edit-selling-rate-modal',editSellingRateChargeForm)"
+    <div class="modal fade" id="edit-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
         aria-hidden="true">
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit selling rate</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        (click)="resetChargeForm('edit-selling-rate-modal',editSellingRateChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -2397,9 +2447,24 @@
                                             class="m--margin-left-5 m--font-primary">{{SellingRateChargeToEdit.chargeCode}}
                                             &nbsp;</small>
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'charge.id',value:SellingRateChargeToEdit.chargeId,hardValue:SellingRateChargeToEdit.nameEn}"
+                                        (itemSelected)="SellingRateChargeToEdit.chargeId=$event.charge.id;
+                                        SellingRateChargeToEdit.unitId=$event.charge.unitId;
+                                        SellingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
+                                        SellingRateChargeToEdit.vatrate=$event.charge.vatrate;                                                                 
+                                        SellingRateChargeToEdit.nameEn=$event.charge.chargeNameEn;
+                                        SellingRateChargeToEdit.chargeCode=$event.charge.code;
+                                        calculateTotalEachSelling(true)"
+                                        [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstBuyingRateChargesComboBox"
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="SellingRateChargeToEdit.soano!=null"
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            [disabled]="SellingRateChargeToEdit.soano!=null"
                                             [value]="SellingRateChargeToEdit.nameEn" title="charge">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -2429,7 +2494,8 @@
                                                         *ngIf="lstBuyingRateChargesComboBox!==null && lstBuyingRateChargesComboBox.length>0">
                                                         <tbody
                                                             *ngFor="let item of lstBuyingRateChargesComboBox;let i = index;">
-                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="SellingRateChargeToEdit.chargeId=item.charge.id;
+                                                            <tr class="data-row" attr.data-id="{{i}}"
+                                                                (click)="SellingRateChargeToEdit.chargeId=item.charge.id;
                                                                 SellingRateChargeToEdit.unitId=item.charge.unitId;
                                                                 SellingRateChargeToEdit.unitPrice=item.charge.unitPrice;
                                                                 SellingRateChargeToEdit.vatrate=item.charge.vatrate;                                                                 
@@ -2446,7 +2512,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.chargeId==null">
                                         Charge is required
@@ -2459,7 +2525,8 @@
                                     <label class="form-control-label" for="">
                                         Partner type
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="partnerTypes" [disabled]="SellingRateChargeToEdit.soano!=null"
+                                    <ng-select [allowClear]="true" [items]="partnerTypes"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [active]="[{'text':SellingRateChargeToEdit.objectBePaid,'id':SellingRateChargeToEdit.objectBePaid}]"
                                         (data)="refreshValue($event)"
                                         (selected)="SellingRateChargeToEdit.objectBePaid=$event.id;
@@ -2480,14 +2547,21 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': editSellingRateChargeForm.submitted && SellingRateChargeToEdit.paymentObjectId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': (editSellingRateChargeForm.submitted && SellingRateChargeToEdit.paymentObjectId==null)||(!editSellingRateChargeForm.submitted && SellingRateChargeToEdit.objectBePaid!==null && SellingRateChargeToEdit.paymentObjectId==null)}">
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedSellingRatePartnerEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"                                        
-                                            [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null" readonly
-                                            data-toggle="dropdown" placeholder="Please selected"
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'id',value:SellingRateChargeToEdit.paymentObjectId}"
+                                        (itemSelected)="SellingRateChargeToEdit.paymentObjectId = $event.id"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedSellingRatePartnerEdt>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null"
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="SellingRateChargeToEdit.partnerName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -2532,10 +2606,16 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.paymentObjectId==null">
-                                            Partner name is required !
-                                        </div>
+                                        
+                                    </div> -->
+                                    <div class="form-control-feedback"
+                                        *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.paymentObjectId==null">
+                                        Partner name is required !
+                                    </div>
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="!editSellingRateChargeForm.submitted && SellingRateChargeToEdit.objectBePaid!==null && SellingRateChargeToEdit.paymentObjectId==null">
+                                        Partner does not exist !
                                     </div>
                                 </div>
                             </div>
@@ -2547,7 +2627,8 @@
                                     <label class="form-control-label" for="">
                                         Quantity
                                     </label>
-                                    <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required [disabled]="SellingRateChargeToEdit.soano!=null"
+                                    <input type="text" required #sellingRateChangeQuantityNameEdt="ngModel" required
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" appIntergerInputCheck
                                         [(ngModel)]="SellingRateChargeToEdit.quantity" placeholder="Enter text"
                                         name="sellingRateChangeQuantityNameEdt"
@@ -2564,10 +2645,18 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'id',value:SellingRateChargeToEdit.unitId}"
+                                        (itemSelected)="SellingRateChargeToEdit.unitId=$event.id;
+                                                    SellingRateChargeToEdit.unit=$event.unitNameEn"
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
+                                        [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="SellingRateChargeToEdit.soano!=null"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            [disabled]="SellingRateChargeToEdit.soano!=null" readonly
+                                            data-toggle="dropdown" placeholder="Please selected"
                                             [value]="SellingRateChargeToEdit.unit">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -2604,13 +2693,15 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <div class="form-control-feedback"
-                                                    *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.unitId==null">
-                                                    Unit is required
-                                                </div>
+                                                
                                             </div>
                                         </div>
+                                    </div> -->
+
+                                    <div class="form-control-feedback" *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.unitId==null">
+                                        Unit is required
                                     </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -2659,7 +2750,8 @@
                                         VAT
                                     </label>
                                     <input type="number" name="SellingRateChargeVATNameEdt" required max="100"
-                                        #SellingRateChargeVATNameEdt="ngModel" [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        #SellingRateChargeVATNameEdt="ngModel"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [(ngModel)]="SellingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachSelling(true)">
@@ -2686,7 +2778,8 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo" [disabled]="SellingRateChargeToEdit.soano!=null"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeDocNameEdt">
                                 </div>
@@ -2696,7 +2789,8 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes" [disabled]="SellingRateChargeToEdit.soano!=null"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeNoteNameEdt">
                                 </div>
@@ -2708,7 +2802,8 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true" [disabled]="SellingRateChargeToEdit.soano!=null"
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [disabled]="SellingRateChargeToEdit.soano!=null"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="SellingRateChargeToEdit.exchangeDate" [singleDatePicker]="true"
                                             name="SellingRateChargeExchangeDateNameEdt" readonly />
@@ -2734,7 +2829,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-selling-rate-modal',editSellingRateChargeForm)">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="resetChargeForm('edit-selling-rate-modal',editSellingRateChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2757,7 +2853,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add OBH charge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('add-obh-charge-modal',addOBHChargeForm)">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        (click)="resetChargeForm('add-obh-charge-modal',addOBHChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -2803,9 +2900,9 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover"
                                                         *ngIf="lstOBHChargesComboBox!=null && lstOBHChargesComboBox.length>0">
-                                                        <tbody *ngFor="let item of lstOBHChargesComboBox;let i = index;">
-                                                            <tr class="data-row"                                                               
-                                                                attr.data-id={{i}} (click)="OBHChargeToAdd.chargeId=item.charge.id;
+                                                        <tbody
+                                                            *ngFor="let item of lstOBHChargesComboBox;let i = index;">
+                                                            <tr class="data-row" attr.data-id={{i}} (click)="OBHChargeToAdd.chargeId=item.charge.id;
                                                             OBHChargeToAdd.unitId=item.charge.unitId;
                                                             OBHChargeToAdd.unitPrice=item.charge.unitPrice;
                                                             OBHChargeToAdd.vatrate = item.charge.vatrate;
@@ -3128,7 +3225,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('add-obh-charge-modal',addOBHChargeForm)">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="resetChargeForm('add-obh-charge-modal',addOBHChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -3152,7 +3250,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit OBH rate</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetChargeForm('edit-obh-charge-modal',editOBHChargeForm)"> 
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        (click)="resetChargeForm('edit-obh-charge-modal',editOBHChargeForm)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -3169,8 +3268,8 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
-                                            [value]="OBHChargeToEdit.nameEn"
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            [disabled]="OBHChargeToEdit.soano!=null" [value]="OBHChargeToEdit.nameEn"
                                             title="Đây là một charge name dài thật là dài luôn nạ Thor">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -3201,7 +3300,8 @@
                                                         <tbody>
                                                             <tr class="data-row"
                                                                 *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
-                                                                attr.data-id={{i}} (click)="OBHChargeToEdit.chargeId=item.charge.id;
+                                                                attr.data-id={{i}}
+                                                                (click)="OBHChargeToEdit.chargeId=item.charge.id;
                                                             OBHChargeToEdit.unitId=item.charge.unitId;
                                                             OBHChargeToEdit.unitPrice=item.charge.unitPrice;
                                                             OBHChargeToEdit.vatrate = item.charge.vatrate;
@@ -3231,7 +3331,8 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            [disabled]="OBHChargeToEdit.soano!=null"
                                             [value]="OBHChargeToEdit.receiverName" title="">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
@@ -3290,8 +3391,9 @@
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected" [disabled]="OBHChargeToEdit.soano!=null"
-                                            [value]="OBHChargeToEdit.payerName" title="">
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            [disabled]="OBHChargeToEdit.soano!=null" [value]="OBHChargeToEdit.payerName"
+                                            title="">
                                         <div class="dropdown-menu e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
@@ -3351,8 +3453,9 @@
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
                                         placeholder="Enter text" #OBHQuantityNameEdt="ngModel" appIntergerInputCheck
-                                        [(ngModel)]="OBHChargeToEdit.quantity" required [disabled]="OBHChargeToEdit.soano!=null"
-                                        (keyup)="calculateTotalEachOBH(true)" name="OBHQuantityNameEdt">
+                                        [(ngModel)]="OBHChargeToEdit.quantity" required
+                                        [disabled]="OBHChargeToEdit.soano!=null" (keyup)="calculateTotalEachOBH(true)"
+                                        name="OBHQuantityNameEdt">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeForm.submitted && OBHQuantityNameEdt.invalid">
                                         Quantity is required !
@@ -3419,10 +3522,10 @@
                                     <label class="form-control-label" for="">
                                         Unit price
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" [disabled]="OBHChargeToEdit.soano!=null"
-                                        [(ngModel)]="OBHChargeToEdit.unitPrice" placeholder="Enter text" required
-                                        name="OBHUnitPriceNameEdt" #OBHUnitPriceNameEdt="ngModel"
-                                        (keyup)="calculateTotalEachOBH(true)">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        [disabled]="OBHChargeToEdit.soano!=null" [(ngModel)]="OBHChargeToEdit.unitPrice"
+                                        placeholder="Enter text" required name="OBHUnitPriceNameEdt"
+                                        #OBHUnitPriceNameEdt="ngModel" (keyup)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeForm.submitted &&(OBHUnitPriceNameEdt.invalid || (0 >= OBHChargeToEdit.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -3456,8 +3559,9 @@
                                     <label class="form-control-label" for="">
                                         VAT
                                     </label>
-                                    <input type="number" max="100" name="OBHChargeVATNameEdt" required [disabled]="OBHChargeToEdit.soano!=null"
-                                        #OBHChargeVATNameEdt="ngModel" [(ngModel)]="OBHChargeToEdit.vatrate"
+                                    <input type="number" max="100" name="OBHChargeVATNameEdt" required
+                                        [disabled]="OBHChargeToEdit.soano!=null" #OBHChargeVATNameEdt="ngModel"
+                                        [(ngModel)]="OBHChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
@@ -3483,7 +3587,8 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo" [disabled]="OBHChargeToEdit.soano!=null"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo"
+                                        [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeDocName">
                                 </div>
@@ -3493,7 +3598,8 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes" [disabled]="OBHChargeToEdit.soano!=null"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes"
+                                        [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeNoteName">
                                 </div>
@@ -3505,7 +3611,8 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true" [disabled]="OBHChargeToEdit.soano!=null"
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [disabled]="OBHChargeToEdit.soano!=null"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="OBHChargeToEdit.exchangeDate" [singleDatePicker]="true"
                                             name="OBHExchangeDateNameEdt" readonly />
@@ -3531,7 +3638,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="resetChargeForm('edit-obh-charge-modal',editOBHChargeForm)">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="resetChargeForm('edit-obh-charge-modal',editOBHChargeForm)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -3576,7 +3684,8 @@
             </div>
             <div class="modal-body">
                 <div class="confirm-text-block">
-                    <span>Are you sure want to delete this House Bill? <br> All related charges added to this House Bill will be lost!</span>
+                    <span>Are you sure want to delete this House Bill? <br> All related charges added to this House Bill
+                        will be lost!</span>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">

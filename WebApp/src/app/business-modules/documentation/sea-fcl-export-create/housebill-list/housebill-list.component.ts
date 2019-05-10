@@ -277,7 +277,7 @@ export class HousebillListComponent implements OnInit {
     } else {
       key = search_key == null ? "" : search_key.trim();
     }
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstSellingRateChargesComboBox = res['data'];
     });
   }
