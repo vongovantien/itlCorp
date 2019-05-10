@@ -1208,64 +1208,13 @@
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingCharge>
-                                         [objectToGetData]="'charge'"
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedBuyingCharge.value==null?null:selectedBuyingCharge.value"
-                                            title="charge">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
-                                                                (keyup)="getListBuyingRateCharges($event.target.value)">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Charge code</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Name VN</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="lstBuyingRateChargesComboBox!==null && lstBuyingRateChargesComboBox.length>0">
-                                                        <tbody
-                                                            *ngFor="let item of lstBuyingRateChargesComboBox;let i = index;">
-                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="BuyingRateChargeToAdd.chargeId=item.charge.id;
-                                                                     BuyingRateChargeToAdd.unitId=item.charge.unitId;
-                                                                     BuyingRateChargeToAdd.unitPrice=item.charge.unitPrice;
-                                                                     BuyingRateChargeToAdd.vatrate=item.charge.vatrate;
-                                                                     selectedBuyingChargeCode.value=item.charge.code;
-                                                                     selectedBuyingCharge.value=item.charge.chargeNameEn;
-                                                                     selectedBuyingUnit.value=item.unit;calculateTotalEachBuying()"
-                                                                [ngClass]="{'data-selected':BuyingRateChargeToAdd.chargeId!==null && BuyingRateChargeToAdd.chargeId==item.charge.id}">
-                                                                <td>{{item.charge.code}}</td>
-                                                                <td>{{item.charge.chargeNameEn}}</td>
-                                                                <td>{{item.charge.chargeNameVn}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                    
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
                                         Charge is required
                                     </div>
+                                    
                                 </div>
                             </div>
 
@@ -1310,55 +1259,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingRatePartner>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="BuyingRateChargeToAdd.objectBePaid!=='OTHER'" readonly
-                                            data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedBuyingRatePartner.value==null?null:selectedBuyingRatePartner.value"
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner ID</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':BuyingRateChargeToAdd.paymentObjectId!==null && BuyingRateChargeToAdd.paymentObjectId===item.id}"
-                                                                (click)="BuyingRateChargeToAdd.paymentObjectId = item.id;
-                                                                     selectedBuyingRatePartner.value=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>                                      
-                                    </div> -->
+
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null">
                                         Partner name is required !
@@ -1394,55 +1295,14 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToAdd.unitId}"
                                         (itemSelected)="BuyingRateChargeToAdd.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingUnit>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedBuyingUnit.value==null?null:selectedBuyingUnit.value">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Name EN</th>
-                                                                    <th>Unit type</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
-                                                        <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
-                                                            <tr class="data-row data-selected" attr.data-id="{{i}}"
-                                                                (click)="BuyingRateChargeToAdd.unitId=item.id;
-                                                            selectedBuyingUnit.value=item.unitNameEn"
-                                                                [ngClass]="{'data-selected':BuyingRateChargeToAdd.unitId!==null && BuyingRateChargeToAdd.unitId==item.id}">
-                                                                <td>{{item.unitNameEn}}</td>
-                                                                <td>{{item.unitType}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                               
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                   
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
                                         Unit is required
@@ -1628,62 +1488,13 @@
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingChargeEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" [disabled]="BuyingRateChargeToEdit.soano!=null"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="BuyingRateChargeToEdit.nameEn" title="charge">                                        
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
-                                                                (keyup)="getListBuyingRateCharges($event.target.value)">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Charge code</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Name VN</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="lstBuyingRateChargesComboBox!==null && lstBuyingRateChargesComboBox.length>0">
-                                                        <tbody
-                                                            *ngFor="let item of lstBuyingRateChargesComboBox;let i = index;">
-                                                            <tr class="data-row" attr.data-id="{{i}}" (click)="BuyingRateChargeToEdit.chargeId=item.charge.id;
-                                                                 BuyingRateChargeToEdit.unitId=item.charge.unitId;
-                                                                 BuyingRateChargeToEdit.unitPrice=item.charge.unitPrice;
-                                                                 BuyingRateChargeToEdit.vatrate=item.charge.vatrate;                                                                 
-                                                                 BuyingRateChargeToEdit.nameEn=item.charge.chargeNameEn;
-                                                                 BuyingRateChargeToEdit.chargeCode=item.charge.code;
-                                                                 selectedBuyingUnitEdt.value=item.unit;calculateTotalEachBuying(true)"
-                                                                [ngClass]="{'data-selected':BuyingRateChargeToEdit.chargeId!==null && BuyingRateChargeToEdit.chargeId==item.charge.id}">
-                                                                <td>{{item.charge.code}}</td>
-                                                                <td>{{item.charge.chargeNameEn}}</td>
-                                                                <td>{{item.charge.chargeNameVn}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                   
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.chargeId==null">
                                         Charge is required
                                     </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -1728,59 +1539,7 @@
                                         BuyingRateChargeToEdit.partnerName=$event.shortName;"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                    </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedBuyingRatePartnerEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"                                           
-                                            [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.soano!=null" readonly
-                                            data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="BuyingRateChargeToEdit.partnerName" title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner ID</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':BuyingRateChargeToEdit.paymentObjectId!==null && BuyingRateChargeToEdit.paymentObjectId===item.id}"
-                                                                (click)="BuyingRateChargeToEdit.paymentObjectId = item.id;
-                                                                    BuyingRateChargeToEdit.partnerName=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null">
-                                            Partner name is required !
-                                        </div>
-                                    </div> -->
+                                    </app-combo-grid-virtual-scroll>                                  
 
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null">
@@ -1791,6 +1550,7 @@
                                         *ngIf="!editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.objectBePaid!==null && BuyingRateChargeToEdit.paymentObjectId==null">
                                         Partner does not exist !
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -1818,6 +1578,7 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
+
                                     <app-combo-grid-virtual-scroll [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.unitId}"
                                         (itemSelected)="BuyingRateChargeToEdit.unitId=$event.id;
@@ -1825,55 +1586,11 @@
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="BuyingRateChargeToEdit.soano!=null"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="BuyingRateChargeToEdit.unit">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Name EN</th>
-                                                                    <th>Unit type</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
-                                                        <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
-                                                            <tr class="data-row data-selected" attr.data-id="{{i}}"
-                                                                (click)="BuyingRateChargeToEdit.unitId=item.id;
-                                                                        BuyingRateChargeToEdit.unit=item.unitNameEn"
-                                                                [ngClass]="{'data-selected':BuyingRateChargeToEdit.unitId!==null && BuyingRateChargeToEdit.unitId==item.id}">
-                                                                <td>{{item.unitNameEn}}</td>
-                                                                <td>{{item.unitType}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                               
-                                            </div>
-                                        </div>
-                                    </div> -->
+                         
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.unitId==null">
                                         Unit is required
                                     </div>
-
 
                                 </div>
                             </div>
@@ -2067,65 +1784,12 @@
                                         calculateTotalEachSelling()" [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstSellingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-                                    </app-combo-grid-virtual-scroll>
-
-                                    <!-- <div class="dropdown e--combogrid" #selectedSellingCharge>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedSellingCharge.value==null?null:selectedSellingCharge.value"
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                (keyup)="getListSellingRateCharges($event.target.value)"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Charge code22</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Name VN</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="lstBuyingRateChargesComboBox!=null && lstBuyingRateChargesComboBox.length>0">
-                                                        <tbody  *ngFor="let item of lstSellingRateChargesComboBox;let i = index;">
-                                                            <tr class="data-row"                                                               
-                                                                attr.data-id={{i}} (click)="SellingRateChargeToAdd.chargeId=item.charge.id;
-                                                            SellingRateChargeToAdd.unitId=item.charge.unitId;
-                                                            SellingRateChargeToAdd.unitPrice=item.charge.unitPrice;
-                                                            SellingRateChargeToAdd.vatrate = item.charge.vatrate;
-                                                            selectedSellingChargeCode.value=item.charge.code;
-                                                            selectedSellingCharge.value=item.charge.chargeNameEn;
-                                                            selectedSellingUnit.value=item.unit;calculateTotalEachSelling()">
-                                                                <td>{{item.charge.code}}</td>
-                                                                <td>{{item.charge.chargeNameEn}}</td>
-                                                                <td>{{item.charge.chargeNameVn}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                      
-                                    </div> -->
+                                    </app-combo-grid-virtual-scroll>                                  
 
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
                                         Charge is required
                                     </div>
-
 
                                 </div>
                             </div>
@@ -2166,56 +1830,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedSellingRatePartner>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="SellingRateChargeToAdd.objectBePaid!=='OTHER'" readonly
-                                            data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedSellingRatePartner.value==null?null:selectedSellingRatePartner.value"
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner name</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':SellingRateChargeToAdd.paymentObjectId!==null && SellingRateChargeToAdd.paymentObjectId===item.id}"
-                                                                (click)="SellingRateChargeToAdd.paymentObjectId = item.id;
-                                                                     selectedSellingRatePartner.value=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
+                                    
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.paymentObjectId==null">
                                         Partner name is required !
@@ -2253,60 +1868,18 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:SellingRateChargeToAdd.unitId}"
                                         (itemSelected)="SellingRateChargeToAdd.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedSellingUnit>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedSellingUnit.value==null?null:selectedSellingUnit.value">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Name EN</th>
-                                                                    <th>Unit type</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
-                                                        <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
-                                                            <tr class="data-row data-selected" attr.data-id="{{i}}"
-                                                                (click)="SellingRateChargeToAdd.unitId=item.id;
-                                                                selectedSellingUnit.value=item.unitNameEn"
-                                                                [ngClass]="{'data-selected':BuyingRateChargeToAdd.unitId!==null && SellingRateChargeToAdd.unitId==item.id}">
-                                                                <td>{{item.unitNameEn}}</td>
-                                                                <td>{{item.unitType}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                               
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                   
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
                                         Unit is required
                                     </div>
-
 
                                 </div>
                             </div>
@@ -2473,62 +2046,12 @@
                                         [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [disabled]="SellingRateChargeToEdit.soano!=null"
-                                            [value]="SellingRateChargeToEdit.nameEn" title="charge">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
-                                                                (keyup)="getListBuyingRateCharges($event.target.value)">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Charge code</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Name VN</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="lstBuyingRateChargesComboBox!==null && lstBuyingRateChargesComboBox.length>0">
-                                                        <tbody
-                                                            *ngFor="let item of lstBuyingRateChargesComboBox;let i = index;">
-                                                            <tr class="data-row" attr.data-id="{{i}}"
-                                                                (click)="SellingRateChargeToEdit.chargeId=item.charge.id;
-                                                                SellingRateChargeToEdit.unitId=item.charge.unitId;
-                                                                SellingRateChargeToEdit.unitPrice=item.charge.unitPrice;
-                                                                SellingRateChargeToEdit.vatrate=item.charge.vatrate;                                                                 
-                                                                SellingRateChargeToEdit.nameEn=item.charge.chargeNameEn;
-                                                                SellingRateChargeToEdit.chargeCode=item.charge.code;
-                                                                selectedSellingUnitEdt.value=item.unit;calculateTotalEachSelling(true)"
-                                                                [ngClass]="{'data-selected':SellingRateChargeToEdit.chargeId!==null && SellingRateChargeToEdit.chargeId==item.charge.id}">
-                                                                <td>{{item.charge.code}}</td>
-                                                                <td>{{item.charge.chargeNameEn}}</td>
-                                                                <td>{{item.charge.chargeNameVn}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                  
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.chargeId==null">
                                         Charge is required
                                     </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -2563,6 +2086,7 @@
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:SellingRateChargeToEdit.paymentObjectId}"
@@ -2570,56 +2094,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedSellingRatePartnerEdt>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="SellingRateChargeToEdit.partnerName" title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
-                                                                (keyup)="searchPartner($event.target.value)">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner ID</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':SellingRateChargeToEdit.paymentObjectId!==null && SellingRateChargeToEdit.paymentObjectId===item.id}"
-                                                                (click)="SellingRateChargeToEdit.paymentObjectId = item.id;
-                                                                            SellingRateChargeToEdit.partnerName=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
+      
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.paymentObjectId==null">
                                         Partner name is required !
@@ -2629,6 +2104,7 @@
                                         *ngIf="!editSellingRateChargeForm.submitted && SellingRateChargeToEdit.objectBePaid!==null && SellingRateChargeToEdit.paymentObjectId==null">
                                         Partner does not exist !
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -2663,51 +2139,7 @@
                                                     SellingRateChargeToEdit.unit=$event.unitNameEn"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
-                                    </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            [disabled]="SellingRateChargeToEdit.soano!=null" readonly
-                                            data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="SellingRateChargeToEdit.unit">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Name EN</th>
-                                                                    <th>Unit type</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
-                                                        <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
-                                                            <tr class="data-row data-selected" attr.data-id="{{i}}"
-                                                                (click)="SellingRateChargeToEdit.unitId=item.id;
-                                                                        SellingRateChargeToEdit.unit=item.unitNameEn"
-                                                                [ngClass]="{'data-selected':SellingRateChargeToEdit.unitId!==null && SellingRateChargeToEdit.unitId==item.id}">
-                                                                <td>{{item.unitNameEn}}</td>
-                                                                <td>{{item.unitType}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                    </app-combo-grid-virtual-scroll>                                 
 
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.unitId==null">
@@ -2881,6 +2313,7 @@
                                         Charge <small
                                             class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'charge.id',value:OBHChargeToAdd.chargeId}"
                                         (itemSelected)="OBHChargeToAdd.chargeId=$event.charge.id;
@@ -2892,62 +2325,11 @@
                                         [dataSources]="lstOBHChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedOBHCharge>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedOBHCharge.value==null?null:selectedOBHCharge.value"
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                (keyup)="getListOBHCharges($event.target.value)"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Charge code</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Name VN</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="lstOBHChargesComboBox!=null && lstOBHChargesComboBox.length>0">
-                                                        <tbody
-                                                            *ngFor="let item of lstOBHChargesComboBox;let i = index;">
-                                                            <tr class="data-row" attr.data-id={{i}} (click)="OBHChargeToAdd.chargeId=item.charge.id;
-                                                            OBHChargeToAdd.unitId=item.charge.unitId;
-                                                            OBHChargeToAdd.unitPrice=item.charge.unitPrice;
-                                                            OBHChargeToAdd.vatrate = item.charge.vatrate;
-                                                            selectedOBHChargeCode.value=item.charge.code;
-                                                            selectedOBHCharge.value=item.charge.chargeNameEn;
-                                                            selectedOBHUnit.value=item.unit;calculateTotalEachOBH()">
-                                                                <td>{{item.charge.code}}</td>
-                                                                <td>{{item.charge.chargeNameEn}}</td>
-                                                                <td>{{item.charge.chargeNameVn}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>                                       
-                                    </div> -->
-
+                                    
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
                                         Charge is required
                                     </div>
-
 
                                 </div>
                             </div>
@@ -2958,61 +2340,14 @@
                                     <label class="form-control-label" for="">
                                         Receiver
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.receiverId}"
                                         (itemSelected)="OBHChargeToAdd.receiverId = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedOBHReceiver>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedOBHReceiver.value==null?null:selectedOBHReceiver.value"
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner name</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':OBHChargeToAdd.receiverId!==null && OBHChargeToAdd.receiverId===item.id}"
-                                                                (click)="OBHChargeToAdd.receiverId = item.id;
-                                                            selectedOBHReceiver.value=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
+                                   
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.receiverId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
                                         Receiver name is required and do not same with payer!
@@ -3028,60 +2363,14 @@
                                     <label class="form-control-label" for="">
                                         Payer
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.payerId}"
                                         (itemSelected)="OBHChargeToAdd.payerId  = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid" #selectedOBHPayer>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedOBHPayer.value==null?null:selectedOBHPayer.value" title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner name</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':OBHChargeToAdd.payerId!==null && OBHChargeToAdd.payerId===item.id}"
-                                                                (click)="OBHChargeToAdd.payerId = item.id;
-                                                            selectedOBHPayer.value=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
+
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.payerId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
                                         Payer name is required and do not same with receiver!
@@ -3110,64 +2399,21 @@
                             <div class="col-lg-4">
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.unitId==null}">
+
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.unitId}"
                                         (itemSelected)="OBHChargeToAdd.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
-                                    </app-combo-grid-virtual-scroll>
+                                    </app-combo-grid-virtual-scroll>                                   
 
-                                    <!-- <div class="dropdown e--combogrid" #selectedOBHUnit>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="selectedOBHUnit.value==null?null:selectedOBHUnit.value">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Name EN</th>
-                                                                    <th>Unit type</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
-                                                        <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
-                                                            <tr class="data-row data-selected" attr.data-id="{{i}}"
-                                                                (click)="OBHChargeToAdd.unitId=item.id;
-                                                            selectedOBHUnit.value=item.unitNameEn"
-                                                                [ngClass]="{'data-selected':OBHChargeToAdd.unitId!==null && OBHChargeToAdd.unitId==item.id}">
-                                                                <td>{{item.unitNameEn}}</td>
-                                                                <td>{{item.unitType}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                               
-                                            </div>
-                                        </div>
-                                    </div> -->
-
-                                    <div class="form-control-feedback"
-                                    *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
-                                    Unit is required
-                                </div>
+                                    <div class="form-control-feedback" *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
+                                        Unit is required
+                                    </div>
 
                                 </div>
                             </div>
@@ -3333,59 +2579,7 @@
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstOBHChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-                                    </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [disabled]="OBHChargeToEdit.soano!=null" [value]="OBHChargeToEdit.nameEn"
-                                            title="Đây là một charge name dài thật là dài luôn nạ Thor">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search..."
-                                                                (keyup)="getListSellingRateCharges($event.target.value)">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Charge code</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Name VN</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="lstOBHChargesComboBox!=null && lstOBHChargesComboBox.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row"
-                                                                *ngFor="let item of lstSellingRateChargesComboBox;let i = index;"
-                                                                attr.data-id={{i}}
-                                                                (click)="OBHChargeToEdit.chargeId=item.charge.id;
-                                                            OBHChargeToEdit.unitId=item.charge.unitId;
-                                                            OBHChargeToEdit.unitPrice=item.charge.unitPrice;
-                                                            OBHChargeToEdit.vatrate = item.charge.vatrate;
-                                                            OBHChargeToEdit.chargeCode=item.charge.code;
-                                                            OBHChargeToEdit.unit=item.unit;calculateTotalEachOBH(true)">
-                                                                <td>{{item.charge.code}}</td>
-                                                                <td>{{item.charge.chargeNameEn}}</td>
-                                                                <td>{{item.charge.chargeNameVn}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
+                                    </app-combo-grid-virtual-scroll>                                    
 
                                     <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
                                         Charge is required
@@ -3408,57 +2602,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-
-                                    <!-- <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [disabled]="OBHChargeToEdit.soano!=null"
-                                            [value]="OBHChargeToEdit.receiverName" title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner name</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':OBHChargeToEdit.receiverId!==null && OBHChargeToEdit.receiverId===item.id}"
-                                                                (click)="OBHChargeToEdit.receiverId = item.id;
-                                                                     OBHChargeToEdit.receiverName=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
-
+                                    
                                     <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.receiverId==null">
                                         Receiver name is required !
                                     </div>
@@ -3471,6 +2615,7 @@
                                     <label class="form-control-label" for="">
                                         Payer
                                     </label>
+
                                     <app-combo-grid-virtual-scroll
                                         [disabled]="OBHChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.payerId,hardValue:OBHChargeToEdit.payerName}"
@@ -3479,55 +2624,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    <!-- <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [disabled]="OBHChargeToEdit.soano!=null" [value]="OBHChargeToEdit.payerName"
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner name</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstPartner!==null && comboBoxData.lstPartner.length>0">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1"
-                                                                *ngFor="let item of comboBoxData.lstPartner;let i = index;"
-                                                                [ngClass]="{'data-selected':OBHChargeToEdit.payerId!==null && OBHChargeToEdit.payerId===item.id}"
-                                                                (click)="OBHChargeToEdit.payerId = item.id;
-                                                            OBHChargeToEdit.payerName=item.shortName;">
-                                                                <td>{{item.id}}</td>
-                                                                <td>{{item.shortName}}</td>
-                                                                <td>{{item.partnerNameEn}}</td>
-                                                                <td>{{item.taxCode}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                       
-                                    </div> -->
+                                   
                                     <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.payerId==null">
                                         Receiver name is required !
                                     </div>
@@ -3567,58 +2664,12 @@
                                                         OBHChargeToEdit.unit = $event.unitNameEn"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
-                                    </app-combo-grid-virtual-scroll>
-
-                                    <!-- <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected"
-                                            [value]="OBHChargeToEdit.unit" [disabled]="OBHChargeToEdit.soano!=null">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Name EN</th>
-                                                                    <th>Unit type</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover"
-                                                        *ngIf="comboBoxData.lstUnit!==null && comboBoxData.lstUnit.length>0">
-                                                        <tbody *ngFor="let item of comboBoxData.lstUnit;let i = index;">
-                                                            <tr class="data-row data-selected" attr.data-id="{{i}}"
-                                                                (click)="OBHChargeToEdit.unitId=item.id;
-                                                                     OBHChargeToEdit.unit=item.unitNameEn"
-                                                                [ngClass]="{'data-selected':OBHChargeToEdit.unitId!==null && OBHChargeToEdit.unitId==item.id}">
-                                                                <td>{{item.unitNameEn}}</td>
-                                                                <td>{{item.unitType}}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
+                                    </app-combo-grid-virtual-scroll>                                    
 
                                     <div class="form-control-feedback"
                                             *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
                                             Unit is required
                                     </div>
-
-
 
                                 </div>
                             </div>
