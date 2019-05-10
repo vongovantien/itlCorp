@@ -1299,7 +1299,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': (addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null)||(!addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.objectBePaid!==null && BuyingRateChargeToAdd.paymentObjectId==null)}">
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
@@ -1362,6 +1362,11 @@
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.paymentObjectId==null">
                                         Partner name is required !
+                                    </div>
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="(!addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.objectBePaid!==null && BuyingRateChargeToAdd.paymentObjectId==null)">
+                                        Partner does not exist !
                                     </div>
                                 </div>
                             </div>
@@ -1611,8 +1616,7 @@
                                             class="m--margin-left-5 m--font-primary">{{BuyingRateChargeToEdit.chargeCode}}
                                             &nbsp;</small>
                                     </label>
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToEdit.chargeId}"
                                         (itemSelected)="BuyingRateChargeToEdit.chargeId=$event.charge.id;
                                             BuyingRateChargeToEdit.unitId=$event.charge.unitId;
@@ -1713,7 +1717,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': (editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null)||(!editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.objectBePaid!==null && BuyingRateChargeToEdit.paymentObjectId==null)}">
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
@@ -1777,6 +1781,16 @@
                                             Partner name is required !
                                         </div>
                                     </div> -->
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null">
+                                        Partner name is required !
+                                    </div>
+                                    
+                                    <div class="form-control-feedback"
+                                        *ngIf="!editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.objectBePaid!==null && BuyingRateChargeToEdit.paymentObjectId==null">
+                                        Partner does not exist !
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1804,8 +1818,7 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.unitId}"
                                         (itemSelected)="BuyingRateChargeToEdit.unitId=$event.id;
                                         BuyingRateChargeToEdit.unit=$event.unitNameEn"
@@ -2447,8 +2460,7 @@
                                             class="m--margin-left-5 m--font-primary">{{SellingRateChargeToEdit.chargeCode}}
                                             &nbsp;</small>
                                     </label>
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'charge.id',value:SellingRateChargeToEdit.chargeId,hardValue:SellingRateChargeToEdit.nameEn}"
                                         (itemSelected)="SellingRateChargeToEdit.chargeId=$event.charge.id;
                                         SellingRateChargeToEdit.unitId=$event.charge.unitId;
@@ -2645,8 +2657,7 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="SellingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:SellingRateChargeToEdit.unitId}"
                                         (itemSelected)="SellingRateChargeToEdit.unitId=$event.id;
                                                     SellingRateChargeToEdit.unit=$event.unitNameEn"
@@ -2698,7 +2709,8 @@
                                         </div>
                                     </div> -->
 
-                                    <div class="form-control-feedback" *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.unitId==null">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.unitId==null">
                                         Unit is required
                                     </div>
 
@@ -2869,7 +2881,18 @@
                                         Charge <small
                                             class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedOBHCharge>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'charge.id',value:OBHChargeToAdd.chargeId}"
+                                        (itemSelected)="OBHChargeToAdd.chargeId=$event.charge.id;
+                                        OBHChargeToAdd.unitId=$event.charge.unitId;
+                                        OBHChargeToAdd.unitPrice=$event.charge.unitPrice;
+                                        OBHChargeToAdd.vatrate = $event.charge.vatrate;
+                                        selectedOBHChargeCode.value=$event.charge.code;
+                                        calculateTotalEachOBH()" [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstOBHChargesComboBox"
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedOBHCharge>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedOBHCharge.value==null?null:selectedOBHCharge.value"
@@ -2917,12 +2940,15 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
-                                            Charge is required
-                                        </div>
+                                        </div>                                       
+                                    </div> -->
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
+                                        Charge is required
                                     </div>
+
+
                                 </div>
                             </div>
 
@@ -2932,7 +2958,13 @@
                                     <label class="form-control-label" for="">
                                         Receiver
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedOBHReceiver>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.receiverId}"
+                                        (itemSelected)="OBHChargeToAdd.receiverId = $event.id"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedOBHReceiver>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedOBHReceiver.value==null?null:selectedOBHReceiver.value"
@@ -2979,11 +3011,14 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.receiverId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
-                                            Receiver name is required and do not same with payer!
-                                        </div>
+                                        
+                                    </div> -->
+                                    <div class="form-control-feedback"
+                                        *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.receiverId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
+                                        Receiver name is required and do not same with payer!
                                     </div>
+
+
                                 </div>
                             </div>
 
@@ -2993,7 +3028,13 @@
                                     <label class="form-control-label" for="">
                                         Payer
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedOBHPayer>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.payerId}"
+                                        (itemSelected)="OBHChargeToAdd.payerId  = $event.id"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid" #selectedOBHPayer>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedOBHPayer.value==null?null:selectedOBHPayer.value" title="">
@@ -3039,11 +3080,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.payerId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
-                                            Payer name is required and do not same with receiver!
-                                        </div>
+                                        
+                                    </div> -->
+                                    <div class="form-control-feedback"
+                                        *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.payerId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
+                                        Payer name is required and do not same with receiver!
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -3070,7 +3113,14 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedOBHUnit>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.unitId}"
+                                        (itemSelected)="OBHChargeToAdd.unitId=$event.id"
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
+                                        [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                    <!-- <div class="dropdown e--combogrid" #selectedOBHUnit>
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="selectedOBHUnit.value==null?null:selectedOBHUnit.value">
@@ -3109,13 +3159,16 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <div class="form-control-feedback"
-                                                    *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
-                                                    Unit is required
-                                                </div>
+                                               
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+
+                                    <div class="form-control-feedback"
+                                    *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
+                                    Unit is required
+                                </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -3266,7 +3319,22 @@
                                         Charge <small
                                             class="m--margin-left-5 m--font-primary">{{OBHChargeToEdit.chargeCode}}</small>
                                     </label>
-                                    <div class="dropdown e--combogrid">
+
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'charge.id',value:OBHChargeToEdit.chargeId}"
+                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                        (itemSelected)="OBHChargeToEdit.chargeId=$event.charge.id;
+                                                        OBHChargeToEdit.unitId=$event.charge.unitId;
+                                                        OBHChargeToEdit.unitPrice=$event.charge.unitPrice;
+                                                        OBHChargeToEdit.vatrate = $event.charge.vatrate;
+                                                        OBHChargeToEdit.chargeCode=$event.charge.code;
+                                                        OBHChargeToEdit.unit=$event.unit;
+                                                        calculateTotalEachOBH(true)" 
+                                        [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstOBHChargesComboBox"
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [disabled]="OBHChargeToEdit.soano!=null" [value]="OBHChargeToEdit.nameEn"
@@ -3316,11 +3384,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
-                                            Charge is required
-                                        </div>
+                                        
+                                    </div> -->
+
+                                    <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
+                                        Charge is required
                                     </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -3329,7 +3399,17 @@
                                     <label class="form-control-label" for="">
                                         Receiver
                                     </label>
-                                    <div class="dropdown e--combogrid">
+
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.receiverId,hardValue:OBHChargeToEdit.receiverName}"
+                                        (itemSelected)="OBHChargeToEdit.receiverId = $event.id;
+                                                        OBHChargeToEdit.receiverName = $event.shortName;"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [disabled]="OBHChargeToEdit.soano!=null"
@@ -3376,11 +3456,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.receiverId==null">
-                                            Receiver name is required !
-                                        </div>
+                                        
+                                    </div> -->
+
+                                    <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.receiverId==null">
+                                        Receiver name is required !
                                     </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -3389,7 +3471,15 @@
                                     <label class="form-control-label" for="">
                                         Payer
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.payerId,hardValue:OBHChargeToEdit.payerName}"
+                                        (itemSelected)="OBHChargeToEdit.payerId = $event.id;
+                                                        OBHChargeToEdit.payerName = $event.shortName;"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [disabled]="OBHChargeToEdit.soano!=null" [value]="OBHChargeToEdit.payerName"
@@ -3436,11 +3526,12 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.payerId==null">
-                                            Receiver name is required !
-                                        </div>
+                                       
+                                    </div> -->
+                                    <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.payerId==null">
+                                        Receiver name is required !
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -3468,7 +3559,17 @@
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
-                                    <div class="dropdown e--combogrid">
+
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                        [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.unitId,hardValue:OBHChargeToEdit.unit}"
+                                        (itemSelected)="OBHChargeToEdit.unitId = $event.id;
+                                                        OBHChargeToEdit.unit = $event.unitNameEn"
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
+                                        [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please selected"
                                             [value]="OBHChargeToEdit.unit" [disabled]="OBHChargeToEdit.soano!=null">
@@ -3509,11 +3610,16 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback"
+                                        
+                                    </div> -->
+
+                                    <div class="form-control-feedback"
                                             *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
                                             Unit is required
-                                        </div>
                                     </div>
+
+
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
