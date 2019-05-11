@@ -77,7 +77,7 @@
                           <input type="text" class="form-control m-input m-input--square" placeholder="Enter master bill of lading no"
                               autocomplete="nope" [(ngModel)]="shipment.mawb" formControlName="mawb" name="mawb"
                               minlength="3" (change)="shipment.mawb = shipment.mawb.trim()" required>
-                          <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.mawb.invalid">
+                          <div class="form-control-feedback" *ngIf="submitted && formAddEdit.controls.mawb.invalid" >
                             Master bill of lading no is required least 3 characters
                         </div>
                     </div>

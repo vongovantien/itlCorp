@@ -5,8 +5,7 @@ import { ButtonType } from '../../enums/type-button.enum';
 
 @Component({
   selector: 'app-table-layout',
-  templateUrl: './table-layout.component.html',
-  styleUrls: ['./table-layout.component.scss']
+  templateUrl: './table-layout.component.html'
 })
 export class TableLayoutComponent implements OnInit, OnChanges {
   @Input() records: any[];

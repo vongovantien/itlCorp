@@ -37,7 +37,14 @@
                                         <label class="form-control-label" for="">
                                             Subject to Partner
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <app-combo-grid-virtual-scroll
+                                            [dataSources]="listSubjectPartner" 
+                                            [currentActiveItemId]="{field:'id',value:CDNoteWorking.partnerId}"
+                                            (itemSelected)="CDNoteWorking.partnerId=$event.id;CDNoteWorking.partnerName=$event.partnerNameEn;getListCharges($event.id);totalCreditDebitCalculate()"
+                                            [selectedDisplayFields]="['partnerNameEn']"                            
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Partner Name'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle"
                                                 type="text" readonly data-toggle="dropdown"
                                                 placeholder="Please selected"
@@ -87,7 +94,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="form-control-feedback"
                                         *ngIf="addCDNoteForm.submitted && CDNoteWorking.partnerId==null">
                                             Partner is required !

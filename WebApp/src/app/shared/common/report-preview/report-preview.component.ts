@@ -5,8 +5,7 @@ import { Crystal } from '../../models/report/crystal.model';
 
 @Component({
   selector: 'app-report-preview',
-  templateUrl: './report-preview.component.html',
-  styleUrls: ['./report-preview.component.scss']
+  templateUrl: './report-preview.component.html'
 })
 export class ReportPreviewComponent implements OnInit, AfterViewInit {
   @Input() modalId: any;
