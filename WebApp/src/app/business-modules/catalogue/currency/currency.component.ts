@@ -33,7 +33,7 @@ export class CurrencyComponent implements OnInit {
   selectedFilter = "All";
   configSearch: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.currenciesSettings,
+    settingFields: this.currenciesSettings.filter(x => x.allowSearch == true),
     typeSearch: TypeSearch.outtab
   };
   keySortDefault = "";

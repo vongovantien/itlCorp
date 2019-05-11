@@ -11,7 +11,6 @@ import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
 import { SelectComponent } from 'ng2-select';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-//import { WAREHOUSECOLUMNSETTING } from 'src/app/business-modules/catalogue/warehouse/warehouse.columns';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ExcelService } from 'src/app/shared/services/excel.service';
@@ -20,6 +19,7 @@ declare var $:any;
 import * as lodash from 'lodash';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import {language} from 'src/languages/language.en';
+import * as dataHelper from 'src/helper/data.helper';
 
 @Component({
   selector: 'app-warehouse',
@@ -34,18 +34,11 @@ export class WarehouseComponent implements OnInit {
   provinceActive: any[] = [];
   districts: any[] = [];
   districtActive: any[] = [];
-  keySortDefault: string = "code";
   warehouse: Warehouse = new Warehouse();
   showModal: boolean = false;
-  countryLookup: any = { 
-    dataLookup: {},
-    value: null,
-    displayName: null
-  };
   provinceLookup: any;
   districtLookup: any;
   criteria: any = { placeType: PlaceTypeEnum.Warehouse };
-  // @ViewChild('formAddEdit') form: NgForm;
   pager: PagerSetting = PAGINGSETTING;
   addButtonSetting: ButtonModalSetting = {
     dataTarget: "add-ware-house-modal",
@@ -71,9 +64,13 @@ export class WarehouseComponent implements OnInit {
     this.countryActive = [];
     this.provinceActive = [];
     this.districtActive = [];
+    this.warehouse.countryID = null;
+    this.warehouse.provinceID = null;
+    this.warehouse.districtID = null;
     this.ngSelectCountry.active = [];
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];
+    this.form.onReset();
   }
   importButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.import
@@ -94,14 +91,12 @@ export class WarehouseComponent implements OnInit {
   @ViewChild('chooseDistrict') public ngSelectDistrict: SelectComponent;
   @ViewChild(PaginationComponent) child; 
   @ViewChild('formAddEdit') form: NgForm;
-  nameEditModal = "edit-ware-house-modal";
   selectedFilter = "All";
-  titleConfirmDelete = "You want to delete this warehouse";
   warehouseSettings: ColumnSetting[] = language.Warehouse;//= WAREHOUSECOLUMNSETTING;
   isDesc: boolean = true;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.warehouseSettings,
+    settingFields: this.warehouseSettings.filter(x => x.allowSearch == true),
     typeSearch: TypeSearch.outtab
   };
   
@@ -124,7 +119,7 @@ export class WarehouseComponent implements OnInit {
   async getCountries(){
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage, false, true);
     if(responses != null){
-      this.countries = responses.map(x=>({"text":x.name,"id":x.id}));
+      this.countries = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
     }
     else{
       this.countries = [];
@@ -137,7 +132,7 @@ export class WarehouseComponent implements OnInit {
     }
     let responses = await this.baseService.getAsync(url, false, true);
     if(responses != null){
-      this.provinces = responses.map(x=>({"text":x.name_VN,"id":x.id}));
+      this.provinces = dataHelper.prepareNg2SelectData(responses, 'id', 'name_VN');
     }
     else{
       this.provinces = [];
@@ -150,23 +145,22 @@ export class WarehouseComponent implements OnInit {
     }
     let responses = await this.baseService.getAsync(url, false, true);
     if(responses != null){
-      this.districts = responses.map(x=>({"text":x.name_VN,"id":x.id}));
+      this.districts = dataHelper.prepareNg2SelectData(responses, 'id', 'name_VN');
     }
     else{
       this.districts = [];
     }
   }
   async getWarehouses(pager: PagerSetting) {
-    this.baseService.spinnerShow();
-    this.baseService.post(this.api_menu.Catalogue.CatPlace.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      this.warehouses = response.data.map(x=>Object.assign({},x));
-      console.log(this.warehouses);
-      this.pager.totalItems = response.totalItems;
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    if(responses != null){
+      this.warehouses = responses.data;
+      this.pager.totalItems = responses.totalItems;
+    }
+    else{
+      this.warehouses = [];
+      this.pager.totalItems = 0;
+    }
   }
   onSortChange(column) {
     if(column.dataType != 'boolean'){
@@ -175,24 +169,36 @@ export class WarehouseComponent implements OnInit {
       this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
     }
   }
-  async showDetail(item) {
+  async showDetail(item: Warehouse) {
     this.warehouse = item;
-    //await this.getCountries();
     if(this.warehouse.countryID != null){
       await this.getProvinces(this.warehouse.countryID);
-      let indexOfCountryActive = this.countries.findIndex(x => x.id == this.warehouse.countryID);
-      this.countryActive = [this.countries[indexOfCountryActive]];
+      this.getCountryActive(this.warehouse.countryID);
     }
     if(this.warehouse.provinceID != null){
-      //await this.getProvinces(this.warehouse.countryID);
       await this.getDistricts(this.warehouse.provinceID);
-      let indexOfProvinceActive = this.provinces.findIndex(x => x.id == this.warehouse.provinceID);
-      this.provinceActive = [this.provinces[indexOfProvinceActive]];
+      this.getProvinceActive(this.warehouse.provinceID);
     }
     if(this.warehouse.districtID != null){
-      //await this.getDistricts(this.warehouse.provinceID);
-      let indexOfDistrictActive = this.districts.findIndex(x => x.id == this.warehouse.districtID);
+      this.getDistrictActive(this.warehouse.districtID);
+    }
+  }
+  getDistrictActive(districtID: string) {
+    let indexOfDistrictActive = this.districts.findIndex(x => x.id == districtID);
+    if(indexOfDistrictActive > -1){
       this.districtActive = [this.districts[indexOfDistrictActive]];
+    }
+  }
+  getProvinceActive(provinceID: string) {
+    let indexOfProvinceActive = this.provinces.findIndex(x => x.id == provinceID);
+    if(indexOfProvinceActive > -1){
+      this.provinceActive = [this.provinces[indexOfProvinceActive]];
+    }
+  }
+  getCountryActive(countryID: number) {
+    let indexOfCountryActive = this.countries.findIndex(x => x.id == countryID);
+    if(indexOfCountryActive > -1){
+      this.countryActive = [this.countries[indexOfCountryActive]];
     }
   }
   async onDelete(event) {
@@ -217,11 +223,11 @@ export class WarehouseComponent implements OnInit {
     }
     this.child.setPage(this.pager.currentPage);
   }
-  showConfirmDelete(item) {
+  showConfirmDelete(item: Warehouse) {
     this.warehouse = item;
   }
 
-  setPage(pager) { 
+  setPage(pager: PagerSetting) { 
     this.pager.currentPage = pager.currentPage; 
     this.pager.totalPages = pager.totalPages;
     this.pager.pageSize = pager.pageSize
@@ -236,48 +242,39 @@ export class WarehouseComponent implements OnInit {
         this.update();
       }
     }
-    else{
-      console.log("submit");
+  }
+  async update(){
+    let response = await this.baseService.putAsync(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse, true, true);
+    if(response != null){
+      if(response.status){
+        $('#edit-ware-house-modal').modal('hide');
+        this.getWarehouses(this.pager);
+      }
     }
   }
-  update(){
-    this.baseService.spinnerShow();
-    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse).subscribe((response: any) => { 
-        $('#edit-ware-house-modal').modal('hide');     
-        this.baseService.successToast(response.message);
-        this.getWarehouses(this.pager);       
-        this.baseService.spinnerHide();
-    },err=>{     
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
-  }
-  addNew(){
-    this.baseService.spinnerShow();
-    this.pager.totalItems = 0;
-    this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.warehouse).subscribe((response: any) => {     
-        this.baseService.spinnerHide();
-        this.baseService.successToast(response.message);
-        this.pager.totalItems = this.pager.totalItems + 1;
-        this.pager.currentPage = 1;
+  async addNew(){
+    let response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.add, this.warehouse, true, true);
+    if(response != null){
+      if(response.status){
+        this.initNewPager();
         this.getWarehouses(this.pager);
-        //this.child.setPage(this.pager.currentPage);
         this.resetWarehouse();
-        this.form.onReset();
-        $('#' + this.addButtonSetting.dataTarget).modal('hide');     
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+        $('#' + this.addButtonSetting.dataTarget).modal('hide');  
+      }
+    }
+  }
+  initNewPager() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
   }
 
-  resetSearch(event){
+  resetSearch(event: { field: string; searchString: any; }){
     this.criteria = {
       placeType: PlaceTypeEnum.Warehouse
     };
     this.onSearch(event);
   }
-  onSearch(event){
+  onSearch(event: { field: string; searchString: any; }){
     console.log(event);
     if(event.field == "All"){
       this.criteria.all = event.searchString;
@@ -312,17 +309,17 @@ export class WarehouseComponent implements OnInit {
       if(event.field == "code"){
         this.criteria.code = event.searchString;
       }
-      if(event.field == "nameEN"){
+      if(event.field == "nameEn"){
         this.criteria.nameEN = event.searchString;
       }
-      if(event.field == "nameVN"){
+      if(event.field == "nameVn"){
         this.criteria.nameVN = event.searchString;
       }
       if(event.field == "address"){
         this.criteria.address = event.searchString;
       }
     }
-    this.pager.currentPage = 1;
+    this.initNewPager();
     this.getWarehouses(this.pager);
   }
   onCancel(){
@@ -341,7 +338,6 @@ export class WarehouseComponent implements OnInit {
       this.chooseCountryReset();
       this.provinces = [];
       this.districts = [];
-      //this.refreshValue(null, 'country');
     }
     if(name == 'province'){
       this.warehouse.provinceID = value.id;
@@ -356,31 +352,11 @@ export class WarehouseComponent implements OnInit {
   showAdd(){
     this.resetWarehouse();
     this.showModal = true;
-    this.form.onReset();
-    this.warehouse.countryID = null;
-    this.warehouse.provinceID = null;
-    this.warehouse.districtID = null;
-    this.ngSelectCountry.active = [];
-    this.ngSelectProvince.active = [];
-    this.ngSelectDistrict.active = [];
   }
-  // valueCountry: any = {};
-  // valueProvince: any = {};
-  // valueDistrict: any = {};
+
   value: any = {};
   public refreshValue(value:any, name: any):void {
     this.value = value;
-    // if(name == 'country'){
-    //   this.valueCountry = value;
-    //   this.chooseCountryReset();
-    // }
-    // if(name == 'province'){
-    //   this.valueProvince = value;
-    //   this.chooseProvinceReset();
-    // }
-    // if(name == 'district'){
-    //   this.valueDistrict = value;
-    // }
   }
   public removed(value:any, name: any):void {
     if(name == 'country'){
@@ -395,7 +371,7 @@ export class WarehouseComponent implements OnInit {
       this.warehouse.provinceID = null;
       this.warehouse.districtID = null;
       this.districts = [];
-      //this.chooseProvinceReset();
+      this.chooseProvinceReset();
     }
     if(name == 'district'){
       this.warehouse.districtID = null;
@@ -413,7 +389,7 @@ export class WarehouseComponent implements OnInit {
   }
   chooseProvinceReset(){
     this.ngSelectDistrict.active = [];
-    this.districtActive = null;
+    this.districtActive = [];
   }
 
   /**

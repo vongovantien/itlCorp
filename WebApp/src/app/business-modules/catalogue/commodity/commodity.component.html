@@ -178,9 +178,9 @@
                                 Group: <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select #chooseGroup [allowClear]="true" [items]="groups" [disabled]="disabled"
+                                <ng-select #chooseGroup [allowClear]="true" [items]="groups"
                                     (data)="refreshGroupValue($event)" (selected)="onGroupchange($event)" (removed)="removed($event)"
-                                    (typed)="typed($event)" [active]="groupActive==null?[]:[groupActive]" placeholder="Select group commdity">
+                                    (typed)="typed($event)" [active]="groupActive" placeholder="Select group commdity">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodity.commodityGroupId == null">
                                     Group commdity is required

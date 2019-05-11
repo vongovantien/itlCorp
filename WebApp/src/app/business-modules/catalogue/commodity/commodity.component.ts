@@ -59,7 +59,7 @@ export class CommodityComponent implements OnInit {
     commodityGroup: "commodityGroup"
   };
   activeTab: string = this.tabName.commodity;
-  groupActive: any;
+  groupActive: any[] = [];
   addCommodityButtonSetting: ButtonModalSetting = {
     dataTarget: this.nameCommodityModal,
     typeButton: ButtonType.add
@@ -84,13 +84,13 @@ export class CommodityComponent implements OnInit {
   selectedFilter = "All";
   configSearchGroup: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.commodityGroupSettings,
+    settingFields: this.commodityGroupSettings.filter(x => x.allowSearch == true),
     typeSearch: TypeSearch.intab,
     searchString: ''
   };
   configSearchCommonity: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.commoditySettings,
+    settingFields: this.commoditySettings.filter(x => x.allowSearch == true),
     typeSearch: TypeSearch.intab,
     searchString: ''
   };
@@ -236,7 +236,10 @@ export class CommodityComponent implements OnInit {
       this.commodity = item;
       const response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id,false, false);
       this.commodity = response;
-      this.groupActive = this.groups.find(x => x.id == this.commodity.commodityGroupId);
+      let index = this.groups.findIndex(x => x.id == this.commodity.commodityGroupId);
+      if(index > -1){
+        this.groupActive = [this.groups[index]];
+      }
     }
   }
   async onDelete(event){

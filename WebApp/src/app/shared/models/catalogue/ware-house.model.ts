@@ -11,4 +11,5 @@ export class Warehouse {
     districtName: string;
     address: string;
     placeType: number;
+    inactive?: boolean;
 }

@@ -61,9 +61,9 @@ namespace eFMS.API.Catalogue.Infrastructure
             };
             var localizationOptions = new RequestLocalizationOptions()
             {
-                DefaultRequestCulture = new RequestCulture(culture: "en-US"),
+                DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
                 SupportedCultures = supportedCultures,
-
+                SupportedUICultures = supportedCultures
             };
 
             localizationOptions.RequestCultureProviders = new[]

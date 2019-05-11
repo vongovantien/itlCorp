@@ -32,7 +32,7 @@ export class PartnerComponent implements OnInit {
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   configSearch: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.partnerDataSettings,
+    settingFields: this.partnerDataSettings.filter(x => x.allowSearch == true),
     typeSearch: TypeSearch.intab
   };
   titleConfirmDelete: string = "Do you want to delete this partner?";

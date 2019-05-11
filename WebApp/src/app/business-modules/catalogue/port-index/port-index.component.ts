@@ -56,7 +56,7 @@ export class PortIndexComponent implements OnInit {
   };
   configSearch: any = {
     selectedFilter: this.selectedFilter,
-    settingFields: this.portIndexSettings,
+    settingFields: this.portIndexSettings.filter(x => x.allowSearch == true),
     typeSearch: TypeSearch.outtab
   };
   @ViewChild('formAddEdit') form: NgForm;

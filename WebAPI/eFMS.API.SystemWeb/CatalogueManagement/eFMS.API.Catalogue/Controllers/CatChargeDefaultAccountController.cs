@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
         public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -225,7 +224,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                templateName = "VoucherTypeAccount" + templateName;
+                string templateName = "VoucherTypeAccount" + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

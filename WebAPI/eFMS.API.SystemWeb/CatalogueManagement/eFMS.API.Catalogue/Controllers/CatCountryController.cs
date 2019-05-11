@@ -29,7 +29,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
         public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -144,7 +143,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            templateName = "Country" + templateName;
+            string templateName = "Country" + Templates.ExelImportEx;
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
             {

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Common
 {
-    public class LanguageSub
+    public partial class LanguageSub
     {
         //Global
         public static readonly string MSG_DATA_NOT_FOUND = "MSG_DATA_NOT_FOUND";
@@ -122,5 +122,9 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string MSG_STAGE_CODE_DUPLICATE = "MSG_STAGE_CODE_DUPLICATE";
         public static readonly string MSG_STAGE_STATUS_EMPTY = "MSG_STAGE_STATUS_EMPTY";
         #endregion
+
+        //#region Name field
+        //public const string EF_DISPLAYNAME_CODE = "EF_DISPLAYNAME_CODE";
+        //#endregion
     }
 }

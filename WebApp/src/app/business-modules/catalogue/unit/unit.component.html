@@ -251,7 +251,7 @@
                                 Unit type <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="unitTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                <ng-select [allowClear]="true" [items]="unitTypes" (data)="refreshValue($event)"
                                     (selected)="selected($event)" (removed)="removed($event)"
                                     (typed)="typed($event)" placeholder="Select unit type">
                                 </ng-select>
@@ -376,7 +376,7 @@
                                     Unit type <span class="m--font-danger">(*)</span>
                                 </label>
                                 <div class="col-lg-8">
-                                    <ng-select [allowClear]="true" [active]="currentUnitType" [items]="unitTypes" [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select [allowClear]="true" [active]="currentUnitType" [items]="unitTypes" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)"
                                         (typed)="typed($event)" placeholder="Select unit type">
                                     </ng-select>
