@@ -4,8 +4,7 @@ import { ButtonType } from '../../enums/type-button.enum';
 declare var $: any;
 @Component({
   selector: 'app-search-options',
-  templateUrl: './search-options.component.html',
-  styleUrls: ['./search-options.component.scss']
+  templateUrl: './search-options.component.html'
 })
 export class SearchOptionsComponent implements OnInit {
   @Input() configSearch : any;

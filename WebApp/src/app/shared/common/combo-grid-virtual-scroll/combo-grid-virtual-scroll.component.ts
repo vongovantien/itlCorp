@@ -7,8 +7,7 @@ import { SortService } from '../../services/sort.service';
 // declare var $: any;
 @Component({
   selector: 'app-combo-grid-virtual-scroll',
-  templateUrl: './combo-grid-virtual-scroll.component.html',
-  styleUrls: ['./combo-grid-virtual-scroll.component.scss']
+  templateUrl: './combo-grid-virtual-scroll.component.html'
 })
 export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, AfterViewInit {
 

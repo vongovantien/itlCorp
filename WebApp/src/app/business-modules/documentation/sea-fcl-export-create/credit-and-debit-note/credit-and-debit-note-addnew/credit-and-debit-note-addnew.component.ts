@@ -11,7 +11,6 @@ import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
 declare var $: any;
 // import * as $ from 'jquery';
 import { NgForm } from '@angular/forms';
-import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 @Component({
   selector: 'app-credit-and-debit-note-addnew',
   templateUrl: './credit-and-debit-note-addnew.component.html',
@@ -54,7 +53,6 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartnerByJobId + "?JobId=" + ExtendData.currentJobID).subscribe((data: any[]) => {
       this.listSubjectPartner = cloneDeep(data);
       this.constListSubjectPartner = cloneDeep(data);
-      console.log(this.listSubjectPartner);
     });
   }
   async getListCharges(partnerId: string) {

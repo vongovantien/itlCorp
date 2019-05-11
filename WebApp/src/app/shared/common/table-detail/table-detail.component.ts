@@ -5,8 +5,7 @@ import { ColumnSetting } from '../../models/layout/column-setting.model';
 
 @Component({
   selector: 'app-table-detail',
-  templateUrl: './table-detail.component.html',
-  styleUrls: ['./table-detail.component.scss']
+  templateUrl: './table-detail.component.html'
 })
 export class TableDetailComponent implements OnInit {
   detailButtonSetting: ButtonModalSetting = {
