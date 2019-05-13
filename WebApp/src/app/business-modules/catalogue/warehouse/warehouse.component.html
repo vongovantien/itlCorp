@@ -41,7 +41,7 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Content-->
-            <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [keySort]="keySortDefault" [nameEditModal]="nameEditModal"
+            <app-table-layout [records]="warehouses" [settings]="warehouseSettings" (sortChange)="onSortChange($event)" [nameEditModal]="'edit-ware-house-modal'"
             (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
             <!--begin::pagination-->
@@ -82,7 +82,6 @@
                                         Code is required least 3 characters
                                     </div>
                                 </div>
-                                <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('code')" [form]="formAddEdit"></app-input-form> -->
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameEN.invalid }">
@@ -95,7 +94,6 @@
                                         Name(EN) is required least 3 characters
                                     </div>
                                 </div>
-                                <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('displayName')" [form]="formAddEdit"></app-input-form> -->
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameLocal.invalid }">
@@ -108,7 +106,6 @@
                                         Name(Local) is required least 3 characters
                                     </div>
                                 </div>
-                                <!-- <app-input-form [item]="warehouse" [columnMap]="getColumn('displayName')" [form]="formAddEdit"></app-input-form> -->
                             </div>
                         </div>
                         <div class="row">
@@ -117,7 +114,7 @@
                                     <label class="form-control-label">
                                         Country <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries" (data)="refreshValue($event)"
                                         (selected)="onChange($event, 'country')" (removed)="removed($event, 'country')" (typed)="typed($event)"
                                         placeholder="Select country">
                                     </ng-select>
@@ -131,7 +128,7 @@
                                     <label class="form-control-label">
                                         City/ Province <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces" (data)="refreshValue($event)"
                                         (selected)="onChange($event, 'province')" (removed)="removed($event, 'province')" (typed)="typed($event)"
                                         placeholder="Select province">
                                     </ng-select>
@@ -145,7 +142,7 @@
                                     <label class="form-control-label">
                                         District <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts" (data)="refreshValue($event)"
                                         (removed)="removed($event, 'district')" (typed)="typed($event)" (selected)="onChange($event, 'district')" 
                                         placeholder="Select district">
                                     </ng-select>
@@ -192,7 +189,7 @@
 <!--end::add-warehouse-modal-->
 
 <!--begin::edit-ware-house-modall-->
-<div class="modal fade" *ngIf="warehouse" attr.id="{{nameEditModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" *ngIf="warehouse" id="edit-ware-house-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid"  autocomplete="off">
@@ -252,7 +249,7 @@
                                         <label class="form-control-label">
                                             Country <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive" (data)="refreshValue($event)"
                                             (selected)="onChange($event, 'country')" (removed)="removed($event, 'country')" (typed)="typed($event)"
                                             placeholder="Select country">
                                         </ng-select>
@@ -266,7 +263,7 @@
                                         <label class="form-control-label">
                                             City/ Province <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive" (data)="refreshValue($event)"
                                             (selected)="onChange($event, 'province')" (removed)="removed($event, 'province')" (typed)="typed($event)"
                                             placeholder="Select province">
                                         </ng-select>
@@ -280,7 +277,7 @@
                                         <label class="form-control-label">
                                             District <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive" (data)="refreshValue($event)"
                                             (selected)="onChange($event, 'district')" (removed)="removed($event, 'district')" (typed)="typed($event)"
                                             placeholder="Select district">
                                         </ng-select>
@@ -367,5 +364,5 @@
         </div>
     </div>
 </div> -->
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this warehouse'"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

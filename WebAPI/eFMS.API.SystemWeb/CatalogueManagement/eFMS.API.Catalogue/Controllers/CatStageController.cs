@@ -31,7 +31,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatStageService catStageService;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
 
         public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user)
         {
@@ -210,7 +209,7 @@ namespace eFMS.API.Catalogue.Controllers
  
             try
             {
-                templateName = "Stage" + templateName;
+                string templateName = "Stage" + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

@@ -60,7 +60,7 @@ namespace eFMS.API.Catalogue
             services.AddSession();
             services.AddAuthorize(Configuration);
             services.AddAutoMapper();
-            services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services);
@@ -89,6 +89,7 @@ namespace eFMS.API.Catalogue
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
             DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
+            DbHelper.DbHelper.MongoDBConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "mongoDB");
             //services.AddEntityFrameworkSqlServer()
             //    .AddDbContext<eFMSDataContext>(options =>
             //    {
@@ -152,7 +153,7 @@ namespace eFMS.API.Catalogue
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
-            app.UseRequestLocalization();
+            //app.UseRequestLocalization();
         }
     }
 }

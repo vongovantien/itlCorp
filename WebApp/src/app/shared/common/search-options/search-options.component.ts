@@ -30,9 +30,10 @@ export class SearchOptionsComponent implements OnInit {
   getSettings(configSearch: any): any {
     if(this.configSearch.settingFields){
       this.configSearch.settingFields.forEach(element => {
-        if(element.allowSearch){
-          this.settingFields.push(element);
-        }
+        // if(element.allowSearch){
+        //   this.settingFields.push(element);
+        // }
+        this.settingFields.push(element);
       });
     }
     this.searchObject.field = configSearch.selectedFilter;

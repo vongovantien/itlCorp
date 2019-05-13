@@ -124,10 +124,15 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
+        public List<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CatPartnerViewModel> results = null;
             var list = Query(criteria);
+            if (list == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
             list = list.OrderByDescending(x => x.DatetimeModified).ToList();
             rowsCount = list.ToList().Count;
             if (size > 1)
@@ -138,12 +143,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 results = list.Skip((page - 1) * size).Take(size).ToList();
             }
-            return results.AsQueryable();
+            return results;
         }
 
         public List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = Query(criteria).GroupBy(x => x.SalePersonId);
+            List<CustomerPartnerViewModel> results = null;
+            var data = Query(criteria)?.GroupBy(x => x.SalePersonId);
+            if(data == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
             rowsCount = data.ToList().Count;
             if (size > 1)
             {
@@ -153,7 +164,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 data = data.Skip((page - 1) * size).Take(size);
             }
-            List<CustomerPartnerViewModel> results = new List<CustomerPartnerViewModel>();
+            results = new List<CustomerPartnerViewModel>();
             foreach (var item in data)
             {
                 var partner = new CustomerPartnerViewModel

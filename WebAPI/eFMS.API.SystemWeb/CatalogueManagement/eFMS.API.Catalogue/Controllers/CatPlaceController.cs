@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
 
         public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
         {
@@ -164,7 +163,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
         {
-            templateName = GetFileName(type);
+            string templateName = GetFileName(type);
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
             {
@@ -336,6 +335,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         private string GetFileName(CatPlaceTypeEnum type)
         {
+            string templateName = Templates.ExelImportEx;
             switch (type)
             {
                 case CatPlaceTypeEnum.Port:

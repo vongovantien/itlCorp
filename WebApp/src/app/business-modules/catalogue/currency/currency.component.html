@@ -59,7 +59,7 @@
             <!--begin::Content-->
             <!--begin: Datatable of port-index-list-table -->
             <app-table-layout [records]="currencies" [settings]="currenciesSettings" (sortChange)="onSortChange($event)"
-                [nameEditModal]="nameModal" [keySort]="keySortDefault" (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+                [nameEditModal]="'edit-currency-modal'" [keySort]="keySortDefault" (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
             <!--end: Datatable of port-index-list-table -->
             <!--begin::pagination-->
@@ -73,14 +73,14 @@
 <!--end::m-content of stage-management-->
 
 <!--begin::add-unit-modal-->
-<div class="modal fade" id="{{nameModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="edit-currency-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
             <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" *ngIf="currency.id == null">{{ titleAddModal }}</h5>
-                    <h5 class="modal-title" *ngIf="currency.id">{{ titleEditModal }}</h5>
+                    <h5 class="modal-title" *ngIf="currency.id == null">Add currency</h5>
+                    <h5 class="modal-title" *ngIf="currency.id">Edit currency</h5>
                     <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button> -->
@@ -156,4 +156,4 @@
     </div>
 </div>
 <!--end::add-unit-modal-->
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this currency'"></app-delete-confirm-modal>

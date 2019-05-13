@@ -49,7 +49,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<CatPlaceViewModel> results = new List<CatPlaceViewModel>();
+            List<CatPlaceViewModel> results = null;
             var data = Query(criteria);
             rowsCount = data.Count();
             if (rowsCount == 0) return results;
