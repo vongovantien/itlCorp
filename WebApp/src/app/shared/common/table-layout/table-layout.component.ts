@@ -48,6 +48,7 @@ export class TableLayoutComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
+    console.log(this.records);
     if (this.settings) { // when settings provided
       this.columnMaps = this.settings;
       this.editButtonSetting.dataTarget = this.nameEditModal;

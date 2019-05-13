@@ -35,7 +35,6 @@ export class PartnerComponent implements OnInit {
     settingFields: this.partnerDataSettings.filter(x => x.allowSearch == true),
     typeSearch: TypeSearch.intab
   };
-  titleConfirmDelete: string = "Do you want to delete this partner?";
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
   partner: Partner;
   tabName = {
@@ -74,6 +73,7 @@ export class PartnerComponent implements OnInit {
 
   ngOnInit() {
     this.pager.totalItems = 0;
+    this.pager.totalItems = 1;
     this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
   }
@@ -81,6 +81,8 @@ export class PartnerComponent implements OnInit {
     this.onSearch(event);
   }
   onSearch(event){
+    this.pager.totalItems = 0;
+    this.pager.totalItems = 1;
     if(event.field == "All"){
       this.criteria.all = event.searchString;
     }
@@ -263,7 +265,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
       this.allPartnerComponent.getPartnerData(pager, this.criteria);
     }
-    this.pager.currentPage = pager.currentPage;
+    //this.pager.currentPage = pager.currentPage;
   }
 
   async export(){

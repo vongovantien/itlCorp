@@ -44,34 +44,6 @@ export class WarehouseComponent implements OnInit {
     dataTarget: "add-ware-house-modal",
     typeButton: ButtonType.add
   };
-  resetWarehouse(){
-    this.warehouse = {
-      id: null,
-      code: null,
-      nameEn: null,
-      nameVn: null,
-      countryID: null,
-      districtID: null,
-      provinceID:null,
-      countryName: null,
-      provinceName: null,
-      districtName: null,
-      address: null,
-      placeType: PlaceTypeEnum.Warehouse
-    };
-    this.provinces = [];
-    this.districts = [];
-    this.countryActive = [];
-    this.provinceActive = [];
-    this.districtActive = [];
-    this.warehouse.countryID = null;
-    this.warehouse.provinceID = null;
-    this.warehouse.districtID = null;
-    this.ngSelectCountry.active = [];
-    this.ngSelectProvince.active = [];
-    this.ngSelectDistrict.active = [];
-    this.form.onReset();
-  }
   importButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.import
   };
@@ -106,7 +78,7 @@ export class WarehouseComponent implements OnInit {
     private api_menu: API_MENU) { }
 
   ngOnInit() {
-    this.pager.totalItems = 0;
+    this.initNewPager();
     this.warehouse.placeType = PlaceTypeEnum.Warehouse;
     this.getWarehouses(this.pager);
     this.getDataCombobox();
@@ -173,33 +145,68 @@ export class WarehouseComponent implements OnInit {
     this.warehouse = item;
     if(this.warehouse.countryID != null){
       await this.getProvinces(this.warehouse.countryID);
-      this.getCountryActive(this.warehouse.countryID);
+      this.countryActive = this.getCountryActive(this.warehouse.countryID);
     }
     if(this.warehouse.provinceID != null){
       await this.getDistricts(this.warehouse.provinceID);
-      this.getProvinceActive(this.warehouse.provinceID);
+      this.provinceActive = this.getProvinceActive(this.warehouse.provinceID);
     }
-    if(this.warehouse.districtID != null){
-      this.getDistrictActive(this.warehouse.districtID);
-    }
+    this.districtActive = this.getDistrictActive(this.warehouse.districtID);
   }
   getDistrictActive(districtID: string) {
     let indexOfDistrictActive = this.districts.findIndex(x => x.id == districtID);
     if(indexOfDistrictActive > -1){
-      this.districtActive = [this.districts[indexOfDistrictActive]];
+      return [this.districts[indexOfDistrictActive]];
+    }
+    else{
+      return [];
     }
   }
   getProvinceActive(provinceID: string) {
     let indexOfProvinceActive = this.provinces.findIndex(x => x.id == provinceID);
     if(indexOfProvinceActive > -1){
-      this.provinceActive = [this.provinces[indexOfProvinceActive]];
+      return [this.provinces[indexOfProvinceActive]];
+    }
+    else{
+      return [];
     }
   }
   getCountryActive(countryID: number) {
     let indexOfCountryActive = this.countries.findIndex(x => x.id == countryID);
     if(indexOfCountryActive > -1){
-      this.countryActive = [this.countries[indexOfCountryActive]];
+      return [this.countries[indexOfCountryActive]];
     }
+    else{
+      return [];
+    }
+  }
+  resetWarehouse(){
+    this.warehouse = {
+      id: null,
+      code: null,
+      nameEn: null,
+      nameVn: null,
+      countryID: null,
+      districtID: null,
+      provinceID:null,
+      countryName: null,
+      provinceName: null,
+      districtName: null,
+      address: null,
+      placeType: PlaceTypeEnum.Warehouse
+    };
+    this.provinces = [];
+    this.districts = [];
+    this.countryActive = [];
+    this.provinceActive = [];
+    this.districtActive = [];
+    this.warehouse.countryID = null;
+    this.warehouse.provinceID = null;
+    this.warehouse.districtID = null;
+    this.ngSelectCountry.active = [];
+    this.ngSelectProvince.active = [];
+    this.ngSelectDistrict.active = [];
+    this.form.onReset();
   }
   async onDelete(event) {
     console.log(event);
@@ -249,6 +256,7 @@ export class WarehouseComponent implements OnInit {
       if(response.status){
         $('#edit-ware-house-modal').modal('hide');
         this.getWarehouses(this.pager);
+        this.resetWarehouse();
       }
     }
   }
@@ -325,10 +333,7 @@ export class WarehouseComponent implements OnInit {
   onCancel(){
     this.form.onReset();
     this.resetWarehouse();
-    this.setPage(this.pager);
-  }
-  getColumn(field){
-    return this.warehouseSettings.find(x => x.primaryKey == field);
+    this.getWarehouses(this.pager);
   }
   onChange(value, name: any){
     if(name == 'country')
@@ -336,14 +341,11 @@ export class WarehouseComponent implements OnInit {
       this.warehouse.countryID = value.id;
       this.getProvinces(value.id);
       this.chooseCountryReset();
-      this.provinces = [];
-      this.districts = [];
     }
     if(name == 'province'){
       this.warehouse.provinceID = value.id;
       this.getDistricts(value.id);
       this.chooseProvinceReset();
-      this.districts = [];
     }
     if(name == 'district'){
       this.warehouse.districtID = value.id;
@@ -363,14 +365,11 @@ export class WarehouseComponent implements OnInit {
       this.warehouse.countryID = null;
       this.warehouse.provinceID = null;
       this.warehouse.districtID = null;
-      this.provinces = [];
-      this.districts = [];
       this.chooseCountryReset();
     }
     if(name == 'province'){
       this.warehouse.provinceID = null;
       this.warehouse.districtID = null;
-      this.districts = [];
       this.chooseProvinceReset();
     }
     if(name == 'district'){
@@ -384,11 +383,14 @@ export class WarehouseComponent implements OnInit {
   chooseCountryReset(){
     this.ngSelectProvince.active = [];
     this.ngSelectDistrict.active = [];
+    this.provinces = [];
+    this.districts = [];
     this.provinceActive = [];
     this.districtActive = [];
   }
   chooseProvinceReset(){
     this.ngSelectDistrict.active = [];
+    this.districts = [];
     this.districtActive = [];
   }
 

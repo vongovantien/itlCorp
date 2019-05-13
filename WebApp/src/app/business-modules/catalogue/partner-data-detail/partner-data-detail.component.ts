@@ -36,7 +36,6 @@ export class PartnerDataDetailComponent implements OnInit {
   activeNg = true;
   isRequiredSaleman = false;
   employee: any ={};
-  titleConfirmDelete = "You want to delete this Partner?";
   @ViewChild('formAddEdit') form: NgForm;
   @ViewChild('chooseBillingCountry') public chooseBillingCountry: SelectComponent;
   @ViewChild('chooseBillingProvince') public chooseBillingProvince: SelectComponent;
@@ -136,7 +135,7 @@ export class PartnerDataDetailComponent implements OnInit {
   async getWorkPlaces(){
     let responses = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: 2 });
     if(responses!=null){
-      this.workPlaces = responses.map(x=>({"text":x.code + ' - ' + x.name_VN ,"id":x.id}));
+      this.workPlaces = responses.map(x=>({"text":x.code + ' - ' + x.nameVn ,"id":x.id}));
     }
   }
   async getSalemans(){
@@ -153,8 +152,11 @@ export class PartnerDataDetailComponent implements OnInit {
   async getCountries() {
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage);
     if(responses != null){
-        this.countries = responses.map(x=>({"text":x.name,"id":x.id}));
-      }
+      this.countries = responses.map(x=>({"text":x.name,"id":x.id}));
+    }
+    else{
+      this.countries = [];
+    }
   }
   async getPartnerGroups() {
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.partnerGroup.getAll);
@@ -162,28 +164,29 @@ export class PartnerDataDetailComponent implements OnInit {
       this.partnerGroups = responses.map(x=>({"text":x.id,"id":x.id}));
     }
   }
-  getProvincesByCountry(countryId: number, isBilling: boolean): any {
-    this.baseService.get(this.api_menu.Catalogue.CatPlace.getProvinces + "?countryId=" + countryId).subscribe((response: any) => {
-      if(response != null){
-        let index = -1;
-        if(isBilling){
-          this.billingProvinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
-          index = this.billingProvinces.findIndex(x => x.id == this.partner.provinceId);
-          if(index > -1) this.billingProvinceActive = [this.billingProvinces[index]];
-        }
-        else{
-          this.shippingProvinces = response.map(x=>({"text":x.name_VN,"id":x.id}));
-          index = this.shippingProvinces.findIndex(x => x.id == this.partner.provinceShippingId);
-          if(index > -1) this.shippingProvinceActive = [this.shippingProvinces[index]];
-        }
+  async getProvincesByCountry(countryId: number, isBilling: boolean) {
+    let url = this.api_menu.Catalogue.CatPlace.getProvinces;
+    if(countryId != undefined){
+      url = url + "?countryId=" + countryId; 
+    }
+    let responses = await this.baseService.getAsync(url, false, false);
+    if(responses != null){
+      let index = -1;
+      if(isBilling){
+        this.billingProvinces = responses.map(x=>({"text":x.name_VN,"id":x.id}));
+        index = this.billingProvinces.findIndex(x => x.id == this.partner.provinceId);
+        if(index > -1) this.billingProvinceActive = [this.billingProvinces[index]];
       }
       else{
-        this.billingProvinces = [];
-        this.shippingProvinces = [];
+        this.shippingProvinces = responses.map(x=>({"text":x.name_VN,"id":x.id}));
+        index = this.shippingProvinces.findIndex(x => x.id == this.partner.provinceShippingId);
+        if(index > -1) this.shippingProvinceActive = [this.shippingProvinces[index]];
       }
-    },err=>{
-      this.baseService.handleError(err);
-    });
+    }
+    else{
+      this.billingProvinces = [];
+      this.shippingProvinces = [];
+    }
   }
   onSubmit(){
     if(this.partner.countryId == null || this.partner.provinceId == null || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null){
@@ -258,17 +261,8 @@ export class PartnerDataDetailComponent implements OnInit {
     if(selectName == 'shippingProvince'){
       this.partner.provinceShippingId = value.id;
     }
-    if(selectName == 'department'){
-      this.partner.departmentId = value.id;
-    }
-    if(selectName == 'workplace'){
-      this.partner.workPlaceId = value.id;
-    }
-    if(selectName == 'accountRef'){
-      this.partner.parentId = value.id;
-    }
     if(selectName == 'saleman'){
-      this.partner.salePersonId = value.id;
+      //this.partner.salePersonId = value.id;
       let user = this.users.find(x => x.id == value.id);
       if(user){
         this.getEmployee(user.employeeId);
@@ -291,12 +285,18 @@ export class PartnerDataDetailComponent implements OnInit {
           this.partner.partnerGroup.substring(0, (this.partner.partnerGroup.length-1));
         }
       }
-      if(this.partner.partnerGroup.includes('CUSTOMER')){
-        this.isRequiredSaleman = true;
-      }
-      else{
-        this.isRequiredSaleman = false;
-      }
+      this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
+    }
+  }
+  checkRequireSaleman(partnerGroup: string): boolean {
+    if(partnerGroup == null){
+      return false;
+    }
+    else if(partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')){
+      return true;
+    }
+    else{
+      return false;
     }
   }
   getEmployee(employeeId: any): any {
@@ -345,32 +345,12 @@ export class PartnerDataDetailComponent implements OnInit {
           this.partner.partnerGroup.substring(0, (this.partner.partnerGroup.length-1));
         }
       }
-      if(this.partner.partnerGroup.includes('CUSTOMER')){
-        this.isRequiredSaleman = true;
-      }
-      else{
-        this.isRequiredSaleman = false;
-      }
     }
     if(selectName == 'saleman'){
-      this.partner.salePersonId = null;
+      //this.partner.salePersonId = null;
       this.employee = {};
-      if(this.partner.partnerGroup.includes('CUSTOMER')){
-        this.isRequiredSaleman = true;
-      }
     }
-    if(selectName == 'department'){
-      this.partner.departmentId = null;
-    }
-    if(selectName == 'accountRef'){
-      this.partner.parentId = null;
-    }
-    if(selectName == 'accountRef'){
-      this.partner.parentId = null;
-    }
-    if(selectName == 'workplace'){
-      this.partner.workPlaceId = null;
-    }
+    this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
     console.log('Removed value is: ', value);
   }
 
@@ -381,5 +361,4 @@ export class PartnerDataDetailComponent implements OnInit {
   public refreshValue(value: any): void {
     this.value = value;
   }
-
 }

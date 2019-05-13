@@ -12,8 +12,8 @@
                 <!-- <th *ngFor="let map of columnMaps" class="sorting" (click)="sort(map.primaryKey)"><span *ngIf="map.isShow">{{ map.header }}</span></th> -->
             </tr>
         </thead>
-        <tbody *ngIf="records">
-            <ng-container *ngIf="records.length>0; else norecord">
+        <tbody>
+            <ng-container *ngIf="records; else norecord">
                 <tr *ngFor="let record of records; let i = index">
                         <td class="table-actions-col">
                             <div class="table-actions" style="width: 70px">
