@@ -38,11 +38,8 @@ export class CurrencyComponent implements OnInit {
   };
   keySortDefault = "";
   isDesc: boolean = true;
-  nameModal: string = 'edit-currency-modal';
-  titleAddModal: string = 'Add currency';
-  titleEditModal: string = 'Edit currency';
   addButtonSetting: ButtonModalSetting = {
-    dataTarget: this.nameModal,
+    dataTarget: 'edit-currency-modal',
     typeButton: ButtonType.add
   };
   importButtonSetting: ButtonModalSetting = {
@@ -54,7 +51,6 @@ export class CurrencyComponent implements OnInit {
   saveButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.save
   };
-  titleConfirmDelete = "You want to delete this currency";
   cancelButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.cancel
   };
@@ -126,7 +122,6 @@ export class CurrencyComponent implements OnInit {
   }
   showAdd() {
     this.isAddnew = true;
-    this.form.onReset();
     this.currency = new catCurrency();
   }
   onCancel() {
@@ -144,36 +139,24 @@ export class CurrencyComponent implements OnInit {
       }
     }
   }
-  update(): any {
-    this.baseService.spinnerShow();
-    this.baseService.put(this.api_menu.Catalogue.Currency.update, this.currency).subscribe((response: any) => {
-
-      $('#' + this.nameModal).modal('hide');
-      this.baseService.successToast(response.message);
+  async update() {
+    let response = await this.baseService.putAsync(this.api_menu.Catalogue.Currency.update, this.currency, true, true);
+    if(response){
+      this.resetForm();
       this.getCurrencies(this.pager);
-      this.baseService.spinnerShow();
-
-    }, err => {
-      this.baseService.errorToast(err.error.message);
-      this.baseService.spinnerHide();
-    });
+    }
   }
-  addNew(): any {
-    this.baseService.spinnerShow();
-    this.baseService.post(this.api_menu.Catalogue.Currency.addNew, this.currency).subscribe((response: any) => {
-
-      this.baseService.successToast(response.message);
-      this.form.onReset();
-      $('#' + this.nameModal).modal('hide');
-      this.pager.totalItems = this.pager.totalItems + 1;
-      this.pager.currentPage = 1;
-      this.child.setPage(this.pager.currentPage);
-      this.baseService.spinnerHide();
-
-    }, err => {
-      this.baseService.errorToast(err.error.message);
-      this.baseService.spinnerHide();
-    });
+  async addNew() {
+    let response = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.addNew, this.currency, true, true);
+    if(response.status){
+      this.resetForm();
+      this.initPager();
+      this.getCurrencies(this.pager);
+    }
+  }
+  resetForm(){
+    this.form.onReset();
+    $('#edit-currency-modal').modal('hide');
   }
   showDetail(item) {
     this.isAddnew = false;

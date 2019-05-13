@@ -45,8 +45,7 @@
                                 </button> -->
                                 <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget"
                                     (click)="showAdd(tabName.commodity)"></app-default-button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="importCom()" [routerLink]="['/home/catalogue/commodity-import']">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/catalogue/commodity-import']">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -72,7 +71,7 @@
                     </div>
                     <!--end:: Search-form-->
                     <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)"
-                        [keySort]="keyCommoditySortDefault" [nameEditModal]="nameCommodityModal" (edit)="showDetail($event, tabName.commodity)"
+                        [nameEditModal]="'edit-commodity-modal'" (edit)="showDetail($event, tabName.commodity)"
                         (delete)="showConfirmDelete($event, tabName.commodity)">
                     </app-table-layout>
                     <!--end: Datatable -->
@@ -85,8 +84,7 @@
                             <div class="c-button-actions m--align-right">
                                 <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget"
                                     (click)="showAdd(tabName.commodityGroup)"></app-default-button>
-                                <app-default-button [buttonSetting]="importButtonSetting" (click)="importComGroup()"
-                                    [routerLink]="['/home/catalogue/commodity-group-import']"></app-default-button>
+                                <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/commodity-group-import']"></app-default-button>
                                 <app-default-button [buttonSetting]="exportButtonSetting" (click)="exportComGroup()"></app-default-button>
                             </div>
                         </div>
@@ -98,7 +96,7 @@
                     <!--end:: Search-form-->
                     <!--begin: Datatable-->
                     <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)"
-                        [nameEditModal]="nameGroupModal" [keySort]="keygroupSortDefault" (edit)="showDetail($event, tabName.commodityGroup)"
+                        [nameEditModal]="'edit-commodity-group-modal'" (edit)="showDetail($event, tabName.commodityGroup)"
                         (delete)="showConfirmDelete($event, tabName.commodityGroup)">
                     </app-table-layout>
                     <!--end: Datatable-->
@@ -116,15 +114,15 @@
 <!--end::m-content of Commodity-->
 
 <!--begin::add-commodity-modal-->
-<div *ngIf="commodity" class="modal fade" id="{{nameCommodityModal}}" data-backdrop="static" role="dialog"
+<div *ngIf="commodity" class="modal fade" id="edit-commodity-modal" data-backdrop="static" role="dialog"
     aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form name="formCommodity" #formCommodity="ngForm" novalidate (ngSubmit)="formCommodity.form.valid">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" *ngIf="commodity.id == null">{{ titleAddCommodityModal }}</h5>
-                    <h5 class="modal-title" *ngIf="commodity.id">{{ titleEditCommodityModal }}</h5>
+                    <h5 class="modal-title" *ngIf="commodity.id == null">Add New Commodity</h5>
+                    <h5 class="modal-title" *ngIf="commodity.id">Edit Commodity</h5>
                     <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel(tabName.commodity)">
                         <span aria-hidden="true">&times;</span>
                     </button> -->
@@ -179,7 +177,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select #chooseGroup [allowClear]="true" [items]="groups"
-                                    (data)="refreshGroupValue($event)" (selected)="onGroupchange($event)" (removed)="removed($event)"
+                                    (data)="refreshValue($event)" (selected)="commodity.commodityGroupId = $event.id" (removed)="commodity.commodityGroupId = null"
                                     (typed)="typed($event)" [active]="groupActive" placeholder="Select group commdity">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodity.commodityGroupId == null">
@@ -210,14 +208,14 @@
 <!--end::add-commodity-modal-->
 
 <!--begin::add-commodity-group-modal-->
-<div *ngIf="commodityGroup" class="modal fade" id="{{nameGroupModal}}" data-backdrop="static" role="dialog"
+<div *ngIf="commodityGroup" class="modal fade" id="edit-commodity-group-modal" data-backdrop="static" role="dialog"
     aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form name="formGroupCommodity" #formGroupCommodity="ngForm" novalidate (ngSubmit)="formGroupCommodity.form.valid">
                 <div class="modal-header">
-                    <h5 class="modal-title" *ngIf="commodityGroup.id == null">{{titleAddGroupModal}}</h5>
-                    <h5 class="modal-title" *ngIf="commodityGroup.id">{{titleEditGroupModal}}</h5>
+                    <h5 class="modal-title" *ngIf="commodityGroup.id == null">Add New Commodity Group</h5>
+                    <h5 class="modal-title" *ngIf="commodityGroup.id">Edit Commodity Group</h5>
                     <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel(tabName.commodityGroup)">
                         <span aria-hidden="true">&times;</span>
                     </button> -->
@@ -275,5 +273,5 @@
         </div>
     </div>
 </div>
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this Commodity Group'"></app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->
