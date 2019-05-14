@@ -2279,6 +2279,10 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasMaxLength(10);
 
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.Note).HasMaxLength(10);
 
                 entity.Property(e => e.ServerName)

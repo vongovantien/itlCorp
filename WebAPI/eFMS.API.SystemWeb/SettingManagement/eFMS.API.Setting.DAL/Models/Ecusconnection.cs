@@ -6,6 +6,7 @@ namespace eFMS.API.Setting.Service.Models
     public partial class Ecusconnection
     {
         public int Id { get; set; }
+        public string Name { get; set; }
         public string Username { get; set; }
         public string ServerName { get; set; }
         public string Dbusername { get; set; }
