@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using eFMS.API.Setting.DL.Models;
+using eFMS.API.Setting.Service.Models;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -10,7 +12,7 @@ namespace eFMS.API.System.Infrastructure
             //CreateMap<SysUserGroup, SysUserGroupModel>();
             //CreateMap<SysUserGroupModel, SysUserGroup>();
             //CreateMap<SysUserGroupEditModel, SysUserGroupModel>();
-            //CreateMap<SysUserGroupModel, SysUserViewModel>();
+            CreateMap<SetEcusconnection, SetEcusConnectionModel > ();
         }
     }
 }
