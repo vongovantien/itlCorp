@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalogue.Infrastructure;
-using eFMS.API.Catalogue.Infrastructure.Filters;
-using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Service.Contexts;
-using eFMS.API.Catalogue.Service.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using eFMS.API.Setting.Service;
+using eFMS.API.System.Infrastructure;
+using eFMS.API.System.Infrastructure.Filters;
+using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -14,21 +12,17 @@ using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 
-namespace eFMS.API.Catalogue
+namespace SystemManagementAPI
 {
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -38,11 +32,9 @@ namespace eFMS.API.Catalogue
 
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
+            var builder = new ConfigurationBuilder().SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-            
 
             Configuration = builder.Build();
         }
@@ -52,17 +44,18 @@ namespace eFMS.API.Catalogue
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
+          
             services.AddAutoMapper();
-            services.AddDistributedRedisCache(options =>
-            {
-                options.InstanceName = "Catalogue";
-                options.Configuration = Configuration.GetConnectionString("Redis");
-            });
-            services.AddSession();
             services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.Configure<Settings>(options =>
+            {
+                options.ConnectionString
+                    = Configuration.GetSection("MongoConnection:ConnectionString").Value;
+                options.Database
+                    = Configuration.GetSection("MongoConnection:Database").Value;
+            });
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
-            services.AddMemoryCache();
             ServiceRegister.Register(services);
             services.AddCors(options =>
             {
@@ -73,10 +66,13 @@ namespace eFMS.API.Catalogue
                             .WithHeaders("accept", "content-type", "origin", "x-custom-header")
                             .AllowAnyOrigin()
                             .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials();
+                            .AllowAnyMethod();
                     });
             });
+            // configure jwt authentication
+           
+
+            //services.AddCustomAuthentication(Configuration);
             services.AddApiVersioning(config =>
             {
                 config.ReportApiVersions = true;
@@ -88,8 +84,6 @@ namespace eFMS.API.Catalogue
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
-            DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
-            DbHelper.DbHelper.MongoDBConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "mongoDB");
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
@@ -123,7 +117,7 @@ namespace eFMS.API.Catalogue
 
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
@@ -137,11 +131,11 @@ namespace eFMS.API.Catalogue
             });
 
             app.UseCors("AllowAllOrigins");
-            app.UseAuthentication();
+            //app.UseCors("CorsPolicy");
+            //ConfigureAuth(app);
+
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-            app.UseSession();
             app.UseMvc();
-            //app.UseRequestLocalization();
         }
     }
 }
