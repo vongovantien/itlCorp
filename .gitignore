@@ -92,3 +92,7 @@ bin
 /WebAPI/ITL.NetCoreBase/bin
 /WebAPI/eFMS.API.SystemWeb/ReportPerview/obj
 /WebAPI/eFMS.API.SystemWeb/ReportPerview/.vs
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/.vs
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting/obj
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting.DAL/obj
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting.DL/obj
