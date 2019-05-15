@@ -117,7 +117,7 @@
                                     <label class="form-control-label">
                                         Country <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"  (data)="refreshValue($event)"
                                         (selected)="onChange($event, 'country')" (removed)="removed($event, 'country')" (typed)="typed($event)"
                                         placeholder="Select country">
                                     </ng-select>
@@ -131,7 +131,7 @@
                                     <label class="form-control-label">
                                         City/ Province <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"  (data)="refreshValue($event)"
                                         (selected)="onChange($event, 'province')" (removed)="removed($event, 'province')" (typed)="typed($event)"
                                         placeholder="Select province">
                                     </ng-select>
@@ -145,7 +145,7 @@
                                     <label class="form-control-label">
                                         District <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  [disabled]="disabled" (data)="refreshValue($event)"
+                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"  (data)="refreshValue($event)"
                                         (removed)="removed($event, 'district')" (typed)="typed($event)" (selected)="onChange($event, 'district')" 
                                         placeholder="Select district">
                                     </ng-select>
@@ -252,7 +252,7 @@
                                         <label class="form-control-label">
                                             Country <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseCountry [allowClear]="true" [items]="countries" [active]="countryActive"  (data)="refreshValue($event)"
                                             (selected)="onChange($event, 'country')" (removed)="removed($event, 'country')" (typed)="typed($event)"
                                             placeholder="Select country">
                                         </ng-select>
@@ -266,7 +266,7 @@
                                         <label class="form-control-label">
                                             City/ Province <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseProvince [allowClear]="true" [items]="provinces" [active]="provinceActive"  (data)="refreshValue($event)"
                                             (selected)="onChange($event, 'province')" (removed)="removed($event, 'province')" (typed)="typed($event)"
                                             placeholder="Select province">
                                         </ng-select>
@@ -280,7 +280,7 @@
                                         <label class="form-control-label">
                                             District <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive"  [disabled]="disabled" (data)="refreshValue($event)"
+                                        <ng-select #chooseDistrict [allowClear]="true" [items]="districts" [active]="districtActive"  (data)="refreshValue($event)"
                                             (selected)="onChange($event, 'district')" (removed)="removed($event, 'district')" (typed)="typed($event)"
                                             placeholder="Select district">
                                         </ng-select>

@@ -1,3 +1,517 @@
-<p>
-  ecus-connection works!
-</p>
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <app-breadcrumb></app-breadcrumb>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#add-connection-modal">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        add new
+                    </span>
+                </span>
+            </button>
+            <button data-toggle="modal" type="" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span> 
+                        export
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<!--begin::m-content-->
+<div class="m-content">
+    <!--begin:: m-portlet of search-form-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form">
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group m-input-group m-input-group--square">
+                            <div class="input-group-prepend">
+                                <button aria-expanded="false" aria-haspopup="true"
+                                    class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" type="button"> All
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item active" href="javascript:void(0)"
+                                        id="AllField"> All </a>
+                                    <a class="dropdown-item" href="javascript:void(0)" id="NameField">
+                                        Name </a>
+                                    <a class="dropdown-item" href="javascript:void(0)"
+                                        id="UserNameField"> User Name </a>
+                                    <a class="dropdown-item" href="javascript:void(0)"
+                                        id="ServerNameField"> Server Name </a>
+                                    <a class="dropdown-item" href="javascript:void(0)"
+                                        id="DatabaseNameField"> Database Name </a>
+                                </div>
+                            </div>
+                            <input aria-label="" class="form-control" name="searchString" type="text">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" title="Search" type="button">
+                                    <i class="la la-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Reset
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet of search-form-->
+
+    <!--begin:: m-portlet-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin: Datatable -->
+            <div class="table-wrapper" id="sea-lcl-export-table">
+                <table class="table table-striped table-brand dataTable">
+                    <thead>
+                        <tr>
+                            <th class="table-actions-col no-sorting"></th>
+                            <th class="sorting">
+                                <span>Name</span>
+                            </th>
+                            <th class="sorting">
+                                <span>User name</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Full name</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Server name</span>
+                            </th>
+                            <th class="sorting">
+                                <span>DB name</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Status</span>
+                            </th>
+                            <th class="sorting">
+                                <span>Modified Date</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbody-group">
+                        <tr>
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit" data-toggle="modal" data-target="#edit-connection-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-connection-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="sorting">
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#edit-connection-modal">Name</a>
+                            </td>
+                            <td class="sorting">
+                                <span>User name</span>
+                            </td>
+                            <td class="sorting">
+                                <span>Full name</span>
+                            </td>
+                            <td class="sorting">
+                                <span>Server name</span>
+                            </td>
+                            <td class="sorting">
+                                <span>DB name</span>
+                            </td>
+                            <td class="sorting">
+                                <span class="m--font-success">Active</span>
+                            </td>
+                            <td>
+                                <span>dd/MM/yyyy</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit" data-toggle="modal" data-target="#edit-connection-modal">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-connection-modal">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="sorting">
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#edit-connection-modal">Name</a>
+                            </td>
+                            <td class="sorting">
+                                <span>User name</span>
+                            </td>
+                            <td class="sorting">
+                                <span>Full name</span>
+                            </td>
+                            <td class="sorting">
+                                <span>Server name</span>
+                            </td>
+                            <td class="sorting">
+                                <span>DB name</span>
+                            </td>
+                            <td class="sorting">
+                                <span class="m--font-danger">Inactive</span>
+                            </td>
+                            <td>
+                                <span>dd/MM/yyyy</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--end: Datatable -->
+
+            <!--begin::pagination-->
+            <div class="pagination-nav">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="tatable__pager-size" style="max-width: 190px">
+                            <div class="select-box">
+                                <select class="form-control m-input m-input--square" id="" aria-label="">
+                                    <option value="1">15 line/screen</option>
+                                    <option value="2">30 line/screen</option>
+                                    <option value="3">50 line/screen</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <nav aria-label="">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">First</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Back</a></li>
+                                <li class="page-item active"><a class="page-link" href="javascript:void(0)">1</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Last</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <!--end::pagination-->
+        </div>
+    </div>
+    <!--end:: m-portlet-->
+</div>
+<!--end::m-content-->
+
+<!--begin::add-connection-modal-->
+<div class="modal fade" id="add-connection-modal" data-backdrop="static" role="dialog"
+    aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form>
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Connection</h5>
+                    <button id="closeButton" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="m-form m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        name <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        user name <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        server name
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database name
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database user name
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database password
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        status
+                                    </label>
+                                    <div>
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" >
+                                            Active
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                Save
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::add-connection-modal-->
+
+<!--begin::edit-ware-house-modall-->
+<div class="modal fade" id="edit-connection-modal" data-backdrop="static" role="dialog"
+    aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form>
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail/Edit Connection</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="m-form m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        name <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        user name <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        server name
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database name
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database user name
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database password
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        status
+                                    </label>
+                                    <div>
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" >
+                                            Active
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name="" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
+                                <span class="m--font-bolder">Create:</span>
+                                <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                                <span class="m--font-bolder m--margin-left-5">by</span>
+                                <span class="m--font-brand m--margin-left-5">Lee Le</span>
+                            </div>
+                            <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
+                                <span class="m--font-bolder">Modified:</span>
+                                <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                                <span class="m--font-bolder m--margin-left-5">by</span>
+                                <span class="m--font-brand m--margin-left-5">Lee Le</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                edit
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::edit-ware-house-modal-->
+
+<!--begin::confirm-delete-modal-->
+<div class="modal fade" id="confirm-delete-connection-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Do you want to delete <span class="m--font-bold">Connection Name</span>item?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Ok
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-modal-->
