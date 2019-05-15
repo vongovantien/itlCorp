@@ -648,7 +648,7 @@
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
                                                     <ng-select [allowClear]="true" [items]="containerTypes" *ngIf="visible" #containerSelect id="containerSelect"
-                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (data)="refreshValue($event)"
                                                         (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
                                                         (removed)="container.containerTypeId = null;container.containerTypeName = null"
                                                         (typed)="typed($event)" [active]="container.containerTypeActive"
@@ -717,57 +717,7 @@
                                                     Commodity
                                                 </span> -->
                                                 <div class="control-editable">
-                                                    <!-- <div class="dropdown e--combogrid" #selectedCommodity>
-                                                        <input
-                                                            class="form-control m-input m-input--square dropdown-toggle"
-                                                            type="text" readonly data-toggle="dropdown"
-                                                            placeholder="Please selected"
-                                                            [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value"
-                                                            [(ngModel)]="container.commodityName"
-                                                            name="selectedCommodityValue">
-                                                        <div
-                                                            class="dropdown-menu  dropdown-menu-right e--combogrid-content">
-                                                            <div class="tabel-wrapper table-fixed">
-                                                                <div class="table-head-fixed">
-                                                                    <div class="table-filter-block">
-                                                                        <div class="search-field">
-                                                                            <input
-                                                                                class="form-control m-input m-input--square"
-                                                                                type="text" placeholder="Search..." (keyup)="changeComodity($event.target.value)">
-                                                                            <i class="icon-search"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="table-header">
-                                                                        <table class="table table-hover">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th>Name EN</th>
-                                                                                    <th>Name VN</th>
-                                                                                    <th>Group</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="table-body-scroll">
-                                                                    <table class="table table-hover">
-                                                                        <tbody *ngIf="commodities">
-                                                                            <tr class="data-row "
-                                                                                *ngFor="let commodity of commodities; let i= index"
-                                                                                data-id="{{(i+1)}}"
-                                                                                (click)="container.commodityId=commodity.id; container.commodityName = commodity.commodityNameEn; selectedCommodity.value= commodity.commodityNameEn"
-                                                                                [class.data-selected]="container.commodityId !==null && container.commodityId===commodity.id">
-                                                                                <td>{{ commodity.commodityNameEn }}</td>
-                                                                                <td>{{ commodity.commodityNameVn }}</td>
-                                                                                <td>{{ commodity.commodityGroupNameEn }}
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div> -->
+                                    
                                                     <app-combo-grid-virtual-scroll 
                                                         [currentActiveItemId]="{field:'id',value:container.commodityId}"
                                                         (itemSelected)="container.commodityId=$event.id;container.commodityName=$event.commodityNameEn"
@@ -783,7 +733,7 @@
                                                 </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="packageTypes"
-                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (data)="refreshValue($event)"
                                                         (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
                                                         (removed)="container.packageTypeId = null; container.packageTypeName = null"
                                                         (typed)="typed($event)" [active]="container.packageTypeActive"

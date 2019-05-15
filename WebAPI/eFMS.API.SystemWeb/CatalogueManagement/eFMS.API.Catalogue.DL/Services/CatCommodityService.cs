@@ -115,6 +115,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CommodityNameEn = item.CommodityNameEn,
                         CommodityNameVn = item.CommodityNameVn,
                         CommodityGroupId = item.CommodityGroupId,
+                        Code = item.Code,
                         Inactive = item.Status.ToString().ToLower()=="active"?false:true,
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
@@ -124,7 +125,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     newList.Add(commodity);
                 }
                 dc.SaveChanges();
-                if (lstCommodity.Count == 0)
+                if (lstCommodity == null)
                 {
                     lstCommodity = dc.CatCommodity.ToList();
                 }

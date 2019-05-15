@@ -17,6 +17,8 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public Guid? ProvinceId { get; set; }
         public short? CountryId { get; set; }
         public string AreaId { get; set; }
+        public string AreaNameEN { get; set; }
+        public string AreaNameVN { get; set; }
         public string LocalAreaId { get; set; }
         public string ModeOfTransport { get; set; }
         public string GeoCode { get; set; }

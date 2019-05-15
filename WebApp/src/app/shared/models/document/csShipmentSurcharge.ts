@@ -13,7 +13,7 @@ export class CsShipmentSurcharge{
     payerId: string = null;
     receiverObject: string = null;
     receiverId: string = null;
-    objectBePaid: String = null;
+    objectBePaid: string = null;
     paymentObjectId: String = null;
     kickBack: Boolean = null;
     exchangeDate: Date = null;

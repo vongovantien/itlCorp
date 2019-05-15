@@ -6,8 +6,7 @@ import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefault
 
 @Component({
   selector: 'app-default-button',
-  templateUrl: './default-button.component.html',
-  styleUrls: ['./default-button.component.scss']
+  templateUrl: './default-button.component.html'
 })
 export class DefaultButtonComponent implements OnInit {
   @Input() buttonSetting: ButtonModalSetting;

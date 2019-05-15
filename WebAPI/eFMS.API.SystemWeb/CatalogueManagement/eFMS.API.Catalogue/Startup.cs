@@ -1,31 +1,18 @@
 ﻿using AutoMapper;
 using eFMS.API.Catalogue.Infrastructure;
-using eFMS.API.Catalogue.Infrastructure.Filters;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Service.Contexts;
-using eFMS.API.Catalogue.Service.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using eFMS.API.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace eFMS.API.Catalogue
 {
@@ -52,6 +39,7 @@ namespace eFMS.API.Catalogue
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper();
             services.AddDistributedRedisCache(options =>
             {
                 options.InstanceName = "Catalogue";
@@ -59,8 +47,7 @@ namespace eFMS.API.Catalogue
             });
             services.AddSession();
             services.AddAuthorize(Configuration);
-            services.AddAutoMapper();
-            services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services);
@@ -88,19 +75,19 @@ namespace eFMS.API.Catalogue
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
-            DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
-            //services.AddEntityFrameworkSqlServer()
-            //    .AddDbContext<eFMSDataContext>(options =>
-            //    {
-            //        options.UseSqlServer(Configuration["ConnectionStrings:eFMSConnection"],
-            //            sqlServerOptionsAction: sqlOptions =>
-            //            {
-            //                //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-            //                sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
-            //            });
-            //    },
-            //    ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
-            //    );
+            services.Configure<Settings>(options =>
+            {
+                options.MongoConnection
+                    = Configuration.GetSection("ConnectionStrings:MongoConnection").Value;
+                options.MongoDatabase
+                    = Configuration.GetSection("ConnectionStrings:Database").Value;
+                options.RedisConnection
+                    = Configuration.GetSection("ConnectionStrings:Redis").Value;
+                options.eFMSConnection
+                    = Configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
+            });
+            //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
+            //DbHelper.DbHelper.MongoDBConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "mongoDB");
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
@@ -152,7 +139,7 @@ namespace eFMS.API.Catalogue
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
-            app.UseRequestLocalization();
+            //app.UseRequestLocalization();
         }
     }
 }

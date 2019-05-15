@@ -4,8 +4,7 @@ import { PagingService } from './paging-service';
 
 @Component({
   selector: 'app-pagination',
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.scss']
+  templateUrl: './pagination.component.html'
 })
 export class PaginationComponent implements OnInit {
    @Input() config: PagerSetting = {};

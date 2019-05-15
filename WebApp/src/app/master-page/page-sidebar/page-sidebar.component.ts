@@ -62,7 +62,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
    */
 
   
-  open_sub_menu(index) {
+  open_sub_menu(index: number) {
     if (this.previous_menu_index != null) {
       this.Menu[this.previous_menu_index].display_child = false;
       var previous_menu = document.getElementById(this.previous_menu_index.toString());     
@@ -86,9 +86,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     // this.Page_Info.parent= this.Menu[index].parent_name;    
   }
 
-  sub_menu_click(sub_menu_name, parrent_index, children_index) { 
-    console.log(this.Menu[parrent_index].route_parent+this.Menu[parrent_index].childs[children_index].route_child)
-    if(this.baseService.checkLoginSession()){
+  sub_menu_click(sub_menu_name: string, parrent_index: number, children_index: number) { 
       var current_parent = document.getElementById(parrent_index.toString());
       var current_children = document.getElementById(parrent_index.toString() + '-' + children_index.toString());
   
@@ -117,7 +115,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
           }
         }
       }
-    }
+    
   }
 
   gotoJobManagement() {

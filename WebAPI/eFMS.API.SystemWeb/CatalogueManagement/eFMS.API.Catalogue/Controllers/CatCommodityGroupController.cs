@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityGroupService catComonityGroupService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
         public CatCommodityGroupController(IStringLocalizer<LanguageSub> localizer, ICatCommodityGroupService service, IMapper iMapper,
             ICurrentUser user)
         {
@@ -197,8 +196,8 @@ namespace eFMS.API.Catalogue.Controllers
                     list.Add(commodityGroup);
                 }
                 var data = catComonityGroupService.CheckValidImport(list);
-                var totoalValidRows = data.Count(x => x.IsValid == true);
-                var results = new { data, totoalValidRows };
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
                 return Ok(results);
             }
             return BadRequest(new ResultHandle { Status = false, Message = "Cannot upload, file not found !" });
@@ -221,7 +220,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                templateName = "CommodityGroup" + templateName;
+                string templateName = "CommodityGroup" + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

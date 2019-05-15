@@ -32,7 +32,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        //private string templateName = "ImportTemplate.xlsx";
         public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;

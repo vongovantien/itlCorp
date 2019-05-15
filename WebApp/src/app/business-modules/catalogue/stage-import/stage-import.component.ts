@@ -39,7 +39,6 @@ export class StageImportComponent implements OnInit {
   }
 
   chooseFile(file: Event) {
-    if (!this.baseService.checkLoginSession()) return;
     if (file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.menu_api.Catalogue.Stage_Management.uploadExel, file.target['files'], "uploadedFile")
@@ -109,9 +108,6 @@ export class StageImportComponent implements OnInit {
     }
     else {
       let validItems = this.data.filter(x => x.isValid);
-      if (!this.baseService.checkLoginSession()) {
-        return;
-      }
       var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);

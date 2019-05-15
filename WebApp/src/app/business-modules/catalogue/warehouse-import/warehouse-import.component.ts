@@ -51,7 +51,6 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
-    if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Warehouse, file.target['files'], "uploadedFile")
@@ -98,7 +97,6 @@ export class WarehouseImportComponent implements OnInit {
     }
     else{     
       let data = this.data.filter(x => x.isValid);
-      if(!this.baseService.checkLoginSession()) return;
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);        

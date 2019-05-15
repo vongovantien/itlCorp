@@ -1,4 +1,4 @@
-export enum PartnerGroupEnum{
+export enum PartnerGroupEnum {
     ALL = 0,
     AGENT = 1,
     CONSIGNEE = 2,

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Common
 {
-    public class LanguageSub
+    public partial class LanguageSub
     {
         //Global
         public static readonly string MSG_DATA_NOT_FOUND = "MSG_DATA_NOT_FOUND";
@@ -27,6 +27,11 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string EF_ANNOTATIONS_STRING_LENGTH = "EF_ANNOTATIONS_STRING_LENGTH";
         public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
+
+        #region Unit
+        public static readonly string MSG_NAME_EN_EXISTED = "MSG_NAME_EN_EXISTED";
+        public static readonly string MSG_NAME_LOCAL_EXISTED = "MSG_NAME_LOCAL_EXISTED";
+        #endregion
 
         #region Partner
         public static readonly string MSG_PARTNER_TAXCODE_EMPTY = "MSG_PARTNER_TAXCODE_EMPTY";
@@ -117,5 +122,9 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string MSG_STAGE_CODE_DUPLICATE = "MSG_STAGE_CODE_DUPLICATE";
         public static readonly string MSG_STAGE_STATUS_EMPTY = "MSG_STAGE_STATUS_EMPTY";
         #endregion
+
+        //#region Name field
+        //public const string EF_DISPLAYNAME_CODE = "EF_DISPLAYNAME_CODE";
+        //#endregion
     }
 }

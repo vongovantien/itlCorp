@@ -11,7 +11,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {   
     document.body.style.zoom = "100%"
-    if(!this.baseService.checkLoginSession(false)){
+    if(!this.baseService.checkLoginSession()){
       this.router.navigateByUrl('/login');
     }
   }

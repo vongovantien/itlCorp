@@ -76,7 +76,7 @@
                                 <label class="form-control-label">
                                     Unit Price <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="number" [(ngModel)]="ChargeToAdd.charge.unitPrice" required min="0" name="unitPrice"
+                                <input appTwoDigitDecimaNumber type="number" [(ngModel)]="ChargeToAdd.charge.unitPrice" required min="0" name="unitPrice"
                                     #unitPrice="ngModel" class="form-control m-input m-input--square" placeholder="0000.00">
                                 <div class="form-control-feedback" *ngIf="addChargeForm.submitted && unitPrice.invalid">
                                     Unit price is required
@@ -210,19 +210,19 @@
                                    
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" [(ngModel)]="item.debitAccountNo"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7" class="form-control m-input m-input--square" type="number" [(ngModel)]="item.debitAccountNo"
                                             [name]="'debitAccountNo'+index" />
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" [(ngModel)]="item.creditAccountNo"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7" class="form-control m-input m-input--square" type="number" [(ngModel)]="item.creditAccountNo"
                                             [name]="'creditAccountNo'+index" />
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" [(ngModel)]="item.debitVat"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7" class="form-control m-input m-input--square" type="number" [(ngModel)]="item.debitVat"
                                             [name]="'debitVat'+index" />
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" [(ngModel)]="item.creditVat"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7" class="form-control m-input m-input--square" type="number" [(ngModel)]="item.creditVat"
                                             [name]="'creditVat'+index" />
                                     </td>
                                     

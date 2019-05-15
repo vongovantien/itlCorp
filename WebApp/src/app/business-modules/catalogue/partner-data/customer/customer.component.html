@@ -41,8 +41,8 @@
                 </th>
             </tr>
         </thead>
-        <tbody *ngIf="customers">
-            <ng-container *ngIf="customers.length >0; else norecord">
+        <tbody >
+            <ng-container *ngIf="customers; else norecord">
                 <ng-container *ngFor="let item of customers;let i = index;">
                     <tr style="background-color: #f2dedf">
                         <td colspan="10">

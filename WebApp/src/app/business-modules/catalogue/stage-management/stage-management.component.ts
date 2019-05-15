@@ -110,9 +110,9 @@ export class StageManagementComponent implements OnInit {
                     //this.pager.currentPage = 1;
                     //this.child.setPage(this.pager.currentPage);
                     this.pager.totalItems = 0;
-                    this.getStages(this.pager);
+                    // this.getStages(this.pager);
                     //await this.getStages(this.pager);
-                    //await this.setPage(this.pager);
+                    await this.setPage(this.pager);
                 }
             }
         }
@@ -278,7 +278,7 @@ export class StageManagementComponent implements OnInit {
 
     isDesc = true;
     sortKey: string = "id";
-    sort(property) {
+    sort(property:any) {
         this.sortKey = property;
         this.isDesc = !this.isDesc;
         if (property === 'deptName') {

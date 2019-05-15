@@ -1,6 +1,5 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-// import * as lodash from 'lodash';
 import findIndex from 'lodash/findIndex';
 import filter from 'lodash/filter';
 
@@ -10,8 +9,7 @@ import filter from 'lodash/filter';
   styleUrls: ['./breadcrumb.component.scss']
 })
 export class BreadcrumbComponent implements OnInit, AfterViewInit {
-
-  Menu: { parent_name: string; icon: string; route_parent: string; display_child: boolean; childs: { name: string; "route_child": string; }[]; }[];
+  
   parent_name = null;
   children_name = null;
   ActiveRoute:any[] = [];
@@ -60,7 +58,7 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
   }
 
 
-  constructor(private route: ActivatedRoute, private router: Router, private cdRef: ChangeDetectorRef) { }
+  constructor(private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     
