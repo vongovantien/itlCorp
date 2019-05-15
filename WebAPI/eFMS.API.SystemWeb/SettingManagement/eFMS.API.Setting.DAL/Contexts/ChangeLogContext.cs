@@ -1,4 +1,5 @@
-﻿using eFMS.API.Setting.Service.Models;
+﻿using eFMS.API.Common;
+using eFMS.API.Setting.Service.Models;
 using eFMS.API.Setting.Service.ViewModels;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -10,13 +11,13 @@ namespace eFMS.API.Setting.Service.Contexts
 {
     public class ChangeLogContext
     {
-        private readonly IMongoDatabase _database = null;
+        private readonly IMongoDatabase _database;
 
         public ChangeLogContext(IOptions<Settings> settings)
         {
-            var client = new MongoClient(settings.Value.ConnectionString);
+            var client = new MongoClient(settings.Value.MongoConnection);
             if (client != null)
-                _database = client.GetDatabase(settings.Value.Database);
+                _database = client.GetDatabase(settings.Value.MongoDatabase);
         }
         public IMongoCollection<CatCurrencyLog> CatCurrencies
         {

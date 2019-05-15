@@ -27,12 +27,10 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
   styleUrls: ['./partner.component.sass']
 })
 export class PartnerComponent implements OnInit {
-  selectedFilter = "All";
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   configSearch: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.partnerDataSettings.filter(x => x.allowSearch == true),
+    settingFields: this.partnerDataSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.intab
   };
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };

@@ -88,6 +88,8 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.AreaNameEN ?? "").IndexOf(criteria.AreaNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                    && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                     && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
                     ).AsQueryable();
             }
@@ -104,7 +106,9 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || (x.AreaNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                   || (x.AreaNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                   && ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    )
                                    //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null)

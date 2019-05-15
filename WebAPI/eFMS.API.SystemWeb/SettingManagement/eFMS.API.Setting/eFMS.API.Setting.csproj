@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="1.1.15" />
     <PackageReference Include="LocalizationCultureCore" Version="1.1.2" />
@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="3.0.0" />
@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+      <HintPath>..\..\..\..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Setting.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Setting.DL.dll</HintPath>

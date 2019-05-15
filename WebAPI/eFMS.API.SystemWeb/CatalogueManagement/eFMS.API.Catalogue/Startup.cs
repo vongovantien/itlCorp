@@ -1,31 +1,18 @@
 ﻿using AutoMapper;
 using eFMS.API.Catalogue.Infrastructure;
-using eFMS.API.Catalogue.Infrastructure.Filters;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Service.Contexts;
-using eFMS.API.Catalogue.Service.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using eFMS.API.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace eFMS.API.Catalogue
 {
@@ -88,8 +75,19 @@ namespace eFMS.API.Catalogue
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
-            DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
-            DbHelper.DbHelper.MongoDBConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "mongoDB");
+            services.Configure<Settings>(options =>
+            {
+                options.MongoConnection
+                    = Configuration.GetSection("ConnectionStrings:MongoConnection").Value;
+                options.MongoDatabase
+                    = Configuration.GetSection("ConnectionStrings:Database").Value;
+                options.RedisConnection
+                    = Configuration.GetSection("ConnectionStrings:Redis").Value;
+                options.eFMSConnection
+                    = Configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
+            });
+            //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
+            //DbHelper.DbHelper.MongoDBConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "mongoDB");
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

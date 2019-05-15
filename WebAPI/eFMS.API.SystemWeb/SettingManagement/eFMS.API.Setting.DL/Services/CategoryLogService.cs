@@ -1,19 +1,18 @@
 ﻿using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
-using eFMS.API.Setting.Service;
-using eFMS.API.Setting.Service.Contexts;
-using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using System.Linq;
-using System.Collections;
 using eFMS.API.Setting.Models;
+using eFMS.API.Setting.Service;
+using eFMS.API.Common;
+using eFMS.API.Setting.Service.Contexts;
+using eFMS.API.Setting.Service.Models;
 using eFMS.API.Setting.Service.ViewModels;
 
 namespace eFMS.API.Setting.DL.Services

@@ -63,12 +63,10 @@ export class WarehouseComponent implements OnInit {
   @ViewChild('chooseDistrict') public ngSelectDistrict: SelectComponent;
   @ViewChild(PaginationComponent) child; 
   @ViewChild('formAddEdit') form: NgForm;
-  selectedFilter = "All";
   warehouseSettings: ColumnSetting[] = language.Warehouse;//= WAREHOUSECOLUMNSETTING;
   isDesc: boolean = true;
   configSearch: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.warehouseSettings.filter(x => x.allowSearch == true),
+    settingFields: this.warehouseSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.outtab
   };
   
