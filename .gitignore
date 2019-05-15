@@ -96,3 +96,6 @@ bin
 /WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting/obj
 /WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting.DL/obj
+/WebAPI/eFMS.API.Common/eFMS.API.Common/.vs
+/WebAPI/eFMS.API.Common/eFMS.API.Common/obj
+/WebAPI/eFMS.API.Common/eFMS.API.Provider/obj

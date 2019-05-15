@@ -10,11 +10,11 @@ export class SearchOptionsComponent implements OnInit {
   @Input() configSearch : any;
   @Output() search = new EventEmitter<any>();
   @Output() reset_search = new EventEmitter<any>();
-  defaultSetting: any = { header: 'All', primaryKey: 'All'};
+  defaultSetting: any = { fieldName: 'All', displayName: 'All'};
   settingFields: any [] = [this.defaultSetting];
   searchObject: any = {
     field: "",
-    fieldDisplayName: "",
+    displayName: "",
     searchString: ""
   };
   
@@ -29,25 +29,22 @@ export class SearchOptionsComponent implements OnInit {
   }
   getSettings(configSearch: any): any {
     if(this.configSearch.settingFields){
-      this.configSearch.settingFields.forEach(element => {
-        // if(element.allowSearch){
-        //   this.settingFields.push(element);
-        // }
+      this.configSearch.settingFields.forEach((element: any) => {
         this.settingFields.push(element);
       });
     }
-    this.searchObject.field = configSearch.selectedFilter;
-    this.searchObject.fieldDisplayName = configSearch.selectedFilter;
+    this.searchObject.field = this.defaultSetting.fieldName;
+    this.searchObject.displayName = this.defaultSetting.displayName;
     this.searchObject.searchString = configSearch.searchString;
   }
   searchTypeChange(field, event) {
     if(field == 'All'){
-      this.searchObject.fieldDisplayName = "All";
+      this.searchObject.displayName = "All";
     }
     else{
-      this.searchObject.fieldDisplayName = field.header;
+      this.searchObject.displayName = field.displayName;
     }
-    this.searchObject.field = field.primaryKey;
+    this.searchObject.field = field.fieldName;
     this.setActiveStyle(event);
   }
   setActiveStyle(event: any): any {
@@ -64,11 +61,11 @@ export class SearchOptionsComponent implements OnInit {
   }
   resetSearch(){
     this.searchObject = {
-      field: this.defaultSetting.primaryKey,
-      fieldDisplayName: this.defaultSetting.header,
+      field: this.defaultSetting.fieldName,
+      displayName: this.defaultSetting.displayName,
       searchString: ""
     };
-    //this.searchObject.fieldDisplayName = this.defaultSetting.header;
+    //this.searchObject.displayName = this.defaultSetting.displayName;
     this.reset_search.emit(this.searchObject);
   }
 }

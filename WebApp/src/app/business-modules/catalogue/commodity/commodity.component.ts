@@ -72,16 +72,13 @@ export class CommodityComponent implements OnInit {
   cancelButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.cancel
   };
-  selectedFilter = "All";
   configSearchGroup: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.commodityGroupSettings.filter(x => x.allowSearch == true),
+    settingFields: this.commodityGroupSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.intab,
     searchString: ''
   };
   configSearchCommonity: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.commoditySettings.filter(x => x.allowSearch == true),
+    settingFields: this.commoditySettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.intab,
     searchString: ''
   };

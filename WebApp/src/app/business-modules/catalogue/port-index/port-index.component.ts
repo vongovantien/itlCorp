@@ -38,7 +38,6 @@ export class PortIndexComponent implements OnInit {
     dataTarget: 'edit-port-index-modal',
     typeButton: ButtonType.add
   };
-  selectedFilter = "All";
   importButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.import
   };
@@ -53,8 +52,7 @@ export class PortIndexComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   configSearch: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.portIndexSettings.filter(x => x.allowSearch == true),
+    settingFields: this.portIndexSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.outtab
   };
   @ViewChild('formAddEdit') form: NgForm;
@@ -99,13 +97,13 @@ export class PortIndexComponent implements OnInit {
     }
   }
   onSearch(event) {
+    this.criteria = {
+      placeType: PlaceTypeEnum.Port
+    };
     if (event.field == "All") {
       this.criteria.all = event.searchString;
     }
     else {
-      this.criteria = {
-        placeType: PlaceTypeEnum.Port
-      };
       let language = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
       if (language == SystemConstants.LANGUAGES.ENGLISH) {
         if (event.field == "countryName") {
@@ -128,10 +126,10 @@ export class PortIndexComponent implements OnInit {
       if (event.field == "code") {
         this.criteria.code = event.searchString;
       }
-      if (event.field == "nameEN") {
+      if (event.field == "nameEn") {
         this.criteria.nameEN = event.searchString;
       }
-      if (event.field == "nameVN") {
+      if (event.field == "nameVn") {
         this.criteria.nameVN = event.searchString;
       }
       if (event.field == "modeOfTransport") {

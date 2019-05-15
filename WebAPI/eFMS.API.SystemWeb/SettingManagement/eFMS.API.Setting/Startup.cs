@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Setting.Service;
 using eFMS.API.System.Infrastructure;
 using eFMS.API.System.Infrastructure.Filters;
@@ -50,9 +51,9 @@ namespace SystemManagementAPI
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.Configure<Settings>(options =>
             {
-                options.ConnectionString
+                options.MongoConnection
                     = Configuration.GetSection("MongoConnection:ConnectionString").Value;
-                options.Database
+                options.MongoDatabase
                     = Configuration.GetSection("MongoConnection:Database").Value;
             });
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();

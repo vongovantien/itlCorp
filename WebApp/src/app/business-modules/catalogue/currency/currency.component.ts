@@ -30,10 +30,8 @@ export class CurrencyComponent implements OnInit {
   currenciesSettings: ColumnSetting[] = CURRENCYCOLUMNSETTING;
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = {};
-  selectedFilter = "All";
   configSearch: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.currenciesSettings.filter(x => x.allowSearch == true),
+    settingFields: this.currenciesSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.outtab
   };
   keySortDefault = "";

@@ -60,7 +60,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
-        {
+      {
             var data = catPlaceService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
