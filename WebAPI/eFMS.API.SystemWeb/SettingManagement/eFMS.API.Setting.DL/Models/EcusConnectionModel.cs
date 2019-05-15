@@ -7,6 +7,6 @@ namespace eFMS.API.Setting.DL.Models
 {
     public class SetEcusConnectionModel : SetEcusconnection
     {
-        public string username { get; set; }
+        public string Username { get; set; }
     }
 }

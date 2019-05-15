@@ -13,6 +13,7 @@ using ITL.NetCore.Common;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.Common;
+using eFMS.API.Setting.DL.Models.Ecus;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -77,14 +78,14 @@ namespace eFMS.API.Setting.Controllers
         [Route("GetAll")]
         public List<SetEcusConnectionModel> GetAll()
         {
-            return ecusConnectionService.getConnections();
+            return ecusConnectionService.GetConnections();
         }
 
         [HttpGet]
         [Route("GetDetails")]
         public SetEcusConnectionModel GetDetails(int id_connection)
         {
-            return ecusConnectionService.getConnectionDetails(id_connection);
+            return ecusConnectionService.GetConnectionDetails(id_connection);
         }
         private string CheckExist(SetEcusConnectionModel model)
         {
@@ -94,6 +95,12 @@ namespace eFMS.API.Setting.Controllers
             return message;
         }
 
-
+        [HttpGet]
+        [Route("GetDataEcusByUser")]
+        public IActionResult GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database)
+        {
+            var results = ecusConnectionService.GetDataEcusByUser(userId, serverName, dbusername, dbpassword, database);
+            return Ok(results);
+        }
     }
 }

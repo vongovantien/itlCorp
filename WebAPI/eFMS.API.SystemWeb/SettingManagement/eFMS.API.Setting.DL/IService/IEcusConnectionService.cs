@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Setting.DL.Models;
+using eFMS.API.Setting.DL.Models.Ecus;
 using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -10,7 +11,8 @@ namespace eFMS.API.Setting.DL.IService
 {
     public interface IEcusConnectionService:IRepositoryBase<SetEcusconnection,SetEcusConnectionModel>
     {
-        List<SetEcusConnectionModel> getConnections();
-        SetEcusConnectionModel getConnectionDetails(int connection_id);
+        List<SetEcusConnectionModel> GetConnections();
+        SetEcusConnectionModel GetConnectionDetails(int connection_id);
+        List<DTOKHAIMD> GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database);
     }
 }

@@ -16,6 +16,10 @@ using System.Collections;
 using eFMS.API.Setting.Models;
 using ITL.NetCore.Connection.BL;
 using AutoMapper;
+using System.Data.SqlClient;
+using System.Data;
+using eFMS.API.Setting.DL.Models.Ecus;
+using eFMS.API.Setting.DL.Helpers;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -25,7 +29,7 @@ namespace eFMS.API.Setting.DL.Services
         {
         }
 
-        public SetEcusConnectionModel getConnectionDetails(int connection_id)
+        public SetEcusConnectionModel GetConnectionDetails(int connection_id)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             SetEcusConnectionModel EcusConnection = new SetEcusConnectionModel();
@@ -38,13 +42,13 @@ namespace eFMS.API.Setting.DL.Services
             {
                 EcusConnection = mapper.Map<SetEcusConnectionModel>(con);
                 var user = dc.SysUser.Where(x => x.Id == con.UserId).FirstOrDefault();
-                EcusConnection.username = user == null ? null : user.Username;
+                EcusConnection.Username = user?.Username;
                 
             }
             return EcusConnection;
         }
 
-        public List<SetEcusConnectionModel> getConnections()
+        public List<SetEcusConnectionModel> GetConnections()
         {
             List<SetEcusConnectionModel> returnList = new List<SetEcusConnectionModel>();
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
@@ -60,11 +64,31 @@ namespace eFMS.API.Setting.DL.Services
             foreach(var item in query)
             {
                 SetEcusConnectionModel ecus = mapper.Map<SetEcusConnectionModel>(item.con);
-                ecus.username = item.user.Username;
+                ecus.Username = item.user.Username;
                 returnList.Add(ecus);
             }
-
             return returnList;
+        }
+        public List<DTOKHAIMD> GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database)
+        {
+            List<DTOKHAIMD> results = null;
+            if (DataContext.Any(x => x.UserId == userId))
+            {
+                results = GetDataFromEcus(serverName, dbusername, dbpassword, database);
+            }
+            return results;
+        }
+        private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
+        {
+            string queryString = "SELECT * FROM [ECUS5VNACCS].[dbo].[DTOKHAIMD]";
+            string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
+            var data = Helpers.Helper.ExecuteDataSet(connectionString, queryString);
+            if (data != null)
+            {
+                DataTable dt = data.Tables[0];
+                return dt.DataTableToList<DTOKHAIMD>();
+            }
+            return null;
         }
     }
 }
