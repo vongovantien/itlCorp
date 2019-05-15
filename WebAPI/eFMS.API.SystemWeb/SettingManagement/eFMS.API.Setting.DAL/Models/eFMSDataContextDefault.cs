@@ -49,7 +49,7 @@ namespace eFMS.API.Setting.Service.Models
         public virtual DbSet<CsShippingInstruction> CsShippingInstruction { get; set; }
         public virtual DbSet<CsTransaction> CsTransaction { get; set; }
         public virtual DbSet<CsTransactionDetail> CsTransactionDetail { get; set; }
-        public virtual DbSet<Ecusconnection> Ecusconnection { get; set; }
+        public virtual DbSet<SetEcusconnection> SetEcusconnection { get; set; }
         public virtual DbSet<SysAuthorization> SysAuthorization { get; set; }
         public virtual DbSet<SysAuthorizationDetail> SysAuthorizationDetail { get; set; }
         public virtual DbSet<SysBu> SysBu { get; set; }
@@ -79,7 +79,11 @@ namespace eFMS.API.Setting.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
+                    options =>
+                    {
+                        options.UseRowNumberForPaging();
+                    });
             }
         }
 
@@ -2247,9 +2251,9 @@ namespace eFMS.API.Setting.Service.Models
                     .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
-            modelBuilder.Entity<Ecusconnection>(entity =>
+            modelBuilder.Entity<SetEcusconnection>(entity =>
             {
-                entity.ToTable("ECUSConnection");
+                entity.ToTable("setECUSConnection");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -2294,12 +2298,12 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UserModified)
+                entity.Property(e => e.UserId)
+                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Username)
-                    .IsRequired()
+                entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });

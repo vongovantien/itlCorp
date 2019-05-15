@@ -24,6 +24,7 @@ namespace eFMS.API.System.Infrastructure
         {
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddTransient<ICategoryLogService, CategoryLogService>();
+            services.AddTransient<IEcusConnectionService, EcusConnectionService>();
         }
 
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)

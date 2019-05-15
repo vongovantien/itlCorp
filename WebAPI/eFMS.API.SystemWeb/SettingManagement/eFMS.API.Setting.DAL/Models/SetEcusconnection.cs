@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Setting.Service.Models
 {
-    public partial class Ecusconnection
+    public partial class SetEcusconnection
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Username { get; set; }
+        public string UserId { get; set; }
         public string ServerName { get; set; }
         public string Dbusername { get; set; }
         public string Dbpassword { get; set; }
