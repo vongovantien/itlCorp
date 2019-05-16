@@ -90,7 +90,7 @@ namespace eFMS.API.Setting.Controllers
         {
             string message = string.Empty;
             var existed = ecusConnectionService.Any(x => x.Id!=model.Id && x.UserId == model.UserId && x.ServerName == model.ServerName && x.Dbname == model.Dbname);
-            message = existed ? "Connection with same configurations has been existed !" : null;
+            message = existed ? "This connection of "+model.username+" has already existed, Please check again!" : null;
             return message;
         }
 
