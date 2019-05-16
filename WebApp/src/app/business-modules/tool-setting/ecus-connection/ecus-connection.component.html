@@ -112,7 +112,7 @@
                         </tr>
                     </thead>
                     <tbody class="tbody-group">
-                        <tr>
+                        <tr *ngFor="let item of EcusConnections;let i = index;">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
                                     <button type="button"
@@ -133,70 +133,34 @@
                                     data-target="#edit-connection-modal">Name</a>
                             </td>
                             <td class="sorting">
-                                <span>User name</span>
+                                <span>{{item.username}}</span>
                             </td>
                             <td class="sorting">
-                                <span>Full name</span>
+                                <span>{{item.fullname}}</span>
                             </td>
                             <td class="sorting">
-                                <span>Server name</span>
+                                <span>{{item.serverName}}</span>
                             </td>
                             <td class="sorting">
-                                <span>DB name</span>
+                                <span>{{item.dbname}}</span>
                             </td>
                             <td class="sorting">
-                                <span class="m--font-success">Active</span>
+                                <span class="m--font-success" *ngIf="item.inactive===false">Active</span>
+                                <span class="m--font" *ngIf="item.inactive===true">Inactive</span>
                             </td>
                             <td>
-                                <span>dd/MM/yyyy</span>
+                                <span>{{item.datetimeCreated | date:'dd/MM/yyyy'}}</span>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="table-actions-col">
-                                <div class="table-actions" style="width: 70px">
-                                    <button type="button"
-                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Edit" data-toggle="modal" data-target="#edit-connection-modal">
-                                        <i class="la la-edit"></i>
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        title="Remove" data-toggle="modal"
-                                        data-target="#confirm-delete-connection-modal">
-                                        <i class="la la-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="sorting">
-                                <a href="javascript:void(0)" data-toggle="modal"
-                                    data-target="#edit-connection-modal">Name</a>
-                            </td>
-                            <td class="sorting">
-                                <span>User name</span>
-                            </td>
-                            <td class="sorting">
-                                <span>Full name</span>
-                            </td>
-                            <td class="sorting">
-                                <span>Server name</span>
-                            </td>
-                            <td class="sorting">
-                                <span>DB name</span>
-                            </td>
-                            <td class="sorting">
-                                <span class="m--font-danger">Inactive</span>
-                            </td>
-                            <td>
-                                <span>dd/MM/yyyy</span>
-                            </td>
-                        </tr>
+                      
                     </tbody>
                 </table>
             </div>
             <!--end: Datatable -->
 
             <!--begin::pagination-->
-            <div class="pagination-nav">
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+            <!-- <div class="pagination-nav">
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="tatable__pager-size" style="max-width: 190px">
@@ -223,7 +187,7 @@
                         </nav>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <!--end::pagination-->
         </div>
     </div>
@@ -239,7 +203,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Connection</h5>
-                    <button id="closeButton" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button id="closeButton" (click)="closeModal(addEcusConnectForm)" type="button" class="close" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -361,7 +325,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button (click)="closeModal(addEcusConnectForm)" type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

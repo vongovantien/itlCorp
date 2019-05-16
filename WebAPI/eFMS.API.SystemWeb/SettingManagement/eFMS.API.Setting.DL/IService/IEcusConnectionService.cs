@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Setting.DL.Models;
+using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -12,5 +13,7 @@ namespace eFMS.API.Setting.DL.IService
     {
         List<SetEcusConnectionModel> getConnections();
         SetEcusConnectionModel getConnectionDetails(int connection_id);
+        List<SetEcusConnectionModel> Paging(SetEcusConnectionCriteria criteria, int page_num, int page_size,out int total_items);
+
     }
 }

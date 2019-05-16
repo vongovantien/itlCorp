@@ -14,4 +14,7 @@ export class EcusConnection {
     datetimeCreated: Date = null;
     userModified: string = null;
     datetimeModified: Date = null;
+    userModifiedName:string = null;
+    userCreatedName:string = null;
+    all: string = null;
   }

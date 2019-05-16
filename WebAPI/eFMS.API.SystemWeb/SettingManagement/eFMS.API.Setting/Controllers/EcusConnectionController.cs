@@ -13,6 +13,7 @@ using ITL.NetCore.Common;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.Common;
+using eFMS.API.Setting.DL.Models.Criteria;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -41,7 +42,7 @@ namespace eFMS.API.Setting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
             model.DatetimeCreated = DateTime.Now;
-            model.UserCreated = "thor";
+            model.UserCreated = "admin";
             var hs = ecusConnectionService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -61,8 +62,8 @@ namespace eFMS.API.Setting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            model.DatetimeCreated = DateTime.Now;
-            model.UserCreated = "thor";
+            model.DatetimeModified = DateTime.Now;
+            model.UserModified = "admin";
             var hs = ecusConnectionService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -70,6 +71,29 @@ namespace eFMS.API.Setting.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("Delete")]
+        public IActionResult Delete(int id)
+        {
+            var hs = ecusConnectionService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("Paging")]
+        public IActionResult Paging(SetEcusConnectionCriteria criteria,int page_number, int page_size)
+        {
+            var data = ecusConnectionService.Paging(criteria, page_number, page_size, out int total_item);
+            var result = new { data, totalItems = total_item, page_number, page_size };
             return Ok(result);
         }
 

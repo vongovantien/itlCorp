@@ -237,6 +237,8 @@ export class API_MENU {
         EcusConnection:{
             getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/GetAll",
             addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Add",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Delete",
+            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Paging",
         }
     }
 
