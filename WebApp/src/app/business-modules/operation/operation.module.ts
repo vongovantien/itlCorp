@@ -6,7 +6,10 @@ import { JobMangementComponent } from './job-mangement/job-mangement.component';
 import { AssigmentComponent } from './assigment/assigment.component';
 import { TruckingAssignmentComponent } from './trucking-assignment/trucking-assignment.component';
 import { SelectModule } from 'ng2-select';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SharedModule } from '../../shared/shared.module';
+import { OpsModuleBillingJobCreateComponent } from './ops-module-billing-job-create/ops-module-billing-job-create.component';
+import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billing.component';
 
 
 @NgModule({
@@ -15,8 +18,9 @@ import { SharedModule } from '../../shared/shared.module';
     OperationRoutingModule,
     SelectModule,
     FormsModule,
-    SharedModule
+    SharedModule,
+    NgxDaterangepickerMd
   ],
-  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent],
+  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent],
 })
 export class OperationModule { }
