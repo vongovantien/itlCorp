@@ -20,7 +20,7 @@ const routes: Routes = [
         component: OpsModuleBillingComponent
     },
     {
-        path: 'job-management-create',
+        path: 'job-create',
         component: OpsModuleBillingJobCreateComponent
     },
     {
