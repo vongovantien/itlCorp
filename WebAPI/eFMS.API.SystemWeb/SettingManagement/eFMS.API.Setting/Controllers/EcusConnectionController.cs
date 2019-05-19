@@ -76,9 +76,9 @@ namespace eFMS.API.Setting.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id_connection)
         {
-            var hs = ecusConnectionService.Delete(x => x.Id == id);
+            var hs = ecusConnectionService.Delete(x => x.Id == id_connection);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

@@ -18,12 +18,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace eFMS.API.Shipment
 {
@@ -68,6 +70,24 @@ namespace eFMS.API.Shipment
                             .AllowAnyMethod()
                             .AllowCredentials();
                     });
+            });
+            var key = Encoding.ASCII.GetBytes("EFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPR");
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
             });
             //services.AddCustomAuthentication(Configuration);
             services.AddApiVersioning(config =>

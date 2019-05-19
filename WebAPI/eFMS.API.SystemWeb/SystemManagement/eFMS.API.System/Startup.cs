@@ -66,7 +66,8 @@ namespace SystemManagementAPI
                             .WithHeaders("accept", "content-type", "origin", "x-custom-header")
                             .AllowAnyOrigin()
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                     });
             });
             // configure jwt authentication

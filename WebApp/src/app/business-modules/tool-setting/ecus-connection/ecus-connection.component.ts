@@ -17,7 +17,8 @@ export class EcusConnectionComponent implements OnInit {
     criteria: EcusConnection = new EcusConnection();
     pager: PagerSetting = PAGINGSETTING;
     EcusConnectionAdd: EcusConnection = new EcusConnection();
-    EcusConnections: any[] = [];
+    EcusConnections: EcusConnection[] = [];
+    EcusConnectionEdit : EcusConnection = new EcusConnection ()
     Users: any[] = [];
     constructor(private baseService: BaseService, private api_menu: API_MENU) { }
 
@@ -39,6 +40,7 @@ export class EcusConnectionComponent implements OnInit {
     }
 
     getEcusConnections(pager: PagerSetting) {
+        this.baseService.spinnerShow();
         this.baseService.post(this.api_menu.ToolSetting.EcusConnection.paging + "?page_number=" + pager.currentPage + "&page_size=" + pager.pageSize, this.criteria).subscribe((res: any) => {
             if (res != null) {
                 this.EcusConnections = res.data;
@@ -49,7 +51,13 @@ export class EcusConnectionComponent implements OnInit {
                 this.EcusConnections = [];
                 this.pager.totalItems = 0;
             }
+            this.baseService.spinnerHide();
         });
+    }
+
+    async getEcusConnectionDetails(id:number){
+        this.EcusConnectionEdit = await this.baseService.getAsync(this.api_menu.ToolSetting.EcusConnection.details+"?id_connection="+id,true,false);
+        console.log(this.EcusConnectionEdit);
     }
 
     setPage(pager: PagerSetting) {
@@ -77,6 +85,34 @@ export class EcusConnectionComponent implements OnInit {
             }
         }, 300);
 
+    }
+    SubmitEditConnect(form:NgForm){
+        console.log(this.EcusConnectionEdit);
+        setTimeout(async () => {
+            if (form.submitted) {
+                var error = $('#edit-connection-modal').find('div.has-danger');
+                if (error.length === 0) {
+                    var res = await this.baseService.putAsync(this.api_menu.ToolSetting.EcusConnection.update, this.EcusConnectionEdit);
+                    if (res.status) {
+                        this.resetDisplay();
+                        $('#edit-connection-modal').modal('hide');
+                        this.initNewPager();
+                        this.getEcusConnections(this.pager);
+                    }
+                }
+            }
+        }, 300);
+    }
+
+    idConnectToDelete:string = null;
+    async deleteConfirm(confirm:boolean=false){
+        if(confirm===true){
+            await this.baseService.deleteAsync(this.api_menu.ToolSetting.EcusConnection.delete+"?id_connection="+this.idConnectToDelete);            
+            this.idConnectToDelete = null;
+            this.initNewPager();
+            this.getEcusConnections(this.pager);
+            $('#confirm-delete-connection-modal').modal('hide');
+        }
     }
 
     isDisplay: boolean = true;

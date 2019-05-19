@@ -16,31 +16,59 @@ const routes: Routes = [
   },
   {
     path:'ecus-connection',
-    component:EcusConnectionComponent
+    component:EcusConnectionComponent,
+    data:{
+      name:"Ecus Connection",
+      level:2
+    }
   },
   {
     path:'id-definition',
-    component:IDDefinitionComponent
+    component:IDDefinitionComponent,
+    data:{
+      name:"ID Definition",
+      level:2
+    }
   },
   {
     path:'kpi',
-    component:KPIComponent
+    component:KPIComponent,
+    data:{
+      name:"KPI",
+      level:2
+    }
   },
   {
     path:'supplier',
-    component:SupplierComponent
+    component:SupplierComponent,
+    data:{
+      name:"Supplier",
+      level:2
+    }
   },
   {
     path:'tariff',
-    component:TariffComponent
+    component:TariffComponent,
+    data:{
+      name:"Tariff",
+      level:2
+    }
   },
   {
     path:'exchange-rate',
-    component:ExchangeRateComponent
+    component:ExchangeRateComponent,
+    data:{
+      name:"Exchange Rate",
+      level:2
+    }
   },
   {
     path:'log-viewer',
-    component:LogViewerComponent
+    component:LogViewerComponent,
+    data:{
+      name:"Log Viewer",
+      level:2
+    }
   }
 ];
 
