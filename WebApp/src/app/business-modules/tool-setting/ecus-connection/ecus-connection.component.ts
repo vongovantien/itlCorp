@@ -26,11 +26,6 @@ export class EcusConnectionComponent implements OnInit {
         this.initNewPager();
         this.getListUsers();
         this.getEcusConnections(this.pager);
-        this.test();
-    }
-    async test() {
-        var s = await this.baseService.getAsync(this.api_menu.ToolSetting.EcusConnection.test, false, true);
-        console.log(s);
     }
 
     initNewPager() {

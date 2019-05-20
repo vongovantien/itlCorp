@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System;
 using eFMS.API.Provider.Services.IService;
 using eFMS.API.Provider.Services.ServiceImpl;
+using eFMS.API.Common;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -112,6 +113,39 @@ namespace eFMS.API.System.Infrastructure
             services.AddHttpClient<ICatAreaApiService, CatAreaApiService>()
                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
 
+            return services;
+        }
+
+        public static IServiceCollection AddConfigureSetting(this IServiceCollection service, IConfiguration configuration)
+        {
+            service.Configure<Settings>(options =>
+            {
+                options.MongoConnection
+                    = configuration.GetSection("ConnectionStrings:MongoConnection").Value;
+                options.MongoDatabase
+                    = configuration.GetSection("ConnectionStrings:Database").Value;
+                options.RedisConnection
+                    = configuration.GetSection("ConnectionStrings:Redis").Value;
+                options.eFMSConnection
+                    = configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
+            });
+            return service;
+        }
+        public static IServiceCollection AddCrossOrigin(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder
+                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+            });
             return services;
         }
     }

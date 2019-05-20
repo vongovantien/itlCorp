@@ -50,27 +50,10 @@ namespace SystemManagementAPI
             services.AddAutoMapper();
             services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.Configure<Settings>(options =>
-            {
-                options.MongoConnection
-                    = Configuration.GetSection("MongoConnection:ConnectionString").Value;
-                options.MongoDatabase
-                    = Configuration.GetSection("MongoConnection:Database").Value;
-            });
+            services.AddConfigureSetting(Configuration);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             ServiceRegister.Register(services);
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder
-                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-                            .AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    });
-            });
+            services.AddCrossOrigin();
             // configure jwt authentication
            
 
