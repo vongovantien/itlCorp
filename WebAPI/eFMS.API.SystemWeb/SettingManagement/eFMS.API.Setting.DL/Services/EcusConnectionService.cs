@@ -20,13 +20,16 @@ using System.Data.SqlClient;
 using System.Data;
 using eFMS.API.Setting.DL.Models.Ecus;
 using eFMS.API.Setting.DL.Helpers;
+using eFMS.API.Provider.Services.IService;
 
 namespace eFMS.API.Setting.DL.Services
 {
     public class EcusConnectionService : RepositoryBase<SetEcusconnection, SetEcusConnectionModel>, IEcusConnectionService
     {
-        public EcusConnectionService(IContextBase<SetEcusconnection> repository, IMapper mapper) : base(repository, mapper)
+        private ICatAreaApiService catAreaApi;
+        public EcusConnectionService(IContextBase<SetEcusconnection> repository, IMapper mapper, ICatAreaApiService apiService) : base(repository, mapper)
         {
+            catAreaApi = apiService;
         }
 
         public SetEcusConnectionModel GetConnectionDetails(int connection_id)
@@ -78,6 +81,13 @@ namespace eFMS.API.Setting.DL.Services
             }
             return results;
         }
+
+        public object Test()
+        {
+            var results = catAreaApi.GetAreas().Result.ToList();
+            return results;
+        }
+
         private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
         {
             string queryString = "SELECT * FROM [ECUS5VNACCS].[dbo].[DTOKHAIMD]";

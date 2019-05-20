@@ -80,7 +80,13 @@ namespace eFMS.API.Setting.Controllers
         {
             return ecusConnectionService.GetConnections();
         }
-
+        [HttpGet]
+        [Route("Test")]
+        public IActionResult Test()
+        {
+            var results = ecusConnectionService.Test();
+            return Ok(results);
+        }
         [HttpGet]
         [Route("GetDetails")]
         public SetEcusConnectionModel GetDetails(int id_connection)

@@ -14,6 +14,9 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using eFMS.API.System.Infrastructure.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using eFMS.API.Provider.Services.IService;
+using eFMS.API.Provider.Services.ServiceImpl;
+using System;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -102,6 +105,13 @@ namespace eFMS.API.System.Infrastructure
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
+            return services;
+        }
+        public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)
+        {
+            services.AddHttpClient<ICatAreaApiService, CatAreaApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+
             return services;
         }
     }

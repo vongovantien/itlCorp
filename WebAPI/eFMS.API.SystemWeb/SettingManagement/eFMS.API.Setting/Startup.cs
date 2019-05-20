@@ -20,6 +20,7 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using System.Globalization;
+using static eFMS.API.Provider.Infrasture.Settings;
 
 namespace SystemManagementAPI
 {
@@ -81,7 +82,9 @@ namespace SystemManagementAPI
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
-
+            services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
+            services.AddOptions()
+                .AddCatelogueManagementApiServices();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);

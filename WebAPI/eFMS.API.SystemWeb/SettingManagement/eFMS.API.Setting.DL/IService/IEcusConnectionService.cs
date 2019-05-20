@@ -11,6 +11,7 @@ namespace eFMS.API.Setting.DL.IService
 {
     public interface IEcusConnectionService:IRepositoryBase<SetEcusconnection,SetEcusConnectionModel>
     {
+        object Test();
         List<SetEcusConnectionModel> GetConnections();
         SetEcusConnectionModel GetConnectionDetails(int connection_id);
         List<DTOKHAIMD> GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database);
