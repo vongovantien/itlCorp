@@ -65,7 +65,7 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
 /**
  *  Prepare data for ng2-select control from dataSource
  *  ng2-select required input data following format {id:'',text:''}
- *  for more information please got to : 
+ *  for more information please visit : 
  *  https://valor-software.com/ng2-select/
  * @param dataSource 
  * @param idField 

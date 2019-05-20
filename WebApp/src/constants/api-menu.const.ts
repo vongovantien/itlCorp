@@ -12,9 +12,9 @@ export class API_MENU {
         System: 44360,
         Catalogue: 44361,
         Department: 44242,
-        auditlog: 44363,
+        Setting: 44363,
         Documentation: 44366,
-        ReportPreview: 53717
+        ReportPreview: 53717,
     }
 
     private PROTOCOL = "http://";
@@ -35,7 +35,7 @@ export class API_MENU {
     }
 
 
-    private getUrlMainPath(Module: String) {
+    private getUrlMainPath(Module: string) {
 
         if (this.CURRENT_HOST == this.HOST.Local) {
             return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
@@ -58,8 +58,8 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/Default.aspx";
         }
     }
-    private getPort(Module: String) {
-        return eval("this.PORT." + Module);
+    private getPort(Module: string) {
+        return this.PORT[Module]; //eval("this.PORT." + Module);
     }
 
 
@@ -231,8 +231,17 @@ export class API_MENU {
             removeExchangeCurrency: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/RemoveExchangeCurrency"
         },
         CatalogueLogViewer: {
-            getCategory: this.getUrlMainPath(SystemConstants.MODULE_NAME.LOG) + "CategoryLog/GetCategory",
-            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.LOG) + "CategoryLog/Paging"
+            getCategory: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CategoryLog/GetCategory",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CategoryLog/Paging"
+        },
+        EcusConnection:{
+            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/GetAll",
+            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/GetDetails",
+            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Add",
+            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Update",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Delete",
+            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Paging",
+            test: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Test"
         }
     }
 

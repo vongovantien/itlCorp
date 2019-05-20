@@ -1,10 +1,11 @@
 import { Directive, HostListener, ElementRef, Input } from '@angular/core';
-@Directive({
-  selector: '[specialIsAlphaNumeric]'
-})
-export class SpecialCharacterDirective {
 
-  regexStr = '^[a-zA-Z0-9_ ]*$';
+@Directive({
+  selector: '[ecusSpecicalCharacterAllowSpace]'
+})
+export class EcusSpecicalCharacterAllowSpaceDirective {
+
+  regexStr = '^[a-zA-Z0-9_ ./-]*$';
   @Input() isAlphaNumeric: boolean;
 
   constructor(private el: ElementRef) { }
@@ -21,7 +22,7 @@ export class SpecialCharacterDirective {
   validateFields(event) {
     setTimeout(() => {
 
-      this.el.nativeElement.value = this.el.nativeElement.value.replace(/[^a-zA-Z0-9_ ]/g, '').replace(/\s/g, '');
+      this.el.nativeElement.value = this.el.nativeElement.value.replace(/[^a-zA-Z0-9_ ./-]/g, ''); //.replace(/\s/g, '');
       event.preventDefault();
 
     }, 100)

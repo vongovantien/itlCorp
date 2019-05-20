@@ -22,6 +22,8 @@ import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima
 import { IntergerInputDirective } from './directives/interger-input.directive';
 import { ReportPreviewComponent } from './common/report-preview/report-preview.component';
 import { SpecialCharacterDirective } from './directives/specialChracter.directive';
+import {EcusSpecicalCharacterAllowSpaceDirective} from './directives/ecusSpecicalCharacterAllowSpace.directive';
+import {EcusSpecicalCharacterNoSpaceDirective} from './directives/ecusSpecicalCharacterNoSpace.directive';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 import { RouterModule } from '@angular/router';
@@ -44,6 +46,8 @@ import { RouterModule } from '@angular/router';
     IntergerInputDirective,
     ReportPreviewComponent,
     SpecialCharacterDirective,
+    EcusSpecicalCharacterAllowSpaceDirective,
+    EcusSpecicalCharacterNoSpaceDirective,
     ComboGridVirtualScrollComponent
   ],
   exports: [
@@ -64,6 +68,8 @@ import { RouterModule } from '@angular/router';
     NgProgressModule,
     ReportPreviewComponent,
     SpecialCharacterDirective,
+    EcusSpecicalCharacterAllowSpaceDirective,
+    EcusSpecicalCharacterNoSpaceDirective,
     ComboGridVirtualScrollComponent
   ],
   providers: [

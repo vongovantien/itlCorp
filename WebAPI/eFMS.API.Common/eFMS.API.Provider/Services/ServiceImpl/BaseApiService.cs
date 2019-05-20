@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using static eFMS.API.Provider.Infrasture.Settings;
@@ -34,7 +35,7 @@ namespace eFMS.API.Provider.Services.ServiceImpl
             catch { }
             return default(TResponse);
         }
-        protected async Task<TResponse> TransactionApi<TResponse, TDataModel>(string strUri, TDataModel data, Crud method = Crud.Insert) where TDataModel : new()
+        protected async Task<TResponse> PostApi<TResponse, TDataModel>(string strUri, TDataModel data) where TDataModel : new()
         {
             TResponse response = default(TResponse);
             try
@@ -42,56 +43,11 @@ namespace eFMS.API.Provider.Services.ServiceImpl
                 var payload = JsonConvert.SerializeObject(data == null ? new TDataModel() : data);
                 HttpContent httpContent = new StringContent(payload, Encoding.UTF8, "application/json");
                 HttpResponseMessage httpResponse = null;
-                switch(method)
-                {
-                    case Crud.Insert:
-                        httpResponse = await apiClient.PostAsync(strUri, httpContent);
-                        break;
-                    case Crud.Update:
-                        httpResponse = await apiClient.PutAsync(strUri, httpContent);
-                        break;
-                    case Crud.Delete:
-                        httpResponse = await apiClient.DeleteAsync(strUri);
-                        break;
-                }
+                httpResponse = await apiClient.PostAsync(strUri, httpContent);
                 string strResponse = await httpResponse.Content.ReadAsStringAsync();
                 if (httpResponse.IsSuccessStatusCode && !string.IsNullOrEmpty(strResponse))
                 {
                     response = JsonConvert.DeserializeObject<TResponse>(strResponse);
-                }
-            }
-            catch { }
-            return response;
-        }
-        protected async Task<TResponse> AuthorizationApi<TResponse, TDataModel>(string token, string strUri, TDataModel data, Crud method = Crud.Insert) where TDataModel : new()
-        {
-            TResponse response = default(TResponse);
-            try
-            {
-                using (var httpClient = new HttpClient())
-                {
-                    if (token == null) throw new ArgumentNullException(nameof(token));
-                    httpClient.DefaultRequestHeaders.Add("Authorization", String.Format("Bearer {0}", token));
-                    var payload = JsonConvert.SerializeObject(data == null ? new TDataModel() : data);
-                    HttpContent httpContent = new StringContent(payload, Encoding.UTF8, "application/json");
-                    HttpResponseMessage httpResponse = null;
-                    switch (method)
-                    {
-                        case Crud.Insert:
-                            httpResponse = await apiClient.PostAsync(strUri, httpContent);
-                            break;
-                        case Crud.Update:
-                            httpResponse = await apiClient.PutAsync(strUri, httpContent);
-                            break;
-                        case Crud.Delete:
-                            httpResponse = await apiClient.DeleteAsync(strUri);
-                            break;
-                    }
-                    string strResponse = await httpResponse.Content.ReadAsStringAsync();
-                    if (httpResponse.IsSuccessStatusCode && !string.IsNullOrEmpty(strResponse))
-                    {
-                        response = JsonConvert.DeserializeObject<TResponse>(strResponse);
-                    }
                 }
             }
             catch { }

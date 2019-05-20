@@ -9,6 +9,6 @@ namespace eFMS.API.Provider.Services.IService
 {
     public interface ICatAreaApiService
     {
-        Task<List<CatAreaApiModel>> GetAreas();
+        Task<List<CatAreaApiModel>> GetAreas(string token);
     }
 }

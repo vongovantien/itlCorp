@@ -20,7 +20,7 @@ namespace eFMS.API.Provider.Services.ServiceImpl
         {
         }
 
-        public async Task<List<CatAreaApiModel>> GetAreas()
+        public async Task<List<CatAreaApiModel>> GetAreas(string token)
         {
             string strUri = CatAreaAPI.GetAll(baseUrl);
             return await GetApi<List<CatAreaApiModel>>(strUri);
