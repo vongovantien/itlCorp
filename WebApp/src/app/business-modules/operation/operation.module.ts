@@ -10,6 +10,7 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SharedModule } from '../../shared/shared.module';
 import { OpsModuleBillingJobCreateComponent } from './ops-module-billing-job-create/ops-module-billing-job-create.component';
 import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billing.component';
+import { OpsModuleBillingJobEditComponent } from './ops-module-billing-job-edit/ops-module-billing-job-edit.component';
 
 
 @NgModule({
@@ -21,6 +22,6 @@ import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billi
     SharedModule,
     NgxDaterangepickerMd
   ],
-  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent],
+  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent],
 })
 export class OperationModule { }

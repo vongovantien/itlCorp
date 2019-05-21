@@ -4,6 +4,7 @@ import { AssigmentComponent } from './assigment/assigment.component';
 import { TruckingAssignmentComponent } from './trucking-assignment/trucking-assignment.component';
 import { OpsModuleBillingJobCreateComponent } from './ops-module-billing-job-create/ops-module-billing-job-create.component';
 import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billing.component';
+import { OpsModuleBillingJobEditComponent } from './ops-module-billing-job-edit/ops-module-billing-job-edit.component';
 
 const routes: Routes = [
     {
@@ -22,6 +23,10 @@ const routes: Routes = [
     {
         path: 'job-create',
         component: OpsModuleBillingJobCreateComponent
+    },
+    {
+        path: 'job-edit',
+        component: OpsModuleBillingJobEditComponent
     },
     {
         path: 'assigment',
