@@ -46,6 +46,10 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
         'option 5', 'option 6', 'option 7'];
 
+        
+    packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
+    packagesUnitActive = ['PKG'];
+
     private value: any = {};
     private _disabledV: string = '0';
     public disabled: boolean = false;
