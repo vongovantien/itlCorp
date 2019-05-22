@@ -18,9 +18,9 @@
                 </li>
             </ul> -->
 
-            <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
+            <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow">
                 <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true" *ngFor="let item of Menu;let i = index;"
-                    #parrent [id]="i">
+                    #parrent [id]="'parent-'+i">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(i)">
                         <i [class]="'m-menu__link-icon '+item.icon"></i>
                         <span class="m-menu__link-text">
@@ -28,13 +28,13 @@
                         </span>
                         <i class="m-menu__ver-arrow la la-angle-right"></i>
                     </a>
-                    <div class="m-menu__submenu" *ngIf="item.display_child">
+                    <div class="m-menu__submenu">
                         <span class="m-menu__arrow"></span>
                         <ul class="m-menu__subnav">
                             <li class="m-menu__item m-menu__item" aria-haspopup="true" *ngFor="let sub_item of item.childs;let k = index;"
-                                [id]="i+'-'+k">
+                                [id]="'children-'+i+'-'+k">
                               
-                                    <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link " *ngIf="sub_item.display"
+                                    <a [routerLink]="item.route_parent+sub_item.route_child" [queryParams]="{ serviceId: 99 }" class="m-menu__link " *ngIf="sub_item.display"
                                         (click)="sub_menu_click(sub_item.name,i,k)">
                                         <i class="m-menu__link-bullet m-menu__link-bullet--dot">
                                             <span></span>
