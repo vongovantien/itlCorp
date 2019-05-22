@@ -15,7 +15,8 @@ namespace eFMS.API.Documentation.DL.Common
         SeaFCLExport = 6,
         SeaFCLImport = 7,
         SeaLCLExport = 8,
-        SeaLCLImport = 9
+        SeaLCLImport = 9,
+        CustomClearance = 10
     }
     public static class TermData
     {

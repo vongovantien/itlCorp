@@ -97,7 +97,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatUnit> Query(CatUnitCriteria criteria)
         {
-            cache.Remove(Templates.CatUnit.NameCaching.ListName);
             IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
             IQueryable<CatUnit> list = null;
             if (criteria.All == null)

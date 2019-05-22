@@ -1,6 +1,5 @@
 import { Component, OnInit,Input,Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
-import {PageSidebarComponent} from 'src/app/master-page/page-sidebar/page-sidebar.component'
 declare var $: any;
 @Component({
   selector: 'confirm-before-leave-modal',
@@ -9,7 +8,7 @@ declare var $: any;
 })
 export class CfBeforeLeaveModalComponent implements OnInit {
 
-  constructor(private router: Router,private psb : PageSidebarComponent) { }
+  constructor(private router: Router) { }
 
   IDModalToLeave:string = null;
   MessageToShow:string = "All entered data will be discarded. Are you sure want to leave ?";
@@ -46,7 +45,6 @@ export class CfBeforeLeaveModalComponent implements OnInit {
     if(this.UrlToNavigate!==null){
       this.router.navigateByUrl(this.UrlToNavigate);
       setTimeout(() => {
-        this.psb.highLightMenu();
       }, 400);
      
     }
