@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL
@@ -16,7 +17,11 @@ namespace eFMS.API.Catalogue.DL
         }
         public static void SetObject<T>(IDistributedCache cache, string key, T value)
         {
-            cache.SetString(key, JsonConvert.SerializeObject(value));
+            var field = cache.GetType().GetField("_connection", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field.GetValue(cache) != null)
+            {
+                cache.SetString(key, JsonConvert.SerializeObject(value));
+            }
         }
         // get
         public static async Task<T> GetObjectAsync<T>(IDistributedCache cache, string key)
@@ -26,8 +31,23 @@ namespace eFMS.API.Catalogue.DL
         }
         public static T GetObject<T>(IDistributedCache cache, string key)
         {
-            var value = cache.GetString(key);
-            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
+            var field = cache.GetType().GetField("_connection", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field.GetValue(cache) != null)
+            {
+                try
+                {
+                    var value = cache.GetString(key);
+                    return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
+                }
+                catch (Exception)
+                {
+                    return default(T);
+                }
+            }
+            else
+            {
+                return default(T);
+            }
         }
 
         // verify if an object exists

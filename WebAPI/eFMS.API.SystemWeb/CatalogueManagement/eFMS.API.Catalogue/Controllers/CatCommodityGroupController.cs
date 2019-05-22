@@ -13,8 +13,8 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Connection.NoSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -206,10 +206,9 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPost]
         [Route("import")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Import([FromBody] List<CommodityGroupImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = "1";  //currentUser.UserID;
             var result = catComonityGroupService.Import(data);
             return Ok(result);
         }

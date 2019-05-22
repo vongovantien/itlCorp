@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -12,8 +11,8 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ITL.NetCore.Connection.NoSql;
 using eFMS.API.Documentation.Service.Contexts;
+using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Documentation.DL.Services
 {
