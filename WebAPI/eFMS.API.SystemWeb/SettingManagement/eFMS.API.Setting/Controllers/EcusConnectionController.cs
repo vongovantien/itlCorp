@@ -28,7 +28,7 @@ namespace eFMS.API.Setting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IEcusConnectionService ecusConnectionService;
 
-        public EcusConnectionController(IStringLocalizer<LanguageSub> localizer, IEcusConnectionService service)
+        public EcusConnectionController(IStringLocalizer<SystemManagementAPI.Resources.LanguageSub> localizer, IEcusConnectionService service)
         {
             stringLocalizer = localizer;
             ecusConnectionService = service;
