@@ -29,8 +29,9 @@ import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scrol
 import { RouterModule } from '@angular/router';
 import { CfBeforeLeaveModalComponent } from './common/cf-before-leave-modal/cf-before-leave-modal.component';
 import { PageSidebarComponent } from '../master-page/page-sidebar/page-sidebar.component';
+import { AppModule } from '../app.module';
 @NgModule({
-  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule,RouterModule],
+  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule,RouterModule,AppModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 
