@@ -12,16 +12,16 @@ using eFMS.API.Setting.DL.Models.Criteria;
 using System.Data;
 using eFMS.API.Setting.DL.Models.Ecus;
 using eFMS.API.Setting.DL.Helpers;
-using eFMS.API.Provider.Services.IService;
+//using eFMS.API.Provider.Services.IService;
 
 namespace eFMS.API.Setting.DL.Services
 {
     public class EcusConnectionService : RepositoryBase<SetEcusconnection, SetEcusConnectionModel>, IEcusConnectionService
     {
-        private ICatAreaApiService catAreaApi;
-        public EcusConnectionService(IContextBase<SetEcusconnection> repository, IMapper mapper, ICatAreaApiService apiService) : base(repository, mapper)
+        //private ICatAreaApiService catAreaApi;
+        public EcusConnectionService(IContextBase<SetEcusconnection> repository, IMapper mapper) : base(repository, mapper)
         {
-            catAreaApi = apiService;
+            //catAreaApi = apiService;
         }
 
         public SetEcusConnectionModel GetConnectionDetails(int id)
@@ -121,11 +121,11 @@ namespace eFMS.API.Setting.DL.Services
             return results;
         }
 
-        public object Test(string token)
-        {
-            var results = catAreaApi.GetAreas(token).Result.ToList();
-            return results;
-        }
+        //public object Test(string token)
+        //{
+        //    var results = catAreaApi.GetAreas(token).Result.ToList();
+        //    return results;
+        //}
 
         private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
         {

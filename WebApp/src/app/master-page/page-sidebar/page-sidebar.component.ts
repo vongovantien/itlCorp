@@ -51,6 +51,11 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     }
 
   }
+  public highLightMenu(){
+    
+  }
+
+
   constructor(private router: Router,private baseService:BaseService) { }
 
   async ngOnInit() {

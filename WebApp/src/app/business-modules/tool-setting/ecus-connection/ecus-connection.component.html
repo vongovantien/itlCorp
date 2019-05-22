@@ -35,7 +35,8 @@
         <div class="m-portlet__body">
             <!--begin::Form-->
             <div class="m-form">
-                <div class="row">
+                    <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (reset_search)=resetSearch($event)></app-search-options>
+                <!-- <div class="row">
                     <div class="col">
                         <div class="input-group m-input-group m-input-group--square">
                             <div class="input-group-prepend">
@@ -72,7 +73,7 @@
                             </span>
                         </button>
                     </div>
-                </div>
+                </div> -->
             </div>
             <!--end::Form-->
         </div>
