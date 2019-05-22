@@ -25,5 +25,9 @@ namespace eFMS.API.Documentation.Service.Models
         public string InvoiceNo { get; set; }
         public string Saleman { get; set; }
         public string FieldOps { get; set; }
+        public string UserCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }

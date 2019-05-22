@@ -2337,6 +2337,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CreatedDate).HasColumnType("smalldatetime");
+
                 entity.Property(e => e.CustomerId)
                     .HasColumnName("CustomerID")
                     .HasMaxLength(50)
@@ -2361,6 +2363,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("MBLNO")
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 
@@ -2390,6 +2394,14 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.SupplierId)
                     .HasColumnName("SupplierID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });

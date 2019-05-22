@@ -16,5 +16,13 @@ namespace eFMS.API.Documentation.DL.Services
             var termData = new { freightTerms, shipmentTypes, billOfLadings, serviceTypes, typeOfMoves };
             return termData;
         }
+        public object GetOPSShipmentCommonData()
+        {
+            var productServices = TermData.ProductServices;
+            var serviceModes = TermData.ServiceModes;
+            var shipmentModes = TermData.ShipmentModes;
+            var termData = new { productServices, serviceModes, shipmentModes };
+            return termData;
+        }
     }
 }
