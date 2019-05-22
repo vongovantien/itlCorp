@@ -6,6 +6,7 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { NgForm } from '@angular/forms';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 declare var $: any;
 @Component({
     selector: 'app-ecus-connection',
@@ -20,6 +21,18 @@ export class EcusConnectionComponent implements OnInit {
     EcusConnections: EcusConnection[] = [];
     EcusConnectionEdit : EcusConnection = new EcusConnection ()
     Users: any[] = [];
+    SearchFields = [
+        // {fieldName:"",displayName:"All"},
+        {fieldName:"name",displayName:"Name"},
+        {fieldName:"username",displayName:"User Name"},
+        {fieldName:"serverName",displayName:"Server Name"},
+        {fieldName:"dbname",displayName:"Database Name"}
+    ]
+    configSearch: any = {
+        settingFields: this.SearchFields,
+        typeSearch: TypeSearch.outtab
+      };
+      
     constructor(private baseService: BaseService, private api_menu: API_MENU) { }
 
     ngOnInit() {
@@ -38,6 +51,19 @@ export class EcusConnectionComponent implements OnInit {
             this.Users = prepareNg2SelectData(data, "id", "username");
         });
     }
+
+    onSearch(event: { field: string; searchString: any; }){      
+        this.criteria = new EcusConnection();
+        this.criteria[event.field] = event.searchString;
+        this.initNewPager();
+        this.getEcusConnections(this.pager);
+    }
+
+    resetSearch(event: { field: string; searchString: any; }){
+        this.criteria = new EcusConnection();       
+        this.initNewPager();
+        this.getEcusConnections(this.pager);
+      }
 
     getEcusConnections(pager: PagerSetting) {
         

@@ -27,6 +27,8 @@ import {EcusSpecicalCharacterNoSpaceDirective} from './directives/ecusSpecicalCh
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 import { RouterModule } from '@angular/router';
+import { CfBeforeLeaveModalComponent } from './common/cf-before-leave-modal/cf-before-leave-modal.component';
+import { PageSidebarComponent } from '../master-page/page-sidebar/page-sidebar.component';
 @NgModule({
   imports: [CommonModule, FormsModule,SelectModule,ScrollingModule,RouterModule],
   declarations: [
@@ -48,7 +50,9 @@ import { RouterModule } from '@angular/router';
     SpecialCharacterDirective,
     EcusSpecicalCharacterAllowSpaceDirective,
     EcusSpecicalCharacterNoSpaceDirective,
-    ComboGridVirtualScrollComponent
+    ComboGridVirtualScrollComponent,
+    CfBeforeLeaveModalComponent,
+    
   ],
   exports: [
     CommonModule,
@@ -70,7 +74,9 @@ import { RouterModule } from '@angular/router';
     SpecialCharacterDirective,
     EcusSpecicalCharacterAllowSpaceDirective,
     EcusSpecicalCharacterNoSpaceDirective,
-    ComboGridVirtualScrollComponent
+    ComboGridVirtualScrollComponent,
+    CfBeforeLeaveModalComponent,
+    
   ],
   providers: [
     SortService,

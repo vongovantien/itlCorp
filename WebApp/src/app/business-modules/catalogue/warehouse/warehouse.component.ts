@@ -281,7 +281,6 @@ export class WarehouseComponent implements OnInit {
     this.onSearch(event);
   }
   onSearch(event: { field: string; searchString: any; }){
-    console.log(event);
     if(event.field == "All"){
       this.criteria.all = event.searchString;
     }
@@ -289,6 +288,7 @@ export class WarehouseComponent implements OnInit {
       this.criteria = {
         placeType: PlaceTypeEnum.Warehouse
       };
+      this.criteria[event.field] = event.searchString;
       let language = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
       if(language == SystemConstants.LANGUAGES.ENGLISH){
         if(event.field == "countryName"){
@@ -311,18 +311,6 @@ export class WarehouseComponent implements OnInit {
         if(event.field == "districtName"){
           this.criteria.districtNameVN = event.searchString;
         }
-      }
-      if(event.field == "code"){
-        this.criteria.code = event.searchString;
-      }
-      if(event.field == "nameEn"){
-        this.criteria.nameEN = event.searchString;
-      }
-      if(event.field == "nameVn"){
-        this.criteria.nameVN = event.searchString;
-      }
-      if(event.field == "address"){
-        this.criteria.address = event.searchString;
       }
     }
     this.initNewPager();
@@ -373,10 +361,8 @@ export class WarehouseComponent implements OnInit {
     if(name == 'district'){
       this.warehouse.districtID = null;
     }
-    console.log('Removed value is: ', value);
   }
   public typed(value:any):void {
-    console.log('New search input: ', value);
   }
   chooseCountryReset(){
     this.ngSelectProvince.active = [];

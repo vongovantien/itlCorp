@@ -105,15 +105,15 @@ namespace eFMS.API.Setting.Controllers
         {
             return ecusConnectionService.GetConnections();
         }
-        [HttpGet]
-        [Route("Test")]
-        [Authorize]
-        public IActionResult Test()
-        {
-            var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-            var results = ecusConnectionService.Test(token);
-            return Ok(results);
-        }
+        //[HttpGet]
+        //[Route("Test")]
+        //[Authorize]
+        //public IActionResult Test()
+        //{
+        //    var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        //    var results = ecusConnectionService.Test(token);
+        //    return Ok(results);
+        //}
         [HttpGet]
         [Route("GetDetails")]
         public SetEcusConnectionModel GetDetails(int id)
