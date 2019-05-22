@@ -18,23 +18,43 @@ const routes: Routes = [
     //   },
     {
         path: 'job-management',
-        component: OpsModuleBillingComponent
+        component: OpsModuleBillingComponent,
+        data:{
+            name:"Job Management",
+            level:2
+          }
     },
     {
         path: 'job-create',
-        component: OpsModuleBillingJobCreateComponent
+        component: OpsModuleBillingJobCreateComponent,
+        data:{
+            name:"Job Create",
+            level:2
+          }
     },
     {
         path: 'job-edit',
-        component: OpsModuleBillingJobEditComponent
+        component: OpsModuleBillingJobEditComponent,
+        data:{
+            name:"Job Edit",
+            level:2
+          }
     },
     {
         path: 'assigment',
-        component: AssigmentComponent
+        component: AssigmentComponent,
+        data:{
+            name:"Assigment",
+            level:2
+          }
     },
     {
         path: 'trucking-assigment',
-        component: TruckingAssignmentComponent
+        component: TruckingAssignmentComponent,
+        data:{
+            name:"Trucking Assigment",
+            level:2
+          }
     }
 
 ];
