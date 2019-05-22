@@ -5,6 +5,8 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
+import * as shipmentHelper from 'src/helper/shipment.helper';
+import * as dataHelper from 'src/helper/data.helper';
 
 @Component({
     selector: 'app-ops-module-billing',
@@ -12,6 +14,9 @@ import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum'
     styleUrls: ['./ops-module-billing.component.scss']
 })
 export class OpsModuleBillingComponent implements OnInit {
+    productServices: any[] = [];
+    serviceModes: any[] = [];
+    shipmentModes: any[] = [];
     shipments: any[] = [];
     pager: PagerSetting = PAGINGSETTING;
     criteria: any = {
@@ -26,15 +31,23 @@ export class OpsModuleBillingComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.getShipmentCommonData();
     }
     async getShipments(){
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
         this.shipments = responses.data;
         this.pager.totalItems = responses.totalItems;
     }
+    async getShipmentCommonData() {
+        const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
+        this.productServices = dataHelper.prepareNg2SelectData(data.productServices, 'value', 'displayName');
+        this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
+        this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
+    }
     /**
      * Daterange picker
      */
+    searchFilters: Array<string> = ['Job ID', 'HBL'];
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;

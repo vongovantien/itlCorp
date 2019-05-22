@@ -247,6 +247,7 @@ export class API_MENU {
     public Documentation = {
         Terminology: {
             getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
+            getOPSShipmentCommonData: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/GetOPSShipmentCommonData"
         },
         CsTransaction: {
             post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",

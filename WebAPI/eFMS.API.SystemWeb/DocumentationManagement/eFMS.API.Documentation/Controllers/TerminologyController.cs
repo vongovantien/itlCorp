@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.Controllers
         [Route("GetOPSShipmentCommonData")]
         public IActionResult GetOPSCommonData()
         {
-            var results = terminologyService.GetAllShipmentCommonData();
+            var results = terminologyService.GetOPSShipmentCommonData();
             return Ok(results);
         }
     }
