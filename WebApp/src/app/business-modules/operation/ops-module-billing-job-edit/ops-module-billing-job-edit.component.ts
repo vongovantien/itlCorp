@@ -1,25 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { BaseService } from 'src/services-base/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
-import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 
 @Component({
-    selector: 'app-ops-module-billing',
-    templateUrl: './ops-module-billing.component.html',
-    styleUrls: ['./ops-module-billing.component.scss']
+    selector: 'app-ops-module-billing-job-edit',
+    templateUrl: './ops-module-billing-job-edit.component.html',
+    styleUrls: ['./ops-module-billing-job-edit.component.scss']
 })
-export class OpsModuleBillingComponent implements OnInit {
-    shipments: any[] = [];
-    pager: PagerSetting = PAGINGSETTING;
-    criteria: any = {
-        //transactionType: TransactionTypeEnum.CustomClearance
-    };
-    
-    constructor(private baseServices: BaseService,
-        private api_menu: API_MENU) {
+export class OpsModuleBillingJobEditComponent implements OnInit {
+
+    constructor() { 
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -27,14 +16,10 @@ export class OpsModuleBillingComponent implements OnInit {
 
     ngOnInit() {
     }
-    async getShipments(){
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
-        this.shipments = responses.data;
-        this.pager.totalItems = responses.totalItems;
-    }
+
     /**
-     * Daterange picker
-     */
+       * Daterange picker
+       */
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;
@@ -56,8 +41,8 @@ export class OpsModuleBillingComponent implements OnInit {
     };
 
     /**
-   * ng2-select
-   */
+        * ng2-select
+    */
     public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
         'option 5', 'option 6', 'option 7'];
 
