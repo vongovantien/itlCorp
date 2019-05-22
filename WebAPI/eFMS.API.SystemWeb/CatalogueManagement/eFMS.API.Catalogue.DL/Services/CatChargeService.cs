@@ -11,17 +11,20 @@ using System.Collections.Generic;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Localization;
-using ITL.NetCore.Connection.NoSql;
 using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatChargeService  :RepositoryBase<CatCharge,CatChargeModel>,ICatChargeService
     {
         private readonly IStringLocalizer stringLocalizer;
-        public CatChargeService(IContextBase<CatCharge> repository,IMapper mapper, IStringLocalizer<LanguageSub> localizer) :base(repository,mapper)
+        private readonly ICurrentUser currentUser;
+        public CatChargeService(IContextBase<CatCharge> repository,IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) :base(repository,mapper)
         {
             stringLocalizer = localizer;
+            currentUser = user;
         }
 
         public HandleState AddCharge(CatChargeAddOrUpdateModel model)
@@ -29,7 +32,7 @@ namespace eFMS.API.Catalogue.DL.Services
             Guid chargeId = Guid.NewGuid();
             model.Charge.Id = chargeId;
             model.Charge.Inactive = false;
-            model.Charge.UserCreated = ChangeTrackerHelper.currentUser;
+            model.Charge.UserCreated = model.Charge.UserModified = currentUser.UserID;
             model.Charge.DatetimeCreated = DateTime.Now;
 
             try
@@ -40,7 +43,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     x.ChargeId = chargeId;
                     x.Inactive = false;
-                    x.UserCreated = ChangeTrackerHelper.currentUser;
+                    x.UserCreated = x.UserModified = currentUser.UserID;
                     x.DatetimeCreated = DateTime.Now;
                     ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Add(x);
                     ((eFMSDataContext)DataContext.DC).SaveChanges();
@@ -58,14 +61,14 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState UpdateCharge(CatChargeAddOrUpdateModel model)
         {
-            model.Charge.UserModified = ChangeTrackerHelper.currentUser;
+            model.Charge.UserModified = currentUser.UserID;
             model.Charge.DatetimeModified = DateTime.Now;
             try
             {
                 DataContext.Update(model.Charge, x => x.Id == model.Charge.Id);
                 foreach(var x in model.ListChargeDefaultAccount)
                 {
-                    x.UserModified = ChangeTrackerHelper.currentUser;
+                    x.UserModified = currentUser.UserID;
                     x.DatetimeModified = DateTime.Now;
                     ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Update(x);
                     ((eFMSDataContext)DataContext.DC).SaveChanges();
@@ -148,6 +151,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState DeleteCharge(Guid id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             DataContext.Delete(x => x.Id == id);
             try
             {
@@ -273,7 +277,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         ServiceTypeId = item.ServiceTypeId,
                         Inactive = item.Status.Trim().ToLower() == "active" ? false : true,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID
                     };
                     dc.CatCharge.Add(charge);
                 }

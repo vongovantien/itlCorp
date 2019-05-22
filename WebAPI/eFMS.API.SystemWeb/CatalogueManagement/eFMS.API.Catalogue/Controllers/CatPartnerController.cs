@@ -12,8 +12,8 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Connection.NoSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,13 +31,11 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
-        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper, ICurrentUser user)
+        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             catPartnerService = service;
             mapper = iMapper;
-            currentUser = user;
         }
 
         [HttpPost]
@@ -84,10 +82,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var partner = mapper.Map<CatPartnerModel>(model);
-            partner.UserCreated = currentUser.UserID;
-            //partner.DatetimeCreated = DateTime.Now;
-            //partner.Inactive = false;
-            //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
             var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -108,14 +102,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var partner = mapper.Map<CatPartnerModel>(model);
-            partner.UserModified = currentUser.UserID;
             partner.Id = id;
-            //partner.DatetimeModified = DateTime.Now;
-            //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
-            //if (partner.Inactive == true)
-            //{
-            //    partner.InactiveOn = DateTime.Now;
-            //}
             var hs = catPartnerService.Update(partner);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -129,7 +116,6 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            //var hs = catPartnerService.Delete(x => x.Id == id);
             var hs = catPartnerService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -170,7 +156,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catPartnerService.Import(data);
             if (result.Success)
             {

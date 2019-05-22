@@ -19,7 +19,7 @@ using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using System.Linq;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using ITL.NetCore.Connection.NoSql;
+using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -32,14 +32,12 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
 
-        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
+        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             catPlaceService = service;
             mapper = iMapper;
-            currentUser = user;
         }
 
         [HttpGet]
@@ -60,7 +58,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
-      {
+        {
             var data = catPlaceService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
@@ -110,7 +108,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.UserCreated = currentUser.UserID;
             var hs = catPlaceService.Add(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -132,7 +129,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.UserModified = currentUser.UserID;
             catPlace.Id = id;
             //var hs = catPlaceService.Update(catPlace, x => x.Id == id);
             var hs = catPlaceService.Update(catPlace);
@@ -149,7 +145,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catPlaceService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -321,7 +316,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody]List<CatPlaceImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catPlaceService.Import(data);
             if (result.Success)
             {

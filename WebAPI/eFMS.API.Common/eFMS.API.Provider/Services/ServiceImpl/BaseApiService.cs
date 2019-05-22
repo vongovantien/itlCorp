@@ -1,11 +1,9 @@
-﻿using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
+﻿using eFMS.API.Common.Helpers;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using static eFMS.API.Provider.Infrasture.Settings;

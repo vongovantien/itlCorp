@@ -7,8 +7,8 @@ using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Connection.NoSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -24,14 +24,12 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatUnitService catUnitService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
 
-        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper, ICurrentUser user)
+        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper)
         {
             stringLocalizer = localizer;
             catUnitService = service;
             mapper = imapper;
-            currentUser = user;
         }
 
         [HttpGet]
@@ -83,7 +81,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
-            catUnit.UserCreated = currentUser.UserID;
             var hs = catUnitService.Add(catUnit);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -106,7 +103,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
-            catUnit.UserModified = currentUser.UserID;
             var hs = catUnitService.Update(catUnit);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -123,7 +119,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(short id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             //var hs = catUnitService.Delete(x => x.Id == id);
             var hs = catUnitService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);

@@ -13,8 +13,8 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Connection.NoSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -62,10 +62,9 @@ namespace eFMS.API.Catalogue.Controllers
             }
 
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
-            catChargeDefaultAccount.UserCreated = currentUser.UserID;
+            catChargeDefaultAccount.UserCreated = catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeCreated = DateTime.Now;
             catChargeDefaultAccount.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeDefaultAccountService.Add(catChargeDefaultAccount);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -91,7 +90,6 @@ namespace eFMS.API.Catalogue.Controllers
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
             catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeModified = DateTime.Now;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeDefaultAccountService.Update(catChargeDefaultAccount,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -207,7 +205,6 @@ namespace eFMS.API.Catalogue.Controllers
         //[Authorize]
         public IActionResult Import([FromBody] List<CatChargeDefaultAccountImportModel> data)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catChargeDefaultAccountService.Import(data);
             if (result.Success)
             {

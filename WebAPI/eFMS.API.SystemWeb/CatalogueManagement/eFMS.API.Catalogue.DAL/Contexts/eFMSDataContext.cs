@@ -1,14 +1,10 @@
 ﻿using eFMS.API.Catalogue.Service.Models;
-using ITL.NetCore.Connection.NoSql;
+using eFMS.API.Common.NoSql;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Catalogue.Service.Contexts
 {
-    public partial class eFMSDataContext: eFMSDataContextDefault
+    public class eFMSDataContext: eFMSDataContextDefault
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

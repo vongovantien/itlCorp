@@ -19,8 +19,9 @@ using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Data.SqlClient;
-using ITL.NetCore.Connection.NoSql;
 using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -28,10 +29,12 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
-        public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
+        private ICurrentUser currentUser;
+        public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
+            currentUser = user;
             SetChildren<CatCountry>("Id", "CountryId");
             SetChildren<CatPlace>("Id", "ProvinceId");
             SetChildren<CatPlace>("Id", "DistrictId");
@@ -120,6 +123,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPlace>(model);
             entity.Id = Guid.NewGuid();
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
             entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
             entity.Inactive = false;
             var result = DataContext.Add(entity, true);
@@ -133,6 +137,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPlace>(model);
             entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
             if (entity.Inactive == true)
             {
                 entity.InactiveOn = DateTime.Now;
@@ -667,7 +672,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DistrictId = item.DistrictId,
                         Address = item.Address,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser,
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
                         PlaceTypeId = item.PlaceTypeId,
                         Inactive = inactive,
                         InactiveOn = inactiveDate,
@@ -687,6 +693,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Delete(Guid id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
