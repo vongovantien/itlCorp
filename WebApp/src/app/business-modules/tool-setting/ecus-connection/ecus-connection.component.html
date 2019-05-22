@@ -121,7 +121,7 @@
                                         title="Edit" data-toggle="modal" data-target="#edit-connection-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" (click)="idConnectToDelete=item.id;deleteConfirm()"
+                                    <button type="button" (click)="indexConnectToDelete=i;deleteConfirm()"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove" data-toggle="modal"
                                         data-target="#confirm-delete-connection-modal">
@@ -502,7 +502,7 @@
 <!--end::edit-ware-house-modal-->
 
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-connection-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<div class="modal fade" id="confirm-delete-connection-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="indexConnectToDelete!==-1"
     aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
@@ -514,7 +514,7 @@
             </div>
             <div class="modal-body">
                 <div class="confirm-text-block">
-                    <span>Do you want to delete <span class="m--font-bold">Connection Name</span>item?</span>
+                    <span>Do you want to delete <span class="m--font-bold">{{EcusConnections[indexConnectToDelete].username}} </span>item?</span>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
