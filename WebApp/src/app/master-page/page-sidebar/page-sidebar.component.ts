@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit} from '@angular/core';
-import { Router } from '@angular/router';
+import { Router,NavigationEnd, NavigationStart,  } from '@angular/router';
 import {language} from 'src/languages/language.en';
 import { BaseService } from 'src/services-base/base.service';
 
@@ -25,6 +25,9 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
   Menu: { parent_name: string; icon: string; route_parent: string; display_child: boolean; childs: { name: string; "route_child": string; }[]; }[];
   
   ngAfterViewInit(): void {
+    // this.highLightMenu();
+  }
+  public highLightMenu(){
     var router = this.router.url.split('/');
     var current_child_route = router[router.length - 1];
     var parentInd = null;
@@ -49,14 +52,22 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         this.sub_menu_click(child_name, parentInd, childInd);
       }, 400);
     }
-
-  }
-  public highLightMenu(){
-    
   }
 
 
-  constructor(private router: Router,private baseService:BaseService) { }
+  constructor(private router: Router,private baseService:BaseService) {
+    router.events.subscribe(
+      (event) => {
+          if (event instanceof NavigationStart)
+              // start loading pages
+              console.log("starting load ....")
+          if (event instanceof NavigationEnd) {
+              // end of loading paegs
+              console.log("end load ....");
+              this.highLightMenu();
+          }
+      });
+   }
 
   async ngOnInit() {
     this.Menu = language.Menu;
