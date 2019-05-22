@@ -8,6 +8,5 @@ export enum TransactionTypeEnum
         SeaFCLExport = 6,
         SeaFCLImport = 7,
         SeaLCLExport = 8,
-        SeaLCLImport = 9,
-        CustomClearance = 10
+        SeaLCLImport = 9
     }

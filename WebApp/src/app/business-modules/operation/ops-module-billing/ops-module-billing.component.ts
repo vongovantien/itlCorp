@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 
 @Component({
     selector: 'app-ops-module-billing',
@@ -7,8 +12,14 @@ import moment from 'moment/moment';
     styleUrls: ['./ops-module-billing.component.scss']
 })
 export class OpsModuleBillingComponent implements OnInit {
-
-    constructor() {
+    shipments: any[] = [];
+    pager: PagerSetting = PAGINGSETTING;
+    criteria: any = {
+        //transactionType: TransactionTypeEnum.CustomClearance
+    };
+    
+    constructor(private baseServices: BaseService,
+        private api_menu: API_MENU) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -16,7 +27,11 @@ export class OpsModuleBillingComponent implements OnInit {
 
     ngOnInit() {
     }
-
+    async getShipments(){
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
+        this.shipments = responses.data;
+        this.pager.totalItems = responses.totalItems;
+    }
     /**
      * Daterange picker
      */
