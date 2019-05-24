@@ -6,6 +6,7 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { NgForm } from '@angular/forms';
 @Component({
     selector: 'app-ops-module-billing-job-create',
     templateUrl: './ops-module-billing-job-create.component.html',
@@ -17,6 +18,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
     serviceModes: any[] = [];
     shipmentModes: any[] = [];
     listCustomers: any[] = [];
+    listPort: any[] = [];
     OpsTransactionToAdd : OpsTransaction = new OpsTransaction();
 
     constructor(private baseServices:BaseService,private api_menu: API_MENU,) {
@@ -46,6 +48,16 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
           this.listCustomers = res;
         });
       }
+
+    public getListPorts() {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { modeOfTransport: "sea", inactive: false}).subscribe((res:any) => {
+          this.listPort = res;
+        });
+      }
+
+    public submitNewOps(form:NgForm){
+        console.log(this.OpsTransactionToAdd);
+    }
 
     /**
      * Daterange picker

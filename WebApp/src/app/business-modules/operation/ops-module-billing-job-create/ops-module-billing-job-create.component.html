@@ -51,12 +51,13 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Service Date 
+                                    Service Date
                                 </label>
                                 <div class="m-input-icon m-input-icon--right down">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                        [(ngModel)]="OpsTransactionToAdd.serviceDate" [singleDatePicker]="true" name="singledater" readonly />
+                                        [(ngModel)]="OpsTransactionToAdd.serviceDate" [singleDatePicker]="true"
+                                        name="singledater" readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -68,8 +69,8 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group" 
-                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.productServices!==null}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.productService === null}">
                                 <label class="form-control-label" for="">
                                     Product Service <span class="m--font-danger">(*)</span>
                                 </label>
@@ -78,14 +79,15 @@
                                     (removed)="OpsTransactionToAdd.productService=null" (typed)="typed($event)"
                                     placeholder="Please Select">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && OpsTransactionToAdd.productService !==null">
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.productService === null">
                                     Product Service is required!
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.serviceMode !==null}">
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.serviceMode === null}">
                                 <label class="form-control-label" for="">
                                     Service Mode <span class="m--font-danger">(*)</span>
                                 </label>
@@ -94,14 +96,15 @@
                                     (removed)="OpsTransactionToAdd.serviceMode=null" (typed)="typed($event)"
                                     placeholder="Please Select">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && OpsTransactionToAdd.serviceMode !==null">
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.serviceMode ===null">
                                     Service Mode is required!
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group" 
-                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.shipmentModes !==null}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null}">
                                 <label class="form-control-label" for="">
                                     Shipment Mode <span class="m--font-danger">(*)</span>
                                 </label>
@@ -110,7 +113,8 @@
                                     (removed)="OpsTransactionToAdd.shipmentMode=null" (typed)="typed($event)"
                                     placeholder="Please Select">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && OpsTransactionToAdd.shipmentMode !==null">
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null">
                                     Shipment Mode is required!
                                 </div>
                             </div>
@@ -177,12 +181,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4">    
                             <div class="form-group">
                                 <label class="form-control-label" for="">
                                     Port of Loading
                                 </label>
-                                <div class="dropdown e--combogrid">
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.pol}"
+                                    (itemSelected)="HouseBillWorking.pol=$event.id;activePortOfLoading=$event.nameEn;"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
+                                    [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                </app-combo-grid-virtual-scroll>
+                                <!-- <div class="dropdown e--combogrid">
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                         readonly required data-toggle="dropdown" value="">
                                     <div class="dropdown-menu e--combogrid-content">
@@ -220,7 +230,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -450,7 +460,8 @@
 
             <!-- routerLink="/home/operation/job-edit" -->
             <div class="form-actions m--align-right">
-                <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button (click)="submitNewOps(addOpsForm)" type="submit"
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la la-save"></i>
                         <span>
