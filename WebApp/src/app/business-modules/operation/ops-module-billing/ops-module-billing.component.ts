@@ -26,11 +26,17 @@ export class OpsModuleBillingComponent implements OnInit {
         //transactionType: TransactionTypeEnum.CustomClearance
     };
     
+    DataStorage:Object = null;
+
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.baseServices.dataStorage.subscribe(data=>{
+            this.DataStorage = data;
+        });
+
     }
 
     ngOnInit() {

@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -31,12 +35,80 @@ namespace eFMS.API.Documentation.Controllers
             transactionService = service;
         }
 
-        [HttpGet]
-        public IQueryable<object> Get()
+
+
+        [HttpPost]
+        [Route("Add")]
+        public IActionResult Add(OpsTransactionModel model)
         {
-            OpsTransactionCriteria criteria = null;
-            var results = transactionService.Query(criteria);
-            return results;
+            var existedMessage = CheckExist(model);
+            if (existedMessage != null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+            }
+            model.Id = Guid.NewGuid();
+            model.CreatedDate = DateTime.Now;
+            model.UserCreated = "admin"; //currentUser.UserID;
+            model.ModifiedDate = model.CreatedDate;
+            model.UserModified = model.UserCreated;
+            var hs = transactionService.Add(model);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPut]
+        [Route("Update")]
+        public IActionResult Update(OpsTransactionModel model)
+        {
+            var existedMessage = CheckExist(model);
+            if (existedMessage != null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+            }
+
+            model.ModifiedDate = DateTime.Now;
+            model.UserModified = "admin"; //currentUser.UserID
+            var hs = transactionService.Update(model,x=>x.Id==model.Id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("Delete")]
+        public IActionResult Delete(Guid id)
+        {
+            var hs = transactionService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        private string CheckExist(OpsTransactionModel model)
+        {
+            var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hblno != model.Hblno);
+            var existedMBL = transactionService.Any(x => x.Id != model.Id && x.Mblno != model.Mblno);
+            if (existedHBL)
+            {
+                return "HBL no is existed !";
+            }
+            if (existedMBL)
+            {
+                return "MBL no is existed !";
+            }
+            return null;
         }
     }
 }

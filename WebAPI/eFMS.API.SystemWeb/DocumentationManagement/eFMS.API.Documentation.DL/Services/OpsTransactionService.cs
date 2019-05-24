@@ -16,18 +16,9 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class OpsTransactionService : RepositoryBase<OpsTransaction, OpsTransactionModel>, IOpsTransactionService
     {
-        private ICatStageApiService catStageApi;
-        private ICatPlaceApiService catplaceApi;
-        private ICatPartnerApiService catPartnerApi;
 
-        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, 
-            ICatStageApiService stageApi,
-            ICatPlaceApiService placeApi,
-            ICatPartnerApiService partnerApi) : base(repository, mapper)
+        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper) : base(repository, mapper)
         {
-            catStageApi = stageApi;
-            catplaceApi = placeApi;
-            catPartnerApi = partnerApi;
         }
 
         public List<OpsTransactionModel> Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
@@ -35,12 +26,5 @@ namespace eFMS.API.Documentation.DL.Services
             throw new NotImplementedException();
         }
 
-        public IQueryable<object> Query(OpsTransactionCriteria criteria)
-        {
-            var stages = catStageApi.GetStages(null).Result.ToList();
-            var places = catplaceApi.GetPlaces().Result.ToList();
-            var partners = catPartnerApi.GetPartners().Result.ToList();
-            return null;
-        }
     }
 }
