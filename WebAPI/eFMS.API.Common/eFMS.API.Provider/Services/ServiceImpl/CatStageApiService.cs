@@ -19,10 +19,10 @@ namespace eFMS.API.Provider.Services.ServiceImpl
         {
         }
 
-        public async Task<List<CatAreaApiModel>> GetStages(CatStageCriteria criteria)
+        public async Task<List<CatStageApiModel>> GetStages(CatStageCriteria criteria)
         {
             string strUri = CatStageAPI.GetAll(baseUrl);
-            var results = await PostApi<List<CatAreaApiModel>, CatStageCriteria>(strUri, criteria);
+            var results = await PostApi<List<CatStageApiModel>, CatStageCriteria>(strUri, criteria);
             return results;
         }
     }

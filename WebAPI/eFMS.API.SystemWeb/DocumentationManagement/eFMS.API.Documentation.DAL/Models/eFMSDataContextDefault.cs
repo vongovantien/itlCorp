@@ -2305,6 +2305,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(200);
 
+                entity.Property(e => e.IsCurrentStage).HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.MainPersonInCharge)
@@ -2349,6 +2351,12 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Cbm)
+                    .HasColumnName("CBM")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.ChargeWeight).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.CreatedDate).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.CustomerId)
@@ -2364,6 +2372,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.FlightVessel).HasMaxLength(200);
 
+                entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Hblno)
                     .HasColumnName("HBLNO")
                     .HasMaxLength(200)
@@ -2371,12 +2381,18 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.InvoiceNo).HasMaxLength(200);
 
+                entity.Property(e => e.JobNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNO")
                     .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 

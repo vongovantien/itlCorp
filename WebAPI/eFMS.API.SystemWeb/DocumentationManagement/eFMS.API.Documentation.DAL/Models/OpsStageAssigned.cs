@@ -14,7 +14,8 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? ProcessTime { get; set; }
         public string Description { get; set; }
         public string Comment { get; set; }
-        public DateTime? Deadline { get; set; }
+        public bool? IsCurrentStage { get; set; }
+        public DateTime Deadline { get; set; }
         public string Status { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }

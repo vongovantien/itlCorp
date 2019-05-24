@@ -31,12 +31,18 @@ namespace eFMS.API.Documentation.Controllers
             transactionService = service;
         }
 
-        [HttpGet]
-        public IQueryable<object> Get()
+        [HttpPost("Paging")]
+        public IActionResult Query(OpsTransactionCriteria criteria, int page, int size)
         {
-            OpsTransactionCriteria criteria = null;
             var results = transactionService.Query(criteria);
-            return results;
+            return Ok(results);
+        }
+
+        [HttpPost("Query")]
+        public IActionResult Query(OpsTransactionCriteria criteria)
+        {
+            var results = transactionService.Query(criteria);
+            return Ok(results);
         }
     }
 }

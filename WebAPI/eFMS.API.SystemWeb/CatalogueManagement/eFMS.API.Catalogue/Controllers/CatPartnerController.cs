@@ -41,7 +41,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var results = catPartnerService.Query(null);
+            var results = catPartnerService.GetPartners();
             return Ok(results);
         }
         [HttpPost]

@@ -45,6 +45,12 @@ export class OpsModuleBillingComponent implements OnInit {
             console.log(this.userInCharges);
         }
     }
+    async setPage(pager: PagerSetting) {
+        this.pager.currentPage = pager.currentPage;
+        this.pager.pageSize = pager.pageSize;
+        this.pager.totalPages = pager.totalPages;
+        await this.getShipments();
+    }
     async getCustomers(){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);

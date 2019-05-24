@@ -13,6 +13,7 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatPartnerService : IRepositoryBase<CatPartner, CatPartnerModel>
     {
+        IQueryable<CatPartner> GetPartners();
         List<CatPartnerViewModel> Query(CatPartnerCriteria criteria);
         List<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
         List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount);

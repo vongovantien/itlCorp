@@ -166,5 +166,12 @@ namespace eFMS.API.Shipment.Infrastructure
 
             return services;
         }
+        public static IServiceCollection AddSystemManagementApiServices(this IServiceCollection services)
+        {
+            services.AddHttpClient<ISysUserApiService, SysUserApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+
+            return services;
+        }
     }
 }

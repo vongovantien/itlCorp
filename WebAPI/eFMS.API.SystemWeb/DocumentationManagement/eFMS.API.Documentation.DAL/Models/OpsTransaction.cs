@@ -6,6 +6,7 @@ namespace eFMS.API.Documentation.Service.Models
     public partial class OpsTransaction
     {
         public Guid Id { get; set; }
+        public string JobNo { get; set; }
         public string Mblno { get; set; }
         public string Hblno { get; set; }
         public DateTime? ServiceDate { get; set; }
@@ -25,6 +26,10 @@ namespace eFMS.API.Documentation.Service.Models
         public string InvoiceNo { get; set; }
         public string Saleman { get; set; }
         public string FieldOps { get; set; }
+        public decimal? NetWeight { get; set; }
+        public decimal? GrossWeight { get; set; }
+        public decimal? ChargeWeight { get; set; }
+        public decimal? Cbm { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? CreatedDate { get; set; }

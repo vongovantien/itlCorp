@@ -95,6 +95,7 @@ namespace eFMS.API.Shipment
             services.AddConfigureSetting(Configuration);
             services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
             services.AddOptions().AddCatelogueManagementApiServices();
+            services.AddOptions().AddSystemManagementApiServices();
             //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,

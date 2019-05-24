@@ -14,6 +14,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string ShipmentMode { get; set; }
         public string CustomerId { get; set; }
         public string FieldOps { get; set; }
-        public DateTime? ServiceDate { get; set; }
+        public DateTime? ServiceDateFrom { get; set; }
+        public DateTime? ServiceDateTo { get; set; }
     }
 }

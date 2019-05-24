@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using static eFMS.API.Provider.Infrasture.Settings;
 
 namespace eFMS.API.Provider.Services.ServiceImpl
 {
     public class CatPartnerApiService : BaseApiService, ICatPartnerApiService
     {
-        public CatPartnerApiService(HttpClient httpClient, IOptions<Settings.APIUrls> settings, int versionApi, string nameUrlBase) : base(httpClient, settings, versionApi, nameUrlBase)
+        public CatPartnerApiService(HttpClient httpClient, IOptions<Settings.APIUrls> settings) : base(httpClient, settings, 1, nameof(APIUrls.CatelogueUrl))
         {
         }
 

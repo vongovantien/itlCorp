@@ -186,7 +186,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        private IQueryable<CatPartner> GetPartners()
+        public IQueryable<CatPartner> GetPartners()
         {
             var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
             IQueryable<CatPartner> data = null;
@@ -202,7 +202,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
-            string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
+            string partnerGroup = criteria != null? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup): null;
             var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
                          join user in ((eFMSDataContext)DataContext.DC).SysUser on partner.UserCreated equals user.Id into userPartners
