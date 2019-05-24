@@ -68,7 +68,11 @@ export class PortIndexComponent implements OnInit {
   constructor(private baseService: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService,
-    private excelService: ExcelService,) { }
+    private excelService: ExcelService,) {
+        this.baseService.get(this.api_menu.System.User_Management.getAll).subscribe(data=>{
+          this.baseService.changeData("data",data);
+        });
+     }
 
   ngOnInit() {
     this.initPager();
