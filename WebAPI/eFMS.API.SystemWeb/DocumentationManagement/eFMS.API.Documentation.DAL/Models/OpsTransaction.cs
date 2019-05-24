@@ -21,7 +21,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string PurchaseOrderNo { get; set; }
         public string BillingOps { get; set; }
         public DateTime? FinishDate { get; set; }
-        public Guid? Warehouse { get; set; }
+        public Guid? WarehouseId { get; set; }
         public string InvoiceNo { get; set; }
         public string Saleman { get; set; }
         public string FieldOps { get; set; }

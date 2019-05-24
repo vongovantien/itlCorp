@@ -93,50 +93,13 @@
                                             <label class="form-control-label" for="">
                                                 Customer (Payer)
                                             </label>
-                                            <div class="dropdown e--combogrid">
-                                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                                    type="text" readonly data-toggle="dropdown"
-                                                    placeholder="Please select">
-                                                <div class="dropdown-menu e--combogrid-content">
-                                                    <div class="tabel-wrapper table-fixed">
-                                                        <div class="table-head-fixed">
-                                                            <div class="table-filter-block">
-                                                                <div class="search-field">
-                                                                    <input class="form-control m-input m-input--square"
-                                                                        type="text" placeholder="Search...">
-                                                                    <i class="icon-search"></i>
-                                                                </div>
-                                                            </div>
-                                                            <div class="table-header">
-                                                                <table class="table table-hover">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th class="col-xs-2">Partner ID</th>
-                                                                            <th class="col-xs-3">Name ABBR</th>
-                                                                            <th class="col-xs-5">Name EN</th>
-                                                                            <th class="col-xs-2">Tax Code</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-body-scroll">
-                                                            <table class="table table-hover">
-                                                                <tbody>
-                                                                    <ng-container>
-                                                                        <tr class="data-row">
-                                                                            <td class="col-xs-2">item.id</td>
-                                                                            <td class="col-xs-3">item.shortName</td>
-                                                                            <td class="col-xs-5">item.partnerNameEn</td>
-                                                                            <td class="col-xs-2">item.taxCode</td>
-                                                                        </tr>
-                                                                    </ng-container>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <app-combo-grid-virtual-scroll 
+                                                    [currentActiveItemId]="{field:'id',value:criteria.customerId}"
+                                                    (itemSelected)="criteria.customerId = $event.id;"
+                                                    [selectedDisplayFields]="['partnerNameEn']"
+                                                    [dataSources]="customers" 
+                                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                            </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -144,48 +107,13 @@
                                             <label class="form-control-label" for="">
                                                 OPS Incharge
                                             </label>
-                                            <div class="dropdown e--combogrid">
-                                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                                    type="text" readonly data-toggle="dropdown"
-                                                    placeholder="Please select">
-                                                <div class="dropdown-menu e--combogrid-content">
-                                                    <div class="tabel-wrapper table-fixed">
-                                                        <div class="table-head-fixed">
-                                                            <div class="table-filter-block">
-                                                                <div class="search-field">
-                                                                    <input class="form-control m-input m-input--square"
-                                                                        type="text" placeholder="Search...">
-                                                                    <i class="icon-search"></i>
-                                                                </div>
-                                                            </div>
-                                                            <div class="table-header">
-                                                                <table class="table table-hover">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th class="col-xs-4">User Name</th>
-                                                                            <th class="col-xs-4">Full Name</th>
-                                                                            <th class="col-xs-4">Role</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-body-scroll">
-                                                            <table class="table table-hover">
-                                                                <tbody>
-                                                                    <ng-container>
-                                                                        <tr class="data-row">
-                                                                            <td class="col-xs-4">User Name</td>
-                                                                            <td class="col-xs-4">Full Name</td>
-                                                                            <td class="col-xs-4">CS</td>
-                                                                        </tr>
-                                                                    </ng-container>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <app-combo-grid-virtual-scroll 
+                                                [currentActiveItemId]="{field:'id',value:criteria.saleManID}"
+                                                (itemSelected)="criteria.saleManID = $event.id;"
+                                                [selectedDisplayFields]="['employeeNameVn']"
+                                                [dataSources]="userInCharges" 
+                                                [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
+                                            </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">

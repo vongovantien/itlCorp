@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using static eFMS.API.Provider.Infrasture.Settings;
 
 namespace eFMS.API.Shipment
 {
@@ -92,6 +93,8 @@ namespace eFMS.API.Shipment
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
             services.AddConfigureSetting(Configuration);
+            services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
+            services.AddOptions().AddCatelogueManagementApiServices();
             //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,

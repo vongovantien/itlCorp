@@ -7,6 +7,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 @Component({
     selector: 'app-ops-module-billing',
@@ -18,6 +19,8 @@ export class OpsModuleBillingComponent implements OnInit {
     serviceModes: any[] = [];
     shipmentModes: any[] = [];
     shipments: any[] = [];
+    userInCharges: any[] = [];
+    customers: any[] = [];
     pager: PagerSetting = PAGINGSETTING;
     criteria: any = {
         //transactionType: TransactionTypeEnum.CustomClearance
@@ -32,6 +35,23 @@ export class OpsModuleBillingComponent implements OnInit {
 
     ngOnInit() {
         this.getShipmentCommonData();
+        this.getUserInCharges();
+        this.getCustomers();
+    }
+    async getUserInCharges(){
+        let responses = await this.baseServices.postAsync(this.api_menu.System.User_Management.paging +"?page=1&size=20", { all: null }, false, false);
+        if(responses != null){
+            this.userInCharges = responses.data;
+            console.log(this.userInCharges);
+        }
+    }
+    async getCustomers(){
+        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
+        const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
+        if(partners != null){
+            this.customers = partners;
+            console.log(this.customers);
+        }
     }
     async getShipments(){
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
