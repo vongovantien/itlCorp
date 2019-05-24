@@ -18,7 +18,7 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class OpsTransactionController : Controller
+    public class OpsTransactionController : Controller       
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
