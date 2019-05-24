@@ -62,7 +62,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPut]
-        [Route("Update")]
+        [Route("Update")]       
         public IActionResult Update(OpsTransactionModel model)
         {
             var existedMessage = CheckExist(model);
