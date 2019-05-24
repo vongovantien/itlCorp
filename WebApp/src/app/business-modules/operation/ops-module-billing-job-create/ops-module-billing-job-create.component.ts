@@ -1,20 +1,62 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
-
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import * as shipmentHelper from 'src/helper/shipment.helper';
+import * as dataHelper from 'src/helper/data.helper';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { NgForm } from '@angular/forms';
 @Component({
     selector: 'app-ops-module-billing-job-create',
     templateUrl: './ops-module-billing-job-create.component.html',
     styleUrls: ['./ops-module-billing-job-create.component.scss']
 })
 export class OpsModuleBillingJobCreateComponent implements OnInit {
+    DataStorage:Object = null;
+    productServices: any[] = [];
+    serviceModes: any[] = [];
+    shipmentModes: any[] = [];
+    listCustomers: any[] = [];
+    listPort: any[] = [];
+    OpsTransactionToAdd : OpsTransaction = new OpsTransaction();
 
-    constructor() {
+    constructor(private baseServices:BaseService,private api_menu: API_MENU,) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        
+        this.baseServices.dataStorage.subscribe(data=>{
+            this.DataStorage = data;
+        });
     }
 
     ngOnInit() {
+        this.getShipmentCommonData();
+        this.getListCustomers();
+    }
+
+    async getShipmentCommonData() {
+        const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
+        this.productServices = dataHelper.prepareNg2SelectData(data.productServices, 'value', 'displayName');
+        this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
+        this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
+    }
+
+    public getListCustomers() {
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query , { partnerGroup: PartnerGroupEnum.CUSTOMER, inactive: false, all: null }).subscribe((res:any) => {
+          this.listCustomers = res;
+        });
+      }
+
+    public getListPorts() {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { modeOfTransport: "sea", inactive: false}).subscribe((res:any) => {
+          this.listPort = res;
+        });
+      }
+
+    public submitNewOps(form:NgForm){
+        console.log(this.OpsTransactionToAdd);
     }
 
     /**
