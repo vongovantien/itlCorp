@@ -5,8 +5,6 @@ using eFMS.API.Provider.Services.IService;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,16 +12,16 @@ using static eFMS.API.Provider.Infrasture.Settings;
 
 namespace eFMS.API.Provider.Services.ServiceImpl
 {
-    public class CatAreaApiService: BaseApiService, ICatAreaApiService
+    public class CatPlaceApiService : BaseApiService, ICatPlaceApiService
     {
-        public CatAreaApiService(HttpClient httpClient, IOptions<APIUrls> settings) : base(httpClient, settings, 1, nameof(APIUrls.CatelogueUrl))
+        public CatPlaceApiService(HttpClient httpClient, IOptions<Settings.APIUrls> settings) : base(httpClient, settings, 1, nameof(APIUrls.CatelogueUrl))
         {
         }
 
-        public async Task<List<CatAreaApiModel>> GetAreas()
+        public async Task<List<CatPlaceApiModel>> GetPlaces()
         {
-            string strUri = CatAreaAPI.GetAll(baseUrl);
-            return await GetApi<List<CatAreaApiModel>>(strUri);
+            string strUri = CatPlaceAPI.GetAll(baseUrl);
+            return await GetApi<List<CatPlaceApiModel>>(strUri);
         }
     }
 }

@@ -38,6 +38,12 @@ namespace eFMS.API.Catalogue.Controllers
             mapper = iMapper;
         }
 
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var results = catPartnerService.Query(null);
+            return Ok(results);
+        }
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatPartnerCriteria criteria)

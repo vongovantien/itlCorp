@@ -16,5 +16,9 @@ namespace eFMS.API.Documentation.Service.Models
         public string Comment { get; set; }
         public DateTime? Deadline { get; set; }
         public string Status { get; set; }
+        public string UserCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }

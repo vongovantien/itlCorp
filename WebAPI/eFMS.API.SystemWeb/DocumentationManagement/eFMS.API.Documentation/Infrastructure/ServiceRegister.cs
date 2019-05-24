@@ -20,6 +20,9 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using eFMS.API.Shipment.Infrastructure.Filters;
 using eFMS.API.Common;
+using System;
+using eFMS.API.Provider.Services.IService;
+using eFMS.API.Provider.Services.ServiceImpl;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -152,6 +155,15 @@ namespace eFMS.API.Shipment.Infrastructure
                             .AllowCredentials();
                     });
             });
+            return services;
+        }
+        public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)
+        {
+            services.AddHttpClient<ICatStageApiService, CatStageApiService>()
+                    .AddTypedClient<ICatPlaceApiService, CatPlaceApiService>()
+                    .AddTypedClient<ICatPartnerApiService, CatPartnerApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+
             return services;
         }
     }

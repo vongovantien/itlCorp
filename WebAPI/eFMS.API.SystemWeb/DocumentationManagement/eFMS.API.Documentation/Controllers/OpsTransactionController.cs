@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -20,11 +22,21 @@ namespace eFMS.API.Documentation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
+        private readonly IOpsTransactionService transactionService;
 
-        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user)
+        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IOpsTransactionService service)
         {
             stringLocalizer = localizer;
             currentUser = user;
+            transactionService = service;
+        }
+
+        [HttpGet]
+        public IQueryable<object> Get()
+        {
+            OpsTransactionCriteria criteria = null;
+            var results = transactionService.Query(criteria);
+            return results;
         }
     }
 }
