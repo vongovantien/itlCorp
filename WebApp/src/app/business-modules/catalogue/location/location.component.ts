@@ -127,7 +127,9 @@ export class LocationComponent implements OnInit,AfterViewInit {
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private sortService: SortService) { 
+      this.baseServices.changeData("location","hello from location");
+    }
 
   resetNg2SelectCountry = true;
   resetNg2SelectProvince = true;
