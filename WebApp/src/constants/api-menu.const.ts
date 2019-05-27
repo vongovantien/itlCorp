@@ -303,7 +303,7 @@ export class API_MENU {
             addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Add",
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Update",
             delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete",
-        }
+        }     
     }
     public Report = this.getReportPath(SystemConstants.MODULE_NAME.Report);
 }
