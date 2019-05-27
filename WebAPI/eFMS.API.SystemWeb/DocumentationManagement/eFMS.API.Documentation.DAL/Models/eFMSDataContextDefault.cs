@@ -2290,6 +2290,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Source).HasMaxLength(200);
+
                 entity.Property(e => e.Type).HasMaxLength(50);
             });
 
@@ -2346,12 +2348,13 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.Agent)
+                entity.Property(e => e.AgentId)
+                    .HasColumnName("AgentID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.BillingOps)
-                    .HasColumnName("BillingOPS")
+                entity.Property(e => e.BillingOpsId)
+                    .HasColumnName("BillingOpsID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -2362,8 +2365,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.FieldOps)
-                    .HasColumnName("FieldOPS")
+                entity.Property(e => e.FieldOpsId)
+                    .HasColumnName("FieldOpsID")
                     .HasMaxLength(200);
 
                 entity.Property(e => e.FinishDate).HasColumnType("smalldatetime");
@@ -2398,10 +2401,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PurchaseOrderNo)
                     .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Saleman)
-                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ServiceDate).HasColumnType("smalldatetime");

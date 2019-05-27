@@ -24,5 +24,7 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? Cbm { get; set; }
         public int? ContQuantity { get; set; }
         public string Pcs { get; set; }
+        public string Source { get; set; }
+        public string Note { get; set; }
     }
 }

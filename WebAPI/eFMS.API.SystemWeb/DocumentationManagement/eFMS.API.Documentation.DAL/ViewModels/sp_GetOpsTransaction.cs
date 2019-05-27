@@ -19,14 +19,13 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Nullable<Guid> POD { get; set; }
         public string SupplierID { get; set; }
         public string FlightVessel { get; set; }
-        public string Agent { get; set; }
+        public string AgentID { get; set; }
         public string PurchaseOrderNo { get; set; }
-        public string BillingOPS { get; set; }
+        public string BillingOpsID { get; set; }
         public Nullable<DateTime> FinishDate { get; set; }
         public Nullable<Guid> WarehouseID { get; set; }
         public string InvoiceNo { get; set; }
-        public string Saleman { get; set; }
-        public string FieldOPS { get; set; }
+        public string FieldOpsID { get; set; }
         public Nullable<decimal> SumNetWeight { get; set; }
         public Nullable<decimal> SumGrossWeight { get; set; }
         public Nullable<decimal> SumChargeWeight { get; set; }

@@ -34,6 +34,7 @@ export class OpsModuleBillingComponent implements OnInit {
     searchFilterActive = ['Job ID'];
     isReset = true;
     isFilterTime = false;
+    customClearances: any[] = [];
     
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU) {
@@ -102,6 +103,15 @@ export class OpsModuleBillingComponent implements OnInit {
           }, 100);
         this.getShipments();
     }
+    async showCustomClearance(jobId){
+        let responses = await this.baseServices.getAsync(this.api_menu.Documentation.CustomClearance.getByJob + "?jobId=" + jobId, false, true);
+        if(responses){
+            this.customClearances = responses;
+        }
+        else{
+            this.customClearances = [];
+        }
+    }
     async getCustomers(){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
@@ -111,12 +121,12 @@ export class OpsModuleBillingComponent implements OnInit {
         }
     }
     async getShipments(){
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.opsPaging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
         if(responses.data != null){
             this.shipments = responses.data.opsTransactions;
         }
         else{
-            this.shipments = null;
+            this.shipments = [];
         }
         console.log(this.shipments);
         this.pager.totalItems = responses.totalItems;

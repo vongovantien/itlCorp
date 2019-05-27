@@ -266,7 +266,7 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="tbody-group" *ngIf="shipments; else norecord">
+                                    <tbody class="tbody-group" *ngIf="shipments.length > 0; else norecord">
                                         <ng-container *ngFor="let item of shipments; let i=index">
                                             
                                             <!-- begin collapse-toggle-row -->
@@ -274,7 +274,7 @@
                                                 <td class="table-actions-col">
                                                     <div class="table-actions" style="width: 100px">
                                                         <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
-                                                            title="Collapse">
+                                                            title="Collapse" (click)="showCustomClearance(item.id)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
                                                         <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -366,34 +366,34 @@
                                                                         </th>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody>
-                                                                    <tr>
+                                                                <tbody *ngIf="customClearances.length > 0">
+                                                                    <tr *ngFor="let clearance of customClearances; let j=index">
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.clearanceNo }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>dd/mm/yyyy</span>
+                                                                            <span>{{ clearance.clearanceDate | date:'dd MMM yyyy' }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.hblno }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.exportCountryName }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.importcountryName }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.commodityCode }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.contQuantity }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.Source }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>text</span>
+                                                                            <span>{{ clearance.note }}</span>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
