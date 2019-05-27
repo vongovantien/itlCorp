@@ -22,9 +22,18 @@ export class OpsModuleBillingComponent implements OnInit {
     userInCharges: any[] = [];
     customers: any[] = [];
     pager: PagerSetting = PAGINGSETTING;
+    searchString: string = '';
     criteria: any = {
         //transactionType: TransactionTypeEnum.CustomClearance
     };
+    totalInProcess = 0;
+    totalComplete = 0;
+    totalOverdued = 0;
+    totalCanceled = 0;
+    selectFilter = 'Job ID';
+    searchFilterActive = ['Job ID'];
+    isReset = true;
+    isFilterTime = false;
     
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU) {
@@ -37,6 +46,7 @@ export class OpsModuleBillingComponent implements OnInit {
         this.getShipmentCommonData();
         this.getUserInCharges();
         this.getCustomers();
+        this.getShipments();
     }
     async getUserInCharges(){
         let responses = await this.baseServices.postAsync(this.api_menu.System.User_Management.paging +"?page=1&size=20", { all: null }, false, false);
@@ -51,6 +61,47 @@ export class OpsModuleBillingComponent implements OnInit {
         this.pager.totalPages = pager.totalPages;
         await this.getShipments();
     }
+    searchShipment(){
+        this.pager.totalItems = 0;
+        this.criteria.mblno =null;
+        this.criteria.hblno = null;
+        this.criteria.customerId = null;
+        this.criteria.fieldOps = null;
+        this.criteria.all = null;
+        if(this.isFilterTime){
+            this.criteria.serviceDateFrom = this.selectedRange.startDate;
+            this.criteria.serviceDateTo = this.selectedRange.endDate;
+        }
+        else{
+            this.criteria.serviceDateFrom = null;
+            this.criteria.serviceDateTo = null;
+        }
+        if(this.selectFilter === 'Job ID'){
+            this.criteria.jobNo = this.searchString;
+        }
+        else if(this.selectFilter === 'HBL'){
+            this.criteria.mawb = this.searchString;
+        }
+        else{
+            this.criteria.all = this.searchString;
+        }
+        this.getShipments();
+    }
+    resetSearch(){
+        this.selectFilter = 'Job ID';
+        this.searchFilterActive = ['Job ID'];
+        this.criteria = {
+        };
+        this.searchString = null;
+        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.criteria.serviceDateFrom = this.selectedRange.startDate;
+        this.criteria.serviceDateTo = this.selectedRange.endDate;
+        this.isReset = false;
+        setTimeout(() => {
+            this.isReset = true;
+          }, 100);
+        this.getShipments();
+    }
     async getCustomers(){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
@@ -60,8 +111,14 @@ export class OpsModuleBillingComponent implements OnInit {
         }
     }
     async getShipments(){
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
-        this.shipments = responses.data;
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.opsPaging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
+        if(responses.data != null){
+            this.shipments = responses.data.opsTransactions;
+        }
+        else{
+            this.shipments = null;
+        }
+        console.log(this.shipments);
         this.pager.totalItems = responses.totalItems;
     }
     async getShipmentCommonData() {

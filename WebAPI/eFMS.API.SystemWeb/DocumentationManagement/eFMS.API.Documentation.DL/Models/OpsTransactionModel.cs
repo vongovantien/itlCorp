@@ -9,11 +9,8 @@ namespace eFMS.API.Documentation.DL.Models
     {
         public string PODName { get; set; }
         public string POLName { get; set; }
+        public int CurrentStageId { get; set; }
         public string CurentStageCode { get; set; }
         public string CurrentStatus { get; set; }
-
-        public Nullable<int> SumCont { get; set; }
-        public Nullable<decimal> SumCBM { get; set; }
-        public Nullable<decimal> PackageQuantity { get; set; }
     }
 }

@@ -39,9 +39,6 @@
     <Reference Include="eFMS.API.Common">
       <HintPath>..\..\..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
-    <Reference Include="eFMS.API.Documentation.DL">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.DL.dll</HintPath>
-    </Reference>
     <Reference Include="eFMS.API.System.DL">
       <HintPath>..\..\SystemManagement\bin\netcoreapp2.2\eFMS.API.System.DL.dll</HintPath>
     </Reference>

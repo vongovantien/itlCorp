@@ -1,0 +1,33 @@
+export class OpsTransaction {
+        userModified: string=null;
+        userCreated: string=null;
+        fieldOps: string=null;
+        saleman: string=null;
+        invoiceNo: string=null;
+        warehouse: string=null;
+        finishDate: Date = null;
+        billingOps: string=null;
+        PpurchaseOrderNo: string=null;
+        agent: string=null;
+        createdDate: Date = null;
+        flightVessel: string =null;
+        pod: string = null;
+        pol: string = null;
+        customerId: string = null;
+        shipmentMode: string = null;
+        serviceMode: string = null;
+        productService: string = null;
+        serviceDate: Date = null;
+        hblno: string = null;
+        mblno: string = null;
+        id: string = null;
+        supplierId: string = null;
+        modifiedDate: Date = null;
+        supplierName: string = null;
+        agentName: string = null;
+        podName: string = null;
+        polName: string = null;
+        sumCont: number = null;
+        sumCBM: number = null;
+        packageQuantity: number = null;
+}

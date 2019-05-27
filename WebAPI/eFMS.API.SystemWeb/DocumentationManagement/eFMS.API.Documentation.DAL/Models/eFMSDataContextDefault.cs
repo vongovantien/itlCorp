@@ -2264,6 +2264,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ExportCountryId).HasColumnName("ExportCountryID");
+
                 entity.Property(e => e.Gateway)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2271,6 +2273,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.ImportcountryId).HasColumnName("ImportcountryID");
 
                 entity.Property(e => e.Mblid).HasColumnName("MBLID");
 
@@ -2351,12 +2355,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Cbm)
-                    .HasColumnName("CBM")
-                    .HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.ChargeWeight).HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.CreatedDate).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.CustomerId)
@@ -2371,8 +2369,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.FinishDate).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.FlightVessel).HasMaxLength(200);
-
-                entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Hblno)
                     .HasColumnName("HBLNO")
@@ -2391,8 +2387,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("smalldatetime");
-
-                entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 
@@ -2419,6 +2413,16 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ShipmentMode)
                     .HasMaxLength(10)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SumCbm)
+                    .HasColumnName("SumCBM")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SumChargeWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SumGrossWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SumNetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.SupplierId)
                     .HasColumnName("SupplierID")

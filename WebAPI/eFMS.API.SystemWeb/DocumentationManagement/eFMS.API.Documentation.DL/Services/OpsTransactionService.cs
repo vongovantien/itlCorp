@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.API.Provider.Models.Criteria;
 using eFMS.API.Provider.Services.IService;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -34,12 +37,15 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserApi = userApi;
         }
 
-        public List<OpsTransactionModel> Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
+        public OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<OpsTransactionModel> results = null;
             var data = Query(criteria);
             rowsCount = data.Count();
-            if (rowsCount == 0) return results;
+            var totalProcessing = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Processing));
+            var totalfinish = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Finish));
+            var totalOverdued = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Overdued));
+            var totalCanceled = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Canceled));
+            if (rowsCount == 0) return null;
             if (size > 1)
             {
                 data = data.OrderByDescending(x => x.ModifiedDate);
@@ -48,79 +54,54 @@ namespace eFMS.API.Documentation.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
-                var stages = catStageApi.GetStages(null).Result.ToList();
-                var query = (from tran in data
-                             join stageAssign in ((eFMSDataContext)DataContext.DC).OpsStageAssigned on tran.Id equals stageAssign.JobId into grpStageAssigneds
-                             from assinged in grpStageAssigneds.DefaultIfEmpty()
-                             join stageData in stages on assinged.StageId equals stageData.Id into grpSatges
-                             from stage in grpSatges.DefaultIfEmpty()
-                             where assinged.IsCurrentStage == true
-                             select new { tran, assinged, stage }
-                             );
-                results = new List<OpsTransactionModel>();
-                foreach (var item in query)
-                {
-                    var trans = item.tran;
-                    trans.CurrentStatus = item.assinged?.Status;
-                    trans.CurentStageCode = item.stage?.StageNameEn;
-                    results.Add(trans);
-                }
             }
+            var results = new OpsTransactionResult
+            {
+                OpsTransactions = data,
+                ToTalInProcessing = totalProcessing,
+                ToTalFinish = totalfinish,
+                TotalOverdued = totalOverdued,
+                TotalCanceled = totalCanceled
+            };
             return results;
         }
 
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
-            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
-            
-            var places = catplaceApi.GetPlaces().Result.ToList();
-            var users = sysUserApi.GetUsers().Result.ToList();
-            IQueryable<OpsTransaction> transactions = null;
+            var data = GetView().AsQueryable();
+            if (data == null)
+                return null;
             if (criteria.All == null)
             {
-                transactions = DataContext.Get(x => (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                && (x.Hblno ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                data = data.Where(x => (x.MBLNO ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                && (x.HBLNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                                && (x.FieldOps == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
+                                && (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                                && (x.FieldOPS == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
                                 && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
                             );
             }
             else
             {
-                transactions = DataContext.Get(x => (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.Hblno ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                data = data.Where(x => (x.MBLNO ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.HBLNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                                   || (x.FieldOps == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
+                                   || (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                                   || (x.FieldOPS == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
                                    && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
                                );
             }
-            var query = (from tran in transactions
-                         //join stageAssign in ((eFMSDataContext)DataContext.DC).OpsStageAssigned on tran.Id equals stageAssign.JobId into grpStageAssigneds
-                         //from assinged in grpStageAssigneds.DefaultIfEmpty()
-                         //join stageData in stages on assinged.StageId equals stageData.Id into grpSatges
-                         //from stage in grpSatges.DefaultIfEmpty()
-                         join portOfLoading in places on tran.Pol equals portOfLoading.Id into grpPOL
-                         from pol in grpPOL.DefaultIfEmpty()
-                         join portOfDes in places on tran.Pod equals portOfDes.Id into grpPOD
-                         from pod in grpPOD.DefaultIfEmpty()
-                         select new { tran, pol, pod }
-                         );
-            if (query == null)
-                return null;
-            foreach(var item in query)
-            {
-                var transaction = mapper.Map<OpsTransactionModel>(item.tran);
-                transaction.PODName = item.pod?.NameEn;
-                transaction.POLName = item.pol?.NameEn;
-                //transaction.CurentStageCode = item.stage?.Code;
-                results.Add(transaction);
-            }
+            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
+            results = mapper.Map<List<OpsTransactionModel>>(data);
             return results.AsQueryable();
+        }
+        private List<sp_GetOpsTransaction> GetView()
+        {
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetOpsTransaction>(null);
+            return list;
         }
     }
 }

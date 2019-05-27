@@ -43,8 +43,8 @@
                                         Select filter
                                     </label>
                                     <ng-select [allowClear]="true" [items]="searchFilters" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        (typed)="typed($event)" placeholder="Select filter">
+                                        (selected)="selectedFilter  = $event.id" (removed)="selectedFilter = null"
+                                        (typed)="typed($event)" placeholder="Select filter" [active]="searchFilterActive">
                                     </ng-select>
                                 </div>
                             </div>
@@ -59,7 +59,7 @@
                                                 Product Service
                                             </label>
                                             <ng-select [allowClear]="true" [items]="productServices" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)"
+                                                (selected)="criteria.productService = $event.id" (removed)="criteria.productService = null"
                                                 (typed)="typed($event)" placeholder="Select filter">
                                             </ng-select>
                                         </div>
@@ -70,7 +70,7 @@
                                                 Service Mode
                                             </label>
                                             <ng-select [allowClear]="true" [items]="serviceModes" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)"
+                                                (selected)="criteria.serviceMode = $event.id" (removed)="criteria.serviceMode = null"
                                                 (typed)="typed($event)" placeholder="Select filter">
                                             </ng-select>
                                         </div>
@@ -81,13 +81,13 @@
                                                 Shipment Mode
                                             </label>
                                             <ng-select [allowClear]="true" [items]="shipmentModes" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)"
+                                                (selected)="criteria.shipmentMode = $event.id" (removed)="criteria.shipmentMode = null"
                                                 (typed)="typed($event)" placeholder="Select filter">
                                             </ng-select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row" *ngIf="isReset">
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
@@ -108,8 +108,8 @@
                                                 OPS Incharge
                                             </label>
                                             <app-combo-grid-virtual-scroll 
-                                                [currentActiveItemId]="{field:'id',value:criteria.saleManID}"
-                                                (itemSelected)="criteria.saleManID = $event.id;"
+                                                [currentActiveItemId]="{field:'id',value:criteria.fieldOps}"
+                                                (itemSelected)="criteria.fieldOps = $event.id;"
                                                 [selectedDisplayFields]="['employeeNameVn']"
                                                 [dataSources]="userInCharges" 
                                                 [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
@@ -137,7 +137,7 @@
                             <div class="row">
                                 <div class="col-lg-6">
                                     <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse"
-                                        href="#advance-search-of-job" role="button" aria-expanded="false"
+                                        href="#advance-search-of-job" role="button" aria-expanded="false" (click)="isFilterTime = !isFilterTime"
                                         aria-controls="advance-search-of-job">
                                         <span>
                                             <i class="la la-angle-up"></i>
@@ -147,7 +147,7 @@
                                 </div>
                                 <div class="col-lg-6 m--align-right">
                                     <button type="button"
-                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
                                         <span>
                                             <i class="la la-search"></i>
                                             <span>
@@ -156,7 +156,7 @@
                                         </span>
                                     </button>
                                     <button type="button"
-                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
                                         <span>
                                             <i class="la la-refresh"></i>
                                             <span>
@@ -182,16 +182,16 @@
                         <tbody>
                             <tr class="text-center">
                                 <td class="m--font-brand m--font-bolder">
-                                    <i class="la la-spinner"></i> In Progress: 50
+                                    <i class="la la-spinner"></i> In Progress: {{ totalInProcess }}
                                 </td>
                                 <td class="m--font-success m--font-bolder">
-                                    <i class="la la-check-circle"></i> Complete: 50
+                                    <i class="la la-check-circle"></i> Complete: {{ totalComplete }}
                                 </td>
                                 <td class="m--font-danger m--font-bolder">
-                                    <i class="la la-clock-o"></i> Over due: 20
+                                    <i class="la la-clock-o"></i> Over due: {{ totalOverdued }}
                                 </td>
                                 <td class="m--font-bolder">
-                                    <i class="la la-ban"></i> Cancel: 02
+                                    <i class="la la-ban"></i> Cancel: {{ totalCanceled }}
                                 </td>
                             </tr>
                         </tbody>
@@ -266,274 +266,155 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="tbody-group">
-                                        <!-- begin collapse-toggle-row -->
-                                        <tr class="collapse-toggle-row">
-                                            <td class="table-actions-col">
-                                                <div class="table-actions" style="width: 100px">
-                                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#ops-shipment-001"
-                                                        title="Collapse">
-                                                        <i class="la la-angle-up"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-job-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="javascript:void()" routerLink="/home/operation/job-edit">IDshipA</a>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span class="m-badge m-badge--danger m-badge--wide job-overdue">Overdue</span>
-                                            </td>
-                                        </tr>
-                                        <!-- end of collapse-toggle-row -->
-                                        <!-- begin collapse-panel-row -->
-                                        <tr class="collapse-panel-row">
-                                            <td colspan="14">
-                                                <div class="detail-panel-block collapse" id="ops-shipment-001" data-parent="#ops-job-list-table">
-                                                    <div class="table-inside-block">
-                                                        <table class="table table-secondary dataTable">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="sorting_asc">
-                                                                        <span>Custom No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Transfer Date</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>HBL No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Export Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Import Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Commodity Code</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Q'ty</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Source</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Note</span>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>dd/mm/yyyy</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
+                                    <tbody class="tbody-group" *ngIf="shipments; else norecord">
+                                        <ng-container *ngFor="let item of shipments; let i=index">
+                                            
+                                            <!-- begin collapse-toggle-row -->
+                                            <tr class="collapse-toggle-row">
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions" style="width: 100px">
+                                                        <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
+                                                            title="Collapse">
+                                                            <i class="la la-angle-up"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit">
+                                                            <i class="la la-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-job-modal">
+                                                            <i class="la la-trash"></i>
+                                                        </button>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!--end of collapse-panel-row -->
-                                        <!-- begin collapse-toggle-row -->
-                                        <tr class="collapse-toggle-row">
-                                            <td class="table-actions-col">
-                                                <div class="table-actions" style="width: 100px">
-                                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#ops-shipment-002"
-                                                        title="Collapse">
-                                                        <i class="la la-angle-up"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-job-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="javascript:void()" routerLink="/home/operation/job-edit">IDshipA</a>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span class="m-badge m-badge--info m-badge--wide job-processing">Processing</span>
-                                            </td>
-                                        </tr>
-                                        <!-- end of collapse-toggle-row -->
-                                        <!-- begin collapse-panel-row -->
-                                        <tr class="collapse-panel-row">
-                                            <td colspan="14">
-                                                <div class="detail-panel-block collapse" id="ops-shipment-002" data-parent="#ops-job-list-table">
-                                                    <div class="table-inside-block">
-                                                        <table class="table table-secondary dataTable">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="sorting_asc">
-                                                                        <span>Custom No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Transfer Date</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>HBL No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Export Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Import Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Commodity Code</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Q'ty</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Source</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Note</span>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>dd/mm/yyyy</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
+                                                </td>
+                                                <td>
+                                                    <a href="javascript:void()" routerLink="/home/operation/job-edit">{{ item.jobNo }}</a>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.hblno }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.serviceDate | date:'dd MMM yyyy' }}</span>
+                                                </td>
+                                                <td>
+                                                    <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
+                                                    <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.curentStageCode }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.flightVessel }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumContainers }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumPackages }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumGrossWeight }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumCBM }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.invoiceNo }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.modifiedDate | date:'dd MMM yyyy' }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="m-badge m-badge--danger m-badge--wide job-overdue">{{ item.currentStatus }}</span>
+                                                </td>
+                                            </tr>
+                                            <!-- end of collapse-toggle-row -->
+                                            <!-- begin collapse-panel-row -->
+                                            <tr class="collapse-panel-row">
+                                                <td colspan="14">
+                                                    <div class="detail-panel-block collapse" id="ops-shipment-00{{item.id+1}}" data-parent="#ops-job-list-table">
+                                                        <div class="table-inside-block">
+                                                            <table class="table table-secondary dataTable">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="sorting_asc">
+                                                                            <span>Custom No</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Transfer Date</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>HBL No</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Export Country</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Import Country</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Commodity Code</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Q'ty</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Source</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Note</span>
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>dd/mm/yyyy</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>text</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!--end of collapse-panel-row -->
+                                                </td>
+                                            </tr>
+                                            <!--end of collapse-panel-row -->
+                                        </ng-container>
                                     </tbody>
+                                    <ng-template #norecord>
+                                        <tr>
+                                            <td colspan="14">
+                                                <div class="no-data">
+                                                    <i class="flaticon-coins"></i>
+                                                    <span class="no-data-text">No records found</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
                                 </table>
                             </div>
                             <!--end: Datatable of stage-table-view -->

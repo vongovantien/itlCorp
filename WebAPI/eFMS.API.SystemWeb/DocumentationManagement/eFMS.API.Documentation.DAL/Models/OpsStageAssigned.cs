@@ -6,8 +6,8 @@ namespace eFMS.API.Documentation.Service.Models
     public partial class OpsStageAssigned
     {
         public Guid Id { get; set; }
-        public Guid? JobId { get; set; }
-        public int? StageId { get; set; }
+        public Guid JobId { get; set; }
+        public int StageId { get; set; }
         public int? OrderNumberProcessed { get; set; }
         public string MainPersonInCharge { get; set; }
         public string RealPersonInCharge { get; set; }

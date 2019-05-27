@@ -257,7 +257,8 @@ export class API_MENU {
             getTotalProfit: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/GetTotalProfit",
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Import",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
-            checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/CheckAllowDelete/"
+            checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/CheckAllowDelete/",
+            opsPaging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Paging"
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob",

@@ -7,7 +7,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
     public class OpsTransactionCriteria
     {
         public string All { get; set; }
-        public string Mblno { get; set; }
+        public string JobNo { get; set; }
         public string Hblno { get; set; }
         public string ProductService { get; set; }
         public string ServiceMode { get; set; }

@@ -18,6 +18,21 @@ namespace eFMS.API.Documentation.DL.Common
         SeaLCLExport = 8,
         SeaLCLImport = 9
     }
+    public enum JobStatus
+    {
+        [Description("Overdued")]
+        Overdued = 1,
+        [Description("Processing")]
+        Processing = 2,
+        [Description("InSchedule")]
+        InSchedule = 3,
+        [Description("Pending")]
+        Pending = 4,
+        [Description("Finish")]
+        Finish = 5,
+        [Description("Canceled")]
+        Canceled = 6
+    }
     public enum StageEnum
     {
         [Description("InSchedule")]
