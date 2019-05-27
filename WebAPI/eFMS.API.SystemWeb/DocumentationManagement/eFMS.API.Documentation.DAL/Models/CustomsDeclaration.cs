@@ -16,13 +16,15 @@ namespace eFMS.API.Documentation.Service.Models
         public string Type { get; set; }
         public string Route { get; set; }
         public string DocumentType { get; set; }
-        public Guid? ExportCountry { get; set; }
-        public Guid? Importcountry { get; set; }
+        public Guid? ExportCountryId { get; set; }
+        public Guid? ImportcountryId { get; set; }
         public int? CommodityId { get; set; }
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
         public int? ContQuantity { get; set; }
         public string Pcs { get; set; }
+        public string Source { get; set; }
+        public string Note { get; set; }
     }
 }
