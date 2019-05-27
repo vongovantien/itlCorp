@@ -30,7 +30,7 @@ export class OpsModuleBillingComponent implements OnInit {
     totalComplete = 0;
     totalOverdued = 0;
     totalCanceled = 0;
-    selectFilter = 'Job ID';
+    selectedFilter = 'Job ID';
     searchFilterActive = ['Job ID'];
     isReset = true;
     isFilterTime = false;
@@ -77,10 +77,10 @@ export class OpsModuleBillingComponent implements OnInit {
             this.criteria.serviceDateFrom = null;
             this.criteria.serviceDateTo = null;
         }
-        if(this.selectFilter === 'Job ID'){
+        if(this.selectedFilter === 'Job ID'){
             this.criteria.jobNo = this.searchString;
         }
-        else if(this.selectFilter === 'HBL'){
+        else if(this.selectedFilter === 'HBL'){
             this.criteria.mawb = this.searchString;
         }
         else{
@@ -89,7 +89,7 @@ export class OpsModuleBillingComponent implements OnInit {
         this.getShipments();
     }
     resetSearch(){
-        this.selectFilter = 'Job ID';
+        this.selectedFilter = 'Job ID';
         this.searchFilterActive = ['Job ID'];
         this.criteria = {
         };

@@ -35,9 +35,6 @@
     <Reference Include="eFMS.API.Documentation.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.Service.dll</HintPath>
     </Reference>
-    <Reference Include="eFMS.API.Provider">
-      <HintPath>..\..\..\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
-    </Reference>
     <Reference Include="eFMS.Domain.Report">
       <HintPath>..\..\..\..\bin\eFMS.Domain.Report.dll</HintPath>
     </Reference>

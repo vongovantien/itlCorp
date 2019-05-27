@@ -1,33 +1,17 @@
 ﻿using AutoMapper;
-using eFMS.API.Common;
 using eFMS.API.Shipment.Infrastructure;
-using eFMS.API.Shipment.Infrastructure.Filters;
 using eFMS.API.Shipment.Infrastructure.Middlewares;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using static eFMS.API.Provider.Infrasture.Settings;
 
 namespace eFMS.API.Shipment
 {
@@ -93,9 +77,9 @@ namespace eFMS.API.Shipment
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
             services.AddConfigureSetting(Configuration);
-            services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
-            services.AddOptions().AddCatelogueManagementApiServices();
-            services.AddOptions().AddSystemManagementApiServices();
+            //services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
+            //services.AddOptions().AddCatelogueManagementApiServices();
+            //services.AddOptions().AddSystemManagementApiServices();
             //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,

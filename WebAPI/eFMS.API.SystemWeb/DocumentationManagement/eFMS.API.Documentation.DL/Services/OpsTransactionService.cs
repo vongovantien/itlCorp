@@ -6,35 +6,28 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
-using eFMS.API.Provider.Models.Criteria;
-using eFMS.API.Provider.Services.IService;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
     public class OpsTransactionService : RepositoryBase<OpsTransaction, OpsTransactionModel>, IOpsTransactionService
     {
-        private ICatStageApiService catStageApi;
-        private ICatPlaceApiService catplaceApi;
-        private ICatPartnerApiService catPartnerApi;
-        private ISysUserApiService sysUserApi;
+        //private ICatStageApiService catStageApi;
+        //private ICatPlaceApiService catplaceApi;
+        //private ICatPartnerApiService catPartnerApi;
+        //private ISysUserApiService sysUserApi;
 
-        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, 
-            ICatStageApiService stageApi,
-            ICatPlaceApiService placeApi,
-            ICatPartnerApiService partnerApi,
-            ISysUserApiService userApi) : base(repository, mapper)
+        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper) : base(repository, mapper)
         {
-            catStageApi = stageApi;
-            catplaceApi = placeApi;
-            catPartnerApi = partnerApi;
-            sysUserApi = userApi;
+            //catStageApi = stageApi;
+            //catplaceApi = placeApi;
+            //catPartnerApi = partnerApi;
+            //sysUserApi = userApi;
         }
 
         public OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
