@@ -92,13 +92,15 @@
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="">
-                                                    HBL No <span class="m--font-danger">(*)</span>
+                                                    HBL No 
+                                                    <!-- <span class="m--font-danger">(*)</span> -->
                                                 </label>
                                                 <input type="text" required class="form-control m-input m-input--square"
-                                                    placeholder="Enter text" name="" autofocus>
-                                                <div class="form-control-feedback" style="display: none">
+                                                    placeholder="Enter text" name="" disabled=true
+                                                    [(ngModel)]="opsTransaction.jobNo">
+                                                <!-- <div class="form-control-feedback" style="display: none">
                                                     HBL No is required!
-                                                </div>
+                                                </div> -->
                                             </div>
                                         </div>
                                         <div class="col-lg-4">

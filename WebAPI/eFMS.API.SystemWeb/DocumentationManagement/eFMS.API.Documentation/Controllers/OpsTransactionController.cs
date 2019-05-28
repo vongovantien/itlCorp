@@ -44,7 +44,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         public IActionResult Get(Guid id)
         {
-            var result = transactionService.Get(x => x.Id == id);
+            var result = transactionService.First(x => x.Id == id);
             return Ok(result);
         }
         [HttpPost("Paging")]
