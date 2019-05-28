@@ -245,48 +245,6 @@
                                     [selectedDisplayFields]="['employeeNameEn']" [dataSources]="listBillingOps"
                                     [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
                                 </app-combo-grid-virtual-scroll>
-
-                                <!-- <div class="dropdown e--combogrid">
-                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        readonly data-toggle="dropdown" placeholder="Please select">
-                                    <div class="dropdown-menu e--combogrid-content">
-                                        <div class="tabel-wrapper table-fixed">
-                                            <div class="table-head-fixed">
-                                                <div class="table-filter-block">
-                                                    <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text"
-                                                            placeholder="Search...">
-                                                        <i class="icon-search"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="table-header">
-                                                    <table class="table table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="col-xs-4">User Name</th>
-                                                                <th class="col-xs-4">Full Name</th>
-                                                                <th class="col-xs-4">Role</th>
-                                                            </tr>
-                                                        </thead>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <div class="table-body-scroll">
-                                                <table class="table table-hover">
-                                                    <tbody>
-                                                        <ng-container>
-                                                            <tr class="data-row">
-                                                                <td class="col-xs-4">User Name</td>
-                                                                <td class="col-xs-4">Full Name</td>
-                                                                <td class="col-xs-4">CS</td>
-                                                            </tr>
-                                                        </ng-container>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
                                 <div class="form-control-feedback" *ngIf="addOpsForm.submitted && OpsTransactionToAdd.billingOpsId===null">
                                     Billing OPS is required!
                                 </div>
