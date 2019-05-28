@@ -66,7 +66,7 @@ namespace eFMS.API.Documentation.Controllers
             model.UserModified = model.UserCreated;
             var hs = transactionService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
             if (!hs.Success)
             {
                 return BadRequest(result);
