@@ -25,25 +25,30 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     agents: any[] = [];
     billingOps: any[] = [];
 
+    isDisplay: boolean = true;
+    lstBuyingRateChargesComboBox: any[] = [];
+    lstSellingRateChargesComboBox: any[] = [];
+    lstOBHChargesComboBox: any[] = [];
+
     BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
-  
-  
+
+
     BuyingRateChargeToEdit: any = null;
     SellingRateChargeToEdit: any = null
     OBHChargeToEdit: any = null;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
-        private route: ActivatedRoute) { 
+        private route: ActivatedRoute) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
     async ngOnInit() {
         await this.route.params.subscribe(async prams => {
-            if(prams.id != undefined){
+            if (prams.id != undefined) {
                 await this.getShipmentDetails(prams.id);
             }
         });
@@ -53,9 +58,13 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.getSuppliers();
         this.getAgents();
         this.getBillingOps();
+        this.getListBuyingRateCharges();
+        this.getListSellingRateCharges();
+        this.getListOBHCharges();
     }
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
+        console.log(this.opsTransaction)
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
@@ -75,21 +84,44 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.customers = res;
         });
     }
-    private getSuppliers(){
+    private getSuppliers() {
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null }).subscribe((res: any) => {
             this.suppliers = res;
         });
     }
-    private getAgents(){
+    private getAgents() {
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null }).subscribe((res: any) => {
             this.agents = res;
         });
     }
-    private getBillingOps(){
+    private getBillingOps() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
             this.billingOps = res;
         });
     }
+
+    private getListBuyingRateCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF' }).subscribe(res => {
+            this.lstBuyingRateChargesComboBox = res['data'];
+        });
+
+    }
+
+    getListSellingRateCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF'}).subscribe(res => {
+          this.lstSellingRateChargesComboBox = res['data'];
+        });
+      }
+    
+      getListOBHCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF'}).subscribe(res => {
+          this.lstOBHChargesComboBox = res['data'];
+        });
+      }
+
+      calculateTotalEachBuying(){
+          
+      }
     /**
        * Daterange picker
        */
@@ -119,7 +151,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
         'option 5', 'option 6', 'option 7'];
 
-        
+
     packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
     packagesUnitActive = ['PKG'];
 

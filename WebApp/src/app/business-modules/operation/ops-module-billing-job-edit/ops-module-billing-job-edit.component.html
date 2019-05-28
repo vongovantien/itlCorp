@@ -1967,11 +1967,23 @@
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="">
+                                        <label class="form-control-label" for="" #selectedBuyingChargeCode>
                                             Charge  <span class="m--font-danger">(*)</span>
                                             <small class="m--margin-left-5 m--font-primary">ChargeCode&nbsp;</small>
                                         </label>
-                                        <div class="dropdown e--combogrid">
+                                        <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToAdd.chargeId}"
+                                        (itemSelected)="BuyingRateChargeToAdd.chargeId=$event.charge.id;
+                                        BuyingRateChargeToAdd.unitId=$event.charge.unitId;
+                                        BuyingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
+                                        BuyingRateChargeToAdd.vatrate=$event.charge.vatrate;
+                                        selectedBuyingChargeCode.value=$event.charge.code;
+                                        calculateTotalEachBuying();"
+                                        [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstBuyingRateChargesComboBox"
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                        <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                                 readonly data-toggle="dropdown" placeholder="Please selected"
                                                 title="charge">
@@ -2010,7 +2022,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="form-control-feedback" style="display:none">
                                             Charge is required
                                         </div>
