@@ -85,413 +85,636 @@
                         <!--begin:: General Information -->
                         <div class="div-inside bg-secondary m--margin-bottom-15">
                             <h3 class="c-block-title">General Information</h3>
-                            <hr>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            HBL No <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <input type="text" required class="form-control m-input m-input--square"
-                                            placeholder="Enter text" name="" autofocus>
-                                        <div class="form-control-feedback" style="display: none">
-                                            HBL No is required!
+                            <hr/>
+                            <div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Job Id
+                                            </label>
+                                            <input type="text" required class="form-control m-input m-input--square"
+                                                placeholder="Enter text" name="" disabled>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            MBL No
-                                        </label>
-                                        <input type="text" required class="form-control m-input m-input--square"
-                                            placeholder="Enter text" name="">
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Service Date <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <div class="m-input-icon m-input-icon--right down">
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                ngxDaterangepickerMd [autoApply]="true"
-                                                [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="selected"
-                                                [singleDatePicker]="true" name="singledater" readonly />
-                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                <span>
-                                                    <i class="la la-calendar"></i>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Service Date <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <div class="m-input-icon m-input-icon--right down">
+                                                <input type="text" class="form-control m-input m-input--square" 
+                                                    ngxDaterangepickerMd 
+                                                    [autoApply]="true" 
+                                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                    [(ngModel)]="selected" 
+                                                    [singleDatePicker]="true" 
+                                                    name="singledater" readonly/>
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
                                                 </span>
-                                            </span>
+                                            </div>
+                                            <div class="form-control-feedback" style="display: none">
+                                                Service Date is required!
+                                            </div>
                                         </div>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Service Date is required!
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Finish Date 
+                                            </label>
+                                            <div class="m-input-icon m-input-icon--right down">
+                                                <input type="text" class="form-control m-input m-input--square" 
+                                                    ngxDaterangepickerMd 
+                                                    [autoApply]="true" 
+                                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                    [(ngModel)]="selected" 
+                                                    [singleDatePicker]="true" 
+                                                    name="singledater" readonly/>
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Product Service <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)"
-                                            (typed)="typed($event)" placeholder="Select filter">
-                                        </ng-select>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Product Service is required!
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Product Service <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                placeholder="Select filter">
+                                            </ng-select>
+                                            <div class="form-control-feedback" style="display: none">
+                                                Product Service is required!
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Service Mode <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                placeholder="Select filter">
+                                            </ng-select>
+                                            <div class="form-control-feedback" style="display: none">
+                                                Service Mode is required!
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Shipment Mode <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                                placeholder="Select filter">
+                                            </ng-select>
+                                            <div class="form-control-feedback" style="display: none">
+                                                Shipment Mode is required!
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Service Mode <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)"
-                                            (typed)="typed($event)" placeholder="Select filter">
-                                        </ng-select>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Service Mode is required!
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                HBL No <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <input type="text" required class="form-control m-input m-input--square"
+                                                placeholder="Enter text" name="" autofocus>
+                                            <div class="form-control-feedback" style="display: none">
+                                                HBL No is required!
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Shipment Mode <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                            (selected)="selected($event)" (removed)="removed($event)"
-                                            (typed)="typed($event)" placeholder="Select filter">
-                                        </ng-select>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Shipment Mode is required!
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                MBL No
+                                            </label>
+                                            <input type="text" required class="form-control m-input m-input--square"
+                                                placeholder="Enter text" name="">
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Customer <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                                readonly data-toggle="dropdown" placeholder="Please select">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" placeholder="Search...">
-                                                                <i class="icon-search"></i>
+                                    
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Customer <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle"
+                                                    type="text" readonly data-toggle="dropdown"
+                                                    placeholder="Please select">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="col-xs-2">Partner ID</th>
+                                                                            <th class="col-xs-3">Name ABBR</th>
+                                                                            <th class="col-xs-5">Name EN</th>
+                                                                            <th class="col-xs-2">Tax Code</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
                                                             </div>
                                                         </div>
-                                                        <div class="table-header">
+                                                        <div class="table-body-scroll">
                                                             <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="col-xs-2">Partner ID</th>
-                                                                        <th class="col-xs-3">Name ABBR</th>
-                                                                        <th class="col-xs-5">Name EN</th>
-                                                                        <th class="col-xs-2">Tax Code</th>
-                                                                    </tr>
-                                                                </thead>
+                                                                <tbody>
+                                                                    <ng-container>
+                                                                        <tr class="data-row">
+                                                                            <td class="col-xs-2">item.id</td>
+                                                                            <td class="col-xs-3">item.shortName</td>
+                                                                            <td class="col-xs-5">item.partnerNameEn</td>
+                                                                            <td class="col-xs-2">item.taxCode</td>
+                                                                        </tr>
+                                                                    </ng-container>
+                                                                </tbody>
                                                             </table>
                                                         </div>
                                                     </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <ng-container>
+                                                </div>
+                                            </div>
+                                            <div class="form-control-feedback" style="display: none">
+                                                Customer is required!
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Port of Loading
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" 
+                                                    readonly 
+                                                    required
+                                                    data-toggle="dropdown" 
+                                                    value="">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square" type="text"
+                                                                        placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Port Code</th>
+                                                                            <th>Port Name</th>
+                                                                            <th>Country</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-body-scroll">
+                                                            <table class="table table-hover">
+                                                                <tbody>
                                                                     <tr class="data-row">
-                                                                        <td class="col-xs-2">item.id</td>
-                                                                        <td class="col-xs-3">item.shortName</td>
-                                                                        <td class="col-xs-5">item.partnerNameEn</td>
-                                                                        <td class="col-xs-2">item.taxCode</td>
+                                                                        <td>pol.code</td>
+                                                                        <td>pol.nameEN</td>
+                                                                        <td>pol.countryName</td>
                                                                     </tr>
-                                                                </ng-container>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Customer is required!
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Port of Loading
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                                readonly required data-toggle="dropdown" value="">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" placeholder="Search...">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Port Code</th>
-                                                                        <th>Port Name</th>
-                                                                        <th>Country</th>
-                                                                    </tr>
-                                                                </thead>
+                                                                </tbody>
                                                             </table>
                                                         </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row">
-                                                                    <td>pol.code</td>
-                                                                    <td>pol.nameEN</td>
-                                                                    <td>pol.countryName</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Port of Discharge
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                                readonly required data-toggle="dropdown" placeholder="Please selected"
-                                                value="">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" autocomplete="nope" placeholder="Search...">
-                                                                <i class="icon-search"></i>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Port of Discharge
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle" 
+                                                    type="text" 
+                                                    readonly 
+                                                    required
+                                                    data-toggle="dropdown" 
+                                                    placeholder="Please selected"
+                                                    value="">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square" 
+                                                                        type="text" 
+                                                                        autocomplete="nope"
+                                                                        placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Port Code</th>
+                                                                            <th>Port Name</th>
+                                                                            <th>Country</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
                                                             </div>
                                                         </div>
-                                                        <div class="table-header">
+                                                        <div class="table-body-scroll">
                                                             <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Port Code</th>
-                                                                        <th>Port Name</th>
-                                                                        <th>Country</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <tr class="data-row">
-                                                                    <td>pod.code</td>
-                                                                    <td>pod.nameEN</td>
-                                                                    <td>pod.countryName</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Supplier
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                                readonly data-toggle="dropdown" placeholder="Please select">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" placeholder="Search...">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="col-xs-2">Partner ID</th>
-                                                                        <th class="col-xs-3">Name ABBR</th>
-                                                                        <th class="col-xs-5">Name EN</th>
-                                                                        <th class="col-xs-2">Tax Code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <ng-container>
+                                                                <tbody>
                                                                     <tr class="data-row">
-                                                                        <td class="col-xs-2">item.id</td>
-                                                                        <td class="col-xs-3">item.shortName</td>
-                                                                        <td class="col-xs-5">item.partnerNameEn</td>
-                                                                        <td class="col-xs-2">item.taxCode</td>
+                                                                        <td>pod.code</td>
+                                                                        <td>pod.nameEN</td>
+                                                                        <td>pod.countryName</td>
                                                                     </tr>
-                                                                </ng-container>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Vessel/Flight
-                                        </label>
-                                        <input type="text" required class="form-control m-input m-input--square"
-                                            placeholder="Enter text" name="">
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Agent
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                                readonly data-toggle="dropdown" placeholder="Please select">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" placeholder="Search...">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="col-xs-2">Partner ID</th>
-                                                                        <th class="col-xs-3">Name ABBR</th>
-                                                                        <th class="col-xs-5">Name EN</th>
-                                                                        <th class="col-xs-2">Tax Code</th>
-                                                                    </tr>
-                                                                </thead>
+                                                                </tbody>
                                                             </table>
                                                         </div>
                                                     </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <ng-container>
-                                                                    <tr class="data-row">
-                                                                        <td class="col-xs-2">item.id</td>
-                                                                        <td class="col-xs-3">item.shortName</td>
-                                                                        <td class="col-xs-5">item.partnerNameEn</td>
-                                                                        <td class="col-xs-2">item.taxCode</td>
-                                                                    </tr>
-                                                                </ng-container>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Purchase Order No
-                                        </label>
-                                        <input type="text" required class="form-control m-input m-input--square"
-                                            placeholder="Enter text" name="">
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Billing OPS <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                                readonly data-toggle="dropdown" placeholder="Please select">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" placeholder="Search...">
-                                                                <i class="icon-search"></i>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Supplier
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle"
+                                                    type="text" readonly data-toggle="dropdown"
+                                                    placeholder="Please select">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="col-xs-2">Partner ID</th>
+                                                                            <th class="col-xs-3">Name ABBR</th>
+                                                                            <th class="col-xs-5">Name EN</th>
+                                                                            <th class="col-xs-2">Tax Code</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
                                                             </div>
                                                         </div>
-                                                        <div class="table-header">
+                                                        <div class="table-body-scroll">
                                                             <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="col-xs-4">User Name</th>
-                                                                        <th class="col-xs-4">Full Name</th>
-                                                                        <th class="col-xs-4">Role</th>
-                                                                    </tr>
-                                                                </thead>
+                                                                <tbody>
+                                                                    <ng-container>
+                                                                        <tr class="data-row">
+                                                                            <td class="col-xs-2">item.id</td>
+                                                                            <td class="col-xs-3">item.shortName</td>
+                                                                            <td class="col-xs-5">item.partnerNameEn</td>
+                                                                            <td class="col-xs-2">item.taxCode</td>
+                                                                        </tr>
+                                                                    </ng-container>
+                                                                </tbody>
                                                             </table>
                                                         </div>
                                                     </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <ng-container>
-                                                                    <tr class="data-row">
-                                                                        <td class="col-xs-4">User Name</td>
-                                                                        <td class="col-xs-4">Full Name</td>
-                                                                        <td class="col-xs-4">CS</td>
-                                                                    </tr>
-                                                                </ng-container>
-                                                            </tbody>
-                                                        </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Vessel/Flight
+                                            </label>
+                                            <input type="text" required class="form-control m-input m-input--square"
+                                                placeholder="Enter text" name="">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Agent
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle"
+                                                    type="text" readonly data-toggle="dropdown"
+                                                    placeholder="Please select">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="col-xs-2">Partner ID</th>
+                                                                            <th class="col-xs-3">Name ABBR</th>
+                                                                            <th class="col-xs-5">Name EN</th>
+                                                                            <th class="col-xs-2">Tax Code</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-body-scroll">
+                                                            <table class="table table-hover">
+                                                                <tbody>
+                                                                    <ng-container>
+                                                                        <tr class="data-row">
+                                                                            <td class="col-xs-2">item.id</td>
+                                                                            <td class="col-xs-3">item.shortName</td>
+                                                                            <td class="col-xs-5">item.partnerNameEn</td>
+                                                                            <td class="col-xs-2">item.taxCode</td>
+                                                                        </tr>
+                                                                    </ng-container>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Billing OPS is required!
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Warehouse
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle"
+                                                    type="text" readonly data-toggle="dropdown"
+                                                    placeholder="Please select">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Code</th>
+                                                                            <th>Name EN</th>
+                                                                            <th>City/Province</th>
+                                                                            <th>Ditrict</th>
+                                                                            <th>Address</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-body-scroll">
+                                                            <table class="table table-hover">
+                                                                <tbody>
+                                                                    <tr class="data-row">
+                                                                        <td>Code</td>
+                                                                        <td>Name EN</td>
+                                                                        <td>City/Province</td>
+                                                                        <td>Ditrict</td>
+                                                                        <td>Address</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Invoice No
+                                            </label>
+                                            <input type="text" required class="form-control m-input m-input--square"
+                                                placeholder="Enter text" name="">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Purchase Order No
+                                            </label>
+                                            <input type="text" required class="form-control m-input m-input--square"
+                                                placeholder="Enter text" name="">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Saleman
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle"
+                                                    type="text" readonly data-toggle="dropdown"
+                                                    placeholder="Please select">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>User Name</th>
+                                                                            <th>Full Name</th>
+                                                                            <th>Role</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-body-scroll">
+                                                            <table class="table table-hover">
+                                                                <tbody>
+                                                                    <tr class="data-row">
+                                                                        <td>User Name</td>
+                                                                        <td>Full Name</td>
+                                                                        <td>Role</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Field OPS
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle"
+                                                    type="text" readonly data-toggle="dropdown"
+                                                    placeholder="Please select">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="col-xs-4">User Name</th>
+                                                                            <th class="col-xs-4">Full Name</th>
+                                                                            <th class="col-xs-4">Role</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-body-scroll">
+                                                            <table class="table table-hover">
+                                                                <tbody>
+                                                                    <ng-container>
+                                                                        <tr class="data-row">
+                                                                            <td class="col-xs-4">User Name</td>
+                                                                            <td class="col-xs-4">Full Name</td>
+                                                                            <td class="col-xs-4">CS</td>
+                                                                        </tr>
+                                                                    </ng-container>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Billing OPS  <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <div class="dropdown e--combogrid">
+                                                <input class="form-control m-input m-input--square dropdown-toggle"
+                                                    type="text" readonly data-toggle="dropdown"
+                                                    placeholder="Please select">
+                                                <div class="dropdown-menu e--combogrid-content">
+                                                    <div class="tabel-wrapper table-fixed">
+                                                        <div class="table-head-fixed">
+                                                            <div class="table-filter-block">
+                                                                <div class="search-field">
+                                                                    <input class="form-control m-input m-input--square"
+                                                                        type="text" placeholder="Search...">
+                                                                    <i class="icon-search"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-header">
+                                                                <table class="table table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="col-xs-4">User Name</th>
+                                                                            <th class="col-xs-4">Full Name</th>
+                                                                            <th class="col-xs-4">Role</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="table-body-scroll">
+                                                            <table class="table table-hover">
+                                                                <tbody>
+                                                                    <ng-container>
+                                                                        <tr class="data-row">
+                                                                            <td class="col-xs-4">User Name</td>
+                                                                            <td class="col-xs-4">Full Name</td>
+                                                                            <td class="col-xs-4">CS</td>
+                                                                        </tr>
+                                                                    </ng-container>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-control-feedback" style="display: none">
+                                                Billing OPS is required!
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                                        <span class="m--font-bolder">Create:</span>
+                                        <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                        <span class="m--font-brand m--margin-left-5">User</span>
+                                    </div>
+                                    <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                                        <span class="m--font-bolder">Modified:</span>
+                                        <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                        <span class="m--font-brand m--margin-left-5">User</span>
                                     </div>
                                 </div>
                             </div>
