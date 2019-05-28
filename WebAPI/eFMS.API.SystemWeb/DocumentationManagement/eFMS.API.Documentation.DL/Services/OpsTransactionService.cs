@@ -6,6 +6,7 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -29,7 +30,18 @@ namespace eFMS.API.Documentation.DL.Services
             //catPartnerApi = partnerApi;
             //sysUserApi = userApi;
         }
-
+        public override HandleState Add(OpsTransactionModel model)
+        {
+            model.Id = Guid.NewGuid();
+            model.CreatedDate = DateTime.Now;
+            model.UserCreated = "admin"; //currentUser.UserID;
+            model.ModifiedDate = model.CreatedDate;
+            model.UserModified = model.UserCreated;
+            int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+            model.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
+            var entity = mapper.Map<OpsTransaction>(model);
+            return DataContext.Add(entity);
+        }
         public OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = Query(criteria);

@@ -41,7 +41,12 @@ namespace eFMS.API.Documentation.Controllers
             var results = transactionService.Query(criteria);
             return Ok(results);
         }
-
+        [HttpGet]
+        public IActionResult Get(Guid id)
+        {
+            var result = transactionService.Get(x => x.Id == id);
+            return Ok(result);
+        }
         [HttpPost("Paging")]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
@@ -59,11 +64,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            model.Id = Guid.NewGuid();
-            model.CreatedDate = DateTime.Now;
-            model.UserCreated = "admin"; //currentUser.UserID;
-            model.ModifiedDate = model.CreatedDate;
-            model.UserModified = model.UserCreated;
+            
             var hs = transactionService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };

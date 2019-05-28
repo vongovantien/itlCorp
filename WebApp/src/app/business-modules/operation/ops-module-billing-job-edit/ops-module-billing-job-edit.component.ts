@@ -7,6 +7,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -34,18 +35,27 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     OBHChargeToEdit: any = null;
 
     constructor(private baseServices: BaseService,
-        private api_menu: API_MENU) { 
+        private api_menu: API_MENU,
+        private route: ActivatedRoute) { 
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
     async ngOnInit() {
+        await this.route.params.subscribe(async prams => {
+            if(prams.id != undefined){
+                await this.getShipmentDetails(prams.id);
+            }
+        });
         await this.getShipmentCommonData();
         this.getCustomers();
         this.getPorts();
         this.getSuppliers();
         this.getAgents();
         this.getBillingOps();
+    }
+    async getShipmentDetails(id: any) {
+        this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
