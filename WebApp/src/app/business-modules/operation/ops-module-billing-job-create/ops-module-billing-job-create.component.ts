@@ -7,6 +7,7 @@ import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 @Component({
     selector: 'app-ops-module-billing-job-create',
     templateUrl: './ops-module-billing-job-create.component.html',
@@ -24,7 +25,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
     listBillingOps: any[] = [];
     OpsTransactionToAdd: OpsTransaction = new OpsTransaction();
 
-    constructor(private baseServices: BaseService, private api_menu: API_MENU, ) {
+    constructor(private baseServices: BaseService, private api_menu: API_MENU, private router:Router) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -79,7 +80,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
     private getListBillingOps(){
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
             this.listBillingOps = res;
-            console.log({"Billing Ops":this.listBillingOps});
+            console.log({"Billing Ops":this.listBillingOps});  
         });
     }
 
@@ -93,6 +94,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
                     var res = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.addNew, this.OpsTransactionToAdd);
                     if (res.status) {
                         console.log(res);
+                        this.router.navigate(["/home/operation/job-edit",{id:res.data}]);
                         this.OpsTransactionToAdd = new OpsTransaction();
                         this.resetDisplay();
                         form.onReset();
