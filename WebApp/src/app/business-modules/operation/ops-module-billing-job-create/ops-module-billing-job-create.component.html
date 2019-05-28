@@ -142,7 +142,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.pol === OpsTransactionToAdd.pod}">
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
                                 <label class="form-control-label" for="">
                                     Port of Loading
                                 </label>
@@ -154,15 +154,15 @@
                                 </app-combo-grid-virtual-scroll>
 
                                 <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.pol === OpsTransactionToAdd.pod">
-                                    Port of loading must be different with port of discharge
+                                    *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
+                                    Port of loading is must be different with port of discharge
                                 </div>
 
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.pol === OpsTransactionToAdd.pod}">
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
                                 <label class="form-control-label" for="">
                                     Port of Discharge
                                 </label>
@@ -174,7 +174,7 @@
                                 </app-combo-grid-virtual-scroll>
 
                                 <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.pol === OpsTransactionToAdd.pod">
+                                    *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
                                     Port of discharge must be different with port of loading
                                 </div>
 

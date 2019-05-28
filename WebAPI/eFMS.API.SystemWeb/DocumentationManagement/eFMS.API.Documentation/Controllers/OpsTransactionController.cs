@@ -111,8 +111,8 @@ namespace eFMS.API.Documentation.Controllers
         }
         private string CheckExist(OpsTransactionModel model)
         {
-            var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hblno != model.Hblno);
-            var existedMBL = transactionService.Any(x => x.Id != model.Id && x.Mblno != model.Mblno);
+            var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hblno == model.Hblno);
+            var existedMBL = transactionService.Any(x => x.Id != model.Id && x.Mblno == model.Mblno);
             if (existedHBL)
             {
                 return "HBL no is existed !";
