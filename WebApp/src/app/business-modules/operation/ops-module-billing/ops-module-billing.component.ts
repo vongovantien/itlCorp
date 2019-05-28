@@ -8,6 +8,7 @@ import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum'
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
     selector: 'app-ops-module-billing',
@@ -37,6 +38,7 @@ export class OpsModuleBillingComponent implements OnInit {
     customClearances: any[] = [];
     
     constructor(private baseServices: BaseService,
+        private sortService: SortService,
         private api_menu: API_MENU) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
@@ -112,6 +114,14 @@ export class OpsModuleBillingComponent implements OnInit {
             this.customClearances = [];
         }
     }
+    isDesc = true;
+    sortKey: string = "";
+    sort(property) {
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.shipments = this.sortService.sort(this.shipments, property, this.isDesc);
+    }
+
     async getCustomers(){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);

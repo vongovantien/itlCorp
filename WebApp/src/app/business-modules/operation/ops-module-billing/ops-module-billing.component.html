@@ -225,43 +225,55 @@
                                     <thead>
                                         <tr>
                                             <th class="table-actions-col no-sorting"></th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo') }"
+                                                (click)="sort('jobNo')">
                                                 <span>Job ID</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblno'), 'sorting_desc': (!isDesc && sortKey == 'hblno') }"
+                                                (click)="sort('hblno')">
                                                 <span>HBL</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceDate'), 'sorting_desc': (!isDesc && sortKey == 'serviceDate') }"
+                                                (click)="sort('serviceDate')">
                                                 <span>Service Date</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th>
                                                 <span>Service Port</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'curentStageCode'), 'sorting_desc': (!isDesc && sortKey == 'curentStageCode') }"
+                                                (click)="sort('curentStageCode')">
                                                 <span>Stage</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'flightVessel'), 'sorting_desc': (!isDesc && sortKey == 'flightVessel') }"
+                                                (click)="sort('flightVessel')">
                                                 <span>Flight/Vessel</span>
                                             </th>
-                                            <th class=sorting> 
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumContainers'), 'sorting_desc': (!isDesc && sortKey == 'sumContainers') }"
+                                                (click)="sort('sumContainers')"> 
                                                 <span>Cont Q'ty</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumPackages'), 'sorting_desc': (!isDesc && sortKey == 'sumPackages') }"
+                                                (click)="sort('sumPackages')">
                                                 <span>Pack Q'ty</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumGrossWeight'), 'sorting_desc': (!isDesc && sortKey == 'sumGrossWeight') }"
+                                                (click)="sort('sumGrossWeight')">
                                                 <span>G.W</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumCBM'), 'sorting_desc': (!isDesc && sortKey == 'sumCBM') }"
+                                                (click)="sort('sumCBM')">
                                                 <span>CBM</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
+                                                (click)="sort('invoiceNo')">
                                                 <span>Invoice No</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modifiedDate'), 'sorting_desc': (!isDesc && sortKey == 'modifiedDate') }"
+                                                (click)="sort('modifiedDate')">
                                                 <span>Modified Date</span>
                                             </th>
-                                            <th>
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currentStatus'), 'sorting_desc': (!isDesc && sortKey == 'currentStatus') }"
+                                                (click)="sort('currentStatus')">
                                                 <span>Status</span>
                                             </th>
                                         </tr>
@@ -325,7 +337,9 @@
                                                     <span>{{ item.modifiedDate | date:'dd MMM yyyy' }}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="m-badge m-badge--danger m-badge--wide job-overdue">{{ item.currentStatus }}</span>
+                                                    <ng-container *ngIf="item.currentStatus">
+                                                        <span class="m-badge m-badge--danger m-badge--wide job-overdue">{{ item.currentStatus }}</span>
+                                                    </ng-container>
                                                 </td>
                                             </tr>
                                             <!-- end of collapse-toggle-row -->

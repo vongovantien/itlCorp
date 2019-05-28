@@ -1,5 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import * as shipmentHelper from 'src/helper/shipment.helper';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import * as dataHelper from 'src/helper/data.helper';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -7,16 +13,63 @@ import moment from 'moment/moment';
     styleUrls: ['./ops-module-billing-job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent implements OnInit {
+    opsTransaction: OpsTransaction = new OpsTransaction();
+    productServices: any[] = [];
+    serviceModes: any[] = [];
+    shipmentModes: any[] = [];
+    customers: any[] = [];
+    ports: any[] = [];
+    suppliers: any[] = [];
+    agents: any[] = [];
+    billingOps: any[] = [];
 
-    constructor() { 
+    constructor(private baseServices: BaseService,
+        private api_menu: API_MENU) { 
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-
-    ngOnInit() {
+    async ngOnInit() {
+        await this.getShipmentCommonData();
+        this.getCustomers();
+        this.getPorts();
+        this.getSuppliers();
+        this.getAgents();
+        this.getBillingOps();
+    }
+    async getShipmentCommonData() {
+        const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
+        this.productServices = dataHelper.prepareNg2SelectData(data.productServices, 'value', 'displayName');
+        this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
+        this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
+    }
+    private getPorts() {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { inactive: false }).subscribe((res: any) => {
+            this.ports = res;
+            console.log(this.ports)
+        });
     }
 
+    private getCustomers() {
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null }).subscribe((res: any) => {
+            this.customers = res;
+        });
+    }
+    private getSuppliers(){
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null }).subscribe((res: any) => {
+            this.suppliers = res;
+        });
+    }
+    private getAgents(){
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null }).subscribe((res: any) => {
+            this.agents = res;
+        });
+    }
+    private getBillingOps(){
+        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
+            this.billingOps = res;
+        });
+    }
     /**
        * Daterange picker
        */

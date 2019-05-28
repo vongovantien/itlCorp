@@ -65,13 +65,14 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        HBL No <span class="m--font-danger">(*)</span>
+                                        Job ID 
+                                        <!-- <span class="m--font-danger">(*)</span> -->
                                     </label>
-                                    <input type="text" required class="form-control m-input m-input--square"
-                                        placeholder="Enter text" name="" autofocus>
-                                    <div class="form-control-feedback" style="display: none">
+                                    <input type="text" required class="form-control m-input m-input--square" disabled=true
+                                        placeholder="Enter text" name="">
+                                    <!-- <div class="form-control-feedback" style="display: none">
                                         HBL No is required!
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -111,7 +112,7 @@
                                     <label class="form-control-label" for="">
                                         Product Service <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                    <ng-select [allowClear]="true" [items]="productServices" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)"
                                         (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
@@ -125,7 +126,7 @@
                                     <label class="form-control-label" for="">
                                         Service Mode <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                    <ng-select [allowClear]="true" [items]="serviceModes" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)"
                                         (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
@@ -139,7 +140,7 @@
                                     <label class="form-control-label" for="">
                                         Shipment Mode <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                    <ng-select [allowClear]="true" [items]="shipmentModes" (data)="refreshValue($event)"
                                         (selected)="selected($event)" (removed)="removed($event)"
                                         (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
@@ -155,7 +156,7 @@
                                     <label class="form-control-label" for="">
                                         Customer <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please select">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -197,7 +198,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:opsTransaction.customerId}"
+                                        (itemSelected)="opsTransaction.customerId = $event.id"
+                                        [selectedDisplayFields]="['partnerNameEn']" [dataSources]="customers"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
                                     <div class="form-control-feedback" style="display: none">
                                         Customer is required!
                                     </div>
@@ -208,7 +215,7 @@
                                     <label class="form-control-label" for="">
                                         Port of Loading
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly required data-toggle="dropdown" value="">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -246,7 +253,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:opsTransaction.pol}"
+                                        (itemSelected)="opsTransaction.pol=$event.id"
+                                        [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
+                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -254,7 +267,7 @@
                                     <label class="form-control-label" for="">
                                         Port of Discharge
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly required data-toggle="dropdown" placeholder="Please selected"
                                             value="">
@@ -293,7 +306,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:opsTransaction.pod}"
+                                        (itemSelected)="opsTransaction.pod=$event.id"
+                                        [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
+                                        [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                         </div>
@@ -303,7 +322,7 @@
                                     <label class="form-control-label" for="">
                                         Supplier
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please select">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -345,7 +364,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:opsTransaction.supplierId}"
+                                        (itemSelected)="opsTransaction.supplierId = $event.id"
+                                        [selectedDisplayFields]="['partnerNameEn']" [dataSources]="suppliers"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -362,7 +387,7 @@
                                     <label class="form-control-label" for="">
                                         Agent
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please select">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -404,7 +429,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:opsTransaction.agentId}"
+                                        (itemSelected)="opsTransaction.agentId = $event.id"
+                                        [selectedDisplayFields]="['partnerNameEn']" [dataSources]="agents"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                         </div>
@@ -423,7 +454,7 @@
                                     <label class="form-control-label" for="">
                                         Billing OPS <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <div class="dropdown e--combogrid">
+                                    <!-- <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             readonly data-toggle="dropdown" placeholder="Please select">
                                         <div class="dropdown-menu e--combogrid-content">
@@ -463,7 +494,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:opsTransaction.billingOpsId}"
+                                        (itemSelected)="opsTransaction.billingOpsId = $event.id"
+                                        [selectedDisplayFields]="['employeeNameEn']" [dataSources]="billingOps"
+                                        [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
+                                    </app-combo-grid-virtual-scroll>
                                     <div class="form-control-feedback" style="display: none">
                                         Billing OPS is required!
                                     </div>
