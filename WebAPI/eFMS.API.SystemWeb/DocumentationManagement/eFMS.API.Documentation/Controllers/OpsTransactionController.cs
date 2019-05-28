@@ -41,7 +41,12 @@ namespace eFMS.API.Documentation.Controllers
             var results = transactionService.Query(criteria);
             return Ok(results);
         }
-
+        [HttpGet]
+        public IActionResult Get(Guid id)
+        {
+            var result = transactionService.Get(x => x.Id == id);
+            return Ok(result);
+        }
         [HttpPost("Paging")]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {

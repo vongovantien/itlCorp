@@ -304,6 +304,7 @@ export class API_MENU {
             addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Add",
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Update",
             delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction"
         },
         CustomClearance: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CustomsDeclaration/GetByJob"

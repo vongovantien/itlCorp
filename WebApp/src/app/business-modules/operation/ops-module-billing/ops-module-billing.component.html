@@ -300,7 +300,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a href="javascript:void()" routerLink="/home/operation/job-edit">{{ item.jobNo }}</a>
+                                                    <a href="javascript:void()" [routerLink]="['/home/operation/job-edit', { id: item.id }]">{{ item.jobNo }}</a>
                                                 </td>
                                                 <td>
                                                     <span>{{ item.hblno }}</span>
