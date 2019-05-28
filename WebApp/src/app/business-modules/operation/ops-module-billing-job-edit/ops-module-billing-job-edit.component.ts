@@ -6,6 +6,7 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -22,6 +23,15 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     suppliers: any[] = [];
     agents: any[] = [];
     billingOps: any[] = [];
+
+    BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+    SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+    OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+  
+  
+    BuyingRateChargeToEdit: any = null;
+    SellingRateChargeToEdit: any = null
+    OBHChargeToEdit: any = null;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU) { 
