@@ -92,6 +92,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
                     this.OpsTransactionToAdd.serviceDate = this.OpsTransactionToAdd.serviceDate.startDate
                     var res = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.addNew, this.OpsTransactionToAdd);
                     if (res.status) {
+                        console.log(res);
                         this.OpsTransactionToAdd = new OpsTransaction();
                         this.resetDisplay();
                         form.onReset();

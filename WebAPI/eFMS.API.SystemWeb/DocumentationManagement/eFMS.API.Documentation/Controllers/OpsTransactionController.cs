@@ -62,7 +62,7 @@ namespace eFMS.API.Documentation.Controllers
             
             var hs = transactionService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -107,8 +107,8 @@ namespace eFMS.API.Documentation.Controllers
         }
         private string CheckExist(OpsTransactionModel model)
         {
-            var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hblno != model.Hblno);
-            var existedMBL = transactionService.Any(x => x.Id != model.Id && x.Mblno != model.Mblno);
+            var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hblno == model.Hblno);
+            var existedMBL = transactionService.Any(x => x.Id != model.Id && x.Mblno == model.Mblno);
             if (existedHBL)
             {
                 return "HBL no is existed !";
