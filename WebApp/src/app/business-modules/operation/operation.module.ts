@@ -12,6 +12,8 @@ import { OpsModuleBillingJobCreateComponent } from './ops-module-billing-job-cre
 import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billing.component';
 import { OpsModuleBillingJobEditComponent } from './ops-module-billing-job-edit/ops-module-billing-job-edit.component';
 import { BillingCustomDeclarationComponent } from './ops-module-billing-job-edit/billing-custom-declaration/billing-custom-declaration.component';
+import { OpsModuleCreditDebitNoteComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note.component';
+import { OpsModuleStageManagementComponent } from './ops-module-billing-job-edit/ops-module-stage-management/ops-module-stage-management.component';
 
 
 @NgModule({
@@ -23,6 +25,6 @@ import { BillingCustomDeclarationComponent } from './ops-module-billing-job-edit
     SharedModule,
     NgxDaterangepickerMd
   ],
-  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent],
+  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent],
 })
 export class OperationModule { }
