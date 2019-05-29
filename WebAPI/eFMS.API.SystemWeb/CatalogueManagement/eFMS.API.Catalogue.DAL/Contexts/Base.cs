@@ -12,7 +12,7 @@ namespace eFMS.API.Catalogue.Service.Contexts
         {
             ConfigDataContext<eFMSDataContext>(settings.Value.eFMSConnection);
             DbHelper.DbHelper.ConnectionString = settings.Value.eFMSConnection;
-            DbHelper.DbHelper.MongoDBConnectionString = settings.Value.MongoDatabase;
+            DbHelper.DbHelper.MongoDBConnectionString = settings.Value.MongoConnection;
         }
     }
 }

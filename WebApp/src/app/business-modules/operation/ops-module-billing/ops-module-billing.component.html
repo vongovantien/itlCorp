@@ -42,9 +42,9 @@
                                     <label class="form-control-label" for="">
                                         Select filter
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        (typed)="typed($event)" placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="searchFilters" (data)="refreshValue($event)"
+                                        (selected)="selectedFilter  = $event.id" (removed)="selectedFilter = null"
+                                        (typed)="typed($event)" placeholder="Select filter" [active]="searchFilterActive">
                                     </ng-select>
                                 </div>
                             </div>
@@ -58,8 +58,8 @@
                                             <label class="form-control-label" for="">
                                                 Product Service
                                             </label>
-                                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)"
+                                            <ng-select [allowClear]="true" [items]="productServices" (data)="refreshValue($event)"
+                                                (selected)="criteria.productService = $event.id" (removed)="criteria.productService = null"
                                                 (typed)="typed($event)" placeholder="Select filter">
                                             </ng-select>
                                         </div>
@@ -69,8 +69,8 @@
                                             <label class="form-control-label" for="">
                                                 Service Mode
                                             </label>
-                                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)"
+                                            <ng-select [allowClear]="true" [items]="serviceModes" (data)="refreshValue($event)"
+                                                (selected)="criteria.serviceMode = $event.id" (removed)="criteria.serviceMode = null"
                                                 (typed)="typed($event)" placeholder="Select filter">
                                             </ng-select>
                                         </div>
@@ -80,63 +80,26 @@
                                             <label class="form-control-label" for="">
                                                 Shipment Mode
                                             </label>
-                                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                                (selected)="selected($event)" (removed)="removed($event)"
+                                            <ng-select [allowClear]="true" [items]="shipmentModes" (data)="refreshValue($event)"
+                                                (selected)="criteria.shipmentMode = $event.id" (removed)="criteria.shipmentMode = null"
                                                 (typed)="typed($event)" placeholder="Select filter">
                                             </ng-select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row" *ngIf="isReset">
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
                                                 Customer (Payer)
                                             </label>
-                                            <div class="dropdown e--combogrid">
-                                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                                    type="text" readonly data-toggle="dropdown"
-                                                    placeholder="Please select">
-                                                <div class="dropdown-menu e--combogrid-content">
-                                                    <div class="tabel-wrapper table-fixed">
-                                                        <div class="table-head-fixed">
-                                                            <div class="table-filter-block">
-                                                                <div class="search-field">
-                                                                    <input class="form-control m-input m-input--square"
-                                                                        type="text" placeholder="Search...">
-                                                                    <i class="icon-search"></i>
-                                                                </div>
-                                                            </div>
-                                                            <div class="table-header">
-                                                                <table class="table table-hover">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th class="col-xs-2">Partner ID</th>
-                                                                            <th class="col-xs-3">Name ABBR</th>
-                                                                            <th class="col-xs-5">Name EN</th>
-                                                                            <th class="col-xs-2">Tax Code</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-body-scroll">
-                                                            <table class="table table-hover">
-                                                                <tbody>
-                                                                    <ng-container>
-                                                                        <tr class="data-row">
-                                                                            <td class="col-xs-2">item.id</td>
-                                                                            <td class="col-xs-3">item.shortName</td>
-                                                                            <td class="col-xs-5">item.partnerNameEn</td>
-                                                                            <td class="col-xs-2">item.taxCode</td>
-                                                                        </tr>
-                                                                    </ng-container>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <app-combo-grid-virtual-scroll 
+                                                    [currentActiveItemId]="{field:'id',value:criteria.customerId}"
+                                                    (itemSelected)="criteria.customerId = $event.id;"
+                                                    [selectedDisplayFields]="['partnerNameEn']"
+                                                    [dataSources]="customers" 
+                                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                            </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -144,48 +107,13 @@
                                             <label class="form-control-label" for="">
                                                 OPS Incharge
                                             </label>
-                                            <div class="dropdown e--combogrid">
-                                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                                    type="text" readonly data-toggle="dropdown"
-                                                    placeholder="Please select">
-                                                <div class="dropdown-menu e--combogrid-content">
-                                                    <div class="tabel-wrapper table-fixed">
-                                                        <div class="table-head-fixed">
-                                                            <div class="table-filter-block">
-                                                                <div class="search-field">
-                                                                    <input class="form-control m-input m-input--square"
-                                                                        type="text" placeholder="Search...">
-                                                                    <i class="icon-search"></i>
-                                                                </div>
-                                                            </div>
-                                                            <div class="table-header">
-                                                                <table class="table table-hover">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th class="col-xs-4">User Name</th>
-                                                                            <th class="col-xs-4">Full Name</th>
-                                                                            <th class="col-xs-4">Role</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-body-scroll">
-                                                            <table class="table table-hover">
-                                                                <tbody>
-                                                                    <ng-container>
-                                                                        <tr class="data-row">
-                                                                            <td class="col-xs-4">User Name</td>
-                                                                            <td class="col-xs-4">Full Name</td>
-                                                                            <td class="col-xs-4">CS</td>
-                                                                        </tr>
-                                                                    </ng-container>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <app-combo-grid-virtual-scroll 
+                                                [currentActiveItemId]="{field:'id',value:criteria.fieldOps}"
+                                                (itemSelected)="criteria.fieldOps = $event.id;"
+                                                [selectedDisplayFields]="['employeeNameVn']"
+                                                [dataSources]="userInCharges" 
+                                                [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
+                                            </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -209,7 +137,7 @@
                             <div class="row">
                                 <div class="col-lg-6">
                                     <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse"
-                                        href="#advance-search-of-job" role="button" aria-expanded="false"
+                                        href="#advance-search-of-job" role="button" aria-expanded="false" (click)="isFilterTime = !isFilterTime"
                                         aria-controls="advance-search-of-job">
                                         <span>
                                             <i class="la la-angle-up"></i>
@@ -219,7 +147,7 @@
                                 </div>
                                 <div class="col-lg-6 m--align-right">
                                     <button type="button"
-                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
                                         <span>
                                             <i class="la la-search"></i>
                                             <span>
@@ -228,7 +156,7 @@
                                         </span>
                                     </button>
                                     <button type="button"
-                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
                                         <span>
                                             <i class="la la-refresh"></i>
                                             <span>
@@ -254,16 +182,16 @@
                         <tbody>
                             <tr class="text-center">
                                 <td class="m--font-brand m--font-bolder">
-                                    <i class="la la-spinner"></i> In Progress: 50
+                                    <i class="la la-spinner"></i> In Progress: {{ totalInProcess }}
                                 </td>
                                 <td class="m--font-success m--font-bolder">
-                                    <i class="la la-check-circle"></i> Complete: 50
+                                    <i class="la la-check-circle"></i> Complete: {{ totalComplete }}
                                 </td>
                                 <td class="m--font-danger m--font-bolder">
-                                    <i class="la la-clock-o"></i> Over due: 20
+                                    <i class="la la-clock-o"></i> Over due: {{ totalOverdued }}
                                 </td>
                                 <td class="m--font-bolder">
-                                    <i class="la la-ban"></i> Deleted: 02
+                                    <i class="la la-ban"></i> Cancel: {{ totalCanceled }}
                                 </td>
                             </tr>
                         </tbody>
@@ -297,347 +225,216 @@
                                     <thead>
                                         <tr>
                                             <th class="table-actions-col no-sorting"></th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo') }"
+                                                (click)="sort('jobNo')">
                                                 <span>Job ID</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblno'), 'sorting_desc': (!isDesc && sortKey == 'hblno') }"
+                                                (click)="sort('hblno')">
                                                 <span>HBL</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceDate'), 'sorting_desc': (!isDesc && sortKey == 'serviceDate') }"
+                                                (click)="sort('serviceDate')">
                                                 <span>Service Date</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th>
                                                 <span>Service Port</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'curentStageCode'), 'sorting_desc': (!isDesc && sortKey == 'curentStageCode') }"
+                                                (click)="sort('curentStageCode')">
                                                 <span>Stage</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'flightVessel'), 'sorting_desc': (!isDesc && sortKey == 'flightVessel') }"
+                                                (click)="sort('flightVessel')">
                                                 <span>Flight/Vessel</span>
                                             </th>
-                                            <th class=sorting> 
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumContainers'), 'sorting_desc': (!isDesc && sortKey == 'sumContainers') }"
+                                                (click)="sort('sumContainers')"> 
                                                 <span>Cont Q'ty</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumPackages'), 'sorting_desc': (!isDesc && sortKey == 'sumPackages') }"
+                                                (click)="sort('sumPackages')">
                                                 <span>Pack Q'ty</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumGrossWeight'), 'sorting_desc': (!isDesc && sortKey == 'sumGrossWeight') }"
+                                                (click)="sort('sumGrossWeight')">
                                                 <span>G.W</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumCBM'), 'sorting_desc': (!isDesc && sortKey == 'sumCBM') }"
+                                                (click)="sort('sumCBM')">
                                                 <span>CBM</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
+                                                (click)="sort('invoiceNo')">
                                                 <span>Invoice No</span>
                                             </th>
-                                            <th class="sorting">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modifiedDate'), 'sorting_desc': (!isDesc && sortKey == 'modifiedDate') }"
+                                                (click)="sort('modifiedDate')">
                                                 <span>Modified Date</span>
                                             </th>
-                                            <th>
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currentStatus'), 'sorting_desc': (!isDesc && sortKey == 'currentStatus') }"
+                                                (click)="sort('currentStatus')">
                                                 <span>Status</span>
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="tbody-group">
-                                        <!-- begin collapse-toggle-row -->
-                                        <tr class="collapse-toggle-row">
-                                            <td class="table-actions-col">
-                                                <div class="table-actions" style="width: 100px">
-                                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#ops-shipment-001"
-                                                        title="Collapse">
-                                                        <i class="la la-angle-up"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-job-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="javascript:void()" routerLink="/home/operation/job-edit">IDshipA</a>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span class="m-badge m-badge--danger m-badge--wide job-overdue">Overdue</span>
-                                            </td>
-                                        </tr>
-                                        <!-- end of collapse-toggle-row -->
-                                        <!-- begin collapse-panel-row -->
-                                        <tr class="collapse-panel-row">
-                                            <td colspan="14">
-                                                <div class="detail-panel-block collapse" id="ops-shipment-001" data-parent="#ops-job-list-table">
-                                                    <div class="table-inside-block">
-                                                        <table class="table table-secondary dataTable">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="sorting_asc">
-                                                                        <span>Custom No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Transfer Date</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>HBL No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Export Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Import Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Commodity Code</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Q'ty</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Source</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Note</span>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>dd/mm/yyyy</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
+                                    <tbody class="tbody-group" *ngIf="shipments.length > 0; else norecord">
+                                        <ng-container *ngFor="let item of shipments; let i=index">
+                                            
+                                            <!-- begin collapse-toggle-row -->
+                                            <tr class="collapse-toggle-row">
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions" style="width: 100px">
+                                                        <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
+                                                            title="Collapse" (click)="showCustomClearance(item.id)">
+                                                            <i class="la la-angle-up"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit">
+                                                            <i class="la la-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-job-modal">
+                                                            <i class="la la-trash"></i>
+                                                        </button>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!--end of collapse-panel-row -->
-                                        <!-- begin collapse-toggle-row -->
-                                        <tr class="collapse-toggle-row">
-                                            <td class="table-actions-col">
-                                                <div class="table-actions" style="width: 100px">
-                                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#ops-shipment-002"
-                                                        title="Collapse">
-                                                        <i class="la la-angle-up"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Remove" data-toggle="modal" data-target="#confirm-delete-job-modal">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="javascript:void()" routerLink="/home/operation/job-edit">IDshipA</a>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>text</span>
-                                            </td>
-                                            <td>
-                                                <span>dd/mm/yyyy</span>
-                                            </td>
-                                            <td>
-                                                <span class="m-badge m-badge--info m-badge--wide job-processing">Processing</span>
-                                            </td>
-                                        </tr>
-                                        <!-- end of collapse-toggle-row -->
-                                        <!-- begin collapse-panel-row -->
-                                        <tr class="collapse-panel-row">
-                                            <td colspan="14">
-                                                <div class="detail-panel-block collapse" id="ops-shipment-002" data-parent="#ops-job-list-table">
-                                                    <div class="table-inside-block">
-                                                        <table class="table table-secondary dataTable">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="sorting_asc">
-                                                                        <span>Custom No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Transfer Date</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>HBL No</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Export Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Import Country</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Commodity Code</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Q'ty</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Source</span>
-                                                                    </th>
-                                                                    <th class="sorting">
-                                                                        <span>Note</span>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>dd/mm/yyyy</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>text</span>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
+                                                </td>
+                                                <td>
+                                                    <a href="javascript:void()" [routerLink]="['/home/operation/job-edit', { id: item.id }]">{{ item.jobNo }}</a>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.hblno }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.serviceDate | date:'dd MMM yyyy' }}</span>
+                                                </td>
+                                                <td>
+                                                    <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
+                                                    <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.curentStageCode }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.flightVessel }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumContainers }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumPackages }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumGrossWeight }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.sumCBM }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.invoiceNo }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.modifiedDate | date:'dd MMM yyyy' }}</span>
+                                                </td>
+                                                <td>
+                                                    <ng-container *ngIf="item.currentStatus">
+                                                        <span class="m-badge m-badge--danger m-badge--wide job-overdue">{{ item.currentStatus }}</span>
+                                                    </ng-container>
+                                                </td>
+                                            </tr>
+                                            <!-- end of collapse-toggle-row -->
+                                            <!-- begin collapse-panel-row -->
+                                            <tr class="collapse-panel-row">
+                                                <td colspan="14">
+                                                    <div class="detail-panel-block collapse" id="ops-shipment-00{{item.id+1}}" data-parent="#ops-job-list-table">
+                                                        <div class="table-inside-block">
+                                                            <table class="table table-secondary dataTable">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="sorting_asc">
+                                                                            <span>Custom No</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Transfer Date</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>HBL No</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Export Country</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Import Country</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Commodity Code</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Q'ty</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Source</span>
+                                                                        </th>
+                                                                        <th class="sorting">
+                                                                            <span>Note</span>
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody *ngIf="customClearances.length > 0">
+                                                                    <tr *ngFor="let clearance of customClearances; let j=index">
+                                                                        <td>
+                                                                            <span>{{ clearance.clearanceNo }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.clearanceDate | date:'dd MMM yyyy' }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.hblno }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.exportCountryName }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.importcountryName }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.commodityCode }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.contQuantity }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.Source }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{ clearance.note }}</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!--end of collapse-panel-row -->
+                                                </td>
+                                            </tr>
+                                            <!--end of collapse-panel-row -->
+                                        </ng-container>
                                     </tbody>
+                                    <ng-template #norecord>
+                                        <tr>
+                                            <td colspan="14">
+                                                <div class="no-data">
+                                                    <i class="flaticon-coins"></i>
+                                                    <span class="no-data-text">No records found</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
                                 </table>
                             </div>
                             <!--end: Datatable of stage-table-view -->
-                            <!--begin::pagination-->
-                            <div class="pagination-nav">
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="tatable__pager-size" style="max-width: 190px">
-                                            <div class="select-box">
-                                                <select class="form-control m-input m-input--square" id="" aria-label="">
-                                                    <option value="1">15 line/screen</option>
-                                                    <option value="2">30 line/screen</option>
-                                                    <option value="3">50 line/screen</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <nav aria-label="">
-                                            <ul class="pagination justify-content-end">
-                                                <li class="page-item"><a class="page-link" href="javascript:void(0)">First</a></li>
-                                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Back</a></li>
-                                                <li class="page-item active"><a class="page-link" href="javascript:void(0)">1</a></li>
-                                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a></li>
-                                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a></li>
-                                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a></li>
-                                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Last</a></li>
-                                            </ul>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div>
+                            <!--begin::pagination-->            
+                            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                                (pagerObject)="setPage($event)"></app-pagination>
                             <!--end::pagination-->
                         </div>
                     </div>

@@ -11,464 +11,278 @@
 <!--end:: subheader-->
 
 <!--begin:: m-content -->
-<div class="m-content">
-    <!--begin::Form-->
-    <div class="m-form m-form--state">
-        <!--begin::m-portlet -->
-        <div class="m-portlet">
-            <div class="m-portlet__body">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                HBL No <span class="m--font-danger">(*)</span>
-                            </label>
-                            <input type="text" required class="form-control m-input m-input--square"
-                                placeholder="Enter text" name="" autofocus>
-                            <div class="form-control-feedback" style="display: none">
-                                HBL No is required!
+<form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="addOpsForm.form.valid">
+    <div class="m-content">
+        <!--begin::Form-->
+        <div class="m-form m-form--state">
+            <!--begin::m-portlet -->
+            <div class="m-portlet">
+                <div class="m-portlet__body" id="add-new-ops-job-form" *ngIf="isDisplay">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsHbl.invalid}">
+                                <label class="form-control-label" for="">
+                                    HBL No <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" (change)="OpsTransactionToAdd.hblno=OpsTransactionToAdd.hblno.trim()"
+                                    required class="form-control m-input m-input--square"
+                                    [(ngModel)]="OpsTransactionToAdd.hblno" placeholder="Enter text" #opsHbl="ngModel"
+                                    name="opsHbl" autofocus>
+                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && opsHbl.invalid">
+                                    HBL No is required!
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                MBL No
-                            </label>
-                            <input type="text" required class="form-control m-input m-input--square"
-                                placeholder="Enter text" name="">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsMbl.invalid}">
+                                <label class="form-control-label" for="">
+                                    MBL No
+                                </label>
+                                <input [(ngModel)]="OpsTransactionToAdd.mblno" type="text" required
+                                    class="form-control m-input m-input--square" placeholder="Enter text" name="opsMbl"
+                                    #opsMbl="ngModel">
+                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && opsMbl.invalid">
+                                    MBL No is required!
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Service Date <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="m-input-icon m-input-icon--right down">
-                                <input type="text" class="form-control m-input m-input--square" 
-                                    ngxDaterangepickerMd 
-                                    [autoApply]="true" 
-                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selected" 
-                                    [singleDatePicker]="true" 
-                                    name="singledater" readonly/>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Service Date
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [(ngModel)]="OpsTransactionToAdd.serviceDate" [singleDatePicker]="true"
+                                        name="singledater" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
                                     </span>
-                                </span>
-                            </div>
-                            <div class="form-control-feedback" style="display: none">
-                                Service Date is required!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Product Service <span class="m--font-danger">(*)</span>
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                            <div class="form-control-feedback" style="display: none">
-                                Product Service is required!
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Service Mode <span class="m--font-danger">(*)</span>
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                            <div class="form-control-feedback" style="display: none">
-                                Service Mode is required!
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Shipment Mode <span class="m--font-danger">(*)</span>
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                            <div class="form-control-feedback" style="display: none">
-                                Shipment Mode is required!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Customer <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                    type="text" readonly data-toggle="dropdown"
-                                    placeholder="Please select">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square"
-                                                        type="text" placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-xs-2">Partner ID</th>
-                                                            <th class="col-xs-3">Name ABBR</th>
-                                                            <th class="col-xs-5">Name EN</th>
-                                                            <th class="col-xs-2">Tax Code</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <ng-container>
-                                                        <tr class="data-row">
-                                                            <td class="col-xs-2">item.id</td>
-                                                            <td class="col-xs-3">item.shortName</td>
-                                                            <td class="col-xs-5">item.partnerNameEn</td>
-                                                            <td class="col-xs-2">item.taxCode</td>
-                                                        </tr>
-                                                    </ng-container>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-control-feedback" style="display: none">
-                                Customer is required!
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Port of Loading
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" 
-                                    readonly 
-                                    required
-                                    data-toggle="dropdown" 
-                                    value="">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text"
-                                                        placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Port Code</th>
-                                                            <th>Port Name</th>
-                                                            <th>Country</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row">
-                                                        <td>pol.code</td>
-                                                        <td>pol.nameEN</td>
-                                                        <td>pol.countryName</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Port of Discharge
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" 
-                                    type="text" 
-                                    readonly 
-                                    required
-                                    data-toggle="dropdown" 
-                                    placeholder="Please selected"
-                                    value="">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" 
-                                                        type="text" 
-                                                        autocomplete="nope"
-                                                        placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Port Code</th>
-                                                            <th>Port Name</th>
-                                                            <th>Country</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row">
-                                                        <td>pod.code</td>
-                                                        <td>pod.nameEN</td>
-                                                        <td>pod.countryName</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.productService === null}">
+                                <label class="form-control-label" for="">
+                                    Product Service <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select [allowClear]="true" [items]="productServices" (data)="refreshValue($event)"
+                                    (selected)="OpsTransactionToAdd.productService=$event.id"
+                                    (removed)="OpsTransactionToAdd.productService=null" (typed)="typed($event)"
+                                    placeholder="Please Select">
+                                </ng-select>
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.productService === null">
+                                    Product Service is required!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.serviceMode === null}">
+                                <label class="form-control-label" for="">
+                                    Service Mode <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select [allowClear]="true" [items]="serviceModes" (data)="refreshValue($event)"
+                                    (selected)="OpsTransactionToAdd.serviceMode=$event.id"
+                                    (removed)="OpsTransactionToAdd.serviceMode=null" (typed)="typed($event)"
+                                    placeholder="Please Select">
+                                </ng-select>
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.serviceMode ===null">
+                                    Service Mode is required!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null}">
+                                <label class="form-control-label" for="">
+                                    Shipment Mode <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select [allowClear]="true" [items]="shipmentModes" (data)="refreshValue($event)"
+                                    (selected)="OpsTransactionToAdd.shipmentMode=$event.id"
+                                    (removed)="OpsTransactionToAdd.shipmentMode=null" (typed)="typed($event)"
+                                    placeholder="Please Select">
+                                </ng-select>
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null">
+                                    Shipment Mode is required!
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Supplier
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                    type="text" readonly data-toggle="dropdown"
-                                    placeholder="Please select">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square"
-                                                        type="text" placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-xs-2">Partner ID</th>
-                                                            <th class="col-xs-3">Name ABBR</th>
-                                                            <th class="col-xs-5">Name EN</th>
-                                                            <th class="col-xs-2">Tax Code</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <ng-container>
-                                                        <tr class="data-row">
-                                                            <td class="col-xs-2">item.id</td>
-                                                            <td class="col-xs-3">item.shortName</td>
-                                                            <td class="col-xs-5">item.partnerNameEn</td>
-                                                            <td class="col-xs-2">item.taxCode</td>
-                                                        </tr>
-                                                    </ng-container>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.customerId === null}">
+                                <label class="form-control-label" for="">
+                                    Customer <span class="m--font-danger">(*)</span>
+                                </label>
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.customerId}"
+                                    (itemSelected)="OpsTransactionToAdd.customerId = $event.id"
+                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listCustomers"
+                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                </app-combo-grid-virtual-scroll>
+
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.customerId===null">
+                                    Customer is required!
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Vessel/Flight
-                            </label>
-                            <input type="text" required class="form-control m-input m-input--square"
-                                placeholder="Enter text" name="">
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Agent
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                    type="text" readonly data-toggle="dropdown"
-                                    placeholder="Please select">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square"
-                                                        type="text" placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-xs-2">Partner ID</th>
-                                                            <th class="col-xs-3">Name ABBR</th>
-                                                            <th class="col-xs-5">Name EN</th>
-                                                            <th class="col-xs-2">Tax Code</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <ng-container>
-                                                        <tr class="data-row">
-                                                            <td class="col-xs-2">item.id</td>
-                                                            <td class="col-xs-3">item.shortName</td>
-                                                            <td class="col-xs-5">item.partnerNameEn</td>
-                                                            <td class="col-xs-2">item.taxCode</td>
-                                                        </tr>
-                                                    </ng-container>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
+                                <label class="form-control-label" for="">
+                                    Port of Loading
+                                </label>
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.pol}"
+                                    (itemSelected)="OpsTransactionToAdd.pol=$event.id"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
+                                    [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                </app-combo-grid-virtual-scroll>
+
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
+                                    Port of loading is must be different with port of discharge
                                 </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
+                                <label class="form-control-label" for="">
+                                    Port of Discharge
+                                </label>
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.pod}"
+                                    (itemSelected)="OpsTransactionToAdd.pod=$event.id"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
+                                    [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                </app-combo-grid-virtual-scroll>
+
+                                <div class="form-control-feedback"
+                                    *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
+                                    Port of discharge must be different with port of loading
+                                </div>
+
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Purchase Order No
-                            </label>
-                            <input type="text" required class="form-control m-input m-input--square"
-                                placeholder="Enter text" name="">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Supplier
+                                </label>
+
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.supplierId}"
+                                    (itemSelected)="OpsTransactionToAdd.supplierId = $event.id"
+                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listSuppliers"
+                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                </app-combo-grid-virtual-scroll>
+            
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Vessel/Flight
+                                </label>
+                                <input type="text" [(ngModel)]="OpsTransactionToAdd.flightVessel"
+                                    class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="opsVessel">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Agent
+                                </label>
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.agentId}"
+                                    (itemSelected)="OpsTransactionToAdd.agentId = $event.id"
+                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listAgents"
+                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                </app-combo-grid-virtual-scroll>
+
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Billing OPS  <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle"
-                                    type="text" readonly data-toggle="dropdown"
-                                    placeholder="Please select">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square"
-                                                        type="text" placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-xs-4">User Name</th>
-                                                            <th class="col-xs-4">Full Name</th>
-                                                            <th class="col-xs-4">Role</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <ng-container>
-                                                        <tr class="data-row">
-                                                            <td class="col-xs-4">User Name</td>
-                                                            <td class="col-xs-4">Full Name</td>
-                                                            <td class="col-xs-4">CS</td>
-                                                        </tr>
-                                                    </ng-container>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Purchase Order No
+                                </label>
+                                <input type="text" [(ngModel)]="OpsTransactionToAdd.purchaseOrderNo"
+                                    class="form-control m-input m-input--square" placeholder="Enter text"
+                                    name="opsPurchaseNo">
                             </div>
-                            <div class="form-control-feedback" style="display: none">
-                                Billing OPS is required!
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.billingOpsId===null}">
+                                <label class="form-control-label" for="">
+                                    Billing OPS <span class="m--font-danger">(*)</span>
+                                </label>
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.billingOpsId}"
+                                    (itemSelected)="OpsTransactionToAdd.billingOpsId = $event.id"
+                                    [selectedDisplayFields]="['employeeNameEn']" [dataSources]="listBillingOps"
+                                    [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
+                                </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && OpsTransactionToAdd.billingOpsId===null">
+                                    Billing OPS is required!
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <!--end::m-portlet -->
-        <!--begin:: form-actions-->
-        <div class="form-actions m--align-right">
-            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" 
-                routerLink="/home/operation/job-edit">
-                <span>
-                    <i class="la la la-save"></i>
-                    <span> 
-                        save
-                    </span>
-                </span>
-            </button>
-            <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" data-target="#cancel-create-ops-job-modal">  
-                <span>
-                    <i class="la la-ban"></i>
+            <!--end::m-portlet -->
+            <!--begin:: form-actions-->
+
+            <!-- routerLink="/home/operation/job-edit" -->
+            <div class="form-actions m--align-right">
+                <button (click)="submitNewOps(addOpsForm)" type="submit"
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
-                        cancel
+                        <i class="la la la-save"></i>
+                        <span>
+                            save
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    data-toggle="modal" data-target="#cancel-create-ops-job-modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+            <!--end:: form-actions-->
         </div>
-        <!--end:: form-actions-->
+        <!--end::Form-->
     </div>
-    <!--end::Form-->
-</div>
+</form>
+
 <!--end:: m-content-->
 
 <!--begin::cancel-create-ops-job-modal-->
@@ -496,7 +310,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

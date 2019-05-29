@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Documentation.DL.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace eFMS.API.Documentation.DL.Common
@@ -16,6 +17,36 @@ namespace eFMS.API.Documentation.DL.Common
         SeaFCLImport = 7,
         SeaLCLExport = 8,
         SeaLCLImport = 9
+    }
+    public enum JobStatus
+    {
+        [Description("Overdued")]
+        Overdued = 1,
+        [Description("Processing")]
+        Processing = 2,
+        [Description("InSchedule")]
+        InSchedule = 3,
+        [Description("Pending")]
+        Pending = 4,
+        [Description("Finish")]
+        Finish = 5,
+        [Description("Canceled")]
+        Canceled = 6
+    }
+    public enum StageEnum
+    {
+        [Description("InSchedule")]
+        InSchedule = 1,
+        [Description("Processing")]
+        Processing = 2,
+        [Description("Done")]
+        Done = 3,
+        [Description("Overdue")]
+        Overdue = 4,
+        [Description("Pending")]
+        Pending = 5,
+        [Description("Deleted")]
+        Deleted = 6
     }
     public static class TermData
     {
@@ -63,6 +94,24 @@ namespace eFMS.API.Documentation.DL.Common
             new TypeOfMove { Value = "LCL/FCL-CFS/CY", DisplayName = "LCL/FCL-CFS/CY" },
             new TypeOfMove { Value = "FCL/LCL-CY/CFS", DisplayName = "FCL/LCL-CY/CFS" }
         };
-        
+        public static readonly List<ProductService> ProductServices = new List<ProductService>
+        {
+            new ProductService { Value = "SeaFCL", DisplayName = "Sea FCL" },
+            new ProductService { Value = "SeaLCL", DisplayName = "Sea LCL" },
+            new ProductService { Value = "Air", DisplayName = "Air" },
+            new ProductService { Value = "Trucking", DisplayName = "Trucking" },
+            new ProductService { Value = "Warehouse", DisplayName = "Warehouse" },
+            new ProductService { Value = "Other", DisplayName = "Other" }
+        };
+        public static readonly List<ServiceMode> ServiceModes = new List<ServiceMode>
+        {
+            new ServiceMode { Value = "Export", DisplayName = "Export" },
+            new ServiceMode { Value = "Import", DisplayName = "Import" }
+        };
+        public static readonly List<ShipmentMode> ShipmentModes = new List<ShipmentMode>
+        {
+            new ShipmentMode { Value = "Internal", DisplayName = "Internal" },
+            new ShipmentMode { Value = "External", DisplayName = "External" }
+        };
     }
 }

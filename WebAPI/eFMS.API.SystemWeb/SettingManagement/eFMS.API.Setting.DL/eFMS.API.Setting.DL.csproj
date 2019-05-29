@@ -38,7 +38,7 @@
 
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
-      <HintPath>..\..\..\..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+      <HintPath>..\..\..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Setting.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Setting.Service.dll</HintPath>
@@ -58,7 +58,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
     <Folder Include="Models\Views\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>

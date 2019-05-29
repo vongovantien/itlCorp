@@ -49,6 +49,10 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CsShippingInstruction> CsShippingInstruction { get; set; }
         public virtual DbSet<CsTransaction> CsTransaction { get; set; }
         public virtual DbSet<CsTransactionDetail> CsTransactionDetail { get; set; }
+        public virtual DbSet<CustomsDeclaration> CustomsDeclaration { get; set; }
+        public virtual DbSet<OpsStageAssigned> OpsStageAssigned { get; set; }
+        public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
+        public virtual DbSet<SetEcusconnection> SetEcusconnection { get; set; }
         public virtual DbSet<SysAuthorization> SysAuthorization { get; set; }
         public virtual DbSet<SysAuthorizationDetail> SysAuthorizationDetail { get; set; }
         public virtual DbSet<SysBu> SysBu { get; set; }
@@ -78,7 +82,11 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;",
+                    options =>
+                    {
+                        options.UseRowNumberForPaging();
+                    });
             }
         }
 
@@ -1435,6 +1443,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2222,6 +2231,269 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ShippingMark).HasMaxLength(4000);
 
                 entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+            });
+
+            modelBuilder.Entity<CustomsDeclaration>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Cbm)
+                    .HasColumnName("CBM")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.ChargeWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.ClearanceDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.ClearanceNo)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CommodityId).HasColumnName("CommodityID");
+
+                entity.Property(e => e.CustomerId)
+                    .HasColumnName("CustomerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DocumentType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ExportCountryId).HasColumnName("ExportCountryID");
+
+                entity.Property(e => e.Gateway)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.ImportcountryId).HasColumnName("ImportcountryID");
+
+                entity.Property(e => e.Mblid).HasColumnName("MBLID");
+
+                entity.Property(e => e.Pcs)
+                    .HasColumnName("PCS")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Route)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Source).HasMaxLength(200);
+
+                entity.Property(e => e.Type).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<OpsStageAssigned>(entity =>
+            {
+                entity.ToTable("opsStageAssigned");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Comment).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Deadline).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Description).HasMaxLength(200);
+
+                entity.Property(e => e.IsCurrentStage).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.MainPersonInCharge)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.ProcessTime).HasColumnType("decimal(18, 3)");
+
+                entity.Property(e => e.RealPersonInCharge)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StageId).HasColumnName("StageID");
+
+                entity.Property(e => e.Status).HasMaxLength(10);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<OpsTransaction>(entity =>
+            {
+                entity.ToTable("opsTransaction");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AgentId)
+                    .HasColumnName("AgentID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingOpsId)
+                    .HasColumnName("BillingOpsID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.CustomerId)
+                    .HasColumnName("CustomerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FieldOpsId)
+                    .HasColumnName("FieldOpsID")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.FinishDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.FlightVessel).HasMaxLength(200);
+
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNO")
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InvoiceNo).HasMaxLength(200);
+
+                entity.Property(e => e.JobNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Mblno)
+                    .HasColumnName("MBLNO")
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Pod).HasColumnName("POD");
+
+                entity.Property(e => e.Pol).HasColumnName("POL");
+
+                entity.Property(e => e.ProductService)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PurchaseOrderNo)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.ServiceMode)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShipmentMode)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SumCbm)
+                    .HasColumnName("SumCBM")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SumChargeWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SumGrossWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SumNetWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SupplierId)
+                    .HasColumnName("SupplierID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
+            });
+
+            modelBuilder.Entity<SetEcusconnection>(entity =>
+            {
+                entity.ToTable("setECUSConnection");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.Dbname)
+                    .IsRequired()
+                    .HasColumnName("DBName")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Dbpassword)
+                    .IsRequired()
+                    .HasColumnName("DBPassword")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Dbusername)
+                    .IsRequired()
+                    .HasColumnName("DBUsername")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.InactiveOn).HasMaxLength(10);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Note).HasMaxLength(10);
+
+                entity.Property(e => e.ServerName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 

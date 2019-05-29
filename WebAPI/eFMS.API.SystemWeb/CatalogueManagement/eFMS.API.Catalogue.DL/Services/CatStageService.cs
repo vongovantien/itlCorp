@@ -12,8 +12,8 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Common.Globals;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
-using ITL.NetCore.Connection.NoSql;
 using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -36,9 +36,9 @@ namespace eFMS.API.Catalogue.DL.Services
             return DataContext.Delete(x => x.Id == id);
         }
 
-        public List<Object> GetStages(CatStageCriteria criteria, int page, int size, out int rowsCount)
+        public List<CatStageModel> GetStages(CatStageCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<Object> returnList = new List<Object>();
+            List<CatStageModel> returnList = new List<CatStageModel>();
             var result = new List<CatStage>();
             var departmentList = new List<CatDepartment>();
             if (criteria.condition == SearchCondition.AND)
@@ -76,8 +76,11 @@ namespace eFMS.API.Catalogue.DL.Services
             foreach(var stage in result)
             {
                 var department = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => x.Id == stage.DepartmentId).FirstOrDefault();
-                var returnStage = new { stage, department?.DeptName,department?.Code };
-                returnList.Add(returnStage);               
+                //var returnStage = new { stage, department?.DeptName,department?.Code };
+                CatStageModel item = mapper.Map<CatStageModel>(stage);
+                item.DeptName = department?.DeptName;
+                item.DeptCode = department?.Code;
+                returnList.Add(item);               
             }
 
             if (size > 1)
@@ -93,10 +96,10 @@ namespace eFMS.API.Catalogue.DL.Services
         }
        
 
-        public List<object> Query(CatStageCriteria criteria)
+        public List<CatStageModel> Query(CatStageCriteria criteria)
         {
 
-            List<Object> returnList = new List<Object>();
+            List<CatStageModel> returnList = new List<CatStageModel>();
             var result = new List<CatStage>();
             var departmentList = new List<CatDepartment>();
             if (criteria.condition == SearchCondition.AND)
@@ -129,8 +132,11 @@ namespace eFMS.API.Catalogue.DL.Services
             foreach (var stage in result)
             {
                 var department = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => x.Id == stage.DepartmentId).FirstOrDefault();
-                var returnStage = new { stage, department?.DeptName, department?.Code };
-                returnList.Add(returnStage);
+                //var returnStage = new { stage, department?.DeptName, department?.Code };
+                var item = mapper.Map<CatStageModel>(stage);
+                item.DeptName = department?.DeptName;
+                item.DeptCode = department?.Code;
+                returnList.Add(item);
             }
 
             return returnList;

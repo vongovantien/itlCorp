@@ -7,10 +7,11 @@ using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using ITL.NetCore.Connection.NoSql;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using System;
@@ -24,10 +25,12 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
-        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
+            currentUser = user;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -41,6 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeCreated = DateTime.Now;
             entity.DatetimeModified = DateTime.Now;
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
             entity.Inactive = false;
             var hs = DataContext.Add(entity);
             if (hs.Success)
@@ -51,6 +55,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(string id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
@@ -68,6 +73,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
             if (entity.Inactive == true)
             {
                 entity.InactiveOn = DateTime.Now;
@@ -99,7 +105,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach (var item in data)
                 {
                     var partner = mapper.Map<CatPartner>(item);
-                    partner.UserCreated = ChangeTrackerHelper.currentUser;
+                    partner.UserCreated = currentUser.UserID;
+                    partner.UserModified = currentUser.UserID;
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
                     partner.Inactive = false;
@@ -179,7 +186,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        private IQueryable<CatPartner> GetPartners()
+        public IQueryable<CatPartner> GetPartners()
         {
             var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
             IQueryable<CatPartner> data = null;
@@ -195,7 +202,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
-            string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
+            string partnerGroup = criteria != null? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup): null;
             var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
                          join user in ((eFMSDataContext)DataContext.DC).SysUser on partner.UserCreated equals user.Id into userPartners

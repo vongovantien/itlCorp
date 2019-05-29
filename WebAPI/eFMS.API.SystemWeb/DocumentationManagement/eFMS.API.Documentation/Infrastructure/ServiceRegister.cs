@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using eFMS.API.Shipment.Infrastructure.Filters;
+using eFMS.API.Common;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -42,6 +43,8 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<IAcctSOAServices, AcctSOAServices>();
             services.AddTransient<ICsManifestService, CsManifestService>();
             services.AddTransient<ICsShippingInstructionService, CsShippingInstructionService>();
+            services.AddTransient<IOpsTransactionService, OpsTransactionService>();
+            services.AddTransient<ICustomsDeclarationService, CustomsDeclarationService>();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {
@@ -120,5 +123,53 @@ namespace eFMS.API.Shipment.Infrastructure
                 });
             return services;
         }
+        public static IServiceCollection AddConfigureSetting(this IServiceCollection service, IConfiguration configuration)
+        {
+            service.Configure<Settings>(options =>
+            {
+                options.MongoConnection
+                    = configuration.GetSection("ConnectionStrings:MongoConnection").Value;
+                options.MongoDatabase
+                    = configuration.GetSection("ConnectionStrings:Database").Value;
+                options.RedisConnection
+                    = configuration.GetSection("ConnectionStrings:Redis").Value;
+                options.eFMSConnection
+                    = configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
+            });
+            return service;
+        }
+        public static IServiceCollection AddCrossOrigin(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder
+                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+            });
+            return services;
+        }
+        //public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)
+        //{
+        //    services.AddHttpClient<ICatStageApiService, CatStageApiService>()
+        //            .AddTypedClient<ICatPlaceApiService, CatPlaceApiService>()
+        //            .AddTypedClient<ICatPartnerApiService, CatPartnerApiService>()
+        //           .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+
+        //    return services;
+        //}
+        //public static IServiceCollection AddSystemManagementApiServices(this IServiceCollection services)
+        //{
+        //    services.AddHttpClient<ISysUserApiService, SysUserApiService>()
+        //           .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+
+        //    return services;
+        //}
     }
 }

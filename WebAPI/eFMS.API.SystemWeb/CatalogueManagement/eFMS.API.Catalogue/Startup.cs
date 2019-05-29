@@ -51,19 +51,7 @@ namespace eFMS.API.Catalogue
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services);
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder
-                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-                            .AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials();
-                    });
-            });
+            services.AddCrossOrigin();
             services.AddApiVersioning(config =>
             {
                 config.ReportApiVersions = true;
@@ -74,20 +62,8 @@ namespace eFMS.API.Catalogue
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
-            services.AddSwagger(Configuration);
-            services.Configure<Settings>(options =>
-            {
-                options.MongoConnection
-                    = Configuration.GetSection("ConnectionStrings:MongoConnection").Value;
-                options.MongoDatabase
-                    = Configuration.GetSection("ConnectionStrings:Database").Value;
-                options.RedisConnection
-                    = Configuration.GetSection("ConnectionStrings:Redis").Value;
-                options.eFMSConnection
-                    = Configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
-            });
-            //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
-            //DbHelper.DbHelper.MongoDBConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "mongoDB");
+            services.AddSwagger();
+            services.AddConfigureSetting(Configuration);
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

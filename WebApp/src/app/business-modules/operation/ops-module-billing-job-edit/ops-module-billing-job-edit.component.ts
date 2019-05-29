@@ -1,5 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import * as shipmentHelper from 'src/helper/shipment.helper';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import * as dataHelper from 'src/helper/data.helper';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -7,16 +15,113 @@ import moment from 'moment/moment';
     styleUrls: ['./ops-module-billing-job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent implements OnInit {
+    opsTransaction: OpsTransaction = new OpsTransaction();
+    productServices: any[] = [];
+    serviceModes: any[] = [];
+    shipmentModes: any[] = [];
+    customers: any[] = [];
+    ports: any[] = [];
+    suppliers: any[] = [];
+    agents: any[] = [];
+    billingOps: any[] = [];
 
-    constructor() { 
+    isDisplay: boolean = true;
+    lstBuyingRateChargesComboBox: any[] = [];
+    lstSellingRateChargesComboBox: any[] = [];
+    lstOBHChargesComboBox: any[] = [];
+
+    BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+    SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+    OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
+
+
+    BuyingRateChargeToEdit: any = null;
+    SellingRateChargeToEdit: any = null
+    OBHChargeToEdit: any = null;
+
+    constructor(private baseServices: BaseService,
+        private api_menu: API_MENU,
+        private route: ActivatedRoute) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-
-    ngOnInit() {
+    async ngOnInit() {
+        await this.route.params.subscribe(async prams => {
+            if (prams.id != undefined) {
+                await this.getShipmentDetails(prams.id);
+            }
+        });
+        await this.getShipmentCommonData();
+        this.getCustomers();
+        this.getPorts();
+        this.getSuppliers();
+        this.getAgents();
+        this.getBillingOps();
+        this.getListBuyingRateCharges();
+        this.getListSellingRateCharges();
+        this.getListOBHCharges();
+    }
+    async getShipmentDetails(id: any) {
+        this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
+        console.log(this.opsTransaction)
+    }
+    async getShipmentCommonData() {
+        const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
+        this.productServices = dataHelper.prepareNg2SelectData(data.productServices, 'value', 'displayName');
+        this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
+        this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
+    }
+    private getPorts() {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { inactive: false }).subscribe((res: any) => {
+            this.ports = res;
+            console.log(this.ports)
+        });
     }
 
+    private getCustomers() {
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null }).subscribe((res: any) => {
+            this.customers = res;
+        });
+    }
+    private getSuppliers() {
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null }).subscribe((res: any) => {
+            this.suppliers = res;
+        });
+    }
+    private getAgents() {
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null }).subscribe((res: any) => {
+            this.agents = res;
+        });
+    }
+    private getBillingOps() {
+        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
+            this.billingOps = res;
+        });
+    }
+
+    private getListBuyingRateCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF' }).subscribe(res => {
+            this.lstBuyingRateChargesComboBox = res['data'];
+        });
+
+    }
+
+    getListSellingRateCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF'}).subscribe(res => {
+          this.lstSellingRateChargesComboBox = res['data'];
+        });
+      }
+    
+      getListOBHCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF'}).subscribe(res => {
+          this.lstOBHChargesComboBox = res['data'];
+        });
+      }
+
+      calculateTotalEachBuying(){
+          
+      }
     /**
        * Daterange picker
        */
@@ -46,7 +151,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
         'option 5', 'option 6', 'option 7'];
 
-        
+
     packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
     packagesUnitActive = ['PKG'];
 

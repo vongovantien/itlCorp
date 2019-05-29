@@ -49,27 +49,10 @@ namespace SystemManagementAPI
             services.AddAutoMapper();
             services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.Configure<Settings>(options =>
-            {
-                options.MongoConnection
-                    = Configuration.GetSection("MongoConnection:ConnectionString").Value;
-                options.MongoDatabase
-                    = Configuration.GetSection("MongoConnection:Database").Value;
-            });
+            services.AddConfigureSetting(Configuration);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             ServiceRegister.Register(services);
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder
-                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-                            .AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    });
-            });
+            services.AddCrossOrigin();
             // configure jwt authentication
            
 
@@ -81,7 +64,9 @@ namespace SystemManagementAPI
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
-
+            //services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
+            //services.AddOptions()
+            //    .AddCatelogueManagementApiServices();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);

@@ -11,9 +11,9 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection.NoSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -105,6 +105,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult DeleteStage(int id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catStageService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

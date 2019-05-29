@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
-      <HintPath>..\..\..\eFMS.API.Common\obj\Debug\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+      <HintPath>..\..\..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Documentation.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.DL.dll</HintPath>
