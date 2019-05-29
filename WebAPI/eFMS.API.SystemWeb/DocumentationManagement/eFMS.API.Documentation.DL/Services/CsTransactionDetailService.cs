@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
-using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.API.Shipment.Service.Helpers;
+//using eFMS.API.Shipment.Service.Helpers;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using eFMS.API.Documentation.Service.Contexts;
+using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -30,18 +31,20 @@ namespace eFMS.API.Documentation.DL.Services
             detail.Inactive = false;           
             try
             {
-                DataContext.Add(detail);
-
-                foreach (var x in model.CsMawbcontainers)
+                var hs = DataContext.Add(detail, false);
+                if(hs.Success == true)
                 {
-                    x.Hblid = detail.Id;
-                    x.Mblid = Guid.Empty;
-                    x.Id = Guid.NewGuid();
-                    ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(x);
+                    foreach (var x in model.CsMawbcontainers)
+                    {
+                        var cont = mapper.Map<CsMawbcontainer>(x);
+                        cont.Hblid = detail.Id;
+                        cont.Mblid = Guid.Empty;
+                        cont.Id = Guid.NewGuid();
+                        ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
 
-                 }
+                    }
+                }
                  ((eFMSDataContext)DataContext.DC).SaveChanges();
-                var hs = new HandleState();
                 return hs;
 
             }

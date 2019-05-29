@@ -49,7 +49,6 @@ export class LocationImportComponent implements OnInit {
     });
   }
   chooseFile(file: Event){
-    if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
     this.progressBar.start();
     let url = '';
@@ -140,7 +139,6 @@ export class LocationImportComponent implements OnInit {
     }
     else{
       let data = this.data.filter(x => x.isValid);
-      if(!this.baseService.checkLoginSession()) return;
       let url = '';
     if(this.type == 'province'){
       url = this.api_menu.Catalogue.CatPlace.import + "?type=" + PlaceTypeEnum.Province;

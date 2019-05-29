@@ -4,9 +4,11 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
-using eFMS.API.Catalogue.Service.Helpers;
+using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -23,10 +25,12 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
-        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
+            currentUser = user;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -39,6 +43,8 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeCreated = DateTime.Now;
+            entity.DatetimeModified = DateTime.Now;
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
             entity.Inactive = false;
             var hs = DataContext.Add(entity);
             if (hs.Success)
@@ -49,6 +55,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(string id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
@@ -66,7 +73,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
-            entity.Inactive = false;
+            entity.UserModified = currentUser.UserID;
             if (entity.Inactive == true)
             {
                 entity.InactiveOn = DateTime.Now;
@@ -98,7 +105,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach (var item in data)
                 {
                     var partner = mapper.Map<CatPartner>(item);
-                    partner.UserCreated = ChangeTrackerHelper.currentUser;
+                    partner.UserCreated = currentUser.UserID;
+                    partner.UserModified = currentUser.UserID;
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
                     partner.Inactive = false;
@@ -123,10 +131,16 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
+        public List<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CatPartnerViewModel> results = null;
             var list = Query(criteria);
+            if (list == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
+            list = list.OrderByDescending(x => x.DatetimeModified).ToList();
             rowsCount = list.ToList().Count;
             if (size > 1)
             {
@@ -136,12 +150,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 results = list.Skip((page - 1) * size).Take(size).ToList();
             }
-            return results.AsQueryable();
+            return results;
         }
 
         public List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = Query(criteria).GroupBy(x => x.SalePersonId);
+            List<CustomerPartnerViewModel> results = null;
+            var data = Query(criteria)?.GroupBy(x => x.SalePersonId);
+            if(data == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
             rowsCount = data.ToList().Count;
             if (size > 1)
             {
@@ -151,7 +171,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 data = data.Skip((page - 1) * size).Take(size);
             }
-            List<CustomerPartnerViewModel> results = new List<CustomerPartnerViewModel>();
+            results = new List<CustomerPartnerViewModel>();
             foreach (var item in data)
             {
                 var partner = new CustomerPartnerViewModel
@@ -166,7 +186,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        private IQueryable<CatPartner> GetPartners()
+        public IQueryable<CatPartner> GetPartners()
         {
             var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
             IQueryable<CatPartner> data = null;
@@ -178,11 +198,11 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 data = DataContext.Get();
             }
-            return data;
+            return data?.OrderByDescending(x => x.DatetimeModified);
         }
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
-            string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
+            string partnerGroup = criteria != null? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup): null;
             var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
                          join user in ((eFMSDataContext)DataContext.DC).SysUser on partner.UserCreated equals user.Id into userPartners

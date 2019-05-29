@@ -2,7 +2,7 @@
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
-            <!-- <app-breadcrumb></app-breadcrumb> -->
+                <app-breadcrumb></app-breadcrumb>
         </div>
     </div>
 </div>
@@ -63,7 +63,7 @@
                                 <label class="form-control-label">
                                     Unit <span class="m--font-danger">(*)</span>
                                 </label>
-                                <ng-select [allowClear]="true" [items]="ngDataUnit" [disabled]="disabled" (data)="refreshValue($event)" [active]="activeUnit"
+                                <ng-select [allowClear]="true" [items]="ngDataUnit" (data)="refreshValue($event)" [active]="activeUnit"
                                     (selected)="selected($event,'unit')" (removed)="removed($event,'unit')" placeholder="Select Unit">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="updateChargeForm.submitted && Charge.charge.unitId==null">
@@ -88,7 +88,7 @@
                                 <label class="form-control-label">
                                     Currency <span class="m--font-danger">(*)</span>
                                 </label>
-                                <ng-select [allowClear]="true" [items]="ngDataCurrency" [disabled]="disabled" (data)="refreshValue($event)" [active]="activeCurrency"
+                                <ng-select [allowClear]="true" [items]="ngDataCurrency" (data)="refreshValue($event)" [active]="activeCurrency"
                                     (selected)="selected($event,'currency')" (removed)="removed($event,'currency')"
                                     placeholder="Select Currency">
                                 </ng-select>
@@ -116,7 +116,7 @@
                                 <label class="form-control-label">
                                     Type <span class="m--font-danger">(*)</span>
                                 </label>
-                                <ng-select [allowClear]="true" [items]="ngDataType" [disabled]="disabled" (data)="refreshValue($event)" [active]="activeType"
+                                <ng-select [allowClear]="true" [items]="ngDataType" (data)="refreshValue($event)" [active]="activeType"
                                     (selected)="selected($event,'type')" (removed)="removed($event,'type')" placeholder="Select Type">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="updateChargeForm.submitted && Charge.charge.type==null">
@@ -129,7 +129,7 @@
                                 <label class="form-control-label">
                                     Service <span class="m--font-danger">(*)</span>
                                 </label>
-                                <ng-select [multiple]="true" [items]="ngDataService" [disabled]="disabled" (data)="refreshValue($event)" [active]="activeServices"
+                                <ng-select [multiple]="true" [items]="ngDataService" (data)="refreshValue($event)" [active]="activeServices"
                                     (selected)="selected($event,'service')" (removed)="removed($event,'service')"
                                     placeholder="Select Services">
                                 </ng-select>
@@ -220,7 +220,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <ng-select [allowClear]="true" [items]="ngDataTypeChargeDefault" [disabled]="disabled" [active]="getActiveVoucherType(index)"
+                                        <ng-select [allowClear]="true" [items]="ngDataTypeChargeDefault" [active]="getActiveVoucherType(index)"
                                             (data)="refreshValue($event)" (selected)="selectedTypeDefault($event,index)"
                                             (removed)="removedTypeDefault($event,index)"   
                                             placeholder="Select Type">

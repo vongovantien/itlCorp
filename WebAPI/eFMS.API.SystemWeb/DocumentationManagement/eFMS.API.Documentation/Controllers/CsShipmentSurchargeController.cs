@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
-using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
@@ -64,11 +61,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult AddNew(CsShipmentSurchargeModel model)
         {
-            model.Id = Guid.NewGuid();
-            model.ExchangeDate = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
             model.UserCreated = currentUser.UserID;
-            model.DatetimeCreated = DateTime.Now;
             var hs = csShipmentSurchargeService.Add(model);           
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

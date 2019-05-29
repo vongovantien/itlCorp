@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
@@ -11,10 +9,10 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -34,16 +32,13 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeService catChargeService;
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
 
-        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, ICatChargeDefaultAccountService catChargeDefaultAccount, IMapper imapper, ICurrentUser user)
+        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, ICatChargeDefaultAccountService catChargeDefaultAccount, IMapper imapper)
         {
             stringLocalizer = localizer;
             catChargeService = service;
             catChargeDefaultAccountService = catChargeDefaultAccount;
             mapper = imapper;
-            currentUser = user;
         }
 
         [HttpPost]
@@ -85,7 +80,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Add(CatChargeAddOrUpdateModel model)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
@@ -107,7 +101,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Update(CatChargeAddOrUpdateModel model)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model.Charge.Id, model);
             if (checkExistMessage.Length > 0)
@@ -129,7 +122,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catChargeService.DeleteCharge(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -244,7 +236,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatChargeImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catChargeService.Import(data);
             if (result.Success)
             {
@@ -263,7 +254,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                templateName = "Charge" + templateName;
+                string templateName = "Charge" + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

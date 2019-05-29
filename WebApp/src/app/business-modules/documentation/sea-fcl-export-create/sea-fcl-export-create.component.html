@@ -116,7 +116,7 @@
         </div>
         <div class="tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="masterbill-tabview-tab">
-                <ng-container *ngIf="shipment && isShipment">
+                <ng-container *ngIf="shipment && isShipment && isLoaded">
 
                     <app-master-bill  (shipmentDetails)="shipmentDetailCatcher($event)" [shipment]="shipment"
                         [isImport]="isImport" [formAddEdit]="myForm" [submitted]="submitted"></app-master-bill>
@@ -372,46 +372,46 @@
     </div>
     <!--end::confirm-create-job-modal-->
 
-<!--begin::confirm-duplicate-job-modal-->
-<div class="modal fade" id="confirm-duplicate-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-aria-hidden="true">
-<div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Duplicate Job Detail</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="confirm-text-block">
-                <span>The system will open the Job Create Screen. Are you sure you want to leave?</span>
+    <!--begin::confirm-duplicate-job-modal-->
+    <div class="modal fade" id="confirm-duplicate-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Duplicate Job Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>The system will open the Job Create Screen. Are you sure you want to leave?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="duplicateJob()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    >
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
             </div>
         </div>
-        <div class="modal-footer m--align-center c-button-actions">
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                data-dismiss="modal" (click)="duplicateJob()">
-                <span>
-                    <i class="la la-save"></i>
-                    <span>
-                        Yes
-                    </span>
-                </span>
-            </button>
-            <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
-                >
-                <span>
-                    <i class="la la-ban"></i>
-                    <span>
-                        No
-                    </span>
-                </span>
-            </button>
-        </div>
     </div>
-</div>
-</div>
-<!--end::confirm-duplicate-job-modal-->
+    </div>
+    <!--end::confirm-duplicate-job-modal-->
 
     <!--begin::confirm-can-not-create-job-modal-->
     <div class="modal fade" id="confirm-can-not-create-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -648,7 +648,7 @@ aria-hidden="true">
                                                 <div class="control-editable"
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
                                                     <ng-select [allowClear]="true" [items]="containerTypes" *ngIf="visible" #containerSelect id="containerSelect"
-                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (data)="refreshValue($event)"
                                                         (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
                                                         (removed)="container.containerTypeId = null;container.containerTypeName = null"
                                                         (typed)="typed($event)" [active]="container.containerTypeActive"
@@ -717,57 +717,14 @@ aria-hidden="true">
                                                     Commodity
                                                 </span> -->
                                                 <div class="control-editable">
-                                                    <div class="dropdown e--combogrid" #selectedCommodity>
-                                                        <input
-                                                            class="form-control m-input m-input--square dropdown-toggle"
-                                                            type="text" readonly data-toggle="dropdown"
-                                                            placeholder="Please selected"
-                                                            [value]="selectedCommodity.value == null?'Please selected a commodity':selectedCommodity.value"
-                                                            [(ngModel)]="container.commodityName"
-                                                            name="selectedCommodityValue">
-                                                        <div
-                                                            class="dropdown-menu  dropdown-menu-right e--combogrid-content">
-                                                            <div class="tabel-wrapper table-fixed">
-                                                                <div class="table-head-fixed">
-                                                                    <div class="table-filter-block">
-                                                                        <div class="search-field">
-                                                                            <input
-                                                                                class="form-control m-input m-input--square"
-                                                                                type="text" placeholder="Search..." (keyup)="changeComodity($event.target.value)">
-                                                                            <i class="icon-search"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="table-header">
-                                                                        <table class="table table-hover">
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th>Name EN</th>
-                                                                                    <th>Name VN</th>
-                                                                                    <th>Group</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="table-body-scroll">
-                                                                    <table class="table table-hover">
-                                                                        <tbody *ngIf="commodities">
-                                                                            <tr class="data-row "
-                                                                                *ngFor="let commodity of commodities; let i= index"
-                                                                                data-id="{{(i+1)}}"
-                                                                                (click)="container.commodityId=commodity.id; container.commodityName = commodity.commodityNameEn; selectedCommodity.value= commodity.commodityNameEn"
-                                                                                [class.data-selected]="container.commodityId !==null && container.commodityId===commodity.id">
-                                                                                <td>{{ commodity.commodityNameEn }}</td>
-                                                                                <td>{{ commodity.commodityNameVn }}</td>
-                                                                                <td>{{ commodity.commonityGroupNameEn }}
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                    
+                                                    <app-combo-grid-virtual-scroll 
+                                                        [currentActiveItemId]="{field:'id',value:container.commodityId}"
+                                                        (itemSelected)="container.commodityId=$event.id;container.commodityName=$event.commodityNameEn"
+                                                        [selectedDisplayFields]="['commodityNameEn']"
+                                                        [dataSources]="commodities" 
+                                                        [displayFields]="[{'field':'commodityNameEn','label':'Name EN'},{'field':'commodityNameVn','label':'Name VN'},{'field':'commodityGroupNameEn','label':'Group'}]">
+                                                        </app-combo-grid-virtual-scroll>
                                                 </div>
                                             </td>
                                             <td class="">
@@ -776,7 +733,7 @@ aria-hidden="true">
                                                 </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="packageTypes"
-                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (data)="refreshValue($event)"
                                                         (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
                                                         (removed)="container.packageTypeId = null; container.packageTypeName = null"
                                                         (typed)="typed($event)" [active]="container.packageTypeActive"

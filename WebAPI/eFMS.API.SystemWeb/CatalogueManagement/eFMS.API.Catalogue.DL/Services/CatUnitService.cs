@@ -4,6 +4,8 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -18,9 +20,11 @@ namespace eFMS.API.Catalogue.DL.Services
     public class CatUnitService:RepositoryBase<CatUnit,CatUnitModel>,ICatUnitService
     {
         private readonly IDistributedCache cache;
-        public CatUnitService(IContextBase<CatUnit> repository,IMapper mapper, IDistributedCache distributedCache) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public CatUnitService(IContextBase<CatUnit> repository,IMapper mapper, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
             cache = distributedCache;
+            currentUser = user;
             SetChildren<CatCharge>("Id", "UnitId"); 
             SetChildren<CsMawbcontainer>("Id", "ContainerTypeId");
             SetChildren<CsMawbcontainer>("Id", "UnitOfMeasureId");
@@ -31,7 +35,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
             model.Inactive = false;
-            var hs = DataContext.Add(model);
+            model.UserCreated = model.UserModified = currentUser.UserID;
+            var entitty = mapper.Map<CatUnit>(model);
+            var hs = DataContext.Add(entitty);
             if (hs.Success)
             {
                 RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
@@ -42,6 +48,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var entity = mapper.Map<CatUnit>(model);
             entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
             if(entity.Inactive == true)
             {
                 entity.InactiveOn = DateTime.Now;
@@ -56,6 +63,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(short id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
@@ -89,7 +97,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatUnit> Query(CatUnitCriteria criteria)
         {
-            cache.Remove(Templates.CatUnit.NameCaching.ListName);
             IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
             IQueryable<CatUnit> list = null;
             if (criteria.All == null)

@@ -10,10 +10,10 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
         public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -63,10 +62,9 @@ namespace eFMS.API.Catalogue.Controllers
             }
 
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
-            catChargeDefaultAccount.UserCreated = currentUser.UserID;
+            catChargeDefaultAccount.UserCreated = catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeCreated = DateTime.Now;
             catChargeDefaultAccount.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeDefaultAccountService.Add(catChargeDefaultAccount);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -92,7 +90,6 @@ namespace eFMS.API.Catalogue.Controllers
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
             catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeModified = DateTime.Now;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeDefaultAccountService.Update(catChargeDefaultAccount,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -208,7 +205,6 @@ namespace eFMS.API.Catalogue.Controllers
         //[Authorize]
         public IActionResult Import([FromBody] List<CatChargeDefaultAccountImportModel> data)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catChargeDefaultAccountService.Import(data);
             if (result.Success)
             {
@@ -225,7 +221,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                templateName = "VoucherTypeAccount" + templateName;
+                string templateName = "VoucherTypeAccount" + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

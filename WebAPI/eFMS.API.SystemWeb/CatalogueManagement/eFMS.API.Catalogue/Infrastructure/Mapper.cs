@@ -14,6 +14,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             //CreateMap<SysUserGroup, SysUserGroupModel>();
             //CreateMap<SysUserGroupModel, SysUserGroup>();
             CreateMap<CatPlace, CatPlaceModel>();
+            CreateMap<CatStage, CatStageModel>();
             CreateMap<CatPartnerGroup, CatPartnerGroupModel>();
             CreateMap<CatPlaceEditModel, CatPlaceModel>();
             CreateMap<CatCommodityGroupEditModel, CatCommodityGroupModel>();
@@ -21,6 +22,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatPartnerEditModel, CatPartnerModel>();
             CreateMap<CatPartner, CatPartnerViewModel>();
             CreateMap<CatPlace, CatPlaceViewModel>();
+            CreateMap<CatCommodity, CatCommodityModel>();
 
             CreateMap<CatCurrencyModel, CatCurrency>();
             CreateMap<CatCommodityGroupModel, CatCommodityGroup>();
@@ -29,6 +31,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatCommodityModel, CatCommodity>();
             CreateMap<CatPlaceModel, CatPlace>();
             CreateMap<CatPartnerImportModel, CatPartner>();
+            CreateMap<CatStageModel, CatStage>();
+            CreateMap<CatPartnerModel, CatPartner>();
         }
     }
 }

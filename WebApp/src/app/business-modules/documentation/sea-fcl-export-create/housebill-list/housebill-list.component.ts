@@ -12,6 +12,7 @@ import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import moment from 'moment/moment';
+import cloneDeep from 'lodash/cloneDeep';
  declare var $: any;
 
 @Component({
@@ -263,9 +264,10 @@ export class HousebillListComponent implements OnInit {
       key = search_key == null ? "" : search_key.trim();
     }
 
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstBuyingRateChargesComboBox = res['data'];
     });
+
   }
 
   getListSellingRateCharges(search_key: string = null) {
@@ -275,7 +277,7 @@ export class HousebillListComponent implements OnInit {
     } else {
       key = search_key == null ? "" : search_key.trim();
     }
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstSellingRateChargesComboBox = res['data'];
     });
   }
@@ -299,126 +301,165 @@ export class HousebillListComponent implements OnInit {
     } else {
       key = search_key == null ? "" : search_key.trim();
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=0", { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
       var data = res['data']
       this.comboBoxData.lstPartner = data;
     });
   }
 
-  async saveNewBuyingRateCharge(form: NgForm, IsContinue: boolean = false) {
-
-    if(form.submitted){
-      var error = $('#add-buying-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
-        this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
-        var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
-        this.getBuyingChargesOfHouseBill(this.houseBillSelected);
-        if (IsContinue && res.status) {
-          this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-        } else if (res.status) {
-          this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-          $('#add-buying-rate-modal').modal('hide');
-        } else {
-  
-        }
-      }
-    }
+  isDisplay:boolean = true;
+  resetDisplay(){
+    this.isDisplay = false;
+    setTimeout(() => {
+      this.isDisplay = true;
+    }, 30);
   }
+   saveNewBuyingRateCharge(form: NgForm, IsContinue: boolean = false) {
 
-  async saveNewSellingRateCharge(form: NgForm, IsContinue: boolean = false) {
-
-    if(form.submitted){
-      var error = $('#add-selling-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        this.SellingRateChargeToAdd.type = SurchargeTypeEnum.SELLING_RATE;
-        this.SellingRateChargeToAdd.hblid = this.houseBillSelected.id;
-        var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.SellingRateChargeToAdd);
-        this.getSellingChargesOfHouseBill(this.houseBillSelected);
-        if (IsContinue && res.status) {
-          this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-        } else if (res.status) {
-          this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-          $('#add-selling-rate-modal').modal('hide');
-        } else {
-  
-        }
-      }
-    }
-  }
-
-
-  async saveNewOBHCharge(form: NgForm, IsContinue: boolean = false) {
-    if(form.submitted){
-      var error = $('#add-obh-charge-modal').find('div.has-danger');
-      if (error.length == 0) {
-        this.OBHChargeToAdd.type = SurchargeTypeEnum.OBH;
-        this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
-        var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
-        this.getOBHChargesOfHouseBill(this.houseBillSelected);
-        if (IsContinue && res.status) {
-          this.OBHChargeToAdd = new CsShipmentSurcharge();
-        } else if (res.status) {
-          this.OBHChargeToAdd = new CsShipmentSurcharge();
-          $('#add-obh-charge-modal').modal('hide');
-        } else {
-
-        }
-      }
-    }
-  }
-
-  async editBuyingRateCharge(form: NgForm) {
-    if(form.submitted){
-      var error = $('#edit-buying-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.BuyingRateChargeToEdit);
-        if (res.status) {
-          $('#edit-buying-rate-modal').modal('hide');
+    setTimeout(async () => {
+      if(form.submitted){
+        var error = $('#add-buying-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
+          this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
+          var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
           this.getBuyingChargesOfHouseBill(this.houseBillSelected);
+          if (IsContinue && res.status) {
+            this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+            // form.reset();
+            form.onReset()
+            this.resetDisplay();
+          } else if (res.status) {
+            this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+            form.onReset();
+            this.resetDisplay();
+            $('#add-buying-rate-modal').modal('hide');
+          } else {
+    
+          }
         }
       }
-    }
+    }, 300);
+
   }
 
-  async editSellingRateCharge(form: NgForm) {    
-    if (form.submitted) {
-      var error = $('#edit-selling-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.SellingRateChargeToEdit);
-        if (res.status) {
-          $('#edit-selling-rate-modal').modal('hide');
+   saveNewSellingRateCharge(form: NgForm, IsContinue: boolean = false) {
+
+    setTimeout(async () => {
+      if(form.submitted){
+        var error = $('#add-selling-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          this.SellingRateChargeToAdd.type = SurchargeTypeEnum.SELLING_RATE;
+          this.SellingRateChargeToAdd.hblid = this.houseBillSelected.id;
+          var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.SellingRateChargeToAdd);
           this.getSellingChargesOfHouseBill(this.houseBillSelected);
-        }
-      } 
-    }
-  }
-
-  async editOBHCharge(form: NgForm) {
-    console.log(this.OBHChargeToEdit);
-    if (form.submitted) {
-      var error = $('#edit-obh-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.OBHChargeToEdit);
-        if (res.status) {
-          $('#edit-obh-rate-modal').modal('hide');
-          this.getOBHChargesOfHouseBill(this.houseBillSelected);
+          if (IsContinue && res.status) {
+            form.onReset()
+            this.resetDisplay();
+            this.SellingRateChargeToAdd = new CsShipmentSurcharge();
+          } else if (res.status) {
+            this.SellingRateChargeToAdd = new CsShipmentSurcharge();
+            form.onReset()
+            this.resetDisplay();
+            $('#add-selling-rate-modal').modal('hide');
+          } else {
+    
+          }
         }
       }
-    }
+    }, 300);
+
   }
 
-  resetChargeForm(formId:string){
+
+  saveNewOBHCharge(form: NgForm, IsContinue: boolean = false) {
+    setTimeout( async() => {
+      if(form.submitted){
+        var error = $('#add-obh-charge-modal').find('div.has-danger');
+        if (error.length == 0) {
+          this.OBHChargeToAdd.type = SurchargeTypeEnum.OBH;
+          this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
+          var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
+          this.getOBHChargesOfHouseBill(this.houseBillSelected);
+          if (IsContinue && res.status) {
+            this.OBHChargeToAdd = new CsShipmentSurcharge();
+            form.onReset()
+            this.resetDisplay();
+          } else if (res.status) {
+            this.OBHChargeToAdd = new CsShipmentSurcharge();
+            form.onReset()
+            this.resetDisplay();
+            $('#add-obh-charge-modal').modal('hide');
+          } else {
+  
+          }
+        }
+      }
+    }, 300);
+
+  }
+
+   editBuyingRateCharge(form: NgForm) {
+    setTimeout(async() => {
+      if(form.submitted){
+        var error = $('#edit-buying-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.BuyingRateChargeToEdit);
+          if (res.status) {
+            $('#edit-buying-rate-modal').modal('hide');
+            this.getBuyingChargesOfHouseBill(this.houseBillSelected);
+          }
+        }
+      }
+    }, 300);
+
+  }
+
+  editSellingRateCharge(form: NgForm) {  
+    setTimeout(async() => {
+      if (form.submitted) {
+        var error = $('#edit-selling-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.SellingRateChargeToEdit);
+          if (res.status) {
+            $('#edit-selling-rate-modal').modal('hide');
+            this.getSellingChargesOfHouseBill(this.houseBillSelected);
+          }
+        } 
+      }
+    }, 300);  
+
+  }
+
+   editOBHCharge(form: NgForm) {
+    setTimeout(async() => {
+      if (form.submitted) {
+        var error = $('#edit-obh-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.OBHChargeToEdit);
+          if (res.status) {
+            $('#edit-obh-rate-modal').modal('hide');
+            this.getOBHChargesOfHouseBill(this.houseBillSelected);
+          }
+        }
+      }
+    }, 300);
+ 
+  }
+
+  resetChargeForm(formId:string,form:NgForm){
+    form.onReset();
+    this.resetDisplay();
     $('#'+formId).modal("hide");
-    // $('#'+formId).get(0).reset();
+  
     this.BuyingRateChargeToAdd= new CsShipmentSurcharge();
     this.SellingRateChargeToAdd= new CsShipmentSurcharge();
     this.OBHChargeToAdd = new CsShipmentSurcharge();  
-  
+    
     this.BuyingRateChargeToEdit= null;
     this.SellingRateChargeToEdit= null
     this.OBHChargeToEdit= null;
-    console.log(this.BuyingRateChargeToAdd);
+
   }
 
 
@@ -559,13 +600,19 @@ export class HousebillListComponent implements OnInit {
     currentSelected.removeClass("selected-row");
     $(event.srcElement).closest("tr").addClass("selected-row");
   }
-  prepareEdit(type: string) {
-
-    /**
-     * format exchangeDate to binding to ngx-daterangepicker-material  
-     */
+  prepareEdit(type: string,charge:any) {
+    
     if (type === "buy") {
+      this.BuyingRateChargeToEdit = cloneDeep(charge);
       this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+    }
+    if(type==="sell"){
+      this.SellingRateChargeToEdit = cloneDeep(charge);
+      this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+    }
+    if(type==="obh"){
+      this.OBHChargeToEdit = cloneDeep(charge);
+      this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
     }
   }
 
@@ -656,6 +703,7 @@ export class HousebillListComponent implements OnInit {
      
     }
   }
+
 
 }
 

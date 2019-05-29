@@ -1,7 +1,7 @@
 export class CatPlaceModel{
     code: string;
-    nameVN: string;
-    nameEN: string;
+    nameVn: string;
+    nameEn: string;
     displayName: string;
     address: string;
     districtId: string;

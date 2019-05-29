@@ -4,7 +4,7 @@ import { Directive, HostListener, ElementRef, Input } from '@angular/core';
 })
 export class SpecialCharacterDirective {
 
-  regexStr = '^[a-zA-Z0-9_]*$';
+  regexStr = '^[a-zA-Z0-9_ ]*$';
   @Input() isAlphaNumeric: boolean;
 
   constructor(private el: ElementRef) { }

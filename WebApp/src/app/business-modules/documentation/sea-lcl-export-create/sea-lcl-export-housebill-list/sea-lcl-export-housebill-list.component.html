@@ -460,7 +460,6 @@
                 <!--end: Datatable-->
             </div>
 
-
             <div class="tab-pane fade" id="selling-rate" role="tabpanel">
                 <!--begin: Search Form -->
                 <div class="m-form m-form--label-align-right m--margin-bottom-10">
@@ -664,7 +663,6 @@
                 </div>
                 <!--end: Datatable-->
             </div>
-
 
             <div class="tab-pane fade" id="obh-charge" role="tabpanel">
                 <!--begin: Search Form -->
@@ -1193,7 +1191,7 @@
 </div>
 <!--end::confirm-delete-housebill-modal-->
 
-<form>
+<form name="addBuyingRateChargeForm">
     <!--begin:: add-buying-rate-modal-->
     <div class="modal fade" id="add-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
         aria-hidden="true">
@@ -1214,8 +1212,8 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Charge &nbsp;
-                                        <small class="m--margin-left-5 m--font-primary">ChargeCode</small>
+                                        Charge  <span class="m--font-danger">(*)</span>
+                                        <small class="m--margin-left-5 m--font-primary">ChargeCode&nbsp;</small>
                                     </label>
                                     <div class="dropdown e--combogrid">
                                         <input class="form-control m-input m-input--square dropdown-toggle" type="text"
@@ -1267,7 +1265,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Partner type
+                                        Partner type  <span class="m--font-danger">(*)</span>
                                     </label>
                                     <!-- <ng-select [allowClear]="true" 
                                         [items]="[
@@ -1356,7 +1354,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Quantity
+                                        Quantity  <span class="m--font-danger">(*)</span>
                                     </label>
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="text" 
@@ -1364,12 +1362,12 @@
                                             class="form-control m-input m-input--square"
                                             placeholder="Enter text"
                                             name="buyingRateChangeQuantityName">                                       
-                                            <div class="input-group-prepend">
-                                                <button type="button" 
-                                                    class="btn btn-secondary">
-                                                    CBM
-                                                </button>
-                                            </div>
+                                        <div class="input-group-prepend">
+                                            <button type="button" 
+                                                class="btn btn-secondary">
+                                                CBM
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="form-control-feedback" style="display: none">
                                         Quantity is required !
@@ -1412,7 +1410,7 @@
                                                 <div class="table-body-scroll">
                                                     <table class="table table-hover">
                                                         <tbody>
-                                                            <tr class="data-row data-selected" data-id="i">
+                                                            <tr class="data-row" data-id="i">
                                                                 <td>item.unitNameEn</td>
                                                                 <td>item.unitType</td>
                                                             </tr>
@@ -1430,7 +1428,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Unit price
+                                        Unit price  <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" 
                                         class="form-control m-input m-input--square"
@@ -1446,7 +1444,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        Currency
+                                        Currency  <span class="m--font-danger">(*)</span>
                                     </label>
                                     <!-- <ng-select 
                                         [allowClear]="true" 
@@ -1476,7 +1474,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
-                                        VAT
+                                        VAT  <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" 
                                         max="100" 
@@ -1575,6 +1573,1940 @@
     </div>
     <!--end:: add-buying-rate-modal-->
 </form>
+
+<!--begin:: edit-buying-rate-modal-->
+<form name="editBuyingRateChargeForm">
+    <div class="modal fade" id="edit-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog c-modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit buying rate</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::Form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Charge  <span class="m--font-danger">(*)</span>
+                                        <small class="m--margin-left-5 m--font-primary">chargeCode&nbsp;</small>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value=""
+                                            title="charge">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Charge code</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.charge.code</td>
+                                                                <td>item.charge.chargeNameEn</td>
+                                                                <td>item.charge.chargeNameVn</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Charge is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner type  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="[
+                                                { 'text': 'AGENT', 'id': 'AGENT' },
+                                                { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]" 
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                        [active]="[{'text':BuyingRateChargeToEdit.objectBePaid,
+                                                    'id':BuyingRateChargeToEdit.objectBePaid}]"
+                                        (data)="refreshValue($event)"
+                                        (selected)="BuyingRateChargeToEdit.objectBePaid=$event.id;
+                                                    BuyingRateChargeToEdit.objectBePaid==='AGENT'? BuyingRateChargeToEdit.paymentObjectId=MasterBillData.agentId:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='SHIPPING'? BuyingRateChargeToEdit.paymentObjectId=MasterBillData.coloaderId:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='AGENT'? BuyingRateChargeToEdit.partnerName=MasterBillData.agentName:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='SHIPPING'? BuyingRateChargeToEdit.partnerName=MasterBillData.coloaderName:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='OTHER'? BuyingRateChargeToEdit.partnerName=null:null;
+                                                    BuyingRateChargeToEdit.objectBePaid==='OTHER'? BuyingRateChargeToEdit.paymentObjectId=null:null;selectPartnerType();"
+                                        (removed)="BuyingRateChargeToAdd.objectBePaid=null;BuyingRateChargeToEdit.paymentObjectId=null;selectedBuyingRatePartnerEdt.value=null"
+                                        (typed)="typed($event)" 
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Partner type is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner name  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"                                           
+                                            readonly
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="" 
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>item.id</td>
+                                                                <td>item.shortName</td>
+                                                                <td>item.partnerNameEn</td>
+                                                                <td>item.taxCode</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Partner name is required !
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Quantity  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" 
+                                        required 
+                                        class="form-control m-input m-input--square"
+                                        placeholder="Enter text"
+                                        name="buyingRateChangeQuantityNameEdt">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Quantity is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Unit type</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.unitNameEn</td>
+                                                                <td>item.unitType</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="form-control-feedback" style="display: none">
+                                                    Unit is required
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit price  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text" 
+                                        required
+                                        name="BuyingRateChargeUnitPriceNameEdt">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Unit Price is required and must be larger than 0 !
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Currency  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="comboBoxData.lstCurrency"
+                                        [active]="[{'text':BuyingRateChargeToEdit.currency,'id':BuyingRateChargeToEdit.currencyId}]"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="BuyingRateChargeToEdit.currencyId=$event.id;BuyingRateChargeToEdit.currency=$event.text"
+                                        (removed)="BuyingRateChargeToEdit.currencyId=null"
+                                        (typed)="getListCurrency($event)" 
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Currency is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        VAT  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="number" 
+                                        name="BuyingRateChargeVATNameEdt" 
+                                        required 
+                                        max="100"
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text">
+                                    <div class="form-control-feedback" style="display: none">
+                                        VAT is required and must be less than or equal 100
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Total
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        disabled
+                                        placeholder="Enter text" 
+                                        name="BuyingRateChargeTotalNameEdt">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Doc no
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="BuyingRateChargeDocNameEdt">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input type="text"
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="BuyingRateChargeNoteNameEdt">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Exchange rate date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down">
+                                        <input type="text" 
+                                            class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd 
+                                            [autoApply]="true"
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selected" 
+                                            [singleDatePicker]="true"
+                                            name="BuyingRateChargeExchangeDateNameEdt" 
+                                            readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <div>
+                                        <label class="m-checkbox m-checkbox--bold">
+                                            <input 
+                                                type="checkbox" 
+                                                name="BuyingRateChargeKickBacksNameEdt">
+                                            Kick back
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Form-->
+                </div>
+                <div class="modal-footer m--align-center">
+                    <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                Edit
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!--end:: Edit-buying-rate-modal-->
+
+<!--begin:: add-selling-rate-modal-->
+<form name="addSellingRateChargeForm">
+    <div class="modal fade" id="add-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog c-modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add selling charge</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::Form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Charge  <span class="m--font-danger">(*)</span>
+                                        <small class="m--margin-left-5 m--font-primary">ChargeCode&nbsp;</small>
+                                    </label>
+                                    <div class="dropdown e--combogrid" #selectedSellingCharge>
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value=""
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" 
+                                                                placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Charge code22</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="">
+                                                                <td>item.charge.code</td>
+                                                                <td>item.charge.chargeNameEn</td>
+                                                                <td>item.charge.chargeNameVn</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Charge is required
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner type  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="partnerTypes" 
+                                        [disabled]="disabled"
+                                        (data)="refreshValue($event)"
+                                        (selected)="SellingRateChargeToAdd.objectBePaid=$event.id;
+                                        SellingRateChargeToAdd.objectBePaid==='AGENT'? SellingRateChargeToAdd.paymentObjectId=MasterBillData.agentId:null;
+                                        SellingRateChargeToAdd.objectBePaid==='CUSTOMER'? SellingRateChargeToAdd.paymentObjectId=houseBillSelected.customerId:null;
+                                        SellingRateChargeToAdd.objectBePaid==='CUSTOMER'? selectedSellingRatePartner.value=houseBillSelected.customerName:null;
+                                        SellingRateChargeToAdd.objectBePaid==='AGENT'? selectedSellingRatePartner.value=MasterBillData.agentName:null;
+                                        SellingRateChargeToAdd.objectBePaid==='OTHER'? selectedSellingRatePartner.value=null:null;
+                                        SellingRateChargeToAdd.objectBePaid==='OTHER'? SellingRateChargeToAdd.paymentObjectId=null:null;selectPartnerType();"
+                                        (removed)="SellingRateChargeToAdd.objectBePaid=null;SellingRateChargeToAdd.paymentObjectId=null;selectedSellingRatePartner.value=null"
+                                        (typed)="typed($event)" 
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Partner type is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner name  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value=""
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text"
+                                                                placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner name</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>item.id</td>
+                                                                <td>item.shortName</td>
+                                                                <td>item.partnerNameEn</td>
+                                                                <td>item.taxCode</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Partner name is required !
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Quantity  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square"
+                                        placeholder="Enter text"
+                                        required
+                                        name="sellingRateChangeQuantityName">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Quantity is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" 
+                                                                placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Unit type</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.unitNameEn</td>
+                                                                <td>item.unitType</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="form-control-feedback" style="display: none">
+                                                    Unit is required
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit price  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square"
+                                        placeholder="Enter text" 
+                                        required
+                                        name="SellingRateChargeUnitPriceName">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Unit Price is required and must be larger than 0 !
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Currency  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="comboBoxData.lstCurrency"
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="SellingRateChargeToAdd.currencyId=$event.id"
+                                        (removed)="SellingRateChargeToAdd.currencyId=null"
+                                        (typed)="getListCurrency($event)" 
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Currency is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        VAT  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="number" 
+                                        max="100" 
+                                        name="BuyingRateChargeVATName" 
+                                        required
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text">
+                                    <div class="form-control-feedback" style="display: none">
+                                        VAT is required and must be less than or equal 100
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Total
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        disabled
+                                        placeholder="Enter text" 
+                                        name="BuyingRateChargeTotalName">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Doc no
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square"
+                                        placeholder="Enter text"
+                                        name="SellingRateChargeDocName">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="SellingRateChargeNoteName">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Form-->
+                </div>
+                <div class="modal-footer m--align-center">
+                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-plus"></i>
+                            <span>
+                                save & continue
+                            </span>
+                        </span>
+                    </button>
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!--end:: add-selling-rate-modal-->
+
+<!--begin:: Edit-selling-rate-modal-->
+<form name="editSellingRateChargeForm">
+    <div class="modal fade" id="edit-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog c-modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit selling rate</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::Form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Charge  <span class="m--font-danger">(*)</span>
+                                            <small class="m--margin-left-5 m--font-primary">chargeCode&nbsp;</small>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly data-toggle="dropdown" 
+                                            placeholder="Please selected" 
+                                            value=""
+                                            title="charge">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Charge code</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.charge.code</td>
+                                                                <td>item.charge.chargeNameEn</td>
+                                                                <td>item.charge.chargeNameVn</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-control-feedback">
+                                        Charge is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner type  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="partnerTypes" 
+                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        [active]="[{'text':SellingRateChargeToEdit.objectBePaid,'id':SellingRateChargeToEdit.objectBePaid}]"
+                                        (data)="refreshValue($event)"
+                                        (selected)="SellingRateChargeToEdit.objectBePaid=$event.id;
+                                                SellingRateChargeToEdit.objectBePaid==='AGENT'? SellingRateChargeToEdit.paymentObjectId=MasterBillData.agentId:null;
+                                                SellingRateChargeToEdit.objectBePaid==='CUSTOMER'? SellingRateChargeToEdit.paymentObjectId=houseBillSelected.customerId:null;
+                                                SellingRateChargeToEdit.objectBePaid==='CUSTOMER'? SellingRateChargeToEdit.partnerName=houseBillSelected.customerName:null;
+                                                SellingRateChargeToEdit.objectBePaid==='AGENT'? SellingRateChargeToEdit.partnerName=MasterBillData.agentName:null;
+                                                SellingRateChargeToEdit.objectBePaid==='OTHER'? SellingRateChargeToEdit.partnerName=null:null;
+                                                SellingRateChargeToEdit.objectBePaid==='OTHER'? SellingRateChargeToEdit.paymentObjectId=null:null;selectPartnerType();"
+                                        (removed)="BuyingRateChargeToAdd.objectBePaid=null;SellingRateChargeToEdit.paymentObjectId=null;selectedSellingRatePartnerEdt.value=null"
+                                        (typed)="typed($event)" 
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback">
+                                        Partner type is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Partner name  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"                                        
+                                            readonly
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="" 
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>item.id</td>
+                                                                <td>item.shortName</td>
+                                                                <td>item.partnerNameEn</td>
+                                                                <td>item.taxCode</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback">
+                                            Partner name is required !
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Quantity  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" 
+                                        required 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="sellingRateChangeQuantityNameEdt">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Quantity is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Unit type</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.unitNameEn</td>
+                                                                <td>item.unitType</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="form-control-feedback" style="display: none">
+                                                    Unit is required
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit price  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square"
+                                        placeholder="Enter text"
+                                        required 
+                                        name="SellingRateChargeUnitPriceNameEdt">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Unit Price is required and must be larger than 0 !
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Currency  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="comboBoxData.lstCurrency"
+                                        [active]="[{'text':SellingRateChargeToEdit.currency,'id':SellingRateChargeToEdit.currencyId}]"
+                                        [disabled]="SellingRateChargeToEdit.soano!=null" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="SellingRateChargeToEdit.currencyId=$event.id;SellingRateChargeToEdit.currency=$event.text"
+                                        (removed)="SellingRateChargeToEdit.currencyId=null"
+                                        (typed)="getListCurrency($event)" 
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback">
+                                        Currency is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        VAT  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="number" 
+                                        name="SellingRateChargeVATNameEdt" 
+                                        required 
+                                        max="100"
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text">
+                                    <div class="form-control-feedback" style="display: none">
+                                        VAT is required and must be less than or equal 100
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Total
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        disabled
+                                        placeholder="Enter text" 
+                                        name="SellingRateChargeTotalNameEdt">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Doc no
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="SellingRateChargeDocNameEdt">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="SellingRateChargeNoteNameEdt">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Exchange rate date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down">
+                                        <input type="text" 
+                                            class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd 
+                                            [autoApply]="true" 
+                                            [disabled]=""
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedDate" 
+                                            [singleDatePicker]="true"
+                                            name="SellingRateChargeExchangeDateNameEdt" 
+                                            readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Form-->
+                </div>
+                <div class="modal-footer m--align-center">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                Edit
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!--end:: Edit-selling-rate-modal-->
+
+<!--begin:: add-obh-charge-modal-->
+<form name="addOBHChargeForm">
+    <div class="modal fade" id="add-obh-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog c-modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add OBH charge</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::Form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Charge  <span class="m--font-danger">(*)</span>
+                                        <small class="m--margin-left-5 m--font-primary">ChargeCode&nbsp;</small>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value=""
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" 
+                                                                placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Charge code</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.charge.code</td>
+                                                                <td>item.charge.chargeNameEn</td>
+                                                                <td>item.charge.chargeNameVn</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Charge is required
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Receiver  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value=""
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner name</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>item.id</td>
+                                                                <td>item.shortName</td>
+                                                                <td>item.partnerNameEn</td>
+                                                                <td>item.taxCode</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Receiver name is required and do not same with payer!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Payer  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value=""
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner name</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>item.id</td>
+                                                                <td>item.shortName</td>
+                                                                <td>item.partnerNameEn</td>
+                                                                <td>item.taxCode</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Payer name is required and do not same with receiver!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Quantity  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Enter text"
+                                        required 
+                                        name="OBHQuantityName">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Quantity is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Unit type</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.unitNameEn</td>
+                                                                <td>item.unitType</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="form-control-feedback" style="display: none">
+                                                    Unit is required
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit price  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" 
+                                        placeholder="Enter text" 
+                                        required
+                                        name="OBHUnitPriceName">
+                                    <div class="form-control-feedback"  style="display: none">
+                                        Unit Price is required and must be larger than 0 !
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Currency  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="comboBoxData.lstCurrency"
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="OBHChargeToAdd.currencyId=$event.id"
+                                        (removed)="OBHChargeToAdd.currencyId=null" 
+                                        (typed)="getListCurrency($event)"
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Currency is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        VAT  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="number" 
+                                        max="100" 
+                                        name="OBHChargeVATName" 
+                                        required
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text">
+                                    <div class="form-control-feedback" style="display: none">
+                                        VAT is required and must be less than or equal 100
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Total
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" 
+                                        disabled
+                                        placeholder="Enter text" 
+                                        name="OBHChargeTotalName">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Doc no
+                                    </label>
+                                    <input type="text"
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="OBHChargeDocName">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input type="text"
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="OBHChargeNoteName">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Form-->
+                </div>
+                <div class="modal-footer m--align-center">
+                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-plus"></i>
+                            <span>
+                                save & continue
+                            </span>
+                        </span>
+                    </button>
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!--end:: add-obh-charge-modal-->
+
+<!--begin:: edit-obh-charge-modal-->
+<form name="editOBHChargeForm">
+    <div class="modal fade" id="edit-obh-charge-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+        aria-hidden="true">
+        <div class="modal-dialog c-modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit OBH rate</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::Form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Charge  <span class="m--font-danger">(*)</span>
+                                        <small class="m--margin-left-5 m--font-primary">chargeCode&nbsp;</small>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Charge code</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Name VN</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data="">
+                                                                <td>item.charge.code</td>
+                                                                <td>item.charge.chargeNameEn</td>
+                                                                <td>item.charge.chargeNameVn</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Charge is required
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Receiver  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="" 
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner name</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>item.id</td>
+                                                                <td>item.shortName</td>
+                                                                <td>item.partnerNameEn</td>
+                                                                <td>item.taxCode</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Receiver name is required !
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Payer  <span class="m--font-danger">(*)</span>
+                                    </label> 
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected" 
+                                            value=""
+                                            title="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner name</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Name EN</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="1">
+                                                                <td>item.id</td>
+                                                                <td>item.shortName</td>
+                                                                <td>item.partnerNameEn</td>
+                                                                <td>item.taxCode</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Receiver name is required !
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Quantity  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Enter text" 
+                                        required  
+                                        name="OBHQuantityNameEdt">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Quantity is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            readonly 
+                                            data-toggle="dropdown" 
+                                            placeholder="Please selected"
+                                            value="">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Name EN</th>
+                                                                    <th>Unit type</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <tr class="data-row" data-id="i">
+                                                                <td>item.unitNameEn</td>
+                                                                <td>item.unitType</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-control-feedback" style="display: none">
+                                            Unit is required
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Unit price  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square"  
+                                        placeholder="Enter text" 
+                                        required
+                                        name="OBHUnitPriceNameEdt">
+                                    <div class="form-control-feedback" style="display: none">
+                                        Unit Price is required and must be larger than 0 !
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Currency  <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <!-- <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="comboBoxData.lstCurrency"
+                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                        [active]="[{'text':OBHChargeToEdit.currency,'id':OBHChargeToEdit.currencyId}]"
+                                        (data)="refreshValue($event)" 
+                                        (selected)="OBHChargeToEdit.currencyId=$event.id"
+                                        (removed)="OBHChargeToEdit.currencyId=null" 
+                                        (typed)="getListCurrency($event)"
+                                        placeholder="Select filter">
+                                    </ng-select> -->
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Currency is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        VAT <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="number" 
+                                        max="100" 
+                                        name="OBHChargeVATNameEdt" 
+                                        required 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text">
+                                    <div class="form-control-feedback" style="display: none">
+                                        VAT is required and must be less than or equal 100
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Total
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        disabled
+                                        placeholder="Enter text" 
+                                        name="OBHChargeTotalNameEdt">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Doc no
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="OBHChargeDocName">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input type="text" 
+                                        class="form-control m-input m-input--square" 
+                                        placeholder="Enter text"
+                                        name="OBHChargeNoteName">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Exchange rate date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down">
+                                        <input type="text" 
+                                            class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd 
+                                            [autoApply]="true" 
+                                            [disabled]=""
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="selectedDate" 
+                                            [singleDatePicker]="true"
+                                            name="OBHExchangeDateNameEdt" 
+                                            readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Form-->
+                </div>
+                <div class="modal-footer m--align-center">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                Edit
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!--end:: Edit-obh-charge-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->
 <app-sea-lcl-export-credit-and-debit-note-detail></app-sea-lcl-export-credit-and-debit-note-detail>

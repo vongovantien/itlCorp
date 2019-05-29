@@ -41,7 +41,7 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">
+                            <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>
@@ -173,7 +173,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Disble Select single
+                                Disable Select single
                             </label>
                             <ng-select [allowClear]="true" [items]="items" [disabled]="true" (data)="refreshValue($event)"
                                 (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"

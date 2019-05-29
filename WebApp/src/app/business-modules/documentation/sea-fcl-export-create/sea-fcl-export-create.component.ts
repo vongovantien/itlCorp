@@ -84,18 +84,24 @@ export class SeaFclExportCreateComponent implements OnInit {
             this.isHouseBill = false;
             this.isCDnote = false;
             if(this.inEditing == true){
-                this.isLoaded = false;
-                setTimeout(() => {
-                    this.isLoaded = true;
-                    this.inEditing = true;
-                }, 100);
+                // this.isLoaded = false;
+                // setTimeout(() => {
+                //     this.isLoaded = true;
+                //     this.inEditing = true;
+                // }, 100);
                 this.myForm.patchValue({
                     estimatedTimeofDepature: { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) },
                     polName: this.shipment.polName,
                     podName: this.shipment.podName,
                     coloaderName: this.shipment.coloaderName,
                     agentName: this.shipment.agentName,
-                    personInChargeName: this.shipment.personInChargeName
+                    personInChargeName: this.shipment.personInChargeName,
+                    mawb: this.shipment.mawb,
+                    bookingNo: this.shipment.bookingNo,
+                    flightVesselName: this.shipment.flightVesselName,
+                    voyNo: this.shipment.voyNo,
+                    pono: this.shipment.pono,
+                    notes: this.shipment.notes
                 });
             }
         }
@@ -279,10 +285,10 @@ export class SeaFclExportCreateComponent implements OnInit {
         if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             criteriaSearchCommodity.inactive = null;
         }
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.paging + "?page=1&size=20", criteriaSearchCommodity, false, false);
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, criteriaSearchCommodity, false, false);
         if(responses != null){
-            this.commodities = this.sortService.sort(responses.data, 'commodityNameEn', true);
-            console.log(this.commodities);
+            this.commodities = this.sortService.sort(responses, 'commodityNameEn', true);
+            console.log('commodities' + this.commodities);
         }
         else{
             this.commodities = [];
@@ -296,9 +302,10 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.getComodities(keySearch);
     }
     validateShipmentForm(){
-        if(this.lstMasterContainers.find(x => x.isNew == false) != null){
-            this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
-        }
+        // if(this.lstMasterContainers != null){
+        //     this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isNew == false);
+        // }
+        this.shipment.csMawbcontainers = this.lstMasterContainers.filter(x => x.isSave == true);
         if(this.myForm.value.estimatedTimeofDepature != null){
             this.shipment.etd = dataHelper.dateTimeToUTC(this.myForm.value.estimatedTimeofDepature["startDate"]);
         }
@@ -315,7 +322,7 @@ export class SeaFclExportCreateComponent implements OnInit {
                 $('#confirm-can-not-create-job-modal').modal('show');
         }
         else{
-            if(this.shipment.csMawbcontainers == null){
+            if(this.shipment.csMawbcontainers.length == 0){
                 $('#confirm-not-create-job-misscont-modal').modal('show');
             }
             else{
@@ -414,6 +421,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsTransaction.post, this.shipment, true, true);
         if(response != null){
             if(response.result.success){
+                this.submitted = false;
                 this.shipment = response.model;
                 this.shipment.transactionTypeEnum = TransactionTypeEnum.SeaFCLExport;
                 this.isShipment = true;

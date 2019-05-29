@@ -465,7 +465,13 @@ export class HousebillAddnewComponent implements OnInit {
       }
 
       this.getListContsOfAllHB();
+    }else{
+      $("#alert-cannot-create-hbl").modal('show');
     }
+  }
+
+  closeAlert(){
+    $("#alert-cannot-create-hbl").modal('hide');
   }
 
   resetForm() {

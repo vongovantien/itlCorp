@@ -12,6 +12,7 @@ import moment from 'moment/moment';
 import { NgForm } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 declare var $: any;
+import * as stringHelper from 'src/helper/string.helper';
 
 @Component({
     selector: 'app-shipping-instruction',
@@ -136,9 +137,9 @@ export class ShippingInstructionComponent implements OnInit {
         this.housebills.forEach(x =>{
                 this.totalGW = this.totalGW + x.gw;
                 this.totalCBM = this.totalCBM + x.cbm;
-                this.shippingIns.goodsDescription += (x.desOfGoods!= null|| x.desOfGoods == '')? (x.desOfGoods + "\n"): '';
-                this.shippingIns.containerNote += (x.containerNames != null || x.containerNames =='')? (x.containerNames + "\n"): '';
-                this.shippingIns.packagesNote += (x.packageTypes != null || x.packageTypes == '')? (x.packageTypes + "\n"): '';
+                this.shippingIns.goodsDescription += (x.desOfGoods!= null|| x.desOfGoods == '')? (stringHelper.subStringComma(x.desOfGoods) + "\n"): '';
+                this.shippingIns.containerNote += (x.containerNames != null || x.containerNames =='')? (stringHelper.subStringComma(x.containerNames) + "\n"): '';
+                this.shippingIns.packagesNote += (x.packageTypes != null || x.packageTypes == '')? (stringHelper.subStringComma(x.packageTypes) + "\n"): '';
         });
         this.shippingIns.grossWeight = this.totalGW;
         this.shippingIns.volume= this.totalCBM;
@@ -167,7 +168,7 @@ export class ShippingInstructionComponent implements OnInit {
         console.log(consignee);
         this.shippingIns.consigneeDescription =
             consignee.shortName + "\n" +
-            "Address: " + consignee.addressEn;
+            consignee.addressEn == null ?'':("Address: " + consignee.addressEn);
     }
     getRealConsigneeDescription(consignee: any) {
         console.log(consignee);
@@ -234,13 +235,13 @@ export class ShippingInstructionComponent implements OnInit {
         if(index > -1)
         {
             this.shippingIns.pol = this.portOfLadings[index].id;
-            this.shippingIns.polName = this.portOfLadings[index].nameEN;
+            this.shippingIns.polName = this.portOfLadings[index].nameEn;
         }
         index = this.portOfDestinations.findIndex(x => x.id == this.shipment.pod);
         if(index > -1){
             this.shippingIns.pod = this.portOfDestinations[index].id;
-            this.shippingIns.podName = this.portOfDestinations[index].nameEN;
-            this.shippingIns.poDelivery = this.portOfDestinations[index].nameEN;
+            this.shippingIns.podName = this.portOfDestinations[index].nameEn;
+            this.shippingIns.poDelivery = this.portOfDestinations[index].nameEn;
         }
         this.paymentTermActive = ["Prepaid"];
         this.shippingIns.paymenType = this.paymentTermActive[0];
@@ -363,10 +364,19 @@ export class ShippingInstructionComponent implements OnInit {
         }
     }
     async getPortOfLading(searchText: any) {
+        // let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
+        // const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        // if (portIndexs != null) {
+        //     this.portOfLadings = portIndexs.data;
+        //     console.log(this.portOfLadings);
+        // }
+        // else{
+        //     this.portOfLadings = [];
+        // }
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfLadings = portIndexs.data;
+            this.portOfLadings = portIndexs;
             console.log(this.portOfLadings);
         }
         else{
@@ -374,11 +384,20 @@ export class ShippingInstructionComponent implements OnInit {
         }
     }
     async getPortOfDestination(searchText: any) {
+        // let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
+        // const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        // if (portIndexs != null) {
+        //     this.portOfDestinations = portIndexs.data;
+        //     console.log(this.portOfLadings);
+        // }
+        // else{
+        //     this.portOfDestinations = [];
+        // }
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfDestinations = portIndexs.data;
-            console.log(this.portOfLadings);
+            this.portOfDestinations = portIndexs;
+            console.log(this.portOfDestinations);
         }
         else{
             this.portOfDestinations = [];

@@ -10,10 +10,10 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityService catComonityService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        //private string templateName = "ImportTemplate.xlsx";
         public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -100,6 +99,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var commodity = mapper.Map<CatCommodityModel>(model);
+            commodity.Id = id;
             commodity.UserModified = currentUser.UserID;
             var hs = catComonityService.Update(commodity);
             var message = HandleError.GetMessage(hs, Crud.Update);

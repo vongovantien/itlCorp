@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -15,6 +16,8 @@ namespace eFMS.API.Shipment.Infrastructure
             //CreateMap<CsTransactionDetail, CsTransactionDetailReport>();
             CreateMap<CsManifest, CsManifestModel>();
             CreateMap<CsShippingInstruction, CsShippingInstructionModel>();
+            CreateMap<OpsTransaction, OpsTransactionModel>();
+            CreateMap<sp_GetOpsTransaction, OpsTransactionModel>();
 
 
             CreateMap<CsTransactionEditModel, CsTransaction>();
@@ -23,6 +26,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsShipmentSurcharge, CsShipmentSurchargeDetailsModel>();
             CreateMap<CsManifestEditModel, CsManifest>();
             CreateMap<CsShippingInstructionModel, CsShippingInstruction>();
+            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
         }
     }
 }

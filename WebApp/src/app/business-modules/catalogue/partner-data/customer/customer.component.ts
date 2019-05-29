@@ -34,21 +34,13 @@ export class CustomerComponent implements OnInit {
 
   ngOnInit() {
   }
-  getPartnerData(pager: PagerSetting, criteria?: any): any {
-    this.baseService.spinnerShow();
+  async getPartnerData(pager: PagerSetting, criteria?: any) {
     if(criteria != undefined){
       this.criteria = criteria;
     }
-    this.baseService.post(this.api_menu.Catalogue.PartnerData.customerPaging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      this.customers = response.data;
-      console.log(this.customers);
-      this.pager.totalItems = response.totalItems;
-      return this.pager.totalItems;
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.customerPaging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    this.customers = responses.data;
+    this.pager.totalItems = responses.totalItems;
   }
   showConfirmDelete(item) {
     this.deleteConfirm.emit(item);

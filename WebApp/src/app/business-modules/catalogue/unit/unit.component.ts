@@ -37,17 +37,24 @@ export class UnitComponent implements OnInit {
   titleConfirmDelete = "Do you want to delete this unit";
   @ViewChild(PaginationComponent,{static:false}) child;
 
-  constructor(
+    constructor (
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService) { 
+      // this.sourceData = this.baseServices.dataStorage.subscribe(data=>{
+      //   this.sourceData = data;
+      //   console.log(this.sourceData);
+      // });
+      
     }
 
   async ngOnInit() {
     this.initPager();
     this.getUnitTypes();
     await this.getUnits();
+    // this.sourceData = await this.baseServices.getDataStorageByKey("default");
+    // console.log(this.sourceData)
   }
   initPager(): any {
     this.pager.totalItems = 0;

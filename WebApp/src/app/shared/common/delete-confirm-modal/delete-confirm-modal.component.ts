@@ -2,8 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-delete-confirm-modal',
-  templateUrl: './delete-confirm-modal.component.html',
-  styleUrls: ['./delete-confirm-modal.component.scss']
+  templateUrl: './delete-confirm-modal.component.html'
 })
 export class DeleteConfirmModalComponent implements OnInit {
   @Input() title:String;

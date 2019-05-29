@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
@@ -10,7 +8,6 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -22,6 +19,7 @@ using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using System.Linq;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -34,15 +32,12 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
 
-        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper, ICurrentUser user)
+        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             catPlaceService = service;
             mapper = iMapper;
-            currentUser = user;
         }
 
         [HttpGet]
@@ -73,13 +68,6 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Get(Guid id)
         {
             var data = catPlaceService.First(x => x.Id == id);
-            return Ok(data);
-        }
-
-        [HttpGet("GetBy")]
-        public IActionResult GetBy(CatPlaceTypeEnum placeType, string modeOfTransport, bool? inactive)
-        {
-            var data = catPlaceService.GetBy(placeType, modeOfTransport, inactive);
             return Ok(data);
         }
 
@@ -120,7 +108,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.UserCreated = currentUser.UserID;
             var hs = catPlaceService.Add(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -142,7 +129,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.UserModified = currentUser.UserID;
             catPlace.Id = id;
             //var hs = catPlaceService.Update(catPlace, x => x.Id == id);
             var hs = catPlaceService.Update(catPlace);
@@ -159,7 +145,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catPlaceService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -173,7 +158,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
         {
-            templateName = GetFileName(type);
+            string templateName = GetFileName(type);
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
             {
@@ -331,7 +316,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody]List<CatPlaceImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catPlaceService.Import(data);
             if (result.Success)
             {
@@ -345,6 +329,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         private string GetFileName(CatPlaceTypeEnum type)
         {
+            string templateName = Templates.ExelImportEx;
             switch (type)
             {
                 case CatPlaceTypeEnum.Port:
@@ -371,14 +356,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower())))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower())))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEN.ToLower() || x.NameVn.ToLower() == model.NameVN.ToLower()) && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower()) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

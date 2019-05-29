@@ -22,10 +22,15 @@ import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima
 import { IntergerInputDirective } from './directives/interger-input.directive';
 import { ReportPreviewComponent } from './common/report-preview/report-preview.component';
 import { SpecialCharacterDirective } from './directives/specialChracter.directive';
+import {EcusSpecicalCharacterAllowSpaceDirective} from './directives/ecusSpecicalCharacterAllowSpace.directive';
+import {EcusSpecicalCharacterNoSpaceDirective} from './directives/ecusSpecicalCharacterNoSpace.directive';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
+import { RouterModule } from '@angular/router';
+import { CfBeforeLeaveModalComponent } from './common/cf-before-leave-modal/cf-before-leave-modal.component';
+import { PageSidebarComponent } from '../master-page/page-sidebar/page-sidebar.component';
 @NgModule({
-  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule],
+  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule,RouterModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 
@@ -43,7 +48,11 @@ import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scrol
     IntergerInputDirective,
     ReportPreviewComponent,
     SpecialCharacterDirective,
-    ComboGridVirtualScrollComponent
+    EcusSpecicalCharacterAllowSpaceDirective,
+    EcusSpecicalCharacterNoSpaceDirective,
+    ComboGridVirtualScrollComponent,
+    CfBeforeLeaveModalComponent,
+    
   ],
   exports: [
     CommonModule,
@@ -63,7 +72,11 @@ import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scrol
     NgProgressModule,
     ReportPreviewComponent,
     SpecialCharacterDirective,
-    ComboGridVirtualScrollComponent
+    EcusSpecicalCharacterAllowSpaceDirective,
+    EcusSpecicalCharacterNoSpaceDirective,
+    ComboGridVirtualScrollComponent,
+    CfBeforeLeaveModalComponent,
+    
   ],
   providers: [
     SortService,

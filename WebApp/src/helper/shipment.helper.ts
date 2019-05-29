@@ -5,3 +5,8 @@ export async function getShipmentCommonData(baseService: BaseService,api_menu:AP
     const data = await baseService.getAsync(api_menu.Documentation.Terminology.getShipmentCommonData);
     return data;
 }
+
+export async function getOPSShipmentCommonData(baseService: BaseService,api_menu:API_MENU) {
+    const data = await baseService.getAsync(api_menu.Documentation.Terminology.getOPSShipmentCommonData);
+    return data;
+}

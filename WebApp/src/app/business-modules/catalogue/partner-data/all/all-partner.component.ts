@@ -22,12 +22,10 @@ import * as lodash from 'lodash';
 })
 export class AllPartnerComponent implements OnInit {
   partners: Array<Partner>;
-  //partner: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.ALL };
   isDesc: boolean = false;
-  keySortDefault: string = "id";
   
   @ViewChild(PaginationComponent,{static:false}) child; 
   @Output() deleteConfirm = new EventEmitter<Partner>();
@@ -43,21 +41,13 @@ export class AllPartnerComponent implements OnInit {
     console.log(pager);
     this.getPartnerData(pager, this.criteria);
   }
-  getPartnerData(pager: PagerSetting, criteria?: any): any {
-    this.baseService.spinnerShow();
+  async getPartnerData(pager: PagerSetting, criteria?: any) {
     if(criteria != undefined){
       this.criteria = criteria;
     }
-    this.baseService.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      this.partners = response.data.map(x=>Object.assign({},x));
-      console.log(this.partners);
-      this.pager.totalItems = response.totalItems;
-      return this.pager.totalItems;
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    this.partners = responses.data;
+    this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
     if(column.dataType != 'boolean'){

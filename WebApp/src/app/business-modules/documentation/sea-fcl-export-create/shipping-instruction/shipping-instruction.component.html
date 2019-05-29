@@ -5,7 +5,7 @@
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <!-- <app-breadcrumb></app-breadcrumb> -->
+            <app-breadcrumb></app-breadcrumb>
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
@@ -134,108 +134,40 @@
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.issuedUser == null }">
                                         <label class="form-control-label" for="">
                                             Issue By <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                                data-toggle="dropdown" placeholder="Please selected" value=""
-                                                [value]="shippingIns.issuedUserName == null?'Please selected issued user':shippingIns.issuedUserName" value="">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
-                                                                    placeholder="Search...">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>User Name</th>
-                                                                        <th>Full Name</th>
-                                                                        <th>Role</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="userIssues">
-                                                                <tr *ngFor="let user of userIssues;let i = index;" class="data-row" 
-                                                                    [ngClass]="{ 'data-selected': shippingIns.issuedUser!==null && shippingIns.issuedUser===user.id }" 
-                                                                    data-id="{{user.id}}" 
-                                                                    (click)="shippingIns.issuedUser = user.id; shippingIns.issuedUser = user.id; shippingIns.issuedUserName= user.username">
-                                                                    <td>{{ user.username }}</td>
-                                                                    <td>{{ user.employeeNameVn }}</td>
-                                                                    <td>Cs</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </label>                 
+
+                                        <app-combo-grid-virtual-scroll 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.issuedUser}"
+                                            (itemSelected)="shippingIns.issuedUser = $event.id; shippingIns.issuedUserName=$event.employeeNameVn"
+                                            [selectedDisplayFields]="['employeeNameVn']"
+                                            [dataSources]="userIssues" 
+                                            [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
+                                        </app-combo-grid-virtual-scroll>
+
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.issuedUser == null">
                                             Issue by is required
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.supplier == null }">
                                         <label class="form-control-label" for="">
                                             Supplier <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" 
-                                                [value]="shippingIns.supplierName == null?'Please selected supplier':shippingIns.supplierName"
-                                                placeholder="Please selected" value="">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
-                                                                    placeholder="Search..."  (keyup)="changeSupplier($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner name</th>
-                                                                        <th>Name ABBR</th>
-                                                                        <th>Partner name</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="suppliers">
-                                                                <tr class="data-row data-selected" *ngFor="let supplier of suppliers;let i = index;" 
-                                                                    [ngClass]="{ 'data-selected': shippingIns.supplier!==null && shippingIns.supplier === supplier.id }" 
-                                                                    data-id="{{supplier.id}}" 
-                                                                    (click)="shippingIns.supplier = supplier.id; shippingIns.supplierName = supplier.partnerNameEn">
-                                                                    <td>{{ supplier.accountNo }}</td>
-                                                                    <td>{{ supplier.shortName }}</td>
-                                                                    <td>{{ supplier.partnerNameEn }}</td>
-                                                                    <td>{{ supplier.taxCode }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </label>                   
+
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="suppliers" 
+                                            [currentActiveItemId]="{field:'id',value: shippingIns.supplier}"
+                                            (itemSelected)="shippingIns.supplier = $event.id; shippingIns.supplierName=$event.partnerNameEn"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.supplier == null">
                                             Supplier is required
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -269,56 +201,23 @@
                                         <label class="form-control-label" for="">
                                             Consignee <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
-                                                [value]="shippingIns.consigneeName == null?'Please selected consignee':shippingIns.consigneeName">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
-                                                                    placeholder="Search..." (keyup)="changeConsignee($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner name</th>
-                                                                        <th>Name ABBR</th>
-                                                                        <th>Partner name</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="consignees">
-                                                                <tr class="data-row data-selected" *ngFor="let consignee of consignees;let i = index;" 
-                                                                    [ngClass]="{ 'data-selected': shippingIns.consigneeId!==null && shippingIns.consigneeId === consignee.id }" 
-                                                                    data-id="{{consignee.id}}" 
-                                                                    (click)="shippingIns.consigneeId = consignee.id; shippingIns.consigneeName = consignee.partnerNameEn; getConsigneeDescription(consignee)">
-                                                                    <td>{{ consignee.accountNo }}</td>
-                                                                    <td>{{ consignee.shortName }}</td>
-                                                                    <td>{{ consignee.partnerNameEn }}</td>
-                                                                    <td>{{ consignee.taxCode }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                       
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="consignees" 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.consigneeId}"
+                                            (itemSelected)="shippingIns.consigneeId = $event.id; shippingIns.consigneeName=$event.partnerNameEn; getConsigneeDescription($event)"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+
                                         <textarea class="form-control m-input--square" id="" rows="3"  autocomplete="nope"
                                             name="consigneeDescription" [(ngModel)]="shippingIns.consigneeDescription" #consigneeDescription="ngModel"
                                             (change)="shippingIns.consigneeDescription = shippingIns.consigneeDescription.trim()" required></textarea>
+
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && (shippingIns.consigneeId == null || consigneeDescription.invalid)">
                                             Consignee is required
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -338,51 +237,16 @@
                                     <div class="form-group" > 
                                         <label class="form-control-label" for="">
                                             Real Shipper
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
-                                                [value]="shippingIns.actualShipperName == null?'Please selected real shipper':shippingIns.actualShipperName">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
-                                                                    placeholder="Search..." (keyup)="changeRealShipper($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner name</th>
-                                                                        <th>Name ABBR</th>
-                                                                        <th>Partner name</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="realShippers">
-                                                                <tr class="data-row" *ngFor="let realShipper of realShippers;let i = index;"  
-                                                                    [ngClass]="{ 'data-selected': shippingIns.actualShipperName!==null && shippingIns.actualShipperId === realShipper.id }" 
-                                                                    data-id="{{realShipper.id}}" 
-                                                                    (click)="shippingIns.actualShipperId = realShipper.id; shippingIns.actualShipperName = realShipper.partnerNameEn; getRealShipperDescription(realShipper)">
-                                                                    <td>{{ realShipper.accountNo }}</td>
-                                                                    <td>{{ realShipper.shortName }}</td>
-                                                                    <td>{{ realShipper.partnerNameEn }}</td>
-                                                                    <td>{{ realShipper.taxCode }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </label>                                     
+                                        
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="realShippers" 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.actualShipperId}"
+                                            (itemSelected)="shippingIns.actualShipperId = $event.id; shippingIns.actualShipperName=$event.partnerNameEn; getRealShipperDescription($event)"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+
                                         <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
                                             name="actualShipperDescription" [(ngModel)]="shippingIns.actualShipperDescription" #actualShipperDescription="ngModel"
                                             (change)="shippingIns.actualShipperDescription = shippingIns.actualShipperDescription.trim()"></textarea>
@@ -393,53 +257,19 @@
                                         <label class="form-control-label" for="">
                                             Real Consignee
                                         </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" 
-                                                [value]="shippingIns.actualConsigneeName == null?'Please selected real consignee':shippingIns.actualConsigneeName">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text" autocomplete="nope"
-                                                                    placeholder="Search..." (keyup)="changeRealConsignee($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner name</th>
-                                                                        <th>Name ABBR</th>
-                                                                        <th>Partner name</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody *ngIf="realConsignees">
-                                                                <tr class="data-row data-selected" *ngFor="let realConsignee of realConsignees;let i = index;" 
-                                                                    [ngClass]="{ 'data-selected': shippingIns.actualConsigneeName!==null && shippingIns.actualConsigneeId === realConsignee.id }" 
-                                                                    data-id="{{realConsignee.id}}" 
-                                                                    (click)="shippingIns.actualConsigneeId = realConsignee.id; shippingIns.actualConsigneeName = realConsignee.partnerNameEn; getRealConsigneeDescription(realConsignee)">
-                                                                    <td>{{ realConsignee.accountNo }}</td>
-                                                                    <td>{{ realConsignee.shortName }}</td>
-                                                                    <td>{{ realConsignee.partnerNameEn }}</td>
-                                                                    <td>{{ realConsignee.taxCode }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
+                                        <app-combo-grid-virtual-scroll *ngIf="shipment"
+                                            [dataSources]="realConsignees" 
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.actualConsigneeId}"
+                                            (itemSelected)="shippingIns.actualConsigneeId = $event.id; shippingIns.actualConsigneeName=$event.partnerNameEn;getRealConsigneeDescription($event)"
+                                            [selectedDisplayFields]="['partnerNameEn']"                                        
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+
                                         <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
                                             name="actualConsigneeDescription" [(ngModel)]="shippingIns.actualConsigneeDescription" #actualConsigneeDescription="ngModel"
                                             (change)="shippingIns.actualConsigneeDescription = shippingIns.actualConsigneeDescription.trim()"></textarea>
+
                                     </div>
                                 </div>
                                 
@@ -485,101 +315,43 @@
                                         <label class="form-control-label" for="">
                                             Port of Loading <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
-                                                data-toggle="dropdown" [value]="shippingIns.polName == null?'Please selected port of loading':shippingIns.polName" value="">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text"
-                                                                    (keyup)="changePortLoading($event.target.value)"
-                                                                    placeholder="Search...">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Port Code</th>
-                                                                        <th>Port Name</th>
-                                                                        <th>Country</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover" *ngIf="portOfLadings">
-                                                            <tbody *ngFor="let pol of portOfLadings;let i = index;">
-                                                                <tr class="data-row" [ngClass]="{ 'data-selected': shippingIns.pol!==null && shippingIns.pol===pol.id }" data-id="{{pol.id}}" 
-                                                                    (click)="shippingIns.pol = pol.id; shippingIns.polName= pol.nameEN">
-                                                                    <td>{{ pol.code }}</td>
-                                                                    <td>{{ pol.nameEN }}</td>
-                                                                    <td>{{ pol.countryName }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                       
+                                        <app-combo-grid-virtual-scroll *ngIf="shippingIns"
+                                            [dataSources]="portOfLadings"
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.pol}"
+                                            (itemSelected)="shippingIns.pol = $event.id; formShippingInstruction.controls['pol'].setValue($event.id); shippingIns.polName= $event.nameEn"
+                                            [selectedDisplayFields]="['nameEn']"                             
+                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        </app-combo-grid-virtual-scroll>   
+
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pol == null">
                                             Port of Loading is required
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formShippingInstruction.submitted && shippingIns.pod == null }">
                                         <label class="form-control-label" for="">
                                             Port of Discharge <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
-                                                data-toggle="dropdown" placeholder="Please selected"  [value]="shippingIns.podName == null?'Please selected port of discharge':shippingIns.podName">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square" type="text"
-                                                                    (keyup)="changePortDestination($event.target.value)"
-                                                                    placeholder="Search...">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Port Code</th>
-                                                                        <th>Port Name</th>
-                                                                        <th>Country</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover" *ngIf="portOfDestinations">
-                                                            <tbody *ngFor="let pod of portOfDestinations;let i = index;">
-                                                                <tr class="data-row" [ngClass]="{ 'data-selected': shippingIns.pod!==null && shippingIns.pod===pod.id }" data-id="{{pod.id}}" 
-                                                                    (click)="shippingIns.pod = pod.id; shippingIns.pod=pod.id; shippingIns.podName= pod.nameEN; shippingIns.poDelivery = pod.nameEN">
-                                                                    <td>{{ pod.code }}</td>
-                                                                    <td>{{ pod.nameEN }}</td>
-                                                                    <td>{{ pod.countryName }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </label>                                      
+                                        
+                                        <app-combo-grid-virtual-scroll *ngIf="shippingIns"
+                                            [dataSources]="portOfDestinations"
+                                            [currentActiveItemId]="{field:'id',value:shippingIns.pod}"
+                                            (itemSelected)="shippingIns.pod = $event.id; formShippingInstruction.controls['pod'].setValue($event.id); shippingIns.podName= $event.nameEn"
+                                            [selectedDisplayFields]="['nameEn']"                             
+                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        </app-combo-grid-virtual-scroll> 
+
                                         <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pod == null">
                                             Port of Discharge is required
                                         </div>
+
+                                        <div class="form-control-feedback" *ngIf="formShippingInstruction.submitted && shippingIns.pol == shippingIns.pod && shippingIns.pod != null">
+                                            Port of loading is not allow same value
+                                        </div>
+                                        
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

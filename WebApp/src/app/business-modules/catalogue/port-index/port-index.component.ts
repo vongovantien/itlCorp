@@ -19,6 +19,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import {PlaceTypeEnum} from 'src/app/shared/enums/placeType-enum';
 declare var $: any;
+import * as dataHelper from 'src/helper/data.helper';
 
 @Component({
   selector: 'app-port-index',
@@ -32,15 +33,11 @@ export class PortIndexComponent implements OnInit {
   portIndex: PortIndex = new PortIndex();
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = { placeType: PlaceTypeEnum.Port };
-  keySortDefault: string = "code";
-  nameModal = "edit-port-index-modal";
-  titleAddModal = "Add Port Index";
-  titleEditModal = "Edit Port Index";
+  //nameModal = "edit-port-index-modal";
   addButtonSetting: ButtonModalSetting = {
-    dataTarget: this.nameModal,
+    dataTarget: 'edit-port-index-modal',
     typeButton: ButtonType.add
   };
-  selectedFilter = "All";
   importButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.import
   };
@@ -55,8 +52,7 @@ export class PortIndexComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   configSearch: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.portIndexSettings,
+    settingFields: this.portIndexSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.outtab
   };
   @ViewChild('formAddEdit',{static:false}) form: NgForm;
@@ -67,19 +63,22 @@ export class PortIndexComponent implements OnInit {
   countries: any[];
   areas: any[];
   modes: any[];
-  countryActive: any;
-  areaActive: any;
+  countryActive: any[] = [];
+  areaActive: any[] = [];
   isDesc: boolean = false;
-  titleConfirmDelete = "You want to delete this port index";
-  modeActive: any;
+  modeActive: any[] = [];
 
   constructor(private baseService: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService,
-    private excelService: ExcelService,) { }
+    private excelService: ExcelService,) {
+        this.baseService.get(this.api_menu.System.User_Management.getAll).subscribe(data=>{
+          this.baseService.changeData("data",data);
+        });
+     }
 
   ngOnInit() {
-    this.pager.totalItems = 0;
+    this.initPager();
     this.getPortIndexs(this.pager);
     this.getDataCombobox();
   }
@@ -89,25 +88,29 @@ export class PortIndexComponent implements OnInit {
     this.pager.pageSize = pager.pageSize;
     this.getPortIndexs(pager);
   }
-  getPortIndexs(pager: PagerSetting): any {
-    this.baseService.spinnerShow();
-    this.baseService.post(this.api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      this.portIndexs = response.data.map(x => Object.assign({}, x));
-      this.pager.totalItems = response.totalItems;
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+  initPager() {
+    this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
+  }
+  async getPortIndexs(pager: PagerSetting) {
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
+    if(responses != null){
+      this.portIndexs = responses.data;
+      this.pager.totalItems = responses.totalItems;
+    }
+    else{
+      this.portIndexs = [];
+      this.pager.totalItems = 0;
+    }
   }
   onSearch(event) {
+    this.criteria = {
+      placeType: PlaceTypeEnum.Port
+    };
     if (event.field == "All") {
       this.criteria.all = event.searchString;
     }
     else {
-      this.criteria = {
-        placeType: PlaceTypeEnum.Port
-      };
       let language = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
       if (language == SystemConstants.LANGUAGES.ENGLISH) {
         if (event.field == "countryName") {
@@ -130,17 +133,17 @@ export class PortIndexComponent implements OnInit {
       if (event.field == "code") {
         this.criteria.code = event.searchString;
       }
-      if (event.field == "nameEN") {
+      if (event.field == "nameEn") {
         this.criteria.nameEN = event.searchString;
       }
-      if (event.field == "nameVN") {
+      if (event.field == "nameVn") {
         this.criteria.nameVN = event.searchString;
       }
       if (event.field == "modeOfTransport") {
         this.criteria.modeOfTransport = event.searchString;
       }
     }
-    this.pager.currentPage = 1;
+    this.initPager();
     this.setPage(this.pager);
   }
   resetSearch(event) {
@@ -151,17 +154,20 @@ export class PortIndexComponent implements OnInit {
   }
   showAdd() {
     this.initPortIndex();
-    this.ngSelectCountry.active = [];
-    this.ngSelectArea.active = [];
-    this.ngSelectMode.active = [];
   }
   initPortIndex() {
+    this.form.onReset();
     this.portIndex = new PortIndex();
     this.portIndex.placeType = PlaceTypeEnum.Port;
-    this.modeActive = null;
+    this.modeActive = [];
+    this.countryActive = [];
+    this.areaActive = [];
+    this.portIndex.countryID = null;
+    this.portIndex.areaID = null;
+    this.portIndex.modeOfTransport = null;
   }
   onSubmit() {
-    if (this.form.valid) {
+    if (this.form.valid && this.portIndex.countryID != null && this.portIndex.modeOfTransport != null) {
       if (this.portIndex.id == null) {
         this.addNew();
       }
@@ -171,44 +177,31 @@ export class PortIndexComponent implements OnInit {
     }
   }
 
-  update(): any {
-    this.baseService.spinnerShow();
-    this.baseService.put(this.api_menu.Catalogue.CatPlace.update + this.portIndex.id, this.portIndex).subscribe((response: any) => {
-      
-      this.form.onReset();
-      this.initPortIndex();
-      $('#' + this.nameModal).modal('hide');
-      this.baseService.successToast(response.message);
-      this.baseService.spinnerHide();
-      this.setPage(this.pager);
-    }, err => {
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+  async update() {
+    var response = await this.baseService.putAsync(this.api_menu.Catalogue.CatPlace.update + this.portIndex.id, this.portIndex, true, true);
+    if(response != null){
+      if(response.status){
+        this.initPortIndex();
+        $('#edit-port-index-modal').modal('hide');
+        this.getPortIndexs(this.pager);
+      }
+    }
   }
 
-  addNew(): any {
-    this.baseService.spinnerShow();
-    this.baseService.post(this.api_menu.Catalogue.CatPlace.add, this.portIndex).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      this.baseService.successToast(response.message);
-      this.form.onReset();
-      this.initPortIndex();
-      $('#' + this.nameModal).modal('hide');
-      this.pager.totalItems = this.pager.totalItems + 1;
-      this.pager.currentPage = 1;
-      this.child.setPage(this.pager.currentPage);
-    }, err => {
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+  async addNew() {
+    let response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.add, this.portIndex, true, true);
+    if(response != null){
+      if(response.status){
+        this.initPager();
+        this.getPortIndexs(this.pager);
+        $('#edit-port-index-modal').modal('hide');
+      }
+    }
   }
-
 
   onCancel() {
-    this.form.onReset();
     this.initPortIndex();
-    this.setPage(this.pager);
+    this.getPortIndexs(this.pager);
   }
 
   getDataCombobox() {
@@ -216,62 +209,36 @@ export class PortIndexComponent implements OnInit {
     this.getAreas();
     this.getModeOfTransport();
   }
-  getModeOfTransport(): any {
-    this.baseService.spinnerShow();
-    this.baseService.get(this.api_menu.Catalogue.CatPlace.getModeOfTransport).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      if (response != null) {
-        this.modes = response.map(x => ({ "text": x.name, "id": x.id }));
-      }
-      else {
-        this.modes = [];
-      }
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+  async getModeOfTransport() {
+    let responses = await this.baseService.getAsync(this.api_menu.Catalogue.CatPlace.getModeOfTransport, false, false);
+    if(responses != null){
+      this.modes = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
+    }
+    else{
+      this.modes = [];
+    }
   }
-  getAreas(): any {
-    this.baseService.spinnerShow();
-    this.baseService.get(this.api_menu.Catalogue.Area.getAllByLanguage).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      if (response != null) {
-        this.areas = response.map(x => ({ "text": x.name, "id": x.id }));
-      }
-      else {
-        this.areas = [];
-      }
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+  async getAreas() {
+    let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Area.getAllByLanguage, false, false);
+    if(responses != null){
+      this.areas = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
+    }
+    else{
+      this.areas = [];
+    }
   }
-  getCountries() {
-    this.baseService.spinnerShow();
-    this.baseService.get(this.api_menu.Catalogue.Country.getAllByLanguage).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      if (response != null) {
-        this.countries = response.map(x => ({ "text": x.name, "id": x.id }));
-      }
-      else {
-        this.countries = [];
-      }
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+  async getCountries() {
+    let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage, false, true);
+    if(responses != null){
+      this.countries = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
+    }
+    else{
+      this.countries = [];
+    }
   }
-  valueCountry: any = {};
-  valueArea: any = {};
-  valueMode: any = {};
-  refreshCountryValue(value: any): void {
-    this.valueCountry = value;
-  }
-  refreshAreaValue(value: any): void {
-    this.valueArea = value;
-  }
-  refreshModeValue(value: any): void{
-    this.valueMode = value;
+  value: any = {};
+  refreshValue(value: any): void {
+    this.value = value;
   }
   public removed(value: any): void {
     console.log('Removed value is: ', value);
@@ -279,24 +246,44 @@ export class PortIndexComponent implements OnInit {
   public typed(value: any): void {
     console.log('New search input: ', value);
   }
-  onCountrychange(country) {
-    this.portIndex.countryID = country.id;
-  }
-  onAreachange(area) {
-    this.portIndex.areaID = area.id;
-  }
-  onModechange(mode){
-    this.portIndex.modeOfTransport = mode.id;
-  }
   showConfirmDelete(item) {
     this.portIndex = item;
   }
-  showDetail(item) {
+  showDetail(item: PortIndex) {
     this.portIndex = item;
-    this.countryActive = this.countries.find(x => x.id == this.portIndex.countryID);
-    this.areaActive = this.areas.find(x => x.id == this.portIndex.areaID);
-    this.modeActive = this.modes.find(x => x.id == this.portIndex.modeOfTransport);
+    this.countryActive = this.getCountryActive(this.portIndex.countryID);
+    this.areaActive = this.getDistrictAactive(this.portIndex.areaID);
+    this.modeActive = this.getModeActive(this.portIndex.modeOfTransport);
   }
+  getModeActive(modeOfTransport: string){
+    let index = this.modes.findIndex(x => x.id == modeOfTransport);
+    if(index > -1){
+      return [this.modes[index]];
+    }
+    else{
+      return [];
+    }
+  }
+  getDistrictAactive(areaID: string) {
+    let index = this.areas.findIndex(x => x.id == areaID);
+    if(index > -1){
+      return [this.areas[index]];
+    }
+    else{
+      return [];
+    }
+  }
+  getCountryActive(countryID: number) {
+    let index = this.countries.findIndex(x => x.id == countryID);
+    if(index > -1)
+    {
+      return [this.countries[index]];
+    }
+    else{
+      return [];
+    }
+  }
+
 
   async onDelete(event) {
     console.log(event);

@@ -8,10 +8,10 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +31,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatStageService catStageService;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
 
         public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user)
         {
@@ -71,7 +70,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult AddStage(CatStageModel catStageModel)
         {
-            catStageModel.DatetimeCreated = DateTime.Now;
+            catStageModel.DatetimeCreated = catStageModel.DatetimeModified = DateTime.Now;
             catStageModel.UserCreated = currentUser.UserID;
             catStageModel.Inactive = false;
             var hs = catStageService.Add(catStageModel);
@@ -106,6 +105,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult DeleteStage(int id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catStageService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -210,7 +210,7 @@ namespace eFMS.API.Catalogue.Controllers
  
             try
             {
-                templateName = "Stage" + templateName;
+                string templateName = "Stage" + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

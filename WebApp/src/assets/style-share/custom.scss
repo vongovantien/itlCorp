@@ -139,6 +139,10 @@ a {
         }
     }
 }
+.btn-cancel {
+    background-color: #ddd;
+    border-color: #ddd;
+}
 .form-group {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
@@ -953,7 +957,7 @@ table.dataTable {
     }
 }
 .fit-height-div {
-    max-height: 250px;
+    height: 250px;
     overflow: auto;
 }
 .alert {

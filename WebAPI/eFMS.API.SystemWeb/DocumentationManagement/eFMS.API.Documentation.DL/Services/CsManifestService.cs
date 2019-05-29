@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -152,6 +153,8 @@ namespace eFMS.API.Documentation.DL.Services
                 });
             }
             result.ReportName = "rptManifest.rpt";
+            result.AllowPrint = true;
+            result.AllowExport = true;
             result.AddDataSource(new List<ManifestReportResult> { manifest });
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.AddSubReport("ManifestHouseBillDetail", housebillList);

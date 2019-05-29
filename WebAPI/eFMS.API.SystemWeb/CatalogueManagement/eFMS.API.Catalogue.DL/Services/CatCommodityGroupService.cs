@@ -7,24 +7,27 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using eFMS.API.Catalogue.DL.ViewModels;
 using System.Globalization;
 using System.Threading;
 using ITL.NetCore.Common;
-using eFMS.API.Catalogue.Service.Helpers;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
+using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCommodityGroupService : RepositoryBase<CatCommodityGroup, CatCommodityGroupModel>, ICatCommodityGroupService
     {
         private readonly IStringLocalizer stringLocalizer;
-        public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
+            currentUser = user;
             SetChildren<CatCommodity>("Id", "CommodityGroupId");
         }
 
@@ -181,9 +184,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         GroupNameEn = item.GroupNameEn,
                         GroupNameVn = item.GroupNameVn,
-                        Inactive = item.Status.ToString().ToLower() == "active" ? false : true,
+                        Inactive = item.Status.ToLower() == "active" ? false : true,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID
                     };
                     dc.CatCommodityGroup.Add(commodityGroup);
                 }

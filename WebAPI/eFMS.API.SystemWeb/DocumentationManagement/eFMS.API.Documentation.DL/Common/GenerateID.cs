@@ -26,5 +26,11 @@ namespace eFMS.API.Documentation.DL.Common
             var currentDate = DateTime.Now;
             return prefix + String.Format("{0:0000}", number);
         }
+        public static string GenerateOPSJobID(string servicePrefix, int number)
+        {
+            number = number + 1;
+            var currentDate = DateTime.Now;
+            return servicePrefix + currentDate.Year.ToString().Substring(2) + "/" + String.Format("{0:00}", currentDate.Month) + String.Format("{0:00000}", number);
+        }
     }
 }

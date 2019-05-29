@@ -25,7 +25,9 @@ export class ChargeComponent implements OnInit {
     private excelService: ExcelService,
     private api_menu: API_MENU,
     private router: Router,
-    private sortService: SortService) { }
+    private sortService: SortService) {
+      this.baseServices.changeData("location","change location message from charge component")
+     }
 
   listFilter = [
     { filter: "All", field: "all" }, { filter: "Code", field: "code" },

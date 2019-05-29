@@ -5,15 +5,47 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { language } from 'src/languages/language.en';
 
+import { BehaviorSubject, Observable } from 'rxjs';
+
 @Injectable({
   providedIn: 'root'
 })
 
-export class BaseService implements ErrorHandler {
+export class  BaseService implements ErrorHandler {
 
   private headers: HttpHeaders;
   protected baseUrl: string;
   protected showError: boolean;
+
+  /**
+   * 
+   */
+  private _DataStorage: BehaviorSubject<Object> = new BehaviorSubject({ "default": "hello world !" });
+  public dataStorage = this._DataStorage.asObservable();
+  public changeData(key: string, value: any) {
+    this._DataStorage.next({ ...this._DataStorage.value, [key]: value });
+  }
+
+  public getDataStorageByKey(key:string){
+    var _this = this;
+    return new Promise(function(resolve,reject){
+      _this.dataStorage.subscribe(data=>{
+        const result = data[key];
+        if(result!==undefined){
+          resolve(result);
+        }else{
+          resolve(null);
+        }
+      },err=>{
+        reject(err);
+      });
+    });
+  }
+
+  /**
+   * 
+   */
+
 
   public LANG = language;
 
@@ -34,7 +66,7 @@ export class BaseService implements ErrorHandler {
    * you must handle error or state by yourself
    * @param url 
    */
-  public get(url: string) {
+  public get(url: string){
 
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
@@ -135,7 +167,6 @@ export class BaseService implements ErrorHandler {
       this.spinnerShow();
     try {
       const res = await this._http.put(url, data, { headers: this.headers }).toPromise();
-      console.log(res)
       this.spinnerHide();
       this.handleState(res, display_notify);
       return res;
@@ -191,7 +222,6 @@ export class BaseService implements ErrorHandler {
       const res = await this._http.post(url, data, { responseType: "blob" }).toPromise();
       return res;
     } catch (error) {
-      console.log({ DOWNLOAD_ERROR_LOG: error });
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
@@ -204,7 +234,6 @@ export class BaseService implements ErrorHandler {
       const res = await this._http.get(url, { responseType: 'blob' }).toPromise();
       saveAs(res, saveAsFileName);
     } catch (error) {
-      console.log({ DOWNLOAD_ERROR_LOG: error });
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
@@ -268,7 +297,7 @@ export class BaseService implements ErrorHandler {
 
   public logOut() {
     localStorage.clear();
-   
+
     setTimeout(() => {
       this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
     }, 1000);
@@ -311,14 +340,9 @@ export class BaseService implements ErrorHandler {
     this.spinnerService.hide();
   }
 
-  checkLoginSession(display_warning = true): boolean {
+  checkLoginSession(): boolean {
     if (this.hasValidAccessToken() == false) {
-      if (display_warning) {
-        this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
-      }     
-      this.router.navigateByUrl('/login');
       localStorage.clear();
-      // this.reloadPage();
       return false;
     } else {
       return true;
@@ -326,8 +350,10 @@ export class BaseService implements ErrorHandler {
   }
 
 
-
-  reloadPage() {
+  /**
+   * Use to hot reload all app 
+   */
+  public reloadPage() {
     if (window.location.hostname === 'localhost') {
       window.location.href = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
     } else {
@@ -354,14 +380,18 @@ export class BaseService implements ErrorHandler {
   /**
    * Return true if access token will be expire time after 3 minutes
    */
-  public remainingExpireTimeToken() :number{
+  public remainingExpireTimeToken(): number {
     if (this.getAccessToken()) {
       var expiresAt = localStorage.getItem('expires_at');
-      var expTime = +new Date(parseInt(expiresAt,10));
+      var expTime = +new Date(parseInt(expiresAt, 10));
       var nowTime = +new Date();
       const remainingMinutes = new Date(expTime - nowTime).getMinutes();
-
-      return remainingMinutes
+      const remainingHours = new Date(expTime).getHours() - new Date(nowTime).getHours();
+      if (remainingHours == 0) {
+        return remainingMinutes;
+      } else {
+        return -1;
+      }
     }
     return -1;
   };

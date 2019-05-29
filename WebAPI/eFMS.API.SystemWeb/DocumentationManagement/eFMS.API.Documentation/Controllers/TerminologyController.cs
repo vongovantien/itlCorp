@@ -28,6 +28,12 @@ namespace eFMS.API.Documentation.Controllers
             var results = terminologyService.GetAllShipmentCommonData();
             return Ok(results);
         }
-
+        [HttpGet]
+        [Route("GetOPSShipmentCommonData")]
+        public IActionResult GetOPSCommonData()
+        {
+            var results = terminologyService.GetOPSShipmentCommonData();
+            return Ok(results);
+        }
     }
 }

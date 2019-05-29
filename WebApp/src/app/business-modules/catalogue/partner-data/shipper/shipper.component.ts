@@ -28,8 +28,6 @@ export class ShipperComponent implements OnInit {
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.SHIPPER };
   isDesc: boolean = false;
-  keySortDefault: string = "id";
-  // @ViewChild(PaginationComponent) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
   constructor(private baseService: BaseService, 
     private excelService: ExcelService,
@@ -38,21 +36,13 @@ export class ShipperComponent implements OnInit {
 
   ngOnInit() {
   }
-  getPartnerData(pager: PagerSetting, criteria?: any): any {
-    this.baseService.spinnerShow();
+  async getPartnerData(pager: PagerSetting, criteria?: any) {
     if(criteria != undefined){
       this.criteria = criteria;
     }
-    this.baseService.post(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      this.shippers = response.data.map(x=>Object.assign({},x));
-      console.log(this.shippers);
-      this.pager.totalItems = response.totalItems;
-      return this.pager.totalItems;
-    },err=>{
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    this.shippers = responses.data;
+    this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
     if(column.dataType != 'boolean'){

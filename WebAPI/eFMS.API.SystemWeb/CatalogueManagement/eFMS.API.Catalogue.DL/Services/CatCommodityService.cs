@@ -7,14 +7,13 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using eFMS.API.Catalogue.DL.ViewModels;
 using ITL.NetCore.Common;
-using eFMS.API.Catalogue.Service.Helpers;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
+using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -34,7 +33,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public override HandleState Add(CatCommodityModel model)
         {
             var commonity = mapper.Map<CatCommodity>(model);
-            commonity.DatetimeCreated = DateTime.Now;
+            commonity.DatetimeCreated = commonity.DatetimeModified = DateTime.Now;
             commonity.Inactive = false;
             var result = DataContext.Add(commonity);
             if (result.Success)
@@ -116,6 +115,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CommodityNameEn = item.CommodityNameEn,
                         CommodityNameVn = item.CommodityNameVn,
                         CommodityGroupId = item.CommodityGroupId,
+                        Code = item.Code,
                         Inactive = item.Status.ToString().ToLower()=="active"?false:true,
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
@@ -125,7 +125,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     newList.Add(commodity);
                 }
                 dc.SaveChanges();
-                if (lstCommodity.Count == 0)
+                if (lstCommodity == null)
                 {
                     lstCommodity = dc.CatCommodity.ToList();
                 }
@@ -151,13 +151,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 return results;
             }
             rowsCount = data.Count();
+            data = data.OrderByDescending(x => x.DatetimeModified);
             if (size > 1)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                results = data.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).ToList();
+                results = data.Skip((page - 1) * size).Take(size).ToList();
             }
             return results;
         }

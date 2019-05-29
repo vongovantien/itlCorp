@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="rptLCLQuotation" xml:space="preserve">
+    <value>select pCus.ShortName, pCus.PartnerName_VN, pCus.PartnerName_EN, sq.DatetimeCreated
+	   , (select top 1 pc.ContactName_VN
+		  from catPartnerContact pc
+		  where pCus.ID = pc.PartnerID and isnull(pc.IsDefault,0) = 1 and isnull(pc.Inactive,0) = 0
+		  order by pc.DatetimeCreated desc) as ContactName_VN
+	   , (select top 1 pc.ContactName_EN
+		  from catPartnerContact pc
+		  where pCus.ID = pc.PartnerID and isnull(pc.IsDefault,0) = 1 and isnull(pc.Inactive,0) = 0
+		  order by pc.DatetimeCreated desc) as ContactName_EN
+	   , (select top 1 pc.JobTitle
+		  from catPartnerContact pc
+		  where pCus.ID = pc.PartnerID and isnull(pc.IsDefault,0) = 1 and isnull(pc.Inactive,0) = 0
+		  order by pc.DatetimeCreated desc) as JobTitle
+	   , c.CommodityName_VN, c.CommodityName_EN, sqr.PickupAdress, sqr.DeliveryAddress
+	   , eSale.EmployeeName_VN, ugSale.Name as SalePosition, eSale.HomePhone, eSale.ExtNo, eSale.Tel
+	   , eSale.Email, sq.MaximumDelayTime, sq.MaximumDelayTimeUnit, sq.PaymentDeadline
+	   , sq.PaymentDeadlineUnit, prc.EffectiveOn, prc.ExpiryOn, prc.FuelPrice
+from lcl.saleQuotation sq
+	 inner join lcl.saleQuotationRoute sqr on sq.ID = sqr.QuotationID
+	 inner join catPartner pCus on sq.CustomerID = pCus.ID
+	 left join catCommodity c on sqr.CommodityID = c.ID
+	 inner join sysUser uSale on sq.UserCreated = uSale.ID
+	 inner join sysEmployee eSale on uSale.EmployeeID = eSale.ID
+	 inner join sysUserGroup ugSale on uSale.UserGroupID = ugSale.ID
+	 inner join lcl.priceRateCard prc on sq.RateCardID = prc.ID
+where sq.RateCardID = '{0}'</value>
+  </data>
+  <data name="rptLCLQuotationOverWeight" xml:space="preserve">
+    <value>select distinct prcowd.Ladder, prcowd.Price, unit.UnitName_VN, unit.UnitName_EN
+	     , PickupName = (select top 1 ps.DisplayName
+							from vw_catPlace ps
+							where ps.ID = prcc.PickupPlaceID)
+	   , DeliveryName = (select top 1 ps.DisplayName
+							  from vw_catPlace ps
+							  where ps.ID = prcc.DeliveryPlaceID)
+	   , (select top 1 ID
+		  from lcl.priceRateCardCondition prccs
+		  where prcc.PickupPlaceID = prccs.PickupPlaceID and prcc.DeliveryPlaceID = prccs.DeliveryPlaceID) as ConditionID
+				, prcowd.UnitID, prcc.SequentialNumber
+from lcl.priceRateCardCondition prcc
+	 left join lcl.priceRateCardOverWeightDetail prcowd on prcc.ID = prcowd.RateCardConditionID
+	 left join catUnit unit on prcowd.UnitID = unit.ID
+	 inner join lcl.saleQuotation sq on prcc.RateCardID = sq.RateCardID
+where prcc.RateCardID = '{0}' and prcc.ServiceTypeMappingID = '{1}'
+order by ConditionID, prcowd.UnitID, prcowd.Ladder</value>
+  </data>
+  <data name="rptLCLQuotationRateCardDetail" xml:space="preserve">
+    <value>DECLARE @Temp TABLE 
+(
+	sequence smallint identity,
+	FromValue decimal(18,4),
+	ToValue decimal(18,4),
+	Price decimal(18,4),
+	UnitName_VN nvarchar(50),
+	UnitName_EN nvarchar(50),
+	IsMinCharges bit,
+	PickupName nvarchar(500),
+	DeliveryName nvarchar(500),
+	ConditionID uniqueidentifier,
+	UnitID smallint,
+	SequentialNumber int
+)
+
+DECLARE @Temp2 TABLE 
+(
+	sequence smallint,
+	FromValue decimal(18,4),
+	ToValue decimal(18,4),
+	Price decimal(18,4),
+	UnitName_VN nvarchar(50),
+	UnitName_EN nvarchar(50),
+	IsMinCharges bit,
+	PickupName nvarchar(500),
+	DeliveryName nvarchar(500),
+	ConditionID uniqueidentifier,
+	UnitID smallint,
+	SequentialNumber int
+)
+
+INSERT INTO @Temp
+select distinct prccd.FromValue, prccd.ToValue, prccd.Price, unit.UnitName_VN, unit.UnitName_EN
+	   , isnull(prccd.IsMinCharges,0) as IsMinCharges
+	   , PickupName = (select top 1 ps.DisplayName
+							from vw_catPlace ps
+							where ps.ID = prcc.PickupPlaceID)
+	   , DeliveryName = (select top 1 ps.DisplayName
+							  from vw_catPlace ps
+							  where ps.ID = prcc.DeliveryPlaceID)
+	   , (select top 1 ID
+		  from lcl.priceRateCardCondition prccs
+		  where prcc.PickupPlaceID = prccs.PickupPlaceID and prcc.DeliveryPlaceID = prccs.DeliveryPlaceID) as ConditionID, prccd.UnitID
+	   ,  prcc.SequentialNumber
+from lcl.priceRateCardCondition prcc
+	 left join lcl.priceRateCardDetail prccd on prcc.ID = prccd.RateCardConditionID
+	 left join catUnit unit on prccd.UnitID = unit.ID
+	inner join lcl.saleQuotation sq on prcc.RateCardID = sq.RateCardID
+where prcc.RateCardID = '{0}' and prcc.ServiceTypeMappingID = '{1}'
+order by ConditionID, prccd.UnitID, prccd.FromValue
+
+DECLARE @Sequence smallint = 1
+
+INSERT INTO @Temp2 select * from @Temp where sequence = 1
+DELETE FROM @Temp WHERE sequence = 1
+
+WHILE (ISNULL((select count(*) from @Temp), 0) &gt;0 )
+BEGIN
+	
+	DECLARE @Price2 decimal(18,4)
+	DECLARE @UnitID2 smallint
+	DECLARE @ConditionID2 uniqueidentifier
+	DECLARE @IsMinCharges bit
+
+	SELECT @Price2 = Price, @UnitID2 = UnitID, @ConditionID2 = ConditionID, @IsMinCharges = IsMinCharges  FROM @Temp2 WHERE sequence = @Sequence
+
+	DECLARE @Price decimal(18, 4)
+	IF Exists(SELECT TOP 1 * FROM @Temp where sequence = (@Sequence + 1)
+	AND Price = @Price2 AND UnitID = @UnitID2 AND ConditionID = @ConditionID2 AND IsMinCharges = @IsMinCharges)
+	BEGIN
+		UPDATE @Temp2 SET ToValue = (SELECT TOP 1 ToValue FROM @Temp WHERE sequence = (@Sequence + 1))
+		WHERE sequence = (SELECT MAX(sequence) FROM @Temp2)
+	END
+	ELSE
+	BEGIN
+		INSERT INTO @Temp2 SELECT * FROM @Temp WHERE sequence = (@Sequence + 1)		
+	END
+
+	DELETE FROM @Temp WHERE sequence = (@Sequence + 1)
+	SET @Sequence = @Sequence + 1
+	
+END
+
+SELECT * FROM @Temp2</value>
+  </data>
+    <data name="rptPRS" xml:space="preserve">
+    <value>SELECT tr.Code, tr.BarCode, cus.ShortName as CustomerName_VN
+	, DriverName= (CASE WHEN ISNULL(tr.IsHire,0)=1 THEN  (SELECT TOP 1 ShortName FROM dbo.catPartner WHERE ID = tr.SupplierID) 
+	ELSE (SELECT TOP 1 DriverName_VN FROM dbo.catDriver WHERE ID = tr.DRIVERID) END)  
+, v.LicensePlate as Vehicle, tr.RequestedForDate as ExecutionDate
+, emp.EmployeeName_VN AS Requester, b.Code as Branch, bu.Logo as Logo, o.Code as OrderDetailCode, o.AWB, o.PickupCompany, o.PickupAddress +
+', ' + pw.Name_VN + ', ' + pw.DistrictName_VN + ', ' + pw.ProvinceName_VN as PickupAddress
+, o.PickupContactPerson, o.PickupContactNo, com.CommodityName_VN as Commodity, o.TotalCustomerQuantity
+, otr.Weight as EstimateWeight
+, (case when otr.Weight = o.TotalEstimateVolume then (o.TotalEstimateVolume / (case when isnull(o.VolumnWeightRate,0) > 0 then o.VolumnWeightRate else 250 end))
+		else ((o.TotalEstimateVolume * otr.Weight) / ISNULL(o.TotalEstimateWeight, 1)) / (case when isnull(o.VolumnWeightRate,0) > 0 then o.VolumnWeightRate else 250 end) end) as EstimateCBM
+, o.TotalEstimateWeight, (o.TotalEstimateVolume / (case when isnull(o.VolumnWeightRate,0) > 0 then o.VolumnWeightRate else 250 end)) as TotalEstimateCBM
+, (pt.FromTime + '-' + pt.ToTime) as DisplayPickupRequestTime, o.PickupInstruction
+, STUFF((select '|' + c.ChargeName_VN +': ' + convert(varchar, cast(bh.Price  as money),1) + ' ' + bh.CurrencyID as 'data()' 
+				  from lcl.csOrderChargeBehalf bh
+				  join dbo.catCharge c on c.ID= bh.ChargeID
+				  where bh.OrderID= o.ID and (bh.TransportRequestID is null or bh.TransportRequestID= tr.ID)
+				  and bh.BehalfType='Income' and bh.ReceivingPlace='Pickup'
+				  for xml path('')), 1, 1,'') as ChargeBehalf
+  FROM [lcl].[opsTransportRequest] tr
+  left join lcl.opsOrderTransportRequest otr on tr.ID= otr.TransportRequestID
+  left join lcl.csOrder o on o.ID= otr.OrderID
+  left join dbo.catPartner cus on cus.ID= o.CustomerID
+  left join dbo.vw_catPickupDeliveryPlace pw on pw.ID= o.PickupWardID
+  left join dbo.catVehicle v on tr.VehicleID= v.ID
+  left join dbo.sysUser u on tr.UserCreated= u.ID
+  left join dbo.sysEmployee emp on emp.ID= u.EmployeeID
+  left join dbo.catCommodity com on o.CommodityID= com.ID
+  left join lcl.catPickupTime pt on o.PickupRequestTime= pt.ID
+  left join dbo.vw_catBranch  b on tr.ResponsibleWorkPlaceID= b.BranchID
+  left join dbo.catHub  h on tr.ResponsibleWorkPlaceID= h.HubID
+  left join dbo.sysBU bu on bu.ID= h.BUID
+  where tr.ID='{0}'</value>
+  </data>
+</root>

@@ -1,29 +1,17 @@
 ﻿using AutoMapper;
 using eFMS.API.Shipment.Infrastructure;
-using eFMS.API.Shipment.Infrastructure.Filters;
 using eFMS.API.Shipment.Infrastructure.Middlewares;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace eFMS.API.Shipment
 {
@@ -56,19 +44,25 @@ namespace eFMS.API.Shipment
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services);
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder
-                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-                            .AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials();
-                    });
-            });
+            services.AddCrossOrigin();
+            //var key = Encoding.ASCII.GetBytes("EFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPREFMS-ITLCOPR");
+            //services.AddAuthentication(x =>
+            //{
+            //    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //})
+            //.AddJwtBearer(x =>
+            //{
+            //    x.RequireHttpsMetadata = false;
+            //    x.SaveToken = true;
+            //    x.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(key),
+            //        ValidateIssuer = false,
+            //        ValidateAudience = false
+            //    };
+            //});
             //services.AddCustomAuthentication(Configuration);
             services.AddApiVersioning(config =>
             {
@@ -82,7 +76,11 @@ namespace eFMS.API.Shipment
             services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
             services.AddCulture(Configuration);
             services.AddSwagger(Configuration);
-            DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
+            services.AddConfigureSetting(Configuration);
+            //services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
+            //services.AddOptions().AddCatelogueManagementApiServices();
+            //services.AddOptions().AddSystemManagementApiServices();
+            //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

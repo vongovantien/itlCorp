@@ -1,7 +1,8 @@
 export class Warehouse { 
-    id: number;
+    id: string = "00000000-0000-0000-0000-000000000000";
     code: string;
-    name: string;
+    nameEn: string;
+    nameVn: string;
     countryID?: number;
     districtID?: string;
     provinceID?:string;
@@ -10,4 +11,5 @@ export class Warehouse {
     districtName: string;
     address: string;
     placeType: number;
+    inactive?: boolean;
 }

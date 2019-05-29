@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Common;
@@ -157,7 +158,7 @@ namespace eFMS.API.Documentation.DL.Services
                 listPartners = listPartners.Distinct().ToList();
                 foreach(var item in listPartners)
                 {
-                    var SOA = DataContext.Where(x => x.PartnerId == item.Id).ToList();
+                    var SOA = DataContext.Where(x => x.PartnerId == item.Id && x.JobId==JobId).ToList();
                     List<object> listSOA = new List<object>();
                     foreach(var soa in SOA)
                     {

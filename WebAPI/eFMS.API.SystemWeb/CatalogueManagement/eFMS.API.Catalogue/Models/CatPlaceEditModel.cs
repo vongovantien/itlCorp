@@ -14,10 +14,10 @@ namespace eFMS.API.Catalogue.Models
         public string Code { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         [StringLength(200, MinimumLength = 3, ErrorMessage = "EF_ANNOTATIONS_STRING_LENGTH")]
-        public string NameVN { get; set; }
+        public string NameVn { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         [StringLength(200, MinimumLength = 3, ErrorMessage = "EF_ANNOTATIONS_STRING_LENGTH")]
-        public string NameEN{ get; set; }
+        public string NameEn{ get; set; }
         public string DisplayName { get; set; }
         public string Address { get; set; }
         public Guid? DistrictId { get; set; }

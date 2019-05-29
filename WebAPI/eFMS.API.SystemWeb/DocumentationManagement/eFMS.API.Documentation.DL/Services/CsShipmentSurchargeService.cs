@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -17,6 +18,15 @@ namespace eFMS.API.Documentation.DL.Services
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper) : base(repository, mapper)
         {
 
+        }
+        public override HandleState Add(CsShipmentSurchargeModel model)
+        {
+            model.Id = Guid.NewGuid();
+            model.ExchangeDate = DateTime.Now;
+            model.DatetimeCreated = DateTime.Now;
+            var entity = mapper.Map<CsShipmentSurcharge>(model);
+            var result = DataContext.Add(entity);
+            return result;
         }
 
         public HandleState DeleteCharge(Guid chargeId)

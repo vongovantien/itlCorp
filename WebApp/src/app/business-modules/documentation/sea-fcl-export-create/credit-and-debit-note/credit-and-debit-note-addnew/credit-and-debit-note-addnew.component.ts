@@ -11,7 +11,6 @@ import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
 declare var $: any;
 // import * as $ from 'jquery';
 import { NgForm } from '@angular/forms';
-import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 @Component({
   selector: 'app-credit-and-debit-note-addnew',
   templateUrl: './credit-and-debit-note-addnew.component.html',
@@ -34,7 +33,8 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   @Output() addNewRemainingCharges = new EventEmitter<any>();
   @Output() currentPartnerIdEmit = new EventEmitter<string>();
-  @Input() set chargesFromRemaining(listCharges:any){
+  @Output() newCDNote = new EventEmitter<boolean>();
+  @Input() set chargesFromRemaining(listCharges: any) {
     this.listChargeOfPartner = cloneDeep(listCharges);
     this.constListChargeOfPartner = cloneDeep(listCharges);
   }
@@ -53,26 +53,27 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartnerByJobId + "?JobId=" + ExtendData.currentJobID).subscribe((data: any[]) => {
       this.listSubjectPartner = cloneDeep(data);
       this.constListSubjectPartner = cloneDeep(data);
-      console.log(this.listSubjectPartner);
     });
   }
   async getListCharges(partnerId: string) {
-    this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?JobId=" + ExtendData.currentJobID + "&partnerID=" + partnerId);
-    this.CDNoteWorking.listShipmentSurcharge = [];    
-    this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
-      for (var i = 0; i < o.listCharges.length; i++) {
-        o.listCharges[i].isRemaining = false;
-      }
-      return o;
-    });
-    this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
-    this.setChargesForCDNote();
-    this.totalCreditDebitCalculate();
-    this.addNewRemainingCharges.emit(this.listChargeOfPartner);
-    this.currentPartnerIdEmit.emit(partnerId);
-    setTimeout(() => {
-      this.checkSttAllNode();
-    }, 100);
+    if(ExtendData.currentJobID!==null && partnerId!=null){
+      this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?JobId=" + ExtendData.currentJobID + "&partnerID=" + partnerId);
+      this.CDNoteWorking.listShipmentSurcharge = [];
+      this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
+        for (var i = 0; i < o.listCharges.length; i++) {
+          o.listCharges[i].isRemaining = false;
+        }
+        return o;
+      });
+      this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
+      this.setChargesForCDNote();
+      this.totalCreditDebitCalculate();
+      this.addNewRemainingCharges.emit(this.listChargeOfPartner);
+      this.currentPartnerIdEmit.emit(partnerId);
+      setTimeout(() => {
+        this.checkSttAllNode();
+      }, 100);
+    }
 
   }
 
@@ -141,29 +142,33 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   }
 
-  async CreateCDNote(form: NgForm) {
-    if (form.submitted) {
-      var errors = $('#add-credit-debit-note-modal').find('div.has-danger');
-      if (errors.length == 0) {
-        console.log({ "CURRENT_JOB_ID": ExtendData.currentJobID });
-        this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
-        this.CDNoteWorking.currencyId = "USD" // in the future , this id must be local currency of each country
-        this.CDNoteWorking.listShipmentSurcharge = filter(this.CDNoteWorking.listShipmentSurcharge, function (o: any) {
-          return !o.isRemaining;
-        });
-        var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
-        if (res.status) {
-          $('#add-credit-debit-note-modal').modal('hide');
-          this.CDNoteWorking = new AcctSOA();
-          this.resetAddSOAForm();
+  CreateCDNote(form: NgForm) {
+    setTimeout(async () => {
+      if (form.submitted) {
+        var errors = $('#add-credit-debit-note-modal').find('div.has-danger');
+        if (errors.length == 0) {
+          this.CDNoteWorking.jobId = ExtendData.currentJobID;
+          this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
+          this.CDNoteWorking.currencyId = "USD" // in the future , this id must be local currency of each country
+          this.CDNoteWorking.listShipmentSurcharge = filter(this.CDNoteWorking.listShipmentSurcharge, function (o: any) {
+            return !o.isRemaining;
+          });
+          var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
+          if (res.status) {
+            $('#add-credit-debit-note-modal').modal('hide');
+            this.CDNoteWorking = new AcctSOA();
+            this.resetAddSOAForm();
+          }
         }
       }
-    }
+    }, 200);
   }
 
   resetAddSOAForm() {
+    this.newCDNote.emit(true);
     this.isDisplayAddSoaForm = false;
     setTimeout(() => {
+      this.newCDNote.emit(false);
       this.isDisplayAddSoaForm = true;
     }, 300);
   }
@@ -290,10 +295,10 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
         this.listChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = true;
         const hbId = this.listChargeOfPartner[indexParent].id;
         const chargeId = this.listChargeOfPartner[indexParent].listCharges[indexSingle].id;
-        const constParentInx = this.constListChargeOfPartner.map(x=>x.id).indexOf(hbId);
-        const constChargeInx = this.constListChargeOfPartner[constParentInx].listCharges.map((x:any)=>x.id).indexOf(chargeId);
+        const constParentInx = this.constListChargeOfPartner.map(x => x.id).indexOf(hbId);
+        const constChargeInx = this.constListChargeOfPartner[constParentInx].listCharges.map((x: any) => x.id).indexOf(chargeId);
         this.constListChargeOfPartner[constParentInx].listCharges[constChargeInx].isRemaining = true;
-       
+
       }
     }
 

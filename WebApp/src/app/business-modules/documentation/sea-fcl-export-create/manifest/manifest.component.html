@@ -5,7 +5,7 @@
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <!--begin:: breadcrumbs-->
-            <!-- <app-breadcrumb></app-breadcrumb> -->
+            <app-breadcrumb></app-breadcrumb>
             <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
@@ -149,7 +149,7 @@
                             <label class="form-control-label" for="">
                                 Port of Loading <span class="m--font-danger">(*)</span>
                             </label>
-                            <div class="dropdown e--combogrid">
+                            <!-- <div class="dropdown e--combogrid">
                                 <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
                                     data-toggle="dropdown" [value]="manifest.polName == null?'Please selected port of loading':manifest.polName" value="">
                                 <div class="dropdown-menu e--combogrid-content">
@@ -189,7 +189,14 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
+                            <app-combo-grid-virtual-scroll *ngIf="manifest"
+                                [dataSources]="portOfLadings"
+                                [currentActiveItemId]="{field:'id',value:manifest.pol}"
+                                (itemSelected)="manifest.pol = $event.id; formManifest.controls['pol'].setValue($event.id); manifest.polName= $event.nameEn"
+                                [selectedDisplayFields]="['nameEn']"                             
+                                [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                            </app-combo-grid-virtual-scroll>   
                             <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == null">
                                 Port of Loading is required
                             </div>
@@ -200,7 +207,7 @@
                             <label class="form-control-label" for="">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
-                            <div class="dropdown e--combogrid">
+                            <!-- <div class="dropdown e--combogrid">
                                 <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly required
                                     data-toggle="dropdown" placeholder="Please selected"  [value]="manifest.podName == null?'Please selected port of loading':manifest.podName">
                                 <div class="dropdown-menu e--combogrid-content">
@@ -240,9 +247,19 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
+                            <app-combo-grid-virtual-scroll *ngIf="manifest"
+                                [dataSources]="portOfDestinations"
+                                [currentActiveItemId]="{field:'id',value:manifest.pod}"
+                                (itemSelected)="manifest.pod = $event.id; formManifest.controls['pod'].setValue($event.id); manifest.podName= $event.nameEn"
+                                [selectedDisplayFields]="['nameEn']"                             
+                                [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                            </app-combo-grid-virtual-scroll>  
                             <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pod == null">
                                 Port of Discharge is required
+                            </div>
+                            <div class="form-control-feedback" *ngIf="formManifest.submitted && manifest.pol == manifest.pod && manifest.pod != null">
+                                Port of loading is not allow same value
                             </div>
                         </div>
                     </div>
