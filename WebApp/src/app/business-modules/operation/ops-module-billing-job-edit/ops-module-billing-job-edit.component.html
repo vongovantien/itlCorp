@@ -1948,8 +1948,9 @@
     
     
     <!--begin:: add-buying-rate-modal-->
-    <form name="addBuyingRateChargeForm">
-        <div class="modal fade" id="add-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    <form novalidate name="addBuyingRateChargeFormOps" #addBuyingRateChargeFormOps="ngForm" *ngIf="isDisplay"
+    (ngSubmit)="addBuyingRateChargeFormOps.form.valid">
+        <div class="modal fade" id="ops-add-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
             aria-hidden="true">
     
             <div class="modal-dialog c-modal-fullscreen" role="document">
@@ -1966,23 +1967,26 @@
                         <div class="m-form m-form--state">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.chargeId==null}">
                                         <label class="form-control-label" for="" #selectedBuyingChargeCode>
                                             Charge  <span class="m--font-danger">(*)</span>
-                                            <small class="m--margin-left-5 m--font-primary">ChargeCode&nbsp;</small>
+                                            <small class="m--margin-left-5 m--font-primary">Charge&nbsp;
+                                                {{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
+                                            </small>
                                         </label>
                                         <app-combo-grid-virtual-scroll
-                                        [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToAdd.chargeId}"
-                                        (itemSelected)="BuyingRateChargeToAdd.chargeId=$event.charge.id;
-                                        BuyingRateChargeToAdd.unitId=$event.charge.unitId;
-                                        BuyingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
-                                        BuyingRateChargeToAdd.vatrate=$event.charge.vatrate;
-                                        selectedBuyingChargeCode.value=$event.charge.code;
-                                        calculateTotalEachBuying();"
-                                        [selectedDisplayFields]="['charge.chargeNameEn']"
-                                        [dataSources]="lstBuyingRateChargesComboBox"
-                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-                                    </app-combo-grid-virtual-scroll>
+                                            [currentActiveItemId]="{field:'charge.id',value:BuyingRateChargeToAdd.chargeId}"
+                                            (itemSelected)="BuyingRateChargeToAdd.chargeId=$event.charge.id;
+                                            BuyingRateChargeToAdd.unitId=$event.charge.unitId;
+                                            BuyingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
+                                            BuyingRateChargeToAdd.vatrate=$event.charge.vatrate;
+                                            selectedBuyingChargeCode.value=$event.charge.code;
+                                            calculateTotalEachBuying();"
+                                            [selectedDisplayFields]="['charge.chargeNameEn']"
+                                            [dataSources]="lstBuyingRateChargesComboBox"
+                                            [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                       </app-combo-grid-virtual-scroll>
                                         <!-- <div class="dropdown e--combogrid">
                                             <input class="form-control m-input m-input--square dropdown-toggle" type="text"
                                                 readonly data-toggle="dropdown" placeholder="Please selected"
@@ -2023,7 +2027,7 @@
                                                 </div>
                                             </div>
                                         </div> -->
-                                        <div class="form-control-feedback" style="display:none">
+                                        <div class="form-control-feedback" *ngIf="addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.chargeId==null">
                                             Charge is required
                                         </div>
                                     </div>
@@ -2035,28 +2039,26 @@
                                         <label class="form-control-label" for="">
                                             Partner type  <span class="m--font-danger">(*)</span>
                                         </label>
-                                        <!-- <ng-select [allowClear]="true" 
+                                        <ng-select [allowClear]="true" 
                                             [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
                                                 { 'text': 'OTHER', 'id': 'OTHER' }]" 
                                             [disabled]="disabled"
                                             (data)="refreshValue($event)"
-                                            (selected)=""
-                                            (removed)=""
+                                            (selected)="BuyingRateChargeToAdd.objectBePaid=$event.id;
+                                                    BuyingRateChargeToAdd.objectBePaid==='AGENT'? BuyingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='SHIPPING'? BuyingRateChargeToAdd.paymentObjectId=opsTransaction.coloaderId:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='AGENT'? selectedBuyingRatePartner.value=opsTransaction.agentName:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='SHIPPING'? selectedBuyingRatePartner.value=opsTransaction.coloaderName:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='OTHER'? selectedBuyingRatePartner.value=null:null;
+                                                    BuyingRateChargeToAdd.objectBePaid==='OTHER'? BuyingRateChargeToAdd.paymentObjectId=null:null;selectPartnerType();"
+
+                                            (removed)="BuyingRateChargeToAdd.objectBePaid=null;BuyingRateChargeToAdd.paymentObjectId=null;selectedBuyingRatePartner.value=null"
                                             (typed)="typed($event)" 
                                             placeholder="Select filter">
-                                        </ng-select> -->
-                                        <ng-select 
-                                            [allowClear]="true" 
-                                            [items]="items" 
-                                            [disabled]="disabled" 
-                                            (data)="refreshValue($event)"
-                                            (selected)="selected($event)" 
-                                            (removed)="removed($event)" 
-                                            (typed)="typed($event)"
-                                            placeholder="Select filter">
                                         </ng-select>
+                               
                                         <div class="form-control-feedback" style="display: none">
                                             Partner type is required !
                                         </div>
