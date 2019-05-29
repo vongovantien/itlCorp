@@ -29,7 +29,7 @@ export class ConsigneeComponent implements OnInit {
   isDesc: boolean = false;
   keySortDefault: string = "id";
   
-  @ViewChild(PaginationComponent) child; 
+  @ViewChild(PaginationComponent,{static:false}) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,

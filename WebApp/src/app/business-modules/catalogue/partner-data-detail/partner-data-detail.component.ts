@@ -37,11 +37,11 @@ export class PartnerDataDetailComponent implements OnInit {
   isRequiredSaleman = false;
   employee: any ={};
   titleConfirmDelete = "You want to delete this Partner?";
-  @ViewChild('formAddEdit') form: NgForm;
-  @ViewChild('chooseBillingCountry') public chooseBillingCountry: SelectComponent;
-  @ViewChild('chooseBillingProvince') public chooseBillingProvince: SelectComponent;
-  @ViewChild('chooseShippingCountry') public chooseShippingCountry: SelectComponent;
-  @ViewChild('chooseShippingProvince') public chooseShippingProvince: SelectComponent;
+  @ViewChild('formAddEdit',{static:false}) form: NgForm;
+  @ViewChild('chooseBillingCountry',{static:false}) public chooseBillingCountry: SelectComponent;
+  @ViewChild('chooseBillingProvince',{static:false}) public chooseBillingProvince: SelectComponent;
+  @ViewChild('chooseShippingCountry',{static:false}) public chooseShippingCountry: SelectComponent;
+  @ViewChild('chooseShippingProvince',{static:false}) public chooseShippingProvince: SelectComponent;
 
   constructor(private route:ActivatedRoute,
     private router:Router,

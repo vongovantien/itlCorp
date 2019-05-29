@@ -26,9 +26,9 @@ export class PortIndexImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild('form') form:any;
-  @ViewChild(PaginationComponent) child:any;
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+  @ViewChild('form',{static:false}) form:any;
+  @ViewChild(PaginationComponent,{static:false}) child:any;
+  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
   
   constructor(
     private pagingService: PagingService,

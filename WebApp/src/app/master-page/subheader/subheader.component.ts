@@ -8,7 +8,7 @@ import {PageSidebarComponent} from '../page-sidebar/page-sidebar.component';
 })
 export class SubheaderComponent implements OnInit,AfterViewInit {
 
-  @ViewChild(PageSidebarComponent) pageSideBar;
+  @ViewChild(PageSidebarComponent,{static:false}) pageSideBar;
 
   Page_Info ={}
 

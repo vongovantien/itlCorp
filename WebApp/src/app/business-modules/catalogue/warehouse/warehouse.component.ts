@@ -88,11 +88,11 @@ export class WarehouseComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   
-  @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
-  @ViewChild('chooseProvince') public ngSelectProvince: SelectComponent;
-  @ViewChild('chooseDistrict') public ngSelectDistrict: SelectComponent;
-  @ViewChild(PaginationComponent) child; 
-  @ViewChild('formAddEdit') form: NgForm;
+  @ViewChild('chooseCountry',{static:false}) public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseProvince',{static:false}) public ngSelectProvince: SelectComponent;
+  @ViewChild('chooseDistrict',{static:false}) public ngSelectDistrict: SelectComponent;
+  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild('formAddEdit',{static:false}) form: NgForm;
   nameEditModal = "edit-ware-house-modal";
   selectedFilter = "All";
   titleConfirmDelete = "You want to delete this warehouse";

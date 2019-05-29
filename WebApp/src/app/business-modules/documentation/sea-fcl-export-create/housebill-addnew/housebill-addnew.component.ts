@@ -487,7 +487,7 @@ export class HousebillAddnewComponent implements OnInit {
   weightMesurements: any[] = [];
   packageTypes: any[] = [];
   commodities: any[] = [];
-  @ViewChild('containerListForm') containerListForm: NgForm;
+  @ViewChild('containerListForm',{static:false}) containerListForm: NgForm;
   async getContainerTypes() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
     if (responses != null) {

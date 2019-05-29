@@ -59,11 +59,11 @@ export class PortIndexComponent implements OnInit {
     settingFields: this.portIndexSettings,
     typeSearch: TypeSearch.outtab
   };
-  @ViewChild('formAddEdit') form: NgForm;
-  @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
-  @ViewChild('chooseArea') public ngSelectArea: SelectComponent;
-  @ViewChild('chooseMode') public ngSelectMode: SelectComponent;
-  @ViewChild(PaginationComponent) child;
+  @ViewChild('formAddEdit',{static:false}) form: NgForm;
+  @ViewChild('chooseCountry',{static:false}) public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseArea',{static:false}) public ngSelectArea: SelectComponent;
+  @ViewChild('chooseMode',{static:false}) public ngSelectMode: SelectComponent;
+  @ViewChild(PaginationComponent,{static:false}) child;
   countries: any[];
   areas: any[];
   modes: any[];

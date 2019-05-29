@@ -29,7 +29,7 @@ export class AllPartnerComponent implements OnInit {
   isDesc: boolean = false;
   keySortDefault: string = "id";
   
-  @ViewChild(PaginationComponent) child; 
+  @ViewChild(PaginationComponent,{static:false}) child; 
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<Partner>();
   constructor(private baseService: BaseService, 
