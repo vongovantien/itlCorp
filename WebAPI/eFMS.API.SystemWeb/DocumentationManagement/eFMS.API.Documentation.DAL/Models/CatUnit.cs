@@ -5,6 +5,11 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CatUnit
     {
+        public CatUnit()
+        {
+            CsMawbcontainerContainerType = new HashSet<CsMawbcontainer>();
+            CsMawbcontainerUnitOfMeasure = new HashSet<CsMawbcontainer>();
+        }
 
         public short Id { get; set; }
         public string Code { get; set; }
@@ -20,5 +25,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string DescriptionEn { get; set; }
         public string DescriptionVn { get; set; }
 
+        public virtual ICollection<CsMawbcontainer> CsMawbcontainerContainerType { get; set; }
+        public virtual ICollection<CsMawbcontainer> CsMawbcontainerUnitOfMeasure { get; set; }
     }
 }

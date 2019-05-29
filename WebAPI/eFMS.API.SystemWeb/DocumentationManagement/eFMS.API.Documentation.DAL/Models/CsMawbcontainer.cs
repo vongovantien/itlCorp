@@ -29,5 +29,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
 
+        public virtual CatUnit ContainerType { get; set; }
+        public virtual CatUnit UnitOfMeasure { get; set; }
     }
 }
