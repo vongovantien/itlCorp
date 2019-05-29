@@ -226,9 +226,9 @@ export class HousebillListComponent implements OnInit {
   ]
 
   selectPartnerType() {
-    console.log(this.BuyingRateChargeToAdd);
-    console.log(this.houseBillSelected);
-    console.log(this.MasterBillData);
+    // console.log(this.BuyingRateChargeToAdd);
+    // console.log(this.houseBillSelected);
+    // console.log(this.MasterBillData);
   }
 
 

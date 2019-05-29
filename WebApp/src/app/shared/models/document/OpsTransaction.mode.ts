@@ -29,7 +29,7 @@ export class OpsTransaction {
         id: string = "00000000-0000-0000-0000-000000000000";
         agentId: string = null;
         modifiedDate: Date = null;
-
+        salemanId: string = null;
         supplierName: string = null;
         agentName: string = null;
         podName: string = null;

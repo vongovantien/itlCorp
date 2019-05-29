@@ -8,6 +8,8 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { ActivatedRoute } from '@angular/router';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -24,8 +26,12 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     suppliers: any[] = [];
     agents: any[] = [];
     billingOps: any[] = [];
+    warehouses: any[] = [];
+    salemans: any[] = [];
+    productServiceActive: any[] = [];
+    serviceModeActive: any[] = [];
+    shipmentModeActive: any[] = [];
 
-    isDisplay: boolean = true;
     lstBuyingRateChargesComboBox: any[] = [];
     lstSellingRateChargesComboBox: any[] = [];
     lstOBHChargesComboBox: any[] = [];
@@ -34,7 +40,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
 
-
+    isDisplay: boolean = true;
     BuyingRateChargeToEdit: any = null;
     SellingRateChargeToEdit: any = null
     OBHChargeToEdit: any = null;
@@ -47,24 +53,41 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
     async ngOnInit() {
-        await this.route.params.subscribe(async prams => {
-            if (prams.id != undefined) {
-                await this.getShipmentDetails(prams.id);
-            }
-        });
-        await this.getShipmentCommonData();
+        this.getListBuyingRateCharges();
+        this.getListSellingRateCharges();
+        this.getListOBHCharges();
         this.getCustomers();
         this.getPorts();
         this.getSuppliers();
         this.getAgents();
         this.getBillingOps();
-        this.getListBuyingRateCharges();
-        this.getListSellingRateCharges();
-        this.getListOBHCharges();
+        this.getWarehouses();
+        await this.getShipmentCommonData();
+        await this.route.params.subscribe(async prams => {
+            if (prams.id != undefined) {
+                await this.getShipmentDetails(prams.id);
+
+                let index = this.productServices.findIndex(x => x.id == this.opsTransaction.productService);
+                if (index > -1) this.productServiceActive = [this.productServices[index]];
+                index = this.serviceModes.findIndex(x => x.id == this.opsTransaction.serviceMode);
+                if (index > -1) this.serviceModeActive = [this.serviceModes[index]];
+                index = this.shipmentModes.findIndex(x => x.id == this.opsTransaction.shipmentMode);
+                if (index > -1) this.shipmentModeActive = [this.shipmentModes[index]];
+            }
+        });
+    }
+    saveShipment(form: NgForm) {
+        console.log(form);
+        console.log(this.opsTransaction);
+    }
+    async getWarehouses() {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
+            this.warehouses = res;
+        });
     }
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
-        console.log(this.opsTransaction)
+        console.log(this.opsTransaction);
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
@@ -72,8 +95,13 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
         this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
     }
+    private getListBillingOps() {
+        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
+            this.billingOps = res;
+        });
+    }
     private getPorts() {
-        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { inactive: false }).subscribe((res: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.ports = res;
             console.log(this.ports)
         });
@@ -97,31 +125,33 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     private getBillingOps() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
             this.billingOps = res;
+            this.salemans = res;
         });
     }
 
-    private getListBuyingRateCharges() {
+    public getListBuyingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF' }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
         });
 
     }
 
-    getListSellingRateCharges() {
+    public getListSellingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF'}).subscribe(res => {
           this.lstSellingRateChargesComboBox = res['data'];
         });
       }
     
-      getListOBHCharges() {
+     public getListOBHCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF'}).subscribe(res => {
           this.lstOBHChargesComboBox = res['data'];
         });
       }
 
-      calculateTotalEachBuying(){
+     public calculateTotalEachBuying(){
           
       }
+
     /**
        * Daterange picker
        */

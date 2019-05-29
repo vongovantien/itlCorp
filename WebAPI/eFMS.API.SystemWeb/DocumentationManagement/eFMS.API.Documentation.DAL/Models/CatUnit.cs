@@ -19,6 +19,5 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? InactiveOn { get; set; }
         public string DescriptionEn { get; set; }
         public string DescriptionVn { get; set; }
-
     }
 }

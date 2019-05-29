@@ -1444,6 +1444,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2238,6 +2239,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
@@ -2407,6 +2409,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PurchaseOrderNo)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SalemanId)
+                    .HasColumnName("SalemanID")
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ServiceDate).HasColumnType("smalldatetime");
