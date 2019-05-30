@@ -1,0 +1,277 @@
+<div class="modal fade" id="ops-add-credit-debit-note-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Credit/Debit Note</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="div-inside bg-secondary m--margin-bottom-15">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note type
+                                    </label>
+                                    <ng-select 
+                                        [allowClear]="true" 
+                                        [items]="items" 
+                                        [disabled]="disabled" 
+                                        (data)="refreshValue($event)"
+                                        (selected)="selected($event)" 
+                                        (removed)="removed($event)" 
+                                        (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Note type is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Subject to Partner
+                                    </label>
+                                    <div class="dropdown e--combogrid">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" 
+                                            type="text"
+                                            readonly data-toggle="dropdown" 
+                                            placeholder="Please selected">
+                                        <div class="dropdown-menu e--combogrid-content">
+                                            <div class="tabel-wrapper table-fixed">
+                                                <div class="table-head-fixed">
+                                                    <div class="table-filter-block">
+                                                        <div class="search-field">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
+                                                            <i class="icon-search"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-header">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Partner ID</th>
+                                                                    <th>Name ABBR</th>
+                                                                    <th>Partner name</th>
+                                                                    <th>Tax code</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="table-body-scroll">
+                                                    <table class="table table-hover">
+                                                        <tbody>
+                                                            <ng-container>
+                                                                <tr class="data-row data-selected">
+                                                                    <td>item.id</td>
+                                                                    <td>item.shortName</td>
+                                                                    <td>item.partnerNameEn</td>
+                                                                    <td>item.taxCode</td>
+                                                                </tr>
+                                                            </ng-container>
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Partner is required !
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin: Search Form -->
+                    <div class="m-form m-form--label-align-right">
+                        <div class="row align-items-center">
+                            <div class="col-lg-4 order-2 order-lg-1">
+                                <div class="form-group">
+                                    <div class="m-input-icon m-input-icon--left">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            placeholder="Search...">
+                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                            <span>
+                                                <i class="la la-search"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                                <button type="button"
+                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="la la-trash"></i>
+                                        <span>
+                                            remove selected
+                                        </span>
+                                    </span>
+                                </button>
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    data-toggle="modal" data-target="#ops-add-remaining-charge-modal">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            add charge
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end: Search Form -->
+                    <!--begin: Datatable-->
+                    <div class="table-wrapper fit-height-div">
+                        <table class="table table-striped table-brand dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="table-actions-col no-sorting">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" class="all-charges-select">
+                                            <span></span>
+                                        </label>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Code</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Charge name</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Quantity</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Unit</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Unit price</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Currency</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>VAT</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Credit value (Local)</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Debit value (Local)</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Note</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-group">
+                                <tr>
+                                    <td class="table-actions-col">
+                                        <div class="table-actions">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" name="" class="single-charge-select">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span>charge.chargeCode</span>
+                                    </td>
+                                    <td>
+                                        <span>charge.nameEn</span>
+                                    </td>
+                                    <td>
+                                        <span>charge.quantity</span>
+                                    </td>
+                                    <td>
+                                        <span>charge.unit</span>
+                                    </td>
+                                    <td>
+                                        <span>charge.unitPrice</span>
+                                    </td>
+                                    <td>
+                                        <span>charge.currency</span>
+                                    </td>
+                                    <td>
+                                        <span>charge.vatrate</span>
+                                    </td>
+                                    <td>
+                                        <span class="credit-value">charge.total*charge.exchangeRate</span>
+                                    </td>
+                                    <td>
+                                        <span class="debit-value">charge.total*charge.exchangeRate</span>
+                                    </td>
+                                    <td>
+                                        <span>charge.notes</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable-->
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            create
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--begin::alert-cannot-create-note-modal-->
+<div class="modal fade" id="alert-cannot-create-note-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alert</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Look like you have not selected any charge for C/D Note. <br>Please recheck and try again!</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-block m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Ok
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::alert-cannot-create-note-modal-->
