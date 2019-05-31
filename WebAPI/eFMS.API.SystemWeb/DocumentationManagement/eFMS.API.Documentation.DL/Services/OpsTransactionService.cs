@@ -42,6 +42,25 @@ namespace eFMS.API.Documentation.DL.Services
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
         }
+
+        public OpsTransactionModel GetDetails(Guid id)
+        {
+            var details = DataContext.Where(x => x.Id == id).FirstOrDefault();
+            OpsTransactionModel OpsDetails = new OpsTransactionModel();
+            OpsDetails = mapper.Map<OpsTransactionModel>(details);
+
+            if (details != null)
+            {
+                var agent = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == details.AgentId).FirstOrDefault();
+                OpsDetails.AgentName = agent == null ? null : agent.PartnerNameEn;
+
+                var supplier = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == details.SupplierId).FirstOrDefault();
+                OpsDetails.SupplierName = supplier == null ? null : supplier.PartnerNameEn; 
+            }
+
+            return OpsDetails;
+        }
+
         public OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = Query(criteria);
