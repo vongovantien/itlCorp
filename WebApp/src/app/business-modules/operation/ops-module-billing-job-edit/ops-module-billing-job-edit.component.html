@@ -668,7 +668,9 @@
                                                 <!-- <span>
                                                     {{charge.nameEn}}
                                                 </span> -->
-                                                <a href="javascript:void()" (click)="prepareEditCharge('buy',charge)" data-toggle="modal" data-target="#ops-edit-buying-rate-modal">{{charge.nameEn}}</a>                                            
+                                                <a href="javascript:void()" (click)="prepareEditCharge('buy',charge)"
+                                                    data-toggle="modal"
+                                                    data-target="#ops-edit-buying-rate-modal">{{charge.nameEn}}</a>
                                             </td>
                                             <td>
                                                 <span>
@@ -734,7 +736,7 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                    </tbody>                                    
+                                    </tbody>
                                 </table>
                             </div>
                             <!--end: Datatable-->
@@ -762,7 +764,7 @@
                                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                                         <button type="button"
                                             class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                            data-toggle="modal" data-target="#add-selling-rate-modal">
+                                            data-toggle="modal" data-target="#ops-add-selling-rate-modal">
                                             <span>
                                                 <i class="la la-plus"></i>
                                                 <span>
@@ -853,16 +855,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="">
+                                        <tr class="" *ngFor="let charge of ListSellingRateCharges;let i = index;">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
-                                                    <button type="button"
+                                                    <button type="button" (click)="prepareEditCharge('sell',charge)"
                                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit" data-toggle="modal"
-                                                        data-target="#edit-selling-rate-modal">
+                                                        title="Edit" data-toggle="modal" data-target="#ops-edit-selling-rate-modal">
                                                         <i class="la la-edit"></i>
                                                     </button>
-                                                    <button type="button"
+                                                    <button type="button" (click)="DeleteCharge('confirm',charge.id)"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Remove" data-toggle="modal"
                                                         data-target="#ops-confirm-delete-charge-modal">
@@ -872,63 +873,64 @@
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.partnerName
+                                                    {{charge.partnerName}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void()" (click)="prepareEditCharge('buy',charge)"
+                                                data-toggle="modal"
+                                                data-target="#ops-edit-selling-rate-modal">{{charge.nameEn}}</a>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    {{charge.quantity}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.nameEn
+                                                    {{charge.unit}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.quantity
+                                                    {{charge.unitPrice}}
+                                                </span>
+                                            </td>
+            
+                                            <td>
+                                                <span>
+                                                    {{charge.currency}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.unit
+                                                    {{charge.vatrate}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.unitPrice
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                <span>
-                                                    charge.currency
+                                                    {{charge.total}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.vatrate
+                                                    {{charge.notes}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.total
+                                                    {{charge.docNo}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.notes
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span>
-                                                    charge.docNo
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span>
-                                                    SOA
+                                                    {{charge.soano}}
                                                 </span>
                                             </td>
                                             <td>
                                                 <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#detail-credit-debit-note-modal">
+                                                    data-target="#detail-credit-debit-note-modal"
+                                                    (click)="openCreditDebitNote()">
                                                     Credit/ Debit note
                                                 </a>
                                             </td>
@@ -939,7 +941,7 @@
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.exchangeDate | date:'dd/MM/yyyy'
+                                                    {{charge.exchangeDate | date:'dd/MM/yyyy'}}
                                                 </span>
                                             </td>
                                         </tr>
@@ -1869,7 +1871,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Add buying charge</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                    (click)="resetChargeForm('ops-add-buying-rate-modal',addBuyingRateChargeFormOps)">
+                        (click)="resetChargeForm('ops-add-buying-rate-modal',addBuyingRateChargeFormOps)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -1899,7 +1901,7 @@
                                         [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
-                                   
+
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.chargeId==null">
                                         Charge is required
@@ -1937,7 +1939,7 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.paymentObjectId==nulll }">
+                                    [ngClass]="{ 'm-form__group has-danger': (addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.paymentObjectId==null)||(!addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.objectBePaid!==null && BuyingRateChargeToAdd.paymentObjectId==null)}">
                                     <label class="form-control-label" for="">
                                         Partner name
                                     </label>
@@ -1945,17 +1947,18 @@
                                         [disabled]="BuyingRateChargeToAdd.objectBePaid!=='OTHER'"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToAdd.paymentObjectId}"
                                         (itemSelected)="BuyingRateChargeToAdd.paymentObjectId = $event.id"
+                                        (remove)="BuyingRateChargeToAdd.paymentObjectId=null"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="lstPartners"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    
+
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.paymentObjectId==null">
                                         Partner name is required !
                                     </div>
 
                                     <div class="form-control-feedback"
-                                        *ngIf="(!addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.objectBePaid!==null && BuyingRateChargeToAdd.paymentObjectId==null)">
+                                        *ngIf="(!addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.objectBePaid!==null && BuyingRateChargeToAdd.paymentObjectId===null)">
                                         Partner does not exist !
                                     </div>
                                 </div>
@@ -2001,7 +2004,7 @@
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
 
-                                   
+
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.unitId==null">
                                         Unit is required
@@ -2136,7 +2139,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="resetChargeForm('ops-add-buying-rate-modal',addBuyingRateChargeFormOps)">
+                        (click)="resetChargeForm('ops-add-buying-rate-modal',addBuyingRateChargeFormOps)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2211,8 +2214,7 @@
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
                                                 { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
                                         [active]="[{'text':BuyingRateChargeToEdit.objectBePaid,'id':BuyingRateChargeToEdit.objectBePaid}]"
-                                        (data)="refreshValue($event)"
-                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                        (data)="refreshValue($event)" [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         (selected)="BuyingRateChargeToEdit.objectBePaid=$event.id;
                                         BuyingRateChargeToEdit.objectBePaid==='AGENT'? BuyingRateChargeToEdit.paymentObjectId=opsTransaction.agentId:null;
                                         BuyingRateChargeToEdit.objectBePaid==='SHIPPING'? BuyingRateChargeToEdit.paymentObjectId=opsTransaction.supplierId:null;
@@ -2242,7 +2244,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="lstPartners"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
- 
+
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeFormOps.submitted && BuyingRateChargeToEdit.paymentObjectId==null">
                                         Partner name is required !
@@ -2289,8 +2291,7 @@
                                         Unit
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                         [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.unitId}"
                                         (itemSelected)="BuyingRateChargeToEdit.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="lstUnits"
@@ -2332,7 +2333,8 @@
                                         Currency <span class="m--font-danger">(*)</span>
                                     </label>
 
-                                    <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                    <ng-select [allowClear]="true" [items]="lstCurrencies"
+                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
                                         [active]="[{'text':BuyingRateChargeToEdit.currency,'id':BuyingRateChargeToEdit.currencyId}]"
                                         (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.currencyId=$event.id"
@@ -2417,8 +2419,7 @@
                     <!--end::Form-->
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="BuyingRateChargeToEdit.exchangeDate=(BuyingRateChargeToEdit.exchangeDate)==null?null:BuyingRateChargeToEdit.exchangeDate.startDate;
+                    <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="BuyingRateChargeToEdit.exchangeDate=(BuyingRateChargeToEdit.exchangeDate)==null?null:BuyingRateChargeToEdit.exchangeDate.startDate;
                         editBuyingRateCharge(editBuyingRateChargeFormOps)">
                         <span>
                             <i class="la la-save"></i>
@@ -2427,7 +2428,9 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" (click)="resetChargeForm('ops-edit-buying-rate-modal',editBuyingRateChargeFormOps)" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button"
+                        (click)="resetChargeForm('ops-edit-buying-rate-modal',editBuyingRateChargeFormOps)"
+                        class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2442,224 +2445,169 @@
 </form>
 <!--end:: Edit-buying-rate-modal-->
 
-<!--begin:: add-selling-rate-modal-->
-<form name="addSellingRateChargeForm">
-    <div class="modal fade" id="add-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<!--begin:: ops-add-selling-rate-modal-->
+<form novalidate name="addSellingRateChargeFormOps" #addSellingRateChargeFormOps="ngForm"
+    (ngSubmit)="addSellingRateChargeFormOps.form.valid">
+    <div class="modal fade" id="ops-add-selling-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
         aria-hidden="true">
         <div class="modal-dialog c-modal-fullscreen" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add selling charge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        (click)="resetChargeForm('ops-add-selling-rate-modal',addSellingRateChargeFormOps)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.chargeId==null}">
+                                    <label class="form-control-label" for="" #selectedSellingChargeCode>
                                         Charge <span class="m--font-danger">(*)</span>
-                                        <small class="m--margin-left-5 m--font-primary">ChargeCode&nbsp;</small>
+                                        <small class="m--margin-left-5 m--font-primary">Charge&nbsp;
+                                            {{selectedSellingChargeCode.value==null?'':selectedSellingChargeCode.value}}
+                                        </small>
                                     </label>
-                                    <div class="dropdown e--combogrid" #selectedSellingCharge>
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected" value=""
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Charge code22</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Name VN</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="">
-                                                                <td>item.charge.code</td>
-                                                                <td>item.charge.chargeNameEn</td>
-                                                                <td>item.charge.chargeNameVn</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Charge is required
-                                        </div>
+
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'charge.id',value:SellingRateChargeToAdd.chargeId}"
+                                        (itemSelected)="SellingRateChargeToAdd.chargeId=$event.charge.id;
+                                        SellingRateChargeToAdd.unitId=$event.charge.unitId;
+                                        SellingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
+                                        SellingRateChargeToAdd.vatrate=$event.charge.vatrate;
+                                        selectedSellingChargeCode.value=$event.charge.code;
+                                        calculateTotalEachSelling ();"
+                                        [selectedDisplayFields]="['charge.chargeNameEn']"
+                                        [dataSources]="lstSellingRateChargesComboBox"
+                                        [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.chargeId==null">
+                                        Charge is required
                                     </div>
+
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.objectBePaid==null }">
                                     <label class="form-control-label" for="">
                                         Partner type <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <!-- <ng-select 
-                                            [allowClear]="true" 
-                                            [items]="partnerTypes" 
-                                            [disabled]="disabled"
-                                            (data)="refreshValue($event)"
-                                            (selected)="SellingRateChargeToAdd.objectBePaid=$event.id;
-                                            SellingRateChargeToAdd.objectBePaid==='AGENT'? SellingRateChargeToAdd.paymentObjectId=MasterBillData.agentId:null;
-                                            SellingRateChargeToAdd.objectBePaid==='CUSTOMER'? SellingRateChargeToAdd.paymentObjectId=houseBillSelected.customerId:null;
-                                            SellingRateChargeToAdd.objectBePaid==='CUSTOMER'? selectedSellingRatePartner.value=houseBillSelected.customerName:null;
-                                            SellingRateChargeToAdd.objectBePaid==='AGENT'? selectedSellingRatePartner.value=MasterBillData.agentName:null;
-                                            SellingRateChargeToAdd.objectBePaid==='OTHER'? selectedSellingRatePartner.value=null:null;
-                                            SellingRateChargeToAdd.objectBePaid==='OTHER'? SellingRateChargeToAdd.paymentObjectId=null:null;selectPartnerType();"
-                                            (removed)="SellingRateChargeToAdd.objectBePaid=null;SellingRateChargeToAdd.paymentObjectId=null;selectedSellingRatePartner.value=null"
-                                            (typed)="typed($event)" 
-                                            placeholder="Select filter">
-                                        </ng-select> -->
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                        (data)="refreshValue($event)" (selected)="selected($event)"
-                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="[
+                                                { 'text': 'AGENT', 'id': 'AGENT' },
+                                                { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
+                                        (data)="refreshValue($event)"
+                                        (selected)="SellingRateChargeToAdd.objectBePaid=$event.id;
+                                        SellingRateChargeToAdd.objectBePaid==='AGENT'? SellingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
+                                        SellingRateChargeToAdd.objectBePaid==='SHIPPING'? SellingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
+                                        SellingRateChargeToAdd.objectBePaid==='OTHER'? SellingRateChargeToAdd.paymentObjectId=null:null;"
+                                        (removed)="SellingRateChargeToAdd.objectBePaid=null;SellingRateChargeToAdd.paymentObjectId=null;"
+                                        (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
-                                    <div class="form-control-feedback" style="display: none">
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.objectBePaid==null">
                                         Partner type is required !
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': (addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.paymentObjectId==null)||(!addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.objectBePaid!==null && SellingRateChargeToAdd.paymentObjectId==null)}">
                                     <label class="form-control-label" for="">
-                                        Partner name <span class="m--font-danger">(*)</span>
+                                        Partner name
                                     </label>
-                                    <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected" value=""
-                                            title="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Partner name</th>
-                                                                    <th>Name ABBR</th>
-                                                                    <th>Name EN</th>
-                                                                    <th>Tax code</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="1">
-                                                                <td>item.id</td>
-                                                                <td>item.shortName</td>
-                                                                <td>item.partnerNameEn</td>
-                                                                <td>item.taxCode</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control-feedback" style="display: none">
-                                            Partner name is required !
-                                        </div>
+                                    <app-combo-grid-virtual-scroll
+                                        [disabled]="SellingRateChargeToAdd.objectBePaid!=='OTHER'"
+                                        [currentActiveItemId]="{field:'id',value:SellingRateChargeToAdd.paymentObjectId}"
+                                        (itemSelected)="SellingRateChargeToAdd.paymentObjectId = $event.id"
+                                        (remove)="SellingRateChargeToAdd.paymentObjectId=null"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="lstPartners"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.paymentObjectId==null">
+                                        Partner name is required !
+                                    </div>
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="(!addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.objectBePaid!==null && SellingRateChargeToAdd.paymentObjectId===null)">
+                                        Partner does not exist !
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted && sellingRateChangeQuantityNameOps.invalid}">
                                     <label class="form-control-label" for="">
                                         Quantity <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Enter text" required name="sellingRateChangeQuantityName">
-                                    <div class="form-control-feedback" style="display: none">
+                                    <div class="input-group m-input-group m-input-group--square">
+                                        <input type="text" required class="form-control m-input m-input--square"
+                                            appIntergerInputCheck placeholder="Enter text"
+                                            name="sellingRateChangeQuantityNameOps"
+                                            #sellingRateChangeQuantityNameOps="ngModel"
+                                            [(ngModel)]="SellingRateChargeToAdd.quantity"
+                                            (keyup)="calculateTotalEachSelling()">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-secondary">
+                                                CBM
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted && sellingRateChangeQuantityNameOps.invalid">
                                         Quantity is required !
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.unitId==null}">
                                     <label class="form-control-label" for="">
-                                        Unit <span class="m--font-danger">(*)</span>
+                                        Unit
                                     </label>
-                                    <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            readonly data-toggle="dropdown" placeholder="Please selected" value="">
-                                        <div class="dropdown-menu e--combogrid-content">
-                                            <div class="tabel-wrapper table-fixed">
-                                                <div class="table-head-fixed">
-                                                    <div class="table-filter-block">
-                                                        <div class="search-field">
-                                                            <input class="form-control m-input m-input--square"
-                                                                type="text" placeholder="Search...">
-                                                            <i class="icon-search"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Name EN</th>
-                                                                    <th>Unit type</th>
-                                                                </tr>
-                                                            </thead>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="table-body-scroll">
-                                                    <table class="table table-hover">
-                                                        <tbody>
-                                                            <tr class="data-row" data-id="i">
-                                                                <td>item.unitNameEn</td>
-                                                                <td>item.unitType</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <div class="form-control-feedback" style="display: none">
-                                                    Unit is required
-                                                </div>
-                                            </div>
-                                        </div>
+
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:SellingRateChargeToAdd.unitId}"
+                                        (itemSelected)="SellingRateChargeToAdd.unitId=$event.id"
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="lstUnits"
+                                        [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.unitId==null">
+                                        Unit is required
                                     </div>
+
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted &&(SellingRateChargeUnitPriceNameOps.invalid || (0 >= SellingRateChargeToAdd.unitPrice)) }">
                                     <label class="form-control-label" for="">
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Enter text" required name="SellingRateChargeUnitPriceName">
-                                    <div class="form-control-feedback" style="display: none">
+                                        [(ngModel)]="SellingRateChargeToAdd.unitPrice"
+                                        (keyup)="calculateTotalEachSelling()" placeholder="Enter text"
+                                        #SellingRateChargeUnitPriceNameOps="ngModel" required
+                                        name="SellingRateChargeUnitPriceNameOps">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted &&(SellingRateChargeUnitPriceNameOps.invalid || (0 >= SellingRateChargeToAdd.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
                                     </div>
                                 </div>
@@ -2667,37 +2615,37 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.currencyId===null }">
                                     <label class="form-control-label" for="">
                                         Currency <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <!-- <ng-select 
-                                            [allowClear]="true" 
-                                            [items]="comboBoxData.lstCurrency"
-                                            [disabled]="disabled" 
-                                            (data)="refreshValue($event)"
-                                            (selected)="SellingRateChargeToAdd.currencyId=$event.id"
-                                            (removed)="SellingRateChargeToAdd.currencyId=null"
-                                            (typed)="getListCurrency($event)" 
-                                            placeholder="Select filter">
-                                        </ng-select> -->
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                        (data)="refreshValue($event)" (selected)="selected($event)"
-                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+
+                                    <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="disabled"
+                                        (data)="refreshValue($event)"
+                                        (selected)="SellingRateChargeToAdd.currencyId=$event.id"
+                                        (removed)="SellingRateChargeToAdd.currencyId=null" placeholder="Select filter">
                                     </ng-select>
-                                    <div class="form-control-feedback" style="display: none">
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.currencyId===null">
                                         Currency is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted && SellingRateChargeVATNameOps.invalid }">
                                     <label class="form-control-label" for="">
                                         VAT <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="number" max="100" name="BuyingRateChargeVATName" required
-                                        class="form-control m-input m-input--square" placeholder="Enter text">
-                                    <div class="form-control-feedback" style="display: none">
+                                    <input type="number" max="100" name="SellingRateChargeVATNameOps" required
+                                        #SellingRateChargeVATNameOps="ngModel"
+                                        [(ngModel)]="SellingRateChargeToAdd.vatrate"
+                                        class="form-control m-input m-input--square" placeholder="Enter text"
+                                        (keyup)="calculateTotalEachSelling()">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addSellingRateChargeFormOps.submitted && SellingRateChargeVATNameOps.invalid">
                                         VAT is required and must be less than or equal 100
                                     </div>
                                 </div>
@@ -2708,7 +2656,8 @@
                                         Total
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square" disabled
-                                        placeholder="Enter text" name="BuyingRateChargeTotalName">
+                                        placeholder="Enter text" name="SellingRateChargeTotalNameOps"
+                                        [(ngModel)]="SellingRateChargeToAdd.total">
                                 </div>
                             </div>
                         </div>
@@ -2718,8 +2667,9 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Enter text" name="SellingRateChargeDocName">
+                                    <input type="text" [(ngModel)]="SellingRateChargeToAdd.docNo"
+                                        class="form-control m-input m-input--square" placeholder="Enter text"
+                                        name="SellingRateChargeDocNameOps">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -2727,8 +2677,9 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Enter text" name="SellingRateChargeNoteName">
+                                    <input type="text" [(ngModel)]="SellingRateChargeToAdd.notes"
+                                        class="form-control m-input m-input--square" placeholder="Enter text"
+                                        name="SellingRateChargeNoteNameOps">
                                 </div>
                             </div>
                         </div>
@@ -2736,7 +2687,8 @@
                     <!--end::Form-->
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="saveNewSellingRateCharge(addSellingRateChargeFormOps,true)">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -2744,7 +2696,8 @@
                             </span>
                         </span>
                     </button>
-                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="saveNewSellingRateCharge(addSellingRateChargeFormOps)">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -2752,7 +2705,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="resetChargeForm('ops-add-selling-rate-modal',addSellingRateChargeFormOps)">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

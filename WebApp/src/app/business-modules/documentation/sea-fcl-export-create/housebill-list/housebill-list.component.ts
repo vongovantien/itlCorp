@@ -370,18 +370,6 @@ export class HousebillListComponent implements OnInit {
             if(!IsContinue)
               $('#add-selling-rate-modal').modal('hide');
           }
-          // if (IsContinue && res.status) {
-          //   form.onReset()
-          //   this.resetDisplay();
-          //   this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-          // } else if (res.status) {
-          //   this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-          //   form.onReset()
-          //   this.resetDisplay();
-          //   $('#add-selling-rate-modal').modal('hide');
-          // } else {
-    
-          // }
         }
       }
     }, 300);
