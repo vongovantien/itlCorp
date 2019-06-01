@@ -27,7 +27,7 @@ export class AgentComponent implements OnInit {
   criteria: any = { partnerGroup: PartnerGroupEnum.AGENT };
   isDesc: boolean = false;
   keySortDefault = "id";
-  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild(PaginationComponent,{static:true}) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
 

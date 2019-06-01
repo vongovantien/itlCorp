@@ -32,7 +32,7 @@ export class StageManagementComponent implements OnInit {
     index_stage_edit = null;
     index_current_department = null;
 
-    @ViewChild(PaginationComponent,{static:false}) child;
+    @ViewChild(PaginationComponent,{static:true}) child;
 
     constructor(
         private excelService: ExcelService,

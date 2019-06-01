@@ -55,11 +55,11 @@ export class PortIndexComponent implements OnInit {
     settingFields: this.portIndexSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.outtab
   };
-  @ViewChild('formAddEdit',{static:false}) form: NgForm;
-  @ViewChild('chooseCountry',{static:false}) public ngSelectCountry: SelectComponent;
-  @ViewChild('chooseArea',{static:false}) public ngSelectArea: SelectComponent;
-  @ViewChild('chooseMode',{static:false}) public ngSelectMode: SelectComponent;
-  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild('formAddEdit',{static:true}) form: NgForm;
+  @ViewChild('chooseCountry',{static:true}) public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseArea',{static:true}) public ngSelectArea: SelectComponent;
+  @ViewChild('chooseMode',{static:true}) public ngSelectMode: SelectComponent;
+  @ViewChild(PaginationComponent,{static:true}) child;
   countries: any[];
   areas: any[];
   modes: any[];

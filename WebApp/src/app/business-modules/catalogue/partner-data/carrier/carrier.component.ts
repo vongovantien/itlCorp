@@ -29,7 +29,7 @@ export class CarrierComponent implements OnInit {
   isDesc: boolean = false;
   keySortDefault: string = "id";
   
-  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild(PaginationComponent,{static:true}) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,

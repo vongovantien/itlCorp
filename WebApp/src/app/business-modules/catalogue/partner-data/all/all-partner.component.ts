@@ -27,7 +27,7 @@ export class AllPartnerComponent implements OnInit {
   criteria: any = { partnerGroup: PartnerGroupEnum.ALL };
   isDesc: boolean = false;
   
-  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild(PaginationComponent,{static:true}) child; 
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<Partner>();
   constructor(private baseService: BaseService, 

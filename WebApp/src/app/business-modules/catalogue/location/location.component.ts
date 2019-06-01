@@ -116,7 +116,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     condition: "OR",
   }
   searchObject: any = { condition: "OR" };
-  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild(PaginationComponent,{static:true}) child;
 
   /**
    * END OF VARIABLES DEFINITIONS

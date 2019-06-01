@@ -35,7 +35,7 @@ export class UnitComponent implements OnInit {
   unitTypes: any[];
   currentUnitType: any = [];
   titleConfirmDelete = "Do you want to delete this unit";
-  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild(PaginationComponent,{static:true}) child;
 
     constructor (
     private excelService: ExcelService,
