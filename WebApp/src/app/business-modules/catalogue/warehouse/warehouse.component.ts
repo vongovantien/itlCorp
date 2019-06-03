@@ -58,11 +58,11 @@ export class WarehouseComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   
-  @ViewChild('chooseCountry') public ngSelectCountry: SelectComponent;
-  @ViewChild('chooseProvince') public ngSelectProvince: SelectComponent;
-  @ViewChild('chooseDistrict') public ngSelectDistrict: SelectComponent;
-  @ViewChild(PaginationComponent) child; 
-  @ViewChild('formAddEdit') form: NgForm;
+  @ViewChild('chooseCountry',{static:true}) public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseProvince',{static:true}) public ngSelectProvince: SelectComponent;
+  @ViewChild('chooseDistrict',{static:true}) public ngSelectDistrict: SelectComponent;
+  @ViewChild(PaginationComponent,{static:true}) child; 
+  @ViewChild('formAddEdit',{static:true}) form: NgForm;
   warehouseSettings: ColumnSetting[] = language.Warehouse;//= WAREHOUSECOLUMNSETTING;
   isDesc: boolean = true;
   configSearch: any = {

@@ -93,14 +93,14 @@ export class HousebillListComponent implements OnInit {
       if (this.BuyingRateChargeToEdit.vatrate >= 0) {
         this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
       } else {
-        this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + this.BuyingRateChargeToEdit.vatrate;
+        this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
       }
     }
     else {
       if (this.BuyingRateChargeToAdd.vatrate >= 0) {
         this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
       } else {
-        this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + this.BuyingRateChargeToAdd.vatrate;
+        this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
       }
     }
   }
@@ -110,13 +110,13 @@ export class HousebillListComponent implements OnInit {
       if (this.SellingRateChargeToEdit.vatrate >= 0) {
         this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
       } else {
-        this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + this.SellingRateChargeToEdit.vatrate;
+        this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + Math.abs(this.SellingRateChargeToEdit.vatrate);
       }
     } else {
       if (this.SellingRateChargeToAdd.vatrate >= 0) {
         this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
       } else {
-        this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + this.SellingRateChargeToAdd.vatrate;
+        this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + Math.abs(this.SellingRateChargeToAdd.vatrate);
       }
     }
   }
@@ -127,13 +127,13 @@ export class HousebillListComponent implements OnInit {
       if (this.OBHChargeToEdit.vatrate >= 0) {
         this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
       } else {
-        this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + this.OBHChargeToEdit.vatrate;
+        this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
       }
     } else {
       if (this.OBHChargeToAdd.vatrate >= 0) {
         this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
       } else {
-        this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + this.OBHChargeToAdd.vatrate;
+        this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
       }
     }
   }
@@ -226,9 +226,9 @@ export class HousebillListComponent implements OnInit {
   ]
 
   selectPartnerType() {
-    console.log(this.BuyingRateChargeToAdd);
-    console.log(this.houseBillSelected);
-    console.log(this.MasterBillData);
+    // console.log(this.BuyingRateChargeToAdd);
+    // console.log(this.houseBillSelected);
+    // console.log(this.MasterBillData);
   }
 
 
@@ -324,19 +324,28 @@ export class HousebillListComponent implements OnInit {
           this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
           var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
           this.getBuyingChargesOfHouseBill(this.houseBillSelected);
-          if (IsContinue && res.status) {
-            this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-            // form.reset();
-            form.onReset()
-            this.resetDisplay();
-          } else if (res.status) {
-            this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+          this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+
+          if(res.status){
             form.onReset();
             this.resetDisplay();
-            $('#add-buying-rate-modal').modal('hide');
-          } else {
-    
+            this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+            if(!IsContinue)
+              $('#add-buying-rate-modal').modal('hide');
           }
+
+          // if (IsContinue && res.status) {
+          //   this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset()
+          //   this.resetDisplay();
+          // } else if (res.status) {
+          //   this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset();
+          //   this.resetDisplay();
+          //   $('#add-buying-rate-modal').modal('hide');
+          // } else {
+    
+          // }
         }
       }
     }, 300);
@@ -353,18 +362,26 @@ export class HousebillListComponent implements OnInit {
           this.SellingRateChargeToAdd.hblid = this.houseBillSelected.id;
           var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.SellingRateChargeToAdd);
           this.getSellingChargesOfHouseBill(this.houseBillSelected);
-          if (IsContinue && res.status) {
-            form.onReset()
+          
+          if(res.status){
+            form.onReset();
             this.resetDisplay();
             this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-          } else if (res.status) {
-            this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-            form.onReset()
-            this.resetDisplay();
-            $('#add-selling-rate-modal').modal('hide');
-          } else {
-    
+            if(!IsContinue)
+              $('#add-selling-rate-modal').modal('hide');
           }
+          // if (IsContinue && res.status) {
+          //   form.onReset()
+          //   this.resetDisplay();
+          //   this.SellingRateChargeToAdd = new CsShipmentSurcharge();
+          // } else if (res.status) {
+          //   this.SellingRateChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset()
+          //   this.resetDisplay();
+          //   $('#add-selling-rate-modal').modal('hide');
+          // } else {
+    
+          // }
         }
       }
     }, 300);
@@ -381,18 +398,27 @@ export class HousebillListComponent implements OnInit {
           this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
           var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
           this.getOBHChargesOfHouseBill(this.houseBillSelected);
-          if (IsContinue && res.status) {
-            this.OBHChargeToAdd = new CsShipmentSurcharge();
-            form.onReset()
+
+          if(res.status){
+            form.onReset();
             this.resetDisplay();
-          } else if (res.status) {
             this.OBHChargeToAdd = new CsShipmentSurcharge();
-            form.onReset()
-            this.resetDisplay();
-            $('#add-obh-charge-modal').modal('hide');
-          } else {
-  
+            if(!IsContinue)
+              $('#add-obh-charge-modal').modal('hide');
           }
+
+          // if (IsContinue && res.status) {
+          //   this.OBHChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset()
+          //   this.resetDisplay();
+          // } else if (res.status) {
+          //   this.OBHChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset()
+          //   this.resetDisplay();
+          //   $('#add-obh-charge-modal').modal('hide');
+          // } else {
+  
+          // }
         }
       }
     }, 300);
@@ -459,7 +485,6 @@ export class HousebillListComponent implements OnInit {
     this.BuyingRateChargeToEdit= null;
     this.SellingRateChargeToEdit= null
     this.OBHChargeToEdit= null;
-
   }
 
 

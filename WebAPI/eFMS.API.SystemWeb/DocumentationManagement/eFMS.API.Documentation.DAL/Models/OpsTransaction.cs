@@ -24,6 +24,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? FinishDate { get; set; }
         public Guid? WarehouseId { get; set; }
         public string InvoiceNo { get; set; }
+        public string SalemanId { get; set; }
         public string FieldOpsId { get; set; }
         public decimal? SumNetWeight { get; set; }
         public decimal? SumGrossWeight { get; set; }

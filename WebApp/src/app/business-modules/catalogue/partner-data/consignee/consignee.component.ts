@@ -26,6 +26,9 @@ export class ConsigneeComponent implements OnInit {
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CONSIGNEE };
   isDesc: boolean = false;
+  keySortDefault: string = "id";
+  
+  @ViewChild(PaginationComponent,{static:true}) child; 
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,

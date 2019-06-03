@@ -54,16 +54,16 @@ export class PartnerComponent implements OnInit {
     typeButton: ButtonType.export
   };
   activeTab: string = this.tabName.allTab;
-  @ViewChild(PaginationComponent) child;
+  @ViewChild(PaginationComponent,{static:true}) child;
   //partnerType: any;
 
-  @ViewChild(AgentComponent) agentComponent; 
-  @ViewChild(AllPartnerComponent) allPartnerComponent; 
-  @ViewChild(ConsigneeComponent) consigneeComponent; 
-  @ViewChild(CustomerComponent) customerComponent; 
-  @ViewChild(AirShipSupComponent) airShipSupComponent; 
-  @ViewChild(CarrierComponent) carrierComponent; 
-  @ViewChild(ShipperComponent) shipperComponent; 
+  @ViewChild(AgentComponent,{static:true}) agentComponent; 
+  @ViewChild(AllPartnerComponent,{static:true}) allPartnerComponent; 
+  @ViewChild(ConsigneeComponent,{static:true}) consigneeComponent; 
+  @ViewChild(CustomerComponent,{static:true}) customerComponent; 
+  @ViewChild(AirShipSupComponent,{static:true}) airShipSupComponent; 
+  @ViewChild(CarrierComponent,{static:true}) carrierComponent; 
+  @ViewChild(ShipperComponent,{static:true}) shipperComponent; 
 
   constructor(private baseService: BaseService, 
     private api_menu: API_MENU,

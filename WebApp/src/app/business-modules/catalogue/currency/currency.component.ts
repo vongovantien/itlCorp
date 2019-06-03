@@ -53,8 +53,8 @@ export class CurrencyComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   isAddnew: boolean;
-  @ViewChild(PaginationComponent) child;
-  @ViewChild('formAddEdit') form: NgForm;
+  @ViewChild(PaginationComponent,{static:true}) child;
+  @ViewChild('formAddEdit',{static:true}) form: NgForm;
   totalPages: number;
   constructor(private sortService: SortService, private baseService: BaseService,
     private excelService: ExcelService,

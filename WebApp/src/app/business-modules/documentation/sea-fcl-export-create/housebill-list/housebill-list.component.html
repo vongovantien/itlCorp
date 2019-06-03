@@ -1233,11 +1233,8 @@
                                         (selected)="BuyingRateChargeToAdd.objectBePaid=$event.id;
                                                     BuyingRateChargeToAdd.objectBePaid==='AGENT'? BuyingRateChargeToAdd.paymentObjectId=MasterBillData.agentId:null;
                                                     BuyingRateChargeToAdd.objectBePaid==='SHIPPING'? BuyingRateChargeToAdd.paymentObjectId=MasterBillData.coloaderId:null;
-                                                    BuyingRateChargeToAdd.objectBePaid==='AGENT'? selectedBuyingRatePartner.value=MasterBillData.agentName:null;
-                                                    BuyingRateChargeToAdd.objectBePaid==='SHIPPING'? selectedBuyingRatePartner.value=MasterBillData.coloaderName:null;
-                                                    BuyingRateChargeToAdd.objectBePaid==='OTHER'? selectedBuyingRatePartner.value=null:null;
                                                     BuyingRateChargeToAdd.objectBePaid==='OTHER'? BuyingRateChargeToAdd.paymentObjectId=null:null;selectPartnerType();"
-                                        (removed)="BuyingRateChargeToAdd.objectBePaid=null;BuyingRateChargeToAdd.paymentObjectId=null;selectedBuyingRatePartner.value=null"
+                                        (removed)="BuyingRateChargeToAdd.objectBePaid=null;BuyingRateChargeToAdd.paymentObjectId=null"
                                         (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                     <div class="form-control-feedback"
@@ -1304,7 +1301,7 @@
                                     </app-combo-grid-virtual-scroll>
                                    
                                     <div class="form-control-feedback"
-                                        *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
+                                        *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.unitId==null">
                                         Unit is required
                                     </div>
 
@@ -1452,7 +1449,7 @@
 
 <!--begin:: edit-buying-rate-modal-->
 <form novalidate #editBuyingRateChargeForm="ngForm" name="editBuyingRateChargeForm"
-    *ngIf="BuyingRateChargeToEdit!=null">
+    *ngIf="BuyingRateChargeToEdit!=null" (ngSubmit)="editBuyingRateChargeForm.form.valid">
     <div class="modal fade" id="edit-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
         aria-hidden="true">
         <div class="modal-dialog c-modal-fullscreen" role="document">
@@ -1517,7 +1514,7 @@
                                                     BuyingRateChargeToEdit.objectBePaid==='SHIPPING'? BuyingRateChargeToEdit.partnerName=MasterBillData.coloaderName:null;
                                                     BuyingRateChargeToEdit.objectBePaid==='OTHER'? BuyingRateChargeToEdit.partnerName=null:null;
                                                     BuyingRateChargeToEdit.objectBePaid==='OTHER'? BuyingRateChargeToEdit.paymentObjectId=null:null;selectPartnerType();"
-                                        (removed)="BuyingRateChargeToEdit.objectBePaid=null;BuyingRateChargeToEdit.paymentObjectId=null;selectedBuyingRatePartnerEdt.value=null"
+                                        (removed)="BuyingRateChargeToEdit.objectBePaid=null;BuyingRateChargeToEdit.paymentObjectId=null"
                                         (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                     <div class="form-control-feedback"

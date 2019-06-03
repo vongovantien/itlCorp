@@ -22,7 +22,7 @@ export class LogViewerComponent implements OnInit {
     query: null
   };
   pager: PagerSetting = PAGINGSETTING;
-  @ViewChild('categorySelect') public categorySelect: SelectComponent;
+  @ViewChild('categorySelect',{static:true}) public categorySelect: SelectComponent;
 
   constructor( private api_menu: API_MENU,
     private toastr: ToastrService,

@@ -13,5 +13,6 @@ namespace eFMS.API.Documentation.DL.IService
     {
         IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria);
         OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount);
+        OpsTransactionModel GetDetails(Guid id);
     }
 }

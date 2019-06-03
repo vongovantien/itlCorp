@@ -10,7 +10,7 @@ import { Crystal } from '../../models/report/crystal.model';
 export class ReportPreviewComponent implements OnInit, AfterViewInit {
   @Input() modalId: any;
   @Input() data: Crystal;
-  @ViewChild('formReport') frm: ElementRef;
+  @ViewChild('formReport',{static:false}) frm: ElementRef;
   
   ngAfterViewInit(): void {
     if(this.data != null && this.frm){

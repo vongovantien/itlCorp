@@ -35,9 +35,7 @@ export class UnitComponent implements OnInit {
   unitTypes: any[];
   currentUnitType: any = [];
   titleConfirmDelete = "Do you want to delete this unit";
-
-  sourceData : any = null;
-  @ViewChild(PaginationComponent) child;
+  @ViewChild(PaginationComponent,{static:true}) child;
 
     constructor (
     private excelService: ExcelService,
@@ -55,8 +53,8 @@ export class UnitComponent implements OnInit {
     this.initPager();
     this.getUnitTypes();
     await this.getUnits();
-    this.sourceData = await this.baseServices.getDataStorageByKey("default");
-    console.log(this.sourceData)
+    // this.sourceData = await this.baseServices.getDataStorageByKey("default");
+    // console.log(this.sourceData)
   }
   initPager(): any {
     this.pager.totalItems = 0;

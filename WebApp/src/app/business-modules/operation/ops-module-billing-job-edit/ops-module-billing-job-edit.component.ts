@@ -8,6 +8,13 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { ActivatedRoute } from '@angular/router';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { NgForm } from '@angular/forms';
+import { prepareNg2SelectData } from 'src/helper/data.helper';
+import filter from 'lodash/filter';
+import cloneDeep from 'lodash/cloneDeep';
+import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
+declare var $: any;
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -24,20 +31,51 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     suppliers: any[] = [];
     agents: any[] = [];
     billingOps: any[] = [];
+    warehouses: any[] = [];
+    salemans: any[] = [];
+    productServiceActive: any[] = [];
+    serviceModeActive: any[] = [];
+    shipmentModeActive: any[] = [];
 
-    isDisplay: boolean = true;
     lstBuyingRateChargesComboBox: any[] = [];
     lstSellingRateChargesComboBox: any[] = [];
     lstOBHChargesComboBox: any[] = [];
+    lstPartners: any[] = [];
+    lstUnits: any[] = [];
+    lstCurrencies: any[] = [];
+
+    ListBuyingRateCharges: any[] = [];
+    ConstListBuyingRateCharges: any = [];
+
+    ListSellingRateCharges: any[] = [];
+    ConstListSellingRateCharges: any[] = [];
+
+    ListOBHCharges: any[] = [];
+    ConstListOBHCharges: any[] = [];
 
     BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
 
-
+    isDisplay: boolean = true;
     BuyingRateChargeToEdit: any = null;
     SellingRateChargeToEdit: any = null
     OBHChargeToEdit: any = null;
+
+    totalSellingUSD: number = 0;
+    totalSellingLocal: number = 0;
+
+    totalProfitUSD: number = 0;
+    totalProfitLocal: number = 0;
+
+    totalLogisticChargeUSD: number = 0;
+    totalLogisticChargeLocal: number = 0;
+
+    totalBuyingUSD: number = 0;
+    totalBuyingLocal: number = 0;
+
+    totalOBHUSD: number = 0;
+    totalOBHLocal: number = 0;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
@@ -47,24 +85,45 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
     async ngOnInit() {
-        await this.route.params.subscribe(async prams => {
-            if (prams.id != undefined) {
-                await this.getShipmentDetails(prams.id);
-            }
-        });
-        await this.getShipmentCommonData();
+        this.getUnits();
+        this.getPartners();
+        this.getCurrencies();
+        this.getListBuyingRateCharges();
+        this.getListSellingRateCharges();
+        this.getListOBHCharges();
         this.getCustomers();
         this.getPorts();
         this.getSuppliers();
         this.getAgents();
         this.getBillingOps();
-        this.getListBuyingRateCharges();
-        this.getListSellingRateCharges();
-        this.getListOBHCharges();
+        this.getWarehouses();
+        await this.getShipmentCommonData();
+        await this.route.params.subscribe(async prams => {
+            if (prams.id != undefined) {
+                await this.getShipmentDetails(prams.id);
+
+                let index = this.productServices.findIndex(x => x.id == this.opsTransaction.productService);
+                if (index > -1) this.productServiceActive = [this.productServices[index]];
+                index = this.serviceModes.findIndex(x => x.id == this.opsTransaction.serviceMode);
+                if (index > -1) this.serviceModeActive = [this.serviceModes[index]];
+                index = this.shipmentModes.findIndex(x => x.id == this.opsTransaction.shipmentMode);
+                if (index > -1) this.shipmentModeActive = [this.shipmentModes[index]];
+            }
+        });
+    }
+    saveShipment(form: NgForm) {
+        console.log(form);
+        console.log(this.opsTransaction);
+    }
+    async getWarehouses() {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
+            this.warehouses = res;
+        });
     }
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
-        console.log(this.opsTransaction)
+        console.log({ SHIPMENT: this.opsTransaction });
+        this.getAllSurCharges();
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
@@ -72,8 +131,13 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
         this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
     }
+    private getListBillingOps() {
+        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
+            this.billingOps = res;
+        });
+    }
     private getPorts() {
-        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { inactive: false }).subscribe((res: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.ports = res;
             console.log(this.ports)
         });
@@ -97,31 +161,274 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     private getBillingOps() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
             this.billingOps = res;
+            this.salemans = res;
         });
     }
 
-    private getListBuyingRateCharges() {
+    public getListBuyingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF' }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
         });
 
     }
 
-    getListSellingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF'}).subscribe(res => {
-          this.lstSellingRateChargesComboBox = res['data'];
+    public getListSellingRateCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF' }).subscribe(res => {
+            this.lstSellingRateChargesComboBox = res['data'];
         });
-      }
-    
-      getListOBHCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF'}).subscribe(res => {
-          this.lstOBHChargesComboBox = res['data'];
+    }
+
+    public getListOBHCharges() {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF' }).subscribe(res => {
+            this.lstOBHChargesComboBox = res['data'];
+        });
+    }
+
+    public getPartners() {
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
+            this.lstPartners = res;
+            console.log({ PARTNERS: this.lstPartners });
+        });
+    }
+
+    public getUnits() {
+        this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
+            this.lstUnits = data;
+        });
+    }
+
+    public getCurrencies() {
+        this.baseServices.get(this.api_menu.Catalogue.Currency.getAll).subscribe((res: any) => {
+            this.lstCurrencies = prepareNg2SelectData(res, "id", "currencyName");
+        });
+    }
+
+    calculateTotalEachBuying(isEdit: boolean = false) {
+        if (isEdit) {
+            if (this.BuyingRateChargeToEdit.vatrate >= 0) {
+                this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
+            } else {
+                this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
+            }
+        }
+        else {
+            if (this.BuyingRateChargeToAdd.vatrate >= 0) {
+                this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
+            } else {
+                this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
+            }
+        }
+    }
+
+    resetDisplay() {
+        this.isDisplay = false;
+        setTimeout(() => {
+            this.isDisplay = true;
+        }, 30);
+    }
+    saveNewBuyingRateCharge(form: NgForm, IsContinue: boolean = false) {
+        setTimeout(async () => {
+            if (form.submitted) {
+                var error = $('#ops-add-buying-rate-modal').find('div.has-danger');
+                if (error.length == 0) {
+                    this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
+                    this.BuyingRateChargeToAdd.hblid = this.opsTransaction.id;
+                    var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
+                    
+                    if (res.status) {
+                        this.getBuyingSurCharges();
+                        form.onReset();
+                        this.resetDisplay();
+                        this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+                        if (!IsContinue)
+                            $('#ops-add-buying-rate-modal').modal('hide');
+                    }
+                }
+            }
+        }, 300);
+    }
+
+
+
+    private totalProfit() {
+        this.totalProfitUSD = this.totalSellingUSD - this.totalBuyingUSD - this.totalLogisticChargeUSD;
+        this.totalProfitLocal = this.totalSellingLocal - this.totalBuyingLocal - this.totalLogisticChargeLocal;
+    }
+
+    /**
+     * Calculate total cost for all buying charges 
+     */
+    private totalBuyingCharge() {
+        this.totalBuyingUSD = 0;
+        this.totalBuyingLocal = 0;
+        if (this.ListBuyingRateCharges.length > 0) {
+
+            this.ListBuyingRateCharges.forEach(element => {
+
+                this.totalBuyingLocal += element.total * element.exchangeRate;
+                this.totalBuyingUSD += this.totalBuyingLocal / element.exchangeRateUSDToVND;
+                this.totalProfit();
+            });
+        }
+    }
+
+     /**
+     * Calculate total cost for all selling charges 
+     */
+    private totalSellingCharge() {
+        this.totalSellingUSD = 0;
+        this.totalSellingLocal = 0;
+        if (this.ListSellingRateCharges.length > 0) {
+
+            this.ListSellingRateCharges.forEach(element => {
+                this.totalSellingLocal += element.total * element.exchangeRate;
+                this.totalSellingUSD += this.totalSellingLocal / element.exchangeRateUSDToVND;
+                this.totalProfit();
+
+            });
+
+        }
+    }
+
+     /**
+     * Calculate total cost for all obh charges 
+     */
+    private totalOBHCharge() {
+        this.totalOBHUSD = 0;
+        this.totalOBHLocal = 0;
+        if (this.ListOBHCharges.length > 0) {
+
+            this.ListOBHCharges.forEach(element => {
+
+                this.totalOBHLocal += element.total * element.exchangeRate;
+                this.totalOBHUSD += this.totalOBHLocal / element.exchangeRateUSDToVND;
+                this.totalProfit();
+            });
+
+        }
+    }
+
+
+
+
+    getBuyingSurCharges() {
+        this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.opsTransaction.id + "&type=BUY").subscribe((res: any) => {
+            this.ListBuyingRateCharges = res;
+            this.ConstListBuyingRateCharges = res;
+            this.totalBuyingCharge()
+        });
+    }
+
+      getSellingSurCharges() {
+        this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.opsTransaction.id + "&type=SELL").subscribe((res: any) => {
+          this.ListSellingRateCharges = res;
+          this.ConstListSellingRateCharges = res;
+          this.totalSellingCharge();
         });
       }
 
-      calculateTotalEachBuying(){
-          
+      getOBHSurCharges() {
+        this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.opsTransaction.id + "&type=OBH").subscribe((res: any) => {
+          this.ListOBHCharges = res;
+          this.ConstListOBHCharges = res;
+          this.totalOBHCharge();
+        });
       }
+
+      getAllSurCharges(){
+          this.getBuyingSurCharges();
+          this.getSellingSurCharges();
+          this.getOBHSurCharges();
+      }
+
+      
+
+      prepareEditCharge(type: string,charge:any) {    
+        if (type === "buy") {
+          this.BuyingRateChargeToEdit = cloneDeep(charge);
+          this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+        }
+        if(type==="sell"){
+          this.SellingRateChargeToEdit = cloneDeep(charge);
+          this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+        }
+        if(type==="obh"){
+          this.OBHChargeToEdit = cloneDeep(charge);
+          this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+        }
+      }
+
+      chargeIdToDelete:string=null;
+      async DeleteCharge(stt:string,chargeId:string=null){
+        if(stt=="confirm"){
+          console.log(chargeId);
+          this.chargeIdToDelete = chargeId;      
+        }
+        if(stt=="ok"){
+          var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsShipmentSurcharge.delete+"?chargId="+this.chargeIdToDelete);
+          if(res.status){
+            this.getAllSurCharges();
+            // this.getHouseBillsOfMaster();
+          }
+         
+        }
+      }
+
+      openCreditDebitNote(){
+
+      }
+
+
+      searchBuyingRate(key: string) {
+        const search_key = key.toString().toLowerCase();
+        this.ListBuyingRateCharges = filter(this.ConstListBuyingRateCharges, function (x: any) {
+          return (
+            ((x.partnerName == null ? "" : x.partnerName.toLowerCase().includes(search_key)) ||
+              (x.nameEn == null ? "" : x.nameEn.toLowerCase().includes(search_key)) ||
+              (x.unit == null ? "" : x.unit.toLowerCase().includes(search_key)) ||
+              (x.currency == null ? "" : x.currency.toLowerCase().includes(search_key)) ||
+              (x.notes == null ? "" : x.notes.toLowerCase().includes(search_key)) ||
+              (x.docNo == null ? "" : x.docNo.toLowerCase().includes(search_key)) ||
+              (x.quantity == null ? "" : x.quantity.toString().toLowerCase().includes(search_key)) ||
+              (x.unitPrice == null ? "" : x.unitPrice.toString().toLowerCase().includes(search_key)) ||
+              (x.vatrate == null ? "" : x.vatrate.toString().toLowerCase().includes(search_key)) ||
+              (x.total == null ? "" : x.total.toString().toLowerCase().includes(search_key)))
+          )
+        });
+      }
+
+      editBuyingRateCharge(form: NgForm) {
+        setTimeout(async() => {
+          if(form.submitted){
+            var error = $('#ops-edit-buying-rate-modal').find('div.has-danger');
+            if(error.length==0){
+              var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.BuyingRateChargeToEdit);
+              if (res.status) {
+                $('#ops-edit-buying-rate-modal').modal('hide');
+                this.getBuyingSurCharges();
+              }
+            }
+          }
+        }, 300);
+    
+      }
+
+
+      resetChargeForm(formId:string,form:NgForm){
+        form.onReset();
+        this.resetDisplay();
+        $('#'+formId).modal("hide");
+      
+        this.BuyingRateChargeToAdd= new CsShipmentSurcharge();
+        this.SellingRateChargeToAdd= new CsShipmentSurcharge();
+        this.OBHChargeToAdd = new CsShipmentSurcharge();  
+        
+        this.BuyingRateChargeToEdit= null;
+        this.SellingRateChargeToEdit= null
+        this.OBHChargeToEdit= null;
+    
+      }
+
     /**
        * Daterange picker
        */

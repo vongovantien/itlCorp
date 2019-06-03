@@ -51,9 +51,9 @@ export class SeaFclExportCreateComponent implements OnInit {
     myForm: FormGroup;
     submitted = false;
     searchcontainer: string = '';
-    @ViewChild('containerMasterForm') containerMasterForm: NgForm;
-    @ViewChild(MasterBillComponent) masterBillComponent: any;
-    @ViewChild('containerSelect') containerSelect: ElementRef;
+    @ViewChild('containerMasterForm',{static:true}) containerMasterForm: NgForm;
+    @ViewChild(MasterBillComponent,{static:true}) masterBillComponent: any;
+    @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
     selectedCommodityValue: any;
     numberOfTimeSaveContainer: number = 0;
     saveButtonSetting: ButtonModalSetting = {
@@ -848,9 +848,8 @@ export class SeaFclExportCreateComponent implements OnInit {
         } else {
             key = search_key;
         }
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
-            var data = res['data'];
-            this._firstLoadData.lstPartner = data;
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe((res:any) => {
+            this._firstLoadData.lstPartner = res;
             console.log({"firstLoadData":this._firstLoadData})
         });
     }

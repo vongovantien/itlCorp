@@ -32,15 +32,15 @@ export class PartnerDataAddnewComponent implements OnInit {
   isRequiredSaleman = false;
   employee: any = {};
   users: any[] = [];
-   @ViewChild('formAddEdit') form: NgForm;
-   @ViewChild('chooseBillingCountry') public chooseBillingCountry: SelectComponent;
-   @ViewChild('chooseBillingProvince') public chooseBillingProvince: SelectComponent;
-   @ViewChild('chooseShippingCountry') public chooseShippingCountry: SelectComponent;
-   @ViewChild('chooseShippingProvince') public chooseShippingProvince: SelectComponent;
-   @ViewChild('chooseSaleman') public chooseSaleman: SelectComponent;
-   @ViewChild('chooseDepartment') public chooseDepartment: SelectComponent;
-   @ViewChild('chooseAccountRef') public chooseAccountRef: SelectComponent;
-   @ViewChild('chooseWorkplace') public chooseWorkplace: SelectComponent;
+   @ViewChild('formAddEdit',{static:true}) form: NgForm;
+   @ViewChild('chooseBillingCountry',{static:true}) public chooseBillingCountry: SelectComponent;
+   @ViewChild('chooseBillingProvince',{static:true}) public chooseBillingProvince: SelectComponent;
+   @ViewChild('chooseShippingCountry',{static:true}) public chooseShippingCountry: SelectComponent;
+   @ViewChild('chooseShippingProvince',{static:true}) public chooseShippingProvince: SelectComponent;
+   @ViewChild('chooseSaleman',{static:true}) public chooseSaleman: SelectComponent;
+   @ViewChild('chooseDepartment',{static:true}) public chooseDepartment: SelectComponent;
+   @ViewChild('chooseAccountRef',{static:true}) public chooseAccountRef: SelectComponent;
+   @ViewChild('chooseWorkplace',{static:true}) public chooseWorkplace: SelectComponent;
 
   constructor(private route:ActivatedRoute,
     private baseService: BaseService,

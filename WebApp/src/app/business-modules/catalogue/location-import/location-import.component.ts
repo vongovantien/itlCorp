@@ -28,9 +28,9 @@ export class LocationImportComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   type: string;
 
-  @ViewChild('form') form:any;
-  @ViewChild(PaginationComponent) child:any;
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+  @ViewChild('form',{static:true}) form:any;
+  @ViewChild(PaginationComponent,{static:true}) child:any;
+  @ViewChild(NgProgressComponent,{static:true}) progressBar: NgProgressComponent;
   constructor(
     private pagingService: PagingService,
     private baseService: BaseService,

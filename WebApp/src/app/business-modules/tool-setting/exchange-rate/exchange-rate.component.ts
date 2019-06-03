@@ -92,7 +92,7 @@ export class ExchangeRateComponent implements OnInit {
     ]
   };
 
-  @ViewChild('currencyRateSelect') public ngSelectCurrencyRate: SelectComponent;
+  @ViewChild('currencyRateSelect',{static:true}) public ngSelectCurrencyRate: SelectComponent;
 
   constructor(
     private api_menu: API_MENU,
