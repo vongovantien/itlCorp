@@ -27,6 +27,7 @@ export class OpsTransaction {
         mblno: string = null;
         jobNo: string = null;
         id: string = "00000000-0000-0000-0000-000000000000";
+        hblid:string = "00000000-0000-0000-0000-000000000000";
         agentId: string = null;
         modifiedDate: Date = null;
         salemanId: string = null;

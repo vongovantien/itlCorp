@@ -2312,6 +2312,7 @@
                                     </label>
 
                                     <app-combo-grid-virtual-scroll
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'charge.id',value:OBHChargeToAdd.chargeId}"
                                         (itemSelected)="OBHChargeToAdd.chargeId=$event.charge.id;
                                         OBHChargeToAdd.unitId=$event.charge.unitId;
@@ -2339,6 +2340,7 @@
                                     </label>
 
                                     <app-combo-grid-virtual-scroll
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.receiverId}"
                                         (itemSelected)="OBHChargeToAdd.receiverId = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
@@ -2362,6 +2364,7 @@
                                     </label>
 
                                     <app-combo-grid-virtual-scroll
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.payerId}"
                                         (itemSelected)="OBHChargeToAdd.payerId  = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
@@ -2384,6 +2387,7 @@
                                         Quantity
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         placeholder="Enter text" #OBHQuantityName="ngModel" appIntergerInputCheck
                                         [(ngModel)]="OBHChargeToAdd.quantity" required (keyup)="calculateTotalEachOBH()"
                                         name="OBHQuantityName">
@@ -2402,6 +2406,7 @@
                                     </label>
 
                                     <app-combo-grid-virtual-scroll
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.unitId}"
                                         (itemSelected)="OBHChargeToAdd.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
@@ -2421,6 +2426,7 @@
                                         Unit price
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         [(ngModel)]="OBHChargeToAdd.unitPrice" placeholder="Enter text" required
                                         name="OBHUnitPriceName" #OBHUnitPriceName="ngModel"
                                         (keyup)="calculateTotalEachOBH()">
@@ -2439,7 +2445,7 @@
                                         Currency
                                     </label>
                                     <ng-select [allowClear]="true" [items]="comboBoxData.lstCurrency"
-                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                        [disabled]="OBHChargeToAdd.soano!==null" (data)="refreshValue($event)"
                                         (selected)="OBHChargeToAdd.currencyId=$event.id"
                                         (removed)="OBHChargeToAdd.currencyId=null" (typed)="getListCurrency($event)"
                                         placeholder="Select filter">
@@ -2457,6 +2463,7 @@
                                         VAT
                                     </label>
                                     <input type="number" max="100" name="OBHChargeVATName" required
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         #OBHChargeVATName="ngModel" [(ngModel)]="OBHChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachOBH()">
@@ -2484,6 +2491,7 @@
                                         Doc no
                                     </label>
                                     <input type="text" [(ngModel)]="OBHChargeToAdd.docNo"
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeDocName">
                                 </div>
@@ -2494,6 +2502,7 @@
                                         Note
                                     </label>
                                     <input type="text" [(ngModel)]="OBHChargeToAdd.notes"
+                                        [disabled]="OBHChargeToAdd.soano!==null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeNoteName">
                                 </div>
@@ -2649,7 +2658,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addOBHChargeForm.submitted && OBHChargeToAdd.unitId==null}">
+                                    [ngClass]="{ 'm-form__group has-danger': editOBHChargeForm.submitted && OBHChargeToEdit.unitId==null}">
                                     <label class="form-control-label" for="">
                                         Unit
                                     </label>
@@ -2664,7 +2673,7 @@
                                     </app-combo-grid-virtual-scroll>                                    
 
                                     <div class="form-control-feedback"
-                                            *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
+                                            *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.unitId==null">
                                             Unit is required
                                     </div>
 
@@ -2744,7 +2753,7 @@
                                     <input type="text" [(ngModel)]="OBHChargeToEdit.docNo"
                                         [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        name="OBHChargeDocName">
+                                        name="OBHChargeDocNameEdt">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -2755,7 +2764,7 @@
                                     <input type="text" [(ngModel)]="OBHChargeToEdit.notes"
                                         [disabled]="OBHChargeToEdit.soano!=null"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
-                                        name="OBHChargeNoteName">
+                                        name="OBHChargeNoteNameEdt">
                                 </div>
                             </div>
                             <div class="col-lg-4">
