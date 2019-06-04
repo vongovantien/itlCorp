@@ -65,8 +65,8 @@
                         <div class="m-portlet__body" id="edit-ops-job-form" *ngIf="isDisplay">
                             <!--begin:: form-actions-->
                             <div class="form-actions m--align-right">
-                                <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="isSubmited = true; saveShipment(addOpsForm)">
+                                <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="saveShipment(addOpsForm)">
                                     <span>
                                         <i class="la la la-save"></i>
                                         <span>
@@ -115,7 +115,7 @@
                                         </div> -->
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{ 'has-danger': isSubmited && serviceDate == null }">
+                                            [ngClass]="{ 'has-danger': addOpsForm.submitted && serviceDate == null }">
                                             <label class="form-control-label" for="">
                                                 Service Date <span class="m--font-danger">(*)</span>
                                             </label>
@@ -132,13 +132,13 @@
                                                 </span>
                                             </div>
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmited && serviceDate == null">
+                                                *ngIf="addOpsForm.submitted && serviceDate == null">
                                                 Service Date is required!
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="form-group"[ngClass]="{ 'has-danger': isSubmited && finishDate != null && (serviceDate != null?serviceDate.startDate: null) >= (finishDate != null?finishDate.startDate: null)}">
+                                        <div class="form-group"[ngClass]="{ 'has-danger': addOpsForm.submitted && finishDate != null && (serviceDate != null?serviceDate.startDate: null) >= (finishDate != null?finishDate.startDate: null)}">
                                             <label class="form-control-label" for="">
                                                 Finish Date
                                             </label>
@@ -154,7 +154,7 @@
                                                     </span>
                                                 </span>
                                             </div>
-                                            <div class="form-control-feedback" *ngIf="isSubmited && finishDate != null && (serviceDate != null?serviceDate.startDate: null) >= (finishDate != null?finishDate.startDate: null)">
+                                            <div class="form-control-feedback" *ngIf="addOpsForm.submitted && finishDate != null && (serviceDate != null?serviceDate.startDate: null) > (finishDate != null?finishDate.startDate: null)">
                                                 Finish Date must more than Service Date
                                             </div>
                                         </div>
@@ -163,7 +163,7 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.productService == null}">
+                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.productService == null}">
                                             <label class="form-control-label" for="">
                                                 Product Service <span class="m--font-danger">(*)</span>
                                             </label>
@@ -174,14 +174,14 @@
                                                 placeholder="Please Select">
                                             </ng-select>
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmited && opsTransaction.productService === null">
+                                                *ngIf="addOpsForm.submitted && opsTransaction.productService === null">
                                                 Product Service is required!
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.serviceMode == null}">
+                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.serviceMode == null}">
                                             <label class="form-control-label" for="">
                                                 Service Mode <span class="m--font-danger">(*)</span>
                                             </label>
@@ -192,14 +192,14 @@
                                                 placeholder="Please Select">
                                             </ng-select>
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmited && opsTransaction.serviceMode === null">
+                                                *ngIf="addOpsForm.submitted && opsTransaction.serviceMode === null">
                                                 Service Mode is required!
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.shipmentMode == null}">
+                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.shipmentMode == null}">
                                             <label class="form-control-label" for="">
                                                 Shipment Mode <span class="m--font-danger">(*)</span>
                                             </label>
@@ -210,7 +210,7 @@
                                                 placeholder="Please Select">
                                             </ng-select>
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmited && opsTransaction.shipmentMode === null">
+                                                *ngIf="addOpsForm.submitted && opsTransaction.shipmentMode === null">
                                                 Shipment Mode is required!
                                             </div>
                                         </div>
@@ -219,7 +219,7 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':isSubmited && hblno.invalid}">
+                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && hblno.invalid}">
                                             <label class="form-control-label" for="">
                                                 HBL No <span class="m--font-danger">(*)</span>
                                             </label>
@@ -227,7 +227,7 @@
                                                 placeholder="Enter text" name="hblno" [(ngModel)]="opsTransaction.hblno"
                                                 #hblno="ngModel">
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmited && hblno.invalid">
+                                                *ngIf="addOpsForm.submitted && hblno.invalid">
                                                 HBL No is required!
                                             </div>
                                         </div>
@@ -245,7 +245,7 @@
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for=""
-                                                [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.customerId == null}">
+                                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.customerId == null}">
                                                 Customer <span class="m--font-danger">(*)</span>
                                             </label>
                                             <app-combo-grid-virtual-scroll
@@ -255,7 +255,7 @@
                                                 [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmited && opsTransaction.customerId == null">
+                                                *ngIf="addOpsForm.submitted && opsTransaction.customerId == null">
                                                 Customer is required!
                                             </div>
                                         </div>
@@ -306,7 +306,7 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':isSubmited && flightVessel.invalid}">
+                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && flightVessel.invalid}">
                                             <label class="form-control-label" for="">
                                                 Vessel/Flight <span class="m--font-danger">(*)</span>
                                             </label>
@@ -314,7 +314,7 @@
                                                 placeholder="Enter text" name="flightVessel"
                                                 [(ngModel)]="opsTransaction.flightVessel" #flightVessel="ngModel">
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmited && flightVessel.invalid">
+                                                *ngIf="addOpsForm.submitted && flightVessel.invalid">
                                                 Vessel/Flight No is required!
                                             </div>
                                         </div>
@@ -397,7 +397,7 @@
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.billingOpsId == null}">
+                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.billingOpsId == null}">
                                             <label class="form-control-label" for="">
                                                 Billing OPS <span class="m--font-danger">(*)</span>
                                             </label>
@@ -407,7 +407,7 @@
                                                 [selectedDisplayFields]="['employeeNameEn']" [dataSources]="billingOps"
                                                 [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
                                             </app-combo-grid-virtual-scroll>
-                                            <div class="form-control-feedback" *ngIf="isSubmited && opsTransaction.billingOpsId == null">
+                                            <div class="form-control-feedback" style="display: none">
                                                 Billing OPS is required!
                                             </div>
                                         </div>

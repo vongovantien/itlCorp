@@ -122,12 +122,17 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             }
         });
     }
-    async saveShipment() {
+    async saveShipment(form: NgForm) {
         console.log(this.opsTransaction);
         this.opsTransaction.serviceDate = this.serviceDate != null?dataHelper.dateTimeToUTC(this.serviceDate.startDate): null;
         this.opsTransaction.finishDate = this.finishDate != null? dataHelper.dateTimeToUTC(this.finishDate.startDate): null;
-        var error = $('#edit-ops-job-form').find('div.has-danger');
-        if (error.length === 0 && this.isSubmited == true) {
+        if (form.valid && this.opsTransaction.shipmentMode != null 
+            && this.opsTransaction.serviceMode != null 
+            && this.opsTransaction.productService != null
+            && this.opsTransaction.customerId != null 
+            && this.opsTransaction.billingOpsId != null 
+            && this.opsTransaction.serviceDate != null
+            && (this.opsTransaction.finishDate != null && this.opsTransaction.serviceDate <= this.opsTransaction.finishDate)) {
             var response = await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
             if(response.success){
                 this.isSubmited = false;
