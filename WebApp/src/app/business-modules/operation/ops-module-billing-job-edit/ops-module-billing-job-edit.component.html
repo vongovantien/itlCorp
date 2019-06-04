@@ -1386,7 +1386,7 @@
                         <table class="table table-striped table-brand">
                             <thead>
                                 <tr>
-                                    <th></th>
+                                    <th>Type</th>
                                     <th>
                                         <span>USD</span>
                                     </th>
@@ -1401,10 +1401,10 @@
                                         <span>Buying rate</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalBuyingUSD | number : '1.3-3'}}</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalBuyingLocal | number : '1.3-3'}}</span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1412,10 +1412,10 @@
                                         <span>Selling rate</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalSellingUSD | number : '1.3-3'}}</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalSellingLocal | number : '1.3-3'}}</span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1423,10 +1423,10 @@
                                         <span>OBH</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalOBHUSD | number : '1.3-3'}}</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalOBHLocal | number : '1.3-3'}}</span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1434,10 +1434,10 @@
                                         <span>Logictis charge</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalLogisticChargeUSD | number : '1.3-3'}}</span>
                                     </td>
                                     <td>
-                                        <span>500.000,000</span>
+                                        <span>{{totalLogisticChargeLocal | number : '1.3-3'}}</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -1447,15 +1447,15 @@
                                         <span>Total</span>
                                     </th>
                                     <th>
-                                        <span>500.000,000</span>
+                                        <span>{{totalProfitUSD | number : '1.3-3'}}</span>
                                     </th>
                                     <th>
-                                        <span>500.000,000</span>
+                                        <span>{{totalProfitLocal | number : '1.3-3'}}</span>
                                     </th>
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
+                    </div>     
                     <!--end: table -->
                 </div>
             </div>

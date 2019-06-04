@@ -25,8 +25,8 @@ export class PartnerDataImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild(PaginationComponent,{static:true}) child;
-  @ViewChild(NgProgressComponent,{static:true}) progressBar: NgProgressComponent;
+  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
   
   constructor(
     private pagingService: PagingService,

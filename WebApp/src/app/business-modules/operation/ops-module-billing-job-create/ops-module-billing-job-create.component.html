@@ -49,9 +49,9 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{ 'has-danger': addOpsForm.submitted && OpsTransactionToAdd.serviceDate.startDate == null }">
                                 <label class="form-control-label" for="">
-                                    Service Date
+                                    Service Date<span class="m--font-danger">(*)</span>
                                 </label>
                                 <div class="m-input-icon m-input-icon--right down">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -64,6 +64,10 @@
                                         </span>
                                     </span>
                                 </div>
+                                <div class="form-control-feedback"
+                                *ngIf="addOpsForm.submitted && OpsTransactionToAdd.serviceDate.startDate == null">
+                                Service Date is required!
+                            </div>
                             </div>
                         </div>
                     </div>

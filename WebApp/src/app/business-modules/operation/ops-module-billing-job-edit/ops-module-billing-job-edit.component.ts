@@ -38,7 +38,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     salemans: any[] = [];
     productServiceActive: any[] = [];
     serviceModeActive: any[] = [];
-    shipmentModeActive: any[] = [];
+    shipmentModeActive: any[] = [];   
     isSubmited = false;
 
     lstBuyingRateChargesComboBox: any[] = [];

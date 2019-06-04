@@ -29,7 +29,7 @@ const routes: Routes = [
         component: OpsModuleBillingJobCreateComponent,
         data:{
             name:"Job Create",
-            level:2
+            level:3
           }
     },
     {
@@ -37,7 +37,7 @@ const routes: Routes = [
         component: OpsModuleBillingJobEditComponent,
         data:{
             name:"Job Edit",
-            level:2
+            level:3
           }
     },
     {

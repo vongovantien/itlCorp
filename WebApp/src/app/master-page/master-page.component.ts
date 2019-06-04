@@ -12,7 +12,7 @@ import { BaseService } from 'src/services-base/base.service';
 })
 export class MasterPageComponent implements OnInit, AfterViewInit {
 
-  @ViewChild(PageSidebarComponent,{static:true}) Page_side_bar;
+  @ViewChild(PageSidebarComponent,{static:false}) Page_side_bar;
   Page_Info = {};
   Component_name: "no-name";
 

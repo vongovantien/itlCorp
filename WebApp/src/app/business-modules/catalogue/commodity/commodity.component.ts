@@ -32,11 +32,11 @@ export class CommodityComponent implements OnInit {
   /*
   declare variable
   */
-  @ViewChild(PaginationComponent,{static:true}) child; 
-  @ViewChild(SearchOptionsComponent,{static:true}) searchOption; 
-  @ViewChild('formCommodity',{static:true}) formCommodity: NgForm;
-  @ViewChild('formGroupCommodity',{static:true}) formGroupCommodity: NgForm;
-  @ViewChild('chooseGroup',{static:true}) public groupSelect: SelectComponent;
+  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild(SearchOptionsComponent,{static:false}) searchOption; 
+  @ViewChild('formCommodity',{static:false}) formCommodity: NgForm;
+  @ViewChild('formGroupCommodity',{static:false}) formGroupCommodity: NgForm;
+  @ViewChild('chooseGroup',{static:false}) public groupSelect: SelectComponent;
   commodities: Array<Commodity>;
   commodity: Commodity;
   commodityGroups: Array<CommodityGroup>;

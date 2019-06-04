@@ -34,9 +34,9 @@ export class CommodityGroupImportComponent implements OnInit {
     private sortService: SortService
   ) { }
 
-  @ViewChild(PaginationComponent,{static:true}) child: any;
-  @ViewChild('form',{static:true}) form: any;
-  @ViewChild(NgProgressComponent,{static:true}) progressBar: NgProgressComponent;
+  @ViewChild(PaginationComponent,{static:false}) child: any;
+  @ViewChild('form',{static:false}) form: any;
+  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
 
   ngOnInit() {
     this.pager.totalItems =0 ;

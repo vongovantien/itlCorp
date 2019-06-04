@@ -429,8 +429,8 @@ export class HousebillAddnewComponent implements OnInit {
     console.log(this.HouseBillWorking)
     if (form.valid) {
       this.HouseBillWorking.csMawbcontainers = this.lstHouseBillContainers;
-      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.sailingDate.startDate);
-      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.closingDate.startDate);
+      this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate.startDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.sailingDate.startDate);
+      this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate.startDate == null ? null : dataHelper.dateTimeToUTC(this.HouseBillWorking.closingDate.startDate);
 
 
       if (this.isImporting == false) {
@@ -493,7 +493,7 @@ export class HousebillAddnewComponent implements OnInit {
   weightMesurements: any[] = [];
   packageTypes: any[] = [];
   commodities: any[] = [];
-  @ViewChild('containerListForm',{static:true}) containerListForm: NgForm;
+  @ViewChild('containerListForm',{static:false}) containerListForm: NgForm;
   async getContainerTypes() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
     if (responses != null) {

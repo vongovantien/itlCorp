@@ -24,7 +24,7 @@ export class CustomerComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
-  @ViewChild(PaginationComponent,{static:true}) child; 
+  @ViewChild(PaginationComponent,{static:false}) child; 
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
