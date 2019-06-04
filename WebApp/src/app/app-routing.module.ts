@@ -32,8 +32,7 @@ const routes: Routes = [
                 component:DashboardComponent
             },
             {
-                path: 'system',
-                // loadChildren: './business-modules/system/system.module#SystemModule',
+                path: 'system',  
                 loadChildren:() => import('./business-modules/system/system.module').then(m => m.SystemModule),
                 data:{
                     name:"System",

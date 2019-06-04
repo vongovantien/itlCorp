@@ -9,6 +9,7 @@ import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
+declare var $: any;
 
 @Component({
     selector: 'app-ops-module-billing',
@@ -36,6 +37,7 @@ export class OpsModuleBillingComponent implements OnInit {
     isReset = true;
     isFilterTime = false;
     customClearances: any[] = [];
+    itemToDelete: any = null;
     
     constructor(private baseServices: BaseService,
         private sortService: SortService,
@@ -66,10 +68,8 @@ export class OpsModuleBillingComponent implements OnInit {
     }
     searchShipment(){
         this.pager.totalItems = 0;
-        this.criteria.mblno =null;
+        this.criteria.jobNo =null;
         this.criteria.hblno = null;
-        this.criteria.customerId = null;
-        this.criteria.fieldOps = null;
         this.criteria.all = null;
         if(this.isFilterTime){
             this.criteria.serviceDateFrom = this.selectedRange.startDate;
@@ -83,7 +83,7 @@ export class OpsModuleBillingComponent implements OnInit {
             this.criteria.jobNo = this.searchString;
         }
         else if(this.selectedFilter === 'HBL'){
-            this.criteria.mawb = this.searchString;
+            this.criteria.hblno = this.searchString;
         }
         else{
             this.criteria.all = this.searchString;
@@ -96,9 +96,10 @@ export class OpsModuleBillingComponent implements OnInit {
         this.criteria = {
         };
         this.searchString = null;
-        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
-        this.criteria.serviceDateFrom = this.selectedRange.startDate;
-        this.criteria.serviceDateTo = this.selectedRange.endDate;
+        // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        // this.criteria.serviceDateFrom = this.selectedRange.startDate;
+        // this.criteria.serviceDateTo = this.selectedRange.endDate;
+        this.isFilterTime = false;
         this.isReset = false;
         setTimeout(() => {
             this.isReset = true;
@@ -112,6 +113,23 @@ export class OpsModuleBillingComponent implements OnInit {
         }
         else{
             this.customClearances = [];
+        }
+    }
+    async confirmDelete(item: { id: string; }){
+        this.itemToDelete = item;
+        let respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + item.id, false, true);
+        if(respone == true){
+            $('#confirm-delete-job-modal').modal('show');
+        }
+        else{
+            $('#confirm-can-not-delete-job-modal').modal('show');
+        }
+    }
+    async deleteJob(){
+        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.itemToDelete.id, true, true);
+        if(respone.status){
+            $('#confirm-delete-job-modal').modal('hide');
+            this.getShipments();
         }
     }
     isDesc = true;

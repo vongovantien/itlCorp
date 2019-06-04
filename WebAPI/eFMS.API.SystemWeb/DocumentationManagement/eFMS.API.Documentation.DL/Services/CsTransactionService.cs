@@ -99,10 +99,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return false;
             }
-            else
-            {
-                return true;
-            }
+            return true;
         }
 
         public HandleState DeleteCSTransaction(Guid jobId)
