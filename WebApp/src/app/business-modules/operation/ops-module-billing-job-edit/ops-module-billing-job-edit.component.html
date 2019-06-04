@@ -62,11 +62,11 @@
                         <div class="alert-block__heading">
                             <h3 class="alert-block__title">Job Information</h3>
                         </div>
-                        <div class="m-portlet__body">
+                        <div class="m-portlet__body" id="edit-ops-job-form" *ngIf="isDisplay">
                             <!--begin:: form-actions-->
                             <div class="form-actions m--align-right">
-                                <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="saveShipment(addOpsForm)">
+                                <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="isSubmited = true; saveShipment(addOpsForm)">
                                     <span>
                                         <i class="la la la-save"></i>
                                         <span>
@@ -115,7 +115,7 @@
                                         </div> -->
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.serviceDate == null}">
+                                            [ngClass]="{ 'has-danger': isSubmited && serviceDate == null }">
                                             <label class="form-control-label" for="">
                                                 Service Date <span class="m--font-danger">(*)</span>
                                             </label>
@@ -123,8 +123,8 @@
                                                 <input type="text" class="form-control m-input m-input--square"
                                                     ngxDaterangepickerMd [autoApply]="true"
                                                     [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                    [(ngModel)]="opsTransaction.serviceDate" [singleDatePicker]="true"
-                                                    name="singledater" readonly />
+                                                    [(ngModel)]="serviceDate" [singleDatePicker]="true"
+                                                    name="serviceDate" readonly />
                                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                                     <span>
                                                         <i class="la la-calendar"></i>
@@ -132,13 +132,13 @@
                                                 </span>
                                             </div>
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && opsTransaction.serviceDate === null">
+                                                *ngIf="isSubmited && serviceDate == null">
                                                 Service Date is required!
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="form-group">
+                                        <div class="form-group"[ngClass]="{ 'has-danger': isSubmited && finishDate != null && (serviceDate != null?serviceDate.startDate: null) >= (finishDate != null?finishDate.startDate: null)}">
                                             <label class="form-control-label" for="">
                                                 Finish Date
                                             </label>
@@ -146,13 +146,16 @@
                                                 <input type="text" class="form-control m-input m-input--square"
                                                     ngxDaterangepickerMd [autoApply]="true"
                                                     [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                    [(ngModel)]="opsTransaction.finishDate" [singleDatePicker]="true"
-                                                    name="singledater" readonly />
+                                                    [(ngModel)]="finishDate" [singleDatePicker]="true"
+                                                    name="finishDate" readonly />
                                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                                     <span>
                                                         <i class="la la-calendar"></i>
                                                     </span>
                                                 </span>
+                                            </div>
+                                            <div class="form-control-feedback" *ngIf="isSubmited && finishDate != null && (serviceDate != null?serviceDate.startDate: null) >= (finishDate != null?finishDate.startDate: null)">
+                                                Finish Date must more than Service Date
                                             </div>
                                         </div>
                                     </div>
@@ -160,7 +163,7 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.productService == null}">
+                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.productService == null}">
                                             <label class="form-control-label" for="">
                                                 Product Service <span class="m--font-danger">(*)</span>
                                             </label>
@@ -171,14 +174,14 @@
                                                 placeholder="Please Select">
                                             </ng-select>
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && opsTransaction.productService === null">
+                                                *ngIf="isSubmited && opsTransaction.productService === null">
                                                 Product Service is required!
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.serviceMode == null}">
+                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.serviceMode == null}">
                                             <label class="form-control-label" for="">
                                                 Service Mode <span class="m--font-danger">(*)</span>
                                             </label>
@@ -189,14 +192,14 @@
                                                 placeholder="Please Select">
                                             </ng-select>
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && opsTransaction.serviceMode === null">
+                                                *ngIf="isSubmited && opsTransaction.serviceMode === null">
                                                 Service Mode is required!
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.shipmentMode == null}">
+                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.shipmentMode == null}">
                                             <label class="form-control-label" for="">
                                                 Shipment Mode <span class="m--font-danger">(*)</span>
                                             </label>
@@ -207,7 +210,7 @@
                                                 placeholder="Please Select">
                                             </ng-select>
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && opsTransaction.shipmentMode === null">
+                                                *ngIf="isSubmited && opsTransaction.shipmentMode === null">
                                                 Shipment Mode is required!
                                             </div>
                                         </div>
@@ -216,7 +219,7 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && hblno.invalid}">
+                                            [ngClass]="{'m-form__group has-danger':isSubmited && hblno.invalid}">
                                             <label class="form-control-label" for="">
                                                 HBL No <span class="m--font-danger">(*)</span>
                                             </label>
@@ -224,7 +227,7 @@
                                                 placeholder="Enter text" name="hblno" [(ngModel)]="opsTransaction.hblno"
                                                 #hblno="ngModel">
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && hblno.invalid">
+                                                *ngIf="isSubmited && hblno.invalid">
                                                 HBL No is required!
                                             </div>
                                         </div>
@@ -242,7 +245,7 @@
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for=""
-                                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.customerId == null}">
+                                                [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.customerId == null}">
                                                 Customer <span class="m--font-danger">(*)</span>
                                             </label>
                                             <app-combo-grid-virtual-scroll
@@ -252,7 +255,7 @@
                                                 [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && opsTransaction.customerId == null">
+                                                *ngIf="isSubmited && opsTransaction.customerId == null">
                                                 Customer is required!
                                             </div>
                                         </div>
@@ -303,7 +306,7 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && flightVessel.invalid}">
+                                            [ngClass]="{'m-form__group has-danger':isSubmited && flightVessel.invalid}">
                                             <label class="form-control-label" for="">
                                                 Vessel/Flight <span class="m--font-danger">(*)</span>
                                             </label>
@@ -311,7 +314,7 @@
                                                 placeholder="Enter text" name="flightVessel"
                                                 [(ngModel)]="opsTransaction.flightVessel" #flightVessel="ngModel">
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && flightVessel.invalid">
+                                                *ngIf="isSubmited && flightVessel.invalid">
                                                 Vessel/Flight No is required!
                                             </div>
                                         </div>
@@ -394,7 +397,7 @@
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.billingOpsId == null}">
+                                            [ngClass]="{'m-form__group has-danger':isSubmited && opsTransaction.billingOpsId == null}">
                                             <label class="form-control-label" for="">
                                                 Billing OPS <span class="m--font-danger">(*)</span>
                                             </label>
@@ -404,10 +407,24 @@
                                                 [selectedDisplayFields]="['employeeNameEn']" [dataSources]="billingOps"
                                                 [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
                                             </app-combo-grid-virtual-scroll>
-                                            <div class="form-control-feedback" style="display: none">
+                                            <div class="form-control-feedback" *ngIf="isSubmited && opsTransaction.billingOpsId == null">
                                                 Billing OPS is required!
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                                        <span class="m--font-bolder">Create:</span>
+                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.createdDate | date : "dd/MM/yyyy hh:mm:ss" }}</span>
+                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.userCreated }}</span>
+                                    </div>
+                                    <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                                        <span class="m--font-bolder">Modified:</span>
+                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.modifiedDate | date : "dd/MM/yyyy hh:mm:ss" }}</span>
+                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.userModified }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -3805,3 +3822,44 @@
     </div>
 </div>
 <!--end::confirm-delete-charge-modal-->
+
+<!--begin::cancel-create-ops-job-modal-->
+<div class="modal fade" id="cancel-create-ops-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>All entered data will be discarded, <br>Are you sure you want to leave? </span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" routerLink="/home/operation/job-management">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::cancel-create-ops-job-modal-->

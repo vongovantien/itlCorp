@@ -24,6 +24,8 @@ declare var $: any;
 export class OpsModuleBillingJobEditComponent implements OnInit {
     opsTransaction: OpsTransaction = new OpsTransaction();
     productServices: any[] = [];
+    serviceDate: any;
+    finishDate: any;
     serviceModes: any[] = [];
     shipmentModes: any[] = [];
     customers: any[] = [];
@@ -36,6 +38,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     productServiceActive: any[] = [];
     serviceModeActive: any[] = [];
     shipmentModeActive: any[] = [];
+    isSubmited = false;
 
     lstBuyingRateChargesComboBox: any[] = [];
     lstSellingRateChargesComboBox: any[] = [];
@@ -81,8 +84,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         private api_menu: API_MENU,
         private route: ActivatedRoute) {
         this.keepCalendarOpeningWithRange = true;
-        this.selectedDate = Date.now();
-        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        // this.selectedDate = Date.now();
+        // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
     async ngOnInit() {
         this.getUnits();
@@ -101,19 +104,35 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         await this.route.params.subscribe(async prams => {
             if (prams.id != undefined) {
                 await this.getShipmentDetails(prams.id);
-
-                let index = this.productServices.findIndex(x => x.id == this.opsTransaction.productService);
-                if (index > -1) this.productServiceActive = [this.productServices[index]];
-                index = this.serviceModes.findIndex(x => x.id == this.opsTransaction.serviceMode);
-                if (index > -1) this.serviceModeActive = [this.serviceModes[index]];
-                index = this.shipmentModes.findIndex(x => x.id == this.opsTransaction.shipmentMode);
-                if (index > -1) this.shipmentModeActive = [this.shipmentModes[index]];
+                if(this.opsTransaction != null){
+                    this.serviceDate = (this.opsTransaction.serviceDate!= null)? { startDate: moment(this.opsTransaction.serviceDate), endDate: moment(this.opsTransaction.serviceDate) }: null;
+                    this.finishDate = this.opsTransaction.finishDate != null? { startDate: moment(this.opsTransaction.finishDate), endDate: moment(this.opsTransaction.finishDate) }: null;
+                    let index = this.productServices.findIndex(x => x.id == this.opsTransaction.productService);
+                    if (index > -1) this.productServiceActive = [this.productServices[index]];
+                    index = this.serviceModes.findIndex(x => x.id == this.opsTransaction.serviceMode);
+                    if (index > -1) this.serviceModeActive = [this.serviceModes[index]];
+                    index = this.shipmentModes.findIndex(x => x.id == this.opsTransaction.shipmentMode);
+                    if (index > -1) this.shipmentModeActive = [this.shipmentModes[index]];
+                    this.getAllSurCharges();
+                }
+                else{
+                    this.serviceDate = null;
+                    this.finishDate = null;
+                }
             }
         });
     }
-    saveShipment(form: NgForm) {
-        console.log(form);
+    async saveShipment() {
         console.log(this.opsTransaction);
+        this.opsTransaction.serviceDate = this.serviceDate != null?dataHelper.dateTimeToUTC(this.serviceDate.startDate): null;
+        this.opsTransaction.finishDate = this.finishDate != null? dataHelper.dateTimeToUTC(this.finishDate.startDate): null;
+        var error = $('#edit-ops-job-form').find('div.has-danger');
+        if (error.length === 0 && this.isSubmited == true) {
+            var response = await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
+            if(response.success){
+                this.isSubmited = false;
+            }
+        }
     }
     async getWarehouses() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
@@ -123,7 +142,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
         console.log({ SHIPMENT: this.opsTransaction });
-        this.getAllSurCharges();
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
@@ -490,8 +508,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     /**
        * Daterange picker
        */
-    selectedRange: any;
-    selectedDate: any;
+    //selectedRange: any;
+    //selectedDate: any;
     keepCalendarOpeningWithRange: true;
     maxDate: moment.Moment = moment();
     ranges: any = {
