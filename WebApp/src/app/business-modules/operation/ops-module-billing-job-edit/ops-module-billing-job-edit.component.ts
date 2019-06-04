@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import moment from 'moment/moment';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import * as shipmentHelper from 'src/helper/shipment.helper';
@@ -7,7 +7,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgForm } from '@angular/forms';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
@@ -15,6 +15,7 @@ import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import { async } from 'rxjs/internal/scheduler/async';
+import { SortService } from 'src/app/shared/services/sort.service';
 declare var $: any;
 
 @Component({
@@ -39,7 +40,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     productServiceActive: any[] = [];
     serviceModeActive: any[] = [];
     shipmentModeActive: any[] = [];
-    isSubmited = false;
+    searchcontainer: string = '';
+    lstMasterContainers: any[] = [];
 
     lstBuyingRateChargesComboBox: any[] = [];
     lstSellingRateChargesComboBox: any[] = [];
@@ -50,6 +52,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     ListBuyingRateCharges: any[] = [];
     ConstListBuyingRateCharges: any = [];
+    numberOfTimeSaveContainer: number = 0;
 
     ListSellingRateCharges: any[] = [];
     ConstListSellingRateCharges: any[] = [];
@@ -80,10 +83,24 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     totalOBHUSD: number = 0;
     totalOBHLocal: number = 0;
+    
+    listContainerType: any[] = [];
+    
+    lstContainerTemp: any[];
+    containerTypes: any[];
+    listPackageTypes: any[];
+    listWeightMesurement: any[];
+    commodities: any[];
+    packageTypes: any[];
+    weightMesurements: any[];
+    @ViewChild('containerMasterForm',{static:true}) containerMasterForm: NgForm;
+    @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
-        private route: ActivatedRoute) {
+        private route: ActivatedRoute,
+        private router:Router,
+        private sortService: SortService) {
         this.keepCalendarOpeningWithRange = true;
         // this.selectedDate = Date.now();
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -101,6 +118,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.getAgents();
         this.getBillingOps();
         this.getWarehouses();
+        this.getContainerData();
         await this.getShipmentCommonData();
         await this.route.params.subscribe(async prams => {
             if (prams.id != undefined) {
@@ -123,21 +141,224 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             }
         });
     }
+    async confirmDelete(){
+        let respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
+        if(respone == true){
+            $('#confirm-delete-job-modal').modal('show');
+        }
+        else{
+            $('#confirm-can-not-delete-job-modal').modal('show');
+        }
+    }
+    async deleteJob(){
+        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.opsTransaction.id, true, true);
+        if(respone.status){
+            $('#confirm-delete-job-modal').modal('hide');
+            this.router.navigate(["/home/operation/job-management"]);
+        }
+    }
     async saveShipment(form: NgForm) {
         console.log(this.opsTransaction);
-        this.opsTransaction.serviceDate = this.serviceDate != null?dataHelper.dateTimeToUTC(this.serviceDate.startDate): null;
-        this.opsTransaction.finishDate = this.finishDate != null? dataHelper.dateTimeToUTC(this.finishDate.startDate): null;
-        if (form.valid && this.opsTransaction.shipmentMode != null 
-            && this.opsTransaction.serviceMode != null 
-            && this.opsTransaction.productService != null
-            && this.opsTransaction.customerId != null 
-            && this.opsTransaction.billingOpsId != null 
-            && this.opsTransaction.serviceDate != null
-            && (this.opsTransaction.finishDate != null && this.opsTransaction.serviceDate <= this.opsTransaction.finishDate)) {
+        this.opsTransaction.serviceDate = this.serviceDate.startDate != null?dataHelper.dateTimeToUTC(this.serviceDate.startDate): null;
+        this.opsTransaction.finishDate = this.finishDate.startDate != null? dataHelper.dateTimeToUTC(this.finishDate.startDate): null;
+        let s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
+        if (form.invalid || this.opsTransaction.shipmentMode == null 
+            || this.opsTransaction.serviceMode == null 
+            || this.opsTransaction.productService == null
+            || this.opsTransaction.customerId == null 
+            || this.opsTransaction.billingOpsId == null 
+            || this.opsTransaction.serviceDate == null
+            || s
+            ) {
+                return;
+        }
+        else{
             var response = await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
-            if(response.success){
-                this.isSubmited = false;
+        }
+    }
+    addNewContainer() {
+        let hasItemEdited = false;
+        let index = -1;
+        for (let i = 0; i < this.lstMasterContainers.length; i++) {
+            if (this.lstMasterContainers[i].allowEdit == true) {
+                hasItemEdited = true;
+                index = i;
+                break;
             }
+        }
+        if (hasItemEdited == false) {
+            console.log(this.containerMasterForm);
+            this.lstMasterContainers.push(this.initNewContainer());
+        }
+        else {
+            this.saveNewContainer(index);
+            if(this.saveContainerSuccess){
+                this.lstMasterContainers.push(this.initNewContainer());
+            }
+        }
+    }
+    saveContainerSuccess = false;
+    async saveNewContainer(index: any){
+        
+        if(this.lstMasterContainers[index].containerNo.length > 0 || this.lstMasterContainers[index].sealNo.length > 0 || this.lstMasterContainers[index].markNo.length > 0){
+            this.lstMasterContainers[index].quantity = 1;
+        }
+        console.log(this.containerMasterForm.submitted && this.lstMasterContainers[index].containerTypeId == null && this.lstMasterContainers[index].verifying);
+        this.lstMasterContainers[index].verifying = true;
+        if(this.lstMasterContainers[index].quantity == null || this.lstMasterContainers[index].containerTypeId == null){
+            this.saveContainerSuccess = false;
+            return;
+        } 
+        //Cont Type, Cont Q'ty, Container No, Package Type
+        let existedItems = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
+            && x.quantity == this.lstMasterContainers[index].quantity);
+        if(this.lstMasterContainers[index].containerNo.length != 0 && this.lstMasterContainers[index].packageTypeId != null){
+            existedItems = existedItems.filter(x => x.containerNo == this.lstMasterContainers[index].containerNo
+                && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
+        }
+        else
+        {
+            existedItems = [];
+        }
+        if(existedItems.length > 1) { 
+            this.lstMasterContainers[index].inValidRow = true;
+            this.saveContainerSuccess = false;
+        }
+        else{
+            if(this.lstMasterContainers[index].isNew == true){
+                this.lstMasterContainers[index].isNew = false;
+            } 
+            else{
+                this.lstMasterContainers[index].inValidRow = false;
+                this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
+                this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
+                this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId!= null? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
+            }
+            this.saveContainerSuccess = true;
+            this.lstMasterContainers[index].allowEdit = false;
+        }
+        this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
+    }
+    initNewContainer() {
+        var container = {
+            mawb: this.opsTransaction.id,
+            containerTypeId: null,
+            containerTypeName: '',
+            containerTypeActive: [],
+            quantity: 1,
+            containerNo: '',
+            sealNo: '',
+            markNo: '',
+            unitOfMeasureId: 37,
+            unitOfMeasureName: 'Kilogam',
+            unitOfMeasureActive: [{ "id": 37, "text": "Kilogam"}],
+            commodityId: null,
+            commodityName: '',
+            packageTypeId: null,
+            packageTypeName: '',
+            packageTypeActive: [],
+            packageQuantity: null,
+            description: null,
+            gw: null,
+            nw: null,
+            chargeAbleWeight: null,
+            cbm: null,
+            packageContainer: '',
+            allowEdit: true,
+            isNew: true,
+            verifying: false
+        };
+        this.filterContainer(this.lstMasterContainers.length);
+        return container;
+    }
+    getContainerData(){
+        this.getContainerTypes();
+        this.getWeightTypes();
+        this.getPackageTypes();
+        this.getComodities();
+    }
+    async getContainerTypes() {
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
+        this.listContainerType = responses;
+        if (responses != null) {
+            this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+            console.log('container type:');
+            console.log(this.containerTypes);
+        }
+    }
+    onSubmitContainer(){
+        for(let i=0; i< this.lstMasterContainers.length; i++){
+            this.lstMasterContainers[i].verifying = true;
+        }
+        if (this.containerMasterForm.valid) {
+            let hasItemEdited = false;
+            for(let i=0; i< this.lstMasterContainers.length; i++){
+                if(this.lstMasterContainers[i].allowEdit == true){
+                    hasItemEdited = true;
+                    break;
+                }
+            }
+            if(hasItemEdited == false){
+                //continue
+                this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
+                this.opsTransaction.sumGrossWeight = 0;
+                this.opsTransaction.sumNetWeight = 0;
+                this.opsTransaction.sumCbm = 0;
+                this.opsTransaction.sumContainers = 0;
+                this.opsTransaction.packageQuantity = 0;
+                $('#container-list-of-ops-billing-modal').modal('hide');
+            }
+            else{
+                this.baseServices.errorToast("Current container must be save!!!");
+            }
+        }
+    }
+    async getWeightTypes() {
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
+        this.listWeightMesurement = responses;
+    }
+    async getPackageTypes() {
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
+        this.listPackageTypes = responses;
+    }
+    async getComodities() {
+        let criteriaSearchCommodity = { inactive: null, all: null };
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, criteriaSearchCommodity, false, false);
+        if(responses != null){
+            this.commodities = this.sortService.sort(responses, 'commodityNameEn', true);
+            console.log('commodities' + this.commodities);
+        }
+        else{
+            this.commodities = [];
+        }
+    }
+    
+    changeComodity(keySearch: any) {
+        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
+            return 0;
+        }
+        this.getComodities();
+    }
+    filterContainer(index: number){
+        if (this.listContainerType != null) {
+            if(this.lstMasterContainers[index] == null){
+                this.containerTypes = dataHelper.prepareNg2SelectData(this.listContainerType, 'id', 'unitNameEn');
+                this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
+                this.weightMesurements = dataHelper.prepareNg2SelectData(this.listWeightMesurement, 'id', 'unitNameEn');
+            }
+            else{
+                if(this.lstMasterContainers[index]["id"] != null){
+                    let conts = this.listContainerType.filter(x => x.inactive == false);
+                    let packs = this.listPackageTypes.filter(x => x.inactive == false);
+                    let weights = this.listWeightMesurement.filter(x => x.inactive == false);
+                    this.containerTypes = dataHelper.prepareNg2SelectData(conts, 'id', 'unitNameEn');
+                    this.packageTypes = dataHelper.prepareNg2SelectData(packs, 'id', 'unitNameEn');
+                    this.weightMesurements = dataHelper.prepareNg2SelectData(weights, 'id', 'unitNameEn');
+                }
+            }
+        }
+        else{
+            this.containerTypes = [];
         }
     }
     async getWarehouses() {

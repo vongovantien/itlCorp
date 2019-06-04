@@ -303,8 +303,9 @@ export class API_MENU {
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Paging",
             addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Add",
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Update",
-            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete",
-            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction"
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete/",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction",
+            checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/CheckAllowDelete/"
         },
         CustomClearance: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CustomsDeclaration/GetByJob"

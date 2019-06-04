@@ -13,6 +13,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -89,7 +90,19 @@ namespace eFMS.API.Documentation.DL.Services
             };
             return results;
         }
-
+        public bool CheckAllowDelete(Guid jobId)
+        {
+            var query = (from detail in ((eFMSDataContext)DataContext.DC).OpsTransaction
+                         where detail.Id == jobId
+                         join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
+                         where surcharge.Soano != null || surcharge.OtherSoa != null
+                         select detail);
+            if (query.Any())
+            {
+                return false;
+            }
+            return true;
+        }
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             var data = GetView().AsQueryable();
@@ -97,7 +110,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             if (criteria.All == null)
             {
-                data = data.Where(x => (x.MBLNO ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                data = data.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.HBLNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -109,7 +122,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                data = data.Where(x => (x.MBLNO ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                data = data.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.HBLNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1

@@ -98,9 +98,13 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpDelete]
-        [Route("Delete")]
+        [Route("Delete/{id}")]
         public IActionResult Delete(Guid id)
         {
+            if (transactionService.CheckAllowDelete(id) == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+            }
             var hs = transactionService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -110,6 +114,12 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+        [HttpGet("CheckAllowDelete/{id}")]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            return Ok(transactionService.CheckAllowDelete(id));
+        }
+
         private string CheckExist(OpsTransactionModel model)
         {
             var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hblno == model.Hblno);

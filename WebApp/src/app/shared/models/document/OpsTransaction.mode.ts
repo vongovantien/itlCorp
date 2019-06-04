@@ -37,6 +37,5 @@ export class OpsTransaction {
         polName: string = null;
 
         sumCont: number = null;
-        sumCBM: number = null;
         packageQuantity: number = null;
 }
