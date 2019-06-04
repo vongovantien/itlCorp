@@ -6,6 +6,7 @@ namespace eFMS.API.Documentation.Service.Models
     public partial class OpsTransaction
     {
         public Guid Id { get; set; }
+        public Guid Hblid { get; set; }
         public string JobNo { get; set; }
         public string Mblno { get; set; }
         public string Hblno { get; set; }
