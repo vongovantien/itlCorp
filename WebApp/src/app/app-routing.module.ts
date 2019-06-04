@@ -33,8 +33,8 @@ const routes: Routes = [
             },
             {
                 path: 'system',
-                // loadChildren: './business-modules/system/system.module#SystemModule',
-                loadChildren:() => import('./business-modules/system/system.module').then(m => m.SystemModule),
+                loadChildren: './business-modules/system/system.module#SystemModule',
+                // loadChildren:() => import('./business-modules/system/system.module').then(m => m.SystemModule),
                 data:{
                     name:"System",
                     path:"system",
@@ -43,8 +43,8 @@ const routes: Routes = [
             },
             {
                 path: 'catalogue',
-                // loadChildren: './business-modules/catalogue/catalogue.module#CatalogueModule',
-                loadChildren:() => import('./business-modules/catalogue/catalogue.module').then(m => m.CatalogueModule),
+                loadChildren: './business-modules/catalogue/catalogue.module#CatalogueModule',
+                // loadChildren:() => import('./business-modules/catalogue/catalogue.module').then(m => m.CatalogueModule),
                 data:{
                     name:"Catalogue",
                     path:"catalogue",
@@ -53,8 +53,8 @@ const routes: Routes = [
             },        
             {
                 path:'accounting',
-                // loadChildren:'./business-modules/accounting/accounting.module#AccountingModule',
-                loadChildren:() => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
+                loadChildren:'./business-modules/accounting/accounting.module#AccountingModule',
+                // loadChildren:() => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
                 data:{
                     name:"Accounting",
                     path:"accounting",
@@ -63,8 +63,8 @@ const routes: Routes = [
             },
             {
                 path:'documentation',
-                // loadChildren:'./business-modules/documentation/documentation.module#DocumentationModule',
-                loadChildren:() => import('./business-modules/documentation/documentation.module').then(m => m.DocumentationModule),
+                loadChildren:'./business-modules/documentation/documentation.module#DocumentationModule',
+                // loadChildren:() => import('./business-modules/documentation/documentation.module').then(m => m.DocumentationModule),
                 data:{
                     name:"Documentation",
                     path:"documentation",
@@ -73,8 +73,8 @@ const routes: Routes = [
             },
             {
                 path:'operation',
-                // loadChildren:'./business-modules/operation/operation.module#OperationModule',
-                loadChildren:() => import('./business-modules/operation/operation.module').then(m => m.OperationModule),
+                loadChildren:'./business-modules/operation/operation.module#OperationModule',
+                // loadChildren:() => import('./business-modules/operation/operation.module').then(m => m.OperationModule),
                 data:{
                     name:"Operation",
                     path:"operation",
@@ -83,8 +83,8 @@ const routes: Routes = [
             },
             {
                 path:'report',
-                // loadChildren:'./business-modules/report/report.module#ReportModule',
-                loadChildren:() => import('./business-modules/report/report.module').then(m => m.ReportModule),
+                loadChildren:'./business-modules/report/report.module#ReportModule',
+                // loadChildren:() => import('./business-modules/report/report.module').then(m => m.ReportModule),
                 data:{
                     name:"Report",
                     path:"report",
@@ -93,8 +93,8 @@ const routes: Routes = [
             },
             {
                 path:'support',
-                // loadChildren:'./business-modules/support/support.module#SupportModule',
-                loadChildren:() => import('./business-modules/support/support.module').then(m => m.SupportModule),
+                loadChildren:'./business-modules/support/support.module#SupportModule',
+                // loadChildren:() => import('./business-modules/support/support.module').then(m => m.SupportModule),
                 data:{
                     name:"Support",
                     path:"support",
@@ -103,8 +103,8 @@ const routes: Routes = [
             },
             {
                 path:'tool',
-                // loadChildren:'./business-modules/tool-setting/tool.module#ToolModule',
-                loadChildren:() => import('./business-modules/tool-setting/tool.module').then(m => m.ToolModule),
+                loadChildren:'./business-modules/tool-setting/tool.module#ToolModule',
+                // loadChildren:() => import('./business-modules/tool-setting/tool.module').then(m => m.ToolModule),
                 data:{
                     name:"Tool",
                     path:"tool",
@@ -113,8 +113,8 @@ const routes: Routes = [
             },
             {
                 path:'designs-zone',
-                // loadChildren:'./design-modules/design-modules.module#DesignModulesModule',
-                loadChildren:() => import('./design-modules/design-modules.module').then(m => m.DesignModulesModule),
+                loadChildren:'./design-modules/design-modules.module#DesignModulesModule',
+                // loadChildren:() => import('./design-modules/design-modules.module').then(m => m.DesignModulesModule),
                 data:{
                     name:"Design Zone",
                     path:"design-zone",
