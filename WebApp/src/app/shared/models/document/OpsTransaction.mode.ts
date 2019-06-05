@@ -1,3 +1,5 @@
+import { Container } from "@angular/compiler/src/i18n/i18n_ast";
+
 export class OpsTransaction {
         userModified: string = null;
         userCreated: string = null;
@@ -38,4 +40,5 @@ export class OpsTransaction {
 
         sumCont: number = null;
         packageQuantity: number = null;
+        csMawbcontainers: Container[] = null;
 }
