@@ -50,6 +50,15 @@ namespace eFMS.API.Documentation.DL.Common
     }
     public static class TermData
     {
+        public static readonly string Canceled = "Canceled";
+
+        public static readonly string InSchedule = "InSchedule";
+        public static readonly string Processing = "Processing";
+        public static readonly string Done = "Done";
+        public static readonly string Overdue = "Overdued";
+        public static readonly string Pending = "Pending";
+        public static readonly string Deleted = "Deleted";
+
         public static readonly string InlandTrucking = "InlandTrucking";
         public static readonly string AirExport  = "AirExport";
         public static readonly string AirImport  = "AirImport";

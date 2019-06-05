@@ -88,10 +88,10 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var data = Query(criteria);
             rowsCount = data.Count();
-            var totalProcessing = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Processing));
-            var totalfinish = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Finish));
-            var totalOverdued = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Overdued));
-            var totalCanceled = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Canceled));
+            var totalProcessing = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Processing));
+            var totalfinish = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Finish));
+            var totalOverdued = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Overdued));
+            var totalCanceled = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Canceled));
             if (rowsCount == 0) return null;
             if (size > 1)
             {

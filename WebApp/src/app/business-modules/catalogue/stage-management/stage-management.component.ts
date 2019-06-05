@@ -39,7 +39,6 @@ export class StageManagementComponent implements OnInit {
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private sortService: SortService) {
-            this.baseServices.changeData("stage","hello from stage !");
     }
 
     async ngOnInit() {

@@ -94,7 +94,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     packageTypes: any[] = [];
     weightMesurements: any[];
     @ViewChild('containerMasterForm',{static:true}) containerMasterForm: NgForm;
-    @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
+    // @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
@@ -262,7 +262,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * change mode of row(editing - not editing)
      */
     changeEditMode(index: any) {
-        this.filterContainer(index);
+        this.getComboboxDataContainer(index);
         if (this.lstMasterContainers[index].allowEdit == false || this.lstMasterContainers[index].allowEdit == undefined) {
             this.lstMasterContainers[index].allowEdit = true;
             this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? 
@@ -413,13 +413,21 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             isNew: true,
             verifying: false
         };
-        this.filterContainer(this.lstMasterContainers.length);
+        this.getComboboxDataContainer(this.lstMasterContainers.length);
         return container;
     }
     removeContainer(){
         this.lstMasterContainers.splice(this.indexItemConDelete, 1);
         this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
         $('#confirm-accept-delete-container-modal').modal('hide');
+    }
+    indexItemConDelete: any = null;
+    /**
+     * confirm item to remove out of table
+     * @param index index of row in table
+     */
+    removeAContainer(index: number){
+        this.indexItemConDelete = index;
     }
     /**
      * get container type data
@@ -441,16 +449,17 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.getComodities();
     }
 
-    //-------------    End Container   -------------------//
-    
-    indexItemConDelete: any = null;
-    removeAContainer(index: number){
-        this.indexItemConDelete = index;
-    }
+    /**
+     * get list weight type
+     */
     async getWeightTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
         this.listWeightMesurement = responses;
     }
+
+    /**
+     * get list package type
+     */
     async getPackageTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
         this.listPackageTypes = responses;
@@ -460,25 +469,20 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.packagesUnitActive = [this.packageTypes[0]];
         }
     }
+    /**
+     * get list commodity
+     */
     async getComodities() {
         let criteriaSearchCommodity = { inactive: null, all: null };
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, criteriaSearchCommodity, false, false);
         if(responses != null){
             this.commodities = this.sortService.sort(responses, 'commodityNameEn', true);
-            console.log('commodities' + this.commodities);
         }
         else{
             this.commodities = [];
         }
     }
-    
-    changeComodity(keySearch: any) {
-        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
-            return 0;
-        }
-        this.getComodities();
-    }
-    filterContainer(index: number){
+    getComboboxDataContainer(index: number){
         if (this.listContainerType != null) {
             if(this.lstMasterContainers[index] == null){
                 this.containerTypes = dataHelper.prepareNg2SelectData(this.listContainerType, 'id', 'unitNameEn');
@@ -500,6 +504,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.containerTypes = [];
         }
     }
+    //-------------    End Container   -------------------//
+    
     async getWarehouses() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
             this.warehouses = res;
@@ -507,7 +513,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     }
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
-        console.log({ SHIPMENT: this.opsTransaction });
+        this.baseServices.setData("CurrentOpsTransaction",this.opsTransaction);
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
@@ -523,7 +529,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     private getPorts() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.ports = res;
-            console.log(this.ports)
         });
     }
 

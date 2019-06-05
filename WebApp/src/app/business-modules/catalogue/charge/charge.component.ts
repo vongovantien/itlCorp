@@ -26,7 +26,7 @@ export class ChargeComponent implements OnInit {
     private api_menu: API_MENU,
     private router: Router,
     private sortService: SortService) {
-      this.baseServices.changeData("location","change location message from charge component")
+
      }
 
   listFilter = [

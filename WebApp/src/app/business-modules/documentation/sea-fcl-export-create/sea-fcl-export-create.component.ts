@@ -52,8 +52,8 @@ export class SeaFclExportCreateComponent implements OnInit {
     submitted = false;
     searchcontainer: string = '';
     @ViewChild('containerMasterForm',{static:false}) containerMasterForm: NgForm;
-    @ViewChild(MasterBillComponent,{static:false}) masterBillComponent: any;
-    @ViewChild('containerSelect',{static:false}) containerSelect: ElementRef;
+    // @ViewChild(MasterBillComponent,{static:false}) masterBillComponent: any;
+    // @ViewChild('containerSelect',{static:false}) containerSelect: ElementRef;
     selectedCommodityValue: any;
     numberOfTimeSaveContainer: number = 0;
     saveButtonSetting: ButtonModalSetting = {

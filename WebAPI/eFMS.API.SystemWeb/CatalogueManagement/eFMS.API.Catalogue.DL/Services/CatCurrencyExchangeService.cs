@@ -143,7 +143,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     if(date.ex.UserModified != "system")
                     {
-                        userName = date.user.Username;
+                        userName = date.user?.Username;
                     }
                 }
                 var rate = new CatCurrencyExchangeHistory
@@ -174,7 +174,7 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 var rates = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.CurrencyFromId == currencyFrom
-                                            && x.Inactive == null);
+                                            && x.Inactive == false);
                 foreach (var item in rates)
                 {
                     item.UserModified = currentUser;

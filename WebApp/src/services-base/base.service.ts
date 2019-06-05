@@ -22,7 +22,7 @@ export class  BaseService implements ErrorHandler {
    */
   private _DataStorage: BehaviorSubject<Object> = new BehaviorSubject({ "default": "hello world !" });
   public dataStorage = this._DataStorage.asObservable();
-  public changeData(key: string, value: any) {
+  public setData(key: string, value: any) {
     this._DataStorage.next({ ...this._DataStorage.value, [key]: value });
   }
 

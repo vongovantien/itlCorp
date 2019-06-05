@@ -48,6 +48,8 @@ export class OpsModuleBillingComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.pager.currentPage = 1;
+        this.pager.totalItems = 0;
         this.getShipmentCommonData();
         this.getUserInCharges();
         this.getCustomers();
