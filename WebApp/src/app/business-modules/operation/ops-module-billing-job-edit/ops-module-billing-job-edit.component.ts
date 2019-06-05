@@ -133,6 +133,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     index = this.shipmentModes.findIndex(x => x.id == this.opsTransaction.shipmentMode);
                     if (index > -1) this.shipmentModeActive = [this.shipmentModes[index]];
                     this.getAllSurCharges();
+                    this.getShipmentContainer();
                 }
                 else{
                     this.serviceDate = null;
@@ -140,6 +141,51 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 }
             }
         });
+    }
+    removeContainer(){
+        this.lstMasterContainers.splice(this.indexItemConDelete, 1);
+        this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
+        $('#confirm-accept-delete-container-modal').modal('hide');
+        this.resetSumContainer();
+    }
+    resetSumContainer(){}
+    changeEditStatus(index: any) {
+        this.filterContainer(index);
+        let hasItemEdited = false;
+        for(let i =0; i< this.lstMasterContainers.length; i++){
+            if(i != index && this.lstMasterContainers[i].allowEdit){
+                hasItemEdited = true;
+                break;
+            }
+        }
+        if(hasItemEdited){
+            this.baseServices.errorToast("You must save current container");
+        }
+        else{
+            if (this.lstMasterContainers[index].allowEdit == false) {
+                this.lstMasterContainers[index].allowEdit = true;
+                this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? 
+                                                [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
+                this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? 
+                                                [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
+                this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureID != null? 
+                                                [{ id: this.lstMasterContainers[index].unitOfMeasureID, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
+                for(let i =0; i< this.lstMasterContainers.length; i++){
+                    if(i != index){
+                        this.lstMasterContainers[i].allowEdit = false;
+                    }
+                }
+            }
+            else {
+                this.lstMasterContainers[index].allowEdit = false;
+            }
+        }
+    }
+    async getShipmentContainer() {
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
+        this.opsTransaction.csMawbcontainers = this.lstMasterContainers = responses;
+        
+        this.lstContainerTemp = this.lstMasterContainers;
     }
     async confirmDelete(){
         let respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
@@ -174,27 +220,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
         else{
             var response = await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
-            }
-        }
-    addNewContainer() {
-        let hasItemEdited = false;
-        let index = -1;
-        for (let i = 0; i < this.lstMasterContainers.length; i++) {
-            if (this.lstMasterContainers[i].allowEdit == true) {
-                hasItemEdited = true;
-                index = i;
-                break;
-    }
-        }
-        if (hasItemEdited == false) {
-            console.log(this.containerMasterForm);
-            this.lstMasterContainers.push(this.initNewContainer());
-        }
-        else {
-            this.saveNewContainer(index);
-            if(this.saveContainerSuccess){
-                this.lstMasterContainers.push(this.initNewContainer());
-            }
         }
     }
     saveContainerSuccess = false;
@@ -286,7 +311,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             console.log(this.containerTypes);
         }
     }
-    onSubmitContainer(){
+    async onSubmitContainer(){
         for(let i=0; i< this.lstMasterContainers.length; i++){
             this.lstMasterContainers[i].verifying = true;
         }
@@ -311,7 +336,92 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             else{
                 this.baseServices.errorToast("Current container must be save!!!");
             }
+            this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
+            var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.opsTransaction.csMawbcontainers, masterId: this.opsTransaction.id}, true, false);
+            let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: this.opsTransaction.id}, false, false);
         }
+    }
+    //-------------     Container   -------------------//
+    /**
+     * Show popup & init new first row( if container list is null)
+     */
+    showListContainer(){
+        if(this.lstMasterContainers.length == 0){
+            this.lstMasterContainers.push(this.initNewContainer());
+        }
+        $('#container-list-of-ops-billing-modal').modal('show');
+        $("#containerSelect").click();
+    }
+
+    /**
+     * Close popup, assign list container to current job & remove last row that is not saved
+     */
+    closeContainerPopup() {
+        let index = this.lstMasterContainers.findIndex(x => x.isNew == true);
+        if (index > -1 && this.lstMasterContainers.length > 1) {
+            this.lstMasterContainers.splice(index, 1);
+        }
+        $('#container-list-of-ops-billing-modal').modal('hide');
+        this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
+    }
+
+    /**
+     * Add new row
+     * 1. check existed a row that is editing
+     * 2. change editing item to label row & push new row
+     */
+    addNewContainer() {
+        let hasItemEdited = false;
+        let index = -1;
+        // 1.
+        for (let i = 0; i < this.lstMasterContainers.length; i++) {
+            if (this.lstMasterContainers[i].allowEdit == true) {
+                hasItemEdited = true;
+                index = i;
+                break;
+            }
+        }
+        // 2.
+        if (hasItemEdited == false) {
+            this.lstMasterContainers.push(this.initNewContainer());
+        }
+        else {
+            this.saveNewContainer(index);
+            if(this.saveContainerSuccess){
+                this.lstMasterContainers.push(this.initNewContainer());
+            }
+        }
+    }
+
+    /**
+     * search container in list container
+     * @param keySearch 
+     */
+    searchContainer(keySearch: any) {
+        keySearch = keySearch != null ? keySearch.trim().toLowerCase() : "";
+        this.lstMasterContainers = Object.assign([], this.lstContainerTemp).filter(
+            item => (item.containerTypeName.toLowerCase().includes(keySearch)
+                || (item.quantity != null ? item.quantity.toString() : "").includes(keySearch)
+                || (item.containerNo != null ? item.containerNo.toLowerCase() : "").includes(keySearch)
+                || (item.sealNo != null ? item.sealNo.toLowerCase() : "").includes(keySearch)
+                || (item.markNo != null ? item.markNo.toLowerCase() : "").includes(keySearch)
+                || (item.commodityName != null ? item.commodityName.toLowerCase() : "").includes(keySearch)
+                || (item.packageTypeName != null ? item.packageTypeName.toLowerCase() : "").includes(keySearch)
+                || (item.packageQuantity != null ? item.packageQuantity.toString().toLowerCase() : "").includes(keySearch)
+                || (item.description != null ? item.description.toLowerCase() : "").includes(keySearch)
+                || (item.nw != null ? item.nw.toString().toLowerCase() : "").includes(keySearch)
+                || (item.chargeAbleWeight != null ? item.chargeAbleWeight.toString() : "").toLowerCase().includes(keySearch)
+                || (item.gw != null ? item.gw.toString().toLowerCase() : "").includes(keySearch)
+                || (item.unitOfMeasureName != null ? item.unitOfMeasureName.toLowerCase() : "").includes(keySearch)
+                || (item.cbm != null ? item.cbm.toString().toLowerCase() : "").includes(keySearch)
+            )
+        );
+    }
+    //-------------    End Container   -------------------//
+    
+    indexItemConDelete: any = null;
+    removeAContainer(index: number){
+        this.indexItemConDelete = index;
     }
     async getWeightTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
