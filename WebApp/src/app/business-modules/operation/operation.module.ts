@@ -12,6 +12,12 @@ import { OpsModuleBillingJobCreateComponent } from './ops-module-billing-job-cre
 import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billing.component';
 import { OpsModuleBillingJobEditComponent } from './ops-module-billing-job-edit/ops-module-billing-job-edit.component';
 import { BillingCustomDeclarationComponent } from './ops-module-billing-job-edit/billing-custom-declaration/billing-custom-declaration.component';
+import { OpsModuleCreditDebitNoteComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note.component';
+import { OpsModuleStageManagementComponent } from './ops-module-billing-job-edit/ops-module-stage-management/ops-module-stage-management.component';
+import { OpsModuleCreditDebitNoteAddnewComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-addnew/ops-module-credit-debit-note-addnew.component';
+import { OpsModuleCreditDebitNoteRemainingChargeComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-remaining-charge/ops-module-credit-debit-note-remaining-charge.component';
+import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
+import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 
 
 @NgModule({
@@ -23,6 +29,6 @@ import { BillingCustomDeclarationComponent } from './ops-module-billing-job-edit
     SharedModule,
     NgxDaterangepickerMd
   ],
-  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent],
+  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent, OpsModuleCreditDebitNoteAddnewComponent, OpsModuleCreditDebitNoteRemainingChargeComponent, OpsModuleCreditDebitNoteDetailComponent, OpsModuleCreditDebitNoteEditComponent],
 })
 export class OperationModule { }

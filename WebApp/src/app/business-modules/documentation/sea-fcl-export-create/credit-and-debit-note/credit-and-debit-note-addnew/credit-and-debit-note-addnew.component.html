@@ -44,57 +44,7 @@
                                             [selectedDisplayFields]="['partnerNameEn']"                            
                                             [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Partner Name'},{'field':'taxCode','label':'Tax Code'}]">
                                         </app-combo-grid-virtual-scroll>
-                                        <!-- <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle"
-                                                type="text" readonly data-toggle="dropdown"
-                                                placeholder="Please selected"
-                                                [value]="CDNoteWorking.partnerName==null?null:CDNoteWorking.partnerName">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" placeholder="Search..."
-                                                                    (keyup)="SearchPartner($event.target.value)">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner ID</th>
-                                                                        <th>Name ABBR</th>
-                                                                        <th>Partner name</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <ng-container
-                                                                    *ngFor="let item of listSubjectPartner;let i = index;">
-                                                                    <tr class="data-row data-selected"
-                                                                        attr.data-id="{{i}}"
-                                                                        (click)="CDNoteWorking.partnerId=item.id;CDNoteWorking.partnerName=item.partnerNameEn;getListCharges(item.id);totalCreditDebitCalculate();"
-                                                                        [ngClass]="{ 'data-selected': CDNoteWorking.partnerId!==null && CDNoteWorking.partnerId===item.id }">
-                                                                        <td>{{item.id}}</td>
-                                                                        <td>{{item.shortName}}</td>
-                                                                        <td>{{item.partnerNameEn}}</td>
-                                                                        <td>{{item.taxCode}}</td>
-                                                                    </tr>
-                                                                </ng-container>
 
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
                                         <div class="form-control-feedback"
                                         *ngIf="addCDNoteForm.submitted && CDNoteWorking.partnerId==null">
                                             Partner is required !

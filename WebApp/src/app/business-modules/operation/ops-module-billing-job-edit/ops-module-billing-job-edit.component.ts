@@ -307,8 +307,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.listContainerType = responses;
         if (responses != null) {
             this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-            console.log('container type:');
-            console.log(this.containerTypes);
+            // console.log('container type:');
+            // console.log(this.containerTypes);
         }
     }
     async onSubmitContainer(){
@@ -436,7 +436,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, criteriaSearchCommodity, false, false);
         if(responses != null){
             this.commodities = this.sortService.sort(responses, 'commodityNameEn', true);
-            console.log('commodities' + this.commodities);
+            // console.log('commodities' + this.commodities);
         }
         else{
             this.commodities = [];
@@ -478,7 +478,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     }
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
-        console.log({ SHIPMENT: this.opsTransaction });
+        this.baseServices.setData("CurrentOpsTransaction",this.opsTransaction);
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
@@ -494,7 +494,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     private getPorts() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.ports = res;
-            console.log(this.ports)
         });
     }
 
