@@ -21,7 +21,7 @@ import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser
     styleUrls: ['./manifest.component.scss']
 })
 export class ManifestComponent implements OnInit {
-    @ViewChild('formReport',{static:false}) frm:ElementRef;
+    // @ViewChild('formReport',{static:false}) frm:ElementRef;
     shipment: CsTransaction = new CsTransaction();
     manifest: CsManifest;// = new CsManifest();
     paymentTerms: any[] = [];

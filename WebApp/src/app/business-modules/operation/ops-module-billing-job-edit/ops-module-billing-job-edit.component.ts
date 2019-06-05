@@ -94,7 +94,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     packageTypes: any[];
     weightMesurements: any[];
     @ViewChild('containerMasterForm',{static:true}) containerMasterForm: NgForm;
-    @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
+    // @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
