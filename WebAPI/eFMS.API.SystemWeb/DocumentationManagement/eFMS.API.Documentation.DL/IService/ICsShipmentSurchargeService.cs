@@ -12,8 +12,8 @@ namespace eFMS.API.Documentation.DL.IService
     {
         List<CsShipmentSurchargeDetailsModel> GetByHB(Guid HbID,string type);
         HandleState DeleteCharge(Guid chargeId);
-        List<object> GroupChargeByHB(Guid JobId,string PartnerId,bool getAll=false);
-        List<CatPartner> GetAllParnerByJob(Guid JobId);
+        List<object> GroupChargeByHB(Guid id,string PartnerId,bool IsHouseBillID,bool getAll=false);
+        List<CatPartner> GetAllParner(Guid id,bool IsHouseBillID);
 
     }
 }

@@ -9,7 +9,7 @@ namespace eFMS.API.Documentation.Service.Models
         public Guid Hblid { get; set; }
         public string JobNo { get; set; }
         public string Mblno { get; set; }
-        public string Hblno { get; set; }
+        public string Hwbno { get; set; }
         public DateTime? ServiceDate { get; set; }
         public string ProductService { get; set; }
         public string ServiceMode { get; set; }
@@ -33,6 +33,7 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? SumCbm { get; set; }
         public int? SumContainers { get; set; }
         public int? SumPackages { get; set; }
+        public short? PackageTypeId { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? CreatedDate { get; set; }

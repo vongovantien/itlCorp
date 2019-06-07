@@ -41,18 +41,18 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpGet]
         [Route("GroupByListHB")]
-        public List<object> GetByListHouseBill(Guid JobId,string partnerID,bool getAll=false)
+        public List<object> GetByListHouseBill(Guid Id,string partnerID,bool IsHouseBillID,bool getAll=false)
         {
 
-            return csShipmentSurchargeService.GroupChargeByHB(JobId, partnerID,getAll);
+            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID,IsHouseBillID,getAll);
         }
 
         [HttpGet]
-        [Route("GetPartnersByJob")]
-        public List<CatPartner> GetPartnersByListHB(Guid JobId)
+        [Route("GetPartners")]
+        public List<CatPartner> GetPartners(Guid Id,bool IsHouseBillID)
         {
 
-            return csShipmentSurchargeService.GetAllParnerByJob(JobId);
+            return csShipmentSurchargeService.GetAllParner(Id, IsHouseBillID);
         }
 
 

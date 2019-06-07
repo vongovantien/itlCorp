@@ -133,7 +133,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.All == null)
             {
                 data = data.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                && (x.HBLNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                && (x.HWBNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
@@ -145,7 +145,7 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 data = data.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.HBLNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.HWBNO ?? "").IndexOf(criteria.Hblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))

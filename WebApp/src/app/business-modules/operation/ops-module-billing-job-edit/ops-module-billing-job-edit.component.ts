@@ -662,6 +662,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
                     this.SellingRateChargeToAdd = new CsShipmentSurcharge();
                     this.OBHChargeToAdd = new CsShipmentSurcharge();
+                    this.baseServices.setData("CurrentOpsTransaction",this.opsTransaction);
                     if (!isContinue)
                         $('#' + id_form).modal('hide');
                 }
@@ -831,11 +832,15 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     if (res.status) {
                         $('#' + id_form).modal('hide');
                         this.getAllSurCharges();
+                        this.baseServices.setData("CurrentOpsTransaction",this.opsTransaction);
                     }
                 }
             }
         }, 300);
     }
+
+
+    
 
 
     closeChargeForm(formId: string, form: NgForm) {

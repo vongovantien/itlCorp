@@ -1438,8 +1438,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
-
+                    .IsUnicode(false);                
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2233,6 +2232,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+          
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
@@ -2376,8 +2377,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
-                entity.Property(e => e.Hblno)
-                    .HasColumnName("HBLNO")
+                entity.Property(e => e.Hwbno)
+                    .HasColumnName("HWBNo")
                     .HasMaxLength(200)
                     .IsUnicode(false);
 
@@ -2393,6 +2394,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.PackageTypeId).HasColumnName("PackageTypeID");
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 

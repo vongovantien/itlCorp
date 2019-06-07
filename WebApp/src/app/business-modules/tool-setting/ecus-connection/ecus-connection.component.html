@@ -121,7 +121,7 @@
                                         title="Edit" data-toggle="modal" data-target="#edit-connection-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" (click)="indexConnectToDelete=i;deleteConfirm()"
+                                    <button type="button" (click)="indexConnectToDelete=i;deleteConfirm()" [disabled]="!item.inactive"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove" data-toggle="modal"
                                         data-target="#confirm-delete-connection-modal">
