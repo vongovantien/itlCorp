@@ -50,14 +50,14 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
 
   getListSubjectPartner() {
-    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartnerByJobId + "?JobId=" + ExtendData.currentJobID).subscribe((data: any[]) => {
+    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + ExtendData.currentJobID+"&IsHouseBillID=false").subscribe((data: any[]) => {
       this.listSubjectPartner = cloneDeep(data);
       this.constListSubjectPartner = cloneDeep(data);
     });
   }
   async getListCharges(partnerId: string) {
     if(ExtendData.currentJobID!==null && partnerId!=null){
-      this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?JobId=" + ExtendData.currentJobID + "&partnerID=" + partnerId);
+      this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + ExtendData.currentJobID + "&partnerID=" + partnerId+"&IsHouseBillId=false");
       this.CDNoteWorking.listShipmentSurcharge = [];
       this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
         for (var i = 0; i < o.listCharges.length; i++) {

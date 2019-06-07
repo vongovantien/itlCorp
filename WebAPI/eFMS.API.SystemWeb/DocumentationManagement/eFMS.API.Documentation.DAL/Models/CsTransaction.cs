@@ -5,6 +5,7 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
+      
 
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }

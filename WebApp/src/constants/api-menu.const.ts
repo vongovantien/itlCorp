@@ -278,7 +278,7 @@ export class API_MENU {
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Update",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Delete",
             getByHBId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetByHB",
-            getPartnerByJobId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetPartnersByJob",
+            getPartners: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetPartners",
             getChargesByPartner: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GroupByListHB",
         },
         AcctSOA: {

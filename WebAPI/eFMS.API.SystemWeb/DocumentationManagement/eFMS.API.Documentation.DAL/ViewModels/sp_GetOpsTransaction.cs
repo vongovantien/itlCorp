@@ -9,7 +9,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Guid ID { get; set; }
         public string JobNo { get; set; }
         public string MBLNO { get; set; }
-        public string HBLNO { get; set; }
+        public string HWBNO { get; set; }
         public Nullable<DateTime> ServiceDate { get; set; }
         public string ProductService { get; set; }
         public string ServiceMode { get; set; }

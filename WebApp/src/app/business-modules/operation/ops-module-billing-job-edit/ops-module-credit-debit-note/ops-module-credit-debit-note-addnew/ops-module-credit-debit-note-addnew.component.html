@@ -15,72 +15,38 @@
                     <div class="m-form m-form--state">
                         <div class="div-inside bg-secondary m--margin-bottom-15">
                             <div class="row">
-                                <div class="col-lg-4">
+                                    <div class="col-lg-4"
+                                    [ngClass]="{ 'm-form__group has-danger': addCDNoteFormOps.submitted && CDNoteWorking.type==null }">
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
                                             Note type
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                            (data)="refreshValue($event)" (selected)="selected($event)"
-                                            (removed)="removed($event)" (typed)="typed($event)"
+                                        <ng-select [allowClear]="true" [items]="noteTypes" [disabled]="disabled"
+                                            (data)="refreshValue($event)" (selected)="CDNoteWorking.type=$event.id"
+                                            (removed)="CDNoteWorking.type=null" (typed)="typed($event)"
                                             placeholder="Select filter">
                                         </ng-select>
-                                        <div class="form-control-feedback" style="display: none">
+                                        <div class="form-control-feedback"
+                                            *ngIf="addCDNoteFormOps.submitted && CDNoteWorking.type==null">
                                             Note type is required !
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-8">
+                                <div class="col-lg-8"
+                                    [ngClass]="{ 'm-form__group has-danger': addCDNoteFormOps.submitted && CDNoteWorking.partnerId==null }">
                                     <div class="form-group">
                                         <label class="form-control-label" for="">
                                             Subject to Partner
                                         </label>
-                                        <div class="dropdown e--combogrid">
-                                            <input class="form-control m-input m-input--square dropdown-toggle"
-                                                type="text" readonly data-toggle="dropdown"
-                                                placeholder="Please selected">
-                                            <div class="dropdown-menu e--combogrid-content">
-                                                <div class="tabel-wrapper table-fixed">
-                                                    <div class="table-head-fixed">
-                                                        <div class="table-filter-block">
-                                                            <div class="search-field">
-                                                                <input class="form-control m-input m-input--square"
-                                                                    type="text" placeholder="Search...">
-                                                                <i class="icon-search"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="table-header">
-                                                            <table class="table table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Partner ID</th>
-                                                                        <th>Name ABBR</th>
-                                                                        <th>Partner name</th>
-                                                                        <th>Tax code</th>
-                                                                    </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-body-scroll">
-                                                        <table class="table table-hover">
-                                                            <tbody>
-                                                                <ng-container>
-                                                                    <tr class="data-row data-selected">
-                                                                        <td>item.id</td>
-                                                                        <td>item.shortName</td>
-                                                                        <td>item.partnerNameEn</td>
-                                                                        <td>item.taxCode</td>
-                                                                    </tr>
-                                                                </ng-container>
+                                        <app-combo-grid-virtual-scroll [dataSources]="listSubjectPartner"
+                                            [currentActiveItemId]="{field:'id',value:CDNoteWorking.partnerId}"
+                                            (itemSelected)="CDNoteWorking.partnerId=$event.id;CDNoteWorking.partnerName=$event.partnerNameEn;getListCharges($event.id);totalCreditDebitCalculate()"
+                                            [selectedDisplayFields]="['partnerNameEn']"
+                                            [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Partner Name'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
 
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control-feedback" style="display: none">
+                                        <div class="form-control-feedback"
+                                            *ngIf="addCDNoteFormOps.submitted && CDNoteWorking.partnerId==null">
                                             Partner is required !
                                         </div>
                                     </div>
@@ -95,7 +61,7 @@
                                     <div class="form-group">
                                         <div class="m-input-icon m-input-icon--left">
                                             <input type="text" class="form-control m-input m-input--square"
-                                                placeholder="Search...">
+                                                placeholder="Search..." (keyup)="SearchCharge($event.target.value)">
                                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                                 <span>
                                                     <i class="la la-search"></i>
@@ -105,7 +71,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                                    <button type="button"
+                                    <button type="button" (click)="removeSelectedCharges()"
                                         class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
                                         <span>
                                             <i class="la la-trash"></i>
@@ -135,7 +101,8 @@
                                     <tr>
                                         <th class="table-actions-col no-sorting">
                                             <label class="m-checkbox">
-                                                <input type="checkbox" name="" class="all-charges-select">
+                                                <input type="checkbox" name="" class="all-charges-select"
+                                                    (change)="selectAllCharges($event)">
                                                 <span></span>
                                             </label>
                                         </th>
@@ -171,47 +138,67 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="tbody-group">
-                                    <tr>
-                                        <td class="table-actions-col">
-                                            <div class="table-actions">
-                                                <label class="m-checkbox">
-                                                    <input type="checkbox" name="" class="single-charge-select">
-                                                    <span></span>
-                                                </label>
-                                            </div>
+                                <tbody class="tbody-group" *ngFor="let item of listChargeOfPartner;let i = index;">
+
+                                    <!-- <tr class="collapse-toggle-row tgroup" *ngIf="checkToDisplay(item)">
+                                        <td colspan="12">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" name="" attr.data-id="{{i}}"
+                                                    class="group-charge-hb-select"
+                                                    (change)="selectAllChargeInGroup($event,i)">
+                                                        HBL No: {{item.hwbno}}
+                                                <span></span>
+                                            </label>
                                         </td>
-                                        <td>
-                                            <span>charge.chargeCode</span>
-                                        </td>
-                                        <td>
-                                            <span>charge.nameEn</span>
-                                        </td>
-                                        <td>
-                                            <span>charge.quantity</span>
-                                        </td>
-                                        <td>
-                                            <span>charge.unit</span>
-                                        </td>
-                                        <td>
-                                            <span>charge.unitPrice</span>
-                                        </td>
-                                        <td>
-                                            <span>charge.currency</span>
-                                        </td>
-                                        <td>
-                                            <span>charge.vatrate</span>
-                                        </td>
-                                        <td>
-                                            <span class="credit-value">charge.total*charge.exchangeRate</span>
-                                        </td>
-                                        <td>
-                                            <span class="debit-value">charge.total*charge.exchangeRate</span>
-                                        </td>
-                                        <td>
-                                            <span>charge.notes</span>
-                                        </td>
-                                    </tr>
+                                    </tr> -->
+                                    <ng-container *ngFor="let charge of item.listCharges;let k = index;">
+                                            <tr class="child" *ngIf="!charge.isRemaining" >
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions">
+                                                        <label class="m-checkbox">
+                                                            <input type="checkbox" name=""  attr.data-id="{{k}}" class="single-charge-select" (change)="selectSingleCharge($event,k)" >
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <!-- <td>
+                                                    <span>{{item.hwbno}}</span>
+                                                </td> -->
+                                                <td>
+                                                    <span>{{charge.chargeCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.nameEn}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.quantity}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.unit}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.unitPrice}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.currency}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.vatrate}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.receiverId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>         
+                                                    <!-- <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.receiverId)">{{charge.total | number:'1.3-3'}}</span>                                                                              -->
+                                                </td>
+                                                <td>
+                                                        <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.payerId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>       
+                                                    <!-- <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.payerId)">{{charge.total | number:'1.3-3'}}</span>                                            -->
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.notes}}</span>
+                                                </td>
+                                            </tr>
+        
+                                        </ng-container>
                                 </tbody>
                             </table>
                         </div>

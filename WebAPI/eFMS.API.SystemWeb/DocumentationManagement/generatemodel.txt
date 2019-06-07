@@ -1,4 +1,4 @@
-Scaffold-DbContext "Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContext -Project eFMS.API.Documentation.Service -Force -Tables catBranch, catStage, catPlace, catPlaceType, catCommodity, catCommodityGroup, catCountry, catArea,catDepartment,catPartner,catPartnerGroup
+Scaffold-DbContext "Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.Documentation.Service -Force -Tables catBranch, catStage, catPlace, catPlaceType, catCommodity, catCommodityGroup, catCountry, catArea,catDepartment,catPartner,catPartnerGroup
 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

@@ -26,21 +26,6 @@ export class  BaseService implements ErrorHandler {
     this._DataStorage.next({ ...this._DataStorage.value, [key]: value });
   }
 
-  public getDataStorageByKey(key:string){
-    var _this = this;
-    return new Promise(function(resolve,reject){
-      _this.dataStorage.subscribe(data=>{
-        const result = data[key];
-        if(result!==undefined){
-          resolve(result);
-        }else{
-          resolve(null);
-        }
-      },err=>{
-        reject(err);
-      });
-    });
-  }
 
   /**
    * 
