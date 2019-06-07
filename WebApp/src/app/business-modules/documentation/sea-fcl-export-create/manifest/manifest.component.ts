@@ -116,8 +116,11 @@ export class ManifestComponent implements OnInit {
         console.log(response);
         this.dataReport = response;
         var id = this.previewModalId;
+        var _this = this;
+        _this.baseServices.spinnerShow();
         setTimeout(function(){ 
             $('#' + id).modal('show');
+            _this.baseServices.spinnerHide();
         }, 100);
     }
     removeAllChecked(){

@@ -163,6 +163,40 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal Preview(ManifestReportModel model)
         {
             Crystal result = new Crystal();
+            string packageQuantity = "";
+            if (model.CsMawbcontainers != null)
+            {
+                string sbContNo = "";
+                string sbContType = "";
+                foreach (var container in model.CsMawbcontainers)
+                {
+                    if (!string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
+                    {
+                        sbContNo += container.ContainerNo + "/ " + container.SealNo + ", ";
+                    }
+                    else if (!string.IsNullOrEmpty(container.ContainerNo) && string.IsNullOrEmpty(container.SealNo))
+                    {
+                        sbContNo += container.ContainerNo + ", ";
+                    }
+                    else if (string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
+                    {
+                        sbContNo += container.SealNo + ", ";
+                    }
+                    sbContType += container.Quantity + "X" + container.ContainerTypeName + ", ";
+                    if (!string.IsNullOrEmpty(container.PackageTypeName) && container.PackageQuantity != null)
+                    {
+                        packageQuantity += container.PackageQuantity + "X" + container.PackageTypeName + ", ";
+                    }
+                }
+                if (sbContNo.Length > 2)
+                {
+                    model.SealNoContainerNames = sbContNo.Substring(0, sbContNo.Length - 2);
+                }
+                if (sbContType.Length > 2)
+                {
+                    model.NumberContainerTypes = sbContType.Substring(0, sbContType.Length - 2);
+                }
+            }
             var parameter = new SeaCargoManifestParameter {
                 ManifestNo = model.RefNo,
                 Owner = model.ManifestIssuer,
@@ -172,13 +206,13 @@ namespace eFMS.API.Documentation.DL.Services
                 PortUnlading = model.PodName,
                 FlightDate = model.InvoiceDate?.ToString(),
                 Eta = model.InvoiceDate?.ToString(),
-                Consolidater = model.Consolidator != null? model.Consolidator: "Consolidater",
-                DeConsolidater = model.DeConsolidator != null? model.DeConsolidator: "DeConsolidator",
+                Consolidater = model.Consolidator != null? model.Consolidator: string.Empty,
+                DeConsolidater = model.DeConsolidator != null? model.DeConsolidator: string.Empty,
                 Forwarder = "Forwarder",
                 OMB = "OMB",
-                ContainerNo = "ContainerNo",
+                ContainerNo = model.SealNoContainerNames != null? model.SealNoContainerNames: string.Empty,
                 Agent = "Agent",
-                QtyPacks = "QtyPacks",
+                QtyPacks = packageQuantity,
                 TotalShipments = "TotalShipments",
                 CompanyName = "CompanyName",
                 CompanyDescription = "CompanyDescription",
@@ -187,46 +221,34 @@ namespace eFMS.API.Documentation.DL.Services
                 Website = "Website",
                 Contact = "Contact"
             };
-            var manifests = new List<SeaCargoManifest>{
-                new SeaCargoManifest {
-                TransID = "TransID",
-                HBL = "HBL",
-                Marks = "Marks",
-                Nofpiece = "Nofpiece",
-                GrossWeight = 123,
-                SeaCBM = 123,
-                NoOfAWB = 123,
-                Destination = "Destination",
-                Shipper = "Shipper",
-                Consignee = "Consignee",
-                Descriptions = "Descriptions",
-                FreightCharge = "FreightCharge",
-                Notify = "FreightCharge",
-                OnboardNote = "OnboardNote",
-                MaskNos = "MaskNos",
-                TranShipmentTo = "TranShipmentTo",
-                BillType = "BillType"
-                },
-                new SeaCargoManifest {
-                TransID = "TransID",
-                HBL = "HBL",
-                Marks = "Marks",
-                Nofpiece = "Nofpiece",
-                GrossWeight = 123,
-                SeaCBM = 123,
-                NoOfAWB = 123,
-                Destination = "Destination",
-                Shipper = "Shipper",
-                Consignee = "Consignee",
-                Descriptions = "Descriptions",
-                FreightCharge = "FreightCharge",
-                Notify = "FreightCharge",
-                OnboardNote = "OnboardNote",
-                MaskNos = "MaskNos",
-                TranShipmentTo = "TranShipmentTo",
-                BillType = "BillType"
+            var manifests = new List<SeaCargoManifest>();
+            if (model.CsTransactionDetails != null)
+            {
+                foreach (var item in model.CsTransactionDetails)
+                {
+                    var manifest = new SeaCargoManifest
+                    {
+                        TransID = item.JobNo,
+                        HBL = item.Hwbno,
+                        Marks = item.ShippingMark,
+                        Nofpiece = item.PackageContainer,
+                        GrossWeight = item.GW != null ? (decimal)item.GW : 0,
+                        SeaCBM = item.CBM != null ? (decimal)item.CBM : 0,
+                        //NoOfAWB = 123,
+                        Destination = item.FinalDestinationPlace,
+                        Shipper = item.ShipperDescription,
+                        Consignee = item.ConsigneeDescription,
+                        Descriptions = item.DesOfGoods,
+                        FreightCharge = item.FreightPayment,
+                        Notify = item.NotifyPartyDescription,
+                        OnboardNote = item.OnBoardStatus,
+                        MaskNos = string.Empty,
+                        TranShipmentTo = item.PODName,
+                        BillType = string.Empty
+                    };
+                    manifests.Add(manifest);
                 }
-            };
+            }
             var freightManifests = new List<FreightManifest> {
                 new FreightManifest
                 {
