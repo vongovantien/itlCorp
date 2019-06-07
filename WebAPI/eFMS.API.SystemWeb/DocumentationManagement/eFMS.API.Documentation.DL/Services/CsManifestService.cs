@@ -162,6 +162,10 @@ namespace eFMS.API.Documentation.DL.Services
         //}
         public Crystal Preview(ManifestReportModel model)
         {
+            if(model == null)
+            {
+                return null;
+            }
             Crystal result = new Crystal();
             string packageQuantity = "";
             if (model.CsMawbcontainers != null)
@@ -198,21 +202,21 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             var parameter = new SeaCargoManifestParameter {
-                ManifestNo = model.RefNo,
-                Owner = model.ManifestIssuer,
-                Marks = model.MasksOfRegistration,
-                Flight = model.VoyNo,
-                PortLading = model.PolName,
-                PortUnlading = model.PodName,
+                ManifestNo = model.RefNo ?? string.Empty,
+                Owner = model.ManifestIssuer ?? string.Empty,
+                Marks = model.MasksOfRegistration ?? string.Empty,
+                Flight = model.VoyNo ?? string.Empty,
+                PortLading = model.PolName ?? string.Empty,
+                PortUnlading = model.PodName ?? string.Empty,
                 FlightDate = model.InvoiceDate?.ToString(),
                 Eta = model.InvoiceDate?.ToString(),
-                Consolidater = model.Consolidator != null? model.Consolidator: string.Empty,
-                DeConsolidater = model.DeConsolidator != null? model.DeConsolidator: string.Empty,
+                Consolidater = model.Consolidator ?? string.Empty,
+                DeConsolidater = model.DeConsolidator ?? string.Empty,
                 Forwarder = "Forwarder",
                 OMB = "OMB",
-                ContainerNo = model.SealNoContainerNames != null? model.SealNoContainerNames: string.Empty,
+                ContainerNo = model.SealNoContainerNames ?? string.Empty,
                 Agent = "Agent",
-                QtyPacks = packageQuantity,
+                QtyPacks = packageQuantity ?? string.Empty,
                 TotalShipments = "TotalShipments",
                 CompanyName = "CompanyName",
                 CompanyDescription = "CompanyDescription",
@@ -228,22 +232,22 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var manifest = new SeaCargoManifest
                     {
-                        TransID = item.JobNo,
-                        HBL = item.Hwbno,
-                        Marks = item.ShippingMark,
-                        Nofpiece = item.PackageContainer,
+                        TransID = item.JobNo ?? string.Empty,
+                        HBL = item.Hwbno ?? string.Empty,
+                        Marks = item.ShippingMark ?? string.Empty,
+                        Nofpiece = item.PackageContainer ?? string.Empty,
                         GrossWeight = item.GW != null ? (decimal)item.GW : 0,
                         SeaCBM = item.CBM != null ? (decimal)item.CBM : 0,
                         //NoOfAWB = 123,
-                        Destination = item.FinalDestinationPlace,
-                        Shipper = item.ShipperDescription,
-                        Consignee = item.ConsigneeDescription,
-                        Descriptions = item.DesOfGoods,
-                        FreightCharge = item.FreightPayment,
-                        Notify = item.NotifyPartyDescription,
-                        OnboardNote = item.OnBoardStatus,
+                        Destination = item.FinalDestinationPlace ?? string.Empty,
+                        Shipper = item.ShipperDescription ?? string.Empty,
+                        Consignee = item.ConsigneeDescription ?? string.Empty,
+                        Descriptions = item.DesOfGoods ?? string.Empty,
+                        FreightCharge = item.FreightPayment ?? string.Empty,
+                        Notify = item.NotifyPartyDescription ?? string.Empty,
+                        OnboardNote = item.OnBoardStatus ?? string.Empty,
                         MaskNos = string.Empty,
-                        TranShipmentTo = item.PODName,
+                        TranShipmentTo = item.PODName ?? string.Empty,
                         BillType = string.Empty
                     };
                     manifests.Add(manifest);

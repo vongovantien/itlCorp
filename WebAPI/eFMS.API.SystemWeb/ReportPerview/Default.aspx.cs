@@ -35,6 +35,11 @@ namespace ReportPerview
                     crystal = null;
                     Response.Redirect("~/NotFound.aspx");
                 }
+                if(crystal.DataSource.Columns.Count == 0)
+                {
+                    crystal = null;
+                    throw new Exception("Resource not found");
+                }
                 ReportDocument rpt = ShowReport(crystal);
                 if (rpt != null)
                 {
