@@ -20,6 +20,7 @@ import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-billing-jo
 import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { OpsModuleStageManagementAddnewComponent } from './ops-module-billing-job-edit/ops-module-stage-management/ops-module-stage-management-addnew/ops-module-stage-management-addnew.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { OpsModuleStageManagementDetailComponent } from './ops-module-billing-job-edit/ops-module-stage-management/ops-module-stage-management-detail/ops-module-stage-management-detail.component';
 
 @NgModule({
   imports: [
@@ -31,6 +32,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     NgxDaterangepickerMd,
     DragDropModule
   ],
-  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent, OpsModuleCreditDebitNoteAddnewComponent, OpsModuleCreditDebitNoteRemainingChargeComponent, OpsModuleCreditDebitNoteDetailComponent, OpsModuleCreditDebitNoteEditComponent, OpsModuleStageManagementAddnewComponent],
+  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent, OpsModuleCreditDebitNoteAddnewComponent, OpsModuleCreditDebitNoteRemainingChargeComponent, OpsModuleCreditDebitNoteDetailComponent, OpsModuleCreditDebitNoteEditComponent, OpsModuleStageManagementAddnewComponent, OpsModuleStageManagementDetailComponent],
 })
 export class OperationModule { }
