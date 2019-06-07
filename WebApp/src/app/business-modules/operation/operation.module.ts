@@ -18,7 +18,8 @@ import { OpsModuleCreditDebitNoteAddnewComponent } from './ops-module-billing-jo
 import { OpsModuleCreditDebitNoteRemainingChargeComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-remaining-charge/ops-module-credit-debit-note-remaining-charge.component';
 import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-billing-job-edit/ops-module-credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
-
+import { OpsModuleStageManagementAddnewComponent } from './ops-module-billing-job-edit/ops-module-stage-management/ops-module-stage-management-addnew/ops-module-stage-management-addnew.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   imports: [
@@ -27,8 +28,9 @@ import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-billing-job-
     SelectModule,
     FormsModule,
     SharedModule,
-    NgxDaterangepickerMd
+    NgxDaterangepickerMd,
+    DragDropModule
   ],
-  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent, OpsModuleCreditDebitNoteAddnewComponent, OpsModuleCreditDebitNoteRemainingChargeComponent, OpsModuleCreditDebitNoteDetailComponent, OpsModuleCreditDebitNoteEditComponent],
+  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent, OpsModuleCreditDebitNoteAddnewComponent, OpsModuleCreditDebitNoteRemainingChargeComponent, OpsModuleCreditDebitNoteDetailComponent, OpsModuleCreditDebitNoteEditComponent, OpsModuleStageManagementAddnewComponent],
 })
 export class OperationModule { }

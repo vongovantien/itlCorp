@@ -34,6 +34,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { HighchartsChartModule } from "highcharts-angular";
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+
+import { DragDropModule } from '@angular/cdk/drag-drop';
 // import { ChartModule } from 'angular-highcharts';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
@@ -49,6 +51,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     PageSidebarComponent,
     SubheaderComponent,
     DashboardComponent
+     
     // TwoDigitDecimaNumberDirective
   ],
   imports: [    
@@ -70,6 +73,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     OAuthModule.forRoot(),
     NgxDaterangepickerMd,
     HighchartsChartModule,
+    DragDropModule
     // ChartModule // add ChartModule to your imports
   ],
   providers: [
