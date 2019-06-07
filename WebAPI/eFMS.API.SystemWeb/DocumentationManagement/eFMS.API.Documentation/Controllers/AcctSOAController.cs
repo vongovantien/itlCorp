@@ -91,9 +91,9 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         [Route("Get")]
         //[Authorize]
-        public List<object> Get(Guid JobId)
+        public List<object> Get(Guid Id,bool IsHouseBillID)
         {
-            return acctSOAServices.GroupSOAByPartner(JobId);
+            return acctSOAServices.GroupSOAByPartner(Id, IsHouseBillID);
         }
 
         [HttpGet]

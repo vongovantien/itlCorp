@@ -119,46 +119,76 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public List<object> GroupSOAByPartner(Guid JobId)
+        public List<object> GroupSOAByPartner(Guid id, bool IsHouseBillID)
         {
             try
             {
                 List<object> returnList = new List<object>();
                 List<CatPartner> listPartners = new List<CatPartner>();
-                List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList().Select(x => x.Id).ToList();
-                foreach (var id in lst_Hbid)
-                {
-                    var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
-                    List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-                    if (houseBill != null)
-                    {
-                        listCharges = Query(houseBill.Id, null);
 
-                        foreach (var c in listCharges)
+                if(IsHouseBillID == false)
+                {
+                    List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
+                    foreach (var _id in lst_Hbid)
+                    {
+                        var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == _id).FirstOrDefault();
+                        List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+                        if (houseBill != null)
                         {
-                            if (c.PaymentObjectId != null)
+                            listCharges = Query(houseBill.Id, null);
+
+                            foreach (var c in listCharges)
                             {
-                                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
-                                if (partner != null) listPartners.Add(partner);
-                            }
-                            if (c.ReceiverId != null)
-                            {
-                                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
-                                if (partner != null) listPartners.Add(partner);
-                            }
-                            if (c.PayerId != null)
-                            {
-                                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
-                                if (partner != null) listPartners.Add(partner);
+                                if (c.PaymentObjectId != null)
+                                {
+                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                                    if (partner != null) listPartners.Add(partner);
+                                }
+                                if (c.ReceiverId != null)
+                                {
+                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
+                                    if (partner != null) listPartners.Add(partner);
+                                }
+                                if (c.PayerId != null)
+                                {
+                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                                    if (partner != null) listPartners.Add(partner);
+                                }
                             }
                         }
-                    }
 
+                    }
                 }
+                else
+                {
+                    List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+                    listCharges = Query(id, null);
+
+                    foreach (var c in listCharges)
+                    {
+                        if (c.PaymentObjectId != null)
+                        {
+                            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                            if (partner != null) listPartners.Add(partner);
+                        }
+                        if (c.ReceiverId != null)
+                        {
+                            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
+                            if (partner != null) listPartners.Add(partner);
+                        }
+                        if (c.PayerId != null)
+                        {
+                            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                            if (partner != null) listPartners.Add(partner);
+                        }
+                    }
+                }
+              
                 listPartners = listPartners.Distinct().ToList();
                 foreach(var item in listPartners)
                 {
-                    var SOA = DataContext.Where(x => x.PartnerId == item.Id && x.JobId==JobId).ToList();
+                    var jobId = IsHouseBillID == true ? ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == id).FirstOrDefault()?.Id : id;
+                    var SOA = DataContext.Where(x => x.PartnerId == item.Id && x.JobId== jobId).ToList();
                     List<object> listSOA = new List<object>();
                     foreach(var soa in SOA)
                     {
