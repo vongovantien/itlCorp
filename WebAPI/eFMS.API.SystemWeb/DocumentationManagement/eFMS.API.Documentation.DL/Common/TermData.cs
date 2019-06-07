@@ -41,12 +41,14 @@ namespace eFMS.API.Documentation.DL.Common
         Processing = 2,
         [Description("Done")]
         Done = 3,
-        [Description("Overdue")]
+        [Description("Overdued")]
         Overdue = 4,
         [Description("Pending")]
         Pending = 5,
         [Description("Deleted")]
-        Deleted = 6
+        Deleted = 6,
+        [Description("Warning")]
+        Warning = 7
     }
     public static class TermData
     {
@@ -58,6 +60,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string Overdue = "Overdued";
         public static readonly string Pending = "Pending";
         public static readonly string Deleted = "Deleted";
+        public static readonly string Warning = "Warning";
 
         public static readonly string InlandTrucking = "InlandTrucking";
         public static readonly string AirExport  = "AirExport";

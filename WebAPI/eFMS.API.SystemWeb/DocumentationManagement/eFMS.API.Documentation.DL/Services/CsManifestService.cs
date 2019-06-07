@@ -80,84 +80,179 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        //public Crystal Preview(ManifestReportModel model)
+        //{
+        //    Crystal result = new Crystal();
+        //    var housebillList = new List<HouseBillManifestModel>();
+        //    if (model.CsMawbcontainers != null)
+        //    {
+        //        string sbContNo = "";
+        //        string sbContType = "";
+        //        foreach (var container in model.CsMawbcontainers)
+        //        {
+        //            if (!string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
+        //            {
+        //                sbContNo += container.ContainerNo + "/ " + container.SealNo + ", ";
+        //            }
+        //            else if (!string.IsNullOrEmpty(container.ContainerNo) && string.IsNullOrEmpty(container.SealNo))
+        //            {
+        //                sbContNo += container.ContainerNo + ", ";
+        //            }
+        //            else if (string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
+        //            {
+        //                sbContNo += container.SealNo + ", ";
+        //            }
+        //            sbContType += container.Quantity + "X" + container.ContainerTypeName + ", ";
+        //        }
+        //        if (sbContNo.Length > 2)
+        //        {
+        //            model.SealNoContainerNames = sbContNo.Substring(0, sbContNo.Length - 2);
+        //        }
+        //        if (sbContType.Length > 2)
+        //        {
+        //            model.NumberContainerTypes = sbContType.Substring(0, sbContType.Length - 2);
+        //        }
+        //    }
+        //    var manifest = new ManifestReportResult
+        //    {
+        //        POD = model.PodName,
+        //        POL = model.PolName,
+        //        VesselNo = model.VoyNo,
+        //        ETD = model.InvoiceDate,
+        //        SealNoContainerNames = model.SealNoContainerNames,
+        //        NumberContainerTypes = model.NumberContainerTypes,
+        //    };
+        //    decimal sumGW = 0;
+        //    decimal sumVolumn = 0;
+        //    if (model.CsTransactionDetails != null)
+        //    {
+        //        foreach (var item in model.CsTransactionDetails)
+        //        {
+        //            var houseBill = new HouseBillManifestModel
+        //            {
+        //                Hwbno = item.Hwbno,
+        //                Packages = item.PackageContainer,
+        //                Weight = (decimal)item.GW,
+        //                Volumn = (decimal)item.CBM,
+        //                Shipper = item.ShipperDescription,
+        //                NotifyParty = item.NotifyPartyDescription,
+        //                ShippingMark = item.ShippingMark,
+        //                Description = item.DesOfGoods,
+        //                FreightPayment = item.FreightPayment
+        //            };
+        //            sumGW += (decimal)item?.GW;
+        //            sumVolumn += (decimal)item?.CBM;
+        //            housebillList.Add(houseBill);
+        //        }
+        //    }
+        //    if(housebillList.Count > 0)
+        //    {
+        //        housebillList.ForEach(x => {
+        //            x.SumGrossWeight = sumGW;
+        //            x.SumVolumn = sumVolumn;
+        //        });
+        //    }
+        //    result.ReportName = "rptManifest.rpt";
+        //    result.AllowPrint = true;
+        //    result.AllowExport = true;
+        //    result.AddDataSource(new List<ManifestReportResult> { manifest });
+        //    result.FormatType = ExportFormatType.PortableDocFormat;
+        //    result.AddSubReport("ManifestHouseBillDetail", housebillList);
+        //    return result;
+        //}
         public Crystal Preview(ManifestReportModel model)
         {
             Crystal result = new Crystal();
-            var housebillList = new List<HouseBillManifestModel>();
-            if (model.CsMawbcontainers != null)
-            {
-                string sbContNo = "";
-                string sbContType = "";
-                foreach (var container in model.CsMawbcontainers)
-                {
-                    if (!string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
-                    {
-                        sbContNo += container.ContainerNo + "/ " + container.SealNo + ", ";
-                    }
-                    else if (!string.IsNullOrEmpty(container.ContainerNo) && string.IsNullOrEmpty(container.SealNo))
-                    {
-                        sbContNo += container.ContainerNo + ", ";
-                    }
-                    else if (string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
-                    {
-                        sbContNo += container.SealNo + ", ";
-                    }
-                    sbContType += container.Quantity + "X" + container.ContainerTypeName + ", ";
-                }
-                if (sbContNo.Length > 2)
-                {
-                    model.SealNoContainerNames = sbContNo.Substring(0, sbContNo.Length - 2);
-                }
-                if (sbContType.Length > 2)
-                {
-                    model.NumberContainerTypes = sbContType.Substring(0, sbContType.Length - 2);
-                }
-            }
-            var manifest = new ManifestReportResult
-            {
-                POD = model.PodName,
-                POL = model.PolName,
-                VesselNo = model.VoyNo,
-                ETD = model.InvoiceDate,
-                SealNoContainerNames = model.SealNoContainerNames,
-                NumberContainerTypes = model.NumberContainerTypes,
+            var parameter = new SeaCargoManifestParameter {
+                ManifestNo = model.RefNo,
+                Owner = model.ManifestIssuer,
+                Marks = model.MasksOfRegistration,
+                Flight = model.VoyNo,
+                PortLading = model.PolName,
+                PortUnlading = model.PodName,
+                FlightDate = model.InvoiceDate?.ToString(),
+                Eta = model.InvoiceDate?.ToString(),
+                Consolidater = model.Consolidator != null? model.Consolidator: "Consolidater",
+                DeConsolidater = model.DeConsolidator != null? model.DeConsolidator: "DeConsolidator",
+                Forwarder = "Forwarder",
+                OMB = "OMB",
+                ContainerNo = "ContainerNo",
+                Agent = "Agent",
+                QtyPacks = "QtyPacks",
+                TotalShipments = "TotalShipments",
+                CompanyName = "CompanyName",
+                CompanyDescription = "CompanyDescription",
+                CompanyAddress1 = "CompanyAddress1",
+                CompanyAddress2 = "CompanyAddress2",
+                Website = "Website",
+                Contact = "Contact"
             };
-            decimal sumGW = 0;
-            decimal sumVolumn = 0;
-            if (model.CsTransactionDetails != null)
-            {
-                foreach (var item in model.CsTransactionDetails)
-                {
-                    var houseBill = new HouseBillManifestModel
-                    {
-                        Hwbno = item.Hwbno,
-                        Packages = item.PackageContainer,
-                        Weight = (decimal)item.GW,
-                        Volumn = (decimal)item.CBM,
-                        Shipper = item.ShipperDescription,
-                        NotifyParty = item.NotifyPartyDescription,
-                        ShippingMark = item.ShippingMark,
-                        Description = item.DesOfGoods,
-                        FreightPayment = item.FreightPayment
-                    };
-                    sumGW += (decimal)item?.GW;
-                    sumVolumn += (decimal)item?.CBM;
-                    housebillList.Add(houseBill);
+            var manifests = new List<SeaCargoManifest>{
+                new SeaCargoManifest {
+                TransID = "TransID",
+                HBL = "HBL",
+                Marks = "Marks",
+                Nofpiece = "Nofpiece",
+                GrossWeight = 123,
+                SeaCBM = 123,
+                NoOfAWB = 123,
+                Destination = "Destination",
+                Shipper = "Shipper",
+                Consignee = "Consignee",
+                Descriptions = "Descriptions",
+                FreightCharge = "FreightCharge",
+                Notify = "FreightCharge",
+                OnboardNote = "OnboardNote",
+                MaskNos = "MaskNos",
+                TranShipmentTo = "TranShipmentTo",
+                BillType = "BillType"
+                },
+                new SeaCargoManifest {
+                TransID = "TransID",
+                HBL = "HBL",
+                Marks = "Marks",
+                Nofpiece = "Nofpiece",
+                GrossWeight = 123,
+                SeaCBM = 123,
+                NoOfAWB = 123,
+                Destination = "Destination",
+                Shipper = "Shipper",
+                Consignee = "Consignee",
+                Descriptions = "Descriptions",
+                FreightCharge = "FreightCharge",
+                Notify = "FreightCharge",
+                OnboardNote = "OnboardNote",
+                MaskNos = "MaskNos",
+                TranShipmentTo = "TranShipmentTo",
+                BillType = "BillType"
                 }
-            }
-            if(housebillList.Count > 0)
-            {
-                housebillList.ForEach(x => {
-                    x.SumGrossWeight = sumGW;
-                    x.SumVolumn = sumVolumn;
-                });
-            }
-            result.ReportName = "rptManifest.rpt";
+            };
+            var freightManifests = new List<FreightManifest> {
+                new FreightManifest
+                {
+                    FieldKeyID = "FieldKeyID",
+                    GroupName = "",
+                    Description = "",
+                    Quantity = 123,
+                    Unit = "",
+                    UnitPrice = 123,
+                    Curr = "",
+                    VAT = 123,
+                    TotalValue = 123,
+                    Dbt = true,
+                    Collect = true,
+                    AccountNo = "",
+                    DecimalNo = 123,
+                    CurrDecimalNo = 123
+                }
+            };
+            result.ReportName = "SeaCargoManifest1.rpt";
             result.AllowPrint = true;
             result.AllowExport = true;
-            result.AddDataSource(new List<ManifestReportResult> { manifest });
+            result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            result.AddSubReport("ManifestHouseBillDetail", housebillList);
+            result.AddSubReport("FreightManifest", freightManifests);
+            result.SetParameter(parameter);
             return result;
         }
     }

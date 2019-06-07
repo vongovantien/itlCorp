@@ -39,6 +39,6 @@ export class OpsTransaction {
         polName: string = null;
 
         //sumCont: number = null;
-        packageQuantity: number = null;
+        //packageQuantity: number = null;
         csMawbcontainers: Container[] = null;
 }

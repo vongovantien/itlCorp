@@ -28,7 +28,7 @@ namespace ReportPerview.Common
                 if (sub.DataSource.Rows.Count > 0)
                     rpt.Subreports[sub.Name].SetDataSource(sub.DataSource);
             }
-            //rpt.setParameter(crystal.GetParameter());
+            rpt.SetParameter(crystal.Parameters);
             return rpt;
         }
     }

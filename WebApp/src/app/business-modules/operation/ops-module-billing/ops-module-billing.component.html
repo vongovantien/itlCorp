@@ -328,7 +328,7 @@
                                                     <span>{{ item.sumGrossWeight }}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{ item.sumCBM }}</span>
+                                                    <span>{{ item.sumCbm }}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{ item.invoiceNo }}</span>
@@ -338,7 +338,12 @@
                                                 </td>
                                                 <td>
                                                     <ng-container *ngIf="item.currentStatus">
-                                                        <span class="m-badge m-badge--danger m-badge--wide job-overdue">{{ item.currentStatus }}</span>
+                                                        <span class="m-badge m-badge--primary m-badge--wide" *ngIf="stageConts.inSchedule">{{ item.currentStatus }}</span>
+                                                        <span class="m-badge m-badge--info m-badge--wide" *ngIf="stageConts.processing">{{ item.currentStatus }}</span>
+                                                        <span class="m-badge m-badge--warning m-badge--wide" *ngIf="stageConts.warning">{{ item.currentStatus }}</span>
+                                                        <span class="m-badge m-badge--danger m-badge--wide" *ngIf="stageConts.overdued">{{ item.currentStatus }}</span>
+                                                        <span class="m-badge m-badge--success m-badge--wide" *ngIf="stageConts.completed">{{ item.currentStatus }}</span>
+                                                        <span class="m-badge m-badge--dark m-badge--wide" *ngIf="stageConts.deleted">{{ item.currentStatus }}</span>
                                                     </ng-container>
                                                 </td>
                                             </tr>

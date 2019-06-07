@@ -352,7 +352,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 this.opsTransaction.sumChargeWeight = 0;
                 this.opsTransaction.sumCbm = 0;
                 this.opsTransaction.sumContainers = 0;
-                this.opsTransaction.packageQuantity = 0;
+                this.opsTransaction.sumPackages = 0;
                 this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
                 var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.opsTransaction.csMawbcontainers, masterId: this.opsTransaction.id}, true, false);
                 if(response.status){
