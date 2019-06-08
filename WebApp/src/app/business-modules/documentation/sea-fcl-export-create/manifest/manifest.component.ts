@@ -112,17 +112,21 @@ export class ManifestComponent implements OnInit {
         this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        
+        var id = this.previewModalId;
+        var _this = this;
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
         console.log(response);
         this.dataReport = response;
-        var id = this.previewModalId;
-        var _this = this;
-        _this.baseServices.spinnerShow();
-        setTimeout(function(){ 
-            $('#' + id).modal('show');
-            _this.baseServices.spinnerHide();
-        }, 100);
+        var checkExist = setInterval(function() {
+            if ($('#frame').length) {
+                console.log("Exists!");
+                $('#' + id).modal('show');
+                clearInterval(checkExist);
+            }
+         }, 100);
     }
+    
     removeAllChecked(){
         this.checkAll = false;
     }

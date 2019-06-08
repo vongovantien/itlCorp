@@ -282,9 +282,15 @@
     <Content Include="Reports\rptShippingInstruction.rpt" />
     <Content Include="Reports\ShippingInstructionContainerList.ttx" />
     <Content Include="Reports\ShippingInstructionReport.ttx" />
-    <Content Include="Reports\FreightManifest.ttx" />
-    <Content Include="Reports\SeaCargoManifest.rpt" />
-    <Content Include="Reports\SeaCargoManifest.ttx" />
+    <Content Include="Reports\FreightManifest.ttx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SeaCargoManifest.rpt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SeaCargoManifest.ttx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

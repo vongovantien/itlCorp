@@ -10,5 +10,5 @@ TotalValue	Number	51000
 Dbt	Boolean
 Collect	Boolean	True	
 AccountNo	String	255	AccountantNo
-DecimalNo	Number	255
-CurrDecimalNo	Number	10
+DecimalNo	Number	2
+CurrDecimalNo	Number	10	10
