@@ -129,8 +129,28 @@ namespace eFMS.API.Setting.DL.Services
 
         private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
         {
-            string queryString = "SELECT * FROM [ECUS5VNACCS].[dbo].[DTOKHAIMD]";
-            string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
+            string queryString = @"SELECT TOP (1000) DTOKHAIMD.[_DToKhaiMDID] AS DToKhaiMDID
+                                  ,[_XorN] AS XorN
+                                  ,[SOTK]
+                                  ,[SOTK_DAU_TIEN]
+                                  ,[NGAY_DK]
+                                  ,[MA_DV]
+                                  ,[VAN_DON]
+                                  ,[MA_CK]
+                                  ,[MA_CANGNN]
+                                  ,[NUOC_XK]
+                                  ,[NUOC_NK]
+                                  ,[TR_LUONG]
+                                  ,[SO_KIEN]
+                                  ,[DVT_KIEN]
+                                  ,[SO_CONTAINER]
+                                  ,[PLUONG]
+	                              ,DTOKHAIMD_VNACCS2.[MA_HIEU_PTVC]
+                              FROM[ECUS5VNACCS].[dbo].[DTOKHAIMD]
+                                    INNER JOIN[ECUS5VNACCS].[dbo].[DTOKHAIMD_VNACCS2]
+                                    ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID";
+
+string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
             var data = Helpers.Helper.ExecuteDataSet(connectionString, queryString);
             if (data != null)
             {

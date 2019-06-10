@@ -6,6 +6,58 @@ namespace eFMS.API.Documentation.DL.Common
 {
     public class DataTypeEx
     {
+        public static string GetJobStatus(JobStatus jobEnum)
+        {
+            string result = string.Empty;
+            switch (jobEnum)
+            {
+                case JobStatus.InSchedule:
+                    result = TermData.InSchedule;
+                    break;
+                case JobStatus.Processing:
+                    result = TermData.Processing;
+                    break;
+                case JobStatus.Pending:
+                    result = TermData.Pending;
+                    break;
+                case JobStatus.Finish:
+                    result = TermData.Done;
+                    break;
+                case JobStatus.Overdued:
+                    result = TermData.Overdue;
+                    break;
+                case JobStatus.Canceled:
+                    result = TermData.Canceled;
+                    break;
+            }
+            return result;
+        }
+        public static string GetStageStatus(StageEnum stageEnum)
+        {
+            string result = string.Empty;
+            switch (stageEnum)
+            {
+                case StageEnum.InSchedule:
+                    result = TermData.InSchedule;
+                    break;
+                case StageEnum.Processing:
+                    result = TermData.Processing;
+                    break;
+                case StageEnum.Pending:
+                    result = TermData.Pending;
+                    break;
+                case StageEnum.Done:
+                    result = TermData.Done;
+                    break;
+                case StageEnum.Overdue:
+                    result = TermData.Overdue;
+                    break;
+                case StageEnum.Deleted:
+                    result = TermData.Deleted;
+                    break;
+            }
+            return result;
+        }
         public static string GetType(TransactionTypeEnum type)
         {
             string result = "";

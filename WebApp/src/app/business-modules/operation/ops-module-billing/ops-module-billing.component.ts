@@ -4,11 +4,11 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { StageConstants } from 'src/constants/stage.const';
 declare var $: any;
 
 @Component({
@@ -17,6 +17,15 @@ declare var $: any;
     styleUrls: ['./ops-module-billing.component.scss']
 })
 export class OpsModuleBillingComponent implements OnInit {
+    stageConts = {
+        inSchedule: StageConstants.InSchedule,
+        processing: StageConstants.Processing,
+        completed: StageConstants.Completed,
+        overdued: StageConstants.Overdued,
+        pending: StageConstants.Pending,
+        deleted: StageConstants.Deleted,
+        warning: StageConstants.Warning
+    }
     productServices: any[] = [];
     serviceModes: any[] = [];
     shipmentModes: any[] = [];
@@ -48,6 +57,8 @@ export class OpsModuleBillingComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.pager.currentPage = 1;
+        this.pager.totalItems = 0;
         this.getShipmentCommonData();
         this.getUserInCharges();
         this.getCustomers();

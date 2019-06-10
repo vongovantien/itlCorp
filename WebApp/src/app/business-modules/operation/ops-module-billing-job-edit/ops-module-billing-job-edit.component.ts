@@ -91,7 +91,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     listPackageTypes: any[];
     listWeightMesurement: any[];
     commodities: any[];
-    packageTypes: any[];
+    packageTypes: any[] = [];
     weightMesurements: any[];
     @ViewChild('containerMasterForm',{static:true}) containerMasterForm: NgForm;
     // @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
@@ -142,50 +142,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             }
         });
     }
-    removeContainer(){
-        this.lstMasterContainers.splice(this.indexItemConDelete, 1);
-        this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
-        $('#confirm-accept-delete-container-modal').modal('hide');
-        this.resetSumContainer();
-    }
-    resetSumContainer(){}
-    changeEditStatus(index: any) {
-        this.filterContainer(index);
-        let hasItemEdited = false;
-        for(let i =0; i< this.lstMasterContainers.length; i++){
-            if(i != index && this.lstMasterContainers[i].allowEdit){
-                hasItemEdited = true;
-                break;
-            }
-        }
-        if(hasItemEdited){
-            this.baseServices.errorToast("You must save current container");
-        }
-        else{
-            if (this.lstMasterContainers[index].allowEdit == false) {
-                this.lstMasterContainers[index].allowEdit = true;
-                this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? 
-                                                [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
-                this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? 
-                                                [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
-                this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureID != null? 
-                                                [{ id: this.lstMasterContainers[index].unitOfMeasureID, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
-                for(let i =0; i< this.lstMasterContainers.length; i++){
-                    if(i != index){
-                        this.lstMasterContainers[i].allowEdit = false;
-                    }
-                }
-            }
-            else {
-                this.lstMasterContainers[index].allowEdit = false;
-            }
-        }
-    }
     async getShipmentContainer() {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
-        this.opsTransaction.csMawbcontainers = this.lstMasterContainers = responses;
-        
-        this.lstContainerTemp = this.lstMasterContainers;
+        this.opsTransaction.csMawbcontainers = this.lstContainerTemp = this.lstMasterContainers = responses;
     }
     async confirmDelete(){
         let respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
@@ -220,125 +179,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
         else{
             var response = await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
-        }
-    }
-    saveContainerSuccess = false;
-    async saveNewContainer(index: any){
-        
-        if(this.lstMasterContainers[index].containerNo.length > 0 || this.lstMasterContainers[index].sealNo.length > 0 || this.lstMasterContainers[index].markNo.length > 0){
-            this.lstMasterContainers[index].quantity = 1;
-        }
-        console.log(this.containerMasterForm.submitted && this.lstMasterContainers[index].containerTypeId == null && this.lstMasterContainers[index].verifying);
-        this.lstMasterContainers[index].verifying = true;
-        if(this.lstMasterContainers[index].quantity == null || this.lstMasterContainers[index].containerTypeId == null){
-            this.saveContainerSuccess = false;
-            return;
-        } 
-        //Cont Type, Cont Q'ty, Container No, Package Type
-        let existedItems = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
-            && x.quantity == this.lstMasterContainers[index].quantity);
-        if(this.lstMasterContainers[index].containerNo.length != 0 && this.lstMasterContainers[index].packageTypeId != null){
-            existedItems = existedItems.filter(x => x.containerNo == this.lstMasterContainers[index].containerNo
-                && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
-        }
-        else
-        {
-            existedItems = [];
-        }
-        if(existedItems.length > 1) { 
-            this.lstMasterContainers[index].inValidRow = true;
-            this.saveContainerSuccess = false;
-        }
-        else{
-            if(this.lstMasterContainers[index].isNew == true){
-                this.lstMasterContainers[index].isNew = false;
-            } 
-            else{
-                this.lstMasterContainers[index].inValidRow = false;
-                this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
-                this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
-                this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId!= null? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
-            }
-            this.saveContainerSuccess = true;
-            this.lstMasterContainers[index].allowEdit = false;
-        }
-        this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
-    }
-    initNewContainer() {
-        var container = {
-            mawb: this.opsTransaction.id,
-            containerTypeId: null,
-            containerTypeName: '',
-            containerTypeActive: [],
-            quantity: 1,
-            containerNo: '',
-            sealNo: '',
-            markNo: '',
-            unitOfMeasureId: 37,
-            unitOfMeasureName: 'Kilogam',
-            unitOfMeasureActive: [{ "id": 37, "text": "Kilogam"}],
-            commodityId: null,
-            commodityName: '',
-            packageTypeId: null,
-            packageTypeName: '',
-            packageTypeActive: [],
-            packageQuantity: null,
-            description: null,
-            gw: null,
-            nw: null,
-            chargeAbleWeight: null,
-            cbm: null,
-            packageContainer: '',
-            allowEdit: true,
-            isNew: true,
-            verifying: false
-        };
-        this.filterContainer(this.lstMasterContainers.length);
-        return container;
-    }
-    getContainerData(){
-        this.getContainerTypes();
-        this.getWeightTypes();
-        this.getPackageTypes();
-        this.getComodities();
-    }
-    async getContainerTypes() {
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
-        this.listContainerType = responses;
-        if (responses != null) {
-            this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-            // console.log('container type:');
-            // console.log(this.containerTypes);
-        }
-    }
-    async onSubmitContainer(){
-        for(let i=0; i< this.lstMasterContainers.length; i++){
-            this.lstMasterContainers[i].verifying = true;
-        }
-        if (this.containerMasterForm.valid) {
-            let hasItemEdited = false;
-            for(let i=0; i< this.lstMasterContainers.length; i++){
-                if(this.lstMasterContainers[i].allowEdit == true){
-                    hasItemEdited = true;
-                    break;
-                }
-            }
-            if(hasItemEdited == false){
-                //continue
-                this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
-                this.opsTransaction.sumGrossWeight = 0;
-                this.opsTransaction.sumNetWeight = 0;
-                this.opsTransaction.sumCbm = 0;
-                this.opsTransaction.sumContainers = 0;
-                this.opsTransaction.packageQuantity = 0;
-                $('#container-list-of-ops-billing-modal').modal('hide');
-            }
-            else{
-                this.baseServices.errorToast("Current container must be save!!!");
-            }
-            this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
-            var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.opsTransaction.csMawbcontainers, masterId: this.opsTransaction.id}, true, false);
-            let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, {mblid: this.opsTransaction.id}, false, false);
         }
     }
     //-------------     Container   -------------------//
@@ -417,39 +257,232 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             )
         );
     }
-    //-------------    End Container   -------------------//
-    
+
+    /**
+     * change mode of row(editing - not editing)
+     */
+    changeEditMode(index: any) {
+        this.getComboboxDataContainer(index);
+        if (this.lstMasterContainers[index].allowEdit == false || this.lstMasterContainers[index].allowEdit == undefined) {
+            this.lstMasterContainers[index].allowEdit = true;
+            this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? 
+                                            [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
+            this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? 
+                                            [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
+            this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureID != null? 
+                                            [{ id: this.lstMasterContainers[index].unitOfMeasureID, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
+            for(let i =0; i< this.lstMasterContainers.length; i++){
+                if(i != index){
+                    this.lstMasterContainers[i].allowEdit = false;
+                }
+            }
+        }
+        else {
+            this.lstMasterContainers[index].allowEdit = false;
+        }
+    }
+
+    saveContainerSuccess = false;
+    /**
+     * change a row from editing mode in table
+     * @param index index of row in table
+     */
+    async saveNewContainer(index: any){
+        //set quantity = 1 (if existed: containerNo || sealNo || markNo)
+        if(this.lstMasterContainers[index].containerNo.length > 0 || this.lstMasterContainers[index].sealNo.length > 0 || this.lstMasterContainers[index].markNo.length > 0){
+            this.lstMasterContainers[index].quantity = 1;
+        }
+        this.lstMasterContainers[index].verifying = true;
+        if(this.lstMasterContainers[index].quantity == null || this.lstMasterContainers[index].containerTypeId == null){
+            this.saveContainerSuccess = false;
+            return;
+        } 
+        //Check duplicate( Cont Type && Cont Q'ty && Container No && Package Type)
+        let existedItems = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
+            && x.quantity == this.lstMasterContainers[index].quantity);
+        if(this.lstMasterContainers[index].containerNo.length != 0 && this.lstMasterContainers[index].packageTypeId != null){
+            existedItems = existedItems.filter(x => x.containerNo == this.lstMasterContainers[index].containerNo
+                && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
+        }
+        else
+        {
+            existedItems = [];
+        }
+        //set row is invalid
+        if(existedItems.length > 1) { 
+            this.lstMasterContainers[index].inValidRow = true;
+            this.saveContainerSuccess = false;
+        }
+        else{
+            //set row is saved
+            if(this.lstMasterContainers[index].isNew == true){
+                this.lstMasterContainers[index].isNew = false;
+            } 
+            else{
+                this.lstMasterContainers[index].inValidRow = false;
+                this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }]: [];
+                this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }]: [];
+                this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId!= null? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }]: [];
+            }
+            this.saveContainerSuccess = true;
+            this.lstMasterContainers[index].allowEdit = false;
+        }
+        this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
+    }
+    /**
+     * save list container
+     */
+    async onSubmitContainer(){
+        for(let i=0; i< this.lstMasterContainers.length; i++){
+            this.lstMasterContainers[i].verifying = true;
+        }
+        if (this.containerMasterForm.valid) {
+            let hasItemEdited = false;
+            for(let i=0; i< this.lstMasterContainers.length; i++){
+                if(this.lstMasterContainers[i].allowEdit == true){
+                    hasItemEdited = true;
+                    break;
+                }
+            }
+            if(hasItemEdited == false){
+                //continue
+                this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
+                this.opsTransaction.sumGrossWeight = 0;
+                this.opsTransaction.sumNetWeight = 0;
+                this.opsTransaction.sumChargeWeight = 0;
+                this.opsTransaction.sumCbm = 0;
+                this.opsTransaction.sumContainers = 0;
+                this.opsTransaction.sumPackages = 0;
+                this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
+                var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.opsTransaction.csMawbcontainers, masterId: this.opsTransaction.id}, true, false);
+                if(response.status){
+                    this.getGoodInfomation(this.lstMasterContainers);
+                    await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, false, false);
+                    $('#container-list-of-ops-billing-modal').modal('hide');
+                }
+            }
+            else{
+                this.baseServices.errorToast("Current container must be save!!!");
+            }
+        }
+    }
+    /**
+     * get container information of a job
+     * @param listContainers list of container
+     */
+    getGoodInfomation(listContainers) {
+        for (var i = 0; i < listContainers.length; i++) {
+            listContainers[i].isSave = true;
+            this.opsTransaction.sumGrossWeight = this.opsTransaction.sumGrossWeight + listContainers[i].gw;
+            this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight + listContainers[i].nw;
+            this.opsTransaction.sumChargeWeight = this.opsTransaction.sumChargeWeight + listContainers[i].chargeAbleWeight;
+            this.opsTransaction.sumCbm = this.opsTransaction.sumCbm + listContainers[i].cbm;
+            this.opsTransaction.sumContainers = this.opsTransaction.sumContainers + listContainers[i].quantity;
+            this.opsTransaction.sumPackages = this.opsTransaction.sumPackages + listContainers[i].packageQuantity;
+        }
+    }
+    /**
+     * init a new container
+     */
+    initNewContainer() {
+        var container = {
+            mawb: this.opsTransaction.id,
+            containerTypeId: null,
+            containerTypeName: '',
+            containerTypeActive: [],
+            quantity: 1,
+            containerNo: '',
+            sealNo: '',
+            markNo: '',
+            unitOfMeasureId: 37,
+            unitOfMeasureName: 'Kilogam',
+            unitOfMeasureActive: [{ "id": 37, "text": "Kilogam"}],
+            commodityId: null,
+            commodityName: '',
+            packageTypeId: null,
+            packageTypeName: '',
+            packageTypeActive: [],
+            packageQuantity: null,
+            description: null,
+            gw: null,
+            nw: null,
+            chargeAbleWeight: null,
+            cbm: null,
+            packageContainer: '',
+            allowEdit: true,
+            isNew: true,
+            verifying: false
+        };
+        this.getComboboxDataContainer(this.lstMasterContainers.length);
+        return container;
+    }
+    removeContainer(){
+        this.lstMasterContainers.splice(this.indexItemConDelete, 1);
+        this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
+        $('#confirm-accept-delete-container-modal').modal('hide');
+    }
     indexItemConDelete: any = null;
+    /**
+     * confirm item to remove out of table
+     * @param index index of row in table
+     */
     removeAContainer(index: number){
         this.indexItemConDelete = index;
     }
+    /**
+     * get container type data
+     */
+    async getContainerTypes() {
+        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
+        this.listContainerType = responses;
+        if (responses != null) {
+            this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
+        }
+    }
+    /**
+     * get reference container
+     */
+    getContainerData(){
+        this.getContainerTypes();
+        this.getWeightTypes();
+        this.getPackageTypes();
+        this.getComodities();
+    }
+
+    /**
+     * get list weight type
+     */
     async getWeightTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
         this.listWeightMesurement = responses;
     }
+
+    /**
+     * get list package type
+     */
     async getPackageTypes() {
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
         this.listPackageTypes = responses;
+        
+        if(this.listPackageTypes){
+            this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
+            this.packagesUnitActive = [this.packageTypes[0]];
+        }
     }
+    /**
+     * get list commodity
+     */
     async getComodities() {
         let criteriaSearchCommodity = { inactive: null, all: null };
         let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, criteriaSearchCommodity, false, false);
         if(responses != null){
             this.commodities = this.sortService.sort(responses, 'commodityNameEn', true);
-            // console.log('commodities' + this.commodities);
         }
         else{
             this.commodities = [];
         }
     }
-    
-    changeComodity(keySearch: any) {
-        if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
-            return 0;
-        }
-        this.getComodities();
-    }
-    filterContainer(index: number){
+    getComboboxDataContainer(index: number){
         if (this.listContainerType != null) {
             if(this.lstMasterContainers[index] == null){
                 this.containerTypes = dataHelper.prepareNg2SelectData(this.listContainerType, 'id', 'unitNameEn');
@@ -471,6 +504,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.containerTypes = [];
         }
     }
+    //-------------    End Container   -------------------//
+    
     async getWarehouses() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
             this.warehouses = res;
@@ -853,7 +888,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         'option 5', 'option 6', 'option 7'];
 
 
-    packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
+    //packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
     packagesUnitActive = ['PKG'];
 
     private value: any = {};

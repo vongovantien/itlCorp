@@ -15,13 +15,13 @@ namespace ReportPerview.Models
         {
             DataSource = new DataTable();
             SubReports = new List<SubReport>();
-            Parameter = new Dictionary<string, object>();
+            Parameters = new Dictionary<string, object>();
         }
         public Crystal(DataTable dataSource, List<SubReport> subReports, Dictionary<string, object> parameter)
         {
             this.DataSource = dataSource;
             this.SubReports = subReports;
-            this.Parameter = parameter;
+            this.Parameters = parameter;
         }
         public void SetParameter<T>(T obj)
         {
@@ -30,7 +30,7 @@ namespace ReportPerview.Models
             for (int i = 0; i < props.Count; i++)
             {
                 PropertyDescriptor prop = props[i];
-                Parameter.Add(prop.Name, obj.GetValueBy(prop.Name));
+                Parameters.Add(prop.Name, obj.GetValueBy(prop.Name));
             }
         }
         public string ReportFile { get; set; }
@@ -38,7 +38,7 @@ namespace ReportPerview.Models
         public ExportFormatType FormatType { get; set; }
         public DataTable DataSource { get; set; }
         public List<SubReport> SubReports { get; set; }
-        public Dictionary<string, object> Parameter { get; set; }
+        public Dictionary<string, object> Parameters { get; set; }
         public bool AllowPrint { get; set; }
         public bool AllowExport { get; set; }
     }

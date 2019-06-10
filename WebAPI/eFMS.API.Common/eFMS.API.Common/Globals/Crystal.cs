@@ -13,13 +13,13 @@ namespace eFMS.API.Common.Globals
         {
             DataSource = new DataTable();
             SubReports = new List<SubReport>();
-            parameter = new Dictionary<string, object>();
+            Parameters = new Dictionary<string, object>();
         }
         public Crystal(DataTable dataSource, List<SubReport> subReports, Dictionary<string, object> parameter)
         {
             this.DataSource = dataSource;
             this.SubReports = subReports;
-            this.parameter = parameter;
+            this.Parameters = parameter;
         }
         public void AddDataSource<T>(List<T> lst)
         {
@@ -36,7 +36,7 @@ namespace eFMS.API.Common.Globals
             for (int i = 0; i < props.Count; i++)
             {
                 PropertyDescriptor prop = props[i];
-                parameter.Add(prop.Name, obj.GetValueBy(prop.Name));
+                Parameters.Add(prop.Name, obj.GetValueBy(prop.Name));
             }
         }
         public string ReportFile { get; set; }
@@ -44,7 +44,7 @@ namespace eFMS.API.Common.Globals
         public ExportFormatType FormatType { get; set; }
         public DataTable DataSource { get; set; }
         public List<SubReport> SubReports { get; set; }
-        public Dictionary<string, object> parameter;
+        public Dictionary<string, object> Parameters;
         public bool AllowPrint { get; set; }
         public bool AllowExport { get; set; }
     }

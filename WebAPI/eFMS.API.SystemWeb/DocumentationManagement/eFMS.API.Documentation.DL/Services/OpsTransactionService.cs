@@ -43,7 +43,29 @@ namespace eFMS.API.Documentation.DL.Services
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
         }
-
+        public HandleState Delete(Guid id)
+        {
+            var result = DataContext.Delete(x => x.Id == id);
+            if (result.Success)
+            {
+                var assigneds = ((eFMSDataContext)DataContext.DC).OpsStageAssigned.Where(x => x.JobId == id);
+                if(assigneds != null)
+                {
+                    ((eFMSDataContext)DataContext.DC).OpsStageAssigned.RemoveRange(assigneds);
+                }
+                var detail = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault(x => x.Id == id);
+                if(detail != null)
+                {
+                    var surcharges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == detail.Hblid && x.Soano == null);
+                    if (surcharges != null)
+                    {
+                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.RemoveRange(surcharges);
+                    }
+                }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
+            }
+            return result;
+        }
         public OpsTransactionModel GetDetails(Guid id)
         {
             var details = DataContext.Where(x => x.Id == id).FirstOrDefault();
@@ -66,10 +88,10 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var data = Query(criteria);
             rowsCount = data.Count();
-            var totalProcessing = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Processing));
-            var totalfinish = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Finish));
-            var totalOverdued = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Overdued));
-            var totalCanceled = data.Count(x => x.CurrentStatus == Enum.GetName(typeof(JobStatus), JobStatus.Canceled));
+            var totalProcessing = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Processing));
+            var totalfinish = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Finish));
+            var totalOverdued = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Overdued));
+            var totalCanceled = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Canceled));
             if (rowsCount == 0) return null;
             if (size > 1)
             {
