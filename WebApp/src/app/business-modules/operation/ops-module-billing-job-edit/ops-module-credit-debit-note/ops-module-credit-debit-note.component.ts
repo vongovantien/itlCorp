@@ -51,13 +51,9 @@ export class OpsModuleCreditDebitNoteComponent implements OnInit {
     });
   }
 
-  
-  EditingCDNoteNo: string = null;
+
   openEdit(soaNo: string) {
-      this.EditingCDNoteNo = soaNo
-      setTimeout(() => {
-          // this.EditingCDNote = null;
-      }, 1000);
+      this.baseServices.setData("CurrentSOANo",soaNo);
   }
 
   SearchCDNotes(search_key: string) {
@@ -99,6 +95,20 @@ export class OpsModuleCreditDebitNoteComponent implements OnInit {
             if (this.listCDNotes[i].id === listBranch[k].partnerID) {
                 this.listCDNotes[i].listSOA = listBranch[k].list;
             }
+        }
+    }
+}
+
+cdNoteIdToDelete: string = null;
+async DeleteCDNote(stt: string, cdNoteId: string = null) {
+    if (stt == "confirm") {
+        console.log(cdNoteId);
+        this.cdNoteIdToDelete = cdNoteId;
+    }
+    if (stt == "ok") {
+        var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.cdNoteIdToDelete);
+        if (res.status) {
+            this.getAllCDNote();
         }
     }
 }

@@ -157,6 +157,7 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
           if (res.status) {
             $('#add-credit-debit-note-modal').modal('hide');
             this.CDNoteWorking = new AcctSOA();
+            this.listChargeOfPartner = [];
             this.resetAddSOAForm();
           }
         }
@@ -197,6 +198,12 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
   }
 
+
+  closeModal(form:NgForm,id_modal:string){
+    form.onReset();
+    $('#'+id_modal).modal('hide');
+    this.resetAddSOAForm();
+}
 
 
 

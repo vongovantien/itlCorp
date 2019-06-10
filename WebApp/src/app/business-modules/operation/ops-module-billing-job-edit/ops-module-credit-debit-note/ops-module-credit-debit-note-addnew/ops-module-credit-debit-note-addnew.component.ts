@@ -64,7 +64,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
 
     getListSubjectPartner() {
         this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + this.currentHbID + "&IsHouseBillID=true").subscribe((data: any[]) => {
-            this.listSubjectPartner = cloneDeep(data);
+            this.listSubjectPartner =  cloneDeep(data);
             this.constListSubjectPartner = cloneDeep(data);
             console.log(this.listSubjectPartner);
         });
@@ -82,7 +82,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
             });
             this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
             console.log(this.listChargeOfPartner);
-            //   this.setChargesForCDNote();
+            this.setChargesForCDNote();
             this.totalCreditDebitCalculate();
             //   this.addNewRemainingCharges.emit(this.listChargeOfPartner);
             //   this.currentPartnerIdEmit.emit(partnerId);
@@ -258,6 +258,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                     if (res.status) {
                         $('#ops-add-credit-debit-note-modal').modal('hide');
                         this.CDNoteWorking = new AcctSOA();
+                        this.baseServices.setData("listChargeOfPartner", []);
                         this.resetAddSOAForm();
                         
                     }
@@ -273,6 +274,15 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
             this.baseServices.setData("isNewCDNote",true);
             this.isDisplay = true;
         }, 300);
+    }
+
+
+    closeModal(form:NgForm,id_modal:string){
+        form.onReset();
+        this.resetAddSOAForm();
+        this.CDNoteWorking = new AcctSOA();
+        this.baseServices.setData("listChargeOfPartner", []);
+        $('#'+id_modal).modal('hide');        
     }
 
 
