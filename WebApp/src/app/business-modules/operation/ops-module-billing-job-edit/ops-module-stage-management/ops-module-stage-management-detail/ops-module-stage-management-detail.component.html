@@ -25,7 +25,7 @@
                                 <label class="form-control-label" for="">
                                     Role
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="" value="CS" disabled>
                             </div>
                         </div>
                     </div>
@@ -43,7 +43,19 @@
                                 <label class="form-control-label" for="">
                                     Deadline
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" 
+                                        ngxDaterangepickerMd 
+                                        [autoApply]="true" 
+                                        [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [singleDatePicker]="true" 
+                                        name="singledater" readonly/>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -53,7 +65,47 @@
                                 <label class="form-control-label" for="">
                                     Main person incharge
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" 
+                                        type="text"
+                                        readonly data-toggle="dropdown" 
+                                        placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>User Name</th>
+                                                                <th>Full Name</th>
+                                                                <th>Role</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>User Name</td>
+                                                            <td>Full Name</td>
+                                                            <td>Role</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -61,7 +113,47 @@
                                 <label class="form-control-label" for="">
                                     Real person incharge
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" 
+                                        type="text"
+                                        readonly data-toggle="dropdown" 
+                                        placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>User Name</th>
+                                                                <th>Full Name</th>
+                                                                <th>Role</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>User Name</td>
+                                                            <td>Full Name</td>
+                                                            <td>Role</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -89,7 +181,16 @@
                                 <label class="form-control-label" for="">
                                     Status
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                                <ng-select 
+                                    [allowClear]="true" 
+                                    [items]="statusStage" 
+                                    [active]="statusStageActive" 
+                                    [disabled]="disabled" 
+                                    (data)="refreshValue($event)"
+                                    (selected)="selected($event)" 
+                                    (typed)="typed($event)"
+                                    placeholder="Select filter">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
