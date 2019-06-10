@@ -8,7 +8,8 @@ import { API_MENU } from 'src/constants/api-menu.const';
 // import { ExtendData } from '../../../extend-data';
 import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
 import { async } from 'rxjs/internal/scheduler/async';
-
+import { NgForm } from '@angular/forms';
+declare var $: any;
 @Component({
     selector: 'app-ops-module-credit-debit-note-addnew',
     templateUrl: './ops-module-credit-debit-note-addnew.component.html',
@@ -54,7 +55,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                 this.currentHbID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
                 this.getListSubjectPartner();
             }
-            if(this.STORAGE_DATA.listChargeOfPartner !== undefined){
+            if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
                 this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
                 this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
             }
@@ -172,7 +173,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                 const indexSingle = parseInt($(chargesElements[i]).attr("data-id"));
                 var parentElement = $(chargesElements[i]).closest('tbody').find('input.group-charge-hb-select')[0];
 
-                const indexParent = parseInt($(parentElement).attr("data-id"));
+                const indexParent = 0;//parseInt($(parentElement).attr("data-id"));
                 $(parentElement).prop("checked", false);
 
                 this.listChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = true;
@@ -240,6 +241,39 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
         return s;
     }
 
+    CreateCDNote(form: NgForm) {
+        setTimeout(async () => {
+            if (form.submitted) {
+                var errors = $('#ops-add-credit-debit-note-modal').find('div.has-danger');
+                if (errors.length == 0) {
+                    this.CDNoteWorking.jobId = this.STORAGE_DATA.CurrentOpsTransaction.id;
+                    this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
+                    this.CDNoteWorking.currencyId = "USD" // in the future , this id must be local currency of each country
+                    this.CDNoteWorking.listShipmentSurcharge = filter(this.CDNoteWorking.listShipmentSurcharge, function (o: any) {
+                        return !o.isRemaining;
+                    });
+
+                    console.log(this.CDNoteWorking);
+                    var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
+                    if (res.status) {
+                        $('#ops-add-credit-debit-note-modal').modal('hide');
+                        this.CDNoteWorking = new AcctSOA();
+                        this.resetAddSOAForm();
+                        
+                    }
+                }
+            }
+        }, 300);
+    }
+
+    resetAddSOAForm() {
+        // this.newCDNote.emit(true);
+        this.isDisplay = false;
+        setTimeout(() => {
+            this.baseServices.setData("isNewCDNote",true);
+            this.isDisplay = true;
+        }, 300);
+    }
 
 
     /**

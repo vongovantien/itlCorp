@@ -30,7 +30,7 @@ export class CreditAndDebitNoteComponent implements OnInit {
 
 
     getAllCDNote() {
-        this.baseServices.get(this.api_menu.Documentation.AcctSOA.getAll + "?JobId=" + ExtendData.currentJobID).subscribe((data: any) => {
+        this.baseServices.get(this.api_menu.Documentation.AcctSOA.getAll + "?Id=" + ExtendData.currentJobID+"&IsHouseBillID=false").subscribe((data: any) => {
             this.listCDNotes = cloneDeep(data);
             this.constListCDNotes = cloneDeep(data);
         });
