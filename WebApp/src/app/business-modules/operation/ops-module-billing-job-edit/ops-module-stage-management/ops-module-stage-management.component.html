@@ -33,7 +33,7 @@
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                     <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        data-toggle="modal" data-target="">
+                        data-toggle="modal" data-target="#ops-add-stage-modal">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -88,7 +88,8 @@
                 <tbody class="tbody-group">
                     <tr>
                         <td class="table-actions-col no-sorting">
-                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
+                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit"
+                                data-toggle="modal" data-target="#ops-detail-stage-modal">
                                 <i class="la la-edit"></i>
                             </button>
                         </td>
@@ -129,4 +130,11 @@
         <!--end: Datatable-->   
     </div>
 </div>
-<!--end:: m-portlet-->
+
+<!--begin:: ops-add-stage-modal-->
+<app-ops-module-stage-management-addnew></app-ops-module-stage-management-addnew>
+<!--end:: ops-add-stage-modal-->
+
+<!--begin:: ops-detail-stage-modal-->
+<app-ops-module-stage-management-detail></app-ops-module-stage-management-detail>
+<!--end:: ops-detail-stage-modal-->
