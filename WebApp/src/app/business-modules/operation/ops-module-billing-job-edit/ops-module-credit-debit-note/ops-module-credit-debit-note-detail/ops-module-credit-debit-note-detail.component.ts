@@ -44,4 +44,12 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
     console.log(this.CDNoteEditing);
 }
 
+
+editCDNote() {
+  $('#ops-credit-debit-note-detail-modal').modal('hide');
+  $('#ops-credit-debit-note-edit-modal').modal('show');
+  // this.CdNoteEditingEmiter.emit(this.CDNoteEditing);
+  this.baseServices.setData("CDNoteEditing",this.CDNoteEditing);
+}
+
 }
