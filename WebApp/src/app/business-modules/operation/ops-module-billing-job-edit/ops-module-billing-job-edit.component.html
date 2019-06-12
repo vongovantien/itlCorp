@@ -222,15 +222,15 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && hblno.invalid}">
+                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && hwbno.invalid}">
                                             <label class="form-control-label" for="">
                                                 HBL No <span class="m--font-danger">(*)</span>
                                             </label>
                                             <input type="text" required class="form-control m-input m-input--square"
-                                                placeholder="Enter text" name="hblno" [(ngModel)]="opsTransaction.hblno"
-                                                #hblno="ngModel">
+                                                placeholder="Enter text" name="hwbno" [(ngModel)]="opsTransaction.hwbno"
+                                                #hwbno="ngModel">
                                             <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && hblno.invalid">
+                                                *ngIf="addOpsForm.submitted && hwbno.invalid">
                                                 HBL No is required!
                                             </div>
                                         </div>
@@ -751,12 +751,12 @@
                                             </td>
                                             <td>
                                                 <span>
-                                                    Settle payment
+                                                    <!-- Settle payment -->
                                                 </span>
                                             </td>
                                             <td>
                                                 <span>
-                                                    charge.exchangeDate | date:'dd/MM/yyyy'
+                                                   {{charge.exchangeDate | date:'dd/MM/yyyy'}}
                                                 </span>
                                             </td>
                                         </tr>
@@ -962,7 +962,7 @@
                                             </td>
                                             <td>
                                                 <span>
-                                                    Settle payment
+                                                    <!-- Settle payment -->
                                                 </span>
                                             </td>
                                             <td>
@@ -1182,7 +1182,7 @@
                                             </td>
                                             <td>
                                                 <span>
-                                                    Settle payment
+                                                    <!-- Settle payment -->
                                                 </span>
                                             </td>
                                             <td>

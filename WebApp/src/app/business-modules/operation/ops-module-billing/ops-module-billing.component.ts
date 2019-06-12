@@ -80,7 +80,7 @@ export class OpsModuleBillingComponent implements OnInit {
     searchShipment(){
         this.pager.totalItems = 0;
         this.criteria.jobNo =null;
-        this.criteria.hblno = null;
+        this.criteria.hwbno = null;
         this.criteria.all = null;
         if(this.isFilterTime){
             this.criteria.serviceDateFrom = this.selectedRange.startDate;
@@ -94,7 +94,7 @@ export class OpsModuleBillingComponent implements OnInit {
             this.criteria.jobNo = this.searchString;
         }
         else if(this.selectedFilter === 'HBL'){
-            this.criteria.hblno = this.searchString;
+            this.criteria.hwbno = this.searchString;
         }
         else{
             this.criteria.all = this.searchString;

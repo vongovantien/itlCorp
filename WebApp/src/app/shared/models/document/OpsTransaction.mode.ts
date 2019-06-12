@@ -25,7 +25,7 @@ export class OpsTransaction {
         serviceMode: string = null;
         productService: string = null;
         serviceDate: any = null;
-        hblno: string = null;
+        hwbno: string = null;
         mblno: string = null;
         jobNo: string = null;
         id: string = "00000000-0000-0000-0000-000000000000";

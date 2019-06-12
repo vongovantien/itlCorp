@@ -8,6 +8,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 @Component({
     selector: 'app-ops-module-billing-job-create',
     templateUrl: './ops-module-billing-job-create.component.html',
@@ -58,7 +59,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
     }
 
     private getListPorts() {
-        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { inactive: false }).subscribe((res: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, {placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.listPort = res;
             console.log(this.listPort)
         });

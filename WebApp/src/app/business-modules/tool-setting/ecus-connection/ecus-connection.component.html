@@ -276,9 +276,9 @@
                                     <div>
                                         <label class="m-checkbox">
                                             <input type="checkbox" name="ecusStatus"
-                                                [checked]="EcusConnectionAdd.inactive"
+                                                [checked]="!EcusConnectionAdd.inactive"
                                                 (change)="EcusConnectionAdd.inactive=!EcusConnectionAdd.inactive">
-                                            <!-- Active -->
+                                            Active
                                             <span></span>
                                         </label>
                                     </div>
@@ -430,10 +430,10 @@
                                         </label>
                                         <div>
                                             <label class="m-checkbox">
-                                                <input type="checkbox" [checked]="EcusConnectionEdit.inactive"
+                                                <input type="checkbox" [checked]="!EcusConnectionEdit.inactive"
                                                     name="edtEcusStatus"
                                                     (change)="EcusConnectionEdit.inactive=!EcusConnectionEdit.inactive">
-                                                <!-- Active -->
+                                                Active
                                                 <span></span>
                                             </label>
                                         </div>

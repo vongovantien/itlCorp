@@ -25,9 +25,9 @@
                                 <label class="form-control-label" for="">
                                     HBL No <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="text" (change)="OpsTransactionToAdd.hblno=OpsTransactionToAdd.hblno.trim()"
+                                <input type="text" (change)="OpsTransactionToAdd.hwbno=OpsTransactionToAdd.hwbno.trim()"
                                     required class="form-control m-input m-input--square"
-                                    [(ngModel)]="OpsTransactionToAdd.hblno" placeholder="Enter text" #opsHbl="ngModel"
+                                    [(ngModel)]="OpsTransactionToAdd.hwbno" placeholder="Enter text" #opsHbl="ngModel"
                                     name="opsHbl" autofocus>
                                 <div class="form-control-feedback" *ngIf="addOpsForm.submitted && opsHbl.invalid">
                                     HBL No is required!
