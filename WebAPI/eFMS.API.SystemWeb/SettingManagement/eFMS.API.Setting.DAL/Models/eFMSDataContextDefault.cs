@@ -2252,10 +2252,7 @@ namespace eFMS.API.Setting.Service.Models
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasColumnType("numeric(18, 0)")
-                    .ValueGeneratedOnAdd();
+                entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Cbm)
                     .HasColumnName("CBM")
@@ -2276,11 +2273,18 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
+
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ExportCountryId).HasColumnName("ExportCountryID");
+                entity.Property(e => e.ExportCountryId)
+                    .HasColumnName("ExportCountryID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.FirstClearanceNo).HasMaxLength(50);
 
@@ -2295,7 +2299,14 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ImportcountryId).HasColumnName("ImportcountryID");
+                entity.Property(e => e.IdfromEcus)
+                    .HasColumnName("IDFromECus")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ImportcountryId)
+                    .HasColumnName("ImportcountryID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Mblid)
                     .HasColumnName("MBLID")
@@ -2306,9 +2317,7 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Pcs)
-                    .HasColumnName("PCS")
-                    .HasMaxLength(200);
+                entity.Property(e => e.Pcs).HasColumnName("PCS");
 
                 entity.Property(e => e.PortCodeCk)
                     .HasColumnName("PortCodeCK")
@@ -2334,6 +2343,14 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });

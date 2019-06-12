@@ -5,7 +5,8 @@ namespace eFMS.API.Setting.Service.Models
 {
     public partial class CustomsDeclaration
     {
-        public decimal Id { get; set; }
+        public int Id { get; set; }
+        public decimal? IdfromEcus { get; set; }
         public string ClearanceNo { get; set; }
         public string FirstClearanceNo { get; set; }
         public string CustomerId { get; set; }
@@ -22,15 +23,19 @@ namespace eFMS.API.Setting.Service.Models
         public string Type { get; set; }
         public string Route { get; set; }
         public string DocumentType { get; set; }
-        public Guid? ExportCountryId { get; set; }
-        public Guid? ImportcountryId { get; set; }
+        public string ExportCountryId { get; set; }
+        public string ImportcountryId { get; set; }
         public int? CommodityId { get; set; }
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
         public int? ContQuantity { get; set; }
-        public string Pcs { get; set; }
+        public int? Pcs { get; set; }
         public string Source { get; set; }
         public string Note { get; set; }
+        public string UserCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }

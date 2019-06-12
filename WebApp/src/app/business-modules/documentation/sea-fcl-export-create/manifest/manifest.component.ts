@@ -112,19 +112,24 @@ export class ManifestComponent implements OnInit {
         this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
-        
-        var id = this.previewModalId;
-        var _this = this;
-        var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
-        console.log(response);
-        this.dataReport = response;
-        var checkExist = setInterval(function() {
-            if ($('#frame').length) {
-                console.log("Exists!");
-                $('#' + id).modal('show');
-                clearInterval(checkExist);
-            }
-         }, 100);
+        if(this.manifest.csTransactionDetails.length == 0)
+        {
+            this.baseServices.errorToast("This manifest must have at least 1 housebilll.");
+        }
+        else{
+            var id = this.previewModalId;
+            var _this = this;
+            var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
+            console.log(response);
+            this.dataReport = response;
+            var checkExist = setInterval(function() {
+                if ($('#frame').length) {
+                    console.log("Exists!");
+                    $('#' + id).modal('show');
+                    clearInterval(checkExist);
+                }
+             }, 100);
+        }
     }
     
     removeAllChecked(){

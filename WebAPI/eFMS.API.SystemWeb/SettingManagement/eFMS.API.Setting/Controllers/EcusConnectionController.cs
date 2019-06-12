@@ -7,15 +7,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using eFMS.API.Setting.DL.Common;
 using Microsoft.Extensions.Localization;
-using SystemManagementAPI.Infrastructure.Middlewares;
+using eFMS.API.Setting.Infrastructure.Middlewares;
 using ITL.NetCore.Common.Items;
 using ITL.NetCore.Common;
 using eFMS.API.Setting.DL.Models;
-using eFMS.API.System.Infrastructure.Common;
+using eFMS.API.Setting.Infrastructure.Common;
 using eFMS.API.Common;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.DL.Models.Ecus;
 using Microsoft.AspNetCore.Authorization;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -28,7 +29,7 @@ namespace eFMS.API.Setting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IEcusConnectionService ecusConnectionService;
 
-        public EcusConnectionController(IStringLocalizer<SystemManagementAPI.Resources.LanguageSub> localizer, IEcusConnectionService service)
+        public EcusConnectionController(IStringLocalizer<eFMS.API.Setting.Resources.LanguageSub> localizer, IEcusConnectionService service)
         {
             stringLocalizer = localizer;
             ecusConnectionService = service;

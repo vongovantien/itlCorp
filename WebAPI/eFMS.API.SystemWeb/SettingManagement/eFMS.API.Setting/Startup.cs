@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Setting.Service;
-using eFMS.API.System.Infrastructure;
-using eFMS.API.System.Infrastructure.Filters;
-using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.API.Setting.Infrastructure;
+using eFMS.API.Setting.Infrastructure.Filters;
+using eFMS.API.Setting.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -21,7 +21,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace SystemManagementAPI
+namespace eFMS.API.Setting
 {
 
     public class Startup

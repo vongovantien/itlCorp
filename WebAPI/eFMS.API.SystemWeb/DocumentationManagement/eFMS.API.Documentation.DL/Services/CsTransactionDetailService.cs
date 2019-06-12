@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Common.NoSql;
+using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -432,6 +434,37 @@ namespace eFMS.API.Documentation.DL.Services
 
             return hs;
           
+        }
+
+        public Crystal Preview(CsTransactionDetailModel model)
+        {
+            if (model == null)
+            {
+                return null;
+            }
+            Crystal result = null;
+            var parameter = new SeaHBillofLadingITLFrameParameter
+            {
+                Packages = model.PackageContainer,
+                GrossWeight = model.GW == null ? (decimal)model.GW : 0,
+                Measurement = string.Empty
+            };
+            result = new Crystal
+            {
+                ReportName = "SeaHBillofLadingITLFrame.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            var housebills = new List<SeaHBillofLadingITLFrame>();
+            //continue
+            var freightCharges = new List<FreightCharge>();
+            if (freightCharges.Count == 0)
+                return null;
+            result.AddDataSource(housebills);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.AddSubReport("Freightcharges", freightCharges);
+            result.SetParameter(parameter);
+            return result;
         }
     }
 }
