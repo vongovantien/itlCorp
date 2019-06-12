@@ -6,7 +6,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Create Credit/Debit Note</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeModal(addCDNoteForm,'add-credit-debit-note-modal')">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -235,7 +235,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" (click)="closeModal(addCDNoteForm,'add-credit-debit-note-modal')" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

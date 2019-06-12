@@ -1170,7 +1170,7 @@
 <!--end:: m-portlet-->
 
 
-<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm" *ngIf="isDisplay"
+<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm" 
     (ngSubmit)="addBuyingRateChargeForm.form.valid">
     <!--begin:: add-buying-rate-modal-->
     <div class="modal fade" id="add-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -1186,7 +1186,7 @@
                     </button>
                 </div>
 
-                <div class="modal-body">
+                <div class="modal-body" *ngIf="isDisplay">
                     <!--begin::Form-->
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -1801,11 +1801,8 @@
                                         (selected)="SellingRateChargeToAdd.objectBePaid=$event.id;
                                         SellingRateChargeToAdd.objectBePaid==='AGENT'? SellingRateChargeToAdd.paymentObjectId=MasterBillData.agentId:null;
                                         SellingRateChargeToAdd.objectBePaid==='CUSTOMER'? SellingRateChargeToAdd.paymentObjectId=houseBillSelected.customerId:null;
-                                        SellingRateChargeToAdd.objectBePaid==='CUSTOMER'? selectedSellingRatePartner.value=houseBillSelected.customerName:null;
-                                        SellingRateChargeToAdd.objectBePaid==='AGENT'? selectedSellingRatePartner.value=MasterBillData.agentName:null;
-                                        SellingRateChargeToAdd.objectBePaid==='OTHER'? selectedSellingRatePartner.value=null:null;
                                         SellingRateChargeToAdd.objectBePaid==='OTHER'? SellingRateChargeToAdd.paymentObjectId=null:null;selectPartnerType();"
-                                        (removed)="SellingRateChargeToAdd.objectBePaid=null;SellingRateChargeToAdd.paymentObjectId=null;selectedSellingRatePartner.value=null"
+                                        (removed)="SellingRateChargeToAdd.objectBePaid=null;SellingRateChargeToAdd.paymentObjectId=null"
                                         (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                     <div class="form-control-feedback"
@@ -2068,7 +2065,7 @@
                                                 SellingRateChargeToEdit.objectBePaid==='AGENT'? SellingRateChargeToEdit.partnerName=MasterBillData.agentName:null;
                                                 SellingRateChargeToEdit.objectBePaid==='OTHER'? SellingRateChargeToEdit.partnerName=null:null;
                                                 SellingRateChargeToEdit.objectBePaid==='OTHER'? SellingRateChargeToEdit.paymentObjectId=null:null;selectPartnerType();"
-                                        (removed)="BuyingRateChargeToAdd.objectBePaid=null;SellingRateChargeToEdit.paymentObjectId=null;selectedSellingRatePartnerEdt.value=null"
+                                        (removed)="BuyingRateChargeToAdd.objectBePaid=null;SellingRateChargeToEdit.paymentObjectId=null"
                                         (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                     <div class="form-control-feedback"

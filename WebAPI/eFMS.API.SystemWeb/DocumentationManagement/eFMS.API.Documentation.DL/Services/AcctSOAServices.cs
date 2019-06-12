@@ -253,14 +253,30 @@ namespace eFMS.API.Documentation.DL.Services
 
         public object GetSOADetails(Guid JobId, string SOACode)
         {
-            var Shipment = ((eFMSDataContext)DataContext.DC).CsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
+            
             var Soa = DataContext.Where(x => x.Code == SOACode).FirstOrDefault();
             var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == Soa.PartnerId).FirstOrDefault();
 
-            var pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment.Pol).FirstOrDefault();
-            var pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment.Pod).FirstOrDefault();
+            CatPlace pol = new CatPlace();
+            CatPlace pod = new CatPlace();
 
-            if (Shipment==null || Soa == null || partner==null)
+            var Shipment1 = ((eFMSDataContext)DataContext.DC).CsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
+            var Shipment2 = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
+
+            if(Shipment1 != null)
+            {
+                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment1.Pol).FirstOrDefault();
+                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment1.Pod).FirstOrDefault();
+            }
+            else
+            {
+                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment2.Pol).FirstOrDefault();
+                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment2.Pod).FirstOrDefault();
+            }
+
+            
+
+            if ((Shipment1==null && Shipment2==null) || Soa == null || partner==null)
             {
                 return null;
             }
@@ -278,17 +294,21 @@ namespace eFMS.API.Documentation.DL.Services
 
                 charge.Currency = ((eFMSDataContext)DataContext.DC).CatCurrency.First(x => x.Id == charge.CurrencyId).CurrencyName;
                 charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
-                charge.hwbno = hb.Hwbno;
+                charge.hwbno = hb!=null ? hb.Hwbno : Shipment2.Hwbno;
                 charge.Unit = ((eFMSDataContext)DataContext.DC).CatUnit.First(x => x.Id == charge.UnitId).UnitNameEn;
                 charge.ChargeCode = catCharge.Code;
                 charge.NameEn = catCharge.ChargeNameEn;
                 listSurcharges.Add(charge);
-                HBList.Add(hb);                
-                HBList = HBList.Distinct().ToList().OrderBy(x => x.Hwbno).ToList();
+                if (hb != null)
+                {
+                    HBList.Add(hb);
+                }
+                     
+                HBList = HBList.Distinct().ToList().OrderBy(x => x?.Hwbno).ToList();
             }
 
-            var hbOfLadingNo = string.Empty;
-            var mbOfLadingNo = string.Empty;
+            var hbOfLadingNo = Shipment2!=null? Shipment2.Hwbno: string.Empty;
+            var mbOfLadingNo = Shipment2!=null? Shipment2.JobNo: string.Empty;
             var hbConstainers = string.Empty;
             decimal? volum = 0;
             foreach(var item in HBList)
@@ -318,17 +338,17 @@ namespace eFMS.API.Documentation.DL.Services
                 partnerId = partner?.Id,
                 hbLadingNo = hbOfLadingNo,
                 mbLadingNo = mbOfLadingNo,
-                jobId = Shipment.Id,
+                jobId = Shipment1 != null? Shipment1.Id:Shipment2.Id, 
                 pol = pol?.NameEn,
                 polCountry = pol==null?null:countries.Where(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn,
 
                 pod = pod?.NameEn,
                 podCountry = pod==null?null:countries.Where(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn,
 
-                vessel = Shipment?.FlightVesselName,
+                vessel = Shipment1!=null?Shipment1.FlightVesselName:Shipment2.FlightVessel, 
                 hbConstainers,
-                etd= Shipment?.Etd,
-                eta= Shipment?.Eta,
+                etd= Shipment1!=null?Shipment1.Etd:Shipment2.ServiceDate,  //Shipment?.Etd,
+                eta= Shipment1!=null?Shipment1.Eta:Shipment2.FinishDate, //Shipment?.Eta,
                 //soaNo = Soa.Code,
                 isLocked = false, // need update later 
                 volum,
