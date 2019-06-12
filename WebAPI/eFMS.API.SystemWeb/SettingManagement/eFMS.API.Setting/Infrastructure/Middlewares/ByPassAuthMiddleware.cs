@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace eFMS.API.System.Infrastructure.Middlewares
+namespace eFMS.API.Setting.Infrastructure.Middlewares
 {
     class ByPassAuthMiddleware
     {

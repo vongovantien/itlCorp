@@ -2,11 +2,11 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using eFMS.API.System.Infrastructure.Common;
+using eFMS.API.Setting.Infrastructure.Common;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace eFMS.API.System.Infrastructure.Middlewares
+namespace eFMS.API.Setting.Infrastructure.Middlewares
 {
     public class ErrorHandlingMiddleware
     {

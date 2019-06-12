@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "SystemManagementAPI": {
+    "eFMS.API.Setting": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/employee",

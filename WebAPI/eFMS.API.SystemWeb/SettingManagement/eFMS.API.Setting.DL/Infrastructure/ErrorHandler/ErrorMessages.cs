@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace eFMS.API.System.DL.Infrastructure.ErrorHandler
+namespace eFMS.API.Setting.DL.Infrastructure.ErrorHandler
 {
     public class ErrorHandler : IErrorHandler
     {

@@ -2,7 +2,7 @@
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.Service.Models;
 
-namespace eFMS.API.System.Infrastructure
+namespace eFMS.API.Setting.Infrastructure
 {
     public class MappingProfile : Profile
     {
@@ -13,6 +13,7 @@ namespace eFMS.API.System.Infrastructure
             //CreateMap<SysUserGroupModel, SysUserGroup>();
             //CreateMap<SysUserGroupEditModel, SysUserGroupModel>();
             CreateMap<SetEcusconnection, SetEcusConnectionModel > ();
+            CreateMap<CustomsDeclaration, CustomsDeclarationModel>();
         }
     }
 }

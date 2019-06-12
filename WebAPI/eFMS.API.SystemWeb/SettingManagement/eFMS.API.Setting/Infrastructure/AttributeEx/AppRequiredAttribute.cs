@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using SystemManagementAPI.Resources;
+using eFMS.API.Setting.Resources;
 
-namespace eFMS.API.System.Infrastructure.AttributeEx
+namespace eFMS.API.Setting.Infrastructure.AttributeEx
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
     public class AppRequiredAttribute : RequiredAttribute

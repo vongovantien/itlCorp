@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace eFMS.API.System.Infrastructure.Filters
+namespace eFMS.API.Setting.Infrastructure.Filters
 {
     public class AuthorizeCheckOperationFilter : IOperationFilter
     {
@@ -25,7 +25,7 @@ namespace eFMS.API.System.Infrastructure.Filters
                 operation.Security = new List<IDictionary<string, IEnumerable<string>>>();
                 operation.Security.Add(new Dictionary<string, IEnumerable<string>>
                 {
-                    { "oauth2", new [] { "systemmanagementapi" } }
+                    { "oauth2", new [] { "eFMS.API.Setting" } }
                 });
             }
         }

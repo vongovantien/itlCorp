@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace SystemManagementAPI
+namespace eFMS.API.Setting
 {
     public class Program
     {

@@ -7,7 +7,7 @@ using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SystemManagementAPI.Infrastructure.Middlewares;
+using eFMS.API.Setting.Infrastructure.Middlewares;
 
 namespace eFMS.API.Setting.Controllers
 {

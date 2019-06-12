@@ -72,80 +72,141 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        //public Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)
+        //{
+        //    Crystal result = new Crystal();
+        //    var contHouseBills = new List<ShippingInstructionContainer>();
+        //    List<ContainerObject> listContainerTypes = new List<ContainerObject>();
+        //    List<ContainerObject> listPackageTypes = new List<ContainerObject>();
+        //    if (model.CsTransactionDetails != null)
+        //    {
+        //        decimal? sumGW = 0;
+        //        decimal? sumCBM = 0;
+        //        foreach (var transactionDetail in model.CsTransactionDetails)
+        //        {
+        //            var item = new ShippingInstructionContainer();
+        //            if (transactionDetail.CsMawbcontainers != null)
+        //            {
+        //                item.ContainerSealNo = string.Empty;
+        //                item.PackagesNote = string.Empty;
+        //                foreach (var container in transactionDetail.CsMawbcontainers)
+        //                {
+        //                    listContainerTypes.Add(new ContainerObject { Quantity = (int)container.Quantity, Name = container.ContainerTypeName });
+        //                    item.ContainerSealNo += container.Quantity + "X" + container.ContainerTypeName + " ";
+        //                    if (!string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
+        //                    {
+        //                        item.ContainerSealNo += container.ContainerNo + "/" + item.ContainerSealNo + ", ";
+        //                    }
+        //                    if (container.PackageQuantity != null && container.PackageTypeId != null)
+        //                    {
+        //                        item.PackagesNote += container.PackageQuantity + " " + container.PackageTypeName;
+        //                        listPackageTypes.Add(new ContainerObject { Quantity = (int)container.PackageQuantity, Name = container.PackageTypeName });
+        //                    }
+        //                    item.DesOfGoods = string.Join(",", transactionDetail.CsMawbcontainers.Select(x => x.Description));
+        //                    item.GW = transactionDetail.CsMawbcontainers.Sum(x => x.Gw);
+        //                    item.CBM = transactionDetail.CsMawbcontainers.Sum(x => x.Cbm);
+        //                    sumCBM += item.CBM;
+        //                    sumGW += item.GW;
+        //                }
+        //            }
+        //            contHouseBills.Add(item);
+        //        }
+        //        if(contHouseBills.Count > 0)
+        //        {
+        //            contHouseBills.ForEach(x => {
+        //                x.SumGrossWeight = sumGW;
+        //                x.SumVolume = sumCBM;
+        //            });
+        //        }
+        //    }
+        //    var s = listContainerTypes.GroupBy(x => new { x.Quantity, x.Name });
+        //    var t = listPackageTypes.GroupBy(x => new { x.Quantity, x.Name });
+        //    var shippingIns = new List<ShippingInstructionReportResult>();
+        //    var si = new ShippingInstructionReportResult
+        //    {
+        //        IssuedUserName = model.IssuedUserName,
+        //        IssuedUserTel = string.Empty,
+        //        SupplierName = model.SupplierName,
+        //        InvoiceNoticeRecevier = model.InvoiceNoticeRecevier,
+        //        BookingNo = model.BookingNo,
+        //        InvoiceDate = model.InvoiceDate?.ToString("dd MMMM, yyyy"),
+        //        LoadingDate = model.LoadingDate?.ToString("dd MMMM, yyyy"),
+        //        Shipper = model.Shipper,
+        //        ConsigneeDescription = model.ConsigneeDescription,
+        //        CargoNoticeRecevier = model.CargoNoticeRecevier,
+        //        PodName = model.PodName,
+        //        PolName = model.PolName,
+        //        PoDelivery = model.PoDelivery,
+        //        VesselNo = model.VoyNo,
+        //        Remark = model.Remark,
+        //        PaymenType = model.PaymenType
+        //    };
+        //    shippingIns.Add(si);
+        //    result.ReportName = "rptShippingInstruction.rpt";
+        //    result.AddDataSource(shippingIns);
+        //    result.FormatType = ExportFormatType.PortableDocFormat;
+        //    result.AddSubReport("ShippingInstructionContainerList", contHouseBills);
+        //    return result;
+        //}
+
         public Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)
         {
             Crystal result = new Crystal();
-            var contHouseBills = new List<ShippingInstructionContainer>();
-            List<ContainerObject> listContainerTypes = new List<ContainerObject>();
-            List<ContainerObject> listPackageTypes = new List<ContainerObject>();
+            var instructions = new List<SeaShippingInstruction>();
+            var parameter = new SeaShippingInstructionParameter
+            {
+                CompanyName = "itl",
+                CompanyAddress1 = "52 Trường Sơn",
+                CompanyAddress2 = "54 Trường Sơn",
+                CompanyDescription = "itl company",
+                Contact = model.IssuedUserName,
+                Tel = string.Empty,
+                Website = string.Empty,
+                DecimalNo = 2
+            };
             if (model.CsTransactionDetails != null)
             {
-                decimal? sumGW = 0;
-                decimal? sumCBM = 0;
-                foreach (var transactionDetail in model.CsTransactionDetails)
+                foreach(var item in model.CsTransactionDetails)
                 {
-                    var item = new ShippingInstructionContainer();
-                    if (transactionDetail.CsMawbcontainers != null)
+                    var instruction = new SeaShippingInstruction
                     {
-                        item.ContainerSealNo = string.Empty;
-                        item.PackagesNote = string.Empty;
-                        foreach (var container in transactionDetail.CsMawbcontainers)
-                        {
-                            listContainerTypes.Add(new ContainerObject { Quantity = (int)container.Quantity, Name = container.ContainerTypeName });
-                            item.ContainerSealNo += container.Quantity + "X" + container.ContainerTypeName + " ";
-                            if (!string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
-                            {
-                                item.ContainerSealNo += container.ContainerNo + "/" + item.ContainerSealNo + ", ";
-                            }
-                            if (container.PackageQuantity != null && container.PackageTypeId != null)
-                            {
-                                item.PackagesNote += container.PackageQuantity + " " + container.PackageTypeName;
-                                listPackageTypes.Add(new ContainerObject { Quantity = (int)container.PackageQuantity, Name = container.PackageTypeName });
-                            }
-                            item.DesOfGoods = string.Join(",", transactionDetail.CsMawbcontainers.Select(x => x.Description));
-                            item.GW = transactionDetail.CsMawbcontainers.Sum(x => x.Gw);
-                            item.CBM = transactionDetail.CsMawbcontainers.Sum(x => x.Cbm);
-                            sumCBM += item.CBM;
-                            sumGW += item.GW;
-                        }
-                    }
-                    contHouseBills.Add(item);
-                }
-                if(contHouseBills.Count > 0)
-                {
-                    contHouseBills.ForEach(x => {
-                        x.SumGrossWeight = sumGW;
-                        x.SumVolume = sumCBM;
-                    });
+                        Attn = item.NotifyParty,
+                        ToPartner = model.SupplierName,
+                        Re = model.BookingNo,
+                        DatePackage = model.InvoiceDate == null? model.InvoiceDate: null,
+                        ShipperDf = model.ActualShipperDescription,
+                        GoodsDelivery = model.ConsigneeDescription,
+                        NotitfyParty = item.NotifyParty,
+                        PortofLoading = model.PolName,
+                        PortofDischarge = model.PodName,
+                        PlaceDelivery = model.PoDelivery,
+                        Vessel = model.VoyNo,
+                        Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
+                        ShippingMarks = item.ShippingMark,
+                        Containers = item.ContainerNames,
+                        ContSealNo = item.OceanVoyNo,
+                        NoofPeace = item.PackageContainer,
+                        SIDescription = model.GoodsDescription,
+                        GrossWeight = (decimal)model?.GrossWeight,
+                        CBM = 200,
+                        Qty = "200",
+                        RateRequest = model.Remark,
+                        Payment = model.PaymenType,
+                        ShippingMarkImport = string.Empty
+                    };
+                    instructions.Add(instruction);
                 }
             }
-            var s = listContainerTypes.GroupBy(x => new { x.Quantity, x.Name });
-            var t = listPackageTypes.GroupBy(x => new { x.Quantity, x.Name });
-            var shippingIns = new List<ShippingInstructionReportResult>();
-            var si = new ShippingInstructionReportResult
+            result = new Crystal
             {
-                IssuedUserName = model.IssuedUserName,
-                IssuedUserTel = string.Empty,
-                SupplierName = model.SupplierName,
-                InvoiceNoticeRecevier = model.InvoiceNoticeRecevier,
-                BookingNo = model.BookingNo,
-                InvoiceDate = model.InvoiceDate?.ToString("dd MMMM, yyyy"),
-                LoadingDate = model.LoadingDate?.ToString("dd MMMM, yyyy"),
-                Shipper = model.Shipper,
-                ConsigneeDescription = model.ConsigneeDescription,
-                CargoNoticeRecevier = model.CargoNoticeRecevier,
-                PodName = model.PodName,
-                PolName = model.PolName,
-                PoDelivery = model.PoDelivery,
-                VesselNo = model.VoyNo,
-                Remark = model.Remark,
-                PaymenType = model.PaymenType
+                ReportName = "SeaShippingInstructionNew.rpt",
+                AllowPrint = true,
+                AllowExport = true
             };
-            shippingIns.Add(si);
-            result.ReportName = "rptShippingInstruction.rpt";
-            result.AddDataSource(shippingIns);
+            result.AddDataSource(instructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            result.AddSubReport("ShippingInstructionContainerList", contHouseBills);
+            //result.AddSubReport("FreightManifest", freightManifests);
+            result.SetParameter(parameter);
             return result;
         }
 

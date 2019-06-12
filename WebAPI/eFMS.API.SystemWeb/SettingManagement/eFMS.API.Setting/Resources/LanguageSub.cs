@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SystemManagementAPI.Resources
+namespace eFMS.API.Setting.Resources
 {
     public class LanguageSub
     {
@@ -29,5 +29,6 @@ namespace SystemManagementAPI.Resources
         public static readonly string MSG_CODE_EXISTED = "MSG_CODE_EXISTED";
         public static readonly string MSG_DELETE_FAIL_INCLUDED_CHILD = "MSG_DELETE_FAIL_INCLUDED_CHILD";
         public static readonly string EF_ANNOTATIONS_REQUIRED = "EF_ANNOTATIONS_REQUIRED";
+        public static readonly string MSG_CLEARANCENO_EXISTED = "MSG_CLEARANCENO_EXISTED";
     }
 }

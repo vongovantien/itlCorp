@@ -358,27 +358,6 @@ namespace eFMS.API.Documentation.DL.Services
             var freightManifests = new List<FreightManifest>();
             if (model.CsTransactionDetails.Count > 0)
             {
-                //var manifest = new SeaCargoManifest
-                //{
-                //    TransID = item.JobNo,
-                //    HBL = item.Hwbno,
-                //    Marks = item.ShippingMark,
-                //    Nofpiece = item.PackageContainer,
-                //    GrossWeight = item.GW ?? (decimal)item.GW,
-                //    SeaCBM = item.CBM ?? (decimal)item.CBM,
-                //    NoOfAWB = 0,
-                //    Destination = item.FinalDestinationPlace ?? string.Empty,
-                //    Shipper = item.ShipperDescription ?? string.Empty,
-                //    Consignee = item.ConsigneeDescription ?? string.Empty,
-                //    Descriptions = item.DesOfGoods ?? string.Empty,
-                //    FreightCharge = item.FreightPayment ?? string.Empty,
-                //    Notify = item.NotifyParty ?? string.Empty,
-                //    OnboardNote = item.OnBoardStatus ?? string.Empty,
-                //    MaskNos = string.Empty,
-                //    TranShipmentTo = item.PlaceFreightPay ?? string.Empty,
-                //    BillType = item.ServiceType ?? string.Empty
-                //};
-                //manifests.Add(manifest);
 
                 foreach (var item in model.CsTransactionDetails)
                 {
@@ -404,102 +383,12 @@ namespace eFMS.API.Documentation.DL.Services
                     };
                     manifests.Add(manifest);
                 }
-                freightManifests = new List<FreightManifest> {
-                    new FreightManifest
-                    {
-                        FieldKeyID = "FieldKeyID test",
-                        GroupName = "GroupName test",
-                        Description = "Description test",
-                        Quantity = 123,
-                        Unit = "Unit test",
-                        UnitPrice = 123,
-                        Curr = "Curr test",
-                        VAT = 123,
-                        TotalValue = 123,
-                        Dbt = true,
-                        Collect = true,
-                        AccountNo = "AccountNo test",
-                        DecimalNo = 2,
-                        CurrDecimalNo = 3
-                    },
-                    new FreightManifest
-                    {
-                        FieldKeyID = "FieldKeyID test",
-                        GroupName = "GroupName test",
-                        Description = "Description test",
-                        Quantity = 123,
-                        Unit = "Unit test",
-                        UnitPrice = 123,
-                        Curr = "Curr test",
-                        VAT = 123,
-                        TotalValue = 123,
-                        Dbt = true,
-                        Collect = true,
-                        AccountNo = "AccountNo test",
-                        DecimalNo = 2,
-                        CurrDecimalNo = 3
-                    }
-                };
+                //freightManifests = new List<FreightManifest> {
+                //};
             }
             else
             {
-                var manifest = new SeaCargoManifest
-                {
-                    TransID = model.JobId.ToString(),
-                    HBL = "",
-                    Marks = "",
-                    Nofpiece = "",
-                    GrossWeight = 0,
-                    SeaCBM = 0,
-                    NoOfAWB = 0,
-                    Destination = "",
-                    Shipper = "",
-                    Consignee = "",
-                    Descriptions = "",
-                    FreightCharge = "",
-                    Notify = "",
-                    OnboardNote = "",
-                    MaskNos = "",
-                    TranShipmentTo = "",
-                    BillType = ""
-                };
-                manifests.Add(manifest);
-                freightManifests = new List<FreightManifest> {
-                    new FreightManifest
-                    {
-                        FieldKeyID = "FieldKeyID test",
-                        GroupName = "GroupName test",
-                        Description = "Description test",
-                        Quantity = 123,
-                        Unit = "Unit test",
-                        UnitPrice = 123,
-                        Curr = "Curr test",
-                        VAT = 123,
-                        TotalValue = 123,
-                        Dbt = true,
-                        Collect = true,
-                        AccountNo = "AccountNo test",
-                        DecimalNo = 2,
-                        CurrDecimalNo = 3
-                    },
-                    new FreightManifest
-                    {
-                        FieldKeyID = "FieldKeyID test",
-                        GroupName = "GroupName test",
-                        Description = "Description test",
-                        Quantity = 123,
-                        Unit = "Unit test",
-                        UnitPrice = 123,
-                        Curr = "Curr test",
-                        VAT = 123,
-                        TotalValue = 123,
-                        Dbt = true,
-                        Collect = true,
-                        AccountNo = "AccountNo test",
-                        DecimalNo = 2,
-                        CurrDecimalNo = 3
-                    }
-                };
+                return null;
             }
             result = new Crystal
             {
@@ -509,7 +398,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            result.AddSubReport("FreightManifest", freightManifests);
+            //result.AddSubReport("FreightManifest", freightManifests);
             result.SetParameter(parameter);
             return result;
         }

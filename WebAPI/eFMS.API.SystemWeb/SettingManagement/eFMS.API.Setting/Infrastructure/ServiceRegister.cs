@@ -12,12 +12,12 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
-using eFMS.API.System.Infrastructure.Filters;
+using eFMS.API.Setting.Infrastructure.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System;
 using eFMS.API.Common;
 
-namespace eFMS.API.System.Infrastructure
+namespace eFMS.API.Setting.Infrastructure
 {
     public static class ServiceRegister
     {
@@ -27,6 +27,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddTransient<ICategoryLogService, CategoryLogService>();
             services.AddTransient<IEcusConnectionService, EcusConnectionService>();
+            services.AddTransient<ICustomsDeclarationService, CustomsDeclarationService>();
         }
 
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)

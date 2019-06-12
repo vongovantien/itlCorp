@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace eFMS.API.System.DL.Infrastructure
+namespace eFMS.API.Setting.DL.Infrastructure
 {
     public static class ExpressionExtension
     {

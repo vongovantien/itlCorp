@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace eFMS.API.System.Infrastructure.Common
+namespace eFMS.API.Setting.Infrastructure.Common
 {
     public class ResponseModel
     {

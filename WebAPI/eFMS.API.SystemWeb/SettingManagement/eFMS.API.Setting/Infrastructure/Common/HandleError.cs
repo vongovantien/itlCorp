@@ -3,17 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SystemManagementAPI.Resources;
+using eFMS.API.Setting.Resources;
+using eFMS.API.Common.Globals;
 
-namespace eFMS.API.System.Infrastructure.Common
+namespace eFMS.API.Setting.Infrastructure.Common
 {
-    public enum Crud
-    {
-        Get,
-        Insert,
-        Update,
-        Delete
-    }
+    //public enum Crud
+    //{
+    //    Get,
+    //    Insert,
+    //    Update,
+    //    Delete
+    //}
     public static class HandleError
     {
         public static string GetMessage(HandleState hs, Crud crud)
