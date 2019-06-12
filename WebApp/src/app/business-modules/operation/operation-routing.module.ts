@@ -5,6 +5,7 @@ import { TruckingAssignmentComponent } from './trucking-assignment/trucking-assi
 import { OpsModuleBillingJobCreateComponent } from './ops-module-billing-job-create/ops-module-billing-job-create.component';
 import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billing.component';
 import { OpsModuleBillingJobEditComponent } from './ops-module-billing-job-edit/ops-module-billing-job-edit.component';
+import { CustomClearanceComponent } from './custom-clearance/custom-clearance.component';
 
 const routes: Routes = [
     {
@@ -55,6 +56,14 @@ const routes: Routes = [
             name:"Trucking Assigment",
             level:2
           }
+    },
+    {
+        path: 'custom-clearance',
+        component: CustomClearanceComponent,
+        data:{
+            name:"Custom Clearance",
+            level:2
+        }
     }
 
 ];
