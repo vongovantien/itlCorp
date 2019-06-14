@@ -13,6 +13,7 @@ export class TableLayoutComponent implements OnInit, OnChanges {
   @Input() settings: ColumnSetting[];
   @Input() nameEditModal: string;
   @Input() keySort: string = "";
+  @Input() id: string = "";
   @Output() sortChange: EventEmitter<number> = new EventEmitter<number>();
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();

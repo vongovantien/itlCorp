@@ -11,6 +11,27 @@ namespace eFMS.API.Setting.DL.Common
         public const string Delete = "Delete";
         public const string Active = "Active";
     }
+    public class ClearanceConstants
+    {
+        public const string Air_Service = "Air";
+        public const string Sea_FCL_Service = "Sea FCL";
+        public const string Sea_LCL_Service = "Sea LCL";
+        public const string Trucking_Inland_Service = "Trucking Inland";
+        public const string Rail_Service = "Rail";
+        public const string Warehouse_Service = "Warehouse";
+        public const string Air_Service_Type = "1";
+        public const string Sea_FCL_Service_Type = "2";
+        public const string Sea_LCL_Service_Type = "3";
+        public const string Trucking_Inland_Service_Type = "4";
+        public const string Rail_Service_Type = "5";
+        public const string Warehouse_Service_Type6 = "6";
+        public const string Warehouse_Service_Type9 = "9";
+
+        public const string Import_Type = "N";
+        public const string Export_Type = "X";
+        public const string Import_Type_Value = "Import";
+        public const string Export_Type_Value = "Export";
+    }
     public class CatPlaceConstant
     {
         public const string Warehouse = "Warehouse";

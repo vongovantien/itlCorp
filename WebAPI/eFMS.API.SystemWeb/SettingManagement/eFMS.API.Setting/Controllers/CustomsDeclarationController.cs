@@ -12,6 +12,7 @@ using Microsoft.Extensions.Localization;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using eFMS.API.Setting.Resources;
 using System.Diagnostics.Contracts;
+using eFMS.API.Setting.DL.Models.Criteria;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,6 +31,21 @@ namespace eFMS.API.Setting.Controllers
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
+        }
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            var results = customsDeclarationService.Get();
+            return Ok(results);
+        }
+
+        [HttpPost("Paging")]
+        public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
         }
 
         [HttpPost]
@@ -53,6 +69,7 @@ namespace eFMS.API.Setting.Controllers
             }
             return Ok(result);
         }
+
         [HttpPut]
         [Route("Update")]
         public IActionResult Update(CustomsDeclarationModel model)
@@ -73,6 +90,7 @@ namespace eFMS.API.Setting.Controllers
             }
             return Ok(result);
         }
+
         [HttpDelete]
         [Route("Delete")]
         public IActionResult Delete(int id)
@@ -86,11 +104,14 @@ namespace eFMS.API.Setting.Controllers
             }
             return Ok(result);
         }
-        //[HttpGet("ImportClearancesFromEcus")]
-        //public IActionResult ImportClearancesFromEcus()
-        //{
-        //    ResultHandle result = customsDeclarationService.ImportClearancesFromEcus();
-        //}
+
+        [HttpGet("ImportClearancesFromEcus")]
+        public IActionResult ImportClearancesFromEcus()
+        {
+            var result = customsDeclarationService.ImportClearancesFromEcus();
+            return Ok(result);
+        }
+
         private string CheckExist(CustomsDeclarationModel model, decimal id)
         {
             string message = string.Empty;

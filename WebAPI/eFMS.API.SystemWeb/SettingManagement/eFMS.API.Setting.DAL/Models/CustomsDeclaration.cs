@@ -7,9 +7,9 @@ namespace eFMS.API.Setting.Service.Models
     {
         public int Id { get; set; }
         public decimal? IdfromEcus { get; set; }
+        public string JobNo { get; set; }
         public string ClearanceNo { get; set; }
         public string FirstClearanceNo { get; set; }
-        public string CustomerId { get; set; }
         public string PartnerTaxCode { get; set; }
         public DateTime? ClearanceDate { get; set; }
         public string Mblid { get; set; }
@@ -23,16 +23,16 @@ namespace eFMS.API.Setting.Service.Models
         public string Type { get; set; }
         public string Route { get; set; }
         public string DocumentType { get; set; }
-        public string ExportCountryId { get; set; }
-        public string ImportcountryId { get; set; }
+        public string ExportCountryCode { get; set; }
+        public string ImportcountryCode { get; set; }
         public int? CommodityId { get; set; }
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
-        public int? ContQuantity { get; set; }
         public int? Pcs { get; set; }
         public string Source { get; set; }
         public string Note { get; set; }
+        public Guid? JobId { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeCreated { get; set; }
