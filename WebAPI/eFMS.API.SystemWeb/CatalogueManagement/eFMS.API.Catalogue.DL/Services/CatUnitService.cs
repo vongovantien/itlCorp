@@ -67,8 +67,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                Func<CatCountry, bool> predicate = x => x.Id == id;
-                RedisCacheHelper.RemoveItemInList(cache, Templates.CatCountry.NameCaching.ListName, predicate);
+                Func<CatUnit, bool> predicate = x => x.Id == id;
+                RedisCacheHelper.RemoveItemInList(cache, Templates.CatUnit.NameCaching.ListName, predicate);
             }
             return hs;
         }

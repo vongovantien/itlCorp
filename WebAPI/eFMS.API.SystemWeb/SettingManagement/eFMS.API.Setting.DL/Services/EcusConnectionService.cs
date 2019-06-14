@@ -121,12 +121,6 @@ namespace eFMS.API.Setting.DL.Services
             return results;
         }
 
-        //public object Test(string token)
-        //{
-        //    var results = catAreaApi.GetAreas(token).Result.ToList();
-        //    return results;
-        //}
-
         private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
         {
             string queryString = @"SELECT TOP (1000) DTOKHAIMD.[_DToKhaiMDID] AS DToKhaiMDID
@@ -148,14 +142,22 @@ namespace eFMS.API.Setting.DL.Services
 	                              ,DTOKHAIMD_VNACCS2.[MA_HIEU_PTVC]
                               FROM[ECUS5VNACCS].[dbo].[DTOKHAIMD]
                                     INNER JOIN[ECUS5VNACCS].[dbo].[DTOKHAIMD_VNACCS2]
-                                    ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID";
+                                    ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID
+                              WHERE NAMDK = YEAR(GETDATE()) AND (MONTH(GETDATE()) - MONTH(NGAY_DK)) < 4";
 
-string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
-            var data = Helpers.Helper.ExecuteDataSet(connectionString, queryString);
-            if (data != null)
+                string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
+            try
             {
-                DataTable dt = data.Tables[0];
-                return dt.DataTableToList<DTOKHAIMD>();
+                var data = Helpers.Helper.ExecuteDataSet(connectionString, queryString);
+                if (data != null)
+                {
+                    DataTable dt = data.Tables[0];
+                    return dt.DataTableToList<DTOKHAIMD>();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return null;
             }
             return null;
         }

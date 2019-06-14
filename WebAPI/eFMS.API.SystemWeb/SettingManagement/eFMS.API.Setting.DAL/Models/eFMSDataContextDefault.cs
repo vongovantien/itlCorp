@@ -2268,11 +2268,6 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.CommodityId).HasColumnName("CommodityID");
 
-                entity.Property(e => e.CustomerId)
-                    .HasColumnName("CustomerID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
@@ -2281,8 +2276,7 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ExportCountryId)
-                    .HasColumnName("ExportCountryID")
+                entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -2303,8 +2297,13 @@ namespace eFMS.API.Setting.Service.Models
                     .HasColumnName("IDFromECus")
                     .HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.ImportcountryId)
-                    .HasColumnName("ImportcountryID")
+                entity.Property(e => e.ImportcountryCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
