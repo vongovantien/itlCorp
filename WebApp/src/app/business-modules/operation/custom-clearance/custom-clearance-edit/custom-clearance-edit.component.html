@@ -1,0 +1,393 @@
+<div class="modal fade" id="custom-clearance-edit-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail/Edit custom clearance no</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Clearance No <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Customer <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Partner Id</th>
+                                                                <th>Name ABBR</th>
+                                                                <th>Name EN</th>
+                                                                <th>Tax Code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>Partner Id</td>
+                                                            <td>Name ABBR</td>
+                                                            <td>Name EN</td>
+                                                            <td>Tax Code</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Clearance Date <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [(ngModel)]="selected" [singleDatePicker]="true" name="singledater" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    HBL/HAWB
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    MBL/MAWB
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Service Type
+                                </label>
+                                <ng-select [allowClear]="true" [items]="serveiceType" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Gateway <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Port Code</th>
+                                                                <th>Port Name (EN)</th>
+                                                                <th>Country Name (EN)</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>Port Code</td>
+                                                            <td>Port Name (EN)</td>
+                                                            <td>Country Name (EN)</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Type
+                                </label>
+                                <ng-select [allowClear]="true" [items]="typeClearance" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Route
+                                </label>
+                                <ng-select [allowClear]="true" [items]="['Red', 'Green', 'Yellow']"
+                                    [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Cargo Type
+                                </label>
+                                <ng-select [allowClear]="true" [items]="['LCL', 'FCL']" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Export Country
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Import Country
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Commodity
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Commodity Code</th>
+                                                                <th>Commodity Name (EN)</th>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>Commodity Code</td>
+                                                            <td>Commodity Name (EN)</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Gross Weight
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Net Weight
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    CBM
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Qty Cont
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Package Qty
+                                </label>
+                                <div class="input-group m-input-group m-input-group--square">
+                                    <input type="text" class="form-control m-input" aria-label="">
+                                    <div class="input-group-prepend">
+                                        <ng-select [allowClear]="false" [items]="packagesUnit"
+                                            [active]="packagesUnitActive" [disabled]="disabled"
+                                            (data)="refreshValue($event)" (selected)="selected($event)"
+                                            (removed)="removed($event)" (typed)="typed($event)" placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                   Note
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                            <span class="m--font-bolder">Create:</span>
+                            <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                            <span class="m--font-bolder m--margin-left-5">by</span>
+                            <span class="m--font-brand m--margin-left-5">userCreated</span>
+                        </div>
+                        <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                            <span class="m--font-bolder">Modified:</span>
+                            <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                            <span class="m--font-bolder m--margin-left-5">by</span>
+                            <span class="m--font-brand m--margin-left-5">userModified</span>
+                        </div>
+                        <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                            <span class="m--font-bolder">Source:</span>
+                            <span class="m--font-brand m--margin-left-5">eFMS</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                            <span class="m--font-bolder">First Customer No:</span>
+                            <span class="m--font-brand m--margin-left-5"></span>
+                        </div>
+                        <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                            <span class="m--font-bolder">Reference JobID:</span>
+                            <span class="m--font-brand m--margin-left-5"></span>
+                        </div>
+                        <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                            <span class="m--font-bolder">Convert time:</span>
+                            <span class="m--font-brand m--margin-left-5"></span>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save and convert
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

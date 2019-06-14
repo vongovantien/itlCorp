@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
 
 @Component({
-    selector: 'app-custom-clearance',
-    templateUrl: './custom-clearance.component.html',
-    styleUrls: ['./custom-clearance.component.scss']
+    selector: 'app-custom-clearance-addnew',
+    templateUrl: './custom-clearance-addnew.component.html',
+    styleUrls: ['./custom-clearance-addnew.component.scss']
 })
-export class CustomClearanceComponent implements OnInit {
+export class CustomClearanceAddnewComponent implements OnInit {
 
     constructor() {
         this.keepCalendarOpeningWithRange = true;
@@ -17,10 +17,9 @@ export class CustomClearanceComponent implements OnInit {
     ngOnInit() {
     }
 
-
     /**
-     * Daterange picker
-     */
+      * Daterange picker
+      */
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;
@@ -48,8 +47,11 @@ export class CustomClearanceComponent implements OnInit {
 
     statusClearance: Array<string> = ['All', 'Imported', 'Not imported'];
     typeClearance: Array<string> = ['All', 'Export', 'Imported'];
-    userList: Array<string> = [];
-    currentUser = ['Thor'];
+
+    serveiceType: Array<string> = ['Air', 'Sea', 'Cross border','Warehouse', 'Inland', 'Railway', 'Express'];
+
+    packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
+    packagesUnitActive = ['PKG'];
 
     private value: any = {};
     private _disabledV: string = '0';

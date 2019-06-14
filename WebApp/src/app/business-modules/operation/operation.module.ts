@@ -22,6 +22,8 @@ import { OpsModuleStageManagementAddnewComponent } from './ops-module-billing-jo
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { OpsModuleStageManagementDetailComponent } from './ops-module-billing-job-edit/ops-module-stage-management/ops-module-stage-management-detail/ops-module-stage-management-detail.component';
 import { CustomClearanceComponent } from './custom-clearance/custom-clearance.component';
+import { CustomClearanceAddnewComponent } from './custom-clearance/custom-clearance-addnew/custom-clearance-addnew.component';
+import { CustomClearanceEditComponent } from './custom-clearance/custom-clearance-edit/custom-clearance-edit.component';
 
 @NgModule({
   imports: [
@@ -33,6 +35,6 @@ import { CustomClearanceComponent } from './custom-clearance/custom-clearance.co
     NgxDaterangepickerMd,
     DragDropModule
   ],
-  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent, OpsModuleCreditDebitNoteAddnewComponent, OpsModuleCreditDebitNoteRemainingChargeComponent, OpsModuleCreditDebitNoteDetailComponent, OpsModuleCreditDebitNoteEditComponent, OpsModuleStageManagementAddnewComponent, OpsModuleStageManagementDetailComponent, CustomClearanceComponent],
+  declarations: [JobMangementComponent, AssigmentComponent, TruckingAssignmentComponent, OpsModuleBillingJobCreateComponent, OpsModuleBillingComponent, OpsModuleBillingJobEditComponent, BillingCustomDeclarationComponent, OpsModuleCreditDebitNoteComponent, OpsModuleStageManagementComponent, OpsModuleCreditDebitNoteAddnewComponent, OpsModuleCreditDebitNoteRemainingChargeComponent, OpsModuleCreditDebitNoteDetailComponent, OpsModuleCreditDebitNoteEditComponent, OpsModuleStageManagementAddnewComponent, OpsModuleStageManagementDetailComponent, CustomClearanceComponent, CustomClearanceAddnewComponent, CustomClearanceEditComponent],
 })
 export class OperationModule { }
