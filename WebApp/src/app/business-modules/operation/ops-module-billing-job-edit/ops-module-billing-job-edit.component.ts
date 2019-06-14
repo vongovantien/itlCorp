@@ -663,6 +663,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     this.SellingRateChargeToAdd = new CsShipmentSurcharge();
                     this.OBHChargeToAdd = new CsShipmentSurcharge();
                     this.baseServices.setData("CurrentOpsTransaction",this.opsTransaction);
+                    this.baseServices.setData("ShipmentAdded",true);
                     if (!isContinue)
                         $('#' + id_form).modal('hide');
                 }
@@ -833,6 +834,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                         $('#' + id_form).modal('hide');
                         this.getAllSurCharges();
                         this.baseServices.setData("CurrentOpsTransaction",this.opsTransaction);
+                        this.baseServices.setData("ShipmentUpdated",true);
                     }
                 }
             }

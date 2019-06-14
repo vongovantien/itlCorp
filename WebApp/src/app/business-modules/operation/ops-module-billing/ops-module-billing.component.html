@@ -229,8 +229,8 @@
                                                 (click)="sort('jobNo')">
                                                 <span>Job ID</span>
                                             </th>
-                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblno'), 'sorting_desc': (!isDesc && sortKey == 'hblno') }"
-                                                (click)="sort('hblno')">
+                                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hwbno'), 'sorting_desc': (!isDesc && sortKey == 'hwbno') }"
+                                                (click)="sort('hwbno')">
                                                 <span>HBL</span>
                                             </th>
                                             <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceDate'), 'sorting_desc': (!isDesc && sortKey == 'serviceDate') }"
@@ -303,7 +303,7 @@
                                                     <a href="javascript:void()" [routerLink]="['/home/operation/job-edit', { id: item.id }]">{{ item.jobNo }}</a>
                                                 </td>
                                                 <td>
-                                                    <span>{{ item.hblno }}</span>
+                                                    <span>{{ item.hwbno }}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{ item.serviceDate | date:'dd/mm/yyyy' }}</span>
@@ -394,7 +394,7 @@
                                                                             <span>{{ clearance.clearanceDate | date:'dd MMM yyyy' }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>{{ clearance.hblno }}</span>
+                                                                            <span>{{ clearance.hwbno }}</span>
                                                                         </td>
                                                                         <td>
                                                                             <span>{{ clearance.exportCountryName }}</span>

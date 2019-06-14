@@ -9,6 +9,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
 import { async } from 'rxjs/internal/scheduler/async';
 import { NgForm } from '@angular/forms';
+import { SortService } from 'src/app/shared/services/sort.service';
 declare var $: any;
 @Component({
     selector: 'app-ops-module-credit-debit-note-addnew',
@@ -25,48 +26,30 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
         { text: 'INVOICE', id: 'INVOICE' }
     ];
 
-    listSubjectPartner: any[] = []; // data for combobox Subject to Partner 
+    listSubjectPartner: any[] = []; 
     constListSubjectPartner: any[] = [];
-    listChargeOfPartner: any[] = []; // charges list group by housebill when choose a partner 
+    listChargeOfPartner: any[] = []; 
     listRemainingCharges: any[] = [];
     constListChargeOfPartner: any[] = [];
     STORAGE_DATA: any = null;
     currentHbID: any = null;
 
-    // @Output() addNewRemainingCharges = new EventEmitter<any>();
-    // @Output() currentPartnerIdEmit = new EventEmitter<string>();
-    // @Output() newCDNote = new EventEmitter<boolean>();
-    // @Input() set chargesFromRemaining(listCharges: any) {
-    //     this.listChargeOfPartner = cloneDeep(listCharges);
-    //     this.constListChargeOfPartner = cloneDeep(listCharges);
-    // }
-
     constructor(
         private baseServices: BaseService,
+        private sortServices: SortService,
         private api_menu: API_MENU
     ) {
 
     }
 
     ngOnInit() {
-        this.baseServices.dataStorage.subscribe(data => {
-            this.STORAGE_DATA = data;
-            if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
-                this.currentHbID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
-                this.getListSubjectPartner();
-            }
-            if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
-                this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-                this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-            }
-        });
+        this.StateChecking();
     }
 
     getListSubjectPartner() {
         this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + this.currentHbID + "&IsHouseBillID=true").subscribe((data: any[]) => {
-            this.listSubjectPartner =  cloneDeep(data);
+            this.listSubjectPartner = cloneDeep(data);
             this.constListSubjectPartner = cloneDeep(data);
-            console.log(this.listSubjectPartner);
         });
     }
 
@@ -80,16 +63,15 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                 }
                 return o;
             });
+            this.listChargeOfPartner = this.sortServices.sort(this.listChargeOfPartner,"chargeCode",true)
             this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
             console.log(this.listChargeOfPartner);
             this.setChargesForCDNote();
             this.totalCreditDebitCalculate();
-            //   this.addNewRemainingCharges.emit(this.listChargeOfPartner);
-            //   this.currentPartnerIdEmit.emit(partnerId);
             this.baseServices.setData("listChargeOfPartner", this.listChargeOfPartner);
             this.baseServices.setData("currentPartnerId", partnerId);
             setTimeout(() => {
-                // this.checkSttAllNode();
+                 this.checkSttAllNode();
             }, 100);
         }
 
@@ -119,7 +101,6 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
     }
 
     SearchCharge(search_key: string) {
-        // listChargeOfPartner
         this.listChargeOfPartner = cloneDeep(this.constListChargeOfPartner);
         search_key = search_key.trim().toLowerCase();
         var listBranch: any[] = [];
@@ -159,9 +140,6 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                 }
             }
         }
-
-        console.log(this.listChargeOfPartner);
-
     }
 
 
@@ -189,7 +167,6 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
         this.setChargesForCDNote()
         this.checkSttAllNode();
         this.listChargeOfPartner = this.constListChargeOfPartner;
-        // this.addNewRemainingCharges.emit(this.constListChargeOfPartner);
         this.baseServices.setData("listChargeOfPartner", this.constListChargeOfPartner);
         this.totalCreditDebitCalculate()
     }
@@ -260,7 +237,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                         this.CDNoteWorking = new AcctSOA();
                         this.baseServices.setData("listChargeOfPartner", []);
                         this.resetAddSOAForm();
-                        
+
                     }
                 }
             }
@@ -268,21 +245,20 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
     }
 
     resetAddSOAForm() {
-        // this.newCDNote.emit(true);
         this.isDisplay = false;
         setTimeout(() => {
-            this.baseServices.setData("isNewCDNote",true);
+            this.baseServices.setData("isNewCDNote", true);
             this.isDisplay = true;
         }, 300);
     }
 
 
-    closeModal(form:NgForm,id_modal:string){
+    closeModal(form: NgForm, id_modal: string) {
         form.onReset();
         this.resetAddSOAForm();
         this.CDNoteWorking = new AcctSOA();
         this.baseServices.setData("listChargeOfPartner", []);
-        $('#'+id_modal).modal('hide');        
+        $('#' + id_modal).modal('hide');
     }
 
 
@@ -323,5 +299,34 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
 
     public refreshValue(value: any): void {
         this.value = value;
+    }
+
+
+    /**
+       * This function use to check changing data from `dataStorage` in BaseService 
+       * `dataStorage` is something same like store in `ReactJs` or `VueJS` and allow store any data that belong app's life circle
+       * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
+       * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
+    */
+    StateChecking() {
+        this.baseServices.dataStorage.subscribe(data => {
+
+            this.STORAGE_DATA = data;
+            if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined && this.currentHbID !== this.STORAGE_DATA.CurrentOpsTransaction.hblid) {
+
+                this.currentHbID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
+                this.getListSubjectPartner();
+
+            }
+            if((this.STORAGE_DATA.ShipmentUpdated!==undefined && this.STORAGE_DATA.ShipmentUpdated)||(this.STORAGE_DATA.ShipmentAdded!==undefined && this.STORAGE_DATA.ShipmentAdded)){
+                this.getListSubjectPartner();
+                this.baseServices.setData("ShipmentAdded",false);
+                this.baseServices.setData("ShipmentUpdated",false);
+            }
+            if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
+                this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
+                this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
+            }
+        });
     }
 }

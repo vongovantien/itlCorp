@@ -14,6 +14,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import { BaseService } from 'src/services-base/base.service';
 import cloneDeep from 'lodash/cloneDeep';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 
  declare var $: any;
 
@@ -284,7 +285,7 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, {placeType: PlaceTypeEnum.Port, modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
       this.listPort = res;
     });
   }
