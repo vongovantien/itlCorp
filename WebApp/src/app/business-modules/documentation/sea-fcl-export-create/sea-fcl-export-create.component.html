@@ -805,7 +805,7 @@
                                                 </span> -->
                                                 <div class="control-editable">
                                                     <ng-select [allowClear]="true" [items]="weightMesurements"
-                                                        [disabled]="true" (data)="refreshValue($event)"
+                                                        (data)="refreshValue($event)"
                                                         (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
                                                         (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
                                                         (typed)="typed($event)" [active]="container.unitOfMeasureActive"

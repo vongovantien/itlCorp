@@ -504,7 +504,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             markNo: '',
             unitOfMeasureId: 37,
             unitOfMeasureName: 'Kilogam',
-            unitOfMeasureActive: [{ "id": 37, "text": "Kilogam"}],
+            unitOfMeasureActive: [],
             commodityId: null,
             commodityName: '',
             packageTypeId: null,
@@ -522,6 +522,7 @@ export class SeaFclExportCreateComponent implements OnInit {
             verifying: false
         };
         this.filterContainer(this.lstMasterContainers.length);
+        container.unitOfMeasureActive = this.weightMesurements!= null? [this.weightMesurements[0]]: [];
         return container;
     }
     saveContainerSuccess = false;
