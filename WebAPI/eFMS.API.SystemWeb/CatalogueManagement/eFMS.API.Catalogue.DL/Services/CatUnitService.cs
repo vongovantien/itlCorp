@@ -68,7 +68,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 Func<CatUnit, bool> predicate = x => x.Id == id;
-                RedisCacheHelper.RemoveItemInList(cache, Templates.CatUnit.NameCaching.ListName, predicate);
+                RedisCacheHelper.RemoveItemInList(cache, Templates.CatCountry.NameCaching.ListName, predicate);
             }
             return hs;
         }
@@ -99,36 +99,25 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
             IQueryable<CatUnit> list = null;
+            Expression<Func<CatUnit, bool>> query = null;
             if (criteria.All == null)
             {
-                //list = data.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
-                Expression<Func<CatUnit, bool>> andQuery = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.UnitNameVn ?? "").IndexOf(criteria.UnitNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
-                list = Query(data, andQuery);
-                //list = list.Where(x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                //&& (x.UnitNameVn??"").IndexOf(criteria.UnitNameVn??"", StringComparison.OrdinalIgnoreCase) > -1
-                //&& (x.UnitNameEn??"").IndexOf(criteria.UnitNameEn??"", StringComparison.OrdinalIgnoreCase) > -1
-                //&& (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                 //);
             }
             else
             {
-                Expression<Func<CatUnit, bool>> orQuery = x => ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                query = x => ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                 && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
-                list = Query(data, orQuery);
-                //list = data.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
-                //list = list.Where(x => (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                //|| (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                //|| (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                //|| (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                //);
             }
+            list = Query(data, query);
             return list;
         }
         private IQueryable<CatUnit> Query(IQueryable<CatUnit> dataFromCache, Expression<Func<CatUnit, bool>> query)
