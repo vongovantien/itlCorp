@@ -80,8 +80,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catUnit = mapper.Map<CatUnitModel>(model);
-            var hs = catUnitService.Add(catUnit);
+            //var catUnit = mapper.Map<CatUnitModel>(model);
+            var hs = catUnitService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
