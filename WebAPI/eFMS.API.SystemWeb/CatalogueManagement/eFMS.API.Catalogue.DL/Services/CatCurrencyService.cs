@@ -81,7 +81,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatCurrency> Query(CatCurrrencyCriteria criteria)
         {
-            var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            IQueryable<CatCurrency> data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
+            if(data == null)
+            {
+                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
+                data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
+            }
+            var list = data.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
                 list = list.Where(x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1

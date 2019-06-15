@@ -161,6 +161,7 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var newList = new List<CatCountry>();
                 foreach (var item in data)
                 {
                     DateTime? inactive = null;
@@ -175,9 +176,20 @@ namespace eFMS.API.Catalogue.DL.Services
                         Inactive = (item.Status ?? "").Contains("active"),
                         InactiveOn = item.Status != null? DateTime.Now: inactive
                     };
-                    dc.CatCountry.Add(country);
+                    newList.Add(country);
                 }
+                dc.CatCountry.AddRange(newList);
                 dc.SaveChanges();
+                var lstCountries = RedisCacheHelper.GetObject<List<CatCountry>>(cache, Templates.CatCountry.NameCaching.ListName);
+                if (lstCountries == null)
+                {
+                    lstCountries = dc.CatCountry.ToList();
+                }
+                else
+                {
+                    lstCountries.AddRange(newList);
+                }
+                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, lstCountries);
                 return new HandleState();
             }
             catch (Exception ex)
@@ -190,23 +202,23 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             IQueryable <CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
             IQueryable<CatCountry> returnList = null;
+            Expression<Func<CatCountry, bool>> query = null;
             if (criteria.condition == SearchCondition.AND)
             {
-                Expression<Func<CatCountry, bool>> andQuery = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
-                returnList = Query(data, andQuery);
             }
             else
             {
-                Expression<Func<CatCountry, bool>> orQuery = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > - 1)
                                                                 && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
-                returnList = Query(data, orQuery);
             }
-           
+            returnList = Query(data, query);
+
             return returnList;
         }
         private IQueryable<CatCountry> Query(IQueryable<CatCountry>  dataFromCache, Expression<Func<CatCountry, bool>> query)

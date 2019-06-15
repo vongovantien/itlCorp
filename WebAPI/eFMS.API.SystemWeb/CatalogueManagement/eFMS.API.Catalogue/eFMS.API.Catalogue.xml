@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.Catalogue</name>
+    </assembly>
+    <members>
+        <member name="T:eFMS.API.Catalogue.Controllers.CatAreaController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatAreaController.Get">
+            <summary>
+            get the list of areas
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatAreaController.GetByLanguage">
+            <summary>
+            get the list of areas by culture current language
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatChargeCriteria,System.Int32,System.Int32)">
+            <summary>
+            get the list of charges by criteria search
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

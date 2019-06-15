@@ -10,8 +10,6 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
-using eFMS.API.Common.NoSql;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -94,7 +92,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPut]
         [Route("update")]
         [Authorize]
-        public IActionResult Upadte(CatCountryModel catCountry)
+        public IActionResult Update(CatCountryModel catCountry)
         {
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(catCountry.Id, catCountry);

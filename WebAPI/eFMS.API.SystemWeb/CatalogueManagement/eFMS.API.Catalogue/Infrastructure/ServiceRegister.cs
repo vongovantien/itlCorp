@@ -20,6 +20,9 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using eFMS.API.Catalogue.Infrastructure.Filters;
 using eFMS.API.Common;
+using System.IO;
+using System.Reflection;
+using System;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -104,6 +107,10 @@ namespace eFMS.API.Catalogue.Infrastructure
                 {
                     var provider = services.BuildServiceProvider()
                     .GetRequiredService<IApiVersionDescriptionProvider>();
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                    options.IncludeXmlComments(xmlPath);
 
                     foreach (var description in provider.ApiVersionDescriptions)
                     {

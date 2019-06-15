@@ -106,7 +106,6 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var lstCommodity = RedisCacheHelper.GetObject<List<CatCommodity>>(cache, Templates.CatCommodity.NameCaching.ListName);
                 var newList = new List<CatCommodity>();
                 foreach (var item in data)
                 {
@@ -116,15 +115,16 @@ namespace eFMS.API.Catalogue.DL.Services
                         CommodityNameVn = item.CommodityNameVn,
                         CommodityGroupId = item.CommodityGroupId,
                         Code = item.Code,
-                        Inactive = item.Status.ToString().ToLower()=="active"?false:true,
+                        Inactive = item.Status.ToLower() != "active",
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         UserCreated = ChangeTrackerHelper.currentUser
                     };
-                    dc.CatCommodity.Add(commodity);
                     newList.Add(commodity);
                 }
+                dc.CatCommodity.AddRange(newList);
                 dc.SaveChanges();
+                var lstCommodity = RedisCacheHelper.GetObject<List<CatCommodity>>(cache, Templates.CatCommodity.NameCaching.ListName);
                 if (lstCommodity == null)
                 {
                     lstCommodity = dc.CatCommodity.ToList();
@@ -133,6 +133,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     lstCommodity.AddRange(newList);
                 }
+                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, lstCommodity);
                 return new HandleState();
             }
             catch(Exception ex)
@@ -168,6 +169,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IQueryable<CatCommodity> commodities = null;
             if (commonitiesCaching == null)
             {
+                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, DataContext.Get());
                 commodities = DataContext.Get(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             }
             else

@@ -96,11 +96,6 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
-                if(lstPartner == null)
-                {
-                    lstPartner = new List<CatPartner>();
-                }
                 var newList = new List<CatPartner>();
                 foreach (var item in data)
                 {
@@ -114,7 +109,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 dc.CatPartner.AddRange(newList);
                 dc.SaveChanges();
-                if(lstPartner.Count == 0)
+                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
+                if (lstPartner.Count == 0)
                 {
                     lstPartner = dc.CatPartner.ToList();
                 }
