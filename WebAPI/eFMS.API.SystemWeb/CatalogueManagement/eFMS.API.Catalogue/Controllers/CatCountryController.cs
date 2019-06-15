@@ -51,6 +51,7 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        
         [HttpGet]
         [Route("getById/{id}")]
         public IActionResult Get(int id)
@@ -58,7 +59,7 @@ namespace eFMS.API.Catalogue.Controllers
             var result = catCountryService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(result);
         }
-
+        
         [HttpGet]
         [Route("getAll")]
         public IActionResult GetAll()

@@ -23,11 +23,45 @@
         </member>
         <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatChargeCriteria,System.Int32,System.Int32)">
             <summary>
-            get the list of charges by criteria search
+            get and paging the list of charges by conditions
             </summary>
             <param name="criteria">search conditions</param>
             <param name="pageNumber">page to retrieve data</param>
             <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatChargeCriteria)">
+            <summary>
+            get the list of charges by criteria search
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Get(System.Guid)">
+            <summary>
+            get charge by id
+            </summary>
+            <param name="id">id of data that need to retrieve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.All">
+            <summary>
+            get all charges
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Add(eFMS.API.Catalogue.DL.Models.CatChargeAddOrUpdateModel)">
+            <summary>
+            add a new charge
+            </summary>
+            <param name="model">object data to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Update(eFMS.API.Catalogue.DL.Models.CatChargeAddOrUpdateModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="model">object to update</param>
             <returns></returns>
         </member>
     </members>
