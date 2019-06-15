@@ -41,6 +41,13 @@ namespace eFMS.API.Catalogue.Controllers
             mapper = imapper;
         }
 
+        /// <summary>
+        /// get and paging the list of charges by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatChargeCriteria criteria,int pageNumber,int pageSize)
@@ -50,6 +57,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get the list of charges by criteria search
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatChargeCriteria criteria)
@@ -58,7 +70,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
-
+        /// <summary>
+        /// get charge by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("getById/{id}")]
         public IActionResult Get(Guid id)
@@ -67,6 +83,10 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get all charges
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("getAll")]
         public IActionResult All()
@@ -75,6 +95,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// add a new charge
+        /// </summary>
+        /// <param name="model">object data to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("addNew")]
         [Authorize]
@@ -96,6 +121,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("update")]
         [Authorize]
