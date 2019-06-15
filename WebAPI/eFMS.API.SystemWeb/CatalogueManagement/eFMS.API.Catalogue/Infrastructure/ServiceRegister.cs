@@ -105,12 +105,15 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddSwaggerGen(
                 options =>
                 {
+                    //options.DescribeAllEnumsAsStrings();
                     var provider = services.BuildServiceProvider()
                     .GetRequiredService<IApiVersionDescriptionProvider>();
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
-                    options.IncludeXmlComments(xmlPath);
+                    if (xmlPath != null)
+                    {
+                        options.IncludeXmlComments(xmlPath);
+                    }
 
                     foreach (var description in provider.ApiVersionDescriptions)
                     {
@@ -123,7 +126,7 @@ namespace eFMS.API.Catalogue.Infrastructure
                                 Description = "eFMS Catalogue API Document"
                             });
                     }
-                    //options.DocumentFilter<SwaggerAddEnumDescriptions>();
+                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
 
                     options.AddSecurityDefinition("oauth2", new OAuth2Scheme
                     {
@@ -131,7 +134,6 @@ namespace eFMS.API.Catalogue.Infrastructure
                         AuthorizationUrl = "",
                         Scopes = new Dictionary<string, string> { { "apimobile", "Catalogue API" } }
                     });
-                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
             return services;

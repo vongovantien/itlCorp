@@ -41,6 +41,10 @@ namespace eFMS.API.Catalogue.Controllers
             currentUser = user;
         }
 
+        /// <summary>
+        /// get all charge default
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("getAll")]
         public IActionResult Get()
@@ -49,6 +53,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// add new charge default
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("addNew")]
         [Authorize]
@@ -75,6 +84,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("update")]
         [Authorize]
@@ -101,6 +115,11 @@ namespace eFMS.API.Catalogue.Controllers
 
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
@@ -137,6 +156,11 @@ namespace eFMS.API.Catalogue.Controllers
             return message;
         }
 
+        /// <summary>
+        /// read charge default data from file excel 
+        /// </summary>
+        /// <param name="uploadedFile">file to read data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
         public IActionResult UploadFile(IFormFile uploadedFile)
@@ -200,6 +224,11 @@ namespace eFMS.API.Catalogue.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
+        /// <summary>
+        /// import list charge default into database
+        /// </summary>
+        /// <param name="data">list of data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("import")]
         //[Authorize]
@@ -215,6 +244,11 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
             }
         }
+
+        /// <summary>
+        /// download exel from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("downloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
@@ -239,7 +273,5 @@ namespace eFMS.API.Catalogue.Controllers
 
 
         }
-
-
     }
 }

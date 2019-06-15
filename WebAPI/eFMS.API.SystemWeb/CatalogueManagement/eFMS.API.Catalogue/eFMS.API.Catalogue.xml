@@ -23,11 +23,190 @@
         </member>
         <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatChargeCriteria,System.Int32,System.Int32)">
             <summary>
-            get the list of charges by criteria search
+            get and paging the list of charges by conditions
             </summary>
             <param name="criteria">search conditions</param>
             <param name="pageNumber">page to retrieve data</param>
             <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatChargeCriteria)">
+            <summary>
+            get the list of charges by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Get(System.Guid)">
+            <summary>
+            get charge by id
+            </summary>
+            <param name="id">id of data that need to retrieve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.All">
+            <summary>
+            get all charges
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Add(eFMS.API.Catalogue.DL.Models.CatChargeAddOrUpdateModel)">
+            <summary>
+            add a new charge
+            </summary>
+            <param name="model">object data to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Update(eFMS.API.Catalogue.DL.Models.CatChargeAddOrUpdateModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Delete(System.Guid)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read charge data from file excel 
+            </summary>
+            <param name="uploadedFile">file to read data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.Import(System.Collections.Generic.List{eFMS.API.Catalogue.DL.Models.CatChargeImportModel})">
+            <summary>
+            import list charge into database
+            </summary>
+            <param name="data">list of data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeController.DownloadExcel">
+            <summary>
+            download exel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeDefaultAccountController.Get">
+            <summary>
+            get all charge default
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeDefaultAccountController.Add(eFMS.API.Catalogue.DL.Models.CatChargeDefaultAccountModel)">
+            <summary>
+            add new charge default
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeDefaultAccountController.Update(eFMS.API.Catalogue.DL.Models.CatChargeDefaultAccountModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeDefaultAccountController.Delete(System.Int32)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id">id of data that need to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeDefaultAccountController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read charge default data from file excel 
+            </summary>
+            <param name="uploadedFile">file to read data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeDefaultAccountController.Import(System.Collections.Generic.List{eFMS.API.Catalogue.DL.Models.CatChargeDefaultAccountImportModel})">
+            <summary>
+            import list charge default into database
+            </summary>
+            <param name="data">list of data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatChargeDefaultAccountController.DownloadExcel">
+            <summary>
+            download exel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatCommodityGroupCriteria)">
+            <summary>
+            get the list of commodities by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatCommodityGroupCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of commodities by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="page">page to retrieve data</param>
+            <param name="size">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.GetByLanguage">
+            <summary>
+            get all commodities by current language
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Get(System.Int16)">
+            <summary>
+            get commodity by id
+            </summary>
+            <param name="id">id of data that need to retrieve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Post(eFMS.API.Catalogue.Models.CatCommodityGroupEditModel)">
+            <summary>
+            add new commodity
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Put(System.Int16,eFMS.API.Catalogue.Models.CatCommodityGroupEditModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="id">id of data that need to retrieve</param>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Delete(System.Int16)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id">id of data that need to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read commodity data from file excel
+            </summary>
+            <param name="uploadedFile">file to read data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Import(System.Collections.Generic.List{eFMS.API.Catalogue.DL.Models.CommodityGroupImportModel})">
+            <summary>
+            import list commodities into database
+            </summary>
+            <param name="data">list of data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.DownloadExcel">
+            <summary>
+            download exel from server
+            </summary>
             <returns></returns>
         </member>
     </members>

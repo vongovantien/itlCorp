@@ -42,6 +42,11 @@ namespace eFMS.API.Catalogue.Controllers
             currentUser = user;
         }
 
+        /// <summary>
+        /// get the list of commodities by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatCommodityGroupCriteria criteria)
@@ -50,6 +55,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get and paging the list of commodities by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatCommodityGroupCriteria criteria, int page, int size)
@@ -59,6 +71,10 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get all commodities by current language
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetByLanguage")]
         public IActionResult GetByLanguage()
@@ -67,6 +83,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get commodity by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(short id)
         {
@@ -74,6 +95,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// add new commodity
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         [Authorize]
@@ -99,6 +125,13 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
         public IActionResult Put(short id, CatCommodityGroupEditModel model)
@@ -126,6 +159,12 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult Delete(short id)
@@ -160,6 +199,11 @@ namespace eFMS.API.Catalogue.Controllers
             return message;
         }
 
+        /// <summary>
+        /// read commodity data from file excel
+        /// </summary>
+        /// <param name="uploadedFile">file to read data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
         public IActionResult UploadFile(IFormFile uploadedFile)
@@ -204,6 +248,11 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
 
+        /// <summary>
+        /// import list commodity groups into database
+        /// </summary>
+        /// <param name="data">list of data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("import")]
         [Authorize]
@@ -213,8 +262,12 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// download exel from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("downloadExcel")]
-        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        public async Task<ActionResult> DownloadExcel()
         {
 
             try

@@ -58,7 +58,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
-        /// get the list of charges by criteria search
+        /// get the list of charges by conditions
         /// </summary>
         /// <param name="criteria">search conditions</param>
         /// <returns></returns>
@@ -147,6 +147,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
@@ -183,6 +188,11 @@ namespace eFMS.API.Catalogue.Controllers
             return message;
         }
 
+        /// <summary>
+        /// read charge data from file excel 
+        /// </summary>
+        /// <param name="uploadedFile">file to read data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
         public IActionResult UploadFile(IFormFile uploadedFile)
@@ -261,6 +271,11 @@ namespace eFMS.API.Catalogue.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
+        /// <summary>
+        /// import list charge into database
+        /// </summary>
+        /// <param name="data">list of data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("import")]
         [Authorize]
@@ -276,15 +291,18 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
             }
         }
-
-
+        
+        /// <summary>
+        /// download exel from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("downloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
 
             try
             {
-                string templateName = "Charge" + Templates.ExelImportEx;
+                string templateName = Templates.CatCharge.ExelImportFileName + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {
@@ -299,15 +317,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
-
-
         }
-
-
-
-
-
-
-
     }
 }
