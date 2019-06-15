@@ -5,8 +5,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" 
-                data-target="#custom-clearance-create-modal" >
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/home/operation/custom-clearance-addnew">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -177,7 +176,7 @@
         <!--end::Form-->
     </div>
     <!--end:: m-portlets-->
-    <!--begin:: m-portlet of trucking-table-->
+    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="m--margin-bottom-15">
@@ -264,7 +263,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="javascript:void(0)" data-toggle="modal" data-target="#custom-clearance-edit-modal">123456789</a>
+                                <a href="javascript:void(0)"  routerLink="/home/operation/custom-clearnce-edit">123456789</a>
                             </td>
                             <td>
                                 <span>text</span>
@@ -307,7 +306,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="javascript:void(0)" data-toggle="modal" data-target="#custom-clearance-edit-modal">123456789</a>
+                                <a href="javascript:void(0)"  routerLink="/home/operation/custom-clearnce-edit">123456789</a>
                             </td>
                             <td>
                                 <span>text</span>
@@ -376,14 +375,6 @@
             <!--end::pagination-->
         </div>
     </div>
-    <!--end::  m-portlet of trucking-table-->
+    <!--end::  m-portlet-->
 </div>
 <!--end:: m-content-->
-
-<!--begin:: custom-clearance-create-modal -->
-<app-custom-clearance-addnew></app-custom-clearance-addnew>
-<!--end:: custom-clearance-create-modal-->
-
-<!--begin:: custom-clearance-edit-modal -->
-<app-custom-clearance-edit></app-custom-clearance-edit>
-<!--end:: custom-clearance-edit-modal-->
