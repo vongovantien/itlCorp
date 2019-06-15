@@ -11,7 +11,6 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +18,6 @@ using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using System.Linq;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Catalogue.Controllers
 {

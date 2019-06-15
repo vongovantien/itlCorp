@@ -658,6 +658,7 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var newList = new List<CatPlace>();
                 foreach (var item in data)
                 {
                     bool inactive = string.IsNullOrEmpty(item.Status) ? false : (item.Status.Trim().ToLower() == "inactive" ? true : false);
@@ -680,9 +681,20 @@ namespace eFMS.API.Catalogue.DL.Services
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId
                     };
-                    dc.CatPlace.Add(catPlace);
+                    newList.Add(catPlace);
                 }
+                dc.CatPlace.AddRange(newList);
                 dc.SaveChanges();
+                var lstPlaces = RedisCacheHelper.GetObject<List<CatPlace>>(cache, Templates.CatPlace.NameCaching.ListName);
+                if (lstPlaces.Count == 0)
+                {
+                    lstPlaces = dc.CatPlace.ToList();
+                }
+                else
+                {
+                    lstPlaces.AddRange(newList);
+                }
+                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, lstPlaces);
                 return new HandleState();
             }
             catch (Exception ex)

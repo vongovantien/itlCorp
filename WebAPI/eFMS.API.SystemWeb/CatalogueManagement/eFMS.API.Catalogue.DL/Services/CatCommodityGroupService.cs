@@ -184,7 +184,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         GroupNameEn = item.GroupNameEn,
                         GroupNameVn = item.GroupNameVn,
-                        Inactive = item.Status.ToLower() == "active" ? false : true,
+                        Inactive = item.Status.ToLower() != "active",
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID

@@ -2,6 +2,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\bin</OutputPath>
+    <DocumentationFile>eFMS.API.Catalogue.xml</DocumentationFile>
   </PropertyGroup>
 <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
